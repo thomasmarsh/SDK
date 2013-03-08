@@ -104,7 +104,6 @@ UIKIT_EXTERN NSString* const kAppBladeCacheDirectory;
 // Shows a feedback dialogue and handles screenshot
 - (void)showFeedbackDialogue;
 
-
 + (void)startSession;
 + (void)endSession;
 

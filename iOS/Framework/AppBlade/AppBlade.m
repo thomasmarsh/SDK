@@ -8,10 +8,10 @@
 
 #import "AppBlade.h"
 #import "AppBladeSimpleKeychain.h"
-#import "PLCrashReporter.h"
-#import "PLCrashReport.h"
+#import "AB_PLCrashReporter.h"
+#import "AB_PLCrashReport.h"
+#import "AB_PLCrashReportTextFormatter.h"
 #import "AppBladeWebClient.h"
-#import "PLCrashReportTextFormatter.h"
 #import "FeedbackDialogue.h"
 #import "asl.h"
 #import <QuartzCore/QuartzCore.h>
@@ -965,12 +965,20 @@ void post_crash_callback (siginfo_t *info, ucontext_t *uap, void *context) {
     return sessionClients > 0;
 }
 
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
 + (void)startSession
 {
     NSLog(@"Starting Session Logging");
     [[AppBlade sharedManager] logSessionStart];
 }
 
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
 + (void)endSession
 {
     NSLog(@"Ended Session Logging");
@@ -1002,7 +1010,11 @@ void post_crash_callback (siginfo_t *info, ucontext_t *uap, void *context) {
 
 - (void)logSessionEnd
 {
+<<<<<<< Updated upstream
     NSDictionary* sessionDict = [NSDictionary dictionaryWithObjectsAndKeys:self.sessionStartDate, @"started_at", [NSDate date], @"ended_at", nil];
+=======
+    NSDictionary* sessionDict = [NSDictionary dictionaryWithObjectsAndKeys:self.sessionStartDate, @"started_at", [NSDate date], @"ended_at", [self getCustomParams], @"custom_params", nil];
+>>>>>>> Stashed changes
     
     NSMutableArray* pastSessions = nil;
     NSString* sessionFilePath = [[AppBlade cachesDirectoryPath] stringByAppendingPathComponent:kAppBladeSessionFile];

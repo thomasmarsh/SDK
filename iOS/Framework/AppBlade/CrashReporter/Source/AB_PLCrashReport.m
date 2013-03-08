@@ -26,7 +26,7 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#import "PLCrashReport.h"
+#import "AB_PLCrashReport.h"
 #import "CrashReporter.h"
 
 #import "crash_report.pb-c.h"
