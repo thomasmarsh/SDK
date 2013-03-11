@@ -27,7 +27,7 @@
  */
 
 
-#import "PLCrashFrameWalker.h"
+#import "AB_PLCrashFrameWalker.h"
 
 
 /**

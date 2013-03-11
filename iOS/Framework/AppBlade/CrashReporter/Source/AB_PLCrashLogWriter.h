@@ -29,8 +29,8 @@
 #import <TargetConditionals.h>
 #import <Foundation/Foundation.h>
 
-#import "PLCrashAsync.h"
-#import "PLCrashAsyncImage.h"
+#import "AB_PLCrashAsync.h"
+#import "AB_PLCrashAsyncImage.h"
 
 /**
  * @internal

@@ -1,7 +1,7 @@
 /*
  * Author: Landon Fuller <landonf@plausiblelabs.com>
  *
- * Copyright (c) 2008-2010 Plausible Labs Cooperative, Inc.
+ * Copyright (c) 2008-2009 Plausible Labs Cooperative, Inc.
  * All rights reserved.
  *
  * Permission is hereby granted, free of charge, to any person
@@ -26,26 +26,41 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#import <Foundation/Foundation.h>
-
-#import "PLCrashReport.h"
+#import "AB_PLCrashReportApplicationInfo.h"
 
 /**
- * A crash report formatter accepts a PLCrashReport instance, formats it according to implementation-specified rules,
- * (such as implementing text output support), and returns the result.
+ * Crash log application data.
+ *
+ * Provides the application identifier and version of the crashed
+ * application.
  */
-@protocol PLCrashReportFormatter
+@implementation PLCrashReportApplicationInfo
 
 /**
- * Format the provided @a report.
+ * Initialize with the provided application identifier and version.
  *
- * @param report Report to be formatted.
- * @param outError A pointer to an NSError object variable. If an error occurs, this pointer will contain an error
- * object indicating why the pending crash report could not be formatted. If no error occurs, this parameter will
- * be left unmodified. You may specify nil for this parameter, and no error information will be provided.
- *
- * @return Returns the formatted report data on success, or nil on failure.
+ * @param applicationIdentifier Application identifier. This is usually the CFBundleIdentifier value.
+ * @param applicationVersion Application version. This is usually the CFBundleVersion value.
  */
-- (NSData *) formatReport: (PLCrashReport *) report error: (NSError **) outError;
+- (id) initWithApplicationIdentifier: (NSString *) applicationIdentifier 
+                  applicationVersion: (NSString *) applicationVersion
+{
+    if ((self = [super init]) == nil)
+        return nil;
+
+    _applicationIdentifier = [applicationIdentifier retain];
+    _applicationVersion = [applicationVersion retain];
+
+    return self;
+}
+
+- (void) dealloc {
+    [_applicationIdentifier release];
+    [_applicationVersion release];
+    [super dealloc];
+}
+
+@synthesize applicationIdentifier = _applicationIdentifier;
+@synthesize applicationVersion = _applicationVersion;
 
 @end

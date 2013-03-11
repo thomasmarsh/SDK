@@ -26,12 +26,12 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#import "PLCrashReporter.h"
+#import "AB_PLCrashReporter.h"
 #import "CrashReporter.h"
-#import "PLCrashSignalHandler.h"
+#import "AB_PLCrashSignalHandler.h"
 
-#import "PLCrashAsync.h"
-#import "PLCrashLogWriter.h"
+#import "AB_PLCrashAsync.h"
+#import "AB_PLCrashLogWriter.h"
 
 #import <fcntl.h>
 #import <mach-o/dyld.h>

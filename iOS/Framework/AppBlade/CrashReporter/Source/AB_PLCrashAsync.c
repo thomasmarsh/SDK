@@ -26,7 +26,7 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#import "PLCrashAsync.h"
+#import "AB_PLCrashAsync.h"
 
 #import <stdint.h>
 #import <errno.h>

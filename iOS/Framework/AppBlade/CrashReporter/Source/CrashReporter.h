@@ -32,9 +32,9 @@
 #import <AvailabilityMacros.h>
 #endif
 
-#import "PLCrashReporter.h"
-#import "PLCrashReport.h"
-#import "PLCrashReportTextFormatter.h"
+#import "AB_PLCrashReporter.h"
+#import "AB_PLCrashReport.h"
+#import "AB_PLCrashReportTextFormatter.h"
 
 /**
  * @defgroup functions Crash Reporter Functions Reference
@@ -93,9 +93,9 @@ typedef enum {
 
 
 /* Library Imports */
-#import "PLCrashReporter.h"
-#import "PLCrashReport.h"
-#import "PLCrashReportTextFormatter.h"
+#import "AB_PLCrashReporter.h"
+#import "AB_PLCrashReport.h"
+#import "AB_PLCrashReportTextFormatter.h"
 
 /**
  * @mainpage Plausible Crash Reporter

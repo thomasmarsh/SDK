@@ -1,7 +1,7 @@
 /*
  * Author: Landon Fuller <landonf@plausiblelabs.com>
  *
- * Copyright (c) 2008-2009 Plausible Labs Cooperative, Inc.
+ * Copyright (c) 2008-2010 Plausible Labs Cooperative, Inc.
  * All rights reserved.
  *
  * Permission is hereby granted, free of charge, to any person
@@ -26,41 +26,26 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#import "PLCrashReportApplicationInfo.h"
+#import <Foundation/Foundation.h>
+
+#import "AB_PLCrashReport.h"
 
 /**
- * Crash log application data.
- *
- * Provides the application identifier and version of the crashed
- * application.
+ * A crash report formatter accepts a PLCrashReport instance, formats it according to implementation-specified rules,
+ * (such as implementing text output support), and returns the result.
  */
-@implementation PLCrashReportApplicationInfo
+@protocol PLCrashReportFormatter
 
 /**
- * Initialize with the provided application identifier and version.
+ * Format the provided @a report.
  *
- * @param applicationIdentifier Application identifier. This is usually the CFBundleIdentifier value.
- * @param applicationVersion Application version. This is usually the CFBundleVersion value.
+ * @param report Report to be formatted.
+ * @param outError A pointer to an NSError object variable. If an error occurs, this pointer will contain an error
+ * object indicating why the pending crash report could not be formatted. If no error occurs, this parameter will
+ * be left unmodified. You may specify nil for this parameter, and no error information will be provided.
+ *
+ * @return Returns the formatted report data on success, or nil on failure.
  */
-- (id) initWithApplicationIdentifier: (NSString *) applicationIdentifier 
-                  applicationVersion: (NSString *) applicationVersion
-{
-    if ((self = [super init]) == nil)
-        return nil;
-
-    _applicationIdentifier = [applicationIdentifier retain];
-    _applicationVersion = [applicationVersion retain];
-
-    return self;
-}
-
-- (void) dealloc {
-    [_applicationIdentifier release];
-    [_applicationVersion release];
-    [super dealloc];
-}
-
-@synthesize applicationIdentifier = _applicationIdentifier;
-@synthesize applicationVersion = _applicationVersion;
+- (NSData *) formatReport: (PLCrashReport *) report error: (NSError **) outError;
 
 @end

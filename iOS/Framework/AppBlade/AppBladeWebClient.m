@@ -7,7 +7,7 @@
 //
 
 #import "AppBladeWebClient.h"
-#import "PLCrashReporter.h"
+#import "AB_PLCrashReporter.h"
 
 #import "AppBlade.h"
 #import <CommonCrypto/CommonHMAC.h>

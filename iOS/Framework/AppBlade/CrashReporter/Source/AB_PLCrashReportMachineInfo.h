@@ -28,7 +28,7 @@
 
 #import <Foundation/Foundation.h>
 
-#import "PLCrashReportProcessorInfo.h"
+#import "AB_PLCrashReportProcessorInfo.h"
 
 @interface PLCrashReportMachineInfo : NSObject {
 @private

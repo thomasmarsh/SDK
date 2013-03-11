@@ -25,7 +25,7 @@
 #import <string.h>
 #import <stdlib.h>
 
-#include "PLCrashLogWriterEncoding.h"
+#include "AB_PLCrashLogWriterEncoding.h"
 
 #define MAX_UINT64_ENCODED_SIZE 10
 

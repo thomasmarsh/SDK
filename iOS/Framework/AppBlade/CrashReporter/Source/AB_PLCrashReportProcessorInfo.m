@@ -26,7 +26,7 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#import "PLCrashReportProcessorInfo.h"
+#import "AB_PLCrashReportProcessorInfo.h"
 
 /**
  * Crash log processor record.

@@ -965,20 +965,12 @@ void post_crash_callback (siginfo_t *info, ucontext_t *uap, void *context) {
     return sessionClients > 0;
 }
 
-<<<<<<< Updated upstream
-=======
-
->>>>>>> Stashed changes
 + (void)startSession
 {
     NSLog(@"Starting Session Logging");
     [[AppBlade sharedManager] logSessionStart];
 }
 
-<<<<<<< Updated upstream
-=======
-
->>>>>>> Stashed changes
 + (void)endSession
 {
     NSLog(@"Ended Session Logging");
@@ -1010,12 +1002,7 @@ void post_crash_callback (siginfo_t *info, ucontext_t *uap, void *context) {
 
 - (void)logSessionEnd
 {
-<<<<<<< Updated upstream
-    NSDictionary* sessionDict = [NSDictionary dictionaryWithObjectsAndKeys:self.sessionStartDate, @"started_at", [NSDate date], @"ended_at", nil];
-=======
     NSDictionary* sessionDict = [NSDictionary dictionaryWithObjectsAndKeys:self.sessionStartDate, @"started_at", [NSDate date], @"ended_at", [self getCustomParams], @"custom_params", nil];
->>>>>>> Stashed changes
-    
     NSMutableArray* pastSessions = nil;
     NSString* sessionFilePath = [[AppBlade cachesDirectoryPath] stringByAppendingPathComponent:kAppBladeSessionFile];
     if ([[NSFileManager defaultManager] fileExistsAtPath:sessionFilePath]) {

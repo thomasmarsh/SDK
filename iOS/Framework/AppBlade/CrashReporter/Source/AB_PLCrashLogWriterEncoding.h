@@ -14,7 +14,7 @@
  * under the License.
  */
 
-#import "PLCrashAsync.h"
+#import "AB_PLCrashAsync.h"
 
 typedef enum {
         PLPROTOBUF_C_TYPE_INT32,

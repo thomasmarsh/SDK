@@ -26,7 +26,7 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#import "PLCrashReportExceptionInfo.h"
+#import "AB_PLCrashReportExceptionInfo.h"
 
 /**
  * If a crash is triggered by an uncaught Objective-C exception, the exception name and reason will be made available.

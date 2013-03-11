@@ -26,8 +26,8 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#import "PLCrashFrameWalker.h"
-#import "PLCrashAsync.h"
+#import "AB_PLCrashFrameWalker.h"
+#import "AB_PLCrashAsync.h"
 
 #import <signal.h>
 #import <assert.h>

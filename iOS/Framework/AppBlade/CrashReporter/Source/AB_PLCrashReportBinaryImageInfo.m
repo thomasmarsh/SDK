@@ -26,7 +26,7 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#import "PLCrashReportBinaryImageInfo.h"
+#import "AB_PLCrashReportBinaryImageInfo.h"
 
 /**
  * Crash Log binary image info. Represents an executable or shared library.

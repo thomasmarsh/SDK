@@ -26,7 +26,7 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#import "PLCrashReportSystemInfo.h"
+#import "AB_PLCrashReportSystemInfo.h"
 
 /**
  * @ingroup constants

@@ -27,9 +27,9 @@
  */
 
 #import "CrashReporter.h"
-#import "PLCrashAsync.h"
-#import "PLCrashSignalHandler.h"
-#import "PLCrashFrameWalker.h"
+#import "AB_PLCrashAsync.h"
+#import "AB_PLCrashSignalHandler.h"
+#import "AB_PLCrashFrameWalker.h"
 
 #import <signal.h>
 #import <unistd.h>

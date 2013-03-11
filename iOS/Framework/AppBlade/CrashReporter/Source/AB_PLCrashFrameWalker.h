@@ -81,10 +81,10 @@ typedef enum  {
 /** Register number type */
 typedef int plframe_regnum_t;
 
-#import "PLCrashFrameWalker_x86_64.h"
-#import "PLCrashFrameWalker_i386.h"
-#import "PLCrashFrameWalker_arm.h"
-#import "PLCrashFrameWalker_ppc.h"
+#import "AB_PLCrashFrameWalker_x86_64.h"
+#import "AB_PLCrashFrameWalker_i386.h"
+#import "AB_PLCrashFrameWalker_arm.h"
+#import "AB_PLCrashFrameWalker_ppc.h"
 
 /** Platform-specific length of stack to be read when iterating frames */
 #define PLFRAME_STACKFRAME_LEN PLFRAME_PDEF_STACKFRAME_LEN

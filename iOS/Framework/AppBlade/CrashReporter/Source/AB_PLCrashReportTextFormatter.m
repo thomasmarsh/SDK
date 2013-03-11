@@ -31,7 +31,7 @@
 
 #import "CrashReporter.h"
 
-#import "PLCrashReportTextFormatter.h"
+#import "AB_PLCrashReportTextFormatter.h"
 
 
 @interface PLCrashReportTextFormatter (PrivateAPI)

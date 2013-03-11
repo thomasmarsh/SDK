@@ -26,7 +26,7 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#import "PLCrashReportMachineInfo.h"
+#import "AB_PLCrashReportMachineInfo.h"
 
 /**
  * Crash log host architecture information.

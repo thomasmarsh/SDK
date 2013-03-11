@@ -26,7 +26,7 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include "PLCrashAsyncSignalInfo.h"
+#include "AB_PLCrashAsyncSignalInfo.h"
 
 #import <unistd.h>
 #import <signal.h>

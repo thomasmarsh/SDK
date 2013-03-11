@@ -26,8 +26,8 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include "PLCrashAsync.h"
-#include "PLCrashAsyncImage.h"
+#include "AB_PLCrashAsync.h"
+#include "AB_PLCrashAsyncImage.h"
 
 #include <stdlib.h>
 #include <string.h>

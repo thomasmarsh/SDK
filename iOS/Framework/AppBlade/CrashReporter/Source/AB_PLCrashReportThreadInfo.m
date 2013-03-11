@@ -26,7 +26,7 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#import "PLCrashReportThreadInfo.h"
+#import "AB_PLCrashReportThreadInfo.h"
 
 /**
  * Crash log per-thread state information.

@@ -40,14 +40,14 @@
 
 #import <libkern/OSAtomic.h>
 
-#import "PLCrashReport.h"
-#import "PLCrashLogWriter.h"
-#import "PLCrashLogWriterEncoding.h"
-#import "PLCrashAsync.h"
-#import "PLCrashAsyncSignalInfo.h"
-#import "PLCrashFrameWalker.h"
+#import "AB_PLCrashReport.h"
+#import "AB_PLCrashLogWriter.h"
+#import "AB_PLCrashLogWriterEncoding.h"
+#import "AB_PLCrashAsync.h"
+#import "AB_PLCrashAsyncSignalInfo.h"
+#import "AB_PLCrashFrameWalker.h"
 
-#import "PLCrashSysctl.h"
+#import "AB_PLCrashSysctl.h"
 
 #if TARGET_OS_IPHONE
 #import <UIKit/UIKit.h> // For UIDevice

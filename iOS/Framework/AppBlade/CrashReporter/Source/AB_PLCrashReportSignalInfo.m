@@ -26,7 +26,7 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#import "PLCrashReportSignalInfo.h"
+#import "AB_PLCrashReportSignalInfo.h"
 
 
 /**
