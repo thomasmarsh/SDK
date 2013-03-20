@@ -29,6 +29,8 @@ protected:
     ~TouchClassifier() {}
     
 public:
+    virtual bool HandlesPenInput() = 0;
+    
     virtual void TouchesBegan(const fiftythree::common::TouchesSet & touches) = 0;
     virtual void TouchesMoved(const fiftythree::common::TouchesSet & touches) = 0;
     virtual void TouchesEnded(const fiftythree::common::TouchesSet & touches) = 0;

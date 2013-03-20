@@ -36,6 +36,11 @@ public:
 //        DebugAssert(_Classifiers.size());
     };
     
+    virtual bool HandlesPenInput()
+    {
+        return true;
+    }
+    
     virtual void TouchesBegan(const fiftythree::common::TouchesSet & touches)
     {
         BOOST_FOREACH(const TouchClassifier::Ptr & classifier, _Classifiers)

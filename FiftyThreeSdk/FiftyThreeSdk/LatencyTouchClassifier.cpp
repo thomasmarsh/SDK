@@ -17,6 +17,11 @@ class LatencyTouchClassifierImpl : public LatencyTouchClassifier
 public:
     LatencyTouchClassifierImpl() {};
     
+    virtual bool HandlesPenInput()
+    {
+        return true;
+    }
+    
     virtual void TouchesBegan(const fiftythree::common::TouchesSet & touches) {}
     virtual void TouchesMoved(const fiftythree::common::TouchesSet & touches) {}
     virtual void TouchesEnded(const fiftythree::common::TouchesSet & touches) {}
