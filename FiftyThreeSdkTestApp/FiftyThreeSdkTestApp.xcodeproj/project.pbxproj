@@ -1,0 +1,639 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		6632313C16F8B1CA008AD3DC /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6632313B16F8B1CA008AD3DC /* MobileCoreServices.framework */; };
+		6632313E16F8B213008AD3DC /* boost.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6644317416F7FC680049E570 /* boost.framework */; };
+		6632314016F8B9F2008AD3DC /* libT1PogoManager.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6632313F16F8B9F2008AD3DC /* libT1PogoManager.a */; };
+		6632314116F8B9FD008AD3DC /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6644317B16F7FE2E0049E570 /* AVFoundation.framework */; };
+		6644311416F3C8390049E570 /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6644311316F3C8390049E570 /* SenTestingKit.framework */; };
+		6644311516F3C8390049E570 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 66A47BF316D835C90016B31C /* UIKit.framework */; };
+		6644311616F3C8390049E570 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 66A47BF516D835C90016B31C /* Foundation.framework */; };
+		6644311C16F3C8390049E570 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6644311A16F3C8390049E570 /* InfoPlist.strings */; };
+		6644312B16F3C86C0049E570 /* FiftyThreeSdkTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 6644312716F3C86C0049E570 /* FiftyThreeSdkTests.m */; };
+		6644313416F3CC2C0049E570 /* SenAsyncTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 6644313316F3CC2C0049E570 /* SenAsyncTestCase.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		6644315216F3D1640049E570 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 6644313716F3D1640049E570 /* AppDelegate.m */; };
+		6644315316F3D1640049E570 /* BTLECentralViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6644313916F3D1640049E570 /* BTLECentralViewController.m */; };
+		6644315416F3D1640049E570 /* BTLEPeripheralViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 6644313B16F3D1640049E570 /* BTLEPeripheralViewController.mm */; };
+		6644315516F3D1640049E570 /* charcoal.img in Resources */ = {isa = PBXBuildFile; fileRef = 6644313F16F3D1640049E570 /* charcoal.img */; };
+		6644315616F3D1640049E570 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 6644314016F3D1640049E570 /* Default-568h@2x.png */; };
+		6644315716F3D1640049E570 /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = 6644314116F3D1640049E570 /* Default.png */; };
+		6644315816F3D1640049E570 /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 6644314216F3D1640049E570 /* Default@2x.png */; };
+		6644315B16F3D1640049E570 /* FTConnectLatencyTester.m in Sources */ = {isa = PBXBuildFile; fileRef = 6644314916F3D1640049E570 /* FTConnectLatencyTester.m */; };
+		6644315C16F3D1640049E570 /* FTPenService.m in Sources */ = {isa = PBXBuildFile; fileRef = 6644314B16F3D1640049E570 /* FTPenService.m */; };
+		6644315D16F3D1640049E570 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 6644314D16F3D1640049E570 /* main.m */; };
+		6644315E16F3D1640049E570 /* MainStoryboard_iPad.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6644314E16F3D1640049E570 /* MainStoryboard_iPad.storyboard */; };
+		6644315F16F3D1640049E570 /* MainStoryboard_iPhone.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6644314F16F3D1640049E570 /* MainStoryboard_iPhone.storyboard */; };
+		6644316016F3D1640049E570 /* TiUpdateService.m in Sources */ = {isa = PBXBuildFile; fileRef = 6644315116F3D1640049E570 /* TiUpdateService.m */; };
+		6644316916F3D24B0049E570 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6644316716F3D24B0049E570 /* InfoPlist.strings */; };
+		6644316A16F3D2E80049E570 /* libFiftyThreeSdk.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6644316616F3D1B60049E570 /* libFiftyThreeSdk.a */; };
+		6644317816F7FDD30049E570 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 6644317716F7FDD30049E570 /* libz.dylib */; };
+		6644317A16F7FE190049E570 /* CoreText.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6644317916F7FE190049E570 /* CoreText.framework */; };
+		6644318016F7FE570049E570 /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6644317F16F7FE570049E570 /* OpenGLES.framework */; };
+		6644318216F7FF260049E570 /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 6644318116F7FF260049E570 /* libsqlite3.dylib */; };
+		6644318416F7FF560049E570 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6644318316F7FF560049E570 /* Security.framework */; };
+		6644318A16F7FFE30049E570 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6644318916F7FFE30049E570 /* CoreData.framework */; };
+		6644319916F8047E0049E570 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6644319816F8047E0049E570 /* SystemConfiguration.framework */; };
+		6644319B16F804B20049E570 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6644319A16F804B20049E570 /* QuartzCore.framework */; };
+		6644319D16F804BE0049E570 /* libAFNetworking.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6644319C16F804BE0049E570 /* libAFNetworking.a */; };
+		66A47BF416D835C90016B31C /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 66A47BF316D835C90016B31C /* UIKit.framework */; };
+		66A47BF616D835C90016B31C /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 66A47BF516D835C90016B31C /* Foundation.framework */; };
+		66A47BF816D835C90016B31C /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 66A47BF716D835C90016B31C /* CoreGraphics.framework */; };
+		66A47C1B16D843250016B31C /* CoreBluetooth.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 66A47C1A16D843250016B31C /* CoreBluetooth.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		6644316516F3D1B60049E570 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 6644316116F3D1B50049E570 /* FiftyThreeSdk.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 66A8387116E52D840048FFE4;
+			remoteInfo = FiftyThreeSdk;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		6632313B16F8B1CA008AD3DC /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
+		6632313F16F8B9F2008AD3DC /* libT1PogoManager.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libT1PogoManager.a; path = ../../ThirdParty/PogoConnect/libT1PogoManager.a; sourceTree = "<group>"; };
+		6644311216F3C8390049E570 /* FiftyThreeSdkTests.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FiftyThreeSdkTests.octest; sourceTree = BUILT_PRODUCTS_DIR; };
+		6644311316F3C8390049E570 /* SenTestingKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SenTestingKit.framework; path = Library/Frameworks/SenTestingKit.framework; sourceTree = DEVELOPER_DIR; };
+		6644311916F3C8390049E570 /* FiftyThreeSdkTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "FiftyThreeSdkTests-Info.plist"; sourceTree = "<group>"; };
+		6644311B16F3C8390049E570 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		6644312016F3C8390049E570 /* FiftyThreeSdkTests-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "FiftyThreeSdkTests-Prefix.pch"; sourceTree = "<group>"; };
+		6644312616F3C86C0049E570 /* FiftyThreeSdkTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FiftyThreeSdkTests.h; sourceTree = "<group>"; };
+		6644312716F3C86C0049E570 /* FiftyThreeSdkTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FiftyThreeSdkTests.m; sourceTree = "<group>"; };
+		6644313216F3CC2C0049E570 /* SenAsyncTestCase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SenAsyncTestCase.h; sourceTree = "<group>"; };
+		6644313316F3CC2C0049E570 /* SenAsyncTestCase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SenAsyncTestCase.m; sourceTree = "<group>"; };
+		6644313616F3D1640049E570 /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = FiftyThreeSdkTestApp/AppDelegate.h; sourceTree = SOURCE_ROOT; };
+		6644313716F3D1640049E570 /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = FiftyThreeSdkTestApp/AppDelegate.m; sourceTree = SOURCE_ROOT; };
+		6644313816F3D1640049E570 /* BTLECentralViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BTLECentralViewController.h; path = FiftyThreeSdkTestApp/BTLECentralViewController.h; sourceTree = SOURCE_ROOT; };
+		6644313916F3D1640049E570 /* BTLECentralViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BTLECentralViewController.m; path = FiftyThreeSdkTestApp/BTLECentralViewController.m; sourceTree = SOURCE_ROOT; };
+		6644313A16F3D1640049E570 /* BTLEPeripheralViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BTLEPeripheralViewController.h; path = FiftyThreeSdkTestApp/BTLEPeripheralViewController.h; sourceTree = SOURCE_ROOT; };
+		6644313B16F3D1640049E570 /* BTLEPeripheralViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = BTLEPeripheralViewController.mm; path = FiftyThreeSdkTestApp/BTLEPeripheralViewController.mm; sourceTree = SOURCE_ROOT; };
+		6644313F16F3D1640049E570 /* charcoal.img */ = {isa = PBXFileReference; lastKnownFileType = file; name = charcoal.img; path = FiftyThreeSdkTestApp/charcoal.img; sourceTree = SOURCE_ROOT; };
+		6644314016F3D1640049E570 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Default-568h@2x.png"; path = "FiftyThreeSdkTestApp/Default-568h@2x.png"; sourceTree = SOURCE_ROOT; };
+		6644314116F3D1640049E570 /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Default.png; path = FiftyThreeSdkTestApp/Default.png; sourceTree = SOURCE_ROOT; };
+		6644314216F3D1640049E570 /* Default@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Default@2x.png"; path = "FiftyThreeSdkTestApp/Default@2x.png"; sourceTree = SOURCE_ROOT; };
+		6644314616F3D1640049E570 /* FiftyThreeSdkTestApp-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "FiftyThreeSdkTestApp-Info.plist"; path = "FiftyThreeSdkTestApp/FiftyThreeSdkTestApp-Info.plist"; sourceTree = SOURCE_ROOT; };
+		6644314716F3D1640049E570 /* FiftyThreeSdkTestApp-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "FiftyThreeSdkTestApp-Prefix.pch"; path = "FiftyThreeSdkTestApp/FiftyThreeSdkTestApp-Prefix.pch"; sourceTree = SOURCE_ROOT; };
+		6644314816F3D1640049E570 /* FTConnectLatencyTester.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FTConnectLatencyTester.h; path = FiftyThreeSdkTestApp/FTConnectLatencyTester.h; sourceTree = SOURCE_ROOT; };
+		6644314916F3D1640049E570 /* FTConnectLatencyTester.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FTConnectLatencyTester.m; path = FiftyThreeSdkTestApp/FTConnectLatencyTester.m; sourceTree = SOURCE_ROOT; };
+		6644314A16F3D1640049E570 /* FTPenService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FTPenService.h; path = FiftyThreeSdkTestApp/FTPenService.h; sourceTree = SOURCE_ROOT; };
+		6644314B16F3D1640049E570 /* FTPenService.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FTPenService.m; path = FiftyThreeSdkTestApp/FTPenService.m; sourceTree = SOURCE_ROOT; };
+		6644314C16F3D1640049E570 /* FTPenServiceUUID.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FTPenServiceUUID.h; path = FiftyThreeSdkTestApp/FTPenServiceUUID.h; sourceTree = SOURCE_ROOT; };
+		6644314D16F3D1640049E570 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = FiftyThreeSdkTestApp/main.m; sourceTree = SOURCE_ROOT; };
+		6644314E16F3D1640049E570 /* MainStoryboard_iPad.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = MainStoryboard_iPad.storyboard; path = FiftyThreeSdkTestApp/MainStoryboard_iPad.storyboard; sourceTree = SOURCE_ROOT; };
+		6644314F16F3D1640049E570 /* MainStoryboard_iPhone.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = MainStoryboard_iPhone.storyboard; path = FiftyThreeSdkTestApp/MainStoryboard_iPhone.storyboard; sourceTree = SOURCE_ROOT; };
+		6644315016F3D1640049E570 /* TiUpdateService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TiUpdateService.h; path = FiftyThreeSdkTestApp/TiUpdateService.h; sourceTree = SOURCE_ROOT; };
+		6644315116F3D1640049E570 /* TiUpdateService.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TiUpdateService.m; path = FiftyThreeSdkTestApp/TiUpdateService.m; sourceTree = SOURCE_ROOT; };
+		6644316116F3D1B50049E570 /* FiftyThreeSdk.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = FiftyThreeSdk.xcodeproj; path = ../FiftyThreeSdk/FiftyThreeSdk.xcodeproj; sourceTree = "<group>"; };
+		6644316816F3D24B0049E570 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = FiftyThreeSdkTestApp/en.lproj/InfoPlist.strings; sourceTree = SOURCE_ROOT; };
+		6644316D16F7F7B70049E570 /* libCommon.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libCommon.a; path = "../../../../../../Library/Developer/Xcode/DerivedData/Paper-fojnnwufckzdqwfidwyifzefweko/Build/Products/Debug-iphoneos/libCommon.a"; sourceTree = "<group>"; };
+		6644317416F7FC680049E570 /* boost.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = boost.framework; path = ../../ThirdParty/boost/framework/boost.framework; sourceTree = "<group>"; };
+		6644317716F7FDD30049E570 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
+		6644317916F7FE190049E570 /* CoreText.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreText.framework; path = System/Library/Frameworks/CoreText.framework; sourceTree = SDKROOT; };
+		6644317B16F7FE2E0049E570 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
+		6644317F16F7FE570049E570 /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
+		6644318116F7FF260049E570 /* libsqlite3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.dylib; path = usr/lib/libsqlite3.dylib; sourceTree = SDKROOT; };
+		6644318316F7FF560049E570 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
+		6644318516F7FF620049E570 /* libCanvas.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libCanvas.a; path = "../../../../../../Library/Developer/Xcode/DerivedData/Paper-fojnnwufckzdqwfidwyifzefweko/Build/Products/Debug-iphoneos/libCanvas.a"; sourceTree = "<group>"; };
+		6644318916F7FFE30049E570 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
+		6644319616F802C80049E570 /* CoreVideo.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreVideo.framework; path = System/Library/Frameworks/CoreVideo.framework; sourceTree = SDKROOT; };
+		6644319816F8047E0049E570 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
+		6644319A16F804B20049E570 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		6644319C16F804BE0049E570 /* libAFNetworking.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libAFNetworking.a; path = "../../AFNetworking/build/Release-iphoneos/libAFNetworking.a"; sourceTree = "<group>"; };
+		66A47BF016D835C90016B31C /* FiftyThreeSdkTestApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FiftyThreeSdkTestApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		66A47BF316D835C90016B31C /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		66A47BF516D835C90016B31C /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		66A47BF716D835C90016B31C /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		66A47C1A16D843250016B31C /* CoreBluetooth.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreBluetooth.framework; path = System/Library/Frameworks/CoreBluetooth.framework; sourceTree = SDKROOT; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		6644310E16F3C8390049E570 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6644311416F3C8390049E570 /* SenTestingKit.framework in Frameworks */,
+				6644311516F3C8390049E570 /* UIKit.framework in Frameworks */,
+				6644311616F3C8390049E570 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		66A47BED16D835C90016B31C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6632314116F8B9FD008AD3DC /* AVFoundation.framework in Frameworks */,
+				6632314016F8B9F2008AD3DC /* libT1PogoManager.a in Frameworks */,
+				6632313E16F8B213008AD3DC /* boost.framework in Frameworks */,
+				6632313C16F8B1CA008AD3DC /* MobileCoreServices.framework in Frameworks */,
+				6644319D16F804BE0049E570 /* libAFNetworking.a in Frameworks */,
+				6644319B16F804B20049E570 /* QuartzCore.framework in Frameworks */,
+				6644319916F8047E0049E570 /* SystemConfiguration.framework in Frameworks */,
+				6644318A16F7FFE30049E570 /* CoreData.framework in Frameworks */,
+				6644318416F7FF560049E570 /* Security.framework in Frameworks */,
+				6644318216F7FF260049E570 /* libsqlite3.dylib in Frameworks */,
+				6644318016F7FE570049E570 /* OpenGLES.framework in Frameworks */,
+				6644317A16F7FE190049E570 /* CoreText.framework in Frameworks */,
+				6644317816F7FDD30049E570 /* libz.dylib in Frameworks */,
+				6644316A16F3D2E80049E570 /* libFiftyThreeSdk.a in Frameworks */,
+				66A47C1B16D843250016B31C /* CoreBluetooth.framework in Frameworks */,
+				66A47BF416D835C90016B31C /* UIKit.framework in Frameworks */,
+				66A47BF616D835C90016B31C /* Foundation.framework in Frameworks */,
+				66A47BF816D835C90016B31C /* CoreGraphics.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		6644311716F3C8390049E570 /* FiftyThreeSdkTests */ = {
+			isa = PBXGroup;
+			children = (
+				6644313216F3CC2C0049E570 /* SenAsyncTestCase.h */,
+				6644313316F3CC2C0049E570 /* SenAsyncTestCase.m */,
+				6644312616F3C86C0049E570 /* FiftyThreeSdkTests.h */,
+				6644312716F3C86C0049E570 /* FiftyThreeSdkTests.m */,
+				6644311816F3C8390049E570 /* Supporting Files */,
+			);
+			path = FiftyThreeSdkTests;
+			sourceTree = "<group>";
+		};
+		6644311816F3C8390049E570 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				6644311916F3C8390049E570 /* FiftyThreeSdkTests-Info.plist */,
+				6644311A16F3C8390049E570 /* InfoPlist.strings */,
+				6644312016F3C8390049E570 /* FiftyThreeSdkTests-Prefix.pch */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		6644316216F3D1B50049E570 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				6644316616F3D1B60049E570 /* libFiftyThreeSdk.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		66A47BE716D835C90016B31C = {
+			isa = PBXGroup;
+			children = (
+				6644316116F3D1B50049E570 /* FiftyThreeSdk.xcodeproj */,
+				66A47BF916D835C90016B31C /* FiftyThreeSdkTestApp */,
+				6644311716F3C8390049E570 /* FiftyThreeSdkTests */,
+				66A47BF216D835C90016B31C /* Frameworks */,
+				66A47BF116D835C90016B31C /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		66A47BF116D835C90016B31C /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				66A47BF016D835C90016B31C /* FiftyThreeSdkTestApp.app */,
+				6644311216F3C8390049E570 /* FiftyThreeSdkTests.octest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		66A47BF216D835C90016B31C /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				6644319C16F804BE0049E570 /* libAFNetworking.a */,
+				6644318516F7FF620049E570 /* libCanvas.a */,
+				6644316D16F7F7B70049E570 /* libCommon.a */,
+				6632313F16F8B9F2008AD3DC /* libT1PogoManager.a */,
+				6644318116F7FF260049E570 /* libsqlite3.dylib */,
+				6644317716F7FDD30049E570 /* libz.dylib */,
+				6644317B16F7FE2E0049E570 /* AVFoundation.framework */,
+				6644317416F7FC680049E570 /* boost.framework */,
+				66A47C1A16D843250016B31C /* CoreBluetooth.framework */,
+				6644318916F7FFE30049E570 /* CoreData.framework */,
+				66A47BF716D835C90016B31C /* CoreGraphics.framework */,
+				6644317916F7FE190049E570 /* CoreText.framework */,
+				6644319616F802C80049E570 /* CoreVideo.framework */,
+				66A47BF516D835C90016B31C /* Foundation.framework */,
+				6632313B16F8B1CA008AD3DC /* MobileCoreServices.framework */,
+				6644317F16F7FE570049E570 /* OpenGLES.framework */,
+				6644319A16F804B20049E570 /* QuartzCore.framework */,
+				6644318316F7FF560049E570 /* Security.framework */,
+				6644311316F3C8390049E570 /* SenTestingKit.framework */,
+				6644319816F8047E0049E570 /* SystemConfiguration.framework */,
+				66A47BF316D835C90016B31C /* UIKit.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		66A47BF916D835C90016B31C /* FiftyThreeSdkTestApp */ = {
+			isa = PBXGroup;
+			children = (
+				6644313616F3D1640049E570 /* AppDelegate.h */,
+				6644313716F3D1640049E570 /* AppDelegate.m */,
+				6644313816F3D1640049E570 /* BTLECentralViewController.h */,
+				6644313916F3D1640049E570 /* BTLECentralViewController.m */,
+				6644313A16F3D1640049E570 /* BTLEPeripheralViewController.h */,
+				6644313B16F3D1640049E570 /* BTLEPeripheralViewController.mm */,
+				6644314816F3D1640049E570 /* FTConnectLatencyTester.h */,
+				6644314916F3D1640049E570 /* FTConnectLatencyTester.m */,
+				6644314E16F3D1640049E570 /* MainStoryboard_iPad.storyboard */,
+				6644314F16F3D1640049E570 /* MainStoryboard_iPhone.storyboard */,
+				66A47C3216D98E7A0016B31C /* pen-sim */,
+				66A47BFA16D835C90016B31C /* Supporting Files */,
+			);
+			name = FiftyThreeSdkTestApp;
+			path = "charcoal-prototype";
+			sourceTree = "<group>";
+		};
+		66A47BFA16D835C90016B31C /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				6644316716F3D24B0049E570 /* InfoPlist.strings */,
+				6644314616F3D1640049E570 /* FiftyThreeSdkTestApp-Info.plist */,
+				6644314716F3D1640049E570 /* FiftyThreeSdkTestApp-Prefix.pch */,
+				6644314D16F3D1640049E570 /* main.m */,
+				6644313F16F3D1640049E570 /* charcoal.img */,
+				6644314016F3D1640049E570 /* Default-568h@2x.png */,
+				6644314116F3D1640049E570 /* Default.png */,
+				6644314216F3D1640049E570 /* Default@2x.png */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		66A47C3216D98E7A0016B31C /* pen-sim */ = {
+			isa = PBXGroup;
+			children = (
+				6644314C16F3D1640049E570 /* FTPenServiceUUID.h */,
+				6644315016F3D1640049E570 /* TiUpdateService.h */,
+				6644315116F3D1640049E570 /* TiUpdateService.m */,
+				6644314A16F3D1640049E570 /* FTPenService.h */,
+				6644314B16F3D1640049E570 /* FTPenService.m */,
+			);
+			name = "pen-sim";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		6644311116F3C8390049E570 /* FiftyThreeSdkTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6644312116F3C8390049E570 /* Build configuration list for PBXNativeTarget "FiftyThreeSdkTests" */;
+			buildPhases = (
+				6644310D16F3C8390049E570 /* Sources */,
+				6644310E16F3C8390049E570 /* Frameworks */,
+				6644310F16F3C8390049E570 /* Resources */,
+				6644311016F3C8390049E570 /* ShellScript */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = FiftyThreeSdkTests;
+			productName = FiftyThreeSdkTests;
+			productReference = 6644311216F3C8390049E570 /* FiftyThreeSdkTests.octest */;
+			productType = "com.apple.product-type.bundle";
+		};
+		66A47BEF16D835C90016B31C /* FiftyThreeSdkTestApp */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 66A47C1316D835C90016B31C /* Build configuration list for PBXNativeTarget "FiftyThreeSdkTestApp" */;
+			buildPhases = (
+				66A47BEC16D835C90016B31C /* Sources */,
+				66A47BED16D835C90016B31C /* Frameworks */,
+				66A47BEE16D835C90016B31C /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = FiftyThreeSdkTestApp;
+			productName = "charcoal-prototype";
+			productReference = 66A47BF016D835C90016B31C /* FiftyThreeSdkTestApp.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		66A47BE816D835C90016B31C /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				CLASSPREFIX = FT;
+				LastUpgradeCheck = 0460;
+				ORGANIZATIONNAME = "FiftyThree, Inc.";
+			};
+			buildConfigurationList = 66A47BEB16D835C90016B31C /* Build configuration list for PBXProject "FiftyThreeSdkTestApp" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 66A47BE716D835C90016B31C;
+			productRefGroup = 66A47BF116D835C90016B31C /* Products */;
+			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = 6644316216F3D1B50049E570 /* Products */;
+					ProjectRef = 6644316116F3D1B50049E570 /* FiftyThreeSdk.xcodeproj */;
+				},
+			);
+			projectRoot = "";
+			targets = (
+				66A47BEF16D835C90016B31C /* FiftyThreeSdkTestApp */,
+				6644311116F3C8390049E570 /* FiftyThreeSdkTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		6644316616F3D1B60049E570 /* libFiftyThreeSdk.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libFiftyThreeSdk.a;
+			remoteRef = 6644316516F3D1B60049E570 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
+
+/* Begin PBXResourcesBuildPhase section */
+		6644310F16F3C8390049E570 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6644311C16F3C8390049E570 /* InfoPlist.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		66A47BEE16D835C90016B31C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6644315516F3D1640049E570 /* charcoal.img in Resources */,
+				6644315616F3D1640049E570 /* Default-568h@2x.png in Resources */,
+				6644315716F3D1640049E570 /* Default.png in Resources */,
+				6644315816F3D1640049E570 /* Default@2x.png in Resources */,
+				6644315E16F3D1640049E570 /* MainStoryboard_iPad.storyboard in Resources */,
+				6644315F16F3D1640049E570 /* MainStoryboard_iPhone.storyboard in Resources */,
+				6644316916F3D24B0049E570 /* InfoPlist.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		6644311016F3C8390049E570 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Run the unit tests in this test bundle.\n\"${SYSTEM_DEVELOPER_DIR}/Tools/RunUnitTests\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		6644310D16F3C8390049E570 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6644312B16F3C86C0049E570 /* FiftyThreeSdkTests.m in Sources */,
+				6644313416F3CC2C0049E570 /* SenAsyncTestCase.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		66A47BEC16D835C90016B31C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6644315216F3D1640049E570 /* AppDelegate.m in Sources */,
+				6644315316F3D1640049E570 /* BTLECentralViewController.m in Sources */,
+				6644315416F3D1640049E570 /* BTLEPeripheralViewController.mm in Sources */,
+				6644315B16F3D1640049E570 /* FTConnectLatencyTester.m in Sources */,
+				6644315C16F3D1640049E570 /* FTPenService.m in Sources */,
+				6644315D16F3D1640049E570 /* main.m in Sources */,
+				6644316016F3D1640049E570 /* TiUpdateService.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		6644311A16F3C8390049E570 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				6644311B16F3C8390049E570 /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		6644316716F3D24B0049E570 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				6644316816F3D24B0049E570 /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		6644312216F3C8390049E570 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/FiftyThreeSdkTestApp.app/FiftyThreeSdkTestApp";
+				FRAMEWORK_SEARCH_PATHS = (
+					"\"$(SDKROOT)/Developer/Library/Frameworks\"",
+					"\"$(DEVELOPER_LIBRARY_DIR)/Frameworks\"",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "FiftyThreeSdkTests/FiftyThreeSdkTests-Prefix.pch";
+				INFOPLIST_FILE = "FiftyThreeSdkTests/FiftyThreeSdkTests-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUNDLE_LOADER)";
+				WRAPPER_EXTENSION = octest;
+			};
+			name = Debug;
+		};
+		6644312316F3C8390049E570 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/FiftyThreeSdkTestApp.app/FiftyThreeSdkTestApp";
+				FRAMEWORK_SEARCH_PATHS = (
+					"\"$(SDKROOT)/Developer/Library/Frameworks\"",
+					"\"$(DEVELOPER_LIBRARY_DIR)/Frameworks\"",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "FiftyThreeSdkTests/FiftyThreeSdkTests-Prefix.pch";
+				INFOPLIST_FILE = "FiftyThreeSdkTests/FiftyThreeSdkTests-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUNDLE_LOADER)";
+				WRAPPER_EXTENSION = octest;
+			};
+			name = Release;
+		};
+		66A47C1116D835C90016B31C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = armv7;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = 2;
+			};
+			name = Debug;
+		};
+		66A47C1216D835C90016B31C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = armv7;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
+				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = 2;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		66A47C1416D835C90016B31C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = armv7;
+				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
+				CLANG_CXX_LIBRARY = "compiler-default";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../../ThirdParty/boost/framework\"",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "FiftyThreeSdkTestApp/FiftyThreeSdkTestApp-Prefix.pch";
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/../../ThirdParty",
+					"$(SRCROOT)/../../../ThirdParty",
+				);
+				INFOPLIST_FILE = "FiftyThreeSdkTestApp/FiftyThreeSdkTestApp-Info.plist";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../../../../../../Library/Developer/Xcode/DerivedData/Paper-fojnnwufckzdqwfidwyifzefweko/Build/Products/Debug-iphoneos\"",
+					"\"$(SRCROOT)/../../ThirdParty/PogoConnect\"",
+				);
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = FiftyThreeSdkTestApp;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				USER_HEADER_SEARCH_PATHS = "";
+				VALID_ARCHS = "armv7 armv7s";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug;
+		};
+		66A47C1516D835C90016B31C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = armv7;
+				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
+				CLANG_CXX_LIBRARY = "compiler-default";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../../ThirdParty/boost/framework\"",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "FiftyThreeSdkTestApp/FiftyThreeSdkTestApp-Prefix.pch";
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/../../ThirdParty",
+					"$(SRCROOT)/../../../ThirdParty",
+				);
+				INFOPLIST_FILE = "FiftyThreeSdkTestApp/FiftyThreeSdkTestApp-Info.plist";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../../../../../../Library/Developer/Xcode/DerivedData/Paper-fojnnwufckzdqwfidwyifzefweko/Build/Products/Debug-iphoneos\"",
+					"\"$(SRCROOT)/../../ThirdParty/PogoConnect\"",
+				);
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = FiftyThreeSdkTestApp;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				USER_HEADER_SEARCH_PATHS = "";
+				VALID_ARCHS = "armv7 armv7s";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		6644312116F3C8390049E570 /* Build configuration list for PBXNativeTarget "FiftyThreeSdkTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6644312216F3C8390049E570 /* Debug */,
+				6644312316F3C8390049E570 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		66A47BEB16D835C90016B31C /* Build configuration list for PBXProject "FiftyThreeSdkTestApp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				66A47C1116D835C90016B31C /* Debug */,
+				66A47C1216D835C90016B31C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		66A47C1316D835C90016B31C /* Build configuration list for PBXNativeTarget "FiftyThreeSdkTestApp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				66A47C1416D835C90016B31C /* Debug */,
+				66A47C1516D835C90016B31C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 66A47BE816D835C90016B31C /* Project object */;
+}
