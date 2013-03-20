@@ -1,5 +1,5 @@
 //
-//  FTPenGestureRecognizer.m
+//  FTPenGestureRecognizer.mm
 //  FiftyThreeSdk
 //
 //  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
@@ -40,15 +40,15 @@ Touch::Ptr TouchFromUITouch(UITouch *uiTouch, UIView *view)
     Touch::Ptr touch = Touch::New();
     CGPoint p = [uiTouch locationInView:view];
     InputSample sample(p.x, p.y, uiTouch.timestamp);
-    
+
     if (touch->History)
     {
         touch->History->push_back(sample);
     }
-    
+
     touch->Phase = PhaseFromUIKit(uiTouch);
     touch->Sample = sample;
-    
+
     return touch;
 }
 
@@ -59,7 +59,7 @@ TouchesSet TouchesSetFromNSSet(NSSet *nsSet, UIView *view)
     {
         touchesSet.insert(TouchFromUITouch(touch, view));
     }
-    
+
     return touchesSet;
 }
 
@@ -79,10 +79,10 @@ TouchesSet TouchesSetFromNSSet(NSSet *nsSet, UIView *view)
         [self setCancelsTouchesInView:NO];
         [self setDelaysTouchesBegan:NO];
         [self setDelaysTouchesEnded:NO];
-        
+
         _manager = manager;
     }
-    
+
     return self;
 }
 
@@ -91,7 +91,7 @@ TouchesSet TouchesSetFromNSSet(NSSet *nsSet, UIView *view)
     NSLog(@"touchesBegan: %@", touches.allObjects);
 
     [super touchesBegan:touches withEvent:event];
-    
+
     TouchesSet touchesSet = TouchesSetFromNSSet(touches, self.view);
     self.manager->TouchesBegan(touchesSet);
 }
@@ -101,7 +101,7 @@ TouchesSet TouchesSetFromNSSet(NSSet *nsSet, UIView *view)
     NSLog(@"touchesMoved: %@", touches.allObjects);
 
     [super touchesMoved:touches withEvent:event];
-    
+
     TouchesSet touchesSet = TouchesSetFromNSSet(touches, self.view);
     self.manager->TouchesMoved(touchesSet);
 }
@@ -111,7 +111,7 @@ TouchesSet TouchesSetFromNSSet(NSSet *nsSet, UIView *view)
     NSLog(@"touchesEnded: %@", touches.allObjects);
 
     [super touchesEnded:touches withEvent:event];
-    
+
     TouchesSet touchesSet = TouchesSetFromNSSet(touches, self.view);
     self.manager->TouchesEnded(touchesSet);
 }
@@ -121,7 +121,7 @@ TouchesSet TouchesSetFromNSSet(NSSet *nsSet, UIView *view)
     NSLog(@"touchesCancelled: %@", touches.allObjects);
 
     [super touchesCancelled:touches withEvent:event];
-    
+
     TouchesSet touchesSet = TouchesSetFromNSSet(touches, self.view);
     self.manager->TouchesCancelled(touchesSet);
 }

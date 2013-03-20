@@ -1,5 +1,5 @@
 //
-//  FTPenTouchManager.m
+//  FTPenTouchManager.mm
 //  FiftyThreeSdk
 //
 //  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.

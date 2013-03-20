@@ -2,8 +2,7 @@
 //  LatencyTouchClassifier.h
 //  FiftyThreeSdk
 //
-//  Created by Adam on 3/19/13.
-//  Copyright (c) 2013 FiftyThree. All rights reserved.
+//  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
 //
 
 #pragma once
@@ -24,10 +23,10 @@ class LatencyTouchClassifier : public TouchClassifier
 public:
     typedef boost::shared_ptr<LatencyTouchClassifier> Ptr;
     typedef const boost::shared_ptr<LatencyTouchClassifier> cPtr;
-    
+
 protected:
     ~LatencyTouchClassifier() {}
-    
+
 public:
     static Ptr New();
 };

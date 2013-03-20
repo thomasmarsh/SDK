@@ -2,8 +2,7 @@
 //  TouchClassifierManager.h
 //  FiftyThreeSdk
 //
-//  Created by Adam on 3/20/13.
-//  Copyright (c) 2013 FiftyThree. All rights reserved.
+//  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
 //
 
 #pragma once
@@ -24,10 +23,10 @@ class TouchClassifierManager : public TouchClassifier
 public:
     typedef boost::shared_ptr<TouchClassifierManager> Ptr;
     typedef const boost::shared_ptr<TouchClassifierManager> cPtr;
-    
+
 protected:
     ~TouchClassifierManager() {}
-    
+
 public:
     static Ptr New();
 };

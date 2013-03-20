@@ -90,14 +90,14 @@ static NSString *const kImageBlockTransferUUID = @"F000FFC2-0451-4000-B000-00000
     char bytes[2];
     ((uint16_t *)bytes)[0] = CFSwapInt16HostToLittle(self.currentBlock);
     NSData *data = [NSData dataWithBytes:bytes length:sizeof(bytes)]; // bugbug - dummy data
-    
+
     [self.peripheralManager updateValue:data forCharacteristic:self.imageBlockTransfer onSubscribedCentrals:nil];
 }
 
 - (void)peripheralManager:(CBPeripheralManager *)peripheral didReceiveWriteRequests:(NSArray *)requests;
 {
     NSLog(@"Got write request");
-    
+
     for (CBATTRequest *request in requests)
     {
         if ([request.characteristic.UUID isEqual:[CBUUID UUIDWithString:kImageIdentifyUUID]])
@@ -115,23 +115,23 @@ static NSString *const kImageBlockTransferUUID = @"F000FFC2-0451-4000-B000-00000
                 NSLog(@"Invalid block size, aborting transfer");
                 return;
             }
-            
+
             uint16_t blockNum = CFSwapInt16LittleToHost(((uint16_t *)request.value.bytes)[0]);
             NSLog(@"received block %d", blockNum);
-            
+
             if (blockNum != self.currentBlock)
             {
                 NSLog(@"Invalid block number, aborting");
                 return;
             }
-            
+
             self.currentBlock++;
             if (self.currentBlock == self.totalBlocks)
             {
                 NSLog(@"Last block received");
                 return;
             }
-            
+
             [self requestNextBlock];
         }
     }

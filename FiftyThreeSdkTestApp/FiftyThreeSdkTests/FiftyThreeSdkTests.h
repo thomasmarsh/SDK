@@ -1,9 +1,8 @@
 //
-//  FiftyThreeTests.h
-//  FiftyThreeTests
+//  FiftyThreeSdkTests.h
+//  FiftyThreeSdkTestApp
 //
-//  Created by Adam on 3/5/13.
-//  Copyright (c) 2013 FiftyThree. All rights reserved.
+//  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
 //
 
 #import <SenTestingKit/SenTestingKit.h>

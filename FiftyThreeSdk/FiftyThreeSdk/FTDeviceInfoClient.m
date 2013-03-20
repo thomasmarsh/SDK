@@ -1,6 +1,6 @@
 //
 //  FTDeviceInfoClient.m
-//  charcoal-prototype
+//  FiftyThreeSdk
 //
 //  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
 //

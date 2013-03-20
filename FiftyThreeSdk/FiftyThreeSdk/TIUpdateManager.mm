@@ -1,6 +1,6 @@
 //
-//  TIUpdateManager.m
-//  charcoal-prototype
+//  TIUpdateManager.mm
+//  FiftyThreeSdk
 //
 //  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
 //
@@ -52,7 +52,7 @@ static NSString *const kImageBlockTransferUUID = @"F000FFC2-0451-4000-B000-00000
     _complete = complete;
     _oldDelegate = _peripheral.delegate;
     _peripheral.delegate = self;
-    
+
     self.currentBlock = 0;
     self.imagePath = filePath;
     self.imageHandle = [NSFileHandle fileHandleForReadingAtPath:filePath];
@@ -61,11 +61,11 @@ static NSString *const kImageBlockTransferUUID = @"F000FFC2-0451-4000-B000-00000
         NSLog(@"invalid file path");
         [self done:nil];
     }
-    
+
     NSDictionary *attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:self.imagePath error:NULL];
     self.imageSizeRemaining = [attributes fileSize];
     self.imageSize = [attributes fileSize];
-    
+
     [_peripheral discoverServices:@[[CBUUID UUIDWithString:kOADServiceUUID]]];
 }
 
@@ -76,12 +76,12 @@ static NSString *const kImageBlockTransferUUID = @"F000FFC2-0451-4000-B000-00000
         [self done:error];
         return;
     }
-    
+
     NSArray* characteristics = @[
                                  [CBUUID UUIDWithString:kImageIdentifyUUID],
                                  [CBUUID UUIDWithString:kImageBlockTransferUUID]
                                  ];
-    
+
     for (CBService *service in peripheral.services) {
         [peripheral discoverCharacteristics:characteristics forService:service];
     }
@@ -94,7 +94,7 @@ static NSString *const kImageBlockTransferUUID = @"F000FFC2-0451-4000-B000-00000
         [self done:error];
         return;
     }
-    
+
     for (CBCharacteristic *characteristic in service.characteristics) {
         if ([characteristic.UUID isEqual:[CBUUID UUIDWithString:kImageIdentifyUUID]]) {
             self.imageIdentify = characteristic;
@@ -110,7 +110,7 @@ static NSString *const kImageBlockTransferUUID = @"F000FFC2-0451-4000-B000-00000
 {
     if (self.imageBlockTransfer.isNotifying && self.imageIdentify.isNotifying) {
         NSLog(@"Sending image header");
-        
+
         NSData *data = [self.imageHandle readDataOfLength:14];
         [peripheral writeValue:data forCharacteristic:self.imageIdentify type:CBCharacteristicWriteWithoutResponse];
         self.imageSizeRemaining -= data.length;
@@ -121,13 +121,13 @@ static NSString *const kImageBlockTransferUUID = @"F000FFC2-0451-4000-B000-00000
 {
     if ([characteristic.UUID isEqual:[CBUUID UUIDWithString:kImageIdentifyUUID]]) {
         NSLog(@"Update not required, existing version = %d", ((uint16_t *)characteristic.value.bytes)[1]);
-        
+
         [self done:[[NSError alloc] initWithDomain:@"TiUpdateManager" code:FTErrorAborted userInfo:nil]];
     } else if ([characteristic.UUID isEqual:[CBUUID UUIDWithString:kImageBlockTransferUUID]]) {
         // perform block transfer
         uint16_t index = ((uint16_t *)characteristic.value.bytes)[0];
         NSLog(@"block index = %d", index);
-        
+
         if (index != self.currentBlock) {
             NSLog(@"Unexpected block index, aborting.");
             [self done:[[NSError alloc] initWithDomain:@"TiUpdateManager" code:FTErrorAborted userInfo:nil]];
@@ -138,22 +138,22 @@ static NSString *const kImageBlockTransferUUID = @"F000FFC2-0451-4000-B000-00000
             } else {
                 self.lastBlockTimer = Timer::New();
             }
-            
+
             uint16_t indexHeader = CFSwapInt16HostToLittle(self.currentBlock);
             NSMutableData *data = [NSMutableData dataWithBytes:&indexHeader length:sizeof(indexHeader)];
             NSData *block = [self.imageHandle readDataOfLength:16];
-            
+
             NSAssert(block.length != 0, nil);
 
             [data appendData:block];
 
             NSLog(@"sending block %d", self.currentBlock);
-            
+
             self.lastBlockTimer->Reset();
-            
+
             [peripheral writeValue:data forCharacteristic:self.imageBlockTransfer type:CBCharacteristicWriteWithoutResponse];
             self.currentBlock++;
-            
+
             self.imageSizeRemaining -= block.length;
             if (self.imageSizeRemaining == 0)
             {

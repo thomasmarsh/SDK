@@ -92,7 +92,7 @@
 
 - (void)penManager:(FTPenManager *)penManager didUpdateDeviceBatteryLevel:(FTPen *)pen
 {
-    
+
 }
 
 - (void)startTest:(void(^)(NSError *error))complete;

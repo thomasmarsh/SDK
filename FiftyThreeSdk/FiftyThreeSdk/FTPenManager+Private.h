@@ -1,9 +1,8 @@
 //
-//  FTPenPrivate.h
+//  FTPenManager+Private.h
 //  FiftyThreeSdk
 //
-//  Created by Adam on 3/12/13.
-//  Copyright (c) 2013 FiftyThree. All rights reserved.
+//  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>

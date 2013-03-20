@@ -2,8 +2,7 @@
 //  TouchClassifierManager.cpp
 //  FiftyThreeSdk
 //
-//  Created by Adam on 3/20/13.
-//  Copyright (c) 2013 FiftyThree. All rights reserved.
+//  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
 //
 
 #include "TouchClassifierManager.h"
@@ -15,7 +14,7 @@
 #include <set>
 #include "Common/PenManager.h"
 #include "Common/TouchManager.h"
-//#include "Common/Asserts.h"
+#include "Common/Asserts.h"
 
 #include "TouchClassifier.h"
 #include "LatencyTouchClassifier.h"
@@ -32,15 +31,15 @@ public:
     TouchClassifierManagerImpl()
     {
         _Classifiers.push_back(LatencyTouchClassifier::New());
-        
-//        DebugAssert(_Classifiers.size());
+
+        DebugAssert(_Classifiers.size());
     };
-    
+
     virtual bool HandlesPenInput()
     {
         return true;
     }
-    
+
     virtual void TouchesBegan(const fiftythree::common::TouchesSet & touches)
     {
         BOOST_FOREACH(const TouchClassifier::Ptr & classifier, _Classifiers)
@@ -48,7 +47,7 @@ public:
             classifier->TouchesBegan(touches);
         }
     }
-    
+
     virtual void TouchesMoved(const fiftythree::common::TouchesSet & touches)
     {
         BOOST_FOREACH(const TouchClassifier::Ptr & classifier, _Classifiers)
@@ -56,7 +55,7 @@ public:
             classifier->TouchesEnded(touches);
         }
     }
-    
+
     virtual void TouchesEnded(const fiftythree::common::TouchesSet & touches)
     {
         BOOST_FOREACH(const TouchClassifier::Ptr & classifier, _Classifiers)
@@ -64,7 +63,7 @@ public:
             classifier->TouchesMoved(touches);
         }
     }
-    
+
     virtual void TouchesCancelled(const fiftythree::common::TouchesSet & touches)
     {
         BOOST_FOREACH(const TouchClassifier::Ptr & classifier, _Classifiers)
@@ -72,9 +71,9 @@ public:
             classifier->TouchesCancelled(touches);
         }
     }
-    
+
     virtual void ProcessPenEvent(const PenEvent & event) {}
-    
+
     FT_NO_COPY(TouchClassifierManagerImpl);
 };
 

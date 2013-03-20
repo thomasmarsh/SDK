@@ -2,8 +2,7 @@
 //  FTBatteryClient.m
 //  FiftyThreeSdk
 //
-//  Created by Adam on 3/11/13.
-//  Copyright (c) 2013 FiftyThree. All rights reserved.
+//  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
 //
 
 #import "FTBatteryClient.h"
@@ -52,12 +51,12 @@ static NSString *const kBatteryLevelUUID = @"0x2A19";
         [self done:error];
         return;
     }
-    
+
     NSArray* characteristics = @[
                                  [CBUUID UUIDWithString:kBatteryLevelUUID]
                                  ];
     _resultCount = 0;
-    
+
     for (CBService *service in peripheral.services) {
         [peripheral discoverCharacteristics:characteristics forService:service];
     }
@@ -70,7 +69,7 @@ static NSString *const kBatteryLevelUUID = @"0x2A19";
         [self done:error];
         return;
     }
-    
+
     for (CBCharacteristic *characteristic in service.characteristics) {
         [peripheral readValueForCharacteristic:characteristic];
         _resultCount++;
@@ -82,7 +81,7 @@ static NSString *const kBatteryLevelUUID = @"0x2A19";
     if ([characteristic.UUID isEqual:[CBUUID UUIDWithString:kBatteryLevelUUID]]) {
         _batteryLevel = ((char *)characteristic.value.bytes)[0];
     }
-    
+
     _resultCount--;
     if (_resultCount == 0) {
         [self done:error];
