@@ -8,25 +8,11 @@
 #import "FTPenGestureRecognizer.h"
 #import <UIKit/UIKit.h>
 
-#include <boost/foreach.hpp>
-#include <boost/shared_ptr.hpp>
-#include <vector>
-#include <set>
-#include "Common/PenManager.h"
 #include "Common/TouchManager.h"
-#include "Common/Asserts.h"
-
-#include "TouchClassifier.h"
-#include "LatencyTouchClassifier.h"
+#include "TouchClassifierManager.h"
 
 using namespace fiftythree::sdk;
 using namespace fiftythree::common;
-
-@interface FTPenGestureRecognizer ()
-
-@property (nonatomic) std::vector<TouchClassifier::Ptr> classifiers;
-
-@end
 
 TouchPhase PhaseFromUIKit(UITouch *touch)
 {
@@ -73,13 +59,19 @@ TouchesSet TouchesSetFromNSSet(NSSet *nsSet, UIView *view)
     {
         touchesSet.insert(TouchFromUITouch(touch, view));
     }
-
+    
     return touchesSet;
 }
 
+@interface FTPenGestureRecognizer ()
+
+@property (nonatomic) TouchClassifierManager::Ptr manager;
+
+@end
+
 @implementation FTPenGestureRecognizer
 
-- (id)init
+- (id)initWithTouchClassifierManager:(TouchClassifierManager::Ptr)manager
 {
     self = [super init];
     if (self)
@@ -87,10 +79,8 @@ TouchesSet TouchesSetFromNSSet(NSSet *nsSet, UIView *view)
         [self setCancelsTouchesInView:NO];
         [self setDelaysTouchesBegan:NO];
         [self setDelaysTouchesEnded:NO];
-
-        _classifiers.push_back(LatencyTouchClassifier::New());
-
-        DebugAssert(_classifiers.size());
+        
+        _manager = manager;
     }
     
     return self;
@@ -103,10 +93,7 @@ TouchesSet TouchesSetFromNSSet(NSSet *nsSet, UIView *view)
     [super touchesBegan:touches withEvent:event];
     
     TouchesSet touchesSet = TouchesSetFromNSSet(touches, self.view);
-    BOOST_FOREACH(const TouchClassifier::Ptr & classifier, self.classifiers)
-    {
-        classifier->TouchesBegan(touchesSet);
-    }
+    self.manager->TouchesBegan(touchesSet);
 }
 
 - (void) touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
@@ -114,12 +101,9 @@ TouchesSet TouchesSetFromNSSet(NSSet *nsSet, UIView *view)
     NSLog(@"touchesMoved: %@", touches.allObjects);
 
     [super touchesMoved:touches withEvent:event];
-
+    
     TouchesSet touchesSet = TouchesSetFromNSSet(touches, self.view);
-    BOOST_FOREACH(const TouchClassifier::Ptr & classifier, self.classifiers)
-    {
-        classifier->TouchesMoved(touchesSet);
-    }
+    self.manager->TouchesMoved(touchesSet);
 }
 
 - (void) touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
@@ -127,12 +111,9 @@ TouchesSet TouchesSetFromNSSet(NSSet *nsSet, UIView *view)
     NSLog(@"touchesEnded: %@", touches.allObjects);
 
     [super touchesEnded:touches withEvent:event];
-
+    
     TouchesSet touchesSet = TouchesSetFromNSSet(touches, self.view);
-    BOOST_FOREACH(const TouchClassifier::Ptr & classifier, self.classifiers)
-    {
-        classifier->TouchesEnded(touchesSet);
-    }
+    self.manager->TouchesEnded(touchesSet);
 }
 
 - (void) touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event
@@ -142,10 +123,7 @@ TouchesSet TouchesSetFromNSSet(NSSet *nsSet, UIView *view)
     [super touchesCancelled:touches withEvent:event];
     
     TouchesSet touchesSet = TouchesSetFromNSSet(touches, self.view);
-    BOOST_FOREACH(const TouchClassifier::Ptr & classifier, self.classifiers)
-    {
-        classifier->TouchesCancelled(touchesSet);
-    }
+    self.manager->TouchesCancelled(touchesSet);
 }
 
 - (void) ignoreTouch:(UITouch *)touch forEvent:(UIEvent *)event

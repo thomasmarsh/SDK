@@ -8,25 +8,17 @@
 #import "FTPenTouchManager.h"
 #import "FTPenGestureRecognizer.h"
 
+#include "TouchClassifierManager.h"
+
 @interface FTPenTouchManager ()
 
 @end
 
 @implementation FTPenTouchManager
 
-- (id)init
-{
-    self = [super init];
-    if (self)
-    {
-
-    }
-    return self;
-}
-
 - (void)registerView:(UIView *)view
 {
-    [view addGestureRecognizer:[[FTPenGestureRecognizer alloc] init]];
+    [view addGestureRecognizer:[[FTPenGestureRecognizer alloc] initWithTouchClassifierManager:fiftythree::sdk::TouchClassifierManager::New()]];
 }
 
 - (void)deregisterView:(UIView *)view
