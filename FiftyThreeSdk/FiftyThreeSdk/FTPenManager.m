@@ -22,6 +22,9 @@ NSString * const kPairedPenUuidDefaultsKey = @"PairedPenUuid";
     FTPen *_connectedPen;
     BOOL _pairing;
     dispatch_queue_t _queue;
+#if USE_TI_UUIDS
+    char _lastState;
+#endif
 }
 
 - (void)updateFirmware:(NSString *)imagePath forPen:(FTPen *)pen;
@@ -46,6 +49,7 @@ NSString * const kPairedPenUuidDefaultsKey = @"PairedPenUuid";
         _penTouchManager = [[FTPenTouchManager alloc] init];
         _pairedPen = nil;
         _pairing = NO;
+        _lastState = 0;
     }
 
     return self;
@@ -58,7 +62,13 @@ NSString * const kPairedPenUuidDefaultsKey = @"PairedPenUuid";
 
 - (void)scan
 {
-    [self.centralManager scanForPeripheralsWithServices:@[[CBUUID UUIDWithString:FT_PEN_SERVICE_UUID]] options:nil];
+    [self.centralManager scanForPeripheralsWithServices:
+#if !USE_TI_UUIDS
+     @[[CBUUID UUIDWithString:FT_PEN_SERVICE_UUID]]
+#else
+     @[[CBUUID UUIDWithString:TI_SIMPLE_BLE_ADV_UUID]]
+#endif
+                                                options:nil];
 }
 
 - (void)centralManagerDidUpdateState:(CBCentralManager *)central
@@ -155,7 +165,9 @@ NSString * const kPairedPenUuidDefaultsKey = @"PairedPenUuid";
     for (CBService *service in peripheral.services) {
         [peripheral discoverCharacteristics:@[
          [CBUUID UUIDWithString:FT_PEN_TIP1_STATE_UUID],
+#if !USE_TI_UUIDS
          [CBUUID UUIDWithString:FT_PEN_TIP2_STATE_UUID]
+#endif
          ] forService:service];
     }
 }
@@ -253,13 +265,98 @@ NSString * const kPairedPenUuidDefaultsKey = @"PairedPenUuid";
 
         // And check if it's the right one
         if ([characteristic.UUID isEqual:[CBUUID UUIDWithString:FT_PEN_TIP1_STATE_UUID]]
-            || [characteristic.UUID isEqual:[CBUUID UUIDWithString:FT_PEN_TIP2_STATE_UUID]]) {
+#if !USE_TI_UUIDS
+            || [characteristic.UUID isEqual:[CBUUID UUIDWithString:FT_PEN_TIP2_STATE_UUID]]
+#endif
+        ) {
 
             // If it is, subscribe to it
             [peripheral setNotifyValue:YES forCharacteristic:characteristic];
         }
     }
 }
+
+#if USE_TI_UUIDS
+
+- (void)peripheral:(CBPeripheral *)peripheral didUpdateValueForCharacteristic:(CBCharacteristic *)characteristic error:(NSError *)error
+{
+    NSAssert(peripheral == _connectedPen.peripheral, @"got wrong pen");
+    
+    if (error) {
+        NSLog(@"Error discovering characteristics: %@", [error localizedDescription]);
+        return;
+    }
+
+    if (![characteristic.UUID isEqual:[CBUUID UUIDWithString:FT_PEN_TIP1_STATE_UUID]]) {
+        NSLog(@"Unrecognized characteristic");
+        return;
+    }
+    
+    if (characteristic.value.length == 0) {
+        NSLog(@"No data received");
+        return;
+    }
+    
+    const char *bytes = characteristic.value.bytes;
+    char state = bytes[0];
+    
+    FTPenTip tip = FTPenTip1;
+    BOOL pressed = YES;
+    
+    switch (state)
+    {
+        case TI_KEY_PRESS_STATE_NONE:
+        {
+            pressed = NO;
+            if (_lastState == TI_KEY_PRESS_STATE_KEY1)
+            {
+                tip = FTPenTip1;
+            }
+            else if (_lastState == TI_KEY_PRESS_STATE_KEY2)
+            {
+                tip = FTPenTip2;
+            }
+            else
+            {
+                NSAssert(FALSE, nil);
+            }
+        }
+        break;
+        case TI_KEY_PRESS_STATE_KEY1:
+        {
+            pressed = YES;
+            tip = FTPenTip1;
+        }
+        break;
+        case TI_KEY_PRESS_STATE_KEY2:
+        {
+            pressed = YES;
+            tip = FTPenTip2;
+        }
+        break;
+        default:
+            break;
+    }
+    
+    _lastState = state;
+    
+    _connectedPen->_tipPressed[tip] = pressed;
+    NSAssert([self.connectedPen isTipPressed:tip] == pressed, @"");
+    
+    if (pressed) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self.connectedPen.delegate pen:self.connectedPen didPressTip:tip];
+            [self.penTouchManager pen:self.connectedPen didPressTip:tip];
+        });
+    } else {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self.connectedPen.delegate pen:self.connectedPen didReleaseTip:tip];
+            [self.penTouchManager pen:self.connectedPen didReleaseTip:tip];
+        });
+    }
+}
+
+#else
 
 - (void)peripheral:(CBPeripheral *)peripheral didUpdateValueForCharacteristic:(CBCharacteristic *)characteristic error:(NSError *)error
 {
@@ -304,6 +401,8 @@ NSString * const kPairedPenUuidDefaultsKey = @"PairedPenUuid";
     }
 }
 
+#endif
+
 - (void)peripheral:(CBPeripheral *)peripheral didUpdateNotificationStateForCharacteristic:(CBCharacteristic *)characteristic error:(NSError *)error
 {
     NSAssert(peripheral == _connectedPen.peripheral, @"got wrong pen");
@@ -314,7 +413,10 @@ NSString * const kPairedPenUuidDefaultsKey = @"PairedPenUuid";
     }
 
     if (![characteristic.UUID isEqual:[CBUUID UUIDWithString:FT_PEN_TIP1_STATE_UUID]]
-        && ![characteristic.UUID isEqual:[CBUUID UUIDWithString:FT_PEN_TIP2_STATE_UUID]]) {
+#if !USE_TI_UUIDS
+        && ![characteristic.UUID isEqual:[CBUUID UUIDWithString:FT_PEN_TIP2_STATE_UUID]]
+#endif
+        ) {
         return;
     }
 
@@ -387,7 +489,10 @@ NSString * const kPairedPenUuidDefaultsKey = @"PairedPenUuid";
             if (service.characteristics != nil) {
                 for (CBCharacteristic *characteristic in service.characteristics) {
                     if ([characteristic.UUID isEqual:[CBUUID UUIDWithString:FT_PEN_TIP1_STATE_UUID]]
-                        || [characteristic.UUID isEqual:[CBUUID UUIDWithString:FT_PEN_TIP2_STATE_UUID]]) {
+#if !USE_TI_UUIDS
+                        || [characteristic.UUID isEqual:[CBUUID UUIDWithString:FT_PEN_TIP2_STATE_UUID]]
+#endif
+                        ) {
                         if (characteristic.isNotifying) {
                             [_connectedPen.peripheral setNotifyValue:NO forCharacteristic:characteristic];
 
