@@ -86,7 +86,7 @@ TouchesSet TouchesSetFromNSSet(NSSet *nsSet, UIView *view)
 
 - (void) touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
 {
-    NSLog(@"touchesBegan: %@", touches.allObjects);
+//    NSLog(@"touchesBegan: %@", touches.allObjects);
 
     [super touchesBegan:touches withEvent:event];
 
@@ -96,7 +96,7 @@ TouchesSet TouchesSetFromNSSet(NSSet *nsSet, UIView *view)
 
 - (void) touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
 {
-    NSLog(@"touchesMoved: %@", touches.allObjects);
+//    NSLog(@"touchesMoved: %@", touches.allObjects);
 
     [super touchesMoved:touches withEvent:event];
 
@@ -106,7 +106,7 @@ TouchesSet TouchesSetFromNSSet(NSSet *nsSet, UIView *view)
 
 - (void) touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
 {
-    NSLog(@"touchesEnded: %@", touches.allObjects);
+//    NSLog(@"touchesEnded: %@", touches.allObjects);
 
     [super touchesEnded:touches withEvent:event];
 
@@ -116,7 +116,7 @@ TouchesSet TouchesSetFromNSSet(NSSet *nsSet, UIView *view)
 
 - (void) touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event
 {
-    NSLog(@"touchesCancelled: %@", touches.allObjects);
+//    NSLog(@"touchesCancelled: %@", touches.allObjects);
 
     [super touchesCancelled:touches withEvent:event];
 
