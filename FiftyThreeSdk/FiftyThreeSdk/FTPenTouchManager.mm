@@ -21,8 +21,9 @@
 using namespace fiftythree::sdk;
 
 @interface FTPenTouchManager ()
-
-@property (nonatomic) std::vector<TouchClassifierManager::Ptr> managers;
+{
+    std::vector<TouchClassifierManager::Ptr> _managers;
+}
 
 @end
 
