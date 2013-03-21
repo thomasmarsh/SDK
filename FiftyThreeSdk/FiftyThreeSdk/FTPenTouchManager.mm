@@ -10,6 +10,7 @@
 #import "FTPenManager.h"
 #import "FTPen.h"
 #include "TouchClassifierManager.h"
+#include "LatencyTouchClassifier.h"
 
 #include <boost/foreach.hpp>
 #include <vector>
@@ -32,6 +33,7 @@ using namespace fiftythree::sdk;
 - (void)registerView:(UIView *)view
 {
     TouchClassifierManager::Ptr manager = TouchClassifierManager::New();
+    manager->AddClassifier(LatencyTouchClassifier::New());
     _managers.push_back(manager);
     
     [view addGestureRecognizer:[[FTPenGestureRecognizer alloc] initWithTouchClassifierManager:manager]];

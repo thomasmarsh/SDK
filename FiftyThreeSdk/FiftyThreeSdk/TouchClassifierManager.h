@@ -28,6 +28,9 @@ protected:
     ~TouchClassifierManager() {}
 
 public:
+    virtual void AddClassifier(TouchClassifier::Ptr classifier) = 0;
+    virtual void RemoveClassifier(TouchClassifier::Ptr classifier) = 0;
+    
     static Ptr New();
 };
 

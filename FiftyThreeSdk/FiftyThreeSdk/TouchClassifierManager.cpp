@@ -17,7 +17,6 @@
 #include "Common/Asserts.h"
 
 #include "TouchClassifier.h"
-#include "LatencyTouchClassifier.h"
 
 using namespace fiftythree::sdk;
 using namespace fiftythree::common;
@@ -28,16 +27,21 @@ private:
     std::vector<TouchClassifier::Ptr> _Classifiers;
 
 public:
-    TouchClassifierManagerImpl()
-    {
-        _Classifiers.push_back(LatencyTouchClassifier::New());
-
-        DebugAssert(_Classifiers.size());
-    };
+    TouchClassifierManagerImpl() {}
 
     virtual bool HandlesPenInput()
     {
         return true;
+    }
+    
+    virtual void AddClassifier(TouchClassifier::Ptr classifier)
+    {
+        _Classifiers.push_back(classifier);
+    }
+    
+    virtual void RemoveClassifier(TouchClassifier::Ptr classifier)
+    {
+        _Classifiers.erase(std::remove(_Classifiers.begin(), _Classifiers.end(), classifier), _Classifiers.end());
     }
 
     virtual void TouchesBegan(const fiftythree::common::TouchesSet & touches)
