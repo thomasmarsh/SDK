@@ -72,7 +72,13 @@ public:
         }
     }
 
-    virtual void ProcessPenEvent(const PenEvent & event) {}
+    virtual void ProcessPenEvent(const PenEvent & event)
+    {
+        BOOST_FOREACH(const TouchClassifier::Ptr & classifier, _Classifiers)
+        {
+            classifier->ProcessPenEvent(event);
+        }
+    }
 
     FT_NO_COPY(TouchClassifierManagerImpl);
 };

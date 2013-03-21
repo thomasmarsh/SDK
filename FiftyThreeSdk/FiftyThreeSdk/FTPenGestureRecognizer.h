@@ -12,6 +12,8 @@
 
 @interface FTPenGestureRecognizer : UIGestureRecognizer
 
+@property (nonatomic) fiftythree::sdk::TouchClassifierManager::Ptr manager;
+
 - (id)initWithTouchClassifierManager:(fiftythree::sdk::TouchClassifierManager::Ptr)manager;
 - (id)init __unavailable;
 

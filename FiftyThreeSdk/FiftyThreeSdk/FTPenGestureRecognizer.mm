@@ -65,8 +65,6 @@ TouchesSet TouchesSetFromNSSet(NSSet *nsSet, UIView *view)
 
 @interface FTPenGestureRecognizer ()
 
-@property (nonatomic) TouchClassifierManager::Ptr manager;
-
 @end
 
 @implementation FTPenGestureRecognizer

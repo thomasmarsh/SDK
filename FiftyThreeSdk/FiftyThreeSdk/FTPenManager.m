@@ -294,10 +294,12 @@ NSString * const kPairedPenUuidDefaultsKey = @"PairedPenUuid";
     if (pressed) {
         dispatch_async(dispatch_get_main_queue(), ^{
             [self.connectedPen.delegate pen:self.connectedPen didPressTip:tip];
+            [self.penTouchManager pen:self.connectedPen didPressTip:tip];
         });
     } else {
         dispatch_async(dispatch_get_main_queue(), ^{
             [self.connectedPen.delegate pen:self.connectedPen didReleaseTip:tip];
+            [self.penTouchManager pen:self.connectedPen didReleaseTip:tip];
         });
     }
 }

@@ -10,8 +10,9 @@
 #include <boost/smart_ptr.hpp>
 #include <set>
 #include "Common/TouchManager.h"
+#include "Common/PenManager.h"
 
-class PenEvent;
+#include "PenEvent.h"
 
 namespace fiftythree
 {

@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		661993D416EE6D5400B2BEE9 /* FTBatteryClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 661993D316EE6D5400B2BEE9 /* FTBatteryClient.m */; };
 		663AFED616FA511300681A90 /* TouchClassifierManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 663AFED416FA511300681A90 /* TouchClassifierManager.cpp */; };
+		663AFED916FA6BD800681A90 /* PenEvent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 663AFED716FA6BD800681A90 /* PenEvent.cpp */; };
 		6644313016F3CA3F0049E570 /* FTPenManager+Private.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 66D2B4A116F2A8A900E11FE6 /* FTPenManager+Private.h */; };
 		6644313116F3CA3F0049E570 /* FTPen+Private.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 665C1F5E16F0F23100F1BCB7 /* FTPen+Private.h */; };
 		6644317116F7F9EE0049E570 /* libCommon.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6644317016F7F9EE0049E570 /* libCommon.a */; };
@@ -46,6 +47,8 @@
 		661993D516EF973900B2BEE9 /* FTError.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FTError.h; path = FiftyThreeSdk/FTError.h; sourceTree = SOURCE_ROOT; };
 		663AFED416FA511300681A90 /* TouchClassifierManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TouchClassifierManager.cpp; path = FiftyThreeSdk/TouchClassifierManager.cpp; sourceTree = SOURCE_ROOT; };
 		663AFED516FA511300681A90 /* TouchClassifierManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TouchClassifierManager.h; path = FiftyThreeSdk/TouchClassifierManager.h; sourceTree = SOURCE_ROOT; };
+		663AFED716FA6BD800681A90 /* PenEvent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = PenEvent.cpp; path = FiftyThreeSdk/PenEvent.cpp; sourceTree = SOURCE_ROOT; };
+		663AFED816FA6BD800681A90 /* PenEvent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PenEvent.h; path = FiftyThreeSdk/PenEvent.h; sourceTree = SOURCE_ROOT; };
 		6644317016F7F9EE0049E570 /* libCommon.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libCommon.a; path = "../../../../../../Library/Developer/Xcode/DerivedData/Paper-fojnnwufckzdqwfidwyifzefweko/Build/Products/Debug-iphoneos/libCommon.a"; sourceTree = "<group>"; };
 		6644317216F7FB920049E570 /* boost.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = boost.framework; path = ../../ThirdParty/boost/framework/boost.framework; sourceTree = "<group>"; };
 		665C024A16F22BB500B50DAC /* FTPenTouchManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FTPenTouchManager.h; path = FiftyThreeSdk/FTPenTouchManager.h; sourceTree = SOURCE_ROOT; };
@@ -163,6 +166,8 @@
 				66B6E3E916F9255C00251B6A /* LatencyTouchClassifier.h */,
 				663AFED416FA511300681A90 /* TouchClassifierManager.cpp */,
 				663AFED516FA511300681A90 /* TouchClassifierManager.h */,
+				663AFED716FA6BD800681A90 /* PenEvent.cpp */,
+				663AFED816FA6BD800681A90 /* PenEvent.h */,
 			);
 			name = TouchClassifiers;
 			sourceTree = "<group>";
@@ -227,6 +232,7 @@
 				665C024F16F22CBE00B50DAC /* FTPenGestureRecognizer.mm in Sources */,
 				66B6E3EA16F9255C00251B6A /* LatencyTouchClassifier.cpp in Sources */,
 				663AFED616FA511300681A90 /* TouchClassifierManager.cpp in Sources */,
+				663AFED916FA6BD800681A90 /* PenEvent.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

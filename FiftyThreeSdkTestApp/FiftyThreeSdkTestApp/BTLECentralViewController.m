@@ -27,10 +27,18 @@
     _penManager = [[FTPenManager alloc] initWithDelegate:self];
     while (!_penManager.isReady) {}
 
-    [_penManager registerView:self.view];
-
     [self.testConnectButton setHidden:YES];
     [self updateDisplay];
+}
+
+- (void)viewWillAppear:(BOOL)animated
+{
+    [_penManager registerView:self.view];
+}
+
+- (void)viewDidDisappear:(BOOL)animated
+{
+    [_penManager deregisterView:self.view];
 }
 
 - (void)didReceiveMemoryWarning

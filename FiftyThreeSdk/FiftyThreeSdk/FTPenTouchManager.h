@@ -8,7 +8,9 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 
-@interface FTPenTouchManager : NSObject
+#import "FTPen.h"
+
+@interface FTPenTouchManager : NSObject<FTPenDelegate>
 
 - (void)registerView:(UIView *)view;
 - (void)deregisterView:(UIView *)view;
