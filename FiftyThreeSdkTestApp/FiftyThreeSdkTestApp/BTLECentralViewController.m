@@ -88,10 +88,10 @@
 - (void)pen:(FTPen *)pen didPressTip:(FTPenTip)tip
 {
     if (tip == FTPenTip1) {
-        NSLog(@"Tip1 pressed");
+//        NSLog(@"Tip1 pressed");
         [self.tip1State setHighlighted:YES];
     } else if (tip == FTPenTip2) {
-        NSLog(@"Tip2 pressed");
+//        NSLog(@"Tip2 pressed");
         [self.tip2State setHighlighted:YES];
     } else {
         NSLog(@"Unsupported tip pressed");
@@ -123,10 +123,10 @@
 - (void)pen:(FTPen *)pen didReleaseTip:(FTPenTip)tip
 {
     if (tip == FTPenTip1) {
-        NSLog(@"Tip1 released");
+//        NSLog(@"Tip1 released");
         [self.tip1State setHighlighted:NO];
     } else if (tip == FTPenTip2) {
-        NSLog(@"Tip2 released");
+//        NSLog(@"Tip2 released");
         [self.tip2State setHighlighted:NO];
     } else {
         NSLog(@"Unsupported tip released");

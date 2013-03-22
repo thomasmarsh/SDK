@@ -14,8 +14,6 @@
 
 #include "Common/PenManager.h"
 
-using namespace fiftythree::common;
-
 namespace fiftythree
 {
 namespace sdk
@@ -34,6 +32,10 @@ class PenEvent
 public:
     typedef boost::shared_ptr<PenEvent> Ptr;
     typedef boost::shared_ptr<const PenEvent> cPtr;
+    
+    fiftythree::common::InputSample Sample;
+    PenEventType Type;
+    PenTip Tip;
     
 protected:
     ~PenEvent() {}

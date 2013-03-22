@@ -20,6 +20,7 @@
 #include "PenEvent.h"
 
 using namespace fiftythree::sdk;
+using namespace fiftythree::common;
 
 @interface FTPenTouchManager ()
 {

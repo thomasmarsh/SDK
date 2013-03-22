@@ -15,7 +15,12 @@ using namespace fiftythree::sdk;
 class PenEventImpl : public PenEvent
 {
 public:
-    PenEventImpl(fiftythree::common::InputSample sample, PenEventType type, PenTip tip) {}
+    PenEventImpl(fiftythree::common::InputSample sample, PenEventType type, PenTip tip)
+    {
+        Sample = sample;
+        Type = type;
+        Tip = tip;
+    }
     
     ~PenEventImpl() {}
 };

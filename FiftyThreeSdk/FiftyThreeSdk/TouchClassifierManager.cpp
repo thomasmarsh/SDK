@@ -56,7 +56,7 @@ public:
     {
         BOOST_FOREACH(const TouchClassifier::Ptr & classifier, _Classifiers)
         {
-            classifier->TouchesEnded(touches);
+            classifier->TouchesMoved(touches);
         }
     }
 
@@ -64,7 +64,7 @@ public:
     {
         BOOST_FOREACH(const TouchClassifier::Ptr & classifier, _Classifiers)
         {
-            classifier->TouchesMoved(touches);
+            classifier->TouchesEnded(touches);
         }
     }
 

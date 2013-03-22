@@ -48,6 +48,7 @@ Touch::Ptr TouchFromUITouch(UITouch *uiTouch, UIView *view)
 
     touch->Phase = PhaseFromUIKit(uiTouch);
     touch->Sample = sample;
+    touch->Id = [[NSValue valueWithNonretainedObject:uiTouch] pointerValue];
 
     return touch;
 }
@@ -117,6 +118,12 @@ TouchesSet TouchesSetFromNSSet(NSSet *nsSet, UIView *view)
 - (void) touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event
 {
 //    NSLog(@"touchesCancelled: %@", touches.allObjects);
+    
+    if (touches.count >= 4)
+    {
+        // TODO - Display dialog
+        NSLog(@"WARNING: multitasking gestures are enabled");
+    }
 
     [super touchesCancelled:touches withEvent:event];
 
