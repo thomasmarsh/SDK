@@ -111,16 +111,19 @@ static NSString *const kImageBlockTransferUUID = @"F000FFC2-0451-4000-B000-00000
     if (self.imageBlockTransfer.isNotifying && self.imageIdentify.isNotifying) {
         NSLog(@"Sending image header");
 
-        NSData *data = [self.imageHandle readDataOfLength:14];
+        [self.imageHandle seekToFileOffset:4]; // skip CRC + shadow CRC
+        
+        NSData *data = [self.imageHandle readDataOfLength:12];
         [peripheral writeValue:data forCharacteristic:self.imageIdentify type:CBCharacteristicWriteWithoutResponse];
-        self.imageSizeRemaining -= data.length;
+        
+        [self.imageHandle seekToFileOffset:0];
     }
 }
 
 - (void)peripheral:(CBPeripheral *)peripheral didUpdateValueForCharacteristic:(CBCharacteristic *)characteristic error:(NSError *)error
 {
     if ([characteristic.UUID isEqual:[CBUUID UUIDWithString:kImageIdentifyUUID]]) {
-        NSLog(@"Update not required, existing version = %d", ((uint16_t *)characteristic.value.bytes)[1]);
+        NSLog(@"Update not required, existing version = %d", ((uint16_t *)characteristic.value.bytes)[0]);
 
         [self done:[[NSError alloc] initWithDomain:@"TiUpdateManager" code:FTErrorAborted userInfo:nil]];
     } else if ([characteristic.UUID isEqual:[CBUUID UUIDWithString:kImageBlockTransferUUID]]) {

@@ -159,8 +159,15 @@ NSString * const kPairedPenUuidDefaultsKey = @"PairedPenUuid";
 
     NSLog(@"found service");
 
-    // Discover the characteristic we want...
+#if USE_TI_UUIDS
+    if (peripheral.services.count == 0)
+    {
+        [self connectedToPen:_connectedPen];
+    }
+#endif
 
+    // Discover the characteristic we want...
+    
     // Loop through the newly filled peripheral.services array, just in case there's more than one.
     for (CBService *service in peripheral.services) {
         [peripheral discoverCharacteristics:@[

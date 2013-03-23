@@ -20,7 +20,6 @@
 		6644315216F3D1640049E570 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 6644313716F3D1640049E570 /* AppDelegate.m */; };
 		6644315316F3D1640049E570 /* BTLECentralViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6644313916F3D1640049E570 /* BTLECentralViewController.m */; };
 		6644315416F3D1640049E570 /* BTLEPeripheralViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 6644313B16F3D1640049E570 /* BTLEPeripheralViewController.mm */; };
-		6644315516F3D1640049E570 /* charcoal.img in Resources */ = {isa = PBXBuildFile; fileRef = 6644313F16F3D1640049E570 /* charcoal.img */; };
 		6644315616F3D1640049E570 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 6644314016F3D1640049E570 /* Default-568h@2x.png */; };
 		6644315716F3D1640049E570 /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = 6644314116F3D1640049E570 /* Default.png */; };
 		6644315816F3D1640049E570 /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 6644314216F3D1640049E570 /* Default@2x.png */; };
@@ -41,6 +40,7 @@
 		6644319916F8047E0049E570 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6644319816F8047E0049E570 /* SystemConfiguration.framework */; };
 		6644319B16F804B20049E570 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6644319A16F804B20049E570 /* QuartzCore.framework */; };
 		6644319D16F804BE0049E570 /* libAFNetworking.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6644319C16F804BE0049E570 /* libAFNetworking.a */; };
+		6685989F16FD11E1008CAE29 /* charcoal.img in Resources */ = {isa = PBXBuildFile; fileRef = 6685989E16FD11E1008CAE29 /* charcoal.img */; };
 		66A47BF416D835C90016B31C /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 66A47BF316D835C90016B31C /* UIKit.framework */; };
 		66A47BF616D835C90016B31C /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 66A47BF516D835C90016B31C /* Foundation.framework */; };
 		66A47BF816D835C90016B31C /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 66A47BF716D835C90016B31C /* CoreGraphics.framework */; };
@@ -75,7 +75,6 @@
 		6644313916F3D1640049E570 /* BTLECentralViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BTLECentralViewController.m; path = FiftyThreeSdkTestApp/BTLECentralViewController.m; sourceTree = SOURCE_ROOT; };
 		6644313A16F3D1640049E570 /* BTLEPeripheralViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BTLEPeripheralViewController.h; path = FiftyThreeSdkTestApp/BTLEPeripheralViewController.h; sourceTree = SOURCE_ROOT; };
 		6644313B16F3D1640049E570 /* BTLEPeripheralViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = BTLEPeripheralViewController.mm; path = FiftyThreeSdkTestApp/BTLEPeripheralViewController.mm; sourceTree = SOURCE_ROOT; };
-		6644313F16F3D1640049E570 /* charcoal.img */ = {isa = PBXFileReference; lastKnownFileType = file; name = charcoal.img; path = FiftyThreeSdkTestApp/charcoal.img; sourceTree = SOURCE_ROOT; };
 		6644314016F3D1640049E570 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Default-568h@2x.png"; path = "FiftyThreeSdkTestApp/Default-568h@2x.png"; sourceTree = SOURCE_ROOT; };
 		6644314116F3D1640049E570 /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Default.png; path = FiftyThreeSdkTestApp/Default.png; sourceTree = SOURCE_ROOT; };
 		6644314216F3D1640049E570 /* Default@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Default@2x.png"; path = "FiftyThreeSdkTestApp/Default@2x.png"; sourceTree = SOURCE_ROOT; };
@@ -107,6 +106,7 @@
 		6644319816F8047E0049E570 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		6644319A16F804B20049E570 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		6644319C16F804BE0049E570 /* libAFNetworking.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libAFNetworking.a; path = "../../AFNetworking/build/Release-iphoneos/libAFNetworking.a"; sourceTree = "<group>"; };
+		6685989E16FD11E1008CAE29 /* charcoal.img */ = {isa = PBXFileReference; lastKnownFileType = file; path = charcoal.img; sourceTree = SOURCE_ROOT; };
 		66A47BF016D835C90016B31C /* FiftyThreeSdkTestApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FiftyThreeSdkTestApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		66A47BF316D835C90016B31C /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		66A47BF516D835C90016B31C /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -254,11 +254,11 @@
 		66A47BFA16D835C90016B31C /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				6685989E16FD11E1008CAE29 /* charcoal.img */,
 				6644316716F3D24B0049E570 /* InfoPlist.strings */,
 				6644314616F3D1640049E570 /* FiftyThreeSdkTestApp-Info.plist */,
 				6644314716F3D1640049E570 /* FiftyThreeSdkTestApp-Prefix.pch */,
 				6644314D16F3D1640049E570 /* main.m */,
-				6644313F16F3D1640049E570 /* charcoal.img */,
 				6644314016F3D1640049E570 /* Default-568h@2x.png */,
 				6644314116F3D1640049E570 /* Default.png */,
 				6644314216F3D1640049E570 /* Default@2x.png */,
@@ -373,13 +373,13 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6644315516F3D1640049E570 /* charcoal.img in Resources */,
 				6644315616F3D1640049E570 /* Default-568h@2x.png in Resources */,
 				6644315716F3D1640049E570 /* Default.png in Resources */,
 				6644315816F3D1640049E570 /* Default@2x.png in Resources */,
 				6644315E16F3D1640049E570 /* MainStoryboard_iPad.storyboard in Resources */,
 				6644315F16F3D1640049E570 /* MainStoryboard_iPhone.storyboard in Resources */,
 				6644316916F3D24B0049E570 /* InfoPlist.strings in Resources */,
+				6685989F16FD11E1008CAE29 /* charcoal.img in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
