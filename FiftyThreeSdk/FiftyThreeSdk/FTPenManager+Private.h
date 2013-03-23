@@ -9,7 +9,15 @@
 
 @interface FTPenManager ()
 
-- (bool)isPenFirmwareUpdatable:(FTPen *)pen;
 - (void)updateFirmware:(NSString *)imagePath forPen:(FTPen *)pen;
+
+@end
+
+@protocol FTPenManagerDelegatePrivate <FTPenManagerDelegate>
+
+@optional
+
+- (void)penManager:(FTPenManager *)manager didFinishUpdate:(NSError *)error;
+- (void)penManager:(FTPenManager *)manager didUpdatePercentComplete:(float)percent;
 
 @end

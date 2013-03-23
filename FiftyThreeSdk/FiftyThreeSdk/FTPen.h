@@ -37,7 +37,7 @@ typedef NS_ENUM(NSInteger, FTPenTip) {
 
 @end
 
-@protocol FTPenDelegate
+@protocol FTPenDelegate <NSObject>
 
 - (void)pen:(FTPen *)pen didPressTip:(FTPenTip)tip;
 - (void)pen:(FTPen *)pen didReleaseTip:(FTPenTip)tip;

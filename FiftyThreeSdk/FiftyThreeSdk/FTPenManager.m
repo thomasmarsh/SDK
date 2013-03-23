@@ -6,6 +6,7 @@
 //
 
 #import "FTPenManager.h"
+#import "FTPenManager+Private.h"
 #import <CoreBluetooth/CoreBluetooth.h>
 #include "FTPenServiceUUID.h"
 #import "FTPen.h"
@@ -16,7 +17,7 @@
 
 NSString * const kPairedPenUuidDefaultsKey = @"PairedPenUuid";
 
-@interface FTPenManager () <CBCentralManagerDelegate, CBPeripheralDelegate>
+@interface FTPenManager () <CBCentralManagerDelegate, CBPeripheralDelegate, TIUpdateManagerDelegate>
 {
     FTPen *_pairedPen;
     FTPen *_connectedPen;
@@ -467,19 +468,38 @@ NSString * const kPairedPenUuidDefaultsKey = @"PairedPenUuid";
 
 - (void)updateFirmware:(NSString *)imagePath forPen:(FTPen *)pen
 {
-    self.updateManager = [[TIUpdateManager alloc] initWithPeripheral:pen.peripheral]; // BUGBUG - ugly cast
-    [self.updateManager updateImage:imagePath
-                           complete:^(TIUpdateManager *manager, NSError *error) {
-        if (error) {
-            // We failed to get info, but that's ok, continue anyway
-            NSLog(@"update failed=%@", [error localizedDescription]);
-        } else
-        {
-            NSLog(@"update complete");
-        }
+    self.updateManager = [[TIUpdateManager alloc] initWithPeripheral:pen.peripheral delegate:self]; // BUGBUG - ugly cast
+    [self.updateManager updateImage:imagePath];
+}
 
-        self.updateManager = nil;
-    }];
+- (void)updateManager:(TIUpdateManager *)manager didFinishUpdate:(NSError *)error
+{
+    if (error)
+    {
+        // We failed to get info, but that's ok, continue anyway
+        NSLog(@"update failed=%@", [error localizedDescription]);
+    }
+    else
+    {
+        NSLog(@"update complete");
+    }
+
+    self.updateManager = nil;
+
+    if ([self.delegate conformsToProtocol:@protocol(FTPenManagerDelegatePrivate)])
+    {
+        id<FTPenManagerDelegatePrivate> d = (id<FTPenManagerDelegatePrivate>)self.delegate;
+        [d penManager:self didFinishUpdate:error];
+    }
+}
+
+- (void)updateManager:(TIUpdateManager *)manager didUpdatePercentComplete:(float)percent
+{
+    if ([self.delegate conformsToProtocol:@protocol(FTPenManagerDelegatePrivate)])
+    {
+        id<FTPenManagerDelegatePrivate> d = (id<FTPenManagerDelegatePrivate>)self.delegate;
+        [d penManager:self didUpdatePercentComplete:percent];        
+    }
 }
 
 - (void)cleanup

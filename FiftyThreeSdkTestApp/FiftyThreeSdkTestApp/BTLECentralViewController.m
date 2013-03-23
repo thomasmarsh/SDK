@@ -10,7 +10,7 @@
 #import "FiftyThreeSdk/FTPenManager+Private.h"
 #import "FTConnectLatencyTester.h"
 
-@interface BTLECentralViewController () <FTPenManagerDelegate, FTPenDelegate>
+@interface BTLECentralViewController () <FTPenManagerDelegate, FTPenDelegate, FTPenManagerDelegatePrivate>
 
 @property (nonatomic) FTPenManager *penManager;
 @property (nonatomic) id currentTest;
@@ -118,6 +118,16 @@
 - (void)penManager:(FTPenManager *)penManager didUpdateDeviceBatteryLevel:(FTPen *)pen;
 {
     NSLog(@"battery level = %d", pen.batteryLevel);
+}
+
+- (void)penManager:(FTPenManager *)manager didFinishUpdate:(NSError *)error
+{
+    NSLog(@"didFinishUpdate");
+}
+
+- (void)penManager:(FTPenManager *)manager didUpdatePercentComplete:(float)percent
+{
+    NSLog(@"didUpdatePercentComplete %f", percent);
 }
 
 - (void)pen:(FTPen *)pen didReleaseTip:(FTPenTip)tip

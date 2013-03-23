@@ -28,28 +28,29 @@ static NSString *const kImageBlockTransferUUID = @"F000FFC2-0451-4000-B000-00000
 @property (nonatomic) unsigned long long imageSize;
 //@property (nonatomic) NSDate *lastBlockReceiveTime;
 @property (nonatomic) boost::shared_ptr<Timer> lastBlockTimer;
+@property (nonatomic, weak) id<TIUpdateManagerDelegate> delegate;
+@property (nonatomic) int lastPercent;
 
 @end
 
 @implementation TIUpdateManager
 {
     CBPeripheral *_peripheral;
-    void (^_complete)(TIUpdateManager *client, NSError *error);
     id<CBPeripheralDelegate> _oldDelegate;
 }
 
-- (id)initWithPeripheral:(CBPeripheral *)peripheral
+- (id)initWithPeripheral:(CBPeripheral *)peripheral delegate:(id<TIUpdateManagerDelegate>)delegate;
 {
     self = [super init];
     if (self) {
         _peripheral = peripheral;
+        _delegate = delegate;
     }
     return self;
 }
 
-- (void)updateImage:(NSString *)filePath complete:(void(^)(TIUpdateManager *client, NSError *error))complete
+- (void)updateImage:(NSString *)filePath
 {
-    _complete = complete;
     _oldDelegate = _peripheral.delegate;
     _peripheral.delegate = self;
 
@@ -158,12 +159,21 @@ static NSString *const kImageBlockTransferUUID = @"F000FFC2-0451-4000-B000-00000
             self.currentBlock++;
 
             self.imageSizeRemaining -= block.length;
+            
+            float percent = (float)(self.imageSize - self.imageSizeRemaining) / (float)self.imageSize * 100;
+            
+            // only send integral updates
+            if ((int)percent > self.lastPercent)
+            {
+                [self.delegate updateManager:self didUpdatePercentComplete:percent];
+            }
+            self.lastPercent = (int)percent;
+            
             if (self.imageSizeRemaining == 0)
             {
                 NSLog(@"100%% complete");
                 self.imageHandle = 0;
                 [self done:nil];
-                return;
             }
         }
     }
@@ -173,7 +183,8 @@ static NSString *const kImageBlockTransferUUID = @"F000FFC2-0451-4000-B000-00000
 {
     _peripheral.delegate = _oldDelegate;
     _oldDelegate = nil;
-    _complete(self, error);
+    
+    [self.delegate updateManager:self didFinishUpdate:error];
 }
 
 @end

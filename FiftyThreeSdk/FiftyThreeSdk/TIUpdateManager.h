@@ -9,8 +9,17 @@
 
 @class CBPeripheral;
 
+@protocol TIUpdateManagerDelegate;
+
 @interface TIUpdateManager : NSObject
 - (id) init __unavailable;
-- (id)initWithPeripheral:(CBPeripheral *)peripheral;
-- (void)updateImage:(NSString *)filePath complete:(void(^)(TIUpdateManager *client, NSError *error))complete;
+- (id)initWithPeripheral:(CBPeripheral *)peripheral delegate:(id<TIUpdateManagerDelegate>)delegate;
+- (void)updateImage:(NSString *)filePath;
+@end
+
+@protocol TIUpdateManagerDelegate <NSObject>
+
+- (void)updateManager:(TIUpdateManager *)manager didFinishUpdate:(NSError *)error;
+- (void)updateManager:(TIUpdateManager *)manager didUpdatePercentComplete:(float)percent;
+
 @end

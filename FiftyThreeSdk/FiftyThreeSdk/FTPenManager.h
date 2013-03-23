@@ -28,7 +28,7 @@
 
 @end
 
-@protocol FTPenManagerDelegate
+@protocol FTPenManagerDelegate <NSObject>
 
 - (void)penManager:(FTPenManager *)penManager didPairWithPen:(FTPen *)pen;
 - (void)penManager:(FTPenManager *)penManager didConnectToPen:(FTPen *)pen;
