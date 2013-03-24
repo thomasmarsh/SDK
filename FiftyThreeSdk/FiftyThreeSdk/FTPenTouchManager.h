@@ -10,8 +10,12 @@
 
 #import "FTPen.h"
 
+@class FTPenManager;
+
 @interface FTPenTouchManager : NSObject<FTPenDelegate>
 
+- (id)init __unavailable;
+- (id)initWithPenManager:(FTPenManager *)penManager;
 - (void)registerView:(UIView *)view;
 - (void)deregisterView:(UIView *)view;
 

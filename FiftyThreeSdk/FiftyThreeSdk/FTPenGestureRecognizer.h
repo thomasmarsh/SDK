@@ -10,11 +10,13 @@
 
 #include "TouchClassifierManager.h"
 
+@class FTPenManager;
+
 @interface FTPenGestureRecognizer : UIGestureRecognizer
 
-@property (nonatomic) fiftythree::sdk::TouchClassifierManager::Ptr manager;
+@property (nonatomic) fiftythree::sdk::TouchClassifierManager::Ptr classifierManager;
 
-- (id)initWithTouchClassifierManager:(fiftythree::sdk::TouchClassifierManager::Ptr)manager;
+- (id)initWithTouchClassifierManager:(fiftythree::sdk::TouchClassifierManager::Ptr)classifierManager penManager:(FTPenManager *)penManager;
 - (id)init __unavailable;
 
 @end

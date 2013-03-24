@@ -27,17 +27,28 @@ using namespace fiftythree::common;
     std::vector<TouchClassifierManager::Ptr> _managers;
 }
 
+@property (nonatomic) FTPenManager* penManager;
+
 @end
 
 @implementation FTPenTouchManager
 
+- (id)initWithPenManager:(FTPenManager *)penManager
+{
+    if (self = [super init])
+    {
+        _penManager = penManager;
+    }
+    return self;
+}
+
 - (void)registerView:(UIView *)view
 {
-    TouchClassifierManager::Ptr manager = TouchClassifierManager::New();
-    manager->AddClassifier(LatencyTouchClassifier::New());
-    _managers.push_back(manager);
+    TouchClassifierManager::Ptr classifierManager = TouchClassifierManager::New();
+    classifierManager->AddClassifier(LatencyTouchClassifier::New());
+    _managers.push_back(classifierManager);
     
-    [view addGestureRecognizer:[[FTPenGestureRecognizer alloc] initWithTouchClassifierManager:manager]];
+    [view addGestureRecognizer:[[FTPenGestureRecognizer alloc] initWithTouchClassifierManager:classifierManager penManager:self.penManager]];
 }
 
 - (void)deregisterView:(UIView *)view
@@ -46,7 +57,7 @@ using namespace fiftythree::common;
     {
         if ([rec isKindOfClass:[FTPenGestureRecognizer class]])
         {
-            TouchClassifierManager::Ptr manager = ((FTPenGestureRecognizer *)rec).manager;
+            TouchClassifierManager::Ptr manager = ((FTPenGestureRecognizer *)rec).classifierManager;
             [view removeGestureRecognizer:rec];
             
             _managers.erase(std::remove(_managers.begin(), _managers.end(), manager), _managers.end());

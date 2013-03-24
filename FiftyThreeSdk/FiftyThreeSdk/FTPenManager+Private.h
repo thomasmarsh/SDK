@@ -10,6 +10,7 @@
 @interface FTPenManager ()
 
 - (void)updateFirmware:(NSString *)imagePath forPen:(FTPen *)pen;
+- (void)didDetectMultitaskingGesturesEnabled;
 
 @end
 

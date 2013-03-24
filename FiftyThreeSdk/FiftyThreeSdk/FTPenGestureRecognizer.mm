@@ -7,6 +7,8 @@
 
 #import "FTPenGestureRecognizer.h"
 #import <UIKit/UIKit.h>
+#import "FTPenManager.h"
+#import "FTPenManager+Private.h"
 
 #include "Common/TouchManager.h"
 #include "TouchClassifierManager.h"
@@ -66,11 +68,13 @@ TouchesSet TouchesSetFromNSSet(NSSet *nsSet, UIView *view)
 
 @interface FTPenGestureRecognizer ()
 
+@property (nonatomic) FTPenManager *penManager;
+
 @end
 
 @implementation FTPenGestureRecognizer
 
-- (id)initWithTouchClassifierManager:(TouchClassifierManager::Ptr)manager
+- (id)initWithTouchClassifierManager:(TouchClassifierManager::Ptr)classifierManager penManager:(FTPenManager *)penManager
 {
     self = [super init];
     if (self)
@@ -79,7 +83,8 @@ TouchesSet TouchesSetFromNSSet(NSSet *nsSet, UIView *view)
         [self setDelaysTouchesBegan:NO];
         [self setDelaysTouchesEnded:NO];
 
-        _manager = manager;
+        _classifierManager = classifierManager;
+        _penManager = penManager;
     }
 
     return self;
@@ -92,7 +97,7 @@ TouchesSet TouchesSetFromNSSet(NSSet *nsSet, UIView *view)
     [super touchesBegan:touches withEvent:event];
 
     TouchesSet touchesSet = TouchesSetFromNSSet(touches, self.view);
-    self.manager->TouchesBegan(touchesSet);
+    self.classifierManager->TouchesBegan(touchesSet);
 }
 
 - (void) touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
@@ -102,7 +107,7 @@ TouchesSet TouchesSetFromNSSet(NSSet *nsSet, UIView *view)
     [super touchesMoved:touches withEvent:event];
 
     TouchesSet touchesSet = TouchesSetFromNSSet(touches, self.view);
-    self.manager->TouchesMoved(touchesSet);
+    self.classifierManager->TouchesMoved(touchesSet);
 }
 
 - (void) touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
@@ -112,23 +117,24 @@ TouchesSet TouchesSetFromNSSet(NSSet *nsSet, UIView *view)
     [super touchesEnded:touches withEvent:event];
 
     TouchesSet touchesSet = TouchesSetFromNSSet(touches, self.view);
-    self.manager->TouchesEnded(touchesSet);
+    self.classifierManager->TouchesEnded(touchesSet);
 }
 
 - (void) touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event
 {
 //    NSLog(@"touchesCancelled: %@", touches.allObjects);
+
+    [super touchesCancelled:touches withEvent:event];
     
     if (touches.count >= 4)
     {
         // TODO - Display dialog
         NSLog(@"WARNING: multitasking gestures are enabled");
+        [self.penManager didDetectMultitaskingGesturesEnabled];
     }
 
-    [super touchesCancelled:touches withEvent:event];
-
     TouchesSet touchesSet = TouchesSetFromNSSet(touches, self.view);
-    self.manager->TouchesCancelled(touchesSet);
+    self.classifierManager->TouchesCancelled(touchesSet);
 }
 
 - (void) ignoreTouch:(UITouch *)touch forEvent:(UIEvent *)event

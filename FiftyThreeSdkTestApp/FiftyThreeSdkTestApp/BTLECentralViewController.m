@@ -232,4 +232,11 @@
 {
     [self.penManager updateFirmware:[[NSBundle mainBundle] pathForResource:@"charcoal" ofType:@"img"] forPen:self.penManager.connectedPen];
 }
+
+- (void)didDetectMultitaskingGesturesEnabled
+{
+    UIAlertView* alertView = [[UIAlertView alloc] initWithTitle:@"Warning" message:@"Multitasking Gestures detected. For the best experience, turn them Off in the Settings app under General" delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
+    [alertView show];
+}
+
 @end

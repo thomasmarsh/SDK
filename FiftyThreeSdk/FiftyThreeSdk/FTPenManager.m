@@ -47,7 +47,7 @@ NSString * const kPairedPenUuidDefaultsKey = @"PairedPenUuid";
         _delegate = delegate;
         _queue = dispatch_queue_create("com.fiftythree.penmanager", NULL);
         _centralManager = [[CBCentralManager alloc] initWithDelegate:self queue:_queue];
-        _penTouchManager = [[FTPenTouchManager alloc] init];
+        _penTouchManager = [[FTPenTouchManager alloc] initWithPenManager:self];
         _pairedPen = nil;
         _pairing = NO;
         _lastState = 0;
@@ -499,6 +499,14 @@ NSString * const kPairedPenUuidDefaultsKey = @"PairedPenUuid";
     {
         id<FTPenManagerDelegatePrivate> d = (id<FTPenManagerDelegatePrivate>)self.delegate;
         [d penManager:self didUpdatePercentComplete:percent];        
+    }
+}
+
+- (void)didDetectMultitaskingGesturesEnabled
+{
+    if ([self.delegate respondsToSelector:@selector(didDetectMultitaskingGesturesEnabled)])
+    {
+        [self.delegate didDetectMultitaskingGesturesEnabled];
     }
 }
 
