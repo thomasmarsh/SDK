@@ -29,7 +29,7 @@ static NSString *const kImageBlockTransferUUID = @"F000FFC2-0451-4000-B000-00000
 //@property (nonatomic) NSDate *lastBlockReceiveTime;
 @property (nonatomic) boost::shared_ptr<Timer> lastBlockTimer;
 @property (nonatomic, weak) id<TIUpdateManagerDelegate> delegate;
-@property (nonatomic) int lastPercent;
+@property (nonatomic) float lastPercent;
 
 @end
 
@@ -163,16 +163,19 @@ static NSString *const kImageBlockTransferUUID = @"F000FFC2-0451-4000-B000-00000
             float percent = (float)(self.imageSize - self.imageSizeRemaining) / (float)self.imageSize * 100;
             
             // only send integral updates
-            if ((int)percent > self.lastPercent)
+            if ((percent - self.lastPercent) > 0.1)
             {
                 [self.delegate updateManager:self didUpdatePercentComplete:percent];
+                self.lastPercent = percent;
             }
-            self.lastPercent = (int)percent;
             
             if (self.imageSizeRemaining == 0)
             {
                 NSLog(@"100%% complete");
-                self.imageHandle = 0;
+                
+                [self.imageHandle closeFile];
+                self.imageHandle = nil;
+                 
                 [self done:nil];
             }
         }

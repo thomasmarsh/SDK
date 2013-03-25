@@ -10,11 +10,14 @@
 #import "FiftyThreeSdk/FTPenManager+Private.h"
 #import "FTConnectLatencyTester.h"
 
+NSString * const kUpdateAlertViewMessage = @"%.1f%% Complete\nTime Remaining: %02d:%02d";
+
 @interface BTLECentralViewController () <FTPenManagerDelegate, FTPenDelegate, FTPenManagerDelegatePrivate, UIAlertViewDelegate>
 
 @property (nonatomic) FTPenManager *penManager;
 @property (nonatomic) id currentTest;
 @property (nonatomic) UIAlertView *updateAlertView;
+@property (nonatomic) NSDate *updateStart;
 
 @end
 
@@ -133,7 +136,13 @@
 {
     NSLog(@"didUpdatePercentComplete %f", percent);
     
-    self.updateAlertView.message = [NSString stringWithFormat:@"%.1f%% Complete", percent];
+    NSTimeInterval elapsed = -[self.updateStart timeIntervalSinceNow];
+    float totalTime = elapsed / (percent / 100.0);
+    float remainingTime = totalTime - (totalTime * percent / 100.0);
+    int minutes = (int)remainingTime / 60;
+    int seconds = (int)remainingTime % 60;
+
+    self.updateAlertView.message = [NSString stringWithFormat:kUpdateAlertViewMessage, percent, minutes, seconds];
     [self.updateAlertView show];
 }
 
@@ -237,7 +246,9 @@
 
 - (IBAction)updateFirmwareButtonPressed:(id)sender
 {
-    self.updateAlertView = [[UIAlertView alloc] initWithTitle:@"Firmware Update" message:@"0% Complete" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:nil, nil];
+    self.updateStart = [NSDate date];
+    
+    self.updateAlertView = [[UIAlertView alloc] initWithTitle:@"Firmware Update" message:[NSString stringWithFormat:kUpdateAlertViewMessage, 0., 0, 0] delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:nil, nil];
     [self.updateAlertView show];
     
     [self.penManager updateFirmware:[[NSBundle mainBundle] pathForResource:@"charcoal" ofType:@"img"] forPen:self.penManager.connectedPen];
