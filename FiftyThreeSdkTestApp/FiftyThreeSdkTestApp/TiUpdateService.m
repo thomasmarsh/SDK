@@ -102,7 +102,7 @@ static NSString *const kImageBlockTransferUUID = @"F000FFC2-0451-4000-B000-00000
     {
         if ([request.characteristic.UUID isEqual:[CBUUID UUIDWithString:kImageIdentifyUUID]])
         {
-            uint16_t imageLen = CFSwapInt16HostToLittle(((char *)request.value.bytes)[4]);
+            uint16_t imageLen = CFSwapInt16HostToLittle(((char *)request.value.bytes)[0]);
             NSLog(@"imageLen = %d", imageLen);
             self.totalBlocks = imageLen / (16 / 4);
             self.currentBlock = 0;

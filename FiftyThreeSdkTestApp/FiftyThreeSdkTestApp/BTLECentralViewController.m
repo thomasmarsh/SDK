@@ -10,10 +10,11 @@
 #import "FiftyThreeSdk/FTPenManager+Private.h"
 #import "FTConnectLatencyTester.h"
 
-@interface BTLECentralViewController () <FTPenManagerDelegate, FTPenDelegate, FTPenManagerDelegatePrivate>
+@interface BTLECentralViewController () <FTPenManagerDelegate, FTPenDelegate, FTPenManagerDelegatePrivate, UIAlertViewDelegate>
 
 @property (nonatomic) FTPenManager *penManager;
 @property (nonatomic) id currentTest;
+@property (nonatomic) UIAlertView *updateAlertView;
 
 @end
 
@@ -123,11 +124,17 @@
 - (void)penManager:(FTPenManager *)manager didFinishUpdate:(NSError *)error
 {
     NSLog(@"didFinishUpdate");
+    
+    [self.updateAlertView dismissWithClickedButtonIndex:0 animated:NO];
+    self.updateAlertView = nil;
 }
 
 - (void)penManager:(FTPenManager *)manager didUpdatePercentComplete:(float)percent
 {
     NSLog(@"didUpdatePercentComplete %f", percent);
+    
+    self.updateAlertView.message = [NSString stringWithFormat:@"%.1f%% Complete", percent];
+    [self.updateAlertView show];
 }
 
 - (void)pen:(FTPen *)pen didReleaseTip:(FTPenTip)tip
@@ -230,6 +237,9 @@
 
 - (IBAction)updateFirmwareButtonPressed:(id)sender
 {
+    self.updateAlertView = [[UIAlertView alloc] initWithTitle:@"Firmware Update" message:@"0% Complete" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:nil, nil];
+    [self.updateAlertView show];
+    
     [self.penManager updateFirmware:[[NSBundle mainBundle] pathForResource:@"charcoal" ofType:@"img"] forPen:self.penManager.connectedPen];
 }
 
@@ -237,6 +247,11 @@
 {
     UIAlertView* alertView = [[UIAlertView alloc] initWithTitle:@"Warning" message:@"Multitasking Gestures detected. For the best experience, turn them Off in the Settings app under General" delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
     [alertView show];
+}
+
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    [self.penManager disconnect];
 }
 
 @end

@@ -50,7 +50,9 @@ NSString * const kPairedPenUuidDefaultsKey = @"PairedPenUuid";
         _penTouchManager = [[FTPenTouchManager alloc] initWithPenManager:self];
         _pairedPen = nil;
         _pairing = NO;
+#if USE_TI_UUIDS
         _lastState = 0;
+#endif
     }
 
     return self;
@@ -488,8 +490,10 @@ NSString * const kPairedPenUuidDefaultsKey = @"PairedPenUuid";
 
     if ([self.delegate conformsToProtocol:@protocol(FTPenManagerDelegatePrivate)])
     {
-        id<FTPenManagerDelegatePrivate> d = (id<FTPenManagerDelegatePrivate>)self.delegate;
-        [d penManager:self didFinishUpdate:error];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            id<FTPenManagerDelegatePrivate> d = (id<FTPenManagerDelegatePrivate>)self.delegate;
+            [d penManager:self didFinishUpdate:error];
+        });
     }
 }
 
@@ -497,8 +501,10 @@ NSString * const kPairedPenUuidDefaultsKey = @"PairedPenUuid";
 {
     if ([self.delegate conformsToProtocol:@protocol(FTPenManagerDelegatePrivate)])
     {
-        id<FTPenManagerDelegatePrivate> d = (id<FTPenManagerDelegatePrivate>)self.delegate;
-        [d penManager:self didUpdatePercentComplete:percent];        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            id<FTPenManagerDelegatePrivate> d = (id<FTPenManagerDelegatePrivate>)self.delegate;
+            [d penManager:self didUpdatePercentComplete:percent];
+        });
     }
 }
 
@@ -506,7 +512,9 @@ NSString * const kPairedPenUuidDefaultsKey = @"PairedPenUuid";
 {
     if ([self.delegate respondsToSelector:@selector(didDetectMultitaskingGesturesEnabled)])
     {
-        [self.delegate didDetectMultitaskingGesturesEnabled];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self.delegate didDetectMultitaskingGesturesEnabled];
+        });
     }
 }
 
