@@ -160,8 +160,6 @@ NSString * const kPairedPenUuidDefaultsKey = @"PairedPenUuid";
         [self cleanup];
     }
 
-    NSLog(@"found service");
-
 #if USE_TI_UUIDS
     if (peripheral.services.count == 0)
     {

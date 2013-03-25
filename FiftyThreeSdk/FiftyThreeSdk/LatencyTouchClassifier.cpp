@@ -45,7 +45,7 @@ public:
         BOOST_FOREACH(const Touch::cPtr & touch, touches)
         {
             _LastTouchBeganTime = touch->Sample.Timestamp();
-            std::cout << "Touch Began: " << touch->Sample.ToString() << std::endl;
+            std::cout << "Touch Began: id=" << touch->Id << " " << touch->Sample.ToString() << std::endl;
             
 //            _TouchVector.push_back(touch);
             _TouchMap[touch->Id] = touch;
@@ -63,7 +63,7 @@ public:
     {
         BOOST_FOREACH(const Touch::cPtr & touch, touches)
         {
-            std::cout << "Touch Ended: " << touch->Sample.ToString() << std::endl;
+            std::cout << "Touch Ended: id=" << touch->Id << " " << touch->Sample.ToString() << std::endl;
 
             Touch::cPtr t = _TouchMap[touch->Id];
             _TouchMap.erase(touch->Id);
