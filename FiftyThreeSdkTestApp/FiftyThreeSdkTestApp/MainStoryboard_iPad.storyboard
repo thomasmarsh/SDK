@@ -148,6 +148,23 @@
                                             </connections>
                                         </button>
                                     </barButtonItem>
+                                    <barButtonItem style="plain" id="gc0-W3-pLj">
+                                        <button key="customView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="af2-Ke-cZT">
+                                            <rect key="frame" x="360" y="6" width="73" height="33"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
+                                            <state key="normal" title="Update">
+                                                <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                                <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                            </state>
+                                            <state key="highlighted">
+                                                <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                            </state>
+                                            <connections>
+                                                <action selector="updateFirmwareButtonPressed:" destination="7eE-pW-ZTc" eventType="touchUpInside" id="Si6-8T-8iN"/>
+                                            </connections>
+                                        </button>
+                                    </barButtonItem>
                                 </items>
                             </toolbar>
                             <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Label" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="mcn-TJ-2K3">
@@ -202,6 +219,7 @@
                         <outlet property="tip1State" destination="aLs-Rl-wQi" id="nyn-fP-hCI"/>
                         <outlet property="tip2State" destination="Fr8-7O-QGt" id="T8J-Wd-mCN"/>
                         <outlet property="unpairButton" destination="WC1-8y-qlb" id="i1E-Gc-YXu"/>
+                        <outlet property="updateFirmwareButton" destination="af2-Ke-cZT" id="l6G-SO-RPR"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="kpK-Ae-QYl" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -233,8 +251,6 @@
             <relationships>
                 <relationship kind="action" name="connectButtonPressed:"/>
                 <relationship kind="action" name="disconnectButtonPressed:"/>
-                <relationship kind="action" name="pairButtonPressed:"/>
-                <relationship kind="action" name="pairButtonReleased:"/>
                 <relationship kind="action" name="pairButtonTouchDown:"/>
                 <relationship kind="action" name="pairButtonTouchUpInside:"/>
                 <relationship kind="action" name="pairButtonTouchUpOutside:"/>
@@ -268,9 +284,6 @@
         </class>
         <class className="NSLayoutConstraint" superclassName="NSObject">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/NSLayoutConstraint.h"/>
-        </class>
-        <class className="ViewController" superclassName="enable_shared_from_this">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ViewController.h"/>
         </class>
     </classes>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">

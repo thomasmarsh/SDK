@@ -9,7 +9,7 @@
 #define charcoal_prototype_FTPenService_h
 
 #define USE_FT_UUIDS 0
-#define USE_TI_UUIDS 1
+#define USE_TI_UUIDS 0
 
 #define FT_PEN_TIP_STATE_PRESSED 1
 #define FT_PEN_TIP_STATE_RELEASED 0
