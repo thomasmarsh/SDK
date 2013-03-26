@@ -18,7 +18,7 @@
 		6644312B16F3C86C0049E570 /* FiftyThreeSdkTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 6644312716F3C86C0049E570 /* FiftyThreeSdkTests.m */; };
 		6644313416F3CC2C0049E570 /* SenAsyncTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 6644313316F3CC2C0049E570 /* SenAsyncTestCase.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		6644315216F3D1640049E570 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 6644313716F3D1640049E570 /* AppDelegate.m */; };
-		6644315316F3D1640049E570 /* BTLECentralViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6644313916F3D1640049E570 /* BTLECentralViewController.m */; };
+		6644315316F3D1640049E570 /* BTLECentralViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 6644313916F3D1640049E570 /* BTLECentralViewController.mm */; };
 		6644315416F3D1640049E570 /* BTLEPeripheralViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 6644313B16F3D1640049E570 /* BTLEPeripheralViewController.mm */; };
 		6644315616F3D1640049E570 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 6644314016F3D1640049E570 /* Default-568h@2x.png */; };
 		6644315716F3D1640049E570 /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = 6644314116F3D1640049E570 /* Default.png */; };
@@ -41,6 +41,10 @@
 		6644319B16F804B20049E570 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6644319A16F804B20049E570 /* QuartzCore.framework */; };
 		6644319D16F804BE0049E570 /* libAFNetworking.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6644319C16F804BE0049E570 /* libAFNetworking.a */; };
 		6685989F16FD11E1008CAE29 /* charcoal.img in Resources */ = {isa = PBXBuildFile; fileRef = 6685989E16FD11E1008CAE29 /* charcoal.img */; };
+		668F6D5217023A8C002C548B /* libCanvas.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 668F6D5117023A8C002C548B /* libCanvas.a */; };
+		668F6D5A17024021002C548B /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6644319616F802C80049E570 /* CoreVideo.framework */; };
+		668F6D5C17024034002C548B /* libGlobalSettings.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 668F6D5B17024034002C548B /* libGlobalSettings.a */; };
+		668F6D621702436E002C548B /* DrawingView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 668F6D611702436E002C548B /* DrawingView.mm */; };
 		66A47BF416D835C90016B31C /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 66A47BF316D835C90016B31C /* UIKit.framework */; };
 		66A47BF616D835C90016B31C /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 66A47BF516D835C90016B31C /* Foundation.framework */; };
 		66A47BF816D835C90016B31C /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 66A47BF716D835C90016B31C /* CoreGraphics.framework */; };
@@ -72,7 +76,7 @@
 		6644313616F3D1640049E570 /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = FiftyThreeSdkTestApp/AppDelegate.h; sourceTree = SOURCE_ROOT; };
 		6644313716F3D1640049E570 /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = FiftyThreeSdkTestApp/AppDelegate.m; sourceTree = SOURCE_ROOT; };
 		6644313816F3D1640049E570 /* BTLECentralViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BTLECentralViewController.h; path = FiftyThreeSdkTestApp/BTLECentralViewController.h; sourceTree = SOURCE_ROOT; };
-		6644313916F3D1640049E570 /* BTLECentralViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BTLECentralViewController.m; path = FiftyThreeSdkTestApp/BTLECentralViewController.m; sourceTree = SOURCE_ROOT; };
+		6644313916F3D1640049E570 /* BTLECentralViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = BTLECentralViewController.mm; path = FiftyThreeSdkTestApp/BTLECentralViewController.mm; sourceTree = SOURCE_ROOT; };
 		6644313A16F3D1640049E570 /* BTLEPeripheralViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BTLEPeripheralViewController.h; path = FiftyThreeSdkTestApp/BTLEPeripheralViewController.h; sourceTree = SOURCE_ROOT; };
 		6644313B16F3D1640049E570 /* BTLEPeripheralViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = BTLEPeripheralViewController.mm; path = FiftyThreeSdkTestApp/BTLEPeripheralViewController.mm; sourceTree = SOURCE_ROOT; };
 		6644314016F3D1640049E570 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Default-568h@2x.png"; path = "FiftyThreeSdkTestApp/Default-568h@2x.png"; sourceTree = SOURCE_ROOT; };
@@ -107,6 +111,11 @@
 		6644319A16F804B20049E570 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		6644319C16F804BE0049E570 /* libAFNetworking.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libAFNetworking.a; path = "../../AFNetworking/build/Release-iphoneos/libAFNetworking.a"; sourceTree = "<group>"; };
 		6685989E16FD11E1008CAE29 /* charcoal.img */ = {isa = PBXFileReference; lastKnownFileType = file; path = charcoal.img; sourceTree = SOURCE_ROOT; };
+		668F6D5117023A8C002C548B /* libCanvas.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libCanvas.a; path = "../../../../../../Library/Developer/Xcode/DerivedData/FiftyThreeSdkTestApp-fqhrggmyvwwfhzgakxbhthwwiptp/Build/Products/Debug-iphoneos/libCanvas.a"; sourceTree = "<group>"; };
+		668F6D5617023D13002C548B /* libCommon.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libCommon.a; path = "../../../../../../Library/Developer/Xcode/DerivedData/FiftyThreeSdkTestApp-fqhrggmyvwwfhzgakxbhthwwiptp/Build/Products/Debug-iphoneos/libCommon.a"; sourceTree = "<group>"; };
+		668F6D5B17024034002C548B /* libGlobalSettings.a */ = {isa = PBXFileReference; lastKnownFileType = file; name = libGlobalSettings.a; path = "../../GlobalSettings/build/Release-iphoneos/libGlobalSettings.a"; sourceTree = "<group>"; };
+		668F6D601702436E002C548B /* DrawingView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DrawingView.h; path = FiftyThreeSdkTestApp/DrawingView.h; sourceTree = SOURCE_ROOT; };
+		668F6D611702436E002C548B /* DrawingView.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = DrawingView.mm; path = FiftyThreeSdkTestApp/DrawingView.mm; sourceTree = SOURCE_ROOT; };
 		66A47BF016D835C90016B31C /* FiftyThreeSdkTestApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FiftyThreeSdkTestApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		66A47BF316D835C90016B31C /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		66A47BF516D835C90016B31C /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -129,6 +138,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				668F6D5C17024034002C548B /* libGlobalSettings.a in Frameworks */,
+				668F6D5A17024021002C548B /* CoreVideo.framework in Frameworks */,
+				6644318016F7FE570049E570 /* OpenGLES.framework in Frameworks */,
+				668F6D5217023A8C002C548B /* libCanvas.a in Frameworks */,
 				6632314116F8B9FD008AD3DC /* AVFoundation.framework in Frameworks */,
 				6632314016F8B9F2008AD3DC /* libT1PogoManager.a in Frameworks */,
 				6632313E16F8B213008AD3DC /* boost.framework in Frameworks */,
@@ -139,7 +152,6 @@
 				6644318A16F7FFE30049E570 /* CoreData.framework in Frameworks */,
 				6644318416F7FF560049E570 /* Security.framework in Frameworks */,
 				6644318216F7FF260049E570 /* libsqlite3.dylib in Frameworks */,
-				6644318016F7FE570049E570 /* OpenGLES.framework in Frameworks */,
 				6644317A16F7FE190049E570 /* CoreText.framework in Frameworks */,
 				6644317816F7FDD30049E570 /* libz.dylib in Frameworks */,
 				6644316A16F3D2E80049E570 /* libFiftyThreeSdk.a in Frameworks */,
@@ -186,6 +198,7 @@
 		66A47BE716D835C90016B31C = {
 			isa = PBXGroup;
 			children = (
+				668F6D5B17024034002C548B /* libGlobalSettings.a */,
 				6644316116F3D1B50049E570 /* FiftyThreeSdk.xcodeproj */,
 				66A47BF916D835C90016B31C /* FiftyThreeSdkTestApp */,
 				6644311716F3C8390049E570 /* FiftyThreeSdkTests */,
@@ -206,6 +219,8 @@
 		66A47BF216D835C90016B31C /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				668F6D5117023A8C002C548B /* libCanvas.a */,
+				668F6D5617023D13002C548B /* libCommon.a */,
 				6644319C16F804BE0049E570 /* libAFNetworking.a */,
 				6644318516F7FF620049E570 /* libCanvas.a */,
 				6644316D16F7F7B70049E570 /* libCommon.a */,
@@ -237,7 +252,7 @@
 				6644313616F3D1640049E570 /* AppDelegate.h */,
 				6644313716F3D1640049E570 /* AppDelegate.m */,
 				6644313816F3D1640049E570 /* BTLECentralViewController.h */,
-				6644313916F3D1640049E570 /* BTLECentralViewController.m */,
+				6644313916F3D1640049E570 /* BTLECentralViewController.mm */,
 				6644313A16F3D1640049E570 /* BTLEPeripheralViewController.h */,
 				6644313B16F3D1640049E570 /* BTLEPeripheralViewController.mm */,
 				6644314816F3D1640049E570 /* FTConnectLatencyTester.h */,
@@ -246,6 +261,8 @@
 				6644314F16F3D1640049E570 /* MainStoryboard_iPhone.storyboard */,
 				66A47C3216D98E7A0016B31C /* pen-sim */,
 				66A47BFA16D835C90016B31C /* Supporting Files */,
+				668F6D601702436E002C548B /* DrawingView.h */,
+				668F6D611702436E002C548B /* DrawingView.mm */,
 			);
 			name = FiftyThreeSdkTestApp;
 			path = "charcoal-prototype";
@@ -416,12 +433,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				6644315216F3D1640049E570 /* AppDelegate.m in Sources */,
-				6644315316F3D1640049E570 /* BTLECentralViewController.m in Sources */,
+				6644315316F3D1640049E570 /* BTLECentralViewController.mm in Sources */,
 				6644315416F3D1640049E570 /* BTLEPeripheralViewController.mm in Sources */,
 				6644315B16F3D1640049E570 /* FTConnectLatencyTester.m in Sources */,
 				6644315C16F3D1640049E570 /* FTPenService.m in Sources */,
 				6644315D16F3D1640049E570 /* main.m in Sources */,
 				6644316016F3D1640049E570 /* TiUpdateService.m in Sources */,
+				668F6D621702436E002C548B /* DrawingView.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -556,12 +574,15 @@
 				HEADER_SEARCH_PATHS = (
 					"$(SRCROOT)/../../ThirdParty",
 					"$(SRCROOT)/../../../ThirdParty",
+					"$(SRCROOT)/../../Canvas",
+					"$(SRCROOT)/../../Common",
 				);
 				INFOPLIST_FILE = "FiftyThreeSdkTestApp/FiftyThreeSdkTestApp-Info.plist";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/../../../../../../Library/Developer/Xcode/DerivedData/Paper-fojnnwufckzdqwfidwyifzefweko/Build/Products/Debug-iphoneos\"",
 					"\"$(SRCROOT)/../../ThirdParty/PogoConnect\"",
+					"\"$(SRCROOT)/../../../../../../Library/Developer/Xcode/DerivedData/FiftyThreeSdkTestApp-fqhrggmyvwwfhzgakxbhthwwiptp/Build/Products/Debug-iphoneos\"",
 				);
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = FiftyThreeSdkTestApp;
@@ -587,12 +608,15 @@
 				HEADER_SEARCH_PATHS = (
 					"$(SRCROOT)/../../ThirdParty",
 					"$(SRCROOT)/../../../ThirdParty",
+					"$(SRCROOT)/../../Canvas",
+					"$(SRCROOT)/../../Common",
 				);
 				INFOPLIST_FILE = "FiftyThreeSdkTestApp/FiftyThreeSdkTestApp-Info.plist";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/../../../../../../Library/Developer/Xcode/DerivedData/Paper-fojnnwufckzdqwfidwyifzefweko/Build/Products/Debug-iphoneos\"",
 					"\"$(SRCROOT)/../../ThirdParty/PogoConnect\"",
+					"\"$(SRCROOT)/../../../../../../Library/Developer/Xcode/DerivedData/FiftyThreeSdkTestApp-fqhrggmyvwwfhzgakxbhthwwiptp/Build/Products/Debug-iphoneos\"",
 				);
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = FiftyThreeSdkTestApp;

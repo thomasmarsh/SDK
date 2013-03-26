@@ -9,6 +9,7 @@
 #import "FiftyThreeSdk/FTPenManager.h"
 #import "FiftyThreeSdk/FTPenManager+Private.h"
 #import "FTConnectLatencyTester.h"
+#include "Canvas/GLCanvasController.h"
 
 NSString * const kUpdateAlertViewMessage = @"%.1f%% Complete\nTime Remaining: %02d:%02d";
 
