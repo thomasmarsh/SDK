@@ -73,7 +73,7 @@
             <objects>
                 <viewController id="7eE-pW-ZTc" customClass="BTLECentralViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="lin-cR-7UE">
-                        <rect key="frame" x="0.0" y="64" width="768" height="960"/>
+                        <rect key="frame" x="0.0" y="64" width="1024" height="704"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="T0a-F8-CdT">
@@ -198,7 +198,7 @@
                         </subviews>
                         <color key="backgroundColor" white="0.95456042921686746" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
-                            <constraint firstItem="Fr8-7O-QGt" firstAttribute="top" secondItem="aLs-Rl-wQi" secondAttribute="bottom" constant="8" symbolic="YES" type="default" id="3cv-yp-hAt"/>
+                            <constraint firstItem="aLs-Rl-wQi" firstAttribute="top" secondItem="lin-cR-7UE" secondAttribute="top" constant="6" id="62g-9v-RE6"/>
                             <constraint firstAttribute="trailing" secondItem="mcn-TJ-2K3" secondAttribute="trailing" constant="14" id="Aeh-1a-5ia"/>
                             <constraint firstAttribute="bottom" secondItem="mcn-TJ-2K3" secondAttribute="bottom" constant="12" id="CNd-MP-te5"/>
                             <constraint firstItem="T0a-F8-CdT" firstAttribute="leading" secondItem="lin-cR-7UE" secondAttribute="leading" type="default" id="LIR-vM-fPO"/>
@@ -206,11 +206,13 @@
                             <constraint firstItem="Fr8-7O-QGt" firstAttribute="leading" secondItem="aLs-Rl-wQi" secondAttribute="leading" type="default" id="SRe-nq-GMh"/>
                             <constraint firstItem="aLs-Rl-wQi" firstAttribute="trailing" secondItem="Fr8-7O-QGt" secondAttribute="trailing" type="default" id="guJ-ja-mUA"/>
                             <constraint firstItem="T0a-F8-CdT" firstAttribute="trailing" secondItem="lin-cR-7UE" secondAttribute="trailing" type="default" id="lsQ-7h-WTi"/>
-                            <constraint firstItem="aLs-Rl-wQi" firstAttribute="top" secondItem="lin-cR-7UE" secondAttribute="top" constant="8" id="pbr-cD-JKj"/>
-                            <constraint firstAttribute="trailing" secondItem="aLs-Rl-wQi" secondAttribute="trailing" constant="8" id="xJ5-O2-O2Z"/>
+                            <constraint firstAttribute="trailing" secondItem="aLs-Rl-wQi" secondAttribute="trailing" constant="7" id="neq-5o-aI4"/>
+                            <constraint firstItem="Fr8-7O-QGt" firstAttribute="top" secondItem="aLs-Rl-wQi" secondAttribute="bottom" constant="8" symbolic="YES" type="default" id="rtp-oH-NrX"/>
                         </constraints>
+                        <simulatedOrientationMetrics key="simulatedOrientationMetrics" orientation="landscapeRight"/>
                     </view>
                     <navigationItem key="navigationItem" id="ZxX-cB-0EW"/>
+                    <simulatedOrientationMetrics key="simulatedOrientationMetrics" orientation="landscapeRight"/>
                     <connections>
                         <outlet property="connectButton" destination="6zl-tH-yfU" id="Emb-3d-GJj"/>
                         <outlet property="disconnectButton" destination="1d5-T6-CVy" id="eoj-C9-0QJ"/>
@@ -251,6 +253,8 @@
             <relationships>
                 <relationship kind="action" name="connectButtonPressed:"/>
                 <relationship kind="action" name="disconnectButtonPressed:"/>
+                <relationship kind="action" name="pairButtonPressed:"/>
+                <relationship kind="action" name="pairButtonReleased:"/>
                 <relationship kind="action" name="pairButtonTouchDown:"/>
                 <relationship kind="action" name="pairButtonTouchUpInside:"/>
                 <relationship kind="action" name="pairButtonTouchUpOutside:"/>

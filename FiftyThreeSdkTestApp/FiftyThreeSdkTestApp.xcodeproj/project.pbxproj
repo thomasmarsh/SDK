@@ -44,8 +44,9 @@
 		668F6D5217023A8C002C548B /* libCanvas.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 668F6D5117023A8C002C548B /* libCanvas.a */; };
 		668F6D5A17024021002C548B /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6644319616F802C80049E570 /* CoreVideo.framework */; };
 		668F6D5C17024034002C548B /* libGlobalSettings.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 668F6D5B17024034002C548B /* libGlobalSettings.a */; };
-		668F6D621702436E002C548B /* DrawingView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 668F6D611702436E002C548B /* DrawingView.mm */; };
 		668F6D6617024D43002C548B /* charcoal.img in Resources */ = {isa = PBXBuildFile; fileRef = 668F6D6517024D43002C548B /* charcoal.img */; };
+		668F6DE917037361002C548B /* Textures in Resources */ = {isa = PBXBuildFile; fileRef = 668F6DE817037361002C548B /* Textures */; };
+		668F6DEB17037376002C548B /* Shaders in Resources */ = {isa = PBXBuildFile; fileRef = 668F6DEA17037376002C548B /* Shaders */; };
 		66A47BF416D835C90016B31C /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 66A47BF316D835C90016B31C /* UIKit.framework */; };
 		66A47BF616D835C90016B31C /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 66A47BF516D835C90016B31C /* Foundation.framework */; };
 		66A47BF816D835C90016B31C /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 66A47BF716D835C90016B31C /* CoreGraphics.framework */; };
@@ -115,9 +116,9 @@
 		668F6D5117023A8C002C548B /* libCanvas.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libCanvas.a; path = "../../../../../../Library/Developer/Xcode/DerivedData/FiftyThreeSdkTestApp-fqhrggmyvwwfhzgakxbhthwwiptp/Build/Products/Debug-iphoneos/libCanvas.a"; sourceTree = "<group>"; };
 		668F6D5617023D13002C548B /* libCommon.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libCommon.a; path = "../../../../../../Library/Developer/Xcode/DerivedData/FiftyThreeSdkTestApp-fqhrggmyvwwfhzgakxbhthwwiptp/Build/Products/Debug-iphoneos/libCommon.a"; sourceTree = "<group>"; };
 		668F6D5B17024034002C548B /* libGlobalSettings.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libGlobalSettings.a; path = "../../GlobalSettings/build/Release-iphoneos/libGlobalSettings.a"; sourceTree = "<group>"; };
-		668F6D601702436E002C548B /* DrawingView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DrawingView.h; path = FiftyThreeSdkTestApp/DrawingView.h; sourceTree = SOURCE_ROOT; };
-		668F6D611702436E002C548B /* DrawingView.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = DrawingView.mm; path = FiftyThreeSdkTestApp/DrawingView.mm; sourceTree = SOURCE_ROOT; };
 		668F6D6517024D43002C548B /* charcoal.img */ = {isa = PBXFileReference; lastKnownFileType = file; path = charcoal.img; sourceTree = SOURCE_ROOT; };
+		668F6DE817037361002C548B /* Textures */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Textures; path = ../../Canvas/Canvas/Textures; sourceTree = "<group>"; };
+		668F6DEA17037376002C548B /* Shaders */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Shaders; path = ../../Common/Common/Shaders; sourceTree = "<group>"; };
 		66A47BF016D835C90016B31C /* FiftyThreeSdkTestApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FiftyThreeSdkTestApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		66A47BF316D835C90016B31C /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		66A47BF516D835C90016B31C /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -197,11 +198,20 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		668F6DEC1703737A002C548B /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				668F6DEA17037376002C548B /* Shaders */,
+				668F6DE817037361002C548B /* Textures */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
 		66A47BE716D835C90016B31C = {
 			isa = PBXGroup;
 			children = (
-				668F6D5B17024034002C548B /* libGlobalSettings.a */,
 				6644316116F3D1B50049E570 /* FiftyThreeSdk.xcodeproj */,
+				668F6DEC1703737A002C548B /* Resources */,
 				66A47BF916D835C90016B31C /* FiftyThreeSdkTestApp */,
 				6644311716F3C8390049E570 /* FiftyThreeSdkTests */,
 				66A47BF216D835C90016B31C /* Frameworks */,
@@ -221,6 +231,7 @@
 		66A47BF216D835C90016B31C /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				668F6D5B17024034002C548B /* libGlobalSettings.a */,
 				668F6D5117023A8C002C548B /* libCanvas.a */,
 				668F6D5617023D13002C548B /* libCommon.a */,
 				6644319C16F804BE0049E570 /* libAFNetworking.a */,
@@ -263,8 +274,6 @@
 				6644314F16F3D1640049E570 /* MainStoryboard_iPhone.storyboard */,
 				66A47C3216D98E7A0016B31C /* pen-sim */,
 				66A47BFA16D835C90016B31C /* Supporting Files */,
-				668F6D601702436E002C548B /* DrawingView.h */,
-				668F6D611702436E002C548B /* DrawingView.mm */,
 			);
 			name = FiftyThreeSdkTestApp;
 			path = "charcoal-prototype";
@@ -393,6 +402,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				668F6DEB17037376002C548B /* Shaders in Resources */,
+				668F6DE917037361002C548B /* Textures in Resources */,
 				6644315616F3D1640049E570 /* Default-568h@2x.png in Resources */,
 				6644315716F3D1640049E570 /* Default.png in Resources */,
 				6644315816F3D1640049E570 /* Default@2x.png in Resources */,
@@ -443,7 +454,6 @@
 				6644315C16F3D1640049E570 /* FTPenService.m in Sources */,
 				6644315D16F3D1640049E570 /* main.m in Sources */,
 				6644316016F3D1640049E570 /* TiUpdateService.m in Sources */,
-				668F6D621702436E002C548B /* DrawingView.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

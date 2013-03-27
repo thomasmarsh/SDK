@@ -10,6 +10,9 @@
 #import "FiftyThreeSdk/FTPenManager+Private.h"
 #import "FTConnectLatencyTester.h"
 #include "Canvas/GLCanvasController.h"
+#include "Common/InputSample.h"
+
+using namespace fiftythree::common;
 
 NSString * const kUpdateAlertViewMessage = @"%.1f%% Complete\nTime Remaining: %02d:%02d";
 
@@ -19,6 +22,7 @@ NSString * const kUpdateAlertViewMessage = @"%.1f%% Complete\nTime Remaining: %0
 @property (nonatomic) id currentTest;
 @property (nonatomic) UIAlertView *updateAlertView;
 @property (nonatomic) NSDate *updateStart;
+@property (nonatomic) GLCanvasController *canvasController;
 
 @end
 
@@ -27,23 +31,42 @@ NSString * const kUpdateAlertViewMessage = @"%.1f%% Complete\nTime Remaining: %0
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    // Do any additional setup after loading the view.
-
-    _penManager = [[FTPenManager alloc] initWithDelegate:self];
-    while (!_penManager.isReady) {}
-
-    [self.testConnectButton setHidden:YES];
-    [self updateDisplay];
 }
 
 - (void)viewWillAppear:(BOOL)animated
 {
     [_penManager registerView:self.view];
+
+    CGRect frame = self.view.bounds;
+    frame.size.height -= 44; // 44 = height of bottom toolbar
+    
+    self.canvasController = [[GLCanvasController alloc] initWithFrame:frame
+                                                             andScale:[UIScreen mainScreen].scale];
+    [self.canvasController setBrush:@"FountainPen"];
+    self.canvasController.view.hidden = NO;
+    self.canvasController.paused = NO;    
+    [self.view addSubview:self.canvasController.view];
+    [self.view sendSubviewToBack:self.canvasController.view];
+    
+    _penManager = [[FTPenManager alloc] initWithDelegate:self];
+    while (!_penManager.isReady) {}
+
+    [self updateDisplay];
 }
 
 - (void)viewDidDisappear:(BOOL)animated
 {
     [_penManager deregisterView:self.view];
+}
+
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
+{
+    // Return YES for supported orientations
+    if (interfaceOrientation == UIInterfaceOrientationLandscapeLeft ||
+        interfaceOrientation == UIInterfaceOrientationLandscapeRight) {
+        return YES;
+    }
+    return NO;
 }
 
 - (void)didReceiveMemoryWarning
@@ -265,5 +288,36 @@ NSString * const kUpdateAlertViewMessage = @"%.1f%% Complete\nTime Remaining: %0
 {
     [self.penManager disconnect];
 }
+
+- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
+{
+    DebugAssert(touches.count == 1);
+    UITouch *touch = [touches anyObject];
+    [self.canvasController beginStroke:InputSampleFromCGPoint([touch locationInView:self.view],
+                                                              touch.timestamp)];
+}
+
+- (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
+{
+    DebugAssert([touches count] == 1);
+    UITouch *touch = [touches anyObject];
+    [self.canvasController continueStroke:InputSampleFromCGPoint([touch locationInView:self.view],
+                                                                 touch.timestamp)];
+}
+
+- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
+{
+    DebugAssert([touches count] == 1);
+    UITouch *touch = [touches anyObject];
+    [self.canvasController endStroke:InputSampleFromCGPoint([touch locationInView:self.view],
+                                                            touch.timestamp)];
+}
+
+- (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event
+{
+    DebugAssert([touches count] == 1);
+    [self.canvasController cancelStroke];
+}
+
 
 @end
