@@ -2,15 +2,15 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "group:../../GlobalSettings/GlobalSettings.xcodeproj">
+      location = "container:FiftyThreeSdkTestApp.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:../../Common/Common.xcodeproj">
    </FileRef>
    <FileRef
       location = "group:../../Canvas/Canvas.xcodeproj">
    </FileRef>
    <FileRef
-      location = "container:FiftyThreeSdkTestApp.xcodeproj">
-   </FileRef>
-   <FileRef
-      location = "group:../../Common/Common.xcodeproj">
+      location = "group:../../GlobalSettings/GlobalSettings.xcodeproj">
    </FileRef>
 </Workspace>
