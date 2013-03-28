@@ -275,7 +275,7 @@ NSString * const kUpdateAlertViewMessage = @"%.1f%% Complete\nTime Remaining: %0
     self.updateAlertView = [[UIAlertView alloc] initWithTitle:@"Firmware Update" message:[NSString stringWithFormat:kUpdateAlertViewMessage, 0., 0, 0] delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:nil, nil];
     [self.updateAlertView show];
     
-    [self.penManager updateFirmware:[[NSBundle mainBundle] pathForResource:@"charcoal" ofType:@"img"] forPen:self.penManager.connectedPen];
+    [self.penManager updateFirmwareForPen:self.penManager.connectedPen];
 }
 
 - (void)didDetectMultitaskingGesturesEnabled

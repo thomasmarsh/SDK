@@ -14,6 +14,7 @@
 #import "FTDeviceInfoClient.h"
 #import "TIUpdateManager.h"
 #import "FTPenTouchManager.h"
+#import "FTFirmwareManager.h"
 
 NSString * const kPairedPenUuidDefaultsKey = @"PairedPenUuid";
 
@@ -158,6 +159,7 @@ NSString * const kPairedPenUuidDefaultsKey = @"PairedPenUuid";
     if (error) {
         NSLog(@"Error discovering services: %@", [error localizedDescription]);
         [self cleanup];
+        return;
     }
 
 #if USE_TI_UUIDS
@@ -262,7 +264,7 @@ NSString * const kPairedPenUuidDefaultsKey = @"PairedPenUuid";
 {
     NSAssert(peripheral == _connectedPen.peripheral, @"got wrong pen");
 
-    if (error) {
+    if (error || service.characteristics.count == 0) {
         NSLog(@"Error discovering characteristics: %@", [error localizedDescription]);
         [self cleanup];
         return;
@@ -417,6 +419,7 @@ NSString * const kPairedPenUuidDefaultsKey = @"PairedPenUuid";
 
     if (error) {
         NSLog(@"Error changing notification state: %@", error.localizedDescription);
+        [self cleanup];
         return;
     }
 
@@ -466,10 +469,26 @@ NSString * const kPairedPenUuidDefaultsKey = @"PairedPenUuid";
     _isReady = YES;
 }
 
-- (void)updateFirmware:(NSString *)imagePath forPen:(FTPen *)pen
+- (void)updateFirmwareForPen:(FTPen *)pen
 {
+    NSNumberFormatter *f = [[NSNumberFormatter alloc] init];
+    [f setNumberStyle:NSNumberFormatterDecimalStyle];
+    NSInteger existingVersion = [f numberFromString:pen.modelNumber].integerValue;
+    
+    NSInteger availableVersion = [FTFirmwareManager versionForModel:pen.modelNumber];
+    NSLog(@"Firmware version: Available = %d, Existing = %d", availableVersion, existingVersion);
+    if (availableVersion > existingVersion)
+    {
+        NSLog(@"Available version is newer, updating...");
+    }
+    else
+    {
+        NSLog(@"No need to update");
+    }
+    
+    NSString *filePath = [FTFirmwareManager filePathForModel:pen.modelNumber];
     self.updateManager = [[TIUpdateManager alloc] initWithPeripheral:pen.peripheral delegate:self]; // BUGBUG - ugly cast
-    [self.updateManager updateImage:imagePath];
+    [self.updateManager updateImage:filePath];
 }
 
 - (void)updateManager:(TIUpdateManager *)manager didFinishUpdate:(NSError *)error

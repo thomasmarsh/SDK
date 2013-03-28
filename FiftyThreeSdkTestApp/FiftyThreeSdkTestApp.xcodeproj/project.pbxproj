@@ -282,8 +282,7 @@
 		66A47BFA16D835C90016B31C /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				668F6D6517024D43002C548B /* charcoal.img */,
-				6685989E16FD11E1008CAE29 /* SimpleBLEPeripheral.img */,
+				66BEC2871703B458009207F9 /* Firmware */,
 				6644316716F3D24B0049E570 /* InfoPlist.strings */,
 				6644314616F3D1640049E570 /* FiftyThreeSdkTestApp-Info.plist */,
 				6644314716F3D1640049E570 /* FiftyThreeSdkTestApp-Prefix.pch */,
@@ -305,6 +304,15 @@
 				6644314B16F3D1640049E570 /* FTPenService.m */,
 			);
 			name = "pen-sim";
+			sourceTree = "<group>";
+		};
+		66BEC2871703B458009207F9 /* Firmware */ = {
+			isa = PBXGroup;
+			children = (
+				6685989E16FD11E1008CAE29 /* SimpleBLEPeripheral.img */,
+				668F6D6517024D43002C548B /* charcoal.img */,
+			);
+			name = Firmware;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
