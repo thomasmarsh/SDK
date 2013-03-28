@@ -29,7 +29,7 @@ NSString * const kPairedPenUuidDefaultsKey = @"PairedPenUuid";
 #endif
 }
 
-- (void)updateFirmware:(NSString *)imagePath forPen:(FTPen *)pen;
+- (void)updateFirmwareForPen:(FTPen *)pen;
 
 @property (nonatomic) CBCentralManager *centralManager;
 @property (nonatomic) TIUpdateManager *updateManager;

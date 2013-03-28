@@ -15,7 +15,6 @@
 		6644311516F3C8390049E570 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 66A47BF316D835C90016B31C /* UIKit.framework */; };
 		6644311616F3C8390049E570 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 66A47BF516D835C90016B31C /* Foundation.framework */; };
 		6644311C16F3C8390049E570 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6644311A16F3C8390049E570 /* InfoPlist.strings */; };
-		6644312B16F3C86C0049E570 /* FiftyThreeSdkTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 6644312716F3C86C0049E570 /* FiftyThreeSdkTests.m */; };
 		6644313416F3CC2C0049E570 /* SenAsyncTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 6644313316F3CC2C0049E570 /* SenAsyncTestCase.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		6644315216F3D1640049E570 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 6644313716F3D1640049E570 /* AppDelegate.m */; };
 		6644315316F3D1640049E570 /* BTLECentralViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 6644313916F3D1640049E570 /* BTLECentralViewController.mm */; };
@@ -51,6 +50,11 @@
 		66A47BF616D835C90016B31C /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 66A47BF516D835C90016B31C /* Foundation.framework */; };
 		66A47BF816D835C90016B31C /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 66A47BF716D835C90016B31C /* CoreGraphics.framework */; };
 		66A47C1B16D843250016B31C /* CoreBluetooth.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 66A47C1A16D843250016B31C /* CoreBluetooth.framework */; };
+		66C83D701704F9DD00789776 /* FTLatencyTouchClassfierTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 66C83D6F1704F9DD00789776 /* FTLatencyTouchClassfierTests.mm */; };
+		66C83D721704FD9E00789776 /* libCanvas.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 668F6D5117023A8C002C548B /* libCanvas.a */; };
+		66C83D731704FDA200789776 /* libCommon.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 668F6D5617023D13002C548B /* libCommon.a */; };
+		66C83D741704FDA500789776 /* libFiftyThreeSdk.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6644316616F3D1B60049E570 /* libFiftyThreeSdk.a */; };
+		66C83D751704FDB700789776 /* boost.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6644317416F7FC680049E570 /* boost.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -124,6 +128,8 @@
 		66A47BF516D835C90016B31C /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		66A47BF716D835C90016B31C /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		66A47C1A16D843250016B31C /* CoreBluetooth.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreBluetooth.framework; path = System/Library/Frameworks/CoreBluetooth.framework; sourceTree = SDKROOT; };
+		66C83D6E1704F9DD00789776 /* FTLatencyTouchClassfierTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FTLatencyTouchClassfierTests.h; sourceTree = "<group>"; };
+		66C83D6F1704F9DD00789776 /* FTLatencyTouchClassfierTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = FTLatencyTouchClassfierTests.mm; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -131,6 +137,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				66C83D751704FDB700789776 /* boost.framework in Frameworks */,
+				66C83D741704FDA500789776 /* libFiftyThreeSdk.a in Frameworks */,
+				66C83D731704FDA200789776 /* libCommon.a in Frameworks */,
+				66C83D721704FD9E00789776 /* libCanvas.a in Frameworks */,
 				6644311416F3C8390049E570 /* SenTestingKit.framework in Frameworks */,
 				6644311516F3C8390049E570 /* UIKit.framework in Frameworks */,
 				6644311616F3C8390049E570 /* Foundation.framework in Frameworks */,
@@ -176,6 +186,8 @@
 				6644312616F3C86C0049E570 /* FiftyThreeSdkTests.h */,
 				6644312716F3C86C0049E570 /* FiftyThreeSdkTests.m */,
 				6644311816F3C8390049E570 /* Supporting Files */,
+				66C83D6E1704F9DD00789776 /* FTLatencyTouchClassfierTests.h */,
+				66C83D6F1704F9DD00789776 /* FTLatencyTouchClassfierTests.mm */,
 			);
 			path = FiftyThreeSdkTests;
 			sourceTree = "<group>";
@@ -446,8 +458,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6644312B16F3C86C0049E570 /* FiftyThreeSdkTests.m in Sources */,
 				6644313416F3CC2C0049E570 /* SenAsyncTestCase.m in Sources */,
+				66C83D701704F9DD00789776 /* FTLatencyTouchClassfierTests.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -491,13 +503,27 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/FiftyThreeSdkTestApp.app/FiftyThreeSdkTestApp";
+				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
+				CLANG_CXX_LIBRARY = "compiler-default";
 				FRAMEWORK_SEARCH_PATHS = (
 					"\"$(SDKROOT)/Developer/Library/Frameworks\"",
 					"\"$(DEVELOPER_LIBRARY_DIR)/Frameworks\"",
+					"\"$(SRCROOT)/../../ThirdParty/boost/framework\"",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "FiftyThreeSdkTests/FiftyThreeSdkTests-Prefix.pch";
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/../FiftyThreeSdk/FiftyThreeSdk",
+					"$(SRCROOT)/../../Common",
+					"$(SRCROOT)/../../Canvas",
+					"$(SRCROOT)/../../ThirdParty",
+					"$(SRCROOT)/../../../ThirdParty",
+				);
 				INFOPLIST_FILE = "FiftyThreeSdkTests/FiftyThreeSdkTests-Info.plist";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../../../../../../Library/Developer/Xcode/DerivedData/FiftyThreeSdkTestApp-fqhrggmyvwwfhzgakxbhthwwiptp/Build/Products/Debug-iphoneos\"",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUNDLE_LOADER)";
 				WRAPPER_EXTENSION = octest;
@@ -508,13 +534,27 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/FiftyThreeSdkTestApp.app/FiftyThreeSdkTestApp";
+				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
+				CLANG_CXX_LIBRARY = "compiler-default";
 				FRAMEWORK_SEARCH_PATHS = (
 					"\"$(SDKROOT)/Developer/Library/Frameworks\"",
 					"\"$(DEVELOPER_LIBRARY_DIR)/Frameworks\"",
+					"\"$(SRCROOT)/../../ThirdParty/boost/framework\"",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "FiftyThreeSdkTests/FiftyThreeSdkTests-Prefix.pch";
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/../FiftyThreeSdk/FiftyThreeSdk",
+					"$(SRCROOT)/../../Common",
+					"$(SRCROOT)/../../Canvas",
+					"$(SRCROOT)/../../ThirdParty",
+					"$(SRCROOT)/../../../ThirdParty",
+				);
 				INFOPLIST_FILE = "FiftyThreeSdkTests/FiftyThreeSdkTests-Info.plist";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../../../../../../Library/Developer/Xcode/DerivedData/FiftyThreeSdkTestApp-fqhrggmyvwwfhzgakxbhthwwiptp/Build/Products/Debug-iphoneos\"",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUNDLE_LOADER)";
 				WRAPPER_EXTENSION = octest;
