@@ -80,7 +80,10 @@ public:
     {
         BOOST_FOREACH(const TouchClassifier::Ptr & classifier, _Classifiers)
         {
-            classifier->ProcessPenEvent(event);
+            if (classifier->HandlesPenInput())
+            {
+                classifier->ProcessPenEvent(event);
+            }
         }
     }
 

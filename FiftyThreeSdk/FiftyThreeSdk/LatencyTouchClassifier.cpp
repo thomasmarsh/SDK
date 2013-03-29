@@ -20,6 +20,15 @@ using namespace fiftythree::common;
 const double MAX_DELAY_MSEC = 50.0;
 const double MAX_DELAY_SEC = MAX_DELAY_MSEC / 1000;
 
+template <class T>
+void RemoveAll(std::vector<T> v, std::vector<T> removeVector)
+{
+    BOOST_FOREACH(const T & t, removeVector)
+    {
+        v.erase(std::remove(v.end(), v.begin(), t), v.end());
+    }
+}
+
 class LatencyTouchClassifierImpl : public LatencyTouchClassifier
 {
 private:
@@ -75,39 +84,85 @@ public:
         {
             _PenDownTime = event.Sample.Timestamp();
             _PenUpTime = 0;
-            
+
+            /*
+            std::vector<Touch::cPtr> toRemove;
+             
             BOOST_FOREACH(const Touch::cPtr & touch, _CandidateTouches)
             {
                 double timeDelta = event.Sample.Timestamp() - touch->Sample.Timestamp();
             
                 if (timeDelta > MAX_DELAY_SEC)
                 {
-                    std::cout << "Not a candidate: " << std::endl;
+                    std::cout << "Remove candidate touch: " << std::endl;
+                    toRemove.push_back(touch);
                 }
                 
                 std::cout << "PenEvent " << event.Sample.ToString() << std::endl;
+            }
+            
+            RemoveAll(_CandidateTouches, toRemove);
+             */
+            
+            std::vector<Touch::cPtr>::iterator it = _CandidateTouches.begin();
+            for (;it != _CandidateTouches.end();)
+            {
+                const Touch::cPtr & touch = *it;
+                double timeDelta = event.Sample.Timestamp() - touch->Sample.Timestamp();
+                
+                if (timeDelta > MAX_DELAY_SEC)
+                {
+                    std::cout << "Remove candidate touch: " << std::endl;
+                    it = _CandidateTouches.erase(it);
+                }
+                else
+                {
+                    ++it;
+                }
             }
         }
         else // PenUp
         {
             _PenUpTime = event.Sample.Timestamp();
             
+            /*
+            std::vector<Touch::cPtr> toRemove;
+            
             BOOST_FOREACH(const Touch::cPtr & touch, _CandidateTouches)
             {
                 if (!touch->HasEndedOrCancelled) continue;
                 
-                // Measure from end touch
+                // Measure from end-phase touch
                 double timeDelta = event.Sample.Timestamp() - touch->History->back().Timestamp();
                 
                 if (timeDelta > MAX_DELAY_SEC)
                 {
-                    std::cout << "Not a candidate: " << std::endl;
+                    std::cout << "Remove candidate touch: " << std::endl;
+                    toRemove.push_back(touch);
                 }
                 
                 std::cout << "PenEvent " << event.Sample.ToString() << std::endl;
             }
+            
+            RemoveAll(_CandidateTouches, toRemove);
+             */
+            
+            std::vector<Touch::cPtr>::iterator it = _CandidateTouches.begin();
+            for (;it != _CandidateTouches.end();)
+            {
+                const Touch::cPtr & touch = *it;
+                double timeDelta = event.Sample.Timestamp() - touch->History->back().Timestamp(); // Measure from end-phase touch
 
-            // BUGBUG - need to clear out cancelled touches eventually
+                if (!touch->HasEndedOrCancelled || timeDelta > MAX_DELAY_SEC)
+                {
+                    std::cout << "Remove candidate touch: " << std::endl;
+                    it = _CandidateTouches.erase(it);
+                }
+                else
+                {
+                    ++it;
+                }
+            }
         }
     }
 

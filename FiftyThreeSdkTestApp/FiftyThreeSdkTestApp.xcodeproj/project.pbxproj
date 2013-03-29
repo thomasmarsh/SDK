@@ -631,6 +631,7 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/../../ThirdParty/boost/framework\"",
 				);
+				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "FiftyThreeSdkTestApp/FiftyThreeSdkTestApp-Prefix.pch";
 				HEADER_SEARCH_PATHS = (
@@ -665,6 +666,7 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/../../ThirdParty/boost/framework\"",
 				);
+				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "FiftyThreeSdkTestApp/FiftyThreeSdkTestApp-Prefix.pch";
 				HEADER_SEARCH_PATHS = (
