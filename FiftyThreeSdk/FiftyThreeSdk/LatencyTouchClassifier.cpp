@@ -82,6 +82,8 @@ public:
         
         if (_IsPenDown)
         {
+            std::cout << "PenDown" << std::endl;
+
             _PenDownTime = event.Sample.Timestamp();
             _PenUpTime = 0;
 
@@ -123,6 +125,8 @@ public:
         }
         else // PenUp
         {
+            std::cout << "PenDown" << std::endl;
+            
             _PenUpTime = event.Sample.Timestamp();
             
             /*
@@ -163,6 +167,13 @@ public:
                     ++it;
                 }
             }
+            
+            if (_CandidateTouches.size())
+            {
+                // TODO - notify then remove candidates
+            }
+            
+            _CandidateTouches.clear();
         }
     }
 
