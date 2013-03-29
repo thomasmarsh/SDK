@@ -211,11 +211,18 @@
                         </constraints>
                         <simulatedOrientationMetrics key="simulatedOrientationMetrics" orientation="landscapeRight"/>
                     </view>
-                    <navigationItem key="navigationItem" id="ZxX-cB-0EW"/>
+                    <navigationItem key="navigationItem" id="ZxX-cB-0EW">
+                        <barButtonItem key="rightBarButtonItem" title="Info" id="ATW-HV-Wvp">
+                            <connections>
+                                <action selector="infoButtonPressed:" destination="7eE-pW-ZTc" id="UOK-nI-CsX"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
                     <simulatedOrientationMetrics key="simulatedOrientationMetrics" orientation="landscapeRight"/>
                     <connections>
                         <outlet property="connectButton" destination="6zl-tH-yfU" id="Emb-3d-GJj"/>
                         <outlet property="disconnectButton" destination="1d5-T6-CVy" id="eoj-C9-0QJ"/>
+                        <outlet property="infoButton" destination="ATW-HV-Wvp" id="zbN-zW-tGd"/>
                         <outlet property="pairButton" destination="yWR-Ce-NbN" id="SQT-9g-TVh"/>
                         <outlet property="pairingStatusLabel" destination="mcn-TJ-2K3" id="oC2-7r-mu7"/>
                         <outlet property="tip1State" destination="aLs-Rl-wQi" id="nyn-fP-hCI"/>
@@ -247,49 +254,6 @@
             <point key="canvasLocation" x="-236" y="-111"/>
         </scene>
     </scenes>
-    <classes>
-        <class className="BTLECentralViewController" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/BTLECentralViewController.h"/>
-            <relationships>
-                <relationship kind="action" name="connectButtonPressed:"/>
-                <relationship kind="action" name="disconnectButtonPressed:"/>
-                <relationship kind="action" name="pairButtonPressed:"/>
-                <relationship kind="action" name="pairButtonReleased:"/>
-                <relationship kind="action" name="pairButtonTouchDown:"/>
-                <relationship kind="action" name="pairButtonTouchUpInside:"/>
-                <relationship kind="action" name="pairButtonTouchUpOutside:"/>
-                <relationship kind="action" name="testConnectButtonPressed:"/>
-                <relationship kind="action" name="unpairButtonPressed:"/>
-                <relationship kind="action" name="updateFirmwareButtonPressed:"/>
-                <relationship kind="outlet" name="connectButton" candidateClass="UIButton"/>
-                <relationship kind="outlet" name="disconnectButton" candidateClass="UIButton"/>
-                <relationship kind="outlet" name="pairButton" candidateClass="UIButton"/>
-                <relationship kind="outlet" name="pairingStatusLabel" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="testConnectButton" candidateClass="UIButton"/>
-                <relationship kind="outlet" name="tip1State" candidateClass="UIButton"/>
-                <relationship kind="outlet" name="tip2State" candidateClass="UIButton"/>
-                <relationship kind="outlet" name="unpairButton" candidateClass="UIButton"/>
-                <relationship kind="outlet" name="updateFirmwareButton" candidateClass="UIButton"/>
-            </relationships>
-        </class>
-        <class className="BTLEPeripheralViewController" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/BTLEPeripheralViewController.h"/>
-            <relationships>
-                <relationship kind="action" name="secureSwitchChanged:"/>
-                <relationship kind="action" name="tip1TouchDown:"/>
-                <relationship kind="action" name="tip1TouchUpInside:"/>
-                <relationship kind="action" name="tip1TouchUpOutside:"/>
-                <relationship kind="action" name="tip2TouchDown:"/>
-                <relationship kind="action" name="tip2TouchUpInside:"/>
-                <relationship kind="action" name="tip2TouchUpOutside:"/>
-                <relationship kind="outlet" name="connectionStatusLabel" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="secureSwitch" candidateClass="UISwitch"/>
-            </relationships>
-        </class>
-        <class className="NSLayoutConstraint" superclassName="NSObject">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/NSLayoutConstraint.h"/>
-        </class>
-    </classes>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
         <simulatedStatusBarMetrics key="statusBar" statusBarStyle="blackTranslucent"/>
         <simulatedOrientationMetrics key="orientation"/>

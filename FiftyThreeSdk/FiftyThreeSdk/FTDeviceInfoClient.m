@@ -13,6 +13,7 @@ static NSString *const kDeviceInfoServiceUUID = @"0x180A";
 static NSString *const kManufacturerNameUUID = @"0x2A29";
 static NSString *const kModelNumberUUID = @"0x2A24";
 static NSString *const kSerialNumberUUID = @"0x2A25";
+static NSString *const kFirmwareRevisionUUID = @"0x2A26";
 static NSString *const kHardwareRevisionUUID = @"0x2A27";
 static NSString *const kSoftwareRevisionUUID = @"0x2A28";
 static NSString *const kSystemIdUUID = @"0x2A23";
@@ -62,6 +63,7 @@ static NSString *const kPnpIdUUID = @"0x2A50";
                                  [CBUUID UUIDWithString:kManufacturerNameUUID],
                                  [CBUUID UUIDWithString:kModelNumberUUID],
                                  [CBUUID UUIDWithString:kSerialNumberUUID],
+                                 [CBUUID UUIDWithString:kFirmwareRevisionUUID],
                                  [CBUUID UUIDWithString:kHardwareRevisionUUID],
                                  [CBUUID UUIDWithString:kSoftwareRevisionUUID],
                                  [CBUUID UUIDWithString:kSystemIdUUID],
@@ -97,6 +99,8 @@ static NSString *const kPnpIdUUID = @"0x2A50";
         _modelNumber = [NSString stringWithUTF8String:characteristic.value.bytes];
     } else if ([characteristic.UUID isEqual:[CBUUID UUIDWithString:kSerialNumberUUID]]) {
         _serialNumber = [NSString stringWithUTF8String:characteristic.value.bytes];
+    } else if ([characteristic.UUID isEqual:[CBUUID UUIDWithString:kFirmwareRevisionUUID]]) {
+        _firmwareRevision = [NSString stringWithUTF8String:characteristic.value.bytes];
     } else if ([characteristic.UUID isEqual:[CBUUID UUIDWithString:kHardwareRevisionUUID]]) {
         _hardwareRevision = [NSString stringWithUTF8String:characteristic.value.bytes];
     } else if ([characteristic.UUID isEqual:[CBUUID UUIDWithString:kSoftwareRevisionUUID]]) {

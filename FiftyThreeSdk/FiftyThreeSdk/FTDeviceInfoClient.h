@@ -14,6 +14,7 @@
 @property (nonatomic, readonly) NSString *manufacturerName;
 @property (nonatomic, readonly) NSString *modelNumber;
 @property (nonatomic, readonly) NSString *serialNumber;
+@property (nonatomic, readonly) NSString *firmwareRevision;
 @property (nonatomic, readonly) NSString *hardwareRevision;
 @property (nonatomic, readonly) NSString *softwareRevision;
 @property (nonatomic, readonly) NSString *systemId;

@@ -639,6 +639,7 @@
 					"$(SRCROOT)/../../../ThirdParty",
 					"$(SRCROOT)/../../Canvas",
 					"$(SRCROOT)/../../Common",
+					"$(SRCROOT)/../FiftyThreeSdk",
 				);
 				INFOPLIST_FILE = "FiftyThreeSdkTestApp/FiftyThreeSdkTestApp-Info.plist";
 				LIBRARY_SEARCH_PATHS = (
@@ -674,6 +675,7 @@
 					"$(SRCROOT)/../../../ThirdParty",
 					"$(SRCROOT)/../../Canvas",
 					"$(SRCROOT)/../../Common",
+					"$(SRCROOT)/../FiftyThreeSdk",
 				);
 				INFOPLIST_FILE = "FiftyThreeSdkTestApp/FiftyThreeSdkTestApp-Info.plist";
 				LIBRARY_SEARCH_PATHS = (

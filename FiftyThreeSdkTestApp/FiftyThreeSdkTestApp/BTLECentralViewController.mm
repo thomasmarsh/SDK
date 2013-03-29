@@ -12,11 +12,17 @@
 #include "Canvas/GLCanvasController.h"
 #include "Common/InputSample.h"
 
+#include "FiftyThreeSdk/FTPenAndTouchLogger.h"
+
 using namespace fiftythree::common;
+using namespace fiftythree::sdk;
 
 NSString * const kUpdateAlertViewMessage = @"%.1f%% Complete\nTime Remaining: %02d:%02d";
 
 @interface BTLECentralViewController () <FTPenManagerDelegate, FTPenDelegate, FTPenManagerDelegatePrivate, UIAlertViewDelegate>
+{
+    FTPenAndTouchLogger::Ptr _TouchLogger;
+}
 
 @property (nonatomic) FTPenManager *penManager;
 @property (nonatomic) id currentTest;
@@ -31,6 +37,9 @@ NSString * const kUpdateAlertViewMessage = @"%.1f%% Complete\nTime Remaining: %0
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    
+    _TouchLogger = FTPenAndTouchLogger::New();
+    _TouchLogger->StartLogging();
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -56,6 +65,8 @@ NSString * const kUpdateAlertViewMessage = @"%.1f%% Complete\nTime Remaining: %0
 
 - (void)viewDidDisappear:(BOOL)animated
 {
+    _TouchLogger->StopLogging();
+
     [_penManager deregisterView:self.view];
 }
 
@@ -131,11 +142,14 @@ NSString * const kUpdateAlertViewMessage = @"%.1f%% Complete\nTime Remaining: %0
     NSLog(@"manufacturer = %@", pen.manufacturerName);
     NSLog(@"model number = %@", pen.modelNumber);
     NSLog(@"serial number = %@", pen.serialNumber);
-    NSLog(@"hw revision = %@", pen.hardwareRevision);
-    NSLog(@"sw revision = %@", pen.softwareRevision);
+    NSLog(@"firmware revision = %@", pen.firmwareRevision);
+    NSLog(@"hardware revision = %@", pen.hardwareRevision);
+    NSLog(@"software revision = %@", pen.softwareRevision);
     NSLog(@"system id = %@", pen.systemId);
     NSLog(@"pnp id = %@", pen.pnpId);
     NSLog(@"certification data = %@", pen.certificationData);
+    
+    [self updateDisplay];
 }
 
 - (void)penManager:(FTPenManager *)penManager didUpdateDeviceInfo:(FTPen *)pen
@@ -320,4 +334,22 @@ NSString * const kUpdateAlertViewMessage = @"%.1f%% Complete\nTime Remaining: %0
 }
 
 
+- (IBAction)infoButtonPressed:(id)sender
+{
+    FTPen* pen = self.penManager.connectedPen;
+    NSString *info = [NSString stringWithFormat:@"\
+Manufacturer = %@\n \
+Model Number = %@\n \
+Serial Number = %@\n \
+Firmware Revision = %@\n \
+Hardware Revision = %@\n \
+Software Revision = %@\n \
+System ID = %@\n \
+PnP ID = %@\n \
+Certification Data = %@", pen.manufacturerName, pen.modelNumber, pen.serialNumber, pen.firmwareRevision, pen.hardwareRevision,
+                      pen.softwareRevision, pen.systemId, pen.pnpId, pen.certificationData];
+    
+    UIAlertView* alertView = [[UIAlertView alloc] initWithTitle:@"Device Information" message:info delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
+    [alertView show];
+}
 @end

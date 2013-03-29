@@ -90,6 +90,11 @@
     return _deviceInfoClient.serialNumber;
 }
 
+- (NSString *)firmwareRevision
+{
+    return _deviceInfoClient.firmwareRevision;
+}
+
 - (NSString *)hardwareRevision
 {
     return _deviceInfoClient.hardwareRevision;
