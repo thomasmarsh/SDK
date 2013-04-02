@@ -227,7 +227,6 @@ NSString * const kUpdateAlertViewMessage = @"%.1f%% Complete\nTime Remaining: %0
         [self.testConnectButton setHidden:NO];
         [self.connectButton setHidden:NO];
         [self.disconnectButton setHidden:NO];
-        [self.unpairButton setHidden:NO];
         [self.updateFirmwareButton setHidden:NO];
     }
     else
@@ -235,7 +234,6 @@ NSString * const kUpdateAlertViewMessage = @"%.1f%% Complete\nTime Remaining: %0
         [self.testConnectButton setHidden:YES];
         [self.connectButton setHidden:YES];
         [self.disconnectButton setHidden:YES];
-        [self.unpairButton setHidden:YES];
         [self.updateFirmwareButton setHidden:YES];
     }
 }

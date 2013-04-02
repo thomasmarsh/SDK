@@ -23,8 +23,6 @@
 @property (weak, nonatomic) IBOutlet UIButton *disconnectButton;
 - (IBAction)connectButtonPressed:(id)sender;
 - (IBAction)disconnectButtonPressed:(id)sender;
-@property (weak, nonatomic) IBOutlet UIButton *unpairButton;
-- (IBAction)unpairButtonPressed:(id)sender;
 @property (weak, nonatomic) IBOutlet UIButton *updateFirmwareButton;
 - (IBAction)updateFirmwareButtonPressed:(id)sender;
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *infoButton;
