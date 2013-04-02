@@ -221,19 +221,26 @@ NSString * const kUpdateAlertViewMessage = @"%.1f%% Complete\nTime Remaining: %0
     {
         [self.pairingStatusLabel setText:@"Unpaired"];
     }
+    
+    if (self.penManager.connectedPen)
+    {
+        [self.connectButton setTitle:@"Disconnect" forState:UIControlStateNormal];
+    }
+    else
+    {
+        [self.connectButton setTitle:@"Connect" forState:UIControlStateNormal];
+    }
 
     if (self.penManager.pairedPen)
     {
         [self.testConnectButton setHidden:NO];
         [self.connectButton setHidden:NO];
-        [self.disconnectButton setHidden:NO];
         [self.updateFirmwareButton setHidden:NO];
     }
     else
     {
         [self.testConnectButton setHidden:YES];
         [self.connectButton setHidden:YES];
-        [self.disconnectButton setHidden:YES];
         [self.updateFirmwareButton setHidden:YES];
     }
 }
@@ -275,7 +282,14 @@ NSString * const kUpdateAlertViewMessage = @"%.1f%% Complete\nTime Remaining: %0
 
 - (IBAction)connectButtonPressed:(id)sender
 {
-    [self.penManager connect];
+    if (!self.penManager.connectedPen)
+    {
+        [self.penManager connect];
+    }
+    else
+    {
+        [self.penManager disconnect];
+    }
 }
 
 - (IBAction)disconnectButtonPressed:(id)sender

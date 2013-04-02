@@ -20,9 +20,7 @@
 - (IBAction)pairButtonTouchUpOutside:(id)sender;
 - (IBAction)testConnectButtonPressed:(id)sender;
 @property (weak, nonatomic) IBOutlet UIButton *connectButton;
-@property (weak, nonatomic) IBOutlet UIButton *disconnectButton;
 - (IBAction)connectButtonPressed:(id)sender;
-- (IBAction)disconnectButtonPressed:(id)sender;
 @property (weak, nonatomic) IBOutlet UIButton *updateFirmwareButton;
 - (IBAction)updateFirmwareButtonPressed:(id)sender;
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *infoButton;

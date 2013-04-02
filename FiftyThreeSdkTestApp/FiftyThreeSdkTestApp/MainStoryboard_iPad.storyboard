@@ -99,10 +99,10 @@
                                     </barButtonItem>
                                     <barButtonItem style="plain" id="jwT-FN-o8z">
                                         <button key="customView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="6zl-tH-yfU">
-                                            <rect key="frame" x="95" y="6" width="73" height="33"/>
+                                            <rect key="frame" x="95" y="5" width="105" height="34"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                             <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
-                                            <state key="normal" title="Connect">
+                                            <state key="normal" title="Disconnect">
                                                 <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
                                                 <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                             </state>
@@ -114,26 +114,9 @@
                                             </connections>
                                         </button>
                                     </barButtonItem>
-                                    <barButtonItem style="plain" id="4zF-j9-658">
-                                        <button key="customView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="1d5-T6-CVy">
-                                            <rect key="frame" x="178" y="5" width="89" height="34"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                            <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
-                                            <state key="normal" title="Disconnect">
-                                                <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
-                                                <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                            </state>
-                                            <state key="highlighted">
-                                                <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                            </state>
-                                            <connections>
-                                                <action selector="disconnectButtonPressed:" destination="7eE-pW-ZTc" eventType="touchUpInside" id="mML-6i-iUS"/>
-                                            </connections>
-                                        </button>
-                                    </barButtonItem>
                                     <barButtonItem style="plain" id="gc0-W3-pLj">
                                         <button key="customView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="af2-Ke-cZT">
-                                            <rect key="frame" x="277" y="6" width="73" height="33"/>
+                                            <rect key="frame" x="210" y="6" width="73" height="33"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                             <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
                                             <state key="normal" title="Update">
@@ -204,7 +187,6 @@
                     <simulatedOrientationMetrics key="simulatedOrientationMetrics" orientation="landscapeRight"/>
                     <connections>
                         <outlet property="connectButton" destination="6zl-tH-yfU" id="Emb-3d-GJj"/>
-                        <outlet property="disconnectButton" destination="1d5-T6-CVy" id="eoj-C9-0QJ"/>
                         <outlet property="infoButton" destination="ATW-HV-Wvp" id="zbN-zW-tGd"/>
                         <outlet property="pairButton" destination="yWR-Ce-NbN" id="SQT-9g-TVh"/>
                         <outlet property="pairingStatusLabel" destination="mcn-TJ-2K3" id="oC2-7r-mu7"/>
@@ -236,6 +218,49 @@
             <point key="canvasLocation" x="-236" y="-111"/>
         </scene>
     </scenes>
+    <classes>
+        <class className="BTLECentralViewController" superclassName="UIViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/BTLECentralViewController.h"/>
+            <relationships>
+                <relationship kind="action" name="connectButtonPressed:"/>
+                <relationship kind="action" name="disconnectButtonPressed:"/>
+                <relationship kind="action" name="infoButtonPressed:"/>
+                <relationship kind="action" name="pairButtonPressed:"/>
+                <relationship kind="action" name="pairButtonReleased:"/>
+                <relationship kind="action" name="pairButtonTouchDown:"/>
+                <relationship kind="action" name="pairButtonTouchUpInside:"/>
+                <relationship kind="action" name="pairButtonTouchUpOutside:"/>
+                <relationship kind="action" name="testConnectButtonPressed:"/>
+                <relationship kind="action" name="unpairButtonPressed:"/>
+                <relationship kind="action" name="updateFirmwareButtonPressed:"/>
+                <relationship kind="outlet" name="connectButton" candidateClass="UIButton"/>
+                <relationship kind="outlet" name="infoButton" candidateClass="UIBarButtonItem"/>
+                <relationship kind="outlet" name="pairButton" candidateClass="UIButton"/>
+                <relationship kind="outlet" name="pairingStatusLabel" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="testConnectButton" candidateClass="UIButton"/>
+                <relationship kind="outlet" name="tip1State" candidateClass="UIButton"/>
+                <relationship kind="outlet" name="tip2State" candidateClass="UIButton"/>
+                <relationship kind="outlet" name="updateFirmwareButton" candidateClass="UIButton"/>
+            </relationships>
+        </class>
+        <class className="BTLEPeripheralViewController" superclassName="UIViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/BTLEPeripheralViewController.h"/>
+            <relationships>
+                <relationship kind="action" name="secureSwitchChanged:"/>
+                <relationship kind="action" name="tip1TouchDown:"/>
+                <relationship kind="action" name="tip1TouchUpInside:"/>
+                <relationship kind="action" name="tip1TouchUpOutside:"/>
+                <relationship kind="action" name="tip2TouchDown:"/>
+                <relationship kind="action" name="tip2TouchUpInside:"/>
+                <relationship kind="action" name="tip2TouchUpOutside:"/>
+                <relationship kind="outlet" name="connectionStatusLabel" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="secureSwitch" candidateClass="UISwitch"/>
+            </relationships>
+        </class>
+        <class className="NSLayoutConstraint" superclassName="NSObject">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/NSLayoutConstraint.h"/>
+        </class>
+    </classes>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
         <simulatedStatusBarMetrics key="statusBar" statusBarStyle="blackTranslucent"/>
         <simulatedOrientationMetrics key="orientation"/>
