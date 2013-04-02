@@ -12,6 +12,7 @@
 
 #include "Common/NoCopy.h"
 #include "Common/TouchManager.h"
+#include "Common/PenManager.h"
 
 using namespace fiftythree::sdk;
 using namespace fiftythree::common;

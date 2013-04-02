@@ -7,7 +7,7 @@
 //
 
 #import <SenTestingKit/SenTestingKit.h>
-#import "LatencyTouchClassifier.h"
+#import "FiftyThreeSdk/LatencyTouchClassifier.h"
 
 @interface FTLatencyTouchClassfierTests : SenTestCase
 {

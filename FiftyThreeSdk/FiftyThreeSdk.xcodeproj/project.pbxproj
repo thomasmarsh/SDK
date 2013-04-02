@@ -160,10 +160,10 @@
 		66A8389C16E531E40048FFE4 /* export */ = {
 			isa = PBXGroup;
 			children = (
+				66D779B416E57461001C4F55 /* FTPenManager.h */,
 				66D2B4A116F2A8A900E11FE6 /* FTPenManager+Private.h */,
 				66D779B116E57461001C4F55 /* FTPen.h */,
 				665C1F5E16F0F23100F1BCB7 /* FTPen+Private.h */,
-				66D779B416E57461001C4F55 /* FTPenManager.h */,
 			);
 			name = export;
 			sourceTree = "<group>";

@@ -39,6 +39,7 @@
 		6644319916F8047E0049E570 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6644319816F8047E0049E570 /* SystemConfiguration.framework */; };
 		6644319B16F804B20049E570 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6644319A16F804B20049E570 /* QuartzCore.framework */; };
 		6644319D16F804BE0049E570 /* libAFNetworking.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6644319C16F804BE0049E570 /* libAFNetworking.a */; };
+		666FBEEA170A38EA0068551E /* FTTouchTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 666FBEE9170A38EA0068551E /* FTTouchTests.mm */; };
 		6685989F16FD11E1008CAE29 /* SimpleBLEPeripheral.img in Resources */ = {isa = PBXBuildFile; fileRef = 6685989E16FD11E1008CAE29 /* SimpleBLEPeripheral.img */; };
 		668F6D5217023A8C002C548B /* libCanvas.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 668F6D5117023A8C002C548B /* libCanvas.a */; };
 		668F6D5A17024021002C548B /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6644319616F802C80049E570 /* CoreVideo.framework */; };
@@ -116,6 +117,8 @@
 		6644319816F8047E0049E570 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		6644319A16F804B20049E570 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		6644319C16F804BE0049E570 /* libAFNetworking.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libAFNetworking.a; path = "../../AFNetworking/build/Release-iphoneos/libAFNetworking.a"; sourceTree = "<group>"; };
+		666FBEE8170A38EA0068551E /* FTTouchTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FTTouchTests.h; sourceTree = "<group>"; };
+		666FBEE9170A38EA0068551E /* FTTouchTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = FTTouchTests.mm; sourceTree = "<group>"; };
 		6685989E16FD11E1008CAE29 /* SimpleBLEPeripheral.img */ = {isa = PBXFileReference; lastKnownFileType = file; path = SimpleBLEPeripheral.img; sourceTree = SOURCE_ROOT; };
 		668F6D5117023A8C002C548B /* libCanvas.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libCanvas.a; path = "../../../../../../Library/Developer/Xcode/DerivedData/FiftyThreeSdkTestApp-fqhrggmyvwwfhzgakxbhthwwiptp/Build/Products/Debug-iphoneos/libCanvas.a"; sourceTree = "<group>"; };
 		668F6D5617023D13002C548B /* libCommon.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libCommon.a; path = "../../../../../../Library/Developer/Xcode/DerivedData/FiftyThreeSdkTestApp-fqhrggmyvwwfhzgakxbhthwwiptp/Build/Products/Debug-iphoneos/libCommon.a"; sourceTree = "<group>"; };
@@ -188,6 +191,8 @@
 				6644311816F3C8390049E570 /* Supporting Files */,
 				66C83D6E1704F9DD00789776 /* FTLatencyTouchClassfierTests.h */,
 				66C83D6F1704F9DD00789776 /* FTLatencyTouchClassfierTests.mm */,
+				666FBEE8170A38EA0068551E /* FTTouchTests.h */,
+				666FBEE9170A38EA0068551E /* FTTouchTests.mm */,
 			);
 			path = FiftyThreeSdkTests;
 			sourceTree = "<group>";
@@ -460,6 +465,7 @@
 			files = (
 				6644313416F3CC2C0049E570 /* SenAsyncTestCase.m in Sources */,
 				66C83D701704F9DD00789776 /* FTLatencyTouchClassfierTests.mm in Sources */,
+				666FBEEA170A38EA0068551E /* FTTouchTests.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -513,7 +519,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "FiftyThreeSdkTests/FiftyThreeSdkTests-Prefix.pch";
 				HEADER_SEARCH_PATHS = (
-					"$(SRCROOT)/../FiftyThreeSdk/FiftyThreeSdk",
+					"$(SRCROOT)/../FiftyThreeSdk",
 					"$(SRCROOT)/../../Common",
 					"$(SRCROOT)/../../Canvas",
 					"$(SRCROOT)/../../ThirdParty",
@@ -544,7 +550,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "FiftyThreeSdkTests/FiftyThreeSdkTests-Prefix.pch";
 				HEADER_SEARCH_PATHS = (
-					"$(SRCROOT)/../FiftyThreeSdk/FiftyThreeSdk",
+					"$(SRCROOT)/../FiftyThreeSdk",
 					"$(SRCROOT)/../../Common",
 					"$(SRCROOT)/../../Canvas",
 					"$(SRCROOT)/../../ThirdParty",
