@@ -11,11 +11,15 @@
 #import "FTConnectLatencyTester.h"
 #include "Canvas/GLCanvasController.h"
 #include "Common/InputSample.h"
+#include "Common/TouchManager.h"
 
 #include "FiftyThreeSdk/FTPenAndTouchLogger.h"
 
 using namespace fiftythree::common;
+using namespace fiftythree::canvas;
 using namespace fiftythree::sdk;
+using boost::static_pointer_cast;
+using boost::dynamic_pointer_cast;
 
 NSString * const kUpdateAlertViewMessage = @"%.1f%% Complete\nTime Remaining: %02d:%02d";
 
@@ -44,8 +48,6 @@ NSString * const kUpdateAlertViewMessage = @"%.1f%% Complete\nTime Remaining: %0
 
 - (void)viewWillAppear:(BOOL)animated
 {
-    [_penManager registerView:self.view];
-
     CGRect frame = self.view.bounds;
     frame.size.height -= 44; // 44 = height of bottom toolbar
     
@@ -60,7 +62,15 @@ NSString * const kUpdateAlertViewMessage = @"%.1f%% Complete\nTime Remaining: %0
     _penManager = [[FTPenManager alloc] initWithDelegate:self];
     while (!_penManager.isReady) {}
 
+    [_penManager registerView:self.view];
+        
+    static_pointer_cast<TouchManagerObjC>(TouchManager::Instance())->RegisterView(_canvasController.view);
+    
     [self updateDisplay];
+}
+
+- (void)viewDidUnload
+{
 }
 
 - (void)viewDidDisappear:(BOOL)animated
@@ -303,36 +313,72 @@ NSString * const kUpdateAlertViewMessage = @"%.1f%% Complete\nTime Remaining: %0
     [self.penManager disconnect];
 }
 
+
+
+- (BOOL) shouldProcessTouches: (NSSet *)touches
+{
+    BOOL contained = NO;
+    for (UITouch *t in touches)
+    {
+        CGPoint p = [t locationInView:self.view];
+        if (CGRectContainsPoint(_canvasController.view.frame,  p))
+        {
+            contained = YES;
+        }
+    }
+    return contained;
+}
+
+#pragma mark - UIKIt Touches
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
 {
-    DebugAssert(touches.count == 1);
-    UITouch *touch = [touches anyObject];
-    [self.canvasController beginStroke:InputSampleFromCGPoint([touch locationInView:self.view],
-                                                              touch.timestamp)];
+    if ([self shouldProcessTouches:touches])
+    {
+        static_pointer_cast<TouchManagerObjC>(TouchManager::Instance())->ProcessTouches(touches);
+        
+        DebugAssert(touches.count == 1);
+        UITouch *touch = [touches anyObject];
+        [self.canvasController beginStroke:InputSampleFromCGPoint([touch locationInView:self.view],
+                                                                  touch.timestamp)];
+    }
 }
 
 - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
 {
-    DebugAssert([touches count] == 1);
-    UITouch *touch = [touches anyObject];
-    [self.canvasController continueStroke:InputSampleFromCGPoint([touch locationInView:self.view],
-                                                                 touch.timestamp)];
+    if ([self shouldProcessTouches:touches])
+    {
+        static_pointer_cast<TouchManagerObjC>(TouchManager::Instance())->ProcessTouches(touches);
+        
+        DebugAssert([touches count] == 1);
+        UITouch *touch = [touches anyObject];
+        [self.canvasController continueStroke:InputSampleFromCGPoint([touch locationInView:self.view],
+                                                                     touch.timestamp)];
+    }
 }
 
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
 {
-    DebugAssert([touches count] == 1);
-    UITouch *touch = [touches anyObject];
-    [self.canvasController endStroke:InputSampleFromCGPoint([touch locationInView:self.view],
-                                                            touch.timestamp)];
+    if ([self shouldProcessTouches:touches])
+    {
+        static_pointer_cast<TouchManagerObjC>(TouchManager::Instance())->ProcessTouches(touches);
+        
+        DebugAssert([touches count] == 1);
+        UITouch *touch = [touches anyObject];
+        [self.canvasController endStroke:InputSampleFromCGPoint([touch locationInView:self.view],
+                                                                touch.timestamp)];
+    }
 }
 
 - (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event
 {
-    DebugAssert([touches count] == 1);
-    [self.canvasController cancelStroke];
+    if ([self shouldProcessTouches:touches])
+    {
+        static_pointer_cast<TouchManagerObjC>(TouchManager::Instance())->ProcessTouches(touches);
+        
+        DebugAssert([touches count] == 1);
+        [self.canvasController cancelStroke];
+    }
 }
-
 
 - (IBAction)infoButtonPressed:(id)sender
 {
