@@ -25,5 +25,7 @@
 - (IBAction)updateFirmwareButtonPressed:(id)sender;
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *infoButton;
 - (IBAction)infoButtonPressed:(id)sender;
+@property (weak, nonatomic) IBOutlet UIButton *clearButton;
+- (IBAction)clearButtonPressed:(id)sender;
 
 @end

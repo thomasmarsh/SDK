@@ -410,4 +410,9 @@ Certification Data = %@", pen.manufacturerName, pen.modelNumber, pen.serialNumbe
     UIAlertView* alertView = [[UIAlertView alloc] initWithTitle:@"Device Information" message:info delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
     [alertView show];
 }
+
+- (IBAction)clearButtonPressed:(id)sender
+{
+    [self.canvasController clearCanvas];
+}
 @end
