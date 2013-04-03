@@ -39,7 +39,6 @@
 		6644319916F8047E0049E570 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6644319816F8047E0049E570 /* SystemConfiguration.framework */; };
 		6644319B16F804B20049E570 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6644319A16F804B20049E570 /* QuartzCore.framework */; };
 		6644319D16F804BE0049E570 /* libAFNetworking.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6644319C16F804BE0049E570 /* libAFNetworking.a */; };
-		666DC557170BB25900D6B3C2 /* FiftyThreeSdkTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 6644312716F3C86C0049E570 /* FiftyThreeSdkTests.m */; };
 		666FBEEA170A38EA0068551E /* FTTouchTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 666FBEE9170A38EA0068551E /* FTTouchTests.mm */; };
 		6685989F16FD11E1008CAE29 /* SimpleBLEPeripheral.img in Resources */ = {isa = PBXBuildFile; fileRef = 6685989E16FD11E1008CAE29 /* SimpleBLEPeripheral.img */; };
 		668F6D5217023A8C002C548B /* libCanvas.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 668F6D5117023A8C002C548B /* libCanvas.a */; };
@@ -464,7 +463,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				666DC557170BB25900D6B3C2 /* FiftyThreeSdkTests.m in Sources */,
 				6644313416F3CC2C0049E570 /* SenAsyncTestCase.m in Sources */,
 				66C83D701704F9DD00789776 /* FTLatencyTouchClassfierTests.mm in Sources */,
 				666FBEEA170A38EA0068551E /* FTTouchTests.mm in Sources */,

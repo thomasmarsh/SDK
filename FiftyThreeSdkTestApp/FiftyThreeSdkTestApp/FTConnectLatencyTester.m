@@ -46,6 +46,11 @@
     return millis;
 }
 
+- (void)penManagerDidUpdateState:(FTPenManager *)penManager;
+{
+    
+}
+
 - (void)penManager:(FTPenManager *)penManager didPairWithPen:(FTPen *)pen
 {
 }

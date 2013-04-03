@@ -32,12 +32,11 @@ using namespace fiftythree::sdk;
 
 - (void)testTouchSerialization
 {
-    Touch::Ptr t = Touch::New();
-    t->Phase = TouchPhase::Began;
-    t->Id = (void *)12345678;
-
-    InputSample s(12.34567, 89.01234, 123.4567);
-    t->Sample = s;
+    Touch::Ptr t = Touch::New(
+                              12345678,
+                              TouchPhase::Began,
+                              InputSample(Eigen::Vector2f(12.34567, 89.01234), Eigen::Vector2f(12.34567, 89.01234), 123.4567)
+                              );
     
     std::string outputString = t->ToString();
 //    std::cout << outputString << std::endl;
@@ -55,16 +54,14 @@ using namespace fiftythree::sdk;
     Touch::Ptr t2;
     for (int i = 0; i < 1000; i++)
     {
-        Touch::Ptr t1 = Touch::New();
-        t1->Phase = TouchPhase((TouchPhase::TouchPhaseEnum)rng.RandomIntInRange(TouchPhase::Began, TouchPhase::Unknown));
-        t1->Id = (void *)rng.RandomIntInRange(0, std::numeric_limits<int>::max());
-    
-        InputSample s(
-                      rng.Random() * std::numeric_limits<float>::max(),
-                      rng.Random() * std::numeric_limits<float>::max(),
-                      rng.Random() * std::numeric_limits<float>::max()
-                      );
-        t1->Sample = s;
+        Touch::Ptr t1 = Touch::New(
+                                   rng.RandomIntInRange(0, std::numeric_limits<int>::max()),
+                                   TouchPhase((TouchPhase::TouchPhaseEnum)rng.RandomIntInRange(TouchPhase::Began, TouchPhase::Unknown)),
+                                   InputSample(
+                                               Eigen::Vector2f(rng.Random() * std::numeric_limits<float>::max(), rng.Random() * std::numeric_limits<float>::max()),
+                                               Eigen::Vector2f(rng.Random() * std::numeric_limits<float>::max(), rng.Random() * std::numeric_limits<float>::max()),
+                                               rng.Random() * std::numeric_limits<float>::max()
+                                               ));
     
         std::string outputString = t1->ToString();
 //        std::cout << outputString << std::endl;
@@ -85,10 +82,9 @@ using namespace fiftythree::sdk;
     {
                 
         InputSample s(
-                      rng.Random() * std::numeric_limits<float>::max(),
-                      rng.Random() * std::numeric_limits<float>::max(),
-                      rng.Random() * std::numeric_limits<float>::max()
-                      );
+                        Eigen::Vector2f(rng.Random() * std::numeric_limits<float>::max(), rng.Random() * std::numeric_limits<float>::max()),
+                        Eigen::Vector2f(rng.Random() * std::numeric_limits<float>::max(), rng.Random() * std::numeric_limits<float>::max()),
+                      rng.Random() * std::numeric_limits<float>::max());
         
         PenEvent::Ptr e1 = PenEvent::New(s,
                                          PenEventType((PenEventType::PenEventTypeEnum)rng.RandomIntInRange(PenEventType::PenUp, PenEventType::PenDown)),

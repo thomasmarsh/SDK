@@ -12,6 +12,7 @@
 #include "Canvas/GLCanvasController.h"
 #include "Common/InputSample.h"
 #include "Common/TouchManager.h"
+#include "Common/TouchTracker.h"
 
 #include "FiftyThreeSdk/FTPenAndTouchLogger.h"
 
@@ -60,7 +61,8 @@ NSString * const kUpdateAlertViewMessage = @"%.1f%% Complete\nTime Remaining: %0
     [self.view sendSubviewToBack:self.canvasController.view];
     
     _penManager = [[FTPenManager alloc] initWithDelegate:self];
-        
+    
+    static_pointer_cast<TouchTrackerObjC>(TouchTracker::Instance())->RegisterView(_canvasController.view);
     static_pointer_cast<TouchManagerObjC>(TouchManager::Instance())->RegisterView(_canvasController.view);
     
     [self updateDisplay];
@@ -352,7 +354,8 @@ NSString * const kUpdateAlertViewMessage = @"%.1f%% Complete\nTime Remaining: %0
         
         DebugAssert(touches.count == 1);
         UITouch *touch = [touches anyObject];
-        [self.canvasController beginStroke:InputSampleFromCGPoint([touch locationInView:self.view],
+        [self.canvasController beginStroke:InputSampleFromCGPoint([touch locationInView:touch.window],
+                                                                  [touch locationInView:self.view],
                                                                   touch.timestamp)];
     }
 }
@@ -365,7 +368,8 @@ NSString * const kUpdateAlertViewMessage = @"%.1f%% Complete\nTime Remaining: %0
         
         DebugAssert([touches count] == 1);
         UITouch *touch = [touches anyObject];
-        [self.canvasController continueStroke:InputSampleFromCGPoint([touch locationInView:self.view],
+        [self.canvasController continueStroke:InputSampleFromCGPoint([touch locationInView:touch.window],
+                                                                     [touch locationInView:self.view],
                                                                      touch.timestamp)];
     }
 }
@@ -378,7 +382,8 @@ NSString * const kUpdateAlertViewMessage = @"%.1f%% Complete\nTime Remaining: %0
         
         DebugAssert([touches count] == 1);
         UITouch *touch = [touches anyObject];
-        [self.canvasController endStroke:InputSampleFromCGPoint([touch locationInView:self.view],
+        [self.canvasController endStroke:InputSampleFromCGPoint([touch locationInView:touch.window],
+                                                                [touch locationInView:self.view],
                                                                 touch.timestamp)];
     }
 }

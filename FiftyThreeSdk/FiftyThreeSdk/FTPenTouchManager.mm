@@ -68,7 +68,7 @@ using namespace fiftythree::common;
 
 - (void)pen:(FTPen *)pen didPressTip:(FTPenTip)tip
 {
-    InputSample sample(0, 0, [NSProcessInfo processInfo].systemUptime);
+    InputSample sample(Eigen::Vector2f(0., 0.), Eigen::Vector2f(0., 0.), [NSProcessInfo processInfo].systemUptime);
     PenEvent::Ptr penEvent = PenEvent::New(sample, PenEventType::PenDown, PenTip((PenTip::PenTipEnum)tip));
 
     BOOST_FOREACH(const TouchClassifierManager::Ptr & manager, _managers)
@@ -79,7 +79,7 @@ using namespace fiftythree::common;
 
 - (void)pen:(FTPen *)pen didReleaseTip:(FTPenTip)tip
 {
-    InputSample sample(0, 0, [NSProcessInfo processInfo].systemUptime);
+    InputSample sample(Eigen::Vector2f(0., 0.), Eigen::Vector2f(0., 0.), [NSProcessInfo processInfo].systemUptime);
     PenEvent::Ptr penEvent = PenEvent::New(sample, PenEventType::PenUp, PenTip((PenTip::PenTipEnum)tip));
 
     BOOST_FOREACH(const TouchClassifierManager::Ptr & manager, _managers)

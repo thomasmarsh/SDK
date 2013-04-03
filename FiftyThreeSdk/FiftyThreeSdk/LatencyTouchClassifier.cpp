@@ -84,14 +84,14 @@ public:
         {
             std::cout << "PenDown" << std::endl;
 
-            _PenDownTime = event.Sample.Timestamp();
+            _PenDownTime = event.Sample.TimestampSeconds();
             _PenUpTime = 0;
             
             std::vector<Touch::cPtr>::iterator it = _CandidateTouches.begin();
             for (;it != _CandidateTouches.end();)
             {
                 const Touch::cPtr & touch = *it;
-                double timeDelta = event.Sample.Timestamp() - touch->Sample.Timestamp();
+                double timeDelta = event.Sample.TimestampSeconds() - touch->CurrentSample().TimestampSeconds();
                 
                 if (timeDelta > MAX_DELAY_SEC)
                 {
@@ -108,16 +108,16 @@ public:
         {
             std::cout << "PenDown" << std::endl;
             
-            _PenUpTime = event.Sample.Timestamp();
+            _PenUpTime = event.Sample.TimestampSeconds();
             
             
             std::vector<Touch::cPtr>::iterator it = _CandidateTouches.begin();
             for (;it != _CandidateTouches.end();)
             {
                 const Touch::cPtr & touch = *it;
-                double timeDelta = event.Sample.Timestamp() - touch->History->back().Timestamp(); // Measure from end-phase touch
+                double timeDelta = event.Sample.TimestampSeconds() - touch->History()->back().TimestampSeconds(); // Measure from end-phase touch
 
-                if (!touch->HasEndedOrCancelled || timeDelta > MAX_DELAY_SEC)
+                if (!touch->HasEndedOrCancelledInView || timeDelta > MAX_DELAY_SEC)
                 {
                     std::cout << "Remove candidate touch: " << std::endl;
                     it = _CandidateTouches.erase(it);

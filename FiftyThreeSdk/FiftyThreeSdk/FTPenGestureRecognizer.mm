@@ -15,42 +15,43 @@
 
 using namespace fiftythree::sdk;
 using namespace fiftythree::common;
+using namespace Eigen;
 
-TouchPhase PhaseFromUIKit(UITouch *touch)
+// BUGBUG - duplicated code from TouchTracker
+
+Vector2f ScreenLocationForTouch(UITouch *touch)
 {
-    switch (touch.phase)
-    {
-        case UITouchPhaseBegan:
-            return TouchPhase::Began;
-        case UITouchPhaseCancelled:
-            return TouchPhase::Cancelled;
-        case UITouchPhaseMoved:
-            return TouchPhase::Moved;
-        case UITouchPhaseEnded:
-            return TouchPhase::Ended;
-        case UITouchPhaseStationary:
-            return TouchPhase::Stationary;
-        default:
-            DebugAssert(false);
-            return TouchPhase::Unknown;
-            break;
-    }
+    UIWindow *window = touch.window;
+    CGPoint locationInWindowView = [touch locationInView:window];
+    CGPoint windowLocation = [window convertPoint:locationInWindowView toWindow:nil];
+    return Vector2f(windowLocation.x, windowLocation.y);
+}
+
+Vector2f ViewLocationForTouch(UITouch *touch, UIView *view)
+{
+    DebugAssert(view);
+    CGPoint viewLocation = [touch locationInView:view];
+    return Vector2f(viewLocation.x, viewLocation.y);
+}
+
+InputSample InputSampleFromUITouch(UITouch* uiTouch, UIView *view)
+{
+    return InputSample(ScreenLocationForTouch(uiTouch),
+                       ViewLocationForTouch(uiTouch, view),
+                       uiTouch.timestamp);
 }
 
 Touch::Ptr TouchFromUITouch(UITouch *uiTouch, UIView *view)
 {
     Touch::Ptr touch = Touch::New();
-    CGPoint p = [uiTouch locationInView:view];
-    InputSample sample(p.x, p.y, uiTouch.timestamp);
+    InputSample sample = InputSampleFromUITouch(uiTouch, view);
 
-    if (touch->History)
+    if (touch->History())
     {
-        touch->History->push_back(sample);
+        touch->History()->push_back(sample);
     }
 
     touch->Phase = PhaseFromUIKit(uiTouch);
-    touch->Sample = sample;
-    touch->Id = [[NSValue valueWithNonretainedObject:uiTouch] pointerValue];
 
     return touch;
 }

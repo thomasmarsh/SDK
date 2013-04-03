@@ -8,10 +8,11 @@
 #import <UIKit/UIKit.h>
 
 #import "AppDelegate.h"
+#import "FiftyThreeSdk/FTApplication.h"
 
 int main(int argc, char *argv[])
 {
     @autoreleasepool {
-        return UIApplicationMain(argc, argv, nil, NSStringFromClass([AppDelegate class]));
+        return UIApplicationMain(argc, argv, NSStringFromClass([FTApplication class]), NSStringFromClass([AppDelegate class]));
     }
 }
