@@ -26,7 +26,6 @@ static NSString *const kImageBlockTransferUUID = @"F000FFC2-0451-4000-B000-00000
 @property (nonatomic) NSFileHandle *imageHandle;
 @property (nonatomic) unsigned long long imageSizeRemaining;
 @property (nonatomic) unsigned long long imageSize;
-//@property (nonatomic) NSDate *lastBlockReceiveTime;
 @property (nonatomic) boost::shared_ptr<Timer> lastBlockTimer;
 @property (nonatomic, weak) id<TIUpdateManagerDelegate> delegate;
 @property (nonatomic) float lastPercent;

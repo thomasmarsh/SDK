@@ -60,9 +60,6 @@ NSString * const kUpdateAlertViewMessage = @"%.1f%% Complete\nTime Remaining: %0
     [self.view sendSubviewToBack:self.canvasController.view];
     
     _penManager = [[FTPenManager alloc] initWithDelegate:self];
-    while (!_penManager.isReady) {}
-
-    [_penManager registerView:self.view];
         
     static_pointer_cast<TouchManagerObjC>(TouchManager::Instance())->RegisterView(_canvasController.view);
     
@@ -94,6 +91,11 @@ NSString * const kUpdateAlertViewMessage = @"%.1f%% Complete\nTime Remaining: %0
 {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+- (void)penManagerDidUpdateState:(FTPenManager *)penManager
+{
+    [_penManager registerView:self.view];
 }
 
 - (void)penManager:(FTPenManager *)penManager didPairWithPen:(FTPen *)pen

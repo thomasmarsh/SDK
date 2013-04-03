@@ -43,7 +43,7 @@
     [self resetDefaults];
 
     FTPenManager *manager = [[FTPenManager alloc] initWithDelegate:self];
-    while (!manager.isReady) {} // BUGBUG - should there be a callback on ready state change?
+    [self waitForStatus:SenAsyncTestCaseStatusSucceeded timeout:10.0];
 
     STAssertNil(manager.pairedPen, @"start with no paired pen");
     STAssertNil(manager.connectedPen, @"start with no connected pen");
@@ -71,7 +71,7 @@
     // start again with paired pen
 
     manager = [[FTPenManager alloc] initWithDelegate:self];
-    while (!manager.isReady) {}
+    [self waitForStatus:SenAsyncTestCaseStatusSucceeded timeout:10.0];
 
     STAssertNotNil(manager.pairedPen, nil);
     STAssertFalse(manager.pairedPen.isConnected, nil);
@@ -92,9 +92,15 @@
     // start again with no paired pen
 
     manager = [[FTPenManager alloc] initWithDelegate:self];
-    while (!manager.isReady) {}
+    [self waitForStatus:SenAsyncTestCaseStatusSucceeded timeout:10.0];
 
     STAssertNil(manager.pairedPen, nil);
+}
+
+- (void)penManagerDidUpdateState:(FTPenManager *)penManager
+{
+    STAssertEquals(penManager.state, FTPenManagerStateAvailable, nil);
+    [self notify:SenAsyncTestCaseStatusSucceeded];
 }
 
 - (void)penManager:(FTPenManager *)penManager didPairWithPen:(FTPen *)pen

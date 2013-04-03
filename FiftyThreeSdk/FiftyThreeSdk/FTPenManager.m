@@ -34,6 +34,7 @@ NSString * const kPairedPenUuidDefaultsKey = @"PairedPenUuid";
 @property (nonatomic) CBCentralManager *centralManager;
 @property (nonatomic) TIUpdateManager *updateManager;
 @property (nonatomic) FTPenTouchManager *penTouchManager;
+@property (nonatomic, readwrite) FTPenManagerState state;
 
 @end
 
@@ -45,6 +46,7 @@ NSString * const kPairedPenUuidDefaultsKey = @"PairedPenUuid";
 {
     self = [super init];
     if (self) {
+        _state = FTPenManagerStateUnavailable;
         _delegate = delegate;
         _queue = dispatch_queue_create("com.fiftythree.penmanager", NULL);
         _centralManager = [[CBCentralManager alloc] initWithDelegate:self queue:_queue];
@@ -77,8 +79,13 @@ NSString * const kPairedPenUuidDefaultsKey = @"PairedPenUuid";
 
 - (void)centralManagerDidUpdateState:(CBCentralManager *)central
 {
-    if (central.state == CBCentralManagerStatePoweredOn) {
+    if (central.state == CBCentralManagerStatePoweredOn)
+    {
         [self loadPairedPen];
+    }
+    else
+    {
+        [self updateState:FTPenManagerStateUnavailable];
     }
 }
 
@@ -182,6 +189,12 @@ NSString * const kPairedPenUuidDefaultsKey = @"PairedPenUuid";
     }
 }
 
+- (void)updateState:(FTPenManagerState)state
+{
+    self.state = state;
+    [self.delegate penManagerDidUpdateState:self];
+}
+
 - (void)savePairedPen:(FTPen *)pen
 {
     CFUUIDRef uuid = pen.peripheral.UUID;
@@ -198,7 +211,7 @@ NSString * const kPairedPenUuidDefaultsKey = @"PairedPenUuid";
     if (uuid) {
         [self.centralManager retrievePeripherals:[NSArray arrayWithObject:CFBridgingRelease(CFUUIDCreateFromString(NULL, (CFStringRef)uuid)) ]];
     } else {
-        _isReady = YES;
+        [self updateState:FTPenManagerStateAvailable];
     }
 }
 
@@ -477,8 +490,8 @@ NSString * const kPairedPenUuidDefaultsKey = @"PairedPenUuid";
             _pairedPen = [[FTPen alloc] initWithPeripheral:peripherals[0] data:nil];
         }
     }
-
-    _isReady = YES;
+    
+    [self updateState:FTPenManagerStateAvailable];
 }
 
 - (void)updateFirmwareForPen:(FTPen *)pen

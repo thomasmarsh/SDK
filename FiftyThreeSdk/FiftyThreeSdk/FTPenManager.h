@@ -8,6 +8,11 @@
 #import <Foundation/Foundation.h>
 #import "FTPen.h"
 
+typedef NS_ENUM(NSInteger, FTPenManagerState) {
+    FTPenManagerStateUnavailable = 0,
+    FTPenManagerStateAvailable,
+};
+
 @protocol FTPenManagerDelegate;
 
 @interface FTPenManager : NSObject
@@ -15,7 +20,7 @@
 @property(nonatomic, weak) id<FTPenManagerDelegate> delegate;
 @property(nonatomic, readonly) FTPen* pairedPen;
 @property(nonatomic, readonly) FTPen* connectedPen;
-@property(nonatomic, readonly) BOOL isReady;
+@property(nonatomic, readonly) FTPenManagerState state;
 
 - (id)initWithDelegate:(id<FTPenManagerDelegate>)delegate;
 - (void)startPairing;
@@ -30,6 +35,7 @@
 
 @protocol FTPenManagerDelegate <NSObject>
 
+- (void)penManagerDidUpdateState:(FTPenManager *)penManager;
 - (void)penManager:(FTPenManager *)penManager didPairWithPen:(FTPen *)pen;
 - (void)penManager:(FTPenManager *)penManager didConnectToPen:(FTPen *)pen;
 - (void)penManager:(FTPenManager *)penManager didFailConnectToPen:(FTPen *)pen;
