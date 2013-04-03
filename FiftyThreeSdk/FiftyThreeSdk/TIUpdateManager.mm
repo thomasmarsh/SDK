@@ -51,6 +51,8 @@ static NSString *const kImageBlockTransferUUID = @"F000FFC2-0451-4000-B000-00000
 
 - (void)updateImage:(NSString *)filePath
 {
+    self.waitingForReboot = NO;
+    
     _oldDelegate = _peripheral.delegate;
     _peripheral.delegate = self;
 
@@ -124,9 +126,18 @@ static NSString *const kImageBlockTransferUUID = @"F000FFC2-0451-4000-B000-00000
 - (void)peripheral:(CBPeripheral *)peripheral didUpdateValueForCharacteristic:(CBCharacteristic *)characteristic error:(NSError *)error
 {
     if ([characteristic.UUID isEqual:[CBUUID UUIDWithString:kImageIdentifyUUID]]) {
-        NSLog(@"Update not required, existing version = %d", ((uint16_t *)characteristic.value.bytes)[0]);
-
-        [self done:[[NSError alloc] initWithDomain:@"TiUpdateManager" code:FTErrorAborted userInfo:nil]];
+        uint16_t version = ((uint16_t *)characteristic.value.bytes)[0];
+        if (version == 0)
+        {
+            NSLog(@"Device is rebooting, reconnect and attempt again");
+            self.waitingForReboot = YES;
+            [self done:[[NSError alloc] initWithDomain:@"TiUpdateManager" code:FTErrorAborted userInfo:nil]];
+        }
+        else
+        {
+            NSLog(@"Update rejected, existing version = %d", version);
+            [self done:[[NSError alloc] initWithDomain:@"TiUpdateManager" code:FTErrorAborted userInfo:nil]];
+        }
     } else if ([characteristic.UUID isEqual:[CBUUID UUIDWithString:kImageBlockTransferUUID]]) {
         // perform block transfer
         uint16_t index = ((uint16_t *)characteristic.value.bytes)[0];

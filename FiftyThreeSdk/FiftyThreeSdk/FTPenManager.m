@@ -231,6 +231,12 @@ NSString * const kPairedPenUuidDefaultsKey = @"PairedPenUuid";
             [self.delegate penManager:self didPairWithPen:_pairedPen];
         });
     }
+    
+    if (self.updateManager && self.updateManager.waitingForReboot)
+    {
+        [self updateFirmwareForPen:self.connectedPen];
+        return;
+    }
 
     dispatch_async(dispatch_get_main_queue(), ^{
         [self.delegate penManager:self didConnectToPen:_pairedPen];
@@ -450,6 +456,12 @@ NSString * const kPairedPenUuidDefaultsKey = @"PairedPenUuid";
 
     FTPen* pen = self.connectedPen;
     _connectedPen = nil;
+    
+    if (self.updateManager && self.updateManager.waitingForReboot)
+    {
+        [self performSelector:@selector(connect) withObject:nil afterDelay:2.0];
+        return;
+    }
 
     dispatch_async(dispatch_get_main_queue(), ^{
         [self.delegate penManager:self didDisconnectFromPen:pen];

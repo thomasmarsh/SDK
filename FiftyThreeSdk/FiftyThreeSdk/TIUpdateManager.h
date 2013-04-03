@@ -12,6 +12,9 @@
 @protocol TIUpdateManagerDelegate;
 
 @interface TIUpdateManager : NSObject
+
+@property (nonatomic) BOOL waitingForReboot;
+
 - (id) init __unavailable;
 - (id)initWithPeripheral:(CBPeripheral *)peripheral delegate:(id<TIUpdateManagerDelegate>)delegate;
 - (void)updateImage:(NSString *)filePath;
