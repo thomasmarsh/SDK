@@ -500,7 +500,7 @@ NSString * const kPairedPenUuidDefaultsKey = @"PairedPenUuid";
     [self updateState:FTPenManagerStateAvailable];
 }
 
-- (void)updateFirmwareForPen:(FTPen *)pen
+- (BOOL)isUpdateAvailableForPen:(FTPen *)pen
 {
     NSAssert(pen, nil);
     
@@ -510,21 +510,19 @@ NSString * const kPairedPenUuidDefaultsKey = @"PairedPenUuid";
     
     NSInteger availableVersion = [FTFirmwareManager versionForModel:pen.modelNumber];
     NSLog(@"Firmware version: Available = %d, Existing = %d", availableVersion, existingVersion);
-#ifdef DEBUG
-    existingVersion = 0; // ALWAYS update
-#endif
-    if (availableVersion > existingVersion)
-    {
-        NSLog(@"Available version is newer, updating...");
+
+    return availableVersion > existingVersion;
+}
+
+- (void)updateFirmwareForPen:(FTPen *)pen
+{
+    NSAssert(pen, nil);
+
+    NSLog(@"Starting firmware update....");
         
-        NSString *filePath = [FTFirmwareManager filePathForModel:pen.modelNumber];
-        self.updateManager = [[TIUpdateManager alloc] initWithPeripheral:pen.peripheral delegate:self]; // BUGBUG - ugly cast
-        [self.updateManager updateImage:filePath];
-    }
-    else
-    {
-        NSLog(@"No need to update");
-    }
+    NSString *filePath = [FTFirmwareManager filePathForModel:pen.modelNumber];
+    self.updateManager = [[TIUpdateManager alloc] initWithPeripheral:pen.peripheral delegate:self]; // BUGBUG - ugly cast
+    [self.updateManager updateImage:filePath];
 }
 
 - (void)updateManager:(TIUpdateManager *)manager didFinishUpdate:(NSError *)error

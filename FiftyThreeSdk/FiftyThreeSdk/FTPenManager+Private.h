@@ -9,6 +9,7 @@
 
 @interface FTPenManager ()
 
+- (BOOL)isUpdateAvailableForPen:(FTPen *)pen;
 - (void)updateFirmwareForPen:(FTPen *)pen;
 - (void)didDetectMultitaskingGesturesEnabled;
 

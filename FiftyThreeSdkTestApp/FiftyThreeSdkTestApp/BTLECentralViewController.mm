@@ -22,7 +22,7 @@ using namespace fiftythree::sdk;
 using boost::static_pointer_cast;
 using boost::dynamic_pointer_cast;
 
-NSString * const kUpdateAlertViewMessage = @"%.1f%% Complete\nTime Remaining: %02d:%02d";
+NSString * const kUpdateProgressViewMessage = @"%.1f%% Complete\nTime Remaining: %02d:%02d";
 
 @interface BTLECentralViewController () <FTPenManagerDelegate, FTPenDelegate, FTPenManagerDelegatePrivate, UIAlertViewDelegate>
 {
@@ -31,7 +31,8 @@ NSString * const kUpdateAlertViewMessage = @"%.1f%% Complete\nTime Remaining: %0
 
 @property (nonatomic) FTPenManager *penManager;
 @property (nonatomic) id currentTest;
-@property (nonatomic) UIAlertView *updateAlertView;
+@property (nonatomic) UIAlertView *updateProgressView;
+@property (nonatomic) UIAlertView *updateStartView;
 @property (nonatomic) NSDate *updateStart;
 @property (nonatomic) GLCanvasController *canvasController;
 
@@ -67,7 +68,7 @@ NSString * const kUpdateAlertViewMessage = @"%.1f%% Complete\nTime Remaining: %0
     
     _penManager = [[FTPenManager alloc] initWithDelegate:self];
     
-    static_pointer_cast<TouchTrackerObjC>(TouchTracker::Instance())->RegisterView(_canvasController.view);
+    static_pointer_cast<TouchTrackerObjC>(TouchTracker::Instance())->RegisterView(self.view);
     static_pointer_cast<TouchManagerObjC>(TouchManager::Instance())->RegisterView(_canvasController.view);
     
     [self updateDisplay];
@@ -102,6 +103,8 @@ NSString * const kUpdateAlertViewMessage = @"%.1f%% Complete\nTime Remaining: %0
 
 - (void)penManagerDidUpdateState:(FTPenManager *)penManager
 {
+    [self updateDisplay];
+    
     [_penManager registerView:self.view];
 }
 
@@ -174,6 +177,8 @@ NSString * const kUpdateAlertViewMessage = @"%.1f%% Complete\nTime Remaining: %0
 - (void)penManager:(FTPenManager *)penManager didUpdateDeviceInfo:(FTPen *)pen
 {
     [self displayPenInfo:pen];
+        
+    [self checkForUpdates];
 }
 
 - (void)penManager:(FTPenManager *)penManager didUpdateDeviceBatteryLevel:(FTPen *)pen;
@@ -185,8 +190,8 @@ NSString * const kUpdateAlertViewMessage = @"%.1f%% Complete\nTime Remaining: %0
 {
     NSLog(@"didFinishUpdate");
     
-    [self.updateAlertView dismissWithClickedButtonIndex:0 animated:NO];
-    self.updateAlertView = nil;
+    [self.updateProgressView dismissWithClickedButtonIndex:0 animated:NO];
+    self.updateProgressView = nil;
 }
 
 - (void)penManager:(FTPenManager *)manager didUpdatePercentComplete:(float)percent
@@ -199,8 +204,8 @@ NSString * const kUpdateAlertViewMessage = @"%.1f%% Complete\nTime Remaining: %0
     int minutes = (int)remainingTime / 60;
     int seconds = (int)remainingTime % 60;
 
-    self.updateAlertView.message = [NSString stringWithFormat:kUpdateAlertViewMessage, percent, minutes, seconds];
-    [self.updateAlertView show];
+    self.updateProgressView.message = [NSString stringWithFormat:kUpdateProgressViewMessage, percent, minutes, seconds];
+    [self.updateProgressView show];
 }
 
 - (void)pen:(FTPen *)pen didReleaseTip:(FTPenTip)tip
@@ -234,23 +239,23 @@ NSString * const kUpdateAlertViewMessage = @"%.1f%% Complete\nTime Remaining: %0
     if (self.penManager.connectedPen)
     {
         [self.connectButton setTitle:@"Disconnect" forState:UIControlStateNormal];
+        [self.updateFirmwareButton setHidden:NO];
     }
     else
     {
         [self.connectButton setTitle:@"Connect" forState:UIControlStateNormal];
+        [self.updateFirmwareButton setHidden:YES];
     }
 
     if (self.penManager.pairedPen)
     {
         [self.testConnectButton setHidden:NO];
         [self.connectButton setHidden:NO];
-        [self.updateFirmwareButton setHidden:NO];
     }
     else
     {
         [self.testConnectButton setHidden:YES];
         [self.connectButton setHidden:YES];
-        [self.updateFirmwareButton setHidden:YES];
     }
 }
 
@@ -315,10 +320,50 @@ NSString * const kUpdateAlertViewMessage = @"%.1f%% Complete\nTime Remaining: %0
 
 - (IBAction)updateFirmwareButtonPressed:(id)sender
 {
+    [self queryFirmwareUpdate:YES];
+}
+
+- (void)showUpdateStartView
+{
+    self.updateStartView = [[UIAlertView alloc] initWithTitle:@"Firmware Update" message:@"Update available. Update Now?" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Ok", nil];
+    [self.updateStartView show];
+}
+
+- (void)checkForUpdates
+{
+    NSLog(@"Checking for updates...");
+    
+    if ([self.penManager isUpdateAvailableForPen:self.penManager.connectedPen])
+    {
+        NSLog(@"Update available");
+        
+        [self showUpdateStartView];
+    }
+    else
+    {
+        NSLog(@"None available");
+    }
+}
+
+- (void)queryFirmwareUpdate:(BOOL)forced
+{
+    if (forced || [self.penManager isUpdateAvailableForPen:self.penManager.connectedPen])
+     {
+         [self showUpdateStartView];
+     }
+     else
+     {
+         self.updateStartView = [[UIAlertView alloc] initWithTitle:@"Firmware Update" message:@"No update available" delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
+         [self.updateStartView show];
+     }
+}
+
+- (void)updateFirmware
+{
     self.updateStart = [NSDate date];
     
-    self.updateAlertView = [[UIAlertView alloc] initWithTitle:@"Firmware Update" message:[NSString stringWithFormat:kUpdateAlertViewMessage, 0., 0, 0] delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:nil, nil];
-    [self.updateAlertView show];
+    self.updateProgressView = [[UIAlertView alloc] initWithTitle:@"Firmware Update" message:[NSString stringWithFormat:kUpdateProgressViewMessage, 0., 0, 0] delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:nil, nil];
+    [self.updateProgressView show];
     
     [self.penManager updateFirmwareForPen:self.penManager.connectedPen];
 }
@@ -331,10 +376,20 @@ NSString * const kUpdateAlertViewMessage = @"%.1f%% Complete\nTime Remaining: %0
 
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
 {
-    [self.penManager disconnect];
+    if (alertView == self.updateProgressView)
+    {
+        [self.penManager disconnect];
+        self.updateProgressView = nil;
+    }
+    else if (alertView == self.updateStartView)
+    {
+        if (buttonIndex == 1)
+        {
+            [self updateFirmware];
+        }
+        self.updateStartView = nil;
+    }
 }
-
-
 
 - (BOOL) shouldProcessTouches: (NSSet *)touches
 {
