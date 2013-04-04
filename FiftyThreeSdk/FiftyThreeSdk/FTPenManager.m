@@ -197,6 +197,8 @@ NSString * const kPairedPenUuidDefaultsKey = @"PairedPenUuid";
 
 - (void)savePairedPen:(FTPen *)pen
 {
+    NSAssert(pen, nil);
+    
     CFUUIDRef uuid = pen.peripheral.UUID;
     NSString* uuidString = uuid != nil ? CFBridgingRelease(CFUUIDCreateString(NULL, uuid)) : nil;
 
@@ -217,6 +219,8 @@ NSString * const kPairedPenUuidDefaultsKey = @"PairedPenUuid";
 
 - (void)deletePairedPen:(FTPen *)pen
 {
+    NSAssert(pen, nil);
+    
     if (_pairedPen == pen)
     {
         _pairedPen = nil;
@@ -234,6 +238,8 @@ NSString * const kPairedPenUuidDefaultsKey = @"PairedPenUuid";
 
 - (void)connectedToPen:(FTPen *)pen
 {
+    NSAssert(pen, nil);
+    
     if (_pairing) {
         _pairedPen = pen;
         [self stopPairing];
@@ -496,28 +502,35 @@ NSString * const kPairedPenUuidDefaultsKey = @"PairedPenUuid";
 
 - (void)updateFirmwareForPen:(FTPen *)pen
 {
+    NSAssert(pen, nil);
+    
     NSNumberFormatter *f = [[NSNumberFormatter alloc] init];
     [f setNumberStyle:NSNumberFormatterDecimalStyle];
-    NSInteger existingVersion = [f numberFromString:pen.modelNumber].integerValue;
+    NSInteger existingVersion = [f numberFromString:pen.firmwareRevision].integerValue;
     
     NSInteger availableVersion = [FTFirmwareManager versionForModel:pen.modelNumber];
     NSLog(@"Firmware version: Available = %d, Existing = %d", availableVersion, existingVersion);
+#ifdef DEBUG
+    existingVersion = 0; // ALWAYS update
+#endif
     if (availableVersion > existingVersion)
     {
         NSLog(@"Available version is newer, updating...");
+        
+        NSString *filePath = [FTFirmwareManager filePathForModel:pen.modelNumber];
+        self.updateManager = [[TIUpdateManager alloc] initWithPeripheral:pen.peripheral delegate:self]; // BUGBUG - ugly cast
+        [self.updateManager updateImage:filePath];
     }
     else
     {
         NSLog(@"No need to update");
     }
-    
-    NSString *filePath = [FTFirmwareManager filePathForModel:pen.modelNumber];
-    self.updateManager = [[TIUpdateManager alloc] initWithPeripheral:pen.peripheral delegate:self]; // BUGBUG - ugly cast
-    [self.updateManager updateImage:filePath];
 }
 
 - (void)updateManager:(TIUpdateManager *)manager didFinishUpdate:(NSError *)error
 {
+    NSAssert(manager, nil);
+    
     if (error)
     {
         // We failed to get info, but that's ok, continue anyway
@@ -541,6 +554,8 @@ NSString * const kPairedPenUuidDefaultsKey = @"PairedPenUuid";
 
 - (void)updateManager:(TIUpdateManager *)manager didUpdatePercentComplete:(float)percent
 {
+    NSAssert(manager, nil);
+    
     if ([self.delegate conformsToProtocol:@protocol(FTPenManagerDelegatePrivate)])
     {
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -595,12 +610,12 @@ NSString * const kPairedPenUuidDefaultsKey = @"PairedPenUuid";
 
 - (void)registerView:(UIView *)view
 {
-    [_penTouchManager registerView:view];
+//    [_penTouchManager registerView:view];
 }
 
 - (void)deregisterView:(UIView *)view
 {
-    [_penTouchManager deregisterView:view];
+//    [_penTouchManager deregisterView:view];
 }
 
 @end

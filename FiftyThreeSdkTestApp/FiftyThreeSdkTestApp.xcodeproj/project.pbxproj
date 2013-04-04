@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		66166DF0170DE97B00D2BD79 /* es1.img in Resources */ = {isa = PBXBuildFile; fileRef = 66166DEF170DE97B00D2BD79 /* es1.img */; };
 		6632313C16F8B1CA008AD3DC /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6632313B16F8B1CA008AD3DC /* MobileCoreServices.framework */; };
 		6632313E16F8B213008AD3DC /* boost.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6644317416F7FC680049E570 /* boost.framework */; };
 		6632314016F8B9F2008AD3DC /* libT1PogoManager.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6632313F16F8B9F2008AD3DC /* libT1PogoManager.a */; };
@@ -44,7 +45,6 @@
 		668F6D5217023A8C002C548B /* libCanvas.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 668F6D5117023A8C002C548B /* libCanvas.a */; };
 		668F6D5A17024021002C548B /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6644319616F802C80049E570 /* CoreVideo.framework */; };
 		668F6D5C17024034002C548B /* libGlobalSettings.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 668F6D5B17024034002C548B /* libGlobalSettings.a */; };
-		668F6D6617024D43002C548B /* charcoal.img in Resources */ = {isa = PBXBuildFile; fileRef = 668F6D6517024D43002C548B /* charcoal.img */; };
 		668F6DE917037361002C548B /* Textures in Resources */ = {isa = PBXBuildFile; fileRef = 668F6DE817037361002C548B /* Textures */; };
 		668F6DEB17037376002C548B /* Shaders in Resources */ = {isa = PBXBuildFile; fileRef = 668F6DEA17037376002C548B /* Shaders */; };
 		66A47BF416D835C90016B31C /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 66A47BF316D835C90016B31C /* UIKit.framework */; };
@@ -69,6 +69,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		66166DEF170DE97B00D2BD79 /* es1.img */ = {isa = PBXFileReference; lastKnownFileType = file; path = es1.img; sourceTree = SOURCE_ROOT; };
 		6632313B16F8B1CA008AD3DC /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
 		6632313F16F8B9F2008AD3DC /* libT1PogoManager.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libT1PogoManager.a; path = ../../ThirdParty/PogoConnect/libT1PogoManager.a; sourceTree = "<group>"; };
 		6644311216F3C8390049E570 /* FiftyThreeSdkTests.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FiftyThreeSdkTests.octest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -123,7 +124,6 @@
 		668F6D5117023A8C002C548B /* libCanvas.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libCanvas.a; path = "../../../../../../Library/Developer/Xcode/DerivedData/FiftyThreeSdkTestApp-fqhrggmyvwwfhzgakxbhthwwiptp/Build/Products/Debug-iphoneos/libCanvas.a"; sourceTree = "<group>"; };
 		668F6D5617023D13002C548B /* libCommon.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libCommon.a; path = "../../../../../../Library/Developer/Xcode/DerivedData/FiftyThreeSdkTestApp-fqhrggmyvwwfhzgakxbhthwwiptp/Build/Products/Debug-iphoneos/libCommon.a"; sourceTree = "<group>"; };
 		668F6D5B17024034002C548B /* libGlobalSettings.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libGlobalSettings.a; path = "../../GlobalSettings/build/Release-iphoneos/libGlobalSettings.a"; sourceTree = "<group>"; };
-		668F6D6517024D43002C548B /* charcoal.img */ = {isa = PBXFileReference; lastKnownFileType = file; path = charcoal.img; sourceTree = SOURCE_ROOT; };
 		668F6DE817037361002C548B /* Textures */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Textures; path = ../../Canvas/Canvas/Textures; sourceTree = "<group>"; };
 		668F6DEA17037376002C548B /* Shaders */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Shaders; path = ../../Common/Common/Shaders; sourceTree = "<group>"; };
 		66A47BF016D835C90016B31C /* FiftyThreeSdkTestApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FiftyThreeSdkTestApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -326,8 +326,8 @@
 		66BEC2871703B458009207F9 /* Firmware */ = {
 			isa = PBXGroup;
 			children = (
+				66166DEF170DE97B00D2BD79 /* es1.img */,
 				6685989E16FD11E1008CAE29 /* SimpleBLEPeripheral.img */,
-				668F6D6517024D43002C548B /* charcoal.img */,
 			);
 			name = Firmware;
 			sourceTree = "<group>";
@@ -436,7 +436,7 @@
 				6644315F16F3D1640049E570 /* MainStoryboard_iPhone.storyboard in Resources */,
 				6644316916F3D24B0049E570 /* InfoPlist.strings in Resources */,
 				6685989F16FD11E1008CAE29 /* SimpleBLEPeripheral.img in Resources */,
-				668F6D6617024D43002C548B /* charcoal.img in Resources */,
+				66166DF0170DE97B00D2BD79 /* es1.img in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

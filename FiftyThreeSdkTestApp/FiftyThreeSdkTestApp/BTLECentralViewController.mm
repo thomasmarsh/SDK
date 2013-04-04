@@ -43,6 +43,8 @@ NSString * const kUpdateAlertViewMessage = @"%.1f%% Complete\nTime Remaining: %0
 {
     [super viewDidLoad];
     
+    self.view.multipleTouchEnabled = YES;
+    
     _TouchLogger = FTPenAndTouchLogger::New();
     _TouchLogger->StartLogging();
 }
@@ -59,6 +61,9 @@ NSString * const kUpdateAlertViewMessage = @"%.1f%% Complete\nTime Remaining: %0
     self.canvasController.paused = NO;    
     [self.view addSubview:self.canvasController.view];
     [self.view sendSubviewToBack:self.canvasController.view];
+
+    self.canvasController.view.multipleTouchEnabled = YES;
+    self.view.multipleTouchEnabled = YES;
     
     _penManager = [[FTPenManager alloc] initWithDelegate:self];
     

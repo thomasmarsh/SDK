@@ -35,7 +35,7 @@
 {
     model = [model lowercaseString];
     NSArray* models = @[
-        @"charcoal"
+        @"es1"
     ];
     
     NSUInteger index = [models indexOfObject:model];
