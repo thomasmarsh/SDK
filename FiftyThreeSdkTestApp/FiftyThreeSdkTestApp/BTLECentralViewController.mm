@@ -14,7 +14,7 @@
 #include "Common/TouchManager.h"
 #include "Common/TouchTracker.h"
 
-#include "FiftyThreeSdk/FTPenAndTouchLogger.h"
+#include "FiftyThreeSdk/FTPenAndTouchManager.h"
 
 using namespace fiftythree::common;
 using namespace fiftythree::canvas;
@@ -26,7 +26,7 @@ NSString * const kUpdateProgressViewMessage = @"%.1f%% Complete\nTime Remaining:
 
 @interface BTLECentralViewController () <FTPenManagerDelegate, FTPenDelegate, FTPenManagerDelegatePrivate, UIAlertViewDelegate>
 {
-    FTPenAndTouchLogger::Ptr _TouchLogger;
+    FTPenAndTouchManager::Ptr _PenAndTouchManager;
 }
 
 @property (nonatomic) FTPenManager *penManager;
@@ -45,9 +45,6 @@ NSString * const kUpdateProgressViewMessage = @"%.1f%% Complete\nTime Remaining:
     [super viewDidLoad];
     
     self.view.multipleTouchEnabled = YES;
-    
-    _TouchLogger = FTPenAndTouchLogger::New();
-    _TouchLogger->StartLogging();
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -70,7 +67,11 @@ NSString * const kUpdateProgressViewMessage = @"%.1f%% Complete\nTime Remaining:
     
     static_pointer_cast<TouchTrackerObjC>(TouchTracker::Instance())->RegisterView(self.view);
     static_pointer_cast<TouchManagerObjC>(TouchManager::Instance())->RegisterView(_canvasController.view);
-    
+     
+    _PenAndTouchManager = FTPenAndTouchManager::New();
+    _PenAndTouchManager->RegisterForEvents();
+    _PenAndTouchManager->SetLogging(true);
+
     [self updateDisplay];
 }
 
@@ -80,8 +81,6 @@ NSString * const kUpdateProgressViewMessage = @"%.1f%% Complete\nTime Remaining:
 
 - (void)viewDidDisappear:(BOOL)animated
 {
-    _TouchLogger->StopLogging();
-
     [_penManager deregisterView:self.view];
 }
 

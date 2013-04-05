@@ -13,7 +13,6 @@
 #import "FTPen+Private.h"
 #import "FTDeviceInfoClient.h"
 #import "TIUpdateManager.h"
-#import "FTPenTouchManager.h"
 #import "FTFirmwareManager.h"
 
 NSString * const kPairedPenUuidDefaultsKey = @"PairedPenUuid";
@@ -33,7 +32,6 @@ NSString * const kPairedPenUuidDefaultsKey = @"PairedPenUuid";
 
 @property (nonatomic) CBCentralManager *centralManager;
 @property (nonatomic) TIUpdateManager *updateManager;
-@property (nonatomic) FTPenTouchManager *penTouchManager;
 @property (nonatomic, readwrite) FTPenManagerState state;
 
 @end
@@ -50,7 +48,6 @@ NSString * const kPairedPenUuidDefaultsKey = @"PairedPenUuid";
         _delegate = delegate;
         _queue = dispatch_queue_create("com.fiftythree.penmanager", NULL);
         _centralManager = [[CBCentralManager alloc] initWithDelegate:self queue:_queue];
-        _penTouchManager = [[FTPenTouchManager alloc] initWithPenManager:self];
         _pairedPen = nil;
         _pairing = NO;
 #if USE_TI_UUIDS
@@ -426,12 +423,10 @@ NSString * const kPairedPenUuidDefaultsKey = @"PairedPenUuid";
     if (pressed) {
         dispatch_async(dispatch_get_main_queue(), ^{
             [self.connectedPen.delegate pen:self.connectedPen didPressTip:tip];
-            [self.penTouchManager pen:self.connectedPen didPressTip:tip];
         });
     } else {
         dispatch_async(dispatch_get_main_queue(), ^{
             [self.connectedPen.delegate pen:self.connectedPen didReleaseTip:tip];
-            [self.penTouchManager pen:self.connectedPen didReleaseTip:tip];
         });
     }
 }
