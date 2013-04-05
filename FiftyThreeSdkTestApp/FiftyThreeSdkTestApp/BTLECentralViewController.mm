@@ -35,6 +35,7 @@ NSString * const kUpdateProgressViewMessage = @"%.1f%% Complete\nTime Remaining:
 @property (nonatomic) UIAlertView *updateStartView;
 @property (nonatomic) NSDate *updateStart;
 @property (nonatomic) GLCanvasController *canvasController;
+@property (nonatomic) UITouch *strokeTouch;
 
 @end
 
@@ -411,11 +412,14 @@ NSString * const kUpdateProgressViewMessage = @"%.1f%% Complete\nTime Remaining:
     {
         static_pointer_cast<TouchManagerObjC>(TouchManager::Instance())->ProcessTouches(touches);
         
-        DebugAssert(touches.count == 1);
-        UITouch *touch = [touches anyObject];
-        [self.canvasController beginStroke:InputSampleFromCGPoint([touch locationInView:touch.window],
-                                                                  [touch locationInView:self.view],
-                                                                  touch.timestamp)];
+        if (!self.strokeTouch)
+        {
+            self.strokeTouch = [touches anyObject];
+            UITouch *touch = self.strokeTouch;
+            [self.canvasController beginStroke:InputSampleFromCGPoint([touch locationInView:touch.window],
+                                                                      [touch locationInView:self.view],
+                                                                      touch.timestamp)];
+        }
     }
 }
 
@@ -425,11 +429,13 @@ NSString * const kUpdateProgressViewMessage = @"%.1f%% Complete\nTime Remaining:
     {
         static_pointer_cast<TouchManagerObjC>(TouchManager::Instance())->ProcessTouches(touches);
         
-        DebugAssert([touches count] == 1);
-        UITouch *touch = [touches anyObject];
-        [self.canvasController continueStroke:InputSampleFromCGPoint([touch locationInView:touch.window],
-                                                                     [touch locationInView:self.view],
-                                                                     touch.timestamp)];
+        if ([touches containsObject:self.strokeTouch])
+        {
+            UITouch *touch = self.strokeTouch;
+            [self.canvasController continueStroke:InputSampleFromCGPoint([touch locationInView:touch.window],
+                                                                         [touch locationInView:self.view],
+                                                                         touch.timestamp)];
+        }
     }
 }
 
@@ -439,11 +445,14 @@ NSString * const kUpdateProgressViewMessage = @"%.1f%% Complete\nTime Remaining:
     {
         static_pointer_cast<TouchManagerObjC>(TouchManager::Instance())->ProcessTouches(touches);
         
-        DebugAssert([touches count] == 1);
-        UITouch *touch = [touches anyObject];
-        [self.canvasController endStroke:InputSampleFromCGPoint([touch locationInView:touch.window],
-                                                                [touch locationInView:self.view],
-                                                                touch.timestamp)];
+        if ([touches containsObject:self.strokeTouch])
+        {
+            UITouch *touch = self.strokeTouch;
+            [self.canvasController endStroke:InputSampleFromCGPoint([touch locationInView:touch.window],
+                                                                    [touch locationInView:self.view],
+                                                                    touch.timestamp)];
+            self.strokeTouch = nil;
+        }
     }
 }
 
@@ -453,8 +462,11 @@ NSString * const kUpdateProgressViewMessage = @"%.1f%% Complete\nTime Remaining:
     {
         static_pointer_cast<TouchManagerObjC>(TouchManager::Instance())->ProcessTouches(touches);
         
-        DebugAssert([touches count] == 1);
-        [self.canvasController cancelStroke];
+        if ([touches containsObject:self.strokeTouch])
+        {
+            [self.canvasController cancelStroke];
+            self.strokeTouch = nil;
+        }
     }
 }
 
