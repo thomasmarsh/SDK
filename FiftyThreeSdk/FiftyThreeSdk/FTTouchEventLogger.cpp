@@ -53,6 +53,11 @@ public:
         }
     }
     
+    virtual void HandlePenEvent(const PenEvent & event)
+    {
+         std::cout << PEN_PREFIX << event.ToString() << std::endl;
+    }
+
     FT_NO_COPY(FTTouchEventLoggerImpl);
 };
 

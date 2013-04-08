@@ -62,6 +62,10 @@ public:
         {
             _Logger = FTTouchEventLogger::New();
         }
+        else
+        {
+            _Logger.reset();
+        }
     }
     
     void TouchesBegan(const TouchesSetEvent & sender, const TouchesSet & touches)
@@ -90,6 +94,13 @@ public:
         if (_Logger) _Logger->TouchesCancelled(touches);
         
         _ClassifierManager->TouchesCancelled(touches);
+    }
+
+    virtual void HandlePenEvent(const PenEvent & event)
+    {
+        if (_Logger) _Logger->HandlePenEvent(event);
+        
+        _ClassifierManager->ProcessPenEvent(event);
     }
     
     FT_NO_COPY(FTPenAndTouchManagerImpl);

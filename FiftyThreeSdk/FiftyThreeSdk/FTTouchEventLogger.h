@@ -11,6 +11,7 @@
 #include <boost/smart_ptr.hpp>
 
 #include "Common/Touch.h"
+#include "PenEvent.h"
 
 namespace fiftythree
 {
@@ -31,6 +32,7 @@ public:
     virtual void TouchesMoved(const fiftythree::common::TouchesSet & touches) = 0;
     virtual void TouchesEnded(const fiftythree::common::TouchesSet & touches) = 0;
     virtual void TouchesCancelled(const fiftythree::common::TouchesSet & touches) = 0;
+    virtual void HandlePenEvent(const PenEvent & event) = 0;
     
     static Ptr New();
 };
