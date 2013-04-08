@@ -56,7 +56,7 @@ NSString * const kUpdateProgressViewMessage = @"%.1f%% Complete\nTime Remaining:
     
     self.canvasController = [[GLCanvasController alloc] initWithFrame:frame
                                                              andScale:[UIScreen mainScreen].scale];
-    [self.canvasController setBrush:@"FountainPen"];
+    [self.canvasController setBrush:@"Rollerball"];
     self.canvasController.view.hidden = NO;
     self.canvasController.paused = NO;    
     [self.view addSubview:self.canvasController.view];
