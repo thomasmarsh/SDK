@@ -27,5 +27,7 @@
 - (IBAction)infoButtonPressed:(id)sender;
 @property (weak, nonatomic) IBOutlet UIButton *clearButton;
 - (IBAction)clearButtonPressed:(id)sender;
+@property (weak, nonatomic) IBOutlet UIButton *annotateButton;
+- (IBAction)annotateButtonPressed:(id)sender;
 
 @end

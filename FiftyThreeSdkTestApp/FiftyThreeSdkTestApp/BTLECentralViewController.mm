@@ -37,6 +37,7 @@ NSString * const kUpdateProgressViewMessage = @"%.1f%% Complete\nTime Remaining:
 @property (nonatomic) NSDate *updateStart;
 @property (nonatomic) GLCanvasController *canvasController;
 @property (nonatomic) UITouch *strokeTouch;
+@property (nonatomic) BOOL annotationMode;
 
 @end
 
@@ -247,6 +248,17 @@ NSString * const kUpdateProgressViewMessage = @"%.1f%% Complete\nTime Remaining:
         [self.connectButton setTitle:@"Connect" forState:UIControlStateNormal];
         [self.updateFirmwareButton setHidden:YES];
     }
+    
+    if (self.annotationMode)
+    {
+        [self.annotateButton setTitle:@"Draw" forState:UIControlStateNormal];
+        self.navigationItem.title = @"Annotate";
+    }
+    else
+    {
+        [self.annotateButton setTitle:@"Annotate" forState:UIControlStateNormal];
+        self.navigationItem.title = @"Draw";
+    }
 
     if (self.penManager.pairedPen)
     {
@@ -417,6 +429,8 @@ NSString * const kUpdateProgressViewMessage = @"%.1f%% Complete\nTime Remaining:
 #pragma mark - UIKIt Touches
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
 {
+    if (self.annotationMode) return;
+    
     if ([self shouldProcessTouches:touches])
     {
         static_pointer_cast<TouchManagerObjC>(TouchManager::Instance())->ProcessTouches(touches);
@@ -434,6 +448,8 @@ NSString * const kUpdateProgressViewMessage = @"%.1f%% Complete\nTime Remaining:
 
 - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
 {
+    if (self.annotationMode) return;
+    
     if ([self shouldProcessTouches:touches])
     {
         static_pointer_cast<TouchManagerObjC>(TouchManager::Instance())->ProcessTouches(touches);
@@ -450,6 +466,8 @@ NSString * const kUpdateProgressViewMessage = @"%.1f%% Complete\nTime Remaining:
 
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
 {
+    if (self.annotationMode) return;
+    
     if ([self shouldProcessTouches:touches])
     {
         static_pointer_cast<TouchManagerObjC>(TouchManager::Instance())->ProcessTouches(touches);
@@ -467,6 +485,8 @@ NSString * const kUpdateProgressViewMessage = @"%.1f%% Complete\nTime Remaining:
 
 - (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event
 {
+    if (self.annotationMode) return;
+    
     if ([self shouldProcessTouches:touches])
     {
         static_pointer_cast<TouchManagerObjC>(TouchManager::Instance())->ProcessTouches(touches);
@@ -502,5 +522,11 @@ Certification Data = %@", pen.manufacturerName, pen.modelNumber, pen.serialNumbe
 {
     self.clearAlertView = [[UIAlertView alloc] initWithTitle:@"Clear Canvas?" message:@"Are you sure you want to clear the canvas?" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Ok", nil];
     [self.clearAlertView show];
+}
+- (IBAction)annotateButtonPressed:(id)sender
+{
+    self.annotationMode = !self.annotationMode;
+    
+    [self updateDisplay];
 }
 @end
