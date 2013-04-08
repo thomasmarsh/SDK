@@ -33,6 +33,7 @@ NSString * const kUpdateProgressViewMessage = @"%.1f%% Complete\nTime Remaining:
 @property (nonatomic) id currentTest;
 @property (nonatomic) UIAlertView *updateProgressView;
 @property (nonatomic) UIAlertView *updateStartView;
+@property (nonatomic) UIAlertView *clearAlertView;
 @property (nonatomic) NSDate *updateStart;
 @property (nonatomic) GLCanvasController *canvasController;
 @property (nonatomic) UITouch *strokeTouch;
@@ -389,6 +390,14 @@ NSString * const kUpdateProgressViewMessage = @"%.1f%% Complete\nTime Remaining:
         }
         self.updateStartView = nil;
     }
+    else if (alertView == self.clearAlertView)
+    {
+        if (buttonIndex == 1)
+        {
+            [self.canvasController clearCanvas];
+            self.clearAlertView = nil;
+        }
+    }
 }
 
 - (BOOL) shouldProcessTouches: (NSSet *)touches
@@ -491,6 +500,7 @@ Certification Data = %@", pen.manufacturerName, pen.modelNumber, pen.serialNumbe
 
 - (IBAction)clearButtonPressed:(id)sender
 {
-    [self.canvasController clearCanvas];
+    self.clearAlertView = [[UIAlertView alloc] initWithTitle:@"Clear Canvas?" message:@"Are you sure you want to clear the canvas?" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Ok", nil];
+    [self.clearAlertView show];
 }
 @end
