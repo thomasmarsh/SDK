@@ -110,6 +110,11 @@ public:
         _ClassifierManager->ProcessPenEvent(event);
     }
     
+    virtual void Clear()
+    {
+        _BeginTouches.clear();
+    }
+    
     Touch::cPtr NearestStrokeForTouch(Touch::cPtr touch)
     {
         Touch::cPtr nearestStroke;

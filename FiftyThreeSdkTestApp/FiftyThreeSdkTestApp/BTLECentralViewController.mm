@@ -411,6 +411,7 @@ NSString * const kUpdateProgressViewMessage = @"%.1f%% Complete\nTime Remaining:
     {
         if (buttonIndex == 1)
         {
+            _PenAndTouchManager->Clear();
             _HighlightedTouches.clear();
             [self.canvasController clearCanvas];
             self.clearAlertView = nil;
