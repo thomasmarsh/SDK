@@ -15,6 +15,8 @@
 #include "Common/TouchTracker.h"
 
 #include "FiftyThreeSdk/FTPenAndTouchManager.h"
+#include "FiftyThreeSdk/FTTouchEventLogger.h"
+#import <MessageUI/MessageUI.h>
 
 #include <boost/foreach.hpp>
 
@@ -26,9 +28,10 @@ using boost::dynamic_pointer_cast;
 
 NSString * const kUpdateProgressViewMessage = @"%.1f%% Complete\nTime Remaining: %02d:%02d";
 
-@interface BTLECentralViewController () <FTPenManagerDelegate, FTPenDelegate, FTPenManagerDelegatePrivate, UIAlertViewDelegate>
+@interface BTLECentralViewController () <FTPenManagerDelegate, FTPenDelegate, FTPenManagerDelegatePrivate, UIAlertViewDelegate, MFMailComposeViewControllerDelegate>
 {
     FTPenAndTouchManager::Ptr _PenAndTouchManager;
+    FTTouchEventLogger::Ptr _EventLogger;
     Touch::cPtr _SelectedTouch;
     BOOL _SelectedTouchHighlighted; // the state the stroke was in before touched
     std::vector<Touch::cPtr> _HighlightedTouches;
@@ -78,7 +81,8 @@ NSString * const kUpdateProgressViewMessage = @"%.1f%% Complete\nTime Remaining:
      
     _PenAndTouchManager = FTPenAndTouchManager::New();
     _PenAndTouchManager->RegisterForEvents();
-    _PenAndTouchManager->SetLogging(true);
+    _EventLogger = FTTouchEventLogger::New();
+    _PenAndTouchManager->SetLogger(_EventLogger);
 
     [self updateDisplay];
 }
@@ -457,12 +461,10 @@ NSString * const kUpdateProgressViewMessage = @"%.1f%% Complete\nTime Remaining:
 {
     if (highlight)
     {
-        NSLog(@"Draw highlighted stroke");
         [self setInkColorRed];
     }
     else
     {
-        NSLog(@"Draw non-highlighted stroke");
         [self setInkColorBlack];
     }
     
@@ -630,10 +632,49 @@ Certification Data = %@", pen.manufacturerName, pen.modelNumber, pen.serialNumbe
     self.clearAlertView = [[UIAlertView alloc] initWithTitle:@"Clear Canvas?" message:@"Are you sure you want to clear the canvas?" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Ok", nil];
     [self.clearAlertView show];
 }
+
 - (IBAction)annotateButtonPressed:(id)sender
 {
     self.annotationMode = !self.annotationMode;
     
     [self updateDisplay];
+}
+
+-(void)displayComposerSheet
+{
+    MFMailComposeViewController *picker = [[MFMailComposeViewController alloc] init];
+    picker.mailComposeDelegate = self;
+    
+    [picker setSubject:@"Palm Rejection Data"];
+
+    NSArray *toRecipients = [NSArray arrayWithObjects:@"adam@fiftythree.com",
+                             nil];
+    [picker setToRecipients:toRecipients];
+    
+    NSMutableData* data = static_pointer_cast<FTTouchEventLoggerObjc>(_EventLogger)->GetData();
+    [picker addAttachmentData:data mimeType:@"application/prd" fileName:@"strokedata.prd"]; // todo - add counter to filename?
+    
+    [self presentViewController:picker animated:YES completion:nil];
+}
+
+// The mail compose view controller delegate method
+- (void)mailComposeController:(MFMailComposeViewController *)controller
+          didFinishWithResult:(MFMailComposeResult)result
+                        error:(NSError *)error
+{
+    [self dismissViewControllerAnimated:YES completion:nil];
+}
+
+- (IBAction)shareButtonPressed:(id)sender
+{
+    if (![MFMailComposeViewController canSendMail])
+    {
+        UIAlertView* alertView = [[UIAlertView alloc] initWithTitle:@"Share" message:@"Email must be configured to share" delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
+        [alertView show];
+    }
+    else
+    {
+        [self displayComposerSheet];
+    }
 }
 @end

@@ -11,6 +11,7 @@
 #include <boost/smart_ptr.hpp>
 
 #include "Common/Touch.h"
+#include "FTTouchEventLogger.h"
 
 namespace fiftythree
 {
@@ -27,7 +28,7 @@ protected:
     ~FTPenAndTouchManager() {}
     
 public:
-    virtual void SetLogging(bool logging) = 0;
+    virtual void SetLogger(FTTouchEventLogger::Ptr logger) = 0;
     virtual void RegisterForEvents() = 0;
     virtual void UnregisterForEvents() = 0;
     virtual void Clear() = 0;

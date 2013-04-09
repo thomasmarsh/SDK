@@ -58,16 +58,9 @@ public:
         TouchManager::Instance()->TouchesCancelled().RemoveListener(shared_from_this());
     }
     
-    void SetLogging(bool logging)
+    void SetLogger(FTTouchEventLogger::Ptr logger)
     {
-        if (logging)
-        {
-            _Logger = FTTouchEventLogger::New();
-        }
-        else
-        {
-            _Logger.reset();
-        }
+        _Logger = logger;
     }
     
     void TouchesBegan(const TouchesSetEvent & sender, const TouchesSet & touches)
@@ -113,6 +106,10 @@ public:
     virtual void Clear()
     {
         _BeginTouches.clear();
+        if (_Logger)
+        {
+            _Logger->Clear();
+        }
     }
     
     Touch::cPtr NearestStrokeForTouch(Touch::cPtr touch)

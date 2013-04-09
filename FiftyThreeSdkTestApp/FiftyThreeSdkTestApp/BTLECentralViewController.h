@@ -29,5 +29,7 @@
 - (IBAction)clearButtonPressed:(id)sender;
 @property (weak, nonatomic) IBOutlet UIButton *annotateButton;
 - (IBAction)annotateButtonPressed:(id)sender;
+- (IBAction)shareButtonPressed:(id)sender;
+@property (weak, nonatomic) IBOutlet UIButton *shareButton;
 
 @end

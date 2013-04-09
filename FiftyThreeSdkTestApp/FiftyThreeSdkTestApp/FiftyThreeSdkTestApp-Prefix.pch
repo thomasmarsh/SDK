@@ -12,3 +12,10 @@
     #import <UIKit/UIKit.h>
     #import <Foundation/Foundation.h>
 #endif
+
+#ifndef BEGIN_COMMON_NAMESPACE
+#define BEGIN_COMMON_NAMESPACE namespace fiftythree { namespace common {
+#endif
+#ifndef END_COMMON_NAMESPACE
+#define END_COMMON_NAMESPACE }}
+#endif

@@ -34,8 +34,26 @@ public:
     virtual void TouchesCancelled(const fiftythree::common::TouchesSet & touches) = 0;
     virtual void HandlePenEvent(const PenEvent & event) = 0;
     
+    virtual void Clear() = 0;
+    
     static Ptr New();
 };
+    
+#ifdef __OBJC__
+    
+#import <Foundation/Foundation.h>
+    
+class FTTouchEventLoggerObjc : public FTTouchEventLogger
+{
+public:
+    virtual NSMutableData* GetData() = 0;
+    
+    FTTouchEventLoggerObjc() {}
+    
+    FT_NO_COPY(FTTouchEventLoggerObjc);
+};
 
+#endif
+    
 }
 }

@@ -40,6 +40,7 @@
 		6644319916F8047E0049E570 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6644319816F8047E0049E570 /* SystemConfiguration.framework */; };
 		6644319B16F804B20049E570 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6644319A16F804B20049E570 /* QuartzCore.framework */; };
 		6644319D16F804BE0049E570 /* libAFNetworking.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6644319C16F804BE0049E570 /* libAFNetworking.a */; };
+		665C61DB1714974D00E70FB4 /* MessageUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 665C61DA1714974D00E70FB4 /* MessageUI.framework */; };
 		666FBEEA170A38EA0068551E /* FTTouchTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 666FBEE9170A38EA0068551E /* FTTouchTests.mm */; };
 		6685989F16FD11E1008CAE29 /* SimpleBLEPeripheral.img in Resources */ = {isa = PBXBuildFile; fileRef = 6685989E16FD11E1008CAE29 /* SimpleBLEPeripheral.img */; };
 		668F6D5217023A8C002C548B /* libCanvas.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 668F6D5117023A8C002C548B /* libCanvas.a */; };
@@ -118,6 +119,7 @@
 		6644319816F8047E0049E570 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		6644319A16F804B20049E570 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		6644319C16F804BE0049E570 /* libAFNetworking.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libAFNetworking.a; path = "../../AFNetworking/build/Release-iphoneos/libAFNetworking.a"; sourceTree = "<group>"; };
+		665C61DA1714974D00E70FB4 /* MessageUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MessageUI.framework; path = System/Library/Frameworks/MessageUI.framework; sourceTree = SDKROOT; };
 		666FBEE8170A38EA0068551E /* FTTouchTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FTTouchTests.h; sourceTree = "<group>"; };
 		666FBEE9170A38EA0068551E /* FTTouchTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = FTTouchTests.mm; sourceTree = "<group>"; };
 		6685989E16FD11E1008CAE29 /* SimpleBLEPeripheral.img */ = {isa = PBXFileReference; lastKnownFileType = file; path = SimpleBLEPeripheral.img; sourceTree = SOURCE_ROOT; };
@@ -154,6 +156,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				665C61DB1714974D00E70FB4 /* MessageUI.framework in Frameworks */,
 				668F6D5C17024034002C548B /* libGlobalSettings.a in Frameworks */,
 				668F6D5A17024021002C548B /* CoreVideo.framework in Frameworks */,
 				6644318016F7FE570049E570 /* OpenGLES.framework in Frameworks */,
@@ -248,6 +251,7 @@
 		66A47BF216D835C90016B31C /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				665C61DA1714974D00E70FB4 /* MessageUI.framework */,
 				668F6D5B17024034002C548B /* libGlobalSettings.a */,
 				668F6D5117023A8C002C548B /* libCanvas.a */,
 				668F6D5617023D13002C548B /* libCommon.a */,
