@@ -16,6 +16,8 @@
 
 #include "FiftyThreeSdk/FTPenAndTouchManager.h"
 
+#include <boost/foreach.hpp>
+
 using namespace fiftythree::common;
 using namespace fiftythree::canvas;
 using namespace fiftythree::sdk;
@@ -27,6 +29,9 @@ NSString * const kUpdateProgressViewMessage = @"%.1f%% Complete\nTime Remaining:
 @interface BTLECentralViewController () <FTPenManagerDelegate, FTPenDelegate, FTPenManagerDelegatePrivate, UIAlertViewDelegate>
 {
     FTPenAndTouchManager::Ptr _PenAndTouchManager;
+    Touch::cPtr _SelectedTouch;
+    BOOL _SelectedTouchHighlighted; // the state the stroke was in before touched
+    std::vector<Touch::cPtr> _HighlightedTouches;
 }
 
 @property (nonatomic) FTPenManager *penManager;
@@ -406,6 +411,7 @@ NSString * const kUpdateProgressViewMessage = @"%.1f%% Complete\nTime Remaining:
     {
         if (buttonIndex == 1)
         {
+            _HighlightedTouches.clear();
             [self.canvasController clearCanvas];
             self.clearAlertView = nil;
         }
@@ -426,10 +432,76 @@ NSString * const kUpdateProgressViewMessage = @"%.1f%% Complete\nTime Remaining:
     return contained;
 }
 
+- (Touch::cPtr)findStroke:(UITouch *)uiTouch
+{
+    Touch::cPtr touch = static_pointer_cast<TouchTrackerObjC>(TouchTracker::Instance())->TouchForUITouch(uiTouch);
+    Touch::cPtr nearest = _PenAndTouchManager->NearestStrokeForTouch(touch);
+    
+    return nearest;
+}
+
+- (void)drawStrokeFromTouch:(Touch::cPtr)touch withHighlight:(BOOL)highlight
+{
+    if (highlight)
+    {
+        NSLog(@"Draw highlighted stroke");
+        // RED
+        [self.canvasController setColorwithRed:1.0 Green:0.0 Blue:0.0 Alpha:1.0];
+    }
+    else
+    {
+        NSLog(@"Draw non-highlighted stroke");
+        // BLACK
+        [self.canvasController setColorwithRed:0.0 Green:0.0 Blue:0.0 Alpha:1.0];
+    }
+    
+    BOOST_FOREACH(const InputSample & sample, *touch->History())
+    {
+        if (sample == touch->History()->front())
+        {
+            [self.canvasController beginStroke:sample];
+        }
+        else if (sample == touch->History()->back())
+        {
+            [self.canvasController endStroke:sample];
+        }
+        else
+        {
+            [self.canvasController continueStroke:sample];
+        }
+    }
+}
+
+- (void)drawStroke:(UITouch *)uiTouch
+{
+    Touch::cPtr touch = [self findStroke:uiTouch];
+    if (touch == _SelectedTouch) return;
+    
+    if (_SelectedTouch)
+    {
+        // Set the selected touch back to its original state
+        [self drawStrokeFromTouch:_SelectedTouch withHighlight:_SelectedTouchHighlighted];
+    }
+    
+    _SelectedTouch = touch;
+    
+    if (touch)
+    {        
+        BOOL highlighted = std::find(_HighlightedTouches.begin(), _HighlightedTouches.end(), touch) != _HighlightedTouches.end();
+        _SelectedTouchHighlighted = highlighted;
+        
+        [self drawStrokeFromTouch:touch withHighlight:!highlighted]; // invert highlight
+    }
+}
+
 #pragma mark - UIKIt Touches
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
 {
-    if (self.annotationMode) return;
+    if (self.annotationMode)
+    {
+        [self drawStroke:[touches anyObject]];
+        return;
+    }
     
     if ([self shouldProcessTouches:touches])
     {
@@ -448,7 +520,11 @@ NSString * const kUpdateProgressViewMessage = @"%.1f%% Complete\nTime Remaining:
 
 - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
 {
-    if (self.annotationMode) return;
+    if (self.annotationMode)
+    {
+        [self drawStroke:[touches anyObject]];
+        return;
+    }
     
     if ([self shouldProcessTouches:touches])
     {
@@ -466,7 +542,23 @@ NSString * const kUpdateProgressViewMessage = @"%.1f%% Complete\nTime Remaining:
 
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
 {
-    if (self.annotationMode) return;
+    if (self.annotationMode)
+    {
+        [self drawStroke:[touches anyObject]];
+        if (_SelectedTouch)
+        {
+            if (!_SelectedTouchHighlighted)
+            {
+                _HighlightedTouches.push_back(_SelectedTouch);
+            }
+            else
+            {
+                _HighlightedTouches.erase(std::remove(_HighlightedTouches.begin(), _HighlightedTouches.end(), _SelectedTouch), _HighlightedTouches.end());
+            }
+        }
+        _SelectedTouch.reset();
+        return;
+    }
     
     if ([self shouldProcessTouches:touches])
     {
@@ -485,7 +577,11 @@ NSString * const kUpdateProgressViewMessage = @"%.1f%% Complete\nTime Remaining:
 
 - (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event
 {
-    if (self.annotationMode) return;
+    if (self.annotationMode)
+    {
+        _SelectedTouch.reset();
+        return;
+    }
     
     if ([self shouldProcessTouches:touches])
     {

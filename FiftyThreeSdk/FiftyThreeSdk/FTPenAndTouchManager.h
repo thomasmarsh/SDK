@@ -10,6 +10,8 @@
 
 #include <boost/smart_ptr.hpp>
 
+#include "Common/Touch.h"
+
 namespace fiftythree
 {
 namespace sdk
@@ -28,6 +30,7 @@ public:
     virtual void SetLogging(bool logging) = 0;
     virtual void RegisterForEvents() = 0;
     virtual void UnregisterForEvents() = 0;
+    virtual fiftythree::common::Touch::cPtr NearestStrokeForTouch(fiftythree::common::Touch::cPtr touch) = 0;
 
     static Ptr New();
 };

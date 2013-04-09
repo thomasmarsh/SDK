@@ -14,6 +14,7 @@
 #include "Common/NoCopy.h"
 #include "Common/TouchManager.h"
 #include "Common/PenManager.h"
+#include "Common/Mathiness.h"
 
 #include "TouchClassifierManager.h"
 #include "LatencyTouchClassifier.h"
@@ -27,6 +28,7 @@ class FTPenAndTouchManagerImpl : public FTPenAndTouchManager, public boost::enab
 private:
     TouchClassifierManager::Ptr _ClassifierManager;
     FTTouchEventLogger::Ptr _Logger;
+    std::vector<Touch::cPtr> _BeginTouches;
     
 public:
     FTPenAndTouchManagerImpl()
@@ -70,6 +72,11 @@ public:
     
     void TouchesBegan(const TouchesSetEvent & sender, const TouchesSet & touches)
     {
+        BOOST_FOREACH(const Touch::cPtr & touch, touches)
+        {
+            _BeginTouches.push_back(touch);
+        }
+        
         if (_Logger) _Logger->TouchesBegan(touches);
         
         _ClassifierManager->TouchesBegan(touches);
@@ -101,6 +108,30 @@ public:
         if (_Logger) _Logger->HandlePenEvent(event);
         
         _ClassifierManager->ProcessPenEvent(event);
+    }
+    
+    Touch::cPtr NearestStrokeForTouch(Touch::cPtr touch)
+    {
+        Touch::cPtr nearestStroke;
+        float nearestDistance = std::numeric_limits<float>::max();
+        
+        BOOST_FOREACH(const Touch::cPtr & candidate, _BeginTouches)
+        {
+            Eigen::Vector2f touchLocation = touch->CurrentSample().Location();
+            
+            BOOST_FOREACH(const InputSample & sample, *candidate->History())
+            {
+                float distance = Distance<float, Eigen::Vector2f>(touchLocation, sample.Location());
+
+                if (distance < nearestDistance && distance < 20.f)
+                {
+                    nearestDistance = distance;
+                    nearestStroke = candidate;
+                }
+            }
+        }
+        
+        return nearestStroke;
     }
     
     FT_NO_COPY(FTPenAndTouchManagerImpl);
