@@ -19,12 +19,14 @@
 #import <MessageUI/MessageUI.h>
 
 #include <boost/foreach.hpp>
+#include <sstream>
 
 using namespace fiftythree::common;
 using namespace fiftythree::canvas;
 using namespace fiftythree::sdk;
 using boost::static_pointer_cast;
 using boost::dynamic_pointer_cast;
+using std::stringstream;
 
 NSString * const kUpdateProgressViewMessage = @"%.1f%% Complete\nTime Remaining: %02d:%02d";
 
@@ -652,6 +654,15 @@ Certification Data = %@", pen.manufacturerName, pen.modelNumber, pen.serialNumbe
     [picker setToRecipients:toRecipients];
     
     NSMutableData* data = static_pointer_cast<FTTouchEventLoggerObjc>(_EventLogger)->GetData();
+    data = [NSMutableData dataWithData:data]; // copy so we can edit
+
+    BOOST_FOREACH(const Touch::cPtr & touch, _HighlightedTouches)
+    {
+        stringstream ss;
+        ss << "strokestate=" << touch->Id() << ","
+            << 1 << std::endl;
+        [data appendBytes:ss.str().c_str() length:ss.tellp()];
+    }
     [picker addAttachmentData:data mimeType:@"application/prd" fileName:@"strokedata.prd"]; // todo - add counter to filename?
     
     [self presentViewController:picker animated:YES completion:nil];
