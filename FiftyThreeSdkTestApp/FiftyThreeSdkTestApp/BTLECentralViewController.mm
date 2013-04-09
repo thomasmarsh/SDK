@@ -263,6 +263,8 @@ NSString * const kUpdateProgressViewMessage = @"%.1f%% Complete\nTime Remaining:
     {
         [self.annotateButton setTitle:@"Annotate" forState:UIControlStateNormal];
         self.navigationItem.title = @"Draw";
+        
+        [self setInkColorBlack];
     }
 
     if (self.penManager.pairedPen)
@@ -441,19 +443,27 @@ NSString * const kUpdateProgressViewMessage = @"%.1f%% Complete\nTime Remaining:
     return nearest;
 }
 
+- (void)setInkColorRed
+{
+    [self.canvasController setColorwithRed:1.0 Green:0.0 Blue:0.0 Alpha:1.0];
+}
+
+- (void)setInkColorBlack
+{
+    [self.canvasController setColorwithRed:0.0 Green:0.0 Blue:0.0 Alpha:1.0];
+}
+
 - (void)drawStrokeFromTouch:(Touch::cPtr)touch withHighlight:(BOOL)highlight
 {
     if (highlight)
     {
         NSLog(@"Draw highlighted stroke");
-        // RED
-        [self.canvasController setColorwithRed:1.0 Green:0.0 Blue:0.0 Alpha:1.0];
+        [self setInkColorRed];
     }
     else
     {
         NSLog(@"Draw non-highlighted stroke");
-        // BLACK
-        [self.canvasController setColorwithRed:0.0 Green:0.0 Blue:0.0 Alpha:1.0];
+        [self setInkColorBlack];
     }
     
     BOOST_FOREACH(const InputSample & sample, *touch->History())
