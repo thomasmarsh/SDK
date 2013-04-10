@@ -13,6 +13,7 @@
 #include "Common/InputSample.h"
 #include "Common/TouchManager.h"
 #include "Common/TouchTracker.h"
+#include "Common/Timer.h"
 
 #include "FiftyThreeSdk/FTPenAndTouchManager.h"
 #include "FiftyThreeSdk/FTTouchEventLogger.h"
@@ -37,6 +38,7 @@ NSString * const kUpdateProgressViewMessage = @"%.1f%% Complete\nTime Remaining:
     Touch::cPtr _SelectedTouch;
     BOOL _SelectedTouchHighlighted; // the state the stroke was in before touched
     std::vector<Touch::cPtr> _HighlightedTouches;
+    Timer::Ptr _ConnectTimer;
 }
 
 @property (nonatomic) FTPenManager *penManager;
@@ -57,7 +59,19 @@ NSString * const kUpdateProgressViewMessage = @"%.1f%% Complete\nTime Remaining:
 {
     [super viewDidLoad];
     
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(applicationWillEnterForeground:)
+                                                 name:UIApplicationWillEnterForegroundNotification
+                                               object:nil];
+    
     self.view.multipleTouchEnabled = YES;
+    
+    _penManager = [[FTPenManager alloc] initWithDelegate:self];
+    
+    _PenAndTouchManager = FTPenAndTouchManager::New();
+    _PenAndTouchManager->RegisterForEvents();
+    _EventLogger = FTTouchEventLogger::New();
+    _PenAndTouchManager->SetLogger(_EventLogger);
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -76,15 +90,8 @@ NSString * const kUpdateProgressViewMessage = @"%.1f%% Complete\nTime Remaining:
     self.canvasController.view.multipleTouchEnabled = YES;
     self.view.multipleTouchEnabled = YES;
     
-    _penManager = [[FTPenManager alloc] initWithDelegate:self];
-    
     static_pointer_cast<TouchTrackerObjC>(TouchTracker::Instance())->RegisterView(self.view);
     static_pointer_cast<TouchManagerObjC>(TouchManager::Instance())->RegisterView(_canvasController.view);
-     
-    _PenAndTouchManager = FTPenAndTouchManager::New();
-    _PenAndTouchManager->RegisterForEvents();
-    _EventLogger = FTTouchEventLogger::New();
-    _PenAndTouchManager->SetLogger(_EventLogger);
 
     [self updateDisplay];
 }
@@ -114,8 +121,24 @@ NSString * const kUpdateProgressViewMessage = @"%.1f%% Complete\nTime Remaining:
     // Dispose of any resources that can be recreated.
 }
 
+- (void)connect
+{
+    if (self.penManager.pairedPen && !self.penManager.connectedPen)
+    {
+        _ConnectTimer = Timer::New();
+        [self.penManager connect];
+    }
+}
+
+- (void)applicationWillEnterForeground:(NSNotification *)notification
+{
+    [self connect];
+}
+
 - (void)penManagerDidUpdateState:(FTPenManager *)penManager
 {
+    [self connect];
+
     [self updateDisplay];
     
     [_penManager registerView:self.view];
@@ -132,6 +155,11 @@ NSString * const kUpdateProgressViewMessage = @"%.1f%% Complete\nTime Remaining:
 
 - (void)penManager:(FTPenManager *)penManager didConnectToPen:(FTPen *)pen
 {
+    if (_ConnectTimer)
+    {
+        NSLog(@"connect took %f seconds", _ConnectTimer->ElapsedTimeSeconds());
+    }
+    
     NSLog(@"didConnectToPen name=%@", pen.name);
 
     pen.delegate = self;
@@ -324,7 +352,7 @@ NSString * const kUpdateProgressViewMessage = @"%.1f%% Complete\nTime Remaining:
 {
     if (!self.penManager.connectedPen)
     {
-        [self.penManager connect];
+        [self connect];
     }
     else
     {

@@ -60,9 +60,30 @@
                     <view key="view" contentMode="scaleToFill" id="Fy3-SV-Gef">
                         <rect key="frame" x="0.0" y="64" width="768" height="960"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <subviews>
+                            <switch opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="RUl-Sj-atV">
+                                <connections>
+                                    <action selector="secureSwitchChanged:" destination="uwv-lI-X9n" eventType="valueChanged" id="nkc-ib-ldY"/>
+                                </connections>
+                            </switch>
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Secure" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="PwV-Yw-no3">
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                        </subviews>
                         <color key="backgroundColor" white="0.95206607680722888" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="RUl-Sj-atV" firstAttribute="top" secondItem="Fy3-SV-Gef" secondAttribute="top" constant="20" symbolic="YES" type="default" id="8lU-lG-8Aq"/>
+                            <constraint firstItem="PwV-Yw-no3" firstAttribute="leading" secondItem="Fy3-SV-Gef" secondAttribute="leading" constant="52" id="S7j-aw-yM0"/>
+                            <constraint firstItem="PwV-Yw-no3" firstAttribute="centerY" secondItem="RUl-Sj-atV" secondAttribute="centerY" type="default" id="l2s-Fh-tvO"/>
+                            <constraint firstItem="RUl-Sj-atV" firstAttribute="leading" secondItem="Fy3-SV-Gef" secondAttribute="leading" constant="230" id="qX5-wN-6C5"/>
+                        </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="i4m-Pa-H5F"/>
+                    <connections>
+                        <outlet property="secureSwitch" destination="RUl-Sj-atV" id="U9m-Sr-91H"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="34q-pa-9fg" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
@@ -287,6 +308,51 @@
             <point key="canvasLocation" x="-236" y="-111"/>
         </scene>
     </scenes>
+    <classes>
+        <class className="BTLECentralViewController" superclassName="UIViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/BTLECentralViewController.h"/>
+            <relationships>
+                <relationship kind="action" name="annotateButtonPressed:"/>
+                <relationship kind="action" name="clearButtonPressed:"/>
+                <relationship kind="action" name="connectButtonPressed:"/>
+                <relationship kind="action" name="infoButtonPressed:"/>
+                <relationship kind="action" name="pairButtonTouchDown:"/>
+                <relationship kind="action" name="pairButtonTouchUpInside:"/>
+                <relationship kind="action" name="pairButtonTouchUpOutside:"/>
+                <relationship kind="action" name="shareButtonPressed:"/>
+                <relationship kind="action" name="testConnectButtonPressed:"/>
+                <relationship kind="action" name="updateFirmwareButtonPressed:"/>
+                <relationship kind="outlet" name="annotateButton" candidateClass="UIButton"/>
+                <relationship kind="outlet" name="clearButton" candidateClass="UIButton"/>
+                <relationship kind="outlet" name="connectButton" candidateClass="UIButton"/>
+                <relationship kind="outlet" name="infoButton" candidateClass="UIBarButtonItem"/>
+                <relationship kind="outlet" name="pairButton" candidateClass="UIButton"/>
+                <relationship kind="outlet" name="pairingStatusLabel" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="shareButton" candidateClass="UIButton"/>
+                <relationship kind="outlet" name="testConnectButton" candidateClass="UIButton"/>
+                <relationship kind="outlet" name="tip1State" candidateClass="UIButton"/>
+                <relationship kind="outlet" name="tip2State" candidateClass="UIButton"/>
+                <relationship kind="outlet" name="updateFirmwareButton" candidateClass="UIButton"/>
+            </relationships>
+        </class>
+        <class className="BTLEPeripheralViewController" superclassName="UIViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/BTLEPeripheralViewController.h"/>
+            <relationships>
+                <relationship kind="action" name="secureSwitchChanged:"/>
+                <relationship kind="action" name="tip1TouchDown:"/>
+                <relationship kind="action" name="tip1TouchUpInside:"/>
+                <relationship kind="action" name="tip1TouchUpOutside:"/>
+                <relationship kind="action" name="tip2TouchDown:"/>
+                <relationship kind="action" name="tip2TouchUpInside:"/>
+                <relationship kind="action" name="tip2TouchUpOutside:"/>
+                <relationship kind="outlet" name="connectionStatusLabel" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="secureSwitch" candidateClass="UISwitch"/>
+            </relationships>
+        </class>
+        <class className="NSLayoutConstraint" superclassName="NSObject">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/NSLayoutConstraint.h"/>
+        </class>
+    </classes>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
         <simulatedStatusBarMetrics key="statusBar" statusBarStyle="blackTranslucent"/>
         <simulatedOrientationMetrics key="orientation"/>

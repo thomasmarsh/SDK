@@ -39,7 +39,6 @@ public:
     
     ~FTPenAndTouchManagerImpl()
     {
-        UnregisterForEvents();
     }
     
     void RegisterForEvents()
@@ -135,7 +134,7 @@ public:
         
         return nearestStroke;
     }
-    
+        
     FT_NO_COPY(FTPenAndTouchManagerImpl);
 };
 
