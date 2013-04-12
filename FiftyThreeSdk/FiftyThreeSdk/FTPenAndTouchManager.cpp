@@ -34,7 +34,6 @@ class FTPenAndTouchManagerImpl : public FTPenAndTouchManager, public boost::enab
 private:
     TouchClassifierManager::Ptr _ClassifierManager;
     FTTouchEventLogger::Ptr _Logger;
-    std::vector<Touch::cPtr> _PastTouches;
     TouchToTypeMap _Touches;
     Event<Touch::cPtr> _TouchTypeChangedEvent;
     
@@ -74,7 +73,6 @@ public:
     {
         BOOST_FOREACH(const Touch::cPtr & touch, touches)
         {
-            _PastTouches.push_back(touch);
             _Touches[touch] = TouchType::Unknown;
         }
         
@@ -128,30 +126,6 @@ public:
         {
             _Logger->Clear();
         }
-    }
-    
-    Touch::cPtr NearestStrokeForTouch(Touch::cPtr touch)
-    {
-        Touch::cPtr nearestStroke;
-        float nearestDistance = std::numeric_limits<float>::max();
-        
-        BOOST_FOREACH(const Touch::cPtr & candidate, _PastTouches)
-        {
-            Eigen::Vector2f touchLocation = touch->CurrentSample().Location();
-            
-            BOOST_FOREACH(const InputSample & sample, *candidate->History())
-            {
-                float distance = Distance<float, Eigen::Vector2f>(touchLocation, sample.Location());
-
-                if (distance < nearestDistance && distance < 20.f)
-                {
-                    nearestDistance = distance;
-                    nearestStroke = candidate;
-                }
-            }
-        }
-        
-        return nearestStroke;
     }
     
     virtual TouchType GetTouchType(const Touch::cPtr & touch)

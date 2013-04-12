@@ -23,6 +23,7 @@ using std::stringstream;
 class FTTouchEventLoggerImpl : public FTTouchEventLoggerObjc
 {
 private:
+    std::vector<Touch::cPtr> _PastTouches;
     NSMutableData* data;
     
 public:
@@ -35,6 +36,8 @@ public:
     {
         BOOST_FOREACH(const Touch::cPtr & touch, touches)
         {
+            _PastTouches.push_back(touch);
+            
             stringstream ss;
             ss << TOUCH_PREFIX << touch->ToString() << std::endl;
             
@@ -95,12 +98,37 @@ public:
     
     virtual void Clear()
     {
+        _PastTouches.clear();
         data = [NSMutableData data];
     }
     
     virtual NSMutableData* GetData()
     {
         return data;
+    }
+    
+    Touch::cPtr NearestStrokeForTouch(Touch::cPtr touch)
+    {
+        Touch::cPtr nearestStroke;
+        float nearestDistance = std::numeric_limits<float>::max();
+        
+        BOOST_FOREACH(const Touch::cPtr & candidate, _PastTouches)
+        {
+            Eigen::Vector2f touchLocation = touch->CurrentSample().Location();
+            
+            BOOST_FOREACH(const InputSample & sample, *candidate->History())
+            {
+                float distance = Distance<float, Eigen::Vector2f>(touchLocation, sample.Location());
+                
+                if (distance < nearestDistance && distance < 20.f)
+                {
+                    nearestDistance = distance;
+                    nearestStroke = candidate;
+                }
+            }
+        }
+        
+        return nearestStroke;
     }
     
     FT_NO_COPY(FTTouchEventLoggerImpl);

@@ -489,7 +489,7 @@ public:
 - (Touch::cPtr)findStroke:(UITouch *)uiTouch
 {
     Touch::cPtr touch = static_pointer_cast<TouchTrackerObjC>(TouchTracker::Instance())->TouchForUITouch(uiTouch);
-    Touch::cPtr nearest = _PenAndTouchManager->NearestStrokeForTouch(touch);
+    Touch::cPtr nearest = static_pointer_cast<FTTouchEventLoggerObjc>(_EventLogger)->NearestStrokeForTouch(touch);
     
     return nearest;
 }

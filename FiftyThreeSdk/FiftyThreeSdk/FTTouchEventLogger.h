@@ -46,9 +46,10 @@ public:
 class FTTouchEventLoggerObjc : public FTTouchEventLogger
 {
 public:
-    virtual NSMutableData* GetData() = 0;
-    
     FTTouchEventLoggerObjc() {}
+    
+    virtual NSMutableData* GetData() = 0;
+    virtual common::Touch::cPtr NearestStrokeForTouch(common::Touch::cPtr touch) = 0;
     
     FT_NO_COPY(FTTouchEventLoggerObjc);
 };
