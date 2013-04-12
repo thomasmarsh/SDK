@@ -19,6 +19,8 @@
 #include "FiftyThreeSdk/FTTouchEventLogger.h"
 #import <MessageUI/MessageUI.h>
 
+#import <CoreBluetooth/CoreBluetooth.h>
+
 #include <boost/foreach.hpp>
 #include <sstream>
 

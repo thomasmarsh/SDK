@@ -17,7 +17,12 @@ namespace fiftythree
 {
 namespace sdk
 {
-
+ 
+DEFINE_ENUM(TouchType,
+            Finger,
+            Pen,
+            Unknown);
+    
 class FTPenAndTouchManager
 {
 public:
@@ -34,6 +39,8 @@ public:
     virtual void Clear() = 0;
     virtual fiftythree::common::Touch::cPtr NearestStrokeForTouch(fiftythree::common::Touch::cPtr touch) = 0;
     virtual void HandlePenEvent(const PenEvent & event) = 0; // TODO - should register for pen events as with touch events, for now pass them in
+    
+    virtual TouchType GetTouchType(const common::Touch::cPtr & touch) = 0;
 
     static Ptr New();
 };

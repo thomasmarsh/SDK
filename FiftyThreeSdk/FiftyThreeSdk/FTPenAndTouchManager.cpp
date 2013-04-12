@@ -10,6 +10,7 @@
 
 #include <boost/smart_ptr.hpp>
 #include <boost/foreach.hpp>
+#include <boost/unordered_map.hpp>
 
 #include "Common/NoCopy.h"
 #include "Common/TouchManager.h"
@@ -22,13 +23,19 @@
 
 using namespace fiftythree::sdk;
 using namespace fiftythree::common;
+using std::make_pair;
+using std::pair;
+using namespace boost;
+
+typedef unordered_map<Touch::cPtr, TouchType> TouchToTypeMap;
 
 class FTPenAndTouchManagerImpl : public FTPenAndTouchManager, public boost::enable_shared_from_this<FTPenAndTouchManagerImpl>
 {
 private:
     TouchClassifierManager::Ptr _ClassifierManager;
     FTTouchEventLogger::Ptr _Logger;
-    std::vector<Touch::cPtr> _BeginTouches;
+    std::vector<Touch::cPtr> _PastTouches;
+    TouchToTypeMap _Touches;
     
 public:
     FTPenAndTouchManagerImpl()
@@ -66,7 +73,8 @@ public:
     {
         BOOST_FOREACH(const Touch::cPtr & touch, touches)
         {
-            _BeginTouches.push_back(touch);
+            _PastTouches.push_back(touch);
+            _Touches[touch] = TouchType::Unknown;
         }
         
         if (_Logger) _Logger->TouchesBegan(touches);
@@ -83,6 +91,11 @@ public:
     
     void TouchesEnded(const TouchesSetEvent & sender, const TouchesSet & touches)
     {
+        BOOST_FOREACH(const Touch::cPtr & touch, touches)
+        {
+            _Touches.erase(touch);
+        }
+        
         if (_Logger) _Logger->TouchesEnded(touches);
         
         _ClassifierManager->TouchesEnded(touches);
@@ -90,6 +103,11 @@ public:
     
     void TouchesCancelled(const TouchesSetEvent & sender, const TouchesSet & touches)
     {
+        BOOST_FOREACH(const Touch::cPtr & touch, touches)
+        {
+            _Touches.erase(touch);
+        }
+        
         if (_Logger) _Logger->TouchesCancelled(touches);
         
         _ClassifierManager->TouchesCancelled(touches);
@@ -104,7 +122,7 @@ public:
     
     virtual void Clear()
     {
-        _BeginTouches.clear();
+        _Touches.clear();
         if (_Logger)
         {
             _Logger->Clear();
@@ -116,7 +134,7 @@ public:
         Touch::cPtr nearestStroke;
         float nearestDistance = std::numeric_limits<float>::max();
         
-        BOOST_FOREACH(const Touch::cPtr & candidate, _BeginTouches)
+        BOOST_FOREACH(const Touch::cPtr & candidate, _PastTouches)
         {
             Eigen::Vector2f touchLocation = touch->CurrentSample().Location();
             
@@ -134,7 +152,12 @@ public:
         
         return nearestStroke;
     }
-        
+    
+    virtual TouchType GetTouchType(const Touch::cPtr & touch)
+    {
+        return _Touches[touch];
+    }
+    
     FT_NO_COPY(FTPenAndTouchManagerImpl);
 };
 
