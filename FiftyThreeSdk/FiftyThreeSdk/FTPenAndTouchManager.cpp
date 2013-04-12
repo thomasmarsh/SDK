@@ -36,6 +36,7 @@ private:
     FTTouchEventLogger::Ptr _Logger;
     std::vector<Touch::cPtr> _PastTouches;
     TouchToTypeMap _Touches;
+    Event<Touch::cPtr> _TouchTypeChangedEvent;
     
 public:
     FTPenAndTouchManagerImpl()
@@ -156,6 +157,22 @@ public:
     virtual TouchType GetTouchType(const Touch::cPtr & touch)
     {
         return _Touches[touch];
+    }
+    
+    Event<Touch::cPtr> & TouchTypeChanged()
+    {
+        return _TouchTypeChangedEvent;
+    }
+
+private:
+    void SetTouchType(const Touch::cPtr & touch, TouchType type)
+    {
+        TouchType oldType = _Touches[touch];
+        _Touches[touch] = type;
+        if (oldType != type)
+        {
+            _TouchTypeChangedEvent.Fire(touch);
+        }
     }
     
     FT_NO_COPY(FTPenAndTouchManagerImpl);

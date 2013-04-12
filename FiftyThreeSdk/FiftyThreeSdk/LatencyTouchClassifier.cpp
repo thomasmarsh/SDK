@@ -106,7 +106,7 @@ public:
         }
         else // PenUp
         {
-            std::cout << "PenDown" << std::endl;
+            std::cout << "PenUp" << std::endl;
             
             _PenUpTime = event.Sample.TimestampSeconds();
             

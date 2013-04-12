@@ -22,6 +22,7 @@
 #import <CoreBluetooth/CoreBluetooth.h>
 
 #include <boost/foreach.hpp>
+#include <boost/smart_ptr.hpp>
 #include <sstream>
 
 using namespace fiftythree::common;
@@ -29,9 +30,19 @@ using namespace fiftythree::canvas;
 using namespace fiftythree::sdk;
 using boost::static_pointer_cast;
 using boost::dynamic_pointer_cast;
+using boost::shared_ptr;
+using boost::make_shared;
 using std::stringstream;
 
 NSString * const kUpdateProgressViewMessage = @"%.1f%% Complete\nTime Remaining: %02d:%02d";
+
+class TouchObserver
+{
+public:
+    void TouchTypeChanged(const Event<Touch::cPtr> & event, Touch::cPtr touch)
+    {
+    }
+};
 
 @interface BTLECentralViewController () <FTPenManagerDelegate, FTPenDelegate, FTPenManagerDelegatePrivate, UIAlertViewDelegate, MFMailComposeViewControllerDelegate>
 {
@@ -41,6 +52,7 @@ NSString * const kUpdateProgressViewMessage = @"%.1f%% Complete\nTime Remaining:
     BOOL _SelectedTouchHighlighted; // the state the stroke was in before touched
     std::vector<Touch::cPtr> _HighlightedTouches;
     Timer::Ptr _ConnectTimer;
+    shared_ptr<TouchObserver> _TouchObserver;
 }
 
 @property (nonatomic) FTPenManager *penManager;
@@ -74,6 +86,9 @@ NSString * const kUpdateProgressViewMessage = @"%.1f%% Complete\nTime Remaining:
     _PenAndTouchManager->RegisterForEvents();
     _EventLogger = FTTouchEventLogger::New();
     _PenAndTouchManager->SetLogger(_EventLogger);
+    
+    _TouchObserver = make_shared<TouchObserver>();
+    _PenAndTouchManager->TouchTypeChanged().AddListener(_TouchObserver, &TouchObserver::TouchTypeChanged);
 }
 
 - (void)viewWillAppear:(BOOL)animated
