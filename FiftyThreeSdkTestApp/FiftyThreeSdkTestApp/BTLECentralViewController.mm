@@ -554,6 +554,20 @@ public:
     }
 }
 
+- (BOOL)shouldDrawTouch:(const Touch::cPtr &)touch
+{
+    TouchType type = _PenAndTouchManager->GetTouchType(touch);
+    if (self.penManager.connectedPen)
+    {
+        return type == TouchType::Pen;
+    }
+    else
+    {
+        return YES;
+        //return type == TouchType::Finger;
+    }
+}
+
 #pragma mark - UIKIt Touches
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
 {
@@ -567,13 +581,18 @@ public:
     {
         static_pointer_cast<TouchManagerObjC>(TouchManager::Instance())->ProcessTouches(touches);
         
-        if (!self.strokeTouch)
+        for (UITouch *uiTouch in touches)
         {
-            self.strokeTouch = [touches anyObject];
-            UITouch *touch = self.strokeTouch;
-            [self.canvasController beginStroke:InputSampleFromCGPoint([touch locationInView:touch.window],
-                                                                      [touch locationInView:self.view],
-                                                                      touch.timestamp)];
+            Touch::cPtr touch = static_pointer_cast<TouchTrackerObjC>(TouchTracker::Instance())->TouchForUITouch(uiTouch);
+
+            if ([self shouldDrawTouch:touch] && !self.strokeTouch)
+            {
+                self.strokeTouch = [touches anyObject];
+                UITouch *touch = self.strokeTouch;
+                [self.canvasController beginStroke:InputSampleFromCGPoint([touch locationInView:touch.window],
+                                                                          [touch locationInView:self.view],
+                                                                          touch.timestamp)];
+            }
         }
     }
 }
