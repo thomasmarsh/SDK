@@ -104,7 +104,7 @@ public:
     
     virtual NSMutableData* GetData()
     {
-        return data;
+        return [NSMutableData dataWithData:data];
     }
     
     Touch::cPtr NearestStrokeForTouch(Touch::cPtr touch)

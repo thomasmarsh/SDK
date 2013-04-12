@@ -699,7 +699,6 @@ Certification Data = %@", pen.manufacturerName, pen.modelNumber, pen.serialNumbe
     [picker setToRecipients:toRecipients];
     
     NSMutableData* data = static_pointer_cast<FTTouchEventLoggerObjc>(_EventLogger)->GetData();
-    data = [NSMutableData dataWithData:data]; // copy so we can edit
 
     BOOST_FOREACH(const Touch::cPtr & touch, _HighlightedTouches)
     {
