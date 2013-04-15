@@ -40,7 +40,6 @@ public:
     virtual void HandlePenEvent(const PenEvent & event) = 0; // TODO - should register for pen events as with touch events, for now pass them in
     
     virtual TouchType GetTouchType(const common::Touch::cPtr & touch) = 0;
-    
     virtual Event<common::Touch::cPtr> & TouchTypeChanged() = 0;
 
     static Ptr New();

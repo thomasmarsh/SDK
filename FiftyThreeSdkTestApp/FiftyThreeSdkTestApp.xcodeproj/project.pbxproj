@@ -43,6 +43,7 @@
 		665C61DB1714974D00E70FB4 /* MessageUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 665C61DA1714974D00E70FB4 /* MessageUI.framework */; };
 		666FBEEA170A38EA0068551E /* FTTouchTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 666FBEE9170A38EA0068551E /* FTTouchTests.mm */; };
 		6685989F16FD11E1008CAE29 /* SimpleBLEPeripheral.img in Resources */ = {isa = PBXBuildFile; fileRef = 6685989E16FD11E1008CAE29 /* SimpleBLEPeripheral.img */; };
+		6687E3321718B4C3005ACFA3 /* NSFileHandle+readLine.m in Sources */ = {isa = PBXBuildFile; fileRef = 6687E3311718B4C3005ACFA3 /* NSFileHandle+readLine.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		668F6D5217023A8C002C548B /* libCanvas.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 668F6D5117023A8C002C548B /* libCanvas.a */; };
 		668F6D5A17024021002C548B /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6644319616F802C80049E570 /* CoreVideo.framework */; };
 		668F6D5C17024034002C548B /* libGlobalSettings.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 668F6D5B17024034002C548B /* libGlobalSettings.a */; };
@@ -57,6 +58,7 @@
 		66C83D731704FDA200789776 /* libCommon.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 668F6D5617023D13002C548B /* libCommon.a */; };
 		66C83D741704FDA500789776 /* libFiftyThreeSdk.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6644316616F3D1B60049E570 /* libFiftyThreeSdk.a */; };
 		66C83D751704FDB700789776 /* boost.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6644317416F7FC680049E570 /* boost.framework */; };
+		66D2CBD8171C8B01008E1526 /* strokedata-3.prd in Resources */ = {isa = PBXBuildFile; fileRef = 66D2CBD6171C8AB5008E1526 /* strokedata-3.prd */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -123,6 +125,8 @@
 		666FBEE8170A38EA0068551E /* FTTouchTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FTTouchTests.h; sourceTree = "<group>"; };
 		666FBEE9170A38EA0068551E /* FTTouchTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = FTTouchTests.mm; sourceTree = "<group>"; };
 		6685989E16FD11E1008CAE29 /* SimpleBLEPeripheral.img */ = {isa = PBXFileReference; lastKnownFileType = file; path = SimpleBLEPeripheral.img; sourceTree = SOURCE_ROOT; };
+		6687E3301718B4C3005ACFA3 /* NSFileHandle+readLine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSFileHandle+readLine.h"; sourceTree = "<group>"; };
+		6687E3311718B4C3005ACFA3 /* NSFileHandle+readLine.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSFileHandle+readLine.m"; sourceTree = "<group>"; };
 		668F6D5117023A8C002C548B /* libCanvas.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libCanvas.a; path = "../../../../../../Library/Developer/Xcode/DerivedData/FiftyThreeSdkTestApp-fqhrggmyvwwfhzgakxbhthwwiptp/Build/Products/Debug-iphoneos/libCanvas.a"; sourceTree = "<group>"; };
 		668F6D5617023D13002C548B /* libCommon.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libCommon.a; path = "../../../../../../Library/Developer/Xcode/DerivedData/FiftyThreeSdkTestApp-fqhrggmyvwwfhzgakxbhthwwiptp/Build/Products/Debug-iphoneos/libCommon.a"; sourceTree = "<group>"; };
 		668F6D5B17024034002C548B /* libGlobalSettings.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libGlobalSettings.a; path = "../../GlobalSettings/build/Release-iphoneos/libGlobalSettings.a"; sourceTree = "<group>"; };
@@ -135,6 +139,7 @@
 		66A47C1A16D843250016B31C /* CoreBluetooth.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreBluetooth.framework; path = System/Library/Frameworks/CoreBluetooth.framework; sourceTree = SDKROOT; };
 		66C83D6E1704F9DD00789776 /* FTLatencyTouchClassfierTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FTLatencyTouchClassfierTests.h; sourceTree = "<group>"; };
 		66C83D6F1704F9DD00789776 /* FTLatencyTouchClassfierTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = FTLatencyTouchClassfierTests.mm; sourceTree = "<group>"; };
+		66D2CBD6171C8AB5008E1526 /* strokedata-3.prd */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "strokedata-3.prd"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -187,6 +192,9 @@
 		6644311716F3C8390049E570 /* FiftyThreeSdkTests */ = {
 			isa = PBXGroup;
 			children = (
+				6687E3301718B4C3005ACFA3 /* NSFileHandle+readLine.h */,
+				6687E3311718B4C3005ACFA3 /* NSFileHandle+readLine.m */,
+				6687E32C1718B2F6005ACFA3 /* Test Data */,
 				6644313216F3CC2C0049E570 /* SenAsyncTestCase.h */,
 				6644313316F3CC2C0049E570 /* SenAsyncTestCase.m */,
 				6644312616F3C86C0049E570 /* FiftyThreeSdkTests.h */,
@@ -216,6 +224,14 @@
 				6644316616F3D1B60049E570 /* libFiftyThreeSdk.a */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		6687E32C1718B2F6005ACFA3 /* Test Data */ = {
+			isa = PBXGroup;
+			children = (
+				66D2CBD6171C8AB5008E1526 /* strokedata-3.prd */,
+			);
+			name = "Test Data";
 			sourceTree = "<group>";
 		};
 		668F6DEC1703737A002C548B /* Resources */ = {
@@ -423,6 +439,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				66D2CBD8171C8B01008E1526 /* strokedata-3.prd in Resources */,
 				6644311C16F3C8390049E570 /* InfoPlist.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -470,6 +487,7 @@
 				6644313416F3CC2C0049E570 /* SenAsyncTestCase.m in Sources */,
 				66C83D701704F9DD00789776 /* FTLatencyTouchClassfierTests.mm in Sources */,
 				666FBEEA170A38EA0068551E /* FTTouchTests.mm in Sources */,
+				6687E3321718B4C3005ACFA3 /* NSFileHandle+readLine.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
