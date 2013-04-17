@@ -40,7 +40,7 @@
     
     NSUInteger index = [models indexOfObject:model];
     if (index == NSNotFound) return nil;
-    return [[NSBundle mainBundle] pathForResource:models[index] ofType:@"img"];
+    return [[NSBundle mainBundle] pathForResource:models[index] ofType:@"bin"];
 }
 
 @end

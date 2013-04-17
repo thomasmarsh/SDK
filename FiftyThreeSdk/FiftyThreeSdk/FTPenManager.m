@@ -473,6 +473,8 @@ NSString * const kPairedPenUuidDefaultsKey = @"PairedPenUuid";
     
     if (self.updateManager && self.updateManager.waitingForReboot)
     {
+        NSLog(@"Disconnected while performing update, attempting reconnect");
+        
         [self performSelector:@selector(connect) withObject:nil afterDelay:2.0];
         return;
     }
