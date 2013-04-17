@@ -14,6 +14,7 @@
 @interface TIUpdateManager : NSObject
 
 @property (nonatomic) BOOL waitingForReboot;
+@property (nonatomic, readonly) NSDate* updateStartTime;
 
 - (id) init __unavailable;
 - (id)initWithPeripheral:(CBPeripheral *)peripheral delegate:(id<TIUpdateManagerDelegate>)delegate;

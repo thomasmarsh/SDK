@@ -29,6 +29,7 @@ static NSString *const kImageBlockTransferUUID = @"F000FFC2-0451-4000-B000-00000
 @property (nonatomic) boost::shared_ptr<Timer> lastBlockTimer;
 @property (nonatomic, weak) id<TIUpdateManagerDelegate> delegate;
 @property (nonatomic) float lastPercent;
+@property (nonatomic, readwrite) NSDate *updateStartTime;
 
 @end
 
@@ -111,6 +112,8 @@ static NSString *const kImageBlockTransferUUID = @"F000FFC2-0451-4000-B000-00000
 - (void)peripheral:(CBPeripheral *)peripheral didUpdateNotificationStateForCharacteristic:(CBCharacteristic *)characteristic error:(NSError *)error
 {
     if (self.imageBlockTransfer.isNotifying && self.imageIdentify.isNotifying) {
+        self.updateStartTime = [NSDate date];
+        
         NSLog(@"Sending image header");
 
         [self.imageHandle seekToFileOffset:4]; // skip CRC + shadow CRC

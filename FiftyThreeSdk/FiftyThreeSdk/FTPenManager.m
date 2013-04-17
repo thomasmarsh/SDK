@@ -16,6 +16,7 @@
 #import "FTFirmwareManager.h"
 
 NSString * const kPairedPenUuidDefaultsKey = @"PairedPenUuid";
+static const int kInterruptedUpdateDelayMax = 30;
 
 @interface FTPenManager () <CBCentralManagerDelegate, CBPeripheralDelegate, TIUpdateManagerDelegate>
 {
@@ -248,10 +249,17 @@ NSString * const kPairedPenUuidDefaultsKey = @"PairedPenUuid";
         });
     }
     
-    if (self.updateManager && self.updateManager.waitingForReboot)
+    if (self.updateManager)
     {
-        [self updateFirmwareForPen:self.connectedPen];
-        return;
+        if (-[self.updateManager.updateStartTime timeIntervalSinceNow] < kInterruptedUpdateDelayMax)
+        {
+            [self updateFirmwareForPen:self.connectedPen];
+            return;
+        }
+        else
+        {
+            self.updateManager = nil;
+        }
     }
 
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -471,12 +479,18 @@ NSString * const kPairedPenUuidDefaultsKey = @"PairedPenUuid";
     FTPen* pen = self.connectedPen;
     _connectedPen = nil;
     
-    if (self.updateManager && self.updateManager.waitingForReboot)
+    if (self.updateManager)
     {
-        NSLog(@"Disconnected while performing update, attempting reconnect");
-        
-        [self performSelector:@selector(connect) withObject:nil afterDelay:2.0];
-        return;
+        if (-[self.updateManager.updateStartTime timeIntervalSinceNow] < kInterruptedUpdateDelayMax)
+        {
+            NSLog(@"Disconnected while performing update, attempting reconnect");
+            
+            [self performSelectorOnMainThread:@selector(connect) withObject:nil waitUntilDone:NO];
+        }
+        else
+        {
+            self.updateManager = nil;
+        }
     }
 
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -503,7 +517,7 @@ NSString * const kPairedPenUuidDefaultsKey = @"PairedPenUuid";
     
     NSNumberFormatter *f = [[NSNumberFormatter alloc] init];
     [f setNumberStyle:NSNumberFormatterDecimalStyle];
-    NSInteger existingVersion = [f numberFromString:pen.firmwareRevision].integerValue;
+    NSInteger existingVersion = [f numberFromString:pen.softwareRevision].integerValue;
     
     NSInteger availableVersion = [FTFirmwareManager versionForModel:pen.modelNumber];
     NSLog(@"Firmware version: Available = %d, Existing = %d", availableVersion, existingVersion);

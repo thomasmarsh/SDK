@@ -72,7 +72,7 @@ using std::string;
         }
         else if ([prefix isEqualToString:@"strokestate"])
         {
-            
+            // TODO - check final states against classifier output
         }
     } while (data);
 }
