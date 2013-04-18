@@ -99,6 +99,7 @@ static const int kInterruptedUpdateDelayMax = 30;
         [self disconnect];
     }
 
+    _pairedPen = nil;
     self.maxRSSI = 0;
     self.closestPen = nil;
     _pairing = YES;
@@ -167,20 +168,18 @@ static const int kInterruptedUpdateDelayMax = 30;
     int rssiValue = [RSSI integerValue];
     NSLog(@"Discovered %@ at %d", peripheral.name, rssiValue);
     
-    if (rssiValue > self.maxRSSI || self.maxRSSI == 0)
+    if ((rssiValue > self.maxRSSI || self.maxRSSI == 0) &&
+        self.closestPen.peripheral != peripheral)
     {
-        NSLog(@"Updated closest pen");
-        
-        if (self.closestPen.peripheral != peripheral)
-        {
+            NSLog(@"Updated closest pen");
+            
             self.maxRSSI = rssiValue;
             self.closestPen = [[FTPen alloc] initWithPeripheral:peripheral data:advertisementData];
-        }
     }
 
     // Have we already seen it?
     if (self.closestPen.peripheral == peripheral) {
-        [_connectedPen updateData:advertisementData];
+        [self.closestPen updateData:advertisementData];
     }
 }
 
@@ -281,7 +280,7 @@ static const int kInterruptedUpdateDelayMax = 30;
 {
     NSAssert(pen, nil);
     
-    if (_pairing) {
+    if (!_pairedPen) {
         _pairedPen = pen;
         [self stopPairing];
 
