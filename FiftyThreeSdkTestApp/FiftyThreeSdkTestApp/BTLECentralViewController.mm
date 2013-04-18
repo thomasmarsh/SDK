@@ -175,6 +175,7 @@ public:
     if (_ConnectTimer)
     {
         NSLog(@"connect took %f seconds", _ConnectTimer->ElapsedTimeSeconds());
+        _ConnectTimer.reset();
     }
     
     NSLog(@"didConnectToPen name=%@", pen.name);

@@ -34,6 +34,9 @@ static const int kInterruptedUpdateDelayMax = 30;
 @property (nonatomic) CBCentralManager *centralManager;
 @property (nonatomic) TIUpdateManager *updateManager;
 @property (nonatomic, readwrite) FTPenManagerState state;
+@property (nonatomic) NSTimer *pairingTimer;
+@property (nonatomic) int maxRSSI;
+@property (nonatomic) FTPen *closestPen;
 
 @end
 
@@ -90,17 +93,43 @@ static const int kInterruptedUpdateDelayMax = 30;
 - (void)startPairing
 {
     NSLog(@"startPairing");
+    
+    if (self.connectedPen)
+    {
+        [self disconnect];
+    }
 
+    self.maxRSSI = 0;
+    self.closestPen = nil;
     _pairing = YES;
     [self scan];
+    
+    self.pairingTimer = [NSTimer scheduledTimerWithTimeInterval:1.0
+                                                         target:self
+                                                       selector:@selector(pairingTimerExpired:)
+                                                       userInfo:nil
+                                                        repeats:NO];
 }
 
 - (void)stopPairing
 {
     NSLog(@"stopPairing");
 
+    [self.pairingTimer invalidate];
+    self.pairingTimer = nil;
+    
     _pairing = NO;
     [self.centralManager stopScan];
+}
+
+- (void)pairingTimerExpired:(NSTimer *)timer
+{
+    self.pairingTimer = nil;
+    
+    if (self.closestPen)
+    {
+        [self connectPen:self.closestPen];
+    }
 }
 
 - (void)connect
@@ -129,14 +158,22 @@ static const int kInterruptedUpdateDelayMax = 30;
 
 - (void)centralManager:(CBCentralManager *)central didDiscoverPeripheral:(CBPeripheral *)peripheral advertisementData:(NSDictionary *)advertisementData RSSI:(NSNumber *)RSSI
 {
-    NSLog(@"Discovered %@ at %@", peripheral.name, RSSI);
+    int rssiValue = [RSSI integerValue];
+    NSLog(@"Discovered %@ at %d", peripheral.name, rssiValue);
+    
+    if (rssiValue > self.maxRSSI || self.maxRSSI == 0)
+    {
+        NSLog(@"Updated closest pen");
+        
+        if (self.closestPen.peripheral != peripheral)
+        {
+            self.maxRSSI = rssiValue;
+            self.closestPen = [[FTPen alloc] initWithPeripheral:peripheral data:advertisementData];
+        }
+    }
 
-    // Ok, it's in range - have we already seen it?
-    if (_connectedPen.peripheral != peripheral) {
-        FTPen *pen = [[FTPen alloc] initWithPeripheral:peripheral data:advertisementData];
-
-        [self connectPen:pen];
-    } else {
+    // Have we already seen it?
+    if (self.closestPen.peripheral == peripheral) {
         [_connectedPen updateData:advertisementData];
     }
 }
