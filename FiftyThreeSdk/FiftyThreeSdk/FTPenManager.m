@@ -154,6 +154,12 @@ static const int kInterruptedUpdateDelayMax = 30;
     if (self.connectedPen) {
         [self.centralManager cancelPeripheralConnection:_connectedPen.peripheral];
     }
+    
+    // Ensure we don't retry update when disconnect was initiated by the central.
+    if (self.updateManager)
+    {
+        self.updateManager = nil;
+    }
 }
 
 - (void)centralManager:(CBCentralManager *)central didDiscoverPeripheral:(CBPeripheral *)peripheral advertisementData:(NSDictionary *)advertisementData RSSI:(NSNumber *)RSSI
