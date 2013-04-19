@@ -166,12 +166,12 @@ static const int kInterruptedUpdateDelayMax = 30;
 - (void)centralManager:(CBCentralManager *)central didDiscoverPeripheral:(CBPeripheral *)peripheral advertisementData:(NSDictionary *)advertisementData RSSI:(NSNumber *)RSSI
 {
     int rssiValue = [RSSI integerValue];
-    NSLog(@"Discovered %@ at %d", peripheral.name, rssiValue);
+    //NSLog(@"Discovered %@ at %d", peripheral.name, rssiValue);
 
     if ((rssiValue > self.maxRSSI || self.maxRSSI == 0) &&
         self.closestPen.peripheral != peripheral)
     {
-            NSLog(@"Updated closest pen");
+            //NSLog(@"Updated closest pen");
 
             self.maxRSSI = rssiValue;
             self.closestPen = [[FTPen alloc] initWithPeripheral:peripheral data:advertisementData];
@@ -509,15 +509,13 @@ static const int kInterruptedUpdateDelayMax = 30;
             [self connectedToPen:_connectedPen];
         }
     } else {
-        NSLog(@"Notification stopped on %@.  Disconnecting", characteristic);
+        NSLog(@"Notification stopped on %@. Disconnecting", characteristic);
         [self.centralManager cancelPeripheralConnection:peripheral];
     }
 }
 
 - (void)centralManager:(CBCentralManager *)central didDisconnectPeripheral:(CBPeripheral *)peripheral error:(NSError *)error
 {
-    NSLog(@"didDisconnectPeripheral");
-
     FTPen* pen = self.connectedPen;
     _connectedPen = nil;
 
@@ -570,9 +568,7 @@ static const int kInterruptedUpdateDelayMax = 30;
 - (void)updateFirmwareForPen:(FTPen *)pen
 {
     NSAssert(pen, nil);
-
-    NSLog(@"Starting firmware update....");
-
+    
     NSString *filePath = [FTFirmwareManager filePathForModel:pen.modelNumber];
     self.updateManager = [[TIUpdateManager alloc] initWithPeripheral:pen.peripheral delegate:self]; // BUGBUG - ugly cast
     [self.updateManager updateImage:filePath];
@@ -581,16 +577,6 @@ static const int kInterruptedUpdateDelayMax = 30;
 - (void)updateManager:(TIUpdateManager *)manager didFinishUpdate:(NSError *)error
 {
     NSAssert(manager, nil);
-
-    if (error)
-    {
-        // We failed to get info, but that's ok, continue anyway
-        NSLog(@"update failed=%@", [error localizedDescription]);
-    }
-    else
-    {
-        NSLog(@"update complete");
-    }
 
     self.updateManager = nil;
 
@@ -628,8 +614,6 @@ static const int kInterruptedUpdateDelayMax = 30;
 
 - (void)cleanup
 {
-    NSLog(@"cleanup");
-
     if (!self.connectedPen.isConnected) {
         return;
     }

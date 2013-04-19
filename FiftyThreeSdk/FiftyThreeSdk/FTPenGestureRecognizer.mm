@@ -129,8 +129,6 @@ TouchesSet TouchesSetFromNSSet(NSSet *nsSet, UIView *view)
 
     if (touches.count >= 4)
     {
-        // TODO - Display dialog
-        NSLog(@"WARNING: multitasking gestures are enabled");
         [self.penManager didDetectMultitaskingGesturesEnabled];
     }
 

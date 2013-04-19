@@ -143,7 +143,7 @@ static NSString *const kImageBlockTransferUUID = @"F000FFC2-0451-4000-B000-00000
     } else if ([characteristic.UUID isEqual:[CBUUID UUIDWithString:kImageBlockTransferUUID]]) {
         // perform block transfer
         uint16_t index = ((uint16_t *)characteristic.value.bytes)[0];
-        NSLog(@"block index = %d", index);
+        //NSLog(@"block index = %d", index);
 
         if (index != self.currentBlock) {
             NSLog(@"Unexpected block index, aborting.");
