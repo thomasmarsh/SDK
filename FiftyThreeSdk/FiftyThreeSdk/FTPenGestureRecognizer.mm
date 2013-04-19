@@ -126,7 +126,7 @@ TouchesSet TouchesSetFromNSSet(NSSet *nsSet, UIView *view)
 //    NSLog(@"touchesCancelled: %@", touches.allObjects);
 
     [super touchesCancelled:touches withEvent:event];
-    
+
     if (touches.count >= 4)
     {
         // TODO - Display dialog

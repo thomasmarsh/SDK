@@ -36,9 +36,9 @@ private:
     double _LastTouchBeganTime;
     double _PenDownTime;
     double _PenUpTime;
-    
+
     std::vector<Touch::cPtr> _CandidateTouches;
-    
+
 public:
     LatencyTouchClassifierImpl()
     :
@@ -63,36 +63,36 @@ public:
 
         _CandidateTouches.assign(touches.begin(), touches.end());
     }
-    
+
     virtual void TouchesMoved(const fiftythree::common::TouchesSet & touches) {}
-    
+
     virtual void TouchesEnded(const fiftythree::common::TouchesSet & touches) {}
-    
+
     virtual void TouchesCancelled(const fiftythree::common::TouchesSet & touches) {}
 
     virtual void ProcessPenEvent(const PenEvent & event)
     {
         _IsPenDown = event.Type == PenEventType::PenDown;
-            
+
         if (_CandidateTouches.empty())
         {
             std::cout << "WARNING: Pen event received before touch, ignoring\n";
             return;
         }
-        
+
         if (_IsPenDown)
         {
             std::cout << "PenDown" << std::endl;
 
             _PenDownTime = event.Sample.TimestampSeconds();
             _PenUpTime = 0;
-            
+
             std::vector<Touch::cPtr>::iterator it = _CandidateTouches.begin();
             for (;it != _CandidateTouches.end();)
             {
                 const Touch::cPtr & touch = *it;
                 double timeDelta = event.Sample.TimestampSeconds() - touch->CurrentSample().TimestampSeconds();
-                
+
                 if (timeDelta > MAX_DELAY_SEC)
                 {
                     std::cout << "Remove candidate touch: " << std::endl;
@@ -107,10 +107,9 @@ public:
         else // PenUp
         {
             std::cout << "PenUp" << std::endl;
-            
+
             _PenUpTime = event.Sample.TimestampSeconds();
-            
-            
+
             std::vector<Touch::cPtr>::iterator it = _CandidateTouches.begin();
             for (;it != _CandidateTouches.end();)
             {
@@ -127,12 +126,12 @@ public:
                     ++it;
                 }
             }
-            
+
             if (_CandidateTouches.size())
             {
                 // TODO - notify then remove candidates
             }
-            
+
             _CandidateTouches.clear();
         }
     }

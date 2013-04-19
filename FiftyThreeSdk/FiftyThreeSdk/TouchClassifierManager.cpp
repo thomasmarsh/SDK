@@ -33,12 +33,12 @@ public:
     {
         return true;
     }
-    
+
     virtual void AddClassifier(TouchClassifier::Ptr classifier)
     {
         _Classifiers.push_back(classifier);
     }
-    
+
     virtual void RemoveClassifier(TouchClassifier::Ptr classifier)
     {
         _Classifiers.erase(std::remove(_Classifiers.begin(), _Classifiers.end(), classifier), _Classifiers.end());

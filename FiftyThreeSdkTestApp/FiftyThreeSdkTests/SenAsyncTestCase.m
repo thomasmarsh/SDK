@@ -1,13 +1,11 @@
 //
 //  SenAsyncTestCase.m
-//  AsyncSenTestingKit
+//  FiftyThreeSdkTestApp
 //
-//  Created by 小野 将司 on 12/03/17.
-//  Copyright (c) 2012年 AppBankGames Inc. All rights reserved.
+//  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
 //
 
 #import "SenAsyncTestCase.h"
-
 
 @interface SenAsyncTestCase ()
 @property (nonatomic, retain) NSDate *loopUntil;
@@ -16,15 +14,12 @@
 @property (nonatomic, assign) SenAsyncTestCaseStatus expectedStatus;
 @end
 
-
 @implementation SenAsyncTestCase
-
 
 @synthesize loopUntil = _loopUntil;
 @synthesize notified = _notified;
 @synthesize notifiedStatus = _notifiedStatus;
 @synthesize expectedStatus = _expectedStatus;
-
 
 - (void)dealloc
 {
@@ -32,21 +27,19 @@
     [super dealloc];
 }
 
-
 #pragma mark - Public
-
 
 - (void)waitForStatus:(SenAsyncTestCaseStatus)status timeout:(NSTimeInterval)timeout
 {
     self.notified = NO;
     self.expectedStatus = status;
     self.loopUntil = [NSDate dateWithTimeIntervalSinceNow:timeout];
-    
+
     while (!self.notified && [self.loopUntil timeIntervalSinceNow] > 0) {
         [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode
                                  beforeDate:self.loopUntil];
     }
-    
+
     // Only assert when notified. Do not assert when timed out
     // Fail if not notified
     if (self.notified) {
@@ -61,7 +54,7 @@
     self.notified = NO;
     self.expectedStatus = SenAsyncTestCaseStatusUnknown;
     self.loopUntil = [NSDate dateWithTimeIntervalSinceNow:timeout];
-    
+
     while (!self.notified && [self.loopUntil timeIntervalSinceNow] > 0) {
         [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode
                                  beforeDate:self.loopUntil];

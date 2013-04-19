@@ -2,8 +2,7 @@
 //  PenEvent.h
 //  FiftyThreeSdk
 //
-//  Created by Adam on 3/20/13.
-//  Copyright (c) 2013 FiftyThree. All rights reserved.
+//  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
 //
 
 #pragma once
@@ -26,28 +25,28 @@ DEFINE_ENUM(PenEventType,
 DEFINE_ENUM(PenTip,
             Tip1,
             Tip2);
-    
+
 class PenEvent
 {
 public:
     typedef boost::shared_ptr<PenEvent> Ptr;
     typedef boost::shared_ptr<const PenEvent> cPtr;
-    
+
     fiftythree::common::InputSample Sample;
     PenEventType Type;
     PenTip Tip;
-    
+
     std::string ToString() const;
     static PenEvent::Ptr FromString(const std::string & s);
     bool operator==(const PenEvent &other) const;
-    
+
 protected:
     ~PenEvent() {}
     PenEvent() {}
-    
+
 public:
     static PenEvent::Ptr New(fiftythree::common::InputSample sample, PenEventType type, PenTip tip);
-    
+
     FT_NO_COPY(PenEvent)
 };
 

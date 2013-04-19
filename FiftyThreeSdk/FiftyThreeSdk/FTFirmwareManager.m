@@ -2,8 +2,7 @@
 //  FTFirmwareManager.m
 //  FiftyThreeSdk
 //
-//  Created by Adam on 3/27/13.
-//  Copyright (c) 2013 FiftyThree. All rights reserved.
+//  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
 //
 
 #import "FTFirmwareManager.h"
@@ -24,10 +23,10 @@
             version = *((uint16_t *)data.bytes);
             version >>= 1; // LSB is ImgA/ImgB
         }
-        
+
         [fileHandle closeFile];
     }
-    
+
     return version;
 }
 
@@ -37,7 +36,7 @@
     NSArray* models = @[
         @"es1"
     ];
-    
+
     NSUInteger index = [models indexOfObject:model];
     if (index == NSNotFound) return nil;
     return [[NSBundle mainBundle] pathForResource:models[index] ofType:@"bin"];

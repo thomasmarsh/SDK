@@ -2,8 +2,7 @@
 //  FTApplication.h
 //  FiftyThreeSdk
 //
-//  Created by Adam on 4/3/13.
-//  Copyright (c) 2013 FiftyThree. All rights reserved.
+//  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>

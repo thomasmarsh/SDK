@@ -52,7 +52,7 @@ static NSString *const kImageBlockTransferUUID = @"F000FFC2-0451-4000-B000-00000
 - (void)updateImage:(NSString *)filePath
 {
     self.waitingForReboot = NO;
-    
+
     _oldDelegate = _peripheral.delegate;
     _peripheral.delegate = self;
 
@@ -113,14 +113,14 @@ static NSString *const kImageBlockTransferUUID = @"F000FFC2-0451-4000-B000-00000
 {
     if (self.imageBlockTransfer.isNotifying && self.imageIdentify.isNotifying) {
         self.updateStartTime = [NSDate date];
-        
+
         NSLog(@"Sending image header");
 
         [self.imageHandle seekToFileOffset:4]; // skip CRC + shadow CRC
-        
+
         NSData *data = [self.imageHandle readDataOfLength:12];
         [peripheral writeValue:data forCharacteristic:self.imageIdentify type:CBCharacteristicWriteWithoutResponse];
-        
+
         [self.imageHandle seekToFileOffset:0];
     }
 }
@@ -172,23 +172,23 @@ static NSString *const kImageBlockTransferUUID = @"F000FFC2-0451-4000-B000-00000
             self.currentBlock++;
 
             self.imageSizeRemaining -= block.length;
-            
+
             float percent = (float)(self.imageSize - self.imageSizeRemaining) / (float)self.imageSize * 100;
-            
+
             // only send integral updates
             if ((percent - self.lastPercent) > 0.1)
             {
                 [self.delegate updateManager:self didUpdatePercentComplete:percent];
                 self.lastPercent = percent;
             }
-            
+
             if (self.imageSizeRemaining == 0)
             {
                 NSLog(@"100%% complete");
-                
+
                 [self.imageHandle closeFile];
                 self.imageHandle = nil;
-                 
+
                 [self done:nil];
             }
         }
@@ -199,7 +199,7 @@ static NSString *const kImageBlockTransferUUID = @"F000FFC2-0451-4000-B000-00000
 {
     _peripheral.delegate = _oldDelegate;
     _oldDelegate = nil;
-    
+
     [self.delegate updateManager:self didFinishUpdate:error];
 }
 

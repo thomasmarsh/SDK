@@ -1,8 +1,7 @@
 //
-//  FTTouchTests.m
+//  FTTouchTests.mm
 //  FiftyThreeSdkTestApp
 //
-//  Created by Adam on 4/1/13.
 //  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
 //
 
@@ -19,14 +18,14 @@ using namespace fiftythree::sdk;
 - (void)setUp
 {
     [super setUp];
-    
+
     // Set-up code here.
 }
 
 - (void)tearDown
 {
     // Tear-down code here.
-    
+
     [super tearDown];
 }
 
@@ -37,12 +36,12 @@ using namespace fiftythree::sdk;
                               TouchPhase::Began,
                               InputSample(Eigen::Vector2f(12.34567, 89.01234), Eigen::Vector2f(12.34567, 89.01234), 123.4567)
                               );
-    
+
     std::string outputString = t->ToString();
 //    std::cout << outputString << std::endl;
-    
+
     Touch::Ptr t2 = Touch::FromString(outputString);
-    
+
     STAssertTrue(*t == *t2, @"Deserialized form does not match");
 }
 
@@ -62,12 +61,12 @@ using namespace fiftythree::sdk;
                                                Eigen::Vector2f(rng.Random() * std::numeric_limits<float>::max(), rng.Random() * std::numeric_limits<float>::max()),
                                                rng.Random() * std::numeric_limits<float>::max()
                                                ));
-    
+
         std::string outputString = t1->ToString();
 //        std::cout << outputString << std::endl;
 
         Touch::Ptr t2 = Touch::FromString(outputString);
-    
+
         STAssertTrue(*t1 == *t2, @"Deserialized form does not match");
     }
 }
@@ -75,27 +74,27 @@ using namespace fiftythree::sdk;
 - (void)testPenEventRandomSerialization
 {
     RandomNumberGenerator rng;
-    
+
     PenEvent::Ptr e1;
     PenEvent::Ptr e2;
     for (int i = 0; i < 1000; i++)
     {
-                
+
         InputSample s(
                         Eigen::Vector2f(rng.Random() * std::numeric_limits<float>::max(), rng.Random() * std::numeric_limits<float>::max()),
                         Eigen::Vector2f(rng.Random() * std::numeric_limits<float>::max(), rng.Random() * std::numeric_limits<float>::max()),
                       rng.Random() * std::numeric_limits<float>::max());
-        
+
         PenEvent::Ptr e1 = PenEvent::New(s,
                                          PenEventType((PenEventType::PenEventTypeEnum)rng.RandomIntInRange(PenEventType::PenUp, PenEventType::PenDown)),
                                          PenTip((PenTip::PenTipEnum)rng.RandomIntInRange(PenTip::Tip1, PenTip::Tip2))
                                          );
-        
+
         std::string outputString = e1->ToString();
         //        std::cout << outputString << std::endl;
-        
+
         PenEvent::Ptr e2 = PenEvent::FromString(outputString);
-        
+
         STAssertTrue(*e1 == *e2, @"Deserialized form does not match");
     }
 }

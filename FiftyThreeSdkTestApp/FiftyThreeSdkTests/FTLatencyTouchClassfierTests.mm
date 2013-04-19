@@ -1,8 +1,7 @@
 //
-//  FTLatencyTouchClassfierTests.m
+//  FTLatencyTouchClassfierTests.mm
 //  FiftyThreeSdkTestApp
 //
-//  Created by Adam on 3/28/13.
 //  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
 //
 
@@ -21,16 +20,16 @@ using std::string;
 - (void)setUp
 {
     [super setUp];
-    
+
     // Set-up code here.
-    
+
     _Classifier = LatencyTouchClassifier::New();
 }
 
 - (void)tearDown
 {
     // Tear-down code here.
-    
+
     [super tearDown];
 }
 
@@ -44,22 +43,22 @@ using std::string;
         data = [file readLineWithDelimiter:@"\n"];
         NSString *stringData = [[NSString alloc] initWithBytes:[data bytes]
                                   length:[data length] encoding: NSUTF8StringEncoding];
-        
+
         NSArray *components = [stringData componentsSeparatedByString:@"="];
         if ([components count] != 2)
         {
             continue;
             //STAssertTrue(false, @"invalid data");
         }
-        
+
         NSString *prefix = components[0];
         NSString *eventData = components[1];
         eventData = [eventData stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-        
+
         if ([prefix isEqualToString:@"touch"])
         {
             Touch::cPtr touch = Touch::FromString(std::string([eventData cStringUsingEncoding:NSUTF8StringEncoding]));
-            
+
             TouchesSet touchesSet;
             touchesSet.insert(touch);
             _Classifier->TouchesBegan(touchesSet);
@@ -67,7 +66,7 @@ using std::string;
         else if ([prefix isEqualToString:@"pen"])
         {
             PenEvent::Ptr penEvent = PenEvent::FromString(std::string([eventData cStringUsingEncoding:NSUTF8StringEncoding]));
-            
+
             _Classifier->ProcessPenEvent(*penEvent);
         }
         else if ([prefix isEqualToString:@"strokestate"])

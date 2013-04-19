@@ -2,8 +2,7 @@
 //  PenEvent.cpp
 //  FiftyThreeSdk
 //
-//  Created by Adam on 3/20/13.
-//  Copyright (c) 2013 FiftyThree. All rights reserved.
+//  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
 //
 
 #include "PenEvent.h"
@@ -27,14 +26,14 @@ PenEvent::Ptr PenEvent::FromString(const std::string & s)
 {
     std::vector<std::string> parts;
     boost::algorithm::split(parts, s, boost::is_any_of("=,"));
-        
+
     std::vector<std::string> remainder(parts.begin() + 2, parts.end());
-    
+
     PenEvent::Ptr event = PenEvent::New(
                                         InputSample::FromString(boost::algorithm::join(remainder, ",")),
                                         PenEventType((PenEventType::PenEventTypeEnum)boost::lexical_cast<int>(parts[0])),
                                         PenTip((PenTip::PenTipEnum)boost::lexical_cast<int>(parts[1])));
-    
+
     return event;
 }
 
@@ -54,7 +53,7 @@ public:
         Type = type;
         Tip = tip;
     }
-    
+
     ~PenEventImpl() {}
 };
 

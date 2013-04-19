@@ -1,9 +1,8 @@
 //
-//  FTApplication.m
+//  FTApplication.mm
 //  FiftyThreeSdk
 //
-//  Created by Adam on 4/3/13.
-//  Copyright (c) 2013 FiftyThree. All rights reserved.
+//  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
 //
 
 #import "FTApplication.h"
@@ -22,7 +21,7 @@ using namespace boost;
     {
         static_pointer_cast<TouchTrackerObjC>(TouchTracker::Instance())->ProcessTouchesEvent(event);
     }
-    
+
     [super sendEvent:event];
 }
 

@@ -1,5 +1,5 @@
 //
-//  BTLECentralViewController.m
+//  BTLECentralViewController.mm
 //  charcoal-prototype
 //
 //  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
@@ -72,21 +72,21 @@ public:
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    
+
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(applicationWillEnterForeground:)
                                                  name:UIApplicationWillEnterForegroundNotification
                                                object:nil];
-    
+
     self.view.multipleTouchEnabled = YES;
-    
+
     _penManager = [[FTPenManager alloc] initWithDelegate:self];
-    
+
     _PenAndTouchManager = FTPenAndTouchManager::New();
     _PenAndTouchManager->RegisterForEvents();
     _EventLogger = FTTouchEventLogger::New();
     _PenAndTouchManager->SetLogger(_EventLogger);
-    
+
     _TouchObserver = make_shared<TouchObserver>();
     _PenAndTouchManager->TouchTypeChanged().AddListener(_TouchObserver, &TouchObserver::TouchTypeChanged);
 }
@@ -95,18 +95,18 @@ public:
 {
     CGRect frame = self.view.bounds;
     frame.size.height -= 44; // 44 = height of bottom toolbar
-    
+
     self.canvasController = [[GLCanvasController alloc] initWithFrame:frame
                                                              andScale:[UIScreen mainScreen].scale];
     [self.canvasController setBrush:@"Rollerball"];
     self.canvasController.view.hidden = NO;
-    self.canvasController.paused = NO;    
+    self.canvasController.paused = NO;
     [self.view addSubview:self.canvasController.view];
     [self.view sendSubviewToBack:self.canvasController.view];
 
     self.canvasController.view.multipleTouchEnabled = YES;
     self.view.multipleTouchEnabled = YES;
-    
+
     static_pointer_cast<TouchTrackerObjC>(TouchTracker::Instance())->RegisterView(self.view);
     static_pointer_cast<TouchManagerObjC>(TouchManager::Instance())->RegisterView(_canvasController.view);
 
@@ -157,7 +157,7 @@ public:
     [self connect];
 
     [self updateDisplay];
-    
+
     [_penManager registerView:self.view];
 }
 
@@ -177,7 +177,7 @@ public:
         NSLog(@"connect took %f seconds", _ConnectTimer->ElapsedTimeSeconds());
         _ConnectTimer.reset();
     }
-    
+
     NSLog(@"didConnectToPen name=%@", pen.name);
 
     pen.delegate = self;
@@ -229,14 +229,14 @@ public:
     NSLog(@"system id = %@", pen.systemId);
     NSLog(@"pnp id = %@", pen.pnpId);
     NSLog(@"certification data = %@", pen.certificationData);
-    
+
     [self updateDisplay];
 }
 
 - (void)penManager:(FTPenManager *)penManager didUpdateDeviceInfo:(FTPen *)pen
 {
     [self displayPenInfo:pen];
-        
+
     [self checkForUpdates];
 }
 
@@ -248,7 +248,7 @@ public:
 - (void)penManager:(FTPenManager *)manager didFinishUpdate:(NSError *)error
 {
     NSLog(@"didFinishUpdate");
-    
+
     [self.updateProgressView dismissWithClickedButtonIndex:0 animated:NO];
     self.updateProgressView = nil;
 }
@@ -256,7 +256,7 @@ public:
 - (void)penManager:(FTPenManager *)manager didUpdatePercentComplete:(float)percent
 {
     NSLog(@"didUpdatePercentComplete %f", percent);
-    
+
     NSTimeInterval elapsed = -[self.updateStart timeIntervalSinceNow];
     float totalTime = elapsed / (percent / 100.0);
     float remainingTime = totalTime - (totalTime * percent / 100.0);
@@ -294,7 +294,7 @@ public:
     {
         [self.pairingStatusLabel setText:@"Unpaired"];
     }
-    
+
     if (self.penManager.connectedPen)
     {
         [self.connectButton setTitle:@"Disconnect" forState:UIControlStateNormal];
@@ -305,7 +305,7 @@ public:
         [self.connectButton setTitle:@"Connect" forState:UIControlStateNormal];
         [self.updateFirmwareButton setHidden:YES];
     }
-    
+
     if (self.annotationMode)
     {
         [self.annotateButton setTitle:@"Draw" forState:UIControlStateNormal];
@@ -315,7 +315,7 @@ public:
     {
         [self.annotateButton setTitle:@"Annotate" forState:UIControlStateNormal];
         self.navigationItem.title = @"Draw";
-        
+
         [self setInkColorBlack];
     }
 
@@ -404,11 +404,11 @@ public:
 - (void)checkForUpdates
 {
     NSLog(@"Checking for updates...");
-    
+
     if ([self.penManager isUpdateAvailableForPen:self.penManager.connectedPen])
     {
         NSLog(@"Update available");
-        
+
         [self showUpdateStartView];
     }
     else
@@ -433,10 +433,10 @@ public:
 - (void)updateFirmware
 {
     self.updateStart = [NSDate date];
-    
+
     self.updateProgressView = [[UIAlertView alloc] initWithTitle:@"Firmware Update" message:[NSString stringWithFormat:kUpdateProgressViewMessage, 0., 0, 0] delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:nil, nil];
     [self.updateProgressView show];
-    
+
     [self.penManager updateFirmwareForPen:self.penManager.connectedPen];
 }
 
@@ -491,7 +491,7 @@ public:
 {
     Touch::cPtr touch = static_pointer_cast<TouchTrackerObjC>(TouchTracker::Instance())->TouchForUITouch(uiTouch);
     Touch::cPtr nearest = static_pointer_cast<FTTouchEventLoggerObjc>(_EventLogger)->NearestStrokeForTouch(touch);
-    
+
     return nearest;
 }
 
@@ -515,7 +515,7 @@ public:
     {
         [self setInkColorBlack];
     }
-    
+
     BOOST_FOREACH(const InputSample & sample, *touch->History())
     {
         if (sample == touch->History()->front())
@@ -537,20 +537,20 @@ public:
 {
     Touch::cPtr touch = [self findStroke:uiTouch];
     if (touch == _SelectedTouch) return;
-    
+
     if (_SelectedTouch)
     {
         // Set the selected touch back to its original state
         [self drawStrokeFromTouch:_SelectedTouch withHighlight:_SelectedTouchHighlighted];
     }
-    
+
     _SelectedTouch = touch;
-    
+
     if (touch)
-    {        
+    {
         BOOL highlighted = std::find(_HighlightedTouches.begin(), _HighlightedTouches.end(), touch) != _HighlightedTouches.end();
         _SelectedTouchHighlighted = highlighted;
-        
+
         [self drawStrokeFromTouch:touch withHighlight:!highlighted]; // invert highlight
     }
 }
@@ -577,11 +577,11 @@ public:
         [self drawStroke:[touches anyObject]];
         return;
     }
-    
+
     if ([self shouldProcessTouches:touches])
     {
         static_pointer_cast<TouchManagerObjC>(TouchManager::Instance())->ProcessTouches(touches);
-        
+
         for (UITouch *uiTouch in touches)
         {
             Touch::cPtr touch = static_pointer_cast<TouchTrackerObjC>(TouchTracker::Instance())->TouchForUITouch(uiTouch);
@@ -605,11 +605,11 @@ public:
         [self drawStroke:[touches anyObject]];
         return;
     }
-    
+
     if ([self shouldProcessTouches:touches])
     {
         static_pointer_cast<TouchManagerObjC>(TouchManager::Instance())->ProcessTouches(touches);
-        
+
         if ([touches containsObject:self.strokeTouch])
         {
             UITouch *touch = self.strokeTouch;
@@ -639,11 +639,11 @@ public:
         _SelectedTouch.reset();
         return;
     }
-    
+
     if ([self shouldProcessTouches:touches])
     {
         static_pointer_cast<TouchManagerObjC>(TouchManager::Instance())->ProcessTouches(touches);
-        
+
         if ([touches containsObject:self.strokeTouch])
         {
             UITouch *touch = self.strokeTouch;
@@ -662,11 +662,11 @@ public:
         _SelectedTouch.reset();
         return;
     }
-    
+
     if ([self shouldProcessTouches:touches])
     {
         static_pointer_cast<TouchManagerObjC>(TouchManager::Instance())->ProcessTouches(touches);
-        
+
         if ([touches containsObject:self.strokeTouch])
         {
             [self.canvasController cancelStroke];
@@ -689,7 +689,7 @@ System ID = %@\n \
 PnP ID = %@\n \
 Certification Data = %@", pen.manufacturerName, pen.modelNumber, pen.serialNumber, pen.firmwareRevision, pen.hardwareRevision,
                       pen.softwareRevision, pen.systemId, pen.pnpId, pen.certificationData];
-    
+
     UIAlertView* alertView = [[UIAlertView alloc] initWithTitle:@"Device Information" message:info delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
     [alertView show];
 }
@@ -703,7 +703,7 @@ Certification Data = %@", pen.manufacturerName, pen.modelNumber, pen.serialNumbe
 - (IBAction)annotateButtonPressed:(id)sender
 {
     self.annotationMode = !self.annotationMode;
-    
+
     [self updateDisplay];
 }
 
@@ -711,13 +711,13 @@ Certification Data = %@", pen.manufacturerName, pen.modelNumber, pen.serialNumbe
 {
     MFMailComposeViewController *picker = [[MFMailComposeViewController alloc] init];
     picker.mailComposeDelegate = self;
-    
+
     [picker setSubject:@"Palm Rejection Data"];
 
     NSArray *toRecipients = [NSArray arrayWithObjects:@"adam@fiftythree.com",
                              nil];
     [picker setToRecipients:toRecipients];
-    
+
     NSMutableData* data = static_pointer_cast<FTTouchEventLoggerObjc>(_EventLogger)->GetData();
 
     BOOST_FOREACH(const Touch::cPtr & touch, _HighlightedTouches)
@@ -728,7 +728,7 @@ Certification Data = %@", pen.manufacturerName, pen.modelNumber, pen.serialNumbe
         [data appendBytes:ss.str().c_str() length:ss.tellp()];
     }
     [picker addAttachmentData:data mimeType:@"application/prd" fileName:@"strokedata.prd"]; // todo - add counter to filename?
-    
+
     [self presentViewController:picker animated:YES completion:nil];
 }
 

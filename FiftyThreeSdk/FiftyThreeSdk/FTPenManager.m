@@ -93,7 +93,7 @@ static const int kInterruptedUpdateDelayMax = 30;
 - (void)startPairing
 {
     NSLog(@"startPairing");
-    
+
     if (self.connectedPen)
     {
         [self disconnect];
@@ -104,7 +104,7 @@ static const int kInterruptedUpdateDelayMax = 30;
     self.closestPen = nil;
     _pairing = YES;
     [self scan];
-    
+
     self.pairingTimer = [NSTimer scheduledTimerWithTimeInterval:1.0
                                                          target:self
                                                        selector:@selector(pairingTimerExpired:)
@@ -118,7 +118,7 @@ static const int kInterruptedUpdateDelayMax = 30;
 
     [self.pairingTimer invalidate];
     self.pairingTimer = nil;
-    
+
     _pairing = NO;
     [self.centralManager stopScan];
 }
@@ -126,7 +126,7 @@ static const int kInterruptedUpdateDelayMax = 30;
 - (void)pairingTimerExpired:(NSTimer *)timer
 {
     self.pairingTimer = nil;
-    
+
     if (self.closestPen)
     {
         [self connectPen:self.closestPen];
@@ -155,7 +155,7 @@ static const int kInterruptedUpdateDelayMax = 30;
     if (self.connectedPen) {
         [self.centralManager cancelPeripheralConnection:_connectedPen.peripheral];
     }
-    
+
     // Ensure we don't retry update when disconnect was initiated by the central.
     if (self.updateManager)
     {
@@ -167,12 +167,12 @@ static const int kInterruptedUpdateDelayMax = 30;
 {
     int rssiValue = [RSSI integerValue];
     NSLog(@"Discovered %@ at %d", peripheral.name, rssiValue);
-    
+
     if ((rssiValue > self.maxRSSI || self.maxRSSI == 0) &&
         self.closestPen.peripheral != peripheral)
     {
             NSLog(@"Updated closest pen");
-            
+
             self.maxRSSI = rssiValue;
             self.closestPen = [[FTPen alloc] initWithPeripheral:peripheral data:advertisementData];
     }
@@ -217,7 +217,7 @@ static const int kInterruptedUpdateDelayMax = 30;
 #endif
 
     // Discover the characteristic we want...
-    
+
     // Loop through the newly filled peripheral.services array, just in case there's more than one.
     for (CBService *service in peripheral.services) {
         [peripheral discoverCharacteristics:@[
@@ -238,7 +238,7 @@ static const int kInterruptedUpdateDelayMax = 30;
 - (void)savePairedPen:(FTPen *)pen
 {
     NSAssert(pen, nil);
-    
+
     CFUUIDRef uuid = pen.peripheral.UUID;
     NSString* uuidString = uuid != nil ? CFBridgingRelease(CFUUIDCreateString(NULL, uuid)) : nil;
 
@@ -260,7 +260,7 @@ static const int kInterruptedUpdateDelayMax = 30;
 - (void)deletePairedPen:(FTPen *)pen
 {
     NSAssert(pen, nil);
-    
+
     if (_pairedPen == pen)
     {
         _pairedPen = nil;
@@ -279,7 +279,7 @@ static const int kInterruptedUpdateDelayMax = 30;
 - (void)connectedToPen:(FTPen *)pen
 {
     NSAssert(pen, nil);
-    
+
     if (!_pairedPen) {
         _pairedPen = pen;
         [self stopPairing];
@@ -290,7 +290,7 @@ static const int kInterruptedUpdateDelayMax = 30;
             [self.delegate penManager:self didPairWithPen:_pairedPen];
         });
     }
-    
+
     if (self.updateManager)
     {
         if (-[self.updateManager.updateStartTime timeIntervalSinceNow] < kInterruptedUpdateDelayMax)
@@ -363,7 +363,7 @@ static const int kInterruptedUpdateDelayMax = 30;
 - (void)peripheral:(CBPeripheral *)peripheral didUpdateValueForCharacteristic:(CBCharacteristic *)characteristic error:(NSError *)error
 {
     NSAssert(peripheral == _connectedPen.peripheral, @"got wrong pen");
-    
+
     if (error) {
         NSLog(@"Error discovering characteristics: %@", [error localizedDescription]);
         return;
@@ -373,18 +373,18 @@ static const int kInterruptedUpdateDelayMax = 30;
         NSLog(@"Unrecognized characteristic");
         return;
     }
-    
+
     if (characteristic.value.length == 0) {
         NSLog(@"No data received");
         return;
     }
-    
+
     const char *bytes = characteristic.value.bytes;
     char state = bytes[0];
-    
+
     FTPenTip tip = FTPenTip1;
     BOOL pressed = YES;
-    
+
     switch (state)
     {
         case TI_KEY_PRESS_STATE_NONE:
@@ -419,12 +419,12 @@ static const int kInterruptedUpdateDelayMax = 30;
         default:
             break;
     }
-    
+
     _lastState = state;
-    
+
     _connectedPen->_tipPressed[tip] = pressed;
     NSAssert([self.connectedPen isTipPressed:tip] == pressed, @"");
-    
+
     if (pressed) {
         dispatch_async(dispatch_get_main_queue(), ^{
             [self.connectedPen.delegate pen:self.connectedPen didPressTip:tip];
@@ -520,13 +520,13 @@ static const int kInterruptedUpdateDelayMax = 30;
 
     FTPen* pen = self.connectedPen;
     _connectedPen = nil;
-    
+
     if (self.updateManager)
     {
         if (-[self.updateManager.updateStartTime timeIntervalSinceNow] < kInterruptedUpdateDelayMax)
         {
             NSLog(@"Disconnected while performing update, attempting reconnect");
-            
+
             [self performSelectorOnMainThread:@selector(connect) withObject:nil waitUntilDone:NO];
         }
         else
@@ -549,18 +549,18 @@ static const int kInterruptedUpdateDelayMax = 30;
             _pairedPen = [[FTPen alloc] initWithPeripheral:peripherals[0] data:nil];
         }
     }
-    
+
     [self updateState:FTPenManagerStateAvailable];
 }
 
 - (BOOL)isUpdateAvailableForPen:(FTPen *)pen
 {
     NSAssert(pen, nil);
-    
+
     NSNumberFormatter *f = [[NSNumberFormatter alloc] init];
     [f setNumberStyle:NSNumberFormatterDecimalStyle];
     NSInteger existingVersion = [f numberFromString:pen.softwareRevision].integerValue;
-    
+
     NSInteger availableVersion = [FTFirmwareManager versionForModel:pen.modelNumber];
     NSLog(@"Firmware version: Available = %d, Existing = %d", availableVersion, existingVersion);
 
@@ -572,7 +572,7 @@ static const int kInterruptedUpdateDelayMax = 30;
     NSAssert(pen, nil);
 
     NSLog(@"Starting firmware update....");
-        
+
     NSString *filePath = [FTFirmwareManager filePathForModel:pen.modelNumber];
     self.updateManager = [[TIUpdateManager alloc] initWithPeripheral:pen.peripheral delegate:self]; // BUGBUG - ugly cast
     [self.updateManager updateImage:filePath];
@@ -581,7 +581,7 @@ static const int kInterruptedUpdateDelayMax = 30;
 - (void)updateManager:(TIUpdateManager *)manager didFinishUpdate:(NSError *)error
 {
     NSAssert(manager, nil);
-    
+
     if (error)
     {
         // We failed to get info, but that's ok, continue anyway
@@ -606,7 +606,7 @@ static const int kInterruptedUpdateDelayMax = 30;
 - (void)updateManager:(TIUpdateManager *)manager didUpdatePercentComplete:(float)percent
 {
     NSAssert(manager, nil);
-    
+
     if ([self.delegate conformsToProtocol:@protocol(FTPenManagerDelegatePrivate)])
     {
         dispatch_async(dispatch_get_main_queue(), ^{

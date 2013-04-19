@@ -1,8 +1,8 @@
 //
 //  NSFileHandle+readLine.h
+//  FiftyThreeSdkTestApp
 //
-//  Created by Ethan Horger on 11/27/12.
-//  Copyright (c) 2012 Ethan Horger. All rights reserved.
+//  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
