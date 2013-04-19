@@ -11,7 +11,6 @@
 
 - (BOOL)isUpdateAvailableForPen:(FTPen *)pen;
 - (void)updateFirmwareForPen:(FTPen *)pen;
-- (void)didDetectMultitaskingGesturesEnabled;
 
 @end
 

@@ -602,16 +602,6 @@ static const int kInterruptedUpdateDelayMax = 30;
     }
 }
 
-- (void)didDetectMultitaskingGesturesEnabled
-{
-    if ([self.delegate respondsToSelector:@selector(didDetectMultitaskingGesturesEnabled)])
-    {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self.delegate didDetectMultitaskingGesturesEnabled];
-        });
-    }
-}
-
 - (void)cleanup
 {
     if (!self.connectedPen.isConnected) {

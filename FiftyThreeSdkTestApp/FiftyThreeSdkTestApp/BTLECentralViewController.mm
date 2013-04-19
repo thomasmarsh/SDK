@@ -664,6 +664,11 @@ public:
 
 - (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event
 {
+    if (touches.count >= 4)
+    {
+        [self didDetectMultitaskingGesturesEnabled];
+    }
+    
     if (self.annotationMode)
     {
         _SelectedTouch.reset();
