@@ -110,7 +110,13 @@ static NSString *const kPnpIdUUID = @"0x2A50";
     } else if ([characteristic.UUID isEqual:[CBUUID UUIDWithString:kIEEECertificationDataUUID]]) {
         _certificationData = [NSString stringWithUTF8String:characteristic.value.bytes];
     } else if ([characteristic.UUID isEqual:[CBUUID UUIDWithString:kPnpIdUUID]]) {
-        _pnpId = [NSString stringWithUTF8String:characteristic.value.bytes];
+        if (characteristic.value.length != 7) return;
+        char* bytes = (char *)characteristic.value.bytes;
+        
+        _pnpId.vendorIdSource = bytes[0];
+        _pnpId.vendorId = bytes[1] | (bytes[2] << 8);
+        _pnpId.productId = bytes[3] | (bytes[4] << 8);
+        _pnpId.productVersion = bytes[5] | (bytes[6] << 8);
     }
 
     _resultCount--;

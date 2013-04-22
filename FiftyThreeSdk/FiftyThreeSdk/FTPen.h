@@ -19,6 +19,14 @@ typedef NS_ENUM(NSInteger, FTPenTip) {
 {
 }
 
+typedef struct
+{
+    uint8_t vendorIdSource;
+    uint16_t vendorId;
+    uint16_t productId;
+    uint16_t productVersion;
+} PnPID;
+
 @property (nonatomic, readonly) NSString *name;
 @property (nonatomic, readonly) BOOL isConnected;
 @property (nonatomic, weak) id<FTPenDelegate> delegate;
@@ -31,7 +39,7 @@ typedef NS_ENUM(NSInteger, FTPenTip) {
 @property (nonatomic, readonly) NSString *softwareRevision;
 @property (nonatomic, readonly) NSString *systemId;
 @property (nonatomic, readonly) NSString *certificationData;
-@property (nonatomic, readonly) NSString *pnpId;
+@property (nonatomic, readonly) PnPID pnpId;
 @property (nonatomic, readonly) NSInteger batteryLevel;
 
 - (BOOL)isTipPressed:(FTPenTip)tip;

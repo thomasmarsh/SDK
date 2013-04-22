@@ -115,7 +115,7 @@
     return _deviceInfoClient.certificationData;
 }
 
-- (NSString *)pnpId
+- (PnPID)pnpId
 {
     return _deviceInfoClient.pnpId;
 }

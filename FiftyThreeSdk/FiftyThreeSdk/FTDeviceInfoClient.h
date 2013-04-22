@@ -6,6 +6,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "FTPen.h"
 
 @class CBPeripheral;
 
@@ -19,7 +20,7 @@
 @property (nonatomic, readonly) NSString *softwareRevision;
 @property (nonatomic, readonly) NSString *systemId;
 @property (nonatomic, readonly) NSString *certificationData;
-@property (nonatomic, readonly) NSString *pnpId;
+@property (nonatomic, readonly) PnPID pnpId;
 
 - (id)initWithPeripheral:(CBPeripheral *)peripheral;
 - (void)getInfo:(void(^)(FTDeviceInfoClient *client, NSError *error))complete;

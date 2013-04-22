@@ -247,7 +247,10 @@ public:
     NSLog(@"hardware revision = %@", pen.hardwareRevision);
     NSLog(@"software revision = %@", pen.softwareRevision);
     NSLog(@"system id = %@", pen.systemId);
-    NSLog(@"pnp id = %@", pen.pnpId);
+    NSLog(@"PnPID.vendorId = %d", pen.pnpId.vendorId);
+    NSLog(@"PnPID.vendorIdSource = %d", pen.pnpId.vendorIdSource);
+    NSLog(@"PnPID.productId = %d", pen.pnpId.productId);
+    NSLog(@"PnPID.productVersion = %d", pen.pnpId.productVersion);
     NSLog(@"certification data = %@", pen.certificationData);
 
     [self updateDisplay];
