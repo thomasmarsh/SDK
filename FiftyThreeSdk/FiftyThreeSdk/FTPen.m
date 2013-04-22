@@ -110,7 +110,7 @@
     return _deviceInfoClient.systemId;
 }
 
-- (NSString *)certificationData
+- (NSData *)certificationData
 {
     return _deviceInfoClient.certificationData;
 }

@@ -108,7 +108,7 @@ static NSString *const kPnpIdUUID = @"0x2A50";
     } else if ([characteristic.UUID isEqual:[CBUUID UUIDWithString:kSystemIdUUID]]) {
         _systemId = [NSString stringWithUTF8String:characteristic.value.bytes];
     } else if ([characteristic.UUID isEqual:[CBUUID UUIDWithString:kIEEECertificationDataUUID]]) {
-        _certificationData = [NSString stringWithUTF8String:characteristic.value.bytes];
+        _certificationData = characteristic.value;
     } else if ([characteristic.UUID isEqual:[CBUUID UUIDWithString:kPnpIdUUID]]) {
         if (characteristic.value.length != 7) return;
         char* bytes = (char *)characteristic.value.bytes;

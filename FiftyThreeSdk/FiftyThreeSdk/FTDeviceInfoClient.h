@@ -19,7 +19,7 @@
 @property (nonatomic, readonly) NSString *hardwareRevision;
 @property (nonatomic, readonly) NSString *softwareRevision;
 @property (nonatomic, readonly) NSString *systemId;
-@property (nonatomic, readonly) NSString *certificationData;
+@property (nonatomic, readonly) NSData *certificationData;
 @property (nonatomic, readonly) PnPID pnpId;
 
 - (id)initWithPeripheral:(CBPeripheral *)peripheral;

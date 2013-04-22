@@ -251,7 +251,6 @@ public:
     NSLog(@"PnPID.vendorIdSource = %d", pen.pnpId.vendorIdSource);
     NSLog(@"PnPID.productId = %d", pen.pnpId.productId);
     NSLog(@"PnPID.productVersion = %d", pen.pnpId.productVersion);
-    NSLog(@"certification data = %@", pen.certificationData);
 
     [self updateDisplay];
 }
