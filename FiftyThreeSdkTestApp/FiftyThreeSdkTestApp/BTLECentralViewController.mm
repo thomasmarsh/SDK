@@ -428,7 +428,8 @@ public:
 
 - (void)queryFirmwareUpdate:(BOOL)forced
 {
-    if (forced || [self.penManager isUpdateAvailableForPen:self.penManager.connectedPen])
+    if (forced
+        || [self.penManager isUpdateAvailableForPen:self.penManager.connectedPen])
      {
          [self showUpdateStartView];
      }
@@ -699,10 +700,8 @@ Serial Number = %@\n \
 Firmware Revision = %@\n \
 Hardware Revision = %@\n \
 Software Revision = %@\n \
-System ID = %@\n \
-PnP ID = %@\n \
-Certification Data = %@", pen.manufacturerName, pen.modelNumber, pen.serialNumber, pen.firmwareRevision, pen.hardwareRevision,
-                      pen.softwareRevision, pen.systemId, pen.pnpId, pen.certificationData];
+System ID = %@\n", pen.manufacturerName, pen.modelNumber, pen.serialNumber, pen.firmwareRevision, pen.hardwareRevision,
+                      pen.softwareRevision, pen.systemId];
 
     UIAlertView* alertView = [[UIAlertView alloc] initWithTitle:@"Device Information" message:info delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
     [alertView show];

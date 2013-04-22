@@ -6,6 +6,12 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "FTPenManager.h"
+
+typedef NS_ENUM(NSInteger, FTFirmwareImageType) {
+    Factory,
+    Upgrade
+};
 
 @interface FTPenManager ()
 

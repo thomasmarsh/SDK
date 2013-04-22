@@ -47,7 +47,7 @@
 		668F6D5C17024034002C548B /* libGlobalSettings.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 668F6D5B17024034002C548B /* libGlobalSettings.a */; };
 		668F6DE917037361002C548B /* Textures in Resources */ = {isa = PBXBuildFile; fileRef = 668F6DE817037361002C548B /* Textures */; };
 		668F6DEB17037376002C548B /* Shaders in Resources */ = {isa = PBXBuildFile; fileRef = 668F6DEA17037376002C548B /* Shaders */; };
-		669CA621171F034A006596F0 /* es1.bin in Resources */ = {isa = PBXBuildFile; fileRef = 669CA620171F034A006596F0 /* es1.bin */; };
+		669CA621171F034A006596F0 /* charcoal-upgrade.bin in Resources */ = {isa = PBXBuildFile; fileRef = 669CA620171F034A006596F0 /* charcoal-upgrade.bin */; };
 		66A47BF416D835C90016B31C /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 66A47BF316D835C90016B31C /* UIKit.framework */; };
 		66A47BF616D835C90016B31C /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 66A47BF516D835C90016B31C /* Foundation.framework */; };
 		66A47BF816D835C90016B31C /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 66A47BF716D835C90016B31C /* CoreGraphics.framework */; };
@@ -58,6 +58,7 @@
 		66C83D741704FDA500789776 /* libFiftyThreeSdk.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6644316616F3D1B60049E570 /* libFiftyThreeSdk.a */; };
 		66C83D751704FDB700789776 /* boost.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6644317416F7FC680049E570 /* boost.framework */; };
 		66D2CBD8171C8B01008E1526 /* strokedata-3.prd in Resources */ = {isa = PBXBuildFile; fileRef = 66D2CBD6171C8AB5008E1526 /* strokedata-3.prd */; };
+		66FC1EE21725DC7500B9B9E7 /* charcoal-factory.bin in Resources */ = {isa = PBXBuildFile; fileRef = 66FC1EE11725DC7500B9B9E7 /* charcoal-factory.bin */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -129,7 +130,7 @@
 		668F6D5B17024034002C548B /* libGlobalSettings.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libGlobalSettings.a; path = "../../GlobalSettings/build/Release-iphoneos/libGlobalSettings.a"; sourceTree = "<group>"; };
 		668F6DE817037361002C548B /* Textures */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Textures; path = ../../Canvas/Canvas/Textures; sourceTree = "<group>"; };
 		668F6DEA17037376002C548B /* Shaders */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Shaders; path = ../../Common/Common/Shaders; sourceTree = "<group>"; };
-		669CA620171F034A006596F0 /* es1.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; path = es1.bin; sourceTree = SOURCE_ROOT; };
+		669CA620171F034A006596F0 /* charcoal-upgrade.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; path = "charcoal-upgrade.bin"; sourceTree = SOURCE_ROOT; };
 		66A47BF016D835C90016B31C /* FiftyThreeSdkTestApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FiftyThreeSdkTestApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		66A47BF316D835C90016B31C /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		66A47BF516D835C90016B31C /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -138,6 +139,7 @@
 		66C83D6E1704F9DD00789776 /* FTLatencyTouchClassfierTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FTLatencyTouchClassfierTests.h; sourceTree = "<group>"; };
 		66C83D6F1704F9DD00789776 /* FTLatencyTouchClassfierTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = FTLatencyTouchClassfierTests.mm; sourceTree = "<group>"; };
 		66D2CBD6171C8AB5008E1526 /* strokedata-3.prd */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "strokedata-3.prd"; sourceTree = "<group>"; };
+		66FC1EE11725DC7500B9B9E7 /* charcoal-factory.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; path = "charcoal-factory.bin"; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -344,7 +346,8 @@
 		66BEC2871703B458009207F9 /* Firmware */ = {
 			isa = PBXGroup;
 			children = (
-				669CA620171F034A006596F0 /* es1.bin */,
+				66FC1EE11725DC7500B9B9E7 /* charcoal-factory.bin */,
+				669CA620171F034A006596F0 /* charcoal-upgrade.bin */,
 			);
 			name = Firmware;
 			sourceTree = "<group>";
@@ -453,7 +456,8 @@
 				6644315E16F3D1640049E570 /* MainStoryboard_iPad.storyboard in Resources */,
 				6644315F16F3D1640049E570 /* MainStoryboard_iPhone.storyboard in Resources */,
 				6644316916F3D24B0049E570 /* InfoPlist.strings in Resources */,
-				669CA621171F034A006596F0 /* es1.bin in Resources */,
+				669CA621171F034A006596F0 /* charcoal-upgrade.bin in Resources */,
+				66FC1EE21725DC7500B9B9E7 /* charcoal-factory.bin in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

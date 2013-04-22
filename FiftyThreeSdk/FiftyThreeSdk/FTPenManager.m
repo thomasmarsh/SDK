@@ -554,13 +554,31 @@ static const int kInterruptedUpdateDelayMax = 30;
 - (BOOL)isUpdateAvailableForPen:(FTPen *)pen
 {
     NSAssert(pen, nil);
+    
+    return [self isUpdateAvailableForPen:pen imageType:Factory] || [self isUpdateAvailableForPen:pen imageType:Upgrade];
+}
+
+- (BOOL)isUpdateAvailableForPen:(FTPen *)pen imageType:(FTFirmwareImageType)imageType
+{
+    NSAssert(pen, nil);
 
     NSNumberFormatter *f = [[NSNumberFormatter alloc] init];
     [f setNumberStyle:NSNumberFormatterDecimalStyle];
-    NSInteger existingVersion = [f numberFromString:pen.softwareRevision].integerValue;
 
-    NSInteger availableVersion = [FTFirmwareManager versionForModel:pen.modelNumber];
-    NSLog(@"Firmware version: Available = %d, Existing = %d", availableVersion, existingVersion);
+    NSInteger availableVersion = [FTFirmwareManager versionForModel:pen.modelNumber imageType:imageType];
+    NSInteger existingVersion;
+    if (imageType == Factory)
+    {
+        existingVersion = [f numberFromString:[pen.firmwareRevision componentsSeparatedByString:@" "][0]].integerValue;
+        
+        NSLog(@"Factory version: Available = %d, Existing = %d", availableVersion, existingVersion);
+    }
+    else
+    {
+        existingVersion = [f numberFromString:[pen.softwareRevision componentsSeparatedByString:@" "][0]].integerValue;
+        
+        NSLog(@"Upgrade version: Available = %d, Existing = %d", availableVersion, existingVersion);
+    }
 
     return availableVersion > existingVersion;
 }
@@ -569,8 +587,23 @@ static const int kInterruptedUpdateDelayMax = 30;
 {
     NSAssert(pen, nil);
     
-    NSString *filePath = [FTFirmwareManager filePathForModel:pen.modelNumber];
+    FTFirmwareImageType imageType;
+    if ([self isUpdateAvailableForPen:pen imageType:Factory])
+    {
+        imageType = Factory;
+    }
+    else if ([self isUpdateAvailableForPen:pen imageType:Upgrade])
+    {
+        imageType = Upgrade;
+    }
+    else
+    {
+        return;
+    }
+    
+    NSString *filePath = [FTFirmwareManager filePathForModel:pen.modelNumber imageType:imageType];
     self.updateManager = [[TIUpdateManager alloc] initWithPeripheral:pen.peripheral delegate:self]; // BUGBUG - ugly cast
+    
     [self.updateManager updateImage:filePath];
 }
 

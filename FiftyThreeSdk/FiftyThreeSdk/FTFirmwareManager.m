@@ -9,10 +9,10 @@
 
 @implementation FTFirmwareManager
 
-+ (NSInteger)versionForModel:(NSString *)model
++ (NSInteger)versionForModel:(NSString *)model imageType:(FTFirmwareImageType)imageType
 {
     uint16_t version = 0;
-    NSString *filePath = [self filePathForModel:model];
+    NSString *filePath = [self filePathForModel:model imageType:imageType];
     if (filePath)
     {
         NSFileHandle* fileHandle = [NSFileHandle fileHandleForReadingAtPath:filePath];
@@ -30,16 +30,34 @@
     return version;
 }
 
-+ (NSString *)filePathForModel:(NSString *)model
++ (NSString *)filePathForModel:(NSString *)model imageType:(FTFirmwareImageType)imageType
 {
     model = [model lowercaseString];
-    NSArray* models = @[
-        @"es1"
-    ];
+    
+    // map model to image name
+    NSDictionary* modelMap = @{
+                          @"es1" : @"charcoal",
+                          @"es2" : @"charcoal",
+                          @"charcoal" : @"charcoal"
+                          };
 
-    NSUInteger index = [models indexOfObject:model];
-    if (index == NSNotFound) return nil;
-    return [[NSBundle mainBundle] pathForResource:models[index] ofType:@"bin"];
+    NSString *imagePrefix = [modelMap valueForKey:model];
+    if (!imagePrefix)
+    {
+        return nil;
+    }
+
+    NSString *imageFileName;
+    if (imageType == Factory)
+    {
+        imageFileName = [imagePrefix stringByAppendingString:@"-factory"];
+    }
+    else
+    {
+        imageFileName = [imagePrefix stringByAppendingString:@"-upgrade"];
+    }
+    
+    return [[NSBundle mainBundle] pathForResource:imageFileName ofType:@"bin"];
 }
 
 @end

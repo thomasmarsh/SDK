@@ -6,10 +6,11 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "FTPenManager+Private.h"
 
 @interface FTFirmwareManager : NSObject
 
-+ (NSInteger)versionForModel:(NSString *)model;
-+ (NSString *)filePathForModel:(NSString *)model;
++ (NSInteger)versionForModel:(NSString *)model imageType:(FTFirmwareImageType)imageType;
++ (NSString *)filePathForModel:(NSString *)model imageType:(FTFirmwareImageType)imageType;
 
 @end
