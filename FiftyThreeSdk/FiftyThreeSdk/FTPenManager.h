@@ -28,8 +28,6 @@ typedef NS_ENUM(NSInteger, FTPenManagerState) {
 - (void)connect;
 - (void)disconnect;
 - (void)deletePairedPen:(FTPen *)pen;
-- (void)registerView:(UIView *)view;
-- (void)deregisterView:(UIView *)view;
 
 @end
 

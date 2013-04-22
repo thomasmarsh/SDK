@@ -119,7 +119,6 @@ public:
 
 - (void)viewDidDisappear:(BOOL)animated
 {
-    [_penManager deregisterView:self.view];
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
@@ -157,8 +156,6 @@ public:
     [self connect];
 
     [self updateDisplay];
-
-    [_penManager registerView:self.view];
 }
 
 - (void)penManager:(FTPenManager *)penManager didPairWithPen:(FTPen *)pen

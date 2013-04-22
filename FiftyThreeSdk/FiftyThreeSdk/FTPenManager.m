@@ -666,14 +666,4 @@ static const int kInterruptedUpdateDelayMax = 30;
     [self.centralManager cancelPeripheralConnection:_connectedPen.peripheral];
 }
 
-- (void)registerView:(UIView *)view
-{
-//    [_penTouchManager registerView:view];
-}
-
-- (void)deregisterView:(UIView *)view
-{
-//    [_penTouchManager deregisterView:view];
-}
-
 @end
