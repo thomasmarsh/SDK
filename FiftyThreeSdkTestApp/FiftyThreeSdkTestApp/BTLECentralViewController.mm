@@ -36,13 +36,7 @@ using std::stringstream;
 
 NSString * const kUpdateProgressViewMessage = @"%.1f%% Complete\nTime Remaining: %02d:%02d";
 
-class TouchObserver
-{
-public:
-    void TouchTypeChanged(const Event<Touch::cPtr> & event, Touch::cPtr touch)
-    {
-    }
-};
+class TouchObserver;
 
 @interface BTLECentralViewController () <FTPenManagerDelegate, FTPenDelegate, FTPenManagerDelegatePrivate, UIAlertViewDelegate, MFMailComposeViewControllerDelegate>
 {
@@ -55,6 +49,8 @@ public:
     shared_ptr<TouchObserver> _TouchObserver;
 }
 
+- (void)startTrialSeparation;
+
 @property (nonatomic) FTPenManager *penManager;
 @property (nonatomic) id currentTest;
 @property (nonatomic) UIAlertView *updateProgressView;
@@ -66,6 +62,30 @@ public:
 @property (nonatomic) BOOL annotationMode;
 
 @end
+
+
+class TouchObserver
+{
+private:
+    BTLECentralViewController *_vc;
+    
+public:
+    TouchObserver(BTLECentralViewController *vc)
+    {
+        _vc = vc;
+    }
+    
+    void TouchTypeChanged(const Event<Touch::cPtr> & event, Touch::cPtr touch)
+    {
+    }
+    
+    void ShouldStartTrialSeparation(const Event<Unit> & event, Unit unit)
+    {
+        [_vc startTrialSeparation];
+    }
+    
+};
+
 
 @implementation BTLECentralViewController
 
@@ -87,8 +107,9 @@ public:
     _EventLogger = FTTouchEventLogger::New();
     _PenAndTouchManager->SetLogger(_EventLogger);
 
-    _TouchObserver = make_shared<TouchObserver>();
+    _TouchObserver = make_shared<TouchObserver>(self);
     _PenAndTouchManager->TouchTypeChanged().AddListener(_TouchObserver, &TouchObserver::TouchTypeChanged);
+    _PenAndTouchManager->ShouldStartTrialSeparation().AddListener(_TouchObserver, &TouchObserver::ShouldStartTrialSeparation);
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -310,6 +331,9 @@ public:
     {
         [self.connectButton setTitle:@"Connect" forState:UIControlStateNormal];
         [self.updateFirmwareButton setHidden:YES];
+        
+        [self.tip1State setHighlighted:NO];
+        [self.tip2State setHighlighted:NO];
     }
 
     if (self.annotationMode)
@@ -685,6 +709,13 @@ public:
             self.strokeTouch = nil;
         }
     }
+}
+
+- (void)startTrialSeparation
+{
+    NSLog(@"startTrialSeparation");
+    
+    [self.penManager disconnect];
 }
 
 - (IBAction)infoButtonPressed:(id)sender

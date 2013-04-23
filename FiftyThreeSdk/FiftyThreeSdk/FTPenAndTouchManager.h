@@ -40,6 +40,7 @@ public:
 
     virtual TouchType GetTouchType(const common::Touch::cPtr & touch) = 0;
     virtual Event<common::Touch::cPtr> & TouchTypeChanged() = 0;
+    virtual Event<Unit> & ShouldStartTrialSeparation() = 0;
 
     static Ptr New();
 };

@@ -15,6 +15,7 @@
 #include "Common/TouchManager.h"
 #include "Common/PenManager.h"
 #include "Common/Mathiness.h"
+#include "Common/DispatchTimer.h"
 
 #include "TouchClassifierManager.h"
 #include "LatencyTouchClassifier.h"
@@ -35,12 +36,18 @@ private:
     FTTouchEventLogger::Ptr _Logger;
     TouchToTypeMap _Touches;
     Event<Touch::cPtr> _TouchTypeChangedEvent;
+    Event<Unit> _ShouldStartTrialSeparation;
+    DispatchTimer::Ptr _TrialSeparationTimer;
 
 public:
     FTPenAndTouchManagerImpl()
     {
         _ClassifierManager = TouchClassifierManager::New();
         _ClassifierManager->AddClassifier(LatencyTouchClassifier::New());
+        
+        _TrialSeparationTimer = DispatchTimer::New();
+        _TrialSeparationTimer->New();
+        _TrialSeparationTimer->SetCallback(bind(&FTPenAndTouchManagerImpl::TrialSeparationTimerExpired, this));
     }
 
     ~FTPenAndTouchManagerImpl()
@@ -70,6 +77,11 @@ public:
 
     void TouchesBegan(const TouchesSetEvent & sender, const TouchesSet & touches)
     {
+        if (_TrialSeparationTimer->IsActive())
+        {
+            _TrialSeparationTimer->Stop();
+        }
+        
         BOOST_FOREACH(const Touch::cPtr & touch, touches)
         {
             _Touches[touch] = TouchType::Unknown;
@@ -113,6 +125,23 @@ public:
 
     virtual void HandlePenEvent(const PenEvent & event)
     {
+        // Consider trial separation
+        if (event.Tip == PenTip::Tip1)
+        {
+            if (_Touches.size() == 0
+                && event.Type == PenEventType::PenDown)
+            {
+                _TrialSeparationTimer->Start(1.0);
+            }
+            else if (event.Type == PenEventType::PenUp)
+            {
+                if (_TrialSeparationTimer->IsActive())
+                {
+                    _TrialSeparationTimer->Stop();
+                }
+            }
+        }
+        
         if (_Logger) _Logger->HandlePenEvent(event);
 
         _ClassifierManager->ProcessPenEvent(event);
@@ -135,6 +164,17 @@ public:
     Event<Touch::cPtr> & TouchTypeChanged()
     {
         return _TouchTypeChangedEvent;
+    }
+    
+    Event<Unit> & ShouldStartTrialSeparation()
+    {
+        return _ShouldStartTrialSeparation;
+    }
+    
+    void TrialSeparationTimerExpired(void)
+    {
+        _TrialSeparationTimer->Stop();
+        _ShouldStartTrialSeparation.Fire(Unit());
     }
 
 private:
