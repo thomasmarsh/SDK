@@ -693,7 +693,7 @@ static const int kInterruptedUpdateDelayMax = 30;
     // user is not actually pairing with another iPad. Need a scanning strategy for that. This is only a placeholder until
     // FW can implement this.
     
-    self.trialSeparationTimer = [NSTimer scheduledTimerWithTimeInterval:10.0
+    self.trialSeparationTimer = [NSTimer scheduledTimerWithTimeInterval:2.0
                                      target:self
                                    selector:@selector(stopTrialSeparation)
                                    userInfo:nil
