@@ -101,6 +101,7 @@ public:
     self.view.multipleTouchEnabled = YES;
 
     _penManager = [[FTPenManager alloc] initWithDelegate:self];
+    _penManager.autoConnect = YES;
 
     _PenAndTouchManager = FTPenAndTouchManager::New();
     _PenAndTouchManager->RegisterForEvents();
@@ -713,9 +714,7 @@ public:
 
 - (void)startTrialSeparation
 {
-    NSLog(@"startTrialSeparation");
-    
-    [self.penManager disconnect];
+    [self.penManager startTrialSeparation];
 }
 
 - (IBAction)infoButtonPressed:(id)sender

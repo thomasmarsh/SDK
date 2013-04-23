@@ -35,6 +35,7 @@ static const int kInterruptedUpdateDelayMax = 30;
 @property (nonatomic) TIUpdateManager *updateManager;
 @property (nonatomic, readwrite) FTPenManagerState state;
 @property (nonatomic) NSTimer *pairingTimer;
+@property (nonatomic) NSTimer *trialSeparationTimer;
 @property (nonatomic) int maxRSSI;
 @property (nonatomic) FTPen *closestPen;
 
@@ -137,6 +138,16 @@ static const int kInterruptedUpdateDelayMax = 30;
 {
     if (!self.connectedPen && self.pairedPen) {
         [self connectPen:_pairedPen];
+    }
+}
+
+- (void)reconnect
+{
+    if (self.autoConnect && !self.trialSeparationTimer)
+    {
+        NSLog(@"auto reconnect");
+        
+        [self performSelectorOnMainThread:@selector(connect) withObject:nil waitUntilDone:NO];
     }
 }
 
@@ -536,6 +547,8 @@ static const int kInterruptedUpdateDelayMax = 30;
             self.updateManager = nil;
         }
     }
+    
+    [self reconnect];
 
     dispatch_async(dispatch_get_main_queue(), ^{
         [self.delegate penManager:self didDisconnectFromPen:pen];
@@ -669,5 +682,32 @@ static const int kInterruptedUpdateDelayMax = 30;
     // If we've got this far, we're connected, but we're not subscribed, so we just disconnect
     [self.centralManager cancelPeripheralConnection:_connectedPen.peripheral];
 }
+
+- (void)startTrialSeparation
+{
+    NSLog(@"startTrialSeparation");
+
+    [self disconnect];
+    
+    // BUGBUG - the timer based approach is not sufficient to allow for fast reconnection in the case where the
+    // user is not actually pairing with another iPad. Need a scanning strategy for that. This is only a placeholder until
+    // FW can implement this.
+    
+    self.trialSeparationTimer = [NSTimer scheduledTimerWithTimeInterval:10.0
+                                     target:self
+                                   selector:@selector(stopTrialSeparation)
+                                   userInfo:nil
+                                    repeats:NO];
+}
+
+- (void)stopTrialSeparation
+{
+    NSLog(@"stopTrialSeparation");
+
+    self.trialSeparationTimer = nil;
+    
+    [self reconnect];
+}
+
 
 @end
