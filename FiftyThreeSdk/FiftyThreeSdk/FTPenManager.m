@@ -181,6 +181,12 @@ static const int kInterruptedUpdateDelayMax = 30;
     if (self.closestPen.peripheral == peripheral) {
         [self.closestPen updateData:advertisementData];
     }
+    
+    // Timer already expired without finding a pen, so connect immediately.
+    if (!self.pairingTimer)
+    {
+        [self connectPen:self.closestPen];
+    }
 }
 
 - (void)centralManager:(CBCentralManager *)central didFailToConnectPeripheral:(CBPeripheral *)peripheral error:(NSError *)error
