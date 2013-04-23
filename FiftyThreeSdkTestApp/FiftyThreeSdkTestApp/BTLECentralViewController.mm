@@ -312,7 +312,14 @@ public:
 {
     if (self.penManager.connectedPen)
     {
-        [self.pairingStatusLabel setText:[NSString stringWithFormat:@"Connected to %@", self.penManager.pairedPen.name]];
+        if (self.penManager.connectedPen.isConnected)
+        {
+            [self.pairingStatusLabel setText:[NSString stringWithFormat:@"Connected to %@", self.penManager.pairedPen.name]];
+        }
+        else
+        {
+            [self.pairingStatusLabel setText:[NSString stringWithFormat:@"Connecting to %@", self.penManager.pairedPen.name]];
+        }
     }
     else if (self.penManager.pairedPen)
     {

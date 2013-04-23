@@ -547,12 +547,12 @@ static const int kInterruptedUpdateDelayMax = 30;
             self.updateManager = nil;
         }
     }
-    
-    [self reconnect];
 
     dispatch_async(dispatch_get_main_queue(), ^{
         [self.delegate penManager:self didDisconnectFromPen:pen];
     });
+    
+    [self reconnect];
 }
 
 - (void)centralManager:(CBCentralManager *)central didRetrievePeripherals:(NSArray *)peripherals
