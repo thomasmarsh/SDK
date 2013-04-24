@@ -36,6 +36,7 @@ typedef NS_ENUM(NSInteger, FTPenManagerState) {
 
 - (void)penManagerDidUpdateState:(FTPenManager *)penManager;
 - (void)penManager:(FTPenManager *)penManager didPairWithPen:(FTPen *)pen;
+- (void)penManager:(FTPenManager *)penManager didUnpairFromPen:(FTPen *)pen;
 - (void)penManager:(FTPenManager *)penManager didConnectToPen:(FTPen *)pen;
 - (void)penManager:(FTPenManager *)penManager didFailConnectToPen:(FTPen *)pen;
 - (void)penManager:(FTPenManager *)penManager didDisconnectFromPen:(FTPen *)pen;

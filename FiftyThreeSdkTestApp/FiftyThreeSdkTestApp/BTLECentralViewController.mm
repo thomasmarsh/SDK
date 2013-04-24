@@ -190,6 +190,15 @@ public:
     [self.currentTest penManager:penManager didPairWithPen:pen];
 }
 
+- (void)penManager:(FTPenManager *)penManager didUnpairFromPen:(FTPen *)pen
+{
+    NSLog(@"didUnpairFromPen name=%@", pen.name);
+    
+    [self updateDisplay];
+    
+    [self.currentTest penManager:penManager didUnpairFromPen:pen];
+}
+
 - (void)penManager:(FTPenManager *)penManager didConnectToPen:(FTPen *)pen
 {
     if (_ConnectTimer)

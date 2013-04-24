@@ -93,6 +93,11 @@ static NSString *const kPnpIdUUID = @"0x2A50";
 
 - (void)peripheral:(CBPeripheral *)peripheral didUpdateValueForCharacteristic:(CBCharacteristic *)characteristic error:(NSError *)error
 {
+    if (error || characteristic.value.length == 0) {
+        NSLog(@"Error in receiving characteristic value: %@", [error localizedDescription]);
+        return;
+    }
+    
     if ([characteristic.UUID isEqual:[CBUUID UUIDWithString:kManufacturerNameUUID]]) {
         _manufacturerName = [NSString stringWithUTF8String:characteristic.value.bytes];
     } else if ([characteristic.UUID isEqual:[CBUUID UUIDWithString:kModelNumberUUID]]) {

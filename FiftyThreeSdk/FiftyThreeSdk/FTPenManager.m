@@ -105,9 +105,19 @@ static const int kInterruptedUpdateDelayMax = 30;
 
 - (void)pairingTimerExpired:(NSTimer *)timer
 {
+    NSLog(@"pairingTimerExpired");
+    
     self.pairingTimer = nil;
 
-    if (self.closestPen)
+    if (self.trialSeparationTimer)
+    {
+        // We didn't find it, so unpair
+        NSLog(@"Removing paired device");
+     
+        self.trialSeparationTimer = nil;
+        [self deletePairedPen:self.pairedPen];
+    }
+    else if (self.closestPen)
     {
         [self connectPen:self.closestPen];
     }
@@ -129,8 +139,7 @@ static const int kInterruptedUpdateDelayMax = 30;
         && !self.trialSeparationTimer)
     {
         NSLog(@"auto reconnect");
-        
-        [self performSelectorOnMainThread:@selector(connect) withObject:nil waitUntilDone:NO];
+        [self connect];
     }
 }
 
@@ -161,24 +170,28 @@ static const int kInterruptedUpdateDelayMax = 30;
 {
     int rssiValue = [RSSI integerValue];
     //NSLog(@"Discovered %@ at %d", peripheral.name, rssiValue);
-
-    if ((rssiValue > self.maxRSSI || self.maxRSSI == 0) &&
-        self.closestPen.peripheral != peripheral)
+    
+    if (self.trialSeparationTimer && self.pairedPen)
     {
-            //NSLog(@"Updated closest pen");
-
-            self.maxRSSI = rssiValue;
-            self.closestPen = [[FTPen alloc] initWithPeripheral:peripheral data:advertisementData];
+        self.trialSeparationTimer = nil;
+        
+        [self stopPairing];
+        return;
     }
 
-    // Have we already seen it?
-    if (self.closestPen.peripheral == peripheral) {
+    if (self.closestPen.peripheral == peripheral)
+    {
         [self.closestPen updateData:advertisementData];
     }
-    
-    // Timer already expired without finding a pen, so connect immediately.
+    else if (rssiValue > self.maxRSSI || self.maxRSSI == 0)
+    {
+        self.maxRSSI = rssiValue;
+        self.closestPen = [[FTPen alloc] initWithPeripheral:peripheral data:advertisementData];
+    }
+
     if (!self.pairingTimer)
     {
+        // Timer already expired without finding a pen, so connect immediately.
         [self connectPen:self.closestPen];
     }
 }
@@ -249,6 +262,11 @@ static const int kInterruptedUpdateDelayMax = 30;
 - (void)deletePairedPen:(FTPen *)pen
 {
     NSAssert(pen, nil);
+    
+    if (self.connectedPen == pen)
+    {
+        [self disconnect];
+    }
 
     if (self.pairedPen == pen)
     {
@@ -257,11 +275,8 @@ static const int kInterruptedUpdateDelayMax = 30;
         [[NSUserDefaults standardUserDefaults] setValue:nil
                                                  forKey:kPairedPenUuidDefaultsKey];
         [[NSUserDefaults standardUserDefaults] synchronize];
-    }
-
-    if (self.connectedPen == pen)
-    {
-        [self disconnect];
+        
+        [self.delegate penManager:self didUnpairFromPen:pen];
     }
 }
 
@@ -570,9 +585,7 @@ static const int kInterruptedUpdateDelayMax = 30;
 {
     NSLog(@"stopTrialSeparation");
 
-    self.trialSeparationTimer = nil;
-    
-    [self reconnect];
+    [self startPairing];
 }
 
 
