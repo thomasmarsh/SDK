@@ -19,13 +19,6 @@ NSString * const kPairedPenUuidDefaultsKey = @"PairedPenUuid";
 static const int kInterruptedUpdateDelayMax = 30;
 
 @interface FTPenManager () <CBCentralManagerDelegate, CBPeripheralDelegate, TIUpdateManagerDelegate>
-{
-    FTPen *_pairedPen;
-    FTPen *_connectedPen;
-    BOOL _pairing;
-}
-
-- (void)updateFirmwareForPen:(FTPen *)pen;
 
 @property (nonatomic) CBCentralManager *centralManager;
 @property (nonatomic) TIUpdateManager *updateManager;
@@ -34,12 +27,13 @@ static const int kInterruptedUpdateDelayMax = 30;
 @property (nonatomic) NSTimer *trialSeparationTimer;
 @property (nonatomic) int maxRSSI;
 @property (nonatomic) FTPen *closestPen;
+@property (nonatomic, readwrite) FTPen *pairedPen;
+@property (nonatomic, readwrite) FTPen *connectedPen;
+@property (nonatomic, readwrite) BOOL pairing;
 
 @end
 
 @implementation FTPenManager
-
-@synthesize connectedPen = _connectedPen;
 
 - (id)initWithDelegate:(id<FTPenManagerDelegate>)delegate;
 {
@@ -53,11 +47,6 @@ static const int kInterruptedUpdateDelayMax = 30;
     }
 
     return self;
-}
-
-- (FTPen *)pairedPen
-{
-    return _pairedPen;
 }
 
 - (void)scan
@@ -88,10 +77,10 @@ static const int kInterruptedUpdateDelayMax = 30;
         [self disconnect];
     }
 
-    _pairedPen = nil;
+    self.pairedPen = nil;
     self.maxRSSI = 0;
     self.closestPen = nil;
-    _pairing = YES;
+    self.pairing = YES;
     [self scan];
 
     self.pairingTimer = [NSTimer scheduledTimerWithTimeInterval:1.0
@@ -108,7 +97,7 @@ static const int kInterruptedUpdateDelayMax = 30;
     [self.pairingTimer invalidate];
     self.pairingTimer = nil;
 
-    _pairing = NO;
+    self.pairing = NO;
     [self.centralManager stopScan];
 }
 
@@ -125,7 +114,7 @@ static const int kInterruptedUpdateDelayMax = 30;
 - (void)connect
 {
     if (!self.connectedPen && self.pairedPen) {
-        [self connectPen:_pairedPen];
+        [self connectPen:self.pairedPen];
     }
 }
 
@@ -145,14 +134,14 @@ static const int kInterruptedUpdateDelayMax = 30;
 
     [self.centralManager stopScan];
 
-    _connectedPen = pen;
+    self.connectedPen = pen;
     [self.centralManager connectPeripheral:pen.peripheral options:nil];
 }
 
 - (void)disconnect
 {
     if (self.connectedPen) {
-        [self.centralManager cancelPeripheralConnection:_connectedPen.peripheral];
+        [self.centralManager cancelPeripheralConnection:self.connectedPen.peripheral];
     }
 
     // Ensure we don't retry update when disconnect was initiated by the central.
@@ -255,16 +244,16 @@ static const int kInterruptedUpdateDelayMax = 30;
 {
     NSAssert(pen, nil);
 
-    if (_pairedPen == pen)
+    if (self.pairedPen == pen)
     {
-        _pairedPen = nil;
+        self.pairedPen = nil;
 
         [[NSUserDefaults standardUserDefaults] setValue:nil
                                                  forKey:kPairedPenUuidDefaultsKey];
         [[NSUserDefaults standardUserDefaults] synchronize];
     }
 
-    if (_connectedPen == pen)
+    if (self.connectedPen == pen)
     {
         [self disconnect];
     }
@@ -274,13 +263,13 @@ static const int kInterruptedUpdateDelayMax = 30;
 {
     NSAssert(pen, nil);
 
-    if (!_pairedPen) {
-        _pairedPen = pen;
+    if (!self.pairing) {
+        self.pairedPen = pen;
         [self stopPairing];
 
         [self savePairedPen:pen];
 
-        [self.delegate penManager:self didPairWithPen:_pairedPen];
+        [self.delegate penManager:self didPairWithPen:self.pairedPen];
     }
 
     if (self.updateManager)
@@ -296,10 +285,10 @@ static const int kInterruptedUpdateDelayMax = 30;
         }
     }
 
-    [self.delegate penManager:self didConnectToPen:_pairedPen];
+    [self.delegate penManager:self didConnectToPen:self.pairedPen];
 
     // Now that we are connected update the device info
-    [_connectedPen getInfo:^(FTPen *client, NSError *error) {
+    [self.connectedPen getInfo:^(FTPen *client, NSError *error) {
         if (error) {
             // We failed to get info, but that's ok, continue anyway
             NSLog(@"Failed to get device info, error=%@", [error localizedDescription]);
@@ -307,7 +296,7 @@ static const int kInterruptedUpdateDelayMax = 30;
 
         [self.delegate penManager:self didUpdateDeviceInfo:self.connectedPen];
 
-        [_connectedPen getBattery:^(FTPen *client, NSError *error) {
+        [self.connectedPen getBattery:^(FTPen *client, NSError *error) {
             if (error) {
                 // We failed to get info, but that's ok, continue anyway
                 NSLog(@"Failed to get device info, error=%@", [error localizedDescription]);
@@ -320,7 +309,7 @@ static const int kInterruptedUpdateDelayMax = 30;
 
 - (void)peripheral:(CBPeripheral *)peripheral didDiscoverCharacteristicsForService:(CBService *)service error:(NSError *)error
 {
-    NSAssert(peripheral == _connectedPen.peripheral, @"got wrong pen");
+    NSAssert(peripheral == self.connectedPen.peripheral, @"got wrong pen");
 
     if (error || service.characteristics.count == 0) {
         NSLog(@"Error discovering characteristics: %@", [error localizedDescription]);
@@ -344,7 +333,7 @@ static const int kInterruptedUpdateDelayMax = 30;
 
 - (void)peripheral:(CBPeripheral *)peripheral didUpdateValueForCharacteristic:(CBCharacteristic *)characteristic error:(NSError *)error
 {
-    NSAssert(peripheral == _connectedPen.peripheral, @"got wrong pen");
+    NSAssert(peripheral == self.connectedPen.peripheral, @"got wrong pen");
 
     if (error) {
         NSLog(@"Error discovering characteristics: %@", [error localizedDescription]);
@@ -369,7 +358,7 @@ static const int kInterruptedUpdateDelayMax = 30;
     const char *bytes = characteristic.value.bytes;
     BOOL pressed = bytes[0] == FT_PEN_TIP_STATE_PRESSED;
 
-    _connectedPen->_tipPressed[tip] = pressed;
+    self.connectedPen->_tipPressed[tip] = pressed;
     NSAssert([self.connectedPen isTipPressed:tip] == pressed, @"");
 
     if (pressed) {
@@ -381,7 +370,7 @@ static const int kInterruptedUpdateDelayMax = 30;
 
 - (void)peripheral:(CBPeripheral *)peripheral didUpdateNotificationStateForCharacteristic:(CBCharacteristic *)characteristic error:(NSError *)error
 {
-    NSAssert(peripheral == _connectedPen.peripheral, @"got wrong pen");
+    NSAssert(peripheral == self.connectedPen.peripheral, @"got wrong pen");
 
     if (error) {
         NSLog(@"Error changing notification state: %@", error.localizedDescription);
@@ -400,7 +389,7 @@ static const int kInterruptedUpdateDelayMax = 30;
 
         if ([characteristic.UUID isEqual:[CBUUID UUIDWithString:FT_PEN_TIP1_STATE_UUID]]) {
             // "connected" means we have the primary tip notifying
-            [self connectedToPen:_connectedPen];
+            [self connectedToPen:self.connectedPen];
         }
     } else {
         NSLog(@"Notification stopped on %@. Disconnecting", characteristic);
@@ -411,7 +400,7 @@ static const int kInterruptedUpdateDelayMax = 30;
 - (void)centralManager:(CBCentralManager *)central didDisconnectPeripheral:(CBPeripheral *)peripheral error:(NSError *)error
 {
     FTPen* pen = self.connectedPen;
-    _connectedPen = nil;
+    self.connectedPen = nil;
 
     if (self.updateManager)
     {
@@ -434,11 +423,11 @@ static const int kInterruptedUpdateDelayMax = 30;
 
 - (void)centralManager:(CBCentralManager *)central didRetrievePeripherals:(NSArray *)peripherals
 {
-    if (!_pairedPen)
+    if (!self.pairedPen)
     {
         if (peripherals.count)
         {
-            _pairedPen = [[FTPen alloc] initWithPeripheral:peripherals[0] data:nil];
+            self.pairedPen = [[FTPen alloc] initWithPeripheral:peripherals[0] data:nil];
         }
     }
 
@@ -532,15 +521,15 @@ static const int kInterruptedUpdateDelayMax = 30;
     }
 
     // See if we are subscribed to a characteristic on the peripheral
-    if (_connectedPen.peripheral.services != nil) {
-        for (CBService *service in _connectedPen.peripheral.services) {
+    if (self.connectedPen.peripheral.services != nil) {
+        for (CBService *service in self.connectedPen.peripheral.services) {
             if (service.characteristics != nil) {
                 for (CBCharacteristic *characteristic in service.characteristics) {
                     if ([characteristic.UUID isEqual:[CBUUID UUIDWithString:FT_PEN_TIP1_STATE_UUID]]
                         || [characteristic.UUID isEqual:[CBUUID UUIDWithString:FT_PEN_TIP2_STATE_UUID]]
                         ) {
                         if (characteristic.isNotifying) {
-                            [_connectedPen.peripheral setNotifyValue:NO forCharacteristic:characteristic];
+                            [self.connectedPen.peripheral setNotifyValue:NO forCharacteristic:characteristic];
 
                             return;
                         }
@@ -551,7 +540,7 @@ static const int kInterruptedUpdateDelayMax = 30;
     }
 
     // If we've got this far, we're connected, but we're not subscribed, so we just disconnect
-    [self.centralManager cancelPeripheralConnection:_connectedPen.peripheral];
+    [self.centralManager cancelPeripheralConnection:self.connectedPen.peripheral];
 }
 
 - (void)startTrialSeparation
