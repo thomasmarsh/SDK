@@ -23,7 +23,6 @@ static const int kInterruptedUpdateDelayMax = 30;
     FTPen *_pairedPen;
     FTPen *_connectedPen;
     BOOL _pairing;
-    dispatch_queue_t _queue;
 #if USE_TI_UUIDS
     char _lastState;
 #endif
@@ -51,8 +50,7 @@ static const int kInterruptedUpdateDelayMax = 30;
     if (self) {
         _state = FTPenManagerStateUnavailable;
         _delegate = delegate;
-        _queue = dispatch_queue_create("com.fiftythree.penmanager", NULL);
-        _centralManager = [[CBCentralManager alloc] initWithDelegate:self queue:_queue];
+        _centralManager = [[CBCentralManager alloc] initWithDelegate:self queue:nil];
         _pairedPen = nil;
         _pairing = NO;
 #if USE_TI_UUIDS
@@ -205,9 +203,7 @@ static const int kInterruptedUpdateDelayMax = 30;
     NSLog(@"Failed to connect to %@. (%@)", peripheral, [error localizedDescription]);
     [self cleanup];
 
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self.delegate penManager:self didFailConnectToPen:self.connectedPen];
-    });
+    [self.delegate penManager:self didFailConnectToPen:self.connectedPen];
 }
 
 - (void)centralManager:(CBCentralManager *)central didConnectPeripheral:(CBPeripheral *)peripheral
@@ -303,9 +299,7 @@ static const int kInterruptedUpdateDelayMax = 30;
 
         [self savePairedPen:pen];
 
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self.delegate penManager:self didPairWithPen:_pairedPen];
-        });
+        [self.delegate penManager:self didPairWithPen:_pairedPen];
     }
 
     if (self.updateManager)
@@ -321,9 +315,7 @@ static const int kInterruptedUpdateDelayMax = 30;
         }
     }
 
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self.delegate penManager:self didConnectToPen:_pairedPen];
-    });
+    [self.delegate penManager:self didConnectToPen:_pairedPen];
 
     // Now that we are connected update the device info
     [_connectedPen getInfo:^(FTPen *client, NSError *error) {
@@ -332,20 +324,16 @@ static const int kInterruptedUpdateDelayMax = 30;
             NSLog(@"Failed to get device info, error=%@", [error localizedDescription]);
         }
 
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self.delegate penManager:self didUpdateDeviceInfo:self.connectedPen];
+        [self.delegate penManager:self didUpdateDeviceInfo:self.connectedPen];
 
-            [_connectedPen getBattery:^(FTPen *client, NSError *error) {
-                if (error) {
-                    // We failed to get info, but that's ok, continue anyway
-                    NSLog(@"Failed to get device info, error=%@", [error localizedDescription]);
-                }
+        [_connectedPen getBattery:^(FTPen *client, NSError *error) {
+            if (error) {
+                // We failed to get info, but that's ok, continue anyway
+                NSLog(@"Failed to get device info, error=%@", [error localizedDescription]);
+            }
 
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    [self.delegate penManager:self didUpdateDeviceBatteryLevel:self.connectedPen];
-                });
-            }];
-        });
+            [self.delegate penManager:self didUpdateDeviceBatteryLevel:self.connectedPen];
+        }];
     }];
 }
 
@@ -443,13 +431,9 @@ static const int kInterruptedUpdateDelayMax = 30;
     NSAssert([self.connectedPen isTipPressed:tip] == pressed, @"");
 
     if (pressed) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self.connectedPen.delegate pen:self.connectedPen didPressTip:tip];
-        });
+        [self.connectedPen.delegate pen:self.connectedPen didPressTip:tip];
     } else {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self.connectedPen.delegate pen:self.connectedPen didReleaseTip:tip];
-        });
+        [self.connectedPen.delegate pen:self.connectedPen didReleaseTip:tip];
     }
 }
 
@@ -486,13 +470,9 @@ static const int kInterruptedUpdateDelayMax = 30;
     NSAssert([self.connectedPen isTipPressed:tip] == pressed, @"");
 
     if (pressed) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self.connectedPen.delegate pen:self.connectedPen didPressTip:tip];
-        });
+        [self.connectedPen.delegate pen:self.connectedPen didPressTip:tip];
     } else {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self.connectedPen.delegate pen:self.connectedPen didReleaseTip:tip];
-        });
+        [self.connectedPen.delegate pen:self.connectedPen didReleaseTip:tip];
     }
 }
 
@@ -548,9 +528,7 @@ static const int kInterruptedUpdateDelayMax = 30;
         }
     }
 
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self.delegate penManager:self didDisconnectFromPen:pen];
-    });
+    [self.delegate penManager:self didDisconnectFromPen:pen];
     
     [self reconnect];
 }
@@ -632,10 +610,8 @@ static const int kInterruptedUpdateDelayMax = 30;
 
     if ([self.delegate conformsToProtocol:@protocol(FTPenManagerDelegatePrivate)])
     {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            id<FTPenManagerDelegatePrivate> d = (id<FTPenManagerDelegatePrivate>)self.delegate;
-            [d penManager:self didFinishUpdate:error];
-        });
+        id<FTPenManagerDelegatePrivate> d = (id<FTPenManagerDelegatePrivate>)self.delegate;
+        [d penManager:self didFinishUpdate:error];
     }
 }
 
@@ -645,10 +621,8 @@ static const int kInterruptedUpdateDelayMax = 30;
 
     if ([self.delegate conformsToProtocol:@protocol(FTPenManagerDelegatePrivate)])
     {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            id<FTPenManagerDelegatePrivate> d = (id<FTPenManagerDelegatePrivate>)self.delegate;
-            [d penManager:self didUpdatePercentComplete:percent];
-        });
+        id<FTPenManagerDelegatePrivate> d = (id<FTPenManagerDelegatePrivate>)self.delegate;
+        [d penManager:self didUpdatePercentComplete:percent];
     }
 }
 
