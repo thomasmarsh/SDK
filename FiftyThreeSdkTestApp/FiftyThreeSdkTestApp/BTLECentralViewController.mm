@@ -60,6 +60,7 @@ class TouchObserver;
 @property (nonatomic) GLCanvasController *canvasController;
 @property (nonatomic) UITouch *strokeTouch;
 @property (nonatomic) BOOL annotationMode;
+@property (nonatomic) BOOL pairing;
 
 @end
 
@@ -321,6 +322,10 @@ public:
             [self.pairingStatusLabel setText:[NSString stringWithFormat:@"Connecting to %@", self.penManager.pairedPen.name]];
         }
     }
+    else if (self.pairing)
+    {
+        [self.pairingStatusLabel setText:@"Pairing"];
+    }
     else if (self.penManager.pairedPen)
     {
         [self.pairingStatusLabel setText:[NSString stringWithFormat:@"Paired with %@", self.penManager.pairedPen.name]];
@@ -372,12 +377,14 @@ public:
 - (IBAction)pairButtonPressed:(id)sender
 {
     [self.penManager startPairing];
+    self.pairing = YES;
     [self updateDisplay];
 }
 
 - (IBAction)pairButtonReleased:(id)sender
 {
     [self.penManager stopPairing];
+    self.pairing = NO;
     [self updateDisplay];
 }
 
