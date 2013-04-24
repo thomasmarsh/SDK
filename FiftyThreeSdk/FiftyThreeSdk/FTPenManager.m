@@ -71,18 +71,18 @@ static const int kInterruptedUpdateDelayMax = 30;
 - (void)startPairing
 {
     NSLog(@"startPairing");
+    
+    self.pairing = YES;
+    self.maxRSSI = 0;
+    self.closestPen = nil;
 
     if (self.connectedPen)
     {
         [self disconnect];
     }
 
-    self.pairedPen = nil;
-    self.maxRSSI = 0;
-    self.closestPen = nil;
-    self.pairing = YES;
     [self scan];
-
+    
     self.pairingTimer = [NSTimer scheduledTimerWithTimeInterval:1.0
                                                          target:self
                                                        selector:@selector(pairingTimerExpired:)
@@ -99,6 +99,8 @@ static const int kInterruptedUpdateDelayMax = 30;
 
     self.pairing = NO;
     [self.centralManager stopScan];
+    
+    [self reconnect];
 }
 
 - (void)pairingTimerExpired:(NSTimer *)timer
@@ -113,14 +115,18 @@ static const int kInterruptedUpdateDelayMax = 30;
 
 - (void)connect
 {
-    if (!self.connectedPen && self.pairedPen) {
+    if (!self.connectedPen && self.pairedPen)
+    {
         [self connectPen:self.pairedPen];
     }
 }
 
 - (void)reconnect
 {
-    if (self.autoConnect && !self.trialSeparationTimer)
+    if (self.autoConnect
+        && !self.connectedPen
+        && !self.pairing
+        && !self.trialSeparationTimer)
     {
         NSLog(@"auto reconnect");
         
@@ -263,7 +269,7 @@ static const int kInterruptedUpdateDelayMax = 30;
 {
     NSAssert(pen, nil);
 
-    if (!self.pairing) {
+    if (self.pairing) {
         self.pairedPen = pen;
         [self stopPairing];
 
