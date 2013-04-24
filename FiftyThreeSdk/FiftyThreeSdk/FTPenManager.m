@@ -17,6 +17,7 @@
 
 NSString * const kPairedPenUuidDefaultsKey = @"PairedPenUuid";
 static const int kInterruptedUpdateDelayMax = 30;
+static const double kPairingReleaseWindowSeconds = 0.100;
 
 @interface FTPenManager () <CBCentralManagerDelegate, CBPeripheralDelegate, TIUpdateManagerDelegate>
 
@@ -27,6 +28,8 @@ static const int kInterruptedUpdateDelayMax = 30;
 @property (nonatomic) NSTimer *trialSeparationTimer;
 @property (nonatomic) int maxRSSI;
 @property (nonatomic) FTPen *closestPen;
+@property (nonatomic) NSDate *lastReleaseTime;
+@property (nonatomic) NSDate *stopPairingTime;
 @property (nonatomic, readwrite) FTPen *pairedPen;
 @property (nonatomic, readwrite) FTPen *connectedPen;
 @property (nonatomic, readwrite) BOOL pairing;
@@ -68,9 +71,33 @@ static const int kInterruptedUpdateDelayMax = 30;
     }
 }
 
+- (void)resetFalsePairingCheck
+{
+    self.lastReleaseTime = nil;
+    self.stopPairingTime = nil;
+}
+
+- (void)checkForFalsePairing
+{
+    if (self.lastReleaseTime && self.stopPairingTime)
+    {
+        NSTimeInterval diff = ABS([self.lastReleaseTime timeIntervalSinceDate:self.stopPairingTime]);
+        NSLog(@"checkForFalsePairing, diff=%g", diff);
+        if (diff > kPairingReleaseWindowSeconds)
+        {
+            NSAssert(self.pairedPen, nil);
+            [self deletePairedPen:self.pairedPen];
+        }
+        
+        [self resetFalsePairingCheck];
+    }
+}
+
 - (void)startPairing
 {
     NSLog(@"startPairing");
+    
+    [self resetFalsePairingCheck];
     
     self.pairing = YES;
     self.maxRSSI = 0;
@@ -90,10 +117,19 @@ static const int kInterruptedUpdateDelayMax = 30;
                                                         repeats:NO];
 }
 
+// For clients only, internal code should call endPairingProcess
 - (void)stopPairing
 {
     NSLog(@"stopPairing");
+    
+    self.stopPairingTime = [NSDate date];
+    [self checkForFalsePairing];
 
+    [self endPairingProcess];
+}
+
+- (void)endPairingProcess
+{
     [self.pairingTimer invalidate];
     self.pairingTimer = nil;
 
@@ -175,7 +211,7 @@ static const int kInterruptedUpdateDelayMax = 30;
     {
         self.trialSeparationTimer = nil;
         
-        [self stopPairing];
+        [self endPairingProcess];
         return;
     }
 
@@ -286,7 +322,7 @@ static const int kInterruptedUpdateDelayMax = 30;
 
     if (self.pairing) {
         self.pairedPen = pen;
-        [self stopPairing];
+        [self endPairingProcess];
 
         [self savePairedPen:pen];
 
@@ -386,6 +422,12 @@ static const int kInterruptedUpdateDelayMax = 30;
         [self.connectedPen.delegate pen:self.connectedPen didPressTip:tip];
     } else {
         [self.connectedPen.delegate pen:self.connectedPen didReleaseTip:tip];
+        
+        if (tip == FTPenTip1)
+        {
+            self.lastReleaseTime = [NSDate date];
+            [self checkForFalsePairing];
+        }
     }
 }
 
