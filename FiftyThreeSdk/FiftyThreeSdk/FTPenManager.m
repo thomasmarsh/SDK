@@ -351,6 +351,7 @@ static const double kPairingReleaseWindowSeconds = 0.100;
             NSLog(@"Failed to get device info, error=%@", [error localizedDescription]);
         }
 
+        if (!self.connectedPen) return;
         [self.delegate penManager:self didUpdateDeviceInfo:self.connectedPen];
 
         [self.connectedPen getBattery:^(FTPen *client, NSError *error) {
@@ -359,6 +360,7 @@ static const double kPairingReleaseWindowSeconds = 0.100;
                 NSLog(@"Failed to get device info, error=%@", [error localizedDescription]);
             }
 
+            if (!self.connectedPen) return;
             [self.delegate penManager:self didUpdateDeviceBatteryLevel:self.connectedPen];
         }];
     }];
@@ -462,7 +464,6 @@ static const double kPairingReleaseWindowSeconds = 0.100;
 
 - (void)centralManager:(CBCentralManager *)central didDisconnectPeripheral:(CBPeripheral *)peripheral error:(NSError *)error
 {
-    FTPen* pen = self.connectedPen;
     self.connectedPen = nil;
 
     if (self.updateManager)
@@ -479,7 +480,7 @@ static const double kPairingReleaseWindowSeconds = 0.100;
         }
     }
 
-    [self.delegate penManager:self didDisconnectFromPen:pen];
+    [self.delegate penManager:self didDisconnectFromPen:self.pairedPen];
     
     [self reconnect];
 }

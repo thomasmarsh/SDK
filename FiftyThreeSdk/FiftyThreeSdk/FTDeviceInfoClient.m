@@ -20,35 +20,80 @@ static NSString *const kSystemIdUUID = @"0x2A23";
 static NSString *const kIEEECertificationDataUUID = @"0x2A2A";
 static NSString *const kPnpIdUUID = @"0x2A50";
 
-@interface FTDeviceInfoClient () <CBPeripheralDelegate>
+@interface FTDeviceInfoClient () <CBPeripheralDelegate, CBCentralManagerDelegate>
 {
-    NSInteger _resultCount;
+    void (^_complete)(FTDeviceInfoClient *client, NSError *error);
 }
+
+@property (nonatomic) NSInteger resultCount;
+@property (nonatomic) CBPeripheral *parentPeripheral;
+@property (nonatomic) CBPeripheral *peripheral;
+@property (nonatomic) CBCentralManager *manager;
 
 @end
 
 @implementation FTDeviceInfoClient
-{
-    CBPeripheral *_peripheral;
-    void (^_complete)(FTDeviceInfoClient *client, NSError *error);
-    id<CBPeripheralDelegate> _oldDelegate;
-}
 
 - (id)initWithPeripheral:(CBPeripheral *)peripheral
 {
     self = [super init];
-    if (self) {
-        _peripheral = peripheral;
+    if (self)
+    {
+        self.parentPeripheral = peripheral;
     }
     return self;
 }
 
+- (void)dealloc
+{
+    if (self.peripheral)
+    {
+        [self.manager cancelPeripheralConnection:self.peripheral];
+    }
+}
+
 - (void)getInfo:(void(^)(FTDeviceInfoClient *client, NSError *error))complete
 {
+    if (!self.manager)
+    {
+        self.manager = [[CBCentralManager alloc] initWithDelegate:self queue:nil];
+    }
+    
     _complete = complete;
-    _oldDelegate = _peripheral.delegate;
-    _peripheral.delegate = self;
-    [_peripheral discoverServices:@[[CBUUID UUIDWithString:kDeviceInfoServiceUUID]]];
+}
+
+- (void)centralManagerDidUpdateState:(CBCentralManager *)central
+{
+    if (central.state == CBCentralManagerStatePoweredOn)
+    {
+        // We go through the process of retrieving the peripherals to avoid interfering with other instances
+        [central retrieveConnectedPeripherals];
+    }
+}
+
+- (void)centralManager:(CBCentralManager *)central didRetrieveConnectedPeripherals:(NSArray *)peripherals
+{
+    for (CBPeripheral *peripheral in peripherals)
+    {
+        if (CFEqual(peripheral.UUID, self.parentPeripheral.UUID))
+        {
+            self.peripheral = peripheral;
+            self.peripheral.delegate = self;
+            [self.manager connectPeripheral:self.peripheral options:nil];
+            break;
+        }
+    }
+}
+
+- (void)centralManager:(CBCentralManager *)central didConnectPeripheral:(CBPeripheral *)peripheral
+{
+    [peripheral discoverServices:@[[CBUUID UUIDWithString:kDeviceInfoServiceUUID]]];
+}
+
+- (void)centralManager:(CBCentralManager *)central didDisconnectPeripheral:(CBPeripheral *)peripheral error:(NSError *)error
+{
+    self.peripheral = nil;
+    self.manager = nil;
 }
 
 - (void)peripheral:(CBPeripheral *)peripheral didDiscoverServices:(NSError *)error
@@ -70,7 +115,7 @@ static NSString *const kPnpIdUUID = @"0x2A50";
                                  [CBUUID UUIDWithString:kIEEECertificationDataUUID],
                                  [CBUUID UUIDWithString:kPnpIdUUID],
                                  ];
-    _resultCount = 0;
+    self.resultCount = 0;
 
     for (CBService *service in peripheral.services) {
         [peripheral discoverCharacteristics:characteristics forService:service];
@@ -87,7 +132,7 @@ static NSString *const kPnpIdUUID = @"0x2A50";
 
     for (CBCharacteristic *characteristic in service.characteristics) {
         [peripheral readValueForCharacteristic:characteristic];
-        _resultCount++;
+        self.resultCount++;
     }
 }
 
@@ -124,16 +169,19 @@ static NSString *const kPnpIdUUID = @"0x2A50";
         _pnpId.productVersion = bytes[5] | (bytes[6] << 8);
     }
 
-    _resultCount--;
-    if (_resultCount == 0) {
+    self.resultCount--;
+    if (self.resultCount == 0) {
         [self done:error];
     }
 }
 
 - (void)done:(NSError *)error
 {
-    _peripheral.delegate = _oldDelegate;
-    _oldDelegate = nil;
+    if (self.peripheral)
+    {
+        [self.manager cancelPeripheralConnection:self.peripheral];
+    }
+
     _complete(self, error);
 }
 

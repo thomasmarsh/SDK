@@ -77,10 +77,7 @@ public:
 
     void TouchesBegan(const TouchesSetEvent & sender, const TouchesSet & touches)
     {
-        if (_TrialSeparationTimer->IsActive())
-        {
-            _TrialSeparationTimer->Stop();
-        }
+        StopTimer(_TrialSeparationTimer);
         
         BOOST_FOREACH(const Touch::cPtr & touch, touches)
         {
@@ -131,20 +128,26 @@ public:
             if (_Touches.size() == 0
                 && event.Type == PenEventType::PenDown)
             {
+                StopTimer(_TrialSeparationTimer);
                 _TrialSeparationTimer->Start(1.0);
             }
             else if (event.Type == PenEventType::PenUp)
             {
-                if (_TrialSeparationTimer->IsActive())
-                {
-                    _TrialSeparationTimer->Stop();
-                }
+                StopTimer(_TrialSeparationTimer);
             }
         }
         
         if (_Logger) _Logger->HandlePenEvent(event);
 
         _ClassifierManager->ProcessPenEvent(event);
+    }
+    
+    void StopTimer(const DispatchTimer::Ptr & timer)
+    {
+        if (timer->IsActive())
+        {
+            timer->Stop();
+        }
     }
 
     virtual void Clear()

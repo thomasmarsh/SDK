@@ -12,36 +12,76 @@ static NSString *const kBatteryServiceUUID = @"0x180F";
 
 static NSString *const kBatteryLevelUUID = @"0x2A19";
 
-@interface FTBatteryClient () <CBPeripheralDelegate>
+@interface FTBatteryClient () <CBPeripheralDelegate, CBCentralManagerDelegate>
 {
-    NSInteger _resultCount;
-    uint8_t _batteryLevel;
+    void (^_complete)(FTBatteryClient *client, NSError *error);
 }
+
+@property (nonatomic) NSInteger resultCount;
+@property (nonatomic) CBPeripheral *parentPeripheral;
+@property (nonatomic) CBPeripheral *peripheral;
+@property (nonatomic) CBCentralManager *manager;
+@property uint8_t batteryLevel;
 
 @end
 
+
 @implementation FTBatteryClient
-{
-    CBPeripheral *_peripheral;
-    void (^_complete)(FTBatteryClient *client, NSError *error);
-    id<CBPeripheralDelegate> _oldDelegate;
-}
 
 - (id)initWithPeripheral:(CBPeripheral *)peripheral
 {
     self = [super init];
-    if (self) {
-        _peripheral = peripheral;
+    if (self)
+    {
+        self.parentPeripheral = peripheral;
     }
     return self;
+}
+
+- (void)dealloc
+{
+    if (self.peripheral)
+    {
+        [self.manager cancelPeripheralConnection:self.peripheral];
+    }
 }
 
 - (void)getBatteryLevel:(void(^)(FTBatteryClient *client, NSError *error))complete
 {
     _complete = complete;
-    _oldDelegate = _peripheral.delegate;
-    _peripheral.delegate = self;
-    [_peripheral discoverServices:@[[CBUUID UUIDWithString:kBatteryServiceUUID]]];
+
+    if (!self.manager)
+    {
+        self.manager = [[CBCentralManager alloc] initWithDelegate:self queue:nil];
+    }
+}
+
+- (void)centralManagerDidUpdateState:(CBCentralManager *)central
+{
+    if (central.state == CBCentralManagerStatePoweredOn)
+    {
+        // We go through the process of retrieving the peripherals to avoid interfering with other instances
+        [central retrieveConnectedPeripherals];
+    }
+}
+
+- (void)centralManager:(CBCentralManager *)central didRetrieveConnectedPeripherals:(NSArray *)peripherals
+{
+    for (CBPeripheral *peripheral in peripherals)
+    {
+        if (CFEqual(peripheral.UUID, self.parentPeripheral.UUID))
+        {
+            self.peripheral = peripheral;
+            self.peripheral.delegate = self;
+            [self.manager connectPeripheral:self.peripheral options:nil];
+            break;
+        }
+    }
+}
+
+- (void)centralManager:(CBCentralManager *)central didConnectPeripheral:(CBPeripheral *)peripheral
+{
+    [peripheral discoverServices:@[[CBUUID UUIDWithString:kBatteryServiceUUID]]];
 }
 
 - (void)peripheral:(CBPeripheral *)peripheral didDiscoverServices:(NSError *)error
@@ -60,6 +100,12 @@ static NSString *const kBatteryLevelUUID = @"0x2A19";
     for (CBService *service in peripheral.services) {
         [peripheral discoverCharacteristics:characteristics forService:service];
     }
+}
+
+- (void)centralManager:(CBCentralManager *)central didDisconnectPeripheral:(CBPeripheral *)peripheral error:(NSError *)error
+{
+    self.peripheral = nil;
+    self.manager = nil;
 }
 
 - (void)peripheral:(CBPeripheral *)peripheral didDiscoverCharacteristicsForService:(CBService *)service error:(NSError *)error
@@ -90,8 +136,11 @@ static NSString *const kBatteryLevelUUID = @"0x2A19";
 
 - (void)done:(NSError *)error
 {
-    _peripheral.delegate = _oldDelegate;
-    _oldDelegate = nil;
+    if (self.peripheral)
+    {
+        [self.manager cancelPeripheralConnection:self.peripheral];
+    }
+    
     _complete(self, error);
 }
 
