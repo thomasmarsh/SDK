@@ -87,6 +87,12 @@ static const double kPairingReleaseWindowSeconds = 0.100;
 
 - (void)resetFalsePairingCheck
 {
+    if (self.falsePairingTimer)
+    {
+        [self.falsePairingTimer invalidate];
+        self.falsePairingTimer = nil;
+    }
+    
     self.lastReleaseTime = nil;
     self.stopPairingTime = nil;
 }
@@ -106,8 +112,7 @@ static const double kPairingReleaseWindowSeconds = 0.100;
             [self deletePairedPen:self.pairedPen];
         }
     }
-    
-    [self resetFalsePairingCheck];
+
     [self endPairingProcess];
 }
 
@@ -149,6 +154,8 @@ static const double kPairingReleaseWindowSeconds = 0.100;
 - (void)endPairingProcess
 {
     NSLog(@"endPairingProcess");
+        
+    [self resetFalsePairingCheck];
     
     [self.pairingTimer invalidate];
     self.pairingTimer = nil;
