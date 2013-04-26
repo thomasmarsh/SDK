@@ -615,12 +615,11 @@ public:
     TouchType type = _PenAndTouchManager->GetTouchType(touch);
     if (self.penManager.connectedPen)
     {
-        return type == TouchType::Pen;
+        return type != TouchType::Finger;
     }
     else
     {
-        return YES;
-        //return type == TouchType::Finger;
+        return type != TouchType::Pen;
     }
 }
 
