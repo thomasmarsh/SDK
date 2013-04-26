@@ -102,11 +102,7 @@ static const double kPairingReleaseWindowSeconds = 0.100;
     self.maxRSSI = 0;
     self.closestPen = nil;
 
-    if (self.connectedPen)
-    {
-        [self disconnect];
-    }
-
+    [self disconnect];
     [self scan];
     
     self.pairingTimer = [NSTimer scheduledTimerWithTimeInterval:1.0
