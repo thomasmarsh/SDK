@@ -79,13 +79,12 @@ static const double kPairingReleaseWindowSeconds = 0.100;
 
 - (void)checkForFalsePairing
 {
-    if (self.lastReleaseTime && self.stopPairingTime)
+    if (self.pairedPen && self.lastReleaseTime && self.stopPairingTime)
     {
         NSTimeInterval diff = ABS([self.lastReleaseTime timeIntervalSinceDate:self.stopPairingTime]);
         NSLog(@"checkForFalsePairing, diff=%g", diff);
         if (diff > kPairingReleaseWindowSeconds)
         {
-            NSAssert(self.pairedPen, nil);
             [self deletePairedPen:self.pairedPen];
         }
         
@@ -120,8 +119,6 @@ static const double kPairingReleaseWindowSeconds = 0.100;
 // For clients only, internal code should call endPairingProcess
 - (void)stopPairing
 {
-    NSLog(@"stopPairing");
-    
     self.stopPairingTime = [NSDate date];
     [self checkForFalsePairing];
 
@@ -130,6 +127,8 @@ static const double kPairingReleaseWindowSeconds = 0.100;
 
 - (void)endPairingProcess
 {
+    NSLog(@"endPairingProcess");
+    
     [self.pairingTimer invalidate];
     self.pairingTimer = nil;
 
@@ -144,17 +143,20 @@ static const double kPairingReleaseWindowSeconds = 0.100;
     NSLog(@"pairingTimerExpired");
     
     self.pairingTimer = nil;
-
+    
     if (self.trialSeparationTimer)
     {
         // We didn't find it, so unpair
         NSLog(@"Removing paired device");
-     
+        
+        [self.trialSeparationTimer invalidate];
         self.trialSeparationTimer = nil;
         [self deletePairedPen:self.pairedPen];
+        
+        [self endPairingProcess];
     }
     else if (self.closestPen)
-    {
+    {        
         [self connectPen:self.closestPen];
     }
 }
@@ -181,6 +183,7 @@ static const double kPairingReleaseWindowSeconds = 0.100;
 
 - (void)connectPen:(FTPen *)pen
 {
+    NSAssert(pen, nil);
     NSLog(@"Connecting to peripheral %@", pen.peripheral);
 
     [self.centralManager stopScan];
@@ -225,7 +228,7 @@ static const double kPairingReleaseWindowSeconds = 0.100;
         self.closestPen = [[FTPen alloc] initWithPeripheral:peripheral data:advertisementData];
     }
 
-    if (!self.pairingTimer)
+    if (self.pairing && !self.pairingTimer)
     {
         // Timer already expired without finding a pen, so connect immediately.
         [self connectPen:self.closestPen];
@@ -464,6 +467,7 @@ static const double kPairingReleaseWindowSeconds = 0.100;
 
 - (void)centralManager:(CBCentralManager *)central didDisconnectPeripheral:(CBPeripheral *)peripheral error:(NSError *)error
 {
+    FTPen *pen = self.connectedPen;
     self.connectedPen = nil;
 
     if (self.updateManager)
@@ -480,7 +484,7 @@ static const double kPairingReleaseWindowSeconds = 0.100;
         }
     }
 
-    [self.delegate penManager:self didDisconnectFromPen:self.pairedPen];
+    [self.delegate penManager:self didDisconnectFromPen:pen];
     
     [self reconnect];
 }
