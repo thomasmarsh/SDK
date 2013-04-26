@@ -85,7 +85,7 @@ static const double kPairingReleaseWindowSeconds = 0.100;
                                                         repeats:NO];
 }
 
-- (void)resetFalsePairingCheck
+- (void)resetFalsePairingInfo
 {
     if (self.falsePairingTimer)
     {
@@ -120,7 +120,7 @@ static const double kPairingReleaseWindowSeconds = 0.100;
 {
     NSLog(@"startPairing");
     
-    [self resetFalsePairingCheck];
+    [self resetFalsePairingInfo];
     
     self.pairing = YES;
     self.newlyPaired = NO;
@@ -155,7 +155,7 @@ static const double kPairingReleaseWindowSeconds = 0.100;
 {
     NSLog(@"endPairingProcess");
         
-    [self resetFalsePairingCheck];
+    [self resetFalsePairingInfo];
     
     [self.pairingTimer invalidate];
     self.pairingTimer = nil;
