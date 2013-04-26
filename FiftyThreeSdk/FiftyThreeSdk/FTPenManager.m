@@ -26,6 +26,7 @@ static const double kPairingReleaseWindowSeconds = 0.100;
 @property (nonatomic, readwrite) FTPenManagerState state;
 @property (nonatomic) NSTimer *pairingTimer;
 @property (nonatomic) NSTimer *trialSeparationTimer;
+@property (nonatomic) NSTimer *falsePairingTimer;
 @property (nonatomic) int maxRSSI;
 @property (nonatomic) FTPen *closestPen;
 @property (nonatomic) NSDate *lastReleaseTime;
@@ -33,6 +34,7 @@ static const double kPairingReleaseWindowSeconds = 0.100;
 @property (nonatomic, readwrite) FTPen *pairedPen;
 @property (nonatomic, readwrite) FTPen *connectedPen;
 @property (nonatomic, readwrite) BOOL pairing;
+@property (nonatomic, readwrite) BOOL newlyPaired;
 
 @end
 
@@ -47,6 +49,7 @@ static const double kPairingReleaseWindowSeconds = 0.100;
         _centralManager = [[CBCentralManager alloc] initWithDelegate:self queue:nil];
         _pairedPen = nil;
         _pairing = NO;
+        _newlyPaired = NO;
     }
 
     return self;
@@ -71,25 +74,41 @@ static const double kPairingReleaseWindowSeconds = 0.100;
     }
 }
 
+- (void)startFalsePairingTimer
+{
+    if (self.falsePairingTimer) return;
+    
+    self.falsePairingTimer = [NSTimer scheduledTimerWithTimeInterval:kPairingReleaseWindowSeconds
+                                                         target:self
+                                                       selector:@selector(falsePairingTimerExpired:)
+                                                       userInfo:nil
+                                                        repeats:NO];
+}
+
 - (void)resetFalsePairingCheck
 {
     self.lastReleaseTime = nil;
     self.stopPairingTime = nil;
 }
 
-- (void)checkForFalsePairing
+- (void)falsePairingTimerExpired:(NSTimer *)timer
 {
-    if (self.pairedPen && self.lastReleaseTime && self.stopPairingTime)
+    self.falsePairingTimer = nil;
+    
+    NSTimeInterval diff = ABS([self.lastReleaseTime timeIntervalSinceDate:self.stopPairingTime]);
+    NSLog(@"checkForFalsePairing, diff=%g", diff);
+    if (self.lastReleaseTime == 0
+        || self.stopPairingTime == 0
+        || diff > kPairingReleaseWindowSeconds)
     {
-        NSTimeInterval diff = ABS([self.lastReleaseTime timeIntervalSinceDate:self.stopPairingTime]);
-        NSLog(@"checkForFalsePairing, diff=%g", diff);
-        if (diff > kPairingReleaseWindowSeconds)
+        if (self.pairedPen)
         {
             [self deletePairedPen:self.pairedPen];
         }
-        
-        [self resetFalsePairingCheck];
     }
+    
+    [self resetFalsePairingCheck];
+    [self endPairingProcess];
 }
 
 - (void)startPairing
@@ -99,6 +118,7 @@ static const double kPairingReleaseWindowSeconds = 0.100;
     [self resetFalsePairingCheck];
     
     self.pairing = YES;
+    self.newlyPaired = NO;
     self.maxRSSI = 0;
     self.closestPen = nil;
 
@@ -116,9 +136,14 @@ static const double kPairingReleaseWindowSeconds = 0.100;
 - (void)stopPairing
 {
     self.stopPairingTime = [NSDate date];
-    [self checkForFalsePairing];
-
-    [self endPairingProcess];
+    if (!self.newlyPaired)
+    {
+        [self endPairingProcess];
+    }
+    else
+    {
+        [self startFalsePairingTimer];
+    }
 }
 
 - (void)endPairingProcess
@@ -129,6 +154,7 @@ static const double kPairingReleaseWindowSeconds = 0.100;
     self.pairingTimer = nil;
 
     self.pairing = NO;
+    self.newlyPaired = NO;
     [self.centralManager stopScan];
     
     [self reconnect];
@@ -147,7 +173,10 @@ static const double kPairingReleaseWindowSeconds = 0.100;
         
         [self.trialSeparationTimer invalidate];
         self.trialSeparationTimer = nil;
-        [self deletePairedPen:self.pairedPen];
+        if (self.pairedPen)
+        {
+            [self deletePairedPen:self.pairedPen];
+        }
         
         [self endPairingProcess];
     }
@@ -190,7 +219,8 @@ static const double kPairingReleaseWindowSeconds = 0.100;
 
 - (void)disconnect
 {
-    if (self.connectedPen) {
+    if (self.connectedPen)
+    {
         [self.centralManager cancelPeripheralConnection:self.connectedPen.peripheral];
     }
 
@@ -321,7 +351,7 @@ static const double kPairingReleaseWindowSeconds = 0.100;
 
     if (self.pairing) {
         self.pairedPen = pen;
-        [self endPairingProcess];
+        self.newlyPaired = YES;
 
         [self savePairedPen:pen];
 
@@ -426,8 +456,11 @@ static const double kPairingReleaseWindowSeconds = 0.100;
         
         if (tip == FTPenTip1)
         {
-            self.lastReleaseTime = [NSDate date];
-            [self checkForFalsePairing];
+            if (self.pairing)
+            {
+                self.lastReleaseTime = [NSDate date];
+                [self startFalsePairingTimer];
+            }
         }
     }
 }
@@ -619,12 +652,12 @@ static const double kPairingReleaseWindowSeconds = 0.100;
     
     self.trialSeparationTimer = [NSTimer scheduledTimerWithTimeInterval:2.0
                                      target:self
-                                   selector:@selector(stopTrialSeparation)
+                                    selector:@selector(stopTrialSeparation:)
                                    userInfo:nil
                                     repeats:NO];
 }
 
-- (void)stopTrialSeparation
+- (void)stopTrialSeparation:(NSTimer *)timer
 {
     NSLog(@"stopTrialSeparation");
 
