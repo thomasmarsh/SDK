@@ -749,8 +749,9 @@ Serial Number = %@\n \
 Firmware Revision = %@\n \
 Hardware Revision = %@\n \
 Software Revision = %@\n \
-System ID = %@\n", pen.manufacturerName, pen.modelNumber, pen.serialNumber, pen.firmwareRevision, pen.hardwareRevision,
-                      pen.softwareRevision, pen.systemId];
+System ID = %@\n \
+Battery Level = %lu\n", pen.manufacturerName, pen.modelNumber, pen.serialNumber, pen.firmwareRevision, pen.hardwareRevision,
+                      pen.softwareRevision, pen.systemId, (long)pen.batteryLevel];
 
     UIAlertView* alertView = [[UIAlertView alloc] initWithTitle:@"Device Information" message:info delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
     [alertView show];
