@@ -86,6 +86,11 @@ public:
             }
         }
     }
+    
+    virtual TouchType GetTouchType(const fiftythree::common::Touch::cPtr & touch)
+    {
+        return _Classifiers[0]->GetTouchType(touch); // BUGBUG - figure out how to combine
+    }
 
     FT_NO_COPY(TouchClassifierManagerImpl);
 };

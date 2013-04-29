@@ -11,6 +11,7 @@
 #include <set>
 #include "Common/TouchManager.h"
 #include "Common/PenManager.h"
+#include "FTPenAndTouchManager.h"
 
 #include "PenEvent.h"
 
@@ -37,6 +38,8 @@ public:
     virtual void TouchesCancelled(const fiftythree::common::TouchesSet & touches) = 0;
 
     virtual void ProcessPenEvent(const PenEvent & event) = 0;
+    
+    virtual TouchType GetTouchType(const fiftythree::common::Touch::cPtr & touch) = 0;
 };
 
 }

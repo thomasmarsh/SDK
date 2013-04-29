@@ -19,6 +19,8 @@ using namespace fiftythree::sdk;
 using std::string;
 using std::stringstream;
 
+#define FT_LOG_TOUCH_EVENTS_COUT 0
+
 class FTTouchEventLoggerImpl : public FTTouchEventLoggerObjc
 {
 private:
@@ -40,7 +42,9 @@ public:
             stringstream ss;
             ss << TOUCH_PREFIX << touch->ToString() << std::endl;
 
+#if FT_LOG_TOUCH_EVENTS_COUT
             std::cout << ss.str();
+#endif
 
             [data appendBytes:ss.str().c_str() length:ss.tellp()];
         }
@@ -53,7 +57,9 @@ public:
             stringstream ss;
             ss << TOUCH_PREFIX << touch->ToString() << std::endl;
 
+#if FT_LOG_TOUCH_EVENTS_COUT
             std::cout << ss.str();
+#endif
 
             [data appendBytes:ss.str().c_str() length:ss.tellp()];
         }
@@ -66,7 +72,9 @@ public:
             stringstream ss;
             ss << TOUCH_PREFIX << touch->ToString() << std::endl;
 
+#if FT_LOG_TOUCH_EVENTS_COUT
             std::cout << ss.str();
+#endif
 
             [data appendBytes:ss.str().c_str() length:ss.tellp()];
         }
@@ -79,7 +87,9 @@ public:
             stringstream ss;
             ss << TOUCH_PREFIX << touch->ToString() << std::endl;
 
+#if FT_LOG_TOUCH_EVENTS_COUT
             std::cout << ss.str();
+#endif
 
             [data appendBytes:ss.str().c_str() length:ss.tellp()];
         }
@@ -90,7 +100,9 @@ public:
         stringstream ss;
         ss << PEN_PREFIX << event.ToString() << std::endl;
 
+#if FT_LOG_TOUCH_EVENTS_COUT
         std::cout << ss.str();
+#endif
 
         [data appendBytes:ss.str().c_str() length:ss.tellp()];
     }

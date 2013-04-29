@@ -180,7 +180,6 @@ public:
         _ShouldStartTrialSeparation.Fire(Unit());
     }
 
-private:
     void SetTouchType(const Touch::cPtr & touch, TouchType type)
     {
         TouchType oldType = _Touches[touch];

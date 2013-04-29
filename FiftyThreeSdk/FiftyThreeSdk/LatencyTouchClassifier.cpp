@@ -38,6 +38,8 @@ private:
     double _PenUpTime;
 
     std::vector<Touch::cPtr> _CandidateTouches;
+    std::vector<Touch::cPtr> _PenTouches;
+    std::vector<Touch::cPtr> _FingerTouches;
 
 public:
     LatencyTouchClassifierImpl()
@@ -95,7 +97,8 @@ public:
 
                 if (timeDelta > MAX_DELAY_SEC)
                 {
-                    std::cout << "Remove candidate touch: " << std::endl;
+                    std::cout << "Remove touch #" << it - _CandidateTouches.begin() << std::endl;
+                    _FingerTouches.push_back(*it);
                     it = _CandidateTouches.erase(it);
                 }
                 else
@@ -118,7 +121,8 @@ public:
 
                 if (!touch->HasEndedOrCancelledInView || timeDelta > MAX_DELAY_SEC)
                 {
-                    std::cout << "Remove candidate touch: " << std::endl;
+                    std::cout << "Remove touch #" << it - _CandidateTouches.begin() << std::endl;
+                    _FingerTouches.push_back(*it);
                     it = _CandidateTouches.erase(it);
                 }
                 else
@@ -133,6 +137,22 @@ public:
             }
 
             _CandidateTouches.clear();
+        }
+    }
+    
+    virtual TouchType GetTouchType(const fiftythree::common::Touch::cPtr & touch)
+    {
+        if (find(_PenTouches.begin(), _PenTouches.end(), touch) != _PenTouches.end())
+        {
+            return TouchType::Pen;
+        }
+        else if (find(_FingerTouches.begin(), _FingerTouches.end(), touch) != _FingerTouches.end())
+        {
+            return TouchType::Finger;
+        }
+        else
+        {
+            return TouchType::Unknown;
         }
     }
 
