@@ -775,7 +775,7 @@ Battery Level = %lu\n", pen.manufacturerName, pen.modelNumber, pen.serialNumber,
     MFMailComposeViewController *picker = [[MFMailComposeViewController alloc] init];
     picker.mailComposeDelegate = self;
 
-    [picker setSubject:@"Palm Rejection Data"];
+    [picker setSubject:@"Pen and Touch Event Data"];
 
     NSArray *toRecipients = [NSArray arrayWithObjects:@"adam@fiftythree.com",
                              nil];
@@ -790,7 +790,7 @@ Battery Level = %lu\n", pen.manufacturerName, pen.modelNumber, pen.serialNumber,
             << 1 << std::endl;
         [data appendBytes:ss.str().c_str() length:ss.tellp()];
     }
-    [picker addAttachmentData:data mimeType:@"application/prd" fileName:@"strokedata.prd"]; // todo - add counter to filename?
+    [picker addAttachmentData:data mimeType:@"application/prd" fileName:@"strokedata.ptd"]; // todo - add counter to filename?
 
     [self presentViewController:picker animated:YES completion:nil];
 }
