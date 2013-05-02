@@ -55,6 +55,10 @@
 {
 }
 
+- (void)penManager:(FTPenManager *)penManager didUnpairFromPen:(FTPen *)pen
+{
+}
+
 - (void)penManager:(FTPenManager *)penManager didConnectToPen:(FTPen *)pen
 {
     long elapsed = [self currentTimeMillis] - self.startTime;

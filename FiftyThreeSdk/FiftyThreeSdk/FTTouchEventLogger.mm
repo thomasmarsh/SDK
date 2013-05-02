@@ -95,10 +95,10 @@ public:
         }
     }
 
-    virtual void HandlePenEvent(const PenEvent & event)
+    virtual void HandlePenEvent(const PenEvent::Ptr & event)
     {
         stringstream ss;
-        ss << PEN_PREFIX << event.ToString() << std::endl;
+        ss << PEN_PREFIX << event->ToString() << std::endl;
 
 #if FT_LOG_TOUCH_EVENTS_COUT
         std::cout << ss.str();

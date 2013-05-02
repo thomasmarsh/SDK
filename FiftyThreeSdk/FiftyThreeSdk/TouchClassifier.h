@@ -37,9 +37,10 @@ public:
     virtual void TouchesEnded(const fiftythree::common::TouchesSet & touches) = 0;
     virtual void TouchesCancelled(const fiftythree::common::TouchesSet & touches) = 0;
 
-    virtual void ProcessPenEvent(const PenEvent & event) = 0;
+    virtual void ProcessPenEvent(const PenEvent::Ptr & event) = 0;
     
     virtual TouchType GetTouchType(const fiftythree::common::Touch::cPtr & touch) = 0;
+    virtual Event<const common::Touch::cPtr &> & TouchTypeChanged() = 0;
 };
 
 }

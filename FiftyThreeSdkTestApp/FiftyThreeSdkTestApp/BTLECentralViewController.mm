@@ -47,9 +47,11 @@ class TouchObserver;
     std::vector<Touch::cPtr> _HighlightedTouches;
     Timer::Ptr _ConnectTimer;
     shared_ptr<TouchObserver> _TouchObserver;
+    Touch::cPtr _StrokeTouch;
 }
 
 - (void)startTrialSeparation;
+- (void)touchTypeChanged:(const Touch::cPtr &)touch;
 
 @property (nonatomic) FTPenManager *penManager;
 @property (nonatomic) id currentTest;
@@ -58,7 +60,6 @@ class TouchObserver;
 @property (nonatomic) UIAlertView *clearAlertView;
 @property (nonatomic) NSDate *updateStart;
 @property (nonatomic) GLCanvasController *canvasController;
-@property (nonatomic) UITouch *strokeTouch;
 @property (nonatomic) BOOL annotationMode;
 @property (nonatomic) BOOL pairing;
 
@@ -76,8 +77,9 @@ public:
         _vc = vc;
     }
     
-    void TouchTypeChanged(const Event<Touch::cPtr> & event, Touch::cPtr touch)
+    void TouchTypeChanged(const Event<const Touch::cPtr &> & event, const Touch::cPtr & touch)
     {
+        [_vc touchTypeChanged:touch];
     }
     
     void ShouldStartTrialSeparation(const Event<Unit> & event, Unit unit)
@@ -201,6 +203,8 @@ public:
 
 - (void)penManager:(FTPenManager *)penManager didConnectToPen:(FTPen *)pen
 {
+    _PenAndTouchManager->SetPalmRejectionEnabled(true);
+    
     if (_ConnectTimer)
     {
         NSLog(@"connect took %f seconds", _ConnectTimer->ElapsedTimeSeconds());
@@ -228,6 +232,8 @@ public:
 - (void)penManager:(FTPenManager *)penManager didDisconnectFromPen:(FTPen *)pen
 {
     NSLog(@"didDisconnectFromPen name=%@", pen.name);
+    
+    _PenAndTouchManager->SetPalmRejectionEnabled(false);
 
     [self updateDisplay];
 
@@ -247,7 +253,7 @@ public:
     }
     
     PenEvent::Ptr event = PenEvent::New([NSProcessInfo processInfo].systemUptime, PenEventType::PenDown, PenTip((PenTip::PenTipEnum)tip));
-    _PenAndTouchManager->HandlePenEvent(*event);
+    _PenAndTouchManager->HandlePenEvent(event);
 }
 
 
@@ -264,7 +270,7 @@ public:
     }
     
     PenEvent::Ptr event = PenEvent::New([NSProcessInfo processInfo].systemUptime, PenEventType::PenUp, PenTip((PenTip::PenTipEnum)tip));
-    _PenAndTouchManager->HandlePenEvent(*event);
+    _PenAndTouchManager->HandlePenEvent(event);
 }
 
 - (void)displayPenInfo:(FTPen *)pen
@@ -560,17 +566,8 @@ public:
     [self.canvasController setColorwithRed:0.0 Green:0.0 Blue:0.0 Alpha:1.0];
 }
 
-- (void)drawStrokeFromTouch:(Touch::cPtr)touch withHighlight:(BOOL)highlight
+- (void)drawStrokeFromTouch:(Touch::cPtr)touch
 {
-    if (highlight)
-    {
-        [self setInkColorRed];
-    }
-    else
-    {
-        [self setInkColorBlack];
-    }
-
     BOOST_FOREACH(const InputSample & sample, *touch->History())
     {
         if (sample == touch->History()->front())
@@ -586,6 +583,20 @@ public:
             [self.canvasController continueStroke:sample];
         }
     }
+}
+
+- (void)drawStrokeFromTouch:(Touch::cPtr)touch withHighlight:(BOOL)highlight
+{
+    if (highlight)
+    {
+        [self setInkColorRed];
+    }
+    else
+    {
+        [self setInkColorBlack];
+    }
+    
+    [self drawStrokeFromTouch:touch];
 }
 
 - (void)drawStroke:(UITouch *)uiTouch
@@ -612,14 +623,15 @@ public:
 
 - (BOOL)shouldDrawTouch:(const Touch::cPtr &)touch
 {
-    TouchType type = _PenAndTouchManager->GetTouchType(touch);
     if (self.penManager.connectedPen)
     {
+        TouchType type = _PenAndTouchManager->GetTouchType(touch);
+
         return type != TouchType::Finger;
     }
     else
     {
-        return type != TouchType::Pen;
+        return YES;
     }
 }
 
@@ -640,13 +652,10 @@ public:
         {
             Touch::cPtr touch = static_pointer_cast<TouchTrackerObjC>(TouchTracker::Instance())->TouchForUITouch(uiTouch);
 
-            if ([self shouldDrawTouch:touch] && !self.strokeTouch)
+            if ([self shouldDrawTouch:touch] && !_StrokeTouch)
             {
-                self.strokeTouch = [touches anyObject];
-                UITouch *touch = self.strokeTouch;
-                [self.canvasController beginStroke:InputSampleFromCGPoint([touch locationInView:touch.window],
-                                                                          [touch locationInView:self.view],
-                                                                          touch.timestamp)];
+                [self.canvasController beginStroke:touch->CurrentSample()];
+                _StrokeTouch = touch;
             }
         }
     }
@@ -664,12 +673,13 @@ public:
     {
         static_pointer_cast<TouchManagerObjC>(TouchManager::Instance())->ProcessTouches(touches);
 
-        if ([touches containsObject:self.strokeTouch])
+        for (UITouch *uiTouch in touches)
         {
-            UITouch *touch = self.strokeTouch;
-            [self.canvasController continueStroke:InputSampleFromCGPoint([touch locationInView:touch.window],
-                                                                         [touch locationInView:self.view],
-                                                                         touch.timestamp)];
+            Touch::cPtr touch = static_pointer_cast<TouchTrackerObjC>(TouchTracker::Instance())->TouchForUITouch(uiTouch);
+            if (touch == _StrokeTouch)
+            {
+                [self.canvasController continueStroke:touch->CurrentSample()];
+            }
         }
     }
 }
@@ -697,14 +707,15 @@ public:
     if ([self shouldProcessTouches:touches])
     {
         static_pointer_cast<TouchManagerObjC>(TouchManager::Instance())->ProcessTouches(touches);
-
-        if ([touches containsObject:self.strokeTouch])
+        
+        for (UITouch *uiTouch in touches)
         {
-            UITouch *touch = self.strokeTouch;
-            [self.canvasController endStroke:InputSampleFromCGPoint([touch locationInView:touch.window],
-                                                                    [touch locationInView:self.view],
-                                                                    touch.timestamp)];
-            self.strokeTouch = nil;
+            Touch::cPtr touch = static_pointer_cast<TouchTrackerObjC>(TouchTracker::Instance())->TouchForUITouch(uiTouch);
+            if (touch == _StrokeTouch)
+            {
+                [self.canvasController endStroke:touch->CurrentSample()];
+                _StrokeTouch.reset();
+            }
         }
     }
 }
@@ -726,10 +737,14 @@ public:
     {
         static_pointer_cast<TouchManagerObjC>(TouchManager::Instance())->ProcessTouches(touches);
 
-        if ([touches containsObject:self.strokeTouch])
+        for (UITouch *uiTouch in touches)
         {
-            [self.canvasController cancelStroke];
-            self.strokeTouch = nil;
+            Touch::cPtr touch = static_pointer_cast<TouchTrackerObjC>(TouchTracker::Instance())->TouchForUITouch(uiTouch);
+            if (touch == _StrokeTouch)
+            {
+                [self.canvasController cancelStroke];
+                _StrokeTouch.reset();
+            }
         }
     }
 }
@@ -737,6 +752,32 @@ public:
 - (void)startTrialSeparation
 {
     [self.penManager startTrialSeparation];
+}
+
+- (void)touchTypeChanged:(const Touch::cPtr &)touch
+{
+    DebugAssert(self.penManager.connectedPen);
+    
+    if (_StrokeTouch == touch)
+    {
+        if (![self shouldDrawTouch:touch])
+        {
+            _StrokeTouch.reset();
+            
+            [self.canvasController cancelStroke];
+        }
+    }
+    else if ([self shouldDrawTouch:touch])
+    {
+        if (_StrokeTouch)
+        {
+            [self.canvasController cancelStroke];
+        }
+        
+        _StrokeTouch = touch;
+    
+        [self drawStrokeFromTouch:touch];
+    }
 }
 
 - (IBAction)infoButtonPressed:(id)sender

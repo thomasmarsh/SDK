@@ -25,17 +25,13 @@ deltas = [ [], [] ]
 state = {}
 state['touches'] = {}
 state['stroke_count'] = 0
-state['last_touch'] = None
-state['last_pen'] = None
-state['min_delta'] = 0
-state['max_delta'] = 0
-state['count_over'] = 0
-state['count_under'] = 0
-
-pen_state = [ PEN_UP, PEN_UP ]
 
 class PenEvent:
-    def __init__(self, data):
+    def __init__(self, data=None):
+        if data is None:
+            self.state = PEN_UP
+            return
+
         values = data.split(',')
         self.state = int(values[0])
         self.tip = int(values[1])
@@ -73,7 +69,7 @@ class TouchEvent:
         self.x = float(values[4])
         self.y = float(values[5])
         self.timestamp = float(values[6])
-
+        
     def __repr__(self):
         if self.phase == TOUCH_BEGAN:
             phase = "BEGAN"
@@ -90,20 +86,31 @@ class TouchEvent:
             
         return "touch id=%d phase=%s time=%f" % (self.id, phase, self.timestamp)
 
-def log_delta(pen, touch):
+def log_delta():
+    pen = state['last_pen']
+    touch = state['last_touch']
+    assert((pen.state == PEN_UP and touch.phase == TOUCH_ENDED)
+           or (pen.state == PEN_DOWN and touch.phase == TOUCH_BEGAN))
+    
     delta = pen.timestamp - touch.timestamp
     deltas[pen.state].append(delta)
-
-    if delta > 0:
-        state['count_over'] += 1
-    else:
-        state['count_under'] += 1
         
     if log_deltas:
         print "pen_delta (%s, %s) %f" % (pen.tip_str(), pen.state_str(), delta)
-        
+
+def plot(x):
+    import matplotlib.pyplot as plt
+    import numpy as np
+
+    hist, bins = np.histogram(x,bins = 50)
+    width = 0.7*(bins[1]-bins[0])
+    center = (bins[:-1]+bins[1:])/2
+    plt.bar(center, hist, align = 'center', width = width)
+    plt.show()
+
 def process_touch(touch):
-    state['last_touch'] = touch
+    if touch.phase != TOUCH_MOVED:
+        state['last_touch'] = touch
     
     if touch.phase == TOUCH_BEGAN:
         if log_events:
@@ -112,19 +119,19 @@ def process_touch(touch):
         state['stroke_count'] += 1
         state['touches'][touch.id] = touch
 
-        if (pen_state[0] == PEN_DOWN or pen_state[1] == PEN_DOWN):
-            # pen happened first
-            log_delta(state['last_pen'], touch)
+        state['last_pen'] 
+        if (state['last_pen'].state == PEN_DOWN):
+            log_delta()
     elif touch.phase == TOUCH_ENDED or touch.phase == TOUCH_CANCELLED:
         ended = touch
         began = state['touches'][touch.id]
 
-        if (pen_state[0] == PEN_UP or pen_state[1] == PEN_UP):
-            # pen happened first
-            log_delta(state['last_pen'], touch)
-
         if log_events:
-            print "touch ended, duration=%f" % (ended.timestamp - began.timestamp)
+            print 'touch began: %s, duration=%f' % (touch, ended.timestamp - began.timestamp)
+
+        if (state['last_pen'].state == PEN_UP):
+            log_delta()
+
         del state['touches'][touch.id]
 #    print state['touches']
 
@@ -132,18 +139,18 @@ def process_pen(pen):
     if log_events:
         print pen
     
-    if (pen.state == pen_state[pen.tip]):
+    if (pen.state == state['last_pen'].state):
         print "WARNING: duplicate pen state received"
 
     state['last_pen'] = pen
-    pen_state[pen.tip] = pen.state
 
     if not state['last_touch']:
         return
 
-    if len(state['touches']):
-        # pen happened second
-        log_delta(pen, state['last_touch'])
+    if (pen.state == PEN_UP and state['last_touch'].phase == TOUCH_ENDED):
+        log_delta()
+    elif (pen.state == PEN_DOWN and state['last_touch'].phase == TOUCH_BEGAN):
+        log_delta()
 
 def parse_file(filename):
     f = open(filename)
@@ -162,14 +169,18 @@ def parse_file(filename):
     if len(state['touches']) != 0:
         print "WARNING: not all touches ended"
 
-    if pen_state[0] != PEN_UP or pen_state[1] != PEN_UP:
+    if state['last_pen'] != PEN_UP:
         print "WARNING: pen did not end UP"
 
+    print_summary()
+
+def print_summary():
     print "\nSUMMARY"
     print "========================="
     print "stroke count = %d" % (state['stroke_count'])
-
-    for i in [PEN_UP, PEN_DOWN]:
+    
+    for i in [ PEN_DOWN, PEN_UP ]:
+        print
         if i == PEN_UP:
             print "PEN_UP stats:"
         else:
@@ -177,13 +188,21 @@ def parse_file(filename):
             
         print "delta min = %f" % (numpy.min(deltas[i]))
         print "delta max = %f" % (numpy.max(deltas[i]))
-        print "delta %% under 0 = %f" % (float(state['count_under']) / len(deltas[i]) * 100)
-        print "delta %% over 0 = %f" % (float(state['count_over']) / len(deltas[i]) * 100)
+        count_over = len([x for x in deltas[i] if x > 0])
+        count_under = len(deltas[i]) - count_over
+        
+        print "delta %% under 0 = %f (%d/%d)" % (float(count_under) / len(deltas[i]) * 100, count_under, len(deltas[i]))
+        print "delta %% over 0 = %f (%d/%d)" % (float(count_over) / len(deltas[i]) * 100, count_over, len(deltas[i]))
         print "delta average = %f" % (numpy.average(deltas[i]))
         print "delta stddev = %f" % (numpy.std(deltas[i]))
         print "delta var = %f" % (numpy.var(deltas[i]))
+
+        plot(deltas[i])
         
 def main():
+    state['last_pen'] = PenEvent()
+    state['last_touch'] = None
+    
     parser = argparse.ArgumentParser(description='Process pen and touch logs.')
     parser.add_argument('file',
                         help='the file to read data from')

@@ -31,7 +31,7 @@ public:
     virtual void TouchesMoved(const fiftythree::common::TouchesSet & touches) = 0;
     virtual void TouchesEnded(const fiftythree::common::TouchesSet & touches) = 0;
     virtual void TouchesCancelled(const fiftythree::common::TouchesSet & touches) = 0;
-    virtual void HandlePenEvent(const PenEvent & event) = 0;
+    virtual void HandlePenEvent(const PenEvent::Ptr & event) = 0;
 
     virtual void Clear() = 0;
 
