@@ -63,6 +63,14 @@ class TouchObserver;
 @property (nonatomic) BOOL annotationMode;
 @property (nonatomic) BOOL pairing;
 
+@property (nonatomic) long tipDownCount;
+@property (nonatomic) long tipUpCount;
+@property (nonatomic) NSDate *firstTipDate;
+@property (nonatomic) NSDate *lastTipDate;
+@property (nonatomic) long connectCount;
+@property (nonatomic) NSDate *firstConnectDate;
+@property (nonatomic) NSDate *lastConnectDate;
+
 @end
 
 
@@ -203,6 +211,14 @@ public:
 
 - (void)penManager:(FTPenManager *)penManager didConnectToPen:(FTPen *)pen
 {
+    // Stats
+    self.connectCount++;
+    if (!self.firstConnectDate)
+    {
+        self.firstConnectDate = [NSDate date];
+    }
+    self.lastConnectDate = [NSDate date];
+    
     _PenAndTouchManager->SetPalmRejectionEnabled(true);
     
     if (_ConnectTimer)
@@ -241,7 +257,15 @@ public:
 }
 
 - (void)pen:(FTPen *)pen didPressTip:(FTPenTip)tip
-{
+{    
+    // Stats
+    self.tipDownCount++;
+    if (!self.firstTipDate)
+    {
+        self.firstTipDate = [NSDate date];
+    }
+    self.lastTipDate = [NSDate date];
+
     if (tip == FTPenTip1) {
         NSLog(@"Tip1 pressed");
         [self.tip1State setHighlighted:YES];
@@ -259,6 +283,14 @@ public:
 
 - (void)pen:(FTPen *)pen didReleaseTip:(FTPenTip)tip
 {
+    // Stats
+    self.tipUpCount++;
+    if (!self.firstTipDate)
+    {
+        self.firstTipDate = [NSDate date];
+    }
+    self.lastTipDate = [NSDate date];
+    
     if (tip == FTPenTip1) {
         NSLog(@"Tip1 released");
         [self.tip1State setHighlighted:NO];
@@ -530,6 +562,15 @@ public:
             _HighlightedTouches.clear();
             [self.canvasController clearCanvas];
             self.clearAlertView = nil;
+            
+            self.tipDownCount = 0;
+            self.tipUpCount = 0;
+            self.firstTipDate = nil;
+            self.lastTipDate = nil;
+            
+            self.connectCount = 0;
+            self.firstConnectDate = nil;
+            self.lastConnectDate = nil;
         }
     }
 }
@@ -782,6 +823,9 @@ public:
 
 - (IBAction)infoButtonPressed:(id)sender
 {
+    NSDateFormatter *format = [[NSDateFormatter alloc] init];
+    [format setDateFormat:@"MMM dd, yyyy HH:mm:ss"];
+    
     FTPen* pen = self.penManager.connectedPen;
     NSString *info = [NSString stringWithFormat:@"\
 Manufacturer = %@\n \
@@ -791,8 +835,20 @@ Firmware Revision = %@\n \
 Hardware Revision = %@\n \
 Software Revision = %@\n \
 System ID = %@\n \
-Battery Level = %lu\n", pen.manufacturerName, pen.modelNumber, pen.serialNumber, pen.firmwareRevision, pen.hardwareRevision,
-                      pen.softwareRevision, pen.systemId, (long)pen.batteryLevel];
+Battery Level = %lu\n \
+                      \n \
+Tip Press Count = %lu\n \
+Tip Release Count = %lu\n \
+First Tip Date = %@\n \
+Last Tip Date = %@\n \
+                      \n \
+Connect Count = %lu\n \
+First Connect Date = %@\n \
+Last Connect Date = %@\n \
+                      ", pen.manufacturerName, pen.modelNumber, pen.serialNumber, pen.firmwareRevision, pen.hardwareRevision,
+                      pen.softwareRevision, pen.systemId, (long)pen.batteryLevel,
+                      self.tipDownCount, self.tipUpCount, [format stringFromDate:self.firstTipDate], [format stringFromDate:self.lastTipDate],
+                      self.connectCount, [format stringFromDate:self.firstConnectDate], [format stringFromDate:self.lastConnectDate]];
 
     UIAlertView* alertView = [[UIAlertView alloc] initWithTitle:@"Device Information" message:info delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
     [alertView show];
