@@ -670,6 +670,7 @@
 					"$(SRCROOT)/../FiftyThreeSdk",
 				);
 				INFOPLIST_FILE = "FiftyThreeSdkTestApp/FiftyThreeSdkTestApp-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/../../../../../../Library/Developer/Xcode/DerivedData/Paper-fojnnwufckzdqwfidwyifzefweko/Build/Products/Debug-iphoneos\"",
@@ -706,6 +707,7 @@
 					"$(SRCROOT)/../FiftyThreeSdk",
 				);
 				INFOPLIST_FILE = "FiftyThreeSdkTestApp/FiftyThreeSdkTestApp-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/../../../../../../Library/Developer/Xcode/DerivedData/Paper-fojnnwufckzdqwfidwyifzefweko/Build/Products/Debug-iphoneos\"",
