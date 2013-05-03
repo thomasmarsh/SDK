@@ -29,8 +29,9 @@ PenEvent::Ptr PenEvent::FromString(const std::string & s)
 
     std::vector<std::string> remainder(parts.begin() + 2, parts.end());
 
+    InputSample sample = InputSample::FromString(boost::algorithm::join(remainder, ","));
     PenEvent::Ptr event = PenEvent::New(
-                                        InputSample::FromString(boost::algorithm::join(remainder, ",")),
+                                        sample.TimestampSeconds(),
                                         PenEventType((PenEventType::PenEventTypeEnum)boost::lexical_cast<int>(parts[0])),
                                         PenTip((PenTip::PenTipEnum)boost::lexical_cast<int>(parts[1])));
 
@@ -47,8 +48,11 @@ bool PenEvent::operator==(const PenEvent &other) const
 class PenEventImpl : public PenEvent
 {
 public:
-    PenEventImpl(fiftythree::common::InputSample sample, PenEventType type, PenTip tip)
+    PenEventImpl(double timestamp, PenEventType type, PenTip tip)
     {
+        InputSample sample(Eigen::Vector2f::Zero(),
+                           Eigen::Vector2f::Zero(),
+                           timestamp);
         Sample = sample;
         Type = type;
         Tip = tip;
@@ -57,7 +61,7 @@ public:
     ~PenEventImpl() {}
 };
 
-PenEvent::Ptr PenEvent::New(fiftythree::common::InputSample sample, PenEventType type, PenTip tip)
+PenEvent::Ptr PenEvent::New(double timestamp, PenEventType type, PenTip tip)
 {
-    return boost::make_shared<PenEventImpl>(sample, type, tip);
+    return boost::make_shared<PenEventImpl>(timestamp, type, tip);
 }

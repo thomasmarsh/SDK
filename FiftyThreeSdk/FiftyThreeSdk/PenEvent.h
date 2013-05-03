@@ -45,7 +45,7 @@ protected:
     PenEvent() {}
 
 public:
-    static PenEvent::Ptr New(fiftythree::common::InputSample sample, PenEventType type, PenTip tip);
+    static PenEvent::Ptr New(double timestamp, PenEventType type, PenTip tip);
 
     FT_NO_COPY(PenEvent)
 };

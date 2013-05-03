@@ -80,12 +80,7 @@ using namespace fiftythree::sdk;
     for (int i = 0; i < 1000; i++)
     {
 
-        InputSample s(
-                        Eigen::Vector2f(rng.Random() * std::numeric_limits<float>::max(), rng.Random() * std::numeric_limits<float>::max()),
-                        Eigen::Vector2f(rng.Random() * std::numeric_limits<float>::max(), rng.Random() * std::numeric_limits<float>::max()),
-                      rng.Random() * std::numeric_limits<float>::max());
-
-        PenEvent::Ptr e1 = PenEvent::New(s,
+                                    PenEvent::Ptr e1 = PenEvent::New(rng.Random() * std::numeric_limits<float>::max(),
                                          PenEventType((PenEventType::PenEventTypeEnum)rng.RandomIntInRange(PenEventType::PenUp, PenEventType::PenDown)),
                                          PenTip((PenTip::PenTipEnum)rng.RandomIntInRange(PenTip::Tip1, PenTip::Tip2))
                                          );
