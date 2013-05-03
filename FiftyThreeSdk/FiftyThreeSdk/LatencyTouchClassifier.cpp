@@ -17,63 +17,48 @@
 using namespace fiftythree::sdk;
 using namespace fiftythree::common;
 
-const double MAX_DELAY_MSEC = 100.0;
-const double MAX_DELAY_SEC = MAX_DELAY_MSEC / 1000;
-
-template <class T>
-void RemoveAll(std::vector<T> v, std::vector<T> removeVector)
-{
-    BOOST_FOREACH(const T & t, removeVector)
-    {
-        v.erase(std::remove(v.end(), v.begin(), t), v.end());
-    }
-}
-
-template <class T>
-void RemoveAll(std::vector<T> v, std::set<T> removeSet)
-{
-    BOOST_FOREACH(const T & t, removeSet)
-    {
-        v.erase(std::remove(v.end(), v.begin(), t), v.end());
-    }
-}
-
+const double MAX_DELAY_SEC = 0.100;
 
 class LatencyTouchClassifierImpl : public LatencyTouchClassifier
 {
 private:
-    double _PenDownTime;
-    double _PenUpTime;
-
     PenEvent::cPtr _LastPenEvent;
 
     std::vector<Touch::cPtr> _UnknownTouches;
     std::vector<Touch::cPtr> _FingerTouches;
     Touch::cPtr _PenTouch;
+    long _TouchCount;
 
     Event<const Touch::cPtr &> _TouchTypeChangedEvent;
     
 private:
     bool IsPenDown()
     {
-        return _LastPenEvent && _LastPenEvent->Type == PenEventType::PenDown;
+        return _LastPenEvent->Type == PenEventType::PenDown;
     }
 
 public:
     LatencyTouchClassifierImpl()
     :
-    _PenDownTime(0),
-    _PenUpTime(0)
-    {};
+    _TouchCount(0)
+    {
+        // Dummy so we don't need to check for null
+        _LastPenEvent = PenEvent::New(0, PenEventType::PenUp, PenTip::Tip1);
+    };
 
     virtual bool HandlesPenInput()
     {
         return true;
     }
+    
+    long CountTouches()
+    {
+        return _UnknownTouches.size() + _FingerTouches.size() + (!!_PenTouch ? 1 : 0);
+    }
 
     virtual void TouchesBegan(const fiftythree::common::TouchesSet & touches)
     {
-        //std::cout << "Touch, id = " << touch->Id() << std::endl;
+        DebugAssert(CountTouches() == _TouchCount);
         
         if (!_PenTouch && IsPenDown())
         {
@@ -81,6 +66,8 @@ public:
             
             BOOST_FOREACH(const Touch::cPtr & touch, touches)
             {
+                std::cout << "Touch BEGAN, id = " << touch->Id() << std::endl;
+                
                 double delta = std::abs(_LastPenEvent->Sample.TimestampSeconds() - touch->FirstSample().TimestampSeconds());
                 std::cout << "Touch after Pen, id = " << touch->Id() << " delta = " << delta << std::endl;
                 if (delta < MAX_DELAY_SEC)
@@ -112,55 +99,83 @@ public:
         }
         else
         {
-            _LastPenEvent.reset();
-            
-            _UnknownTouches.assign(touches.begin(), touches.end());
+            BOOST_FOREACH(const Touch::cPtr & touch, touches)
+            {
+                std::cout << "Touch BEGAN, id = " << touch->Id() << std::endl;
+                
+                _UnknownTouches.push_back(touch);
+            }
         }
+        
+        _TouchCount += touches.size();
+        DebugAssert(CountTouches() == _TouchCount);
     }
 
     virtual void TouchesMoved(const fiftythree::common::TouchesSet & touches)
     {
+        DebugAssert(CountTouches() == _TouchCount);
+        
         BOOST_FOREACH(const Touch::cPtr & touch, touches)
         {
             if (GetTouchType(touch) != TouchType::Unknown) continue;
             
             double delta = std::abs(touch->CurrentSample().TimestampSeconds() - touch->FirstSample().TimestampSeconds());
-            std::cout << "Moved delta = " << delta << std::endl;
+            //std::cout << "Moved id = " << touch->Id() << " delta = " << delta << std::endl;
             if (delta > MAX_DELAY_SEC)
             {
                 std::cout << "Touch expired, id = " << touch->Id() << std::endl;
 
-                _UnknownTouches.erase(std::remove(_UnknownTouches.end(), _UnknownTouches.begin(), touch), _UnknownTouches.end());
+                DebugAssert(find(_UnknownTouches.begin(), _UnknownTouches.end(), touch) != _UnknownTouches.end());
+                _UnknownTouches.erase(std::remove(_UnknownTouches.begin(), _UnknownTouches.end(), touch), _UnknownTouches.end());
                 _FingerTouches.push_back(touch);
                 
                 FireTouchTypeChangedEvent(touch);
             }
         }
+        
+        DebugAssert(CountTouches() == _TouchCount);
     }
 
     virtual void TouchesEnded(const fiftythree::common::TouchesSet & touches)
     {
+        DebugAssert(CountTouches() == _TouchCount);
+        
         BOOST_FOREACH(const Touch::cPtr & touch, touches)
         {
-            if (_PenTouch == touch)
+            std::cout << "Ended id = " << touch->Id() << std::endl;
+            
+            _TouchCount--;
+            
+            TouchType type = GetTouchType(touch);
+            if (type == TouchType::Pen)
             {
                 _PenTouch.reset();
-                continue;
             }
-            
-            if (GetTouchType(touch) != TouchType::Unknown) continue;
-            
-            _UnknownTouches.erase(std::remove(_UnknownTouches.end(), _UnknownTouches.begin(), touch), _UnknownTouches.end());
-            
-            // No pen event occured during the stroke, so it's a finger
-            if (!_LastPenEvent)
+            else if (type == TouchType::Finger)
             {
-                _FingerTouches.push_back(touch);
-                FireTouchTypeChangedEvent(touch);
+                DebugAssert(find(_FingerTouches.begin(), _FingerTouches.end(), touch) != _FingerTouches.end());
+                _FingerTouches.erase(std::remove(_FingerTouches.begin(), _FingerTouches.end(), touch), _FingerTouches.end());
             }
-
-            _FingerTouches.erase(std::remove(_FingerTouches.end(), _FingerTouches.begin(), touch), _FingerTouches.end());
+            else if (type == TouchType::Unknown)
+            {
+                DebugAssert(find(_UnknownTouches.begin(), _UnknownTouches.end(), touch) != _UnknownTouches.end());
+                _UnknownTouches.erase(std::remove(_UnknownTouches.begin(), _UnknownTouches.end(), touch), _UnknownTouches.end());
+                
+                // No pen event occured during the stroke, so it's a finger
+                if (_LastPenEvent->Sample.TimestampSeconds() < touch->FirstSample().TimestampSeconds() - MAX_DELAY_SEC)
+                {
+                    _FingerTouches.push_back(touch);
+                    FireTouchTypeChangedEvent(touch);   
+                    _FingerTouches.erase(std::remove(_FingerTouches.begin(), _FingerTouches.end(), touch), _FingerTouches.end());
+                }
+            }
+            else // Not Found
+            {
+                _TouchCount++; // Didn't actually remove anything
+            }
         }
+
+        DebugAssert(CountTouches() == _TouchCount);
     }
 
     virtual void TouchesCancelled(const fiftythree::common::TouchesSet & touches)
@@ -170,22 +185,29 @@ public:
 
     virtual void ProcessPenEvent(const PenEvent::Ptr & event)
     {
+        DebugAssert(CountTouches() == _TouchCount);
+
         _LastPenEvent = event;
         
-        std::cout << "PenEvent" << std::endl;
+        std::cout << "PenEvent: " << event->ToString() << std::endl;
 
-        if (!_PenTouch && IsPenDown() && _UnknownTouches.size())
+        if (!_PenTouch && IsPenDown())
         {
-            BOOST_FOREACH(const Touch::cPtr & touch, _UnknownTouches)
+            std::vector<Touch::cPtr>::iterator it = _UnknownTouches.begin();
+            while (it != _UnknownTouches.end())
             {
+                const Touch::cPtr & touch = *it;
+                
                 double delta = std::abs(_LastPenEvent->Sample.TimestampSeconds() - touch->FirstSample().TimestampSeconds());
                 std::cout << "Pen after Touch, id = " << touch->Id() << " delta= " << delta << std::endl;
-
-                _UnknownTouches.erase(std::remove(_UnknownTouches.end(), _UnknownTouches.begin(), touch), _UnknownTouches.end());
                 
                 if (delta < MAX_DELAY_SEC)
                 {
                     std::cout << "Pen is Touch, id = " << touch->Id() << std::endl;
+                    if (_PenTouch)
+                    {
+                        _FingerTouches.push_back(_PenTouch);
+                    }
 
                     _PenTouch = touch;
                     FireTouchTypeChangedEvent(touch);
@@ -195,8 +217,12 @@ public:
                     std::cout << "Pen was down but time delta was " << delta << std::endl;
                     _FingerTouches.push_back(touch);
                 }
+                
+                it = _UnknownTouches.erase(it);
             }
         }
+        
+        DebugAssert(CountTouches() == _TouchCount);
     }
     
     virtual TouchType GetTouchType(const fiftythree::common::Touch::cPtr & touch)
@@ -209,10 +235,13 @@ public:
         {
             return TouchType::Finger;
         }
+        else if (find(_UnknownTouches.begin(), _UnknownTouches.end(), touch) != _UnknownTouches.end())
+        {
+            return TouchType::Unknown;
+        }
         else
         {
-            //DebugAssert(find(_UnknownTouches.begin(), _UnknownTouches.end(), touch) != _UnknownTouches.end());
-            return TouchType::Unknown;
+            return TouchType::NotFound;
         }
     }
     

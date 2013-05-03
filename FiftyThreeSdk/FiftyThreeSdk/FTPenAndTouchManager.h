@@ -20,7 +20,8 @@ namespace sdk
 DEFINE_ENUM(TouchType,
             Finger,
             Pen,
-            Unknown);
+            Unknown,
+            NotFound);
 
 class FTPenAndTouchManager
 {
