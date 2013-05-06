@@ -22,7 +22,8 @@ const double MAX_DELAY_SEC = 0.100;
 class LatencyTouchClassifierImpl : public LatencyTouchClassifier
 {
 private:
-    PenEvent::cPtr _LastPenEvent;
+    PenEvent::cPtr _PenDownEvent;
+    PenEvent::cPtr _PenUpEvent;
 
     std::vector<Touch::cPtr> _UnknownTouches;
     std::vector<Touch::cPtr> _FingerTouches;
@@ -34,7 +35,7 @@ private:
 private:
     bool IsPenDown()
     {
-        return _LastPenEvent->Type == PenEventType::PenDown;
+        return _PenDownEvent->Sample.TimestampSeconds() > _PenUpEvent->Sample.TimestampSeconds();
     }
 
 public:
@@ -43,7 +44,8 @@ public:
     _TouchCount(0)
     {
         // Dummy so we don't need to check for null
-        _LastPenEvent = PenEvent::New(0, PenEventType::PenUp, PenTip::Tip1);
+        _PenDownEvent = PenEvent::New(0, PenEventType::PenDown, PenTip::Tip1);
+        _PenUpEvent = PenEvent::New(0, PenEventType::PenUp, PenTip::Tip1);
     };
 
     virtual bool HandlesPenInput()
@@ -55,56 +57,55 @@ public:
     {
         return _UnknownTouches.size() + _FingerTouches.size() + (!!_PenTouch ? 1 : 0);
     }
+    
+    void ComputeDeltas(const PenEvent::cPtr & penEvent)
+    {
+        double min_delta = std::numeric_limits<double>::max();
+        
+        std::vector<Touch::cPtr>::iterator it = _UnknownTouches.begin();
+        while (it != _UnknownTouches.end())
+        {
+            const Touch::cPtr & touch = *it;
+            double delta = std::abs(penEvent->Sample.TimestampSeconds() - touch->FirstSample().TimestampSeconds());
+
+            if (delta < MAX_DELAY_SEC)
+            {
+                if (delta < min_delta)
+                {
+                    min_delta = delta;
+                    if (_PenTouch)
+                    {
+                        _UnknownTouches.push_back(_PenTouch);
+                    }
+                    
+                    _PenTouch = touch;
+                    it = _UnknownTouches.erase(it);
+                }
+                else
+                {
+                    it++;
+                }
+            }
+            else
+            {
+                _FingerTouches.push_back(touch);
+                it = _UnknownTouches.erase(it);
+            }
+        }
+    }
 
     virtual void TouchesBegan(const fiftythree::common::TouchesSet & touches)
     {
         DebugAssert(CountTouches() == _TouchCount);
+
+        BOOST_FOREACH(const Touch::cPtr & touch, touches)
+        {
+            _UnknownTouches.push_back(touch);
+        }
         
         if (!_PenTouch && IsPenDown())
         {
-            double min_delta = std::numeric_limits<double>::max();
-            
-            BOOST_FOREACH(const Touch::cPtr & touch, touches)
-            {
-                std::cout << "Touch BEGAN, id = " << touch->Id() << std::endl;
-                
-                double delta = std::abs(_LastPenEvent->Sample.TimestampSeconds() - touch->FirstSample().TimestampSeconds());
-                std::cout << "Touch after Pen, id = " << touch->Id() << " delta = " << delta << std::endl;
-                if (delta < MAX_DELAY_SEC)
-                {
-                    if (delta < min_delta)
-                    {
-                        std::cout << "Touch is pen!" << std::endl;
-                    
-                        min_delta = delta;
-                        if (_PenTouch)
-                        {
-                            _UnknownTouches.push_back(_PenTouch);
-                        }
-                        
-                        _PenTouch = touch;
-                    }
-                    else
-                    {
-                        _UnknownTouches.push_back(touch);
-                    }
-                }
-                else
-                {
-                    std::cout << "Pen was down but time delta was " << delta << std::endl;
-
-                    _FingerTouches.push_back(touch);
-                }
-            }
-        }
-        else
-        {
-            BOOST_FOREACH(const Touch::cPtr & touch, touches)
-            {
-                std::cout << "Touch BEGAN, id = " << touch->Id() << std::endl;
-                
-                _UnknownTouches.push_back(touch);
-            }
+            ComputeDeltas(_PenDownEvent);
         }
         
         _TouchCount += touches.size();
@@ -114,13 +115,14 @@ public:
     virtual void TouchesMoved(const fiftythree::common::TouchesSet & touches)
     {
         DebugAssert(CountTouches() == _TouchCount);
-        
+
         BOOST_FOREACH(const Touch::cPtr & touch, touches)
         {
             if (GetTouchType(touch) != TouchType::Unknown) continue;
             
             double delta = std::abs(touch->CurrentSample().TimestampSeconds() - touch->FirstSample().TimestampSeconds());
-            //std::cout << "Moved id = " << touch->Id() << " delta = " << delta << std::endl;
+            std::cout << "Moved id = " << touch->Id() << " delta = " << delta << std::endl;
+
             if (delta > MAX_DELAY_SEC)
             {
                 std::cout << "Touch expired, id = " << touch->Id() << std::endl;
@@ -153,16 +155,15 @@ public:
             }
             else if (type == TouchType::Finger)
             {
-                DebugAssert(find(_FingerTouches.begin(), _FingerTouches.end(), touch) != _FingerTouches.end());
+                // Finger touches are removed right away
                 _FingerTouches.erase(std::remove(_FingerTouches.begin(), _FingerTouches.end(), touch), _FingerTouches.end());
             }
             else if (type == TouchType::Unknown)
             {
-                DebugAssert(find(_UnknownTouches.begin(), _UnknownTouches.end(), touch) != _UnknownTouches.end());
                 _UnknownTouches.erase(std::remove(_UnknownTouches.begin(), _UnknownTouches.end(), touch), _UnknownTouches.end());
                 
                 // No pen event occured during the stroke, so it's a finger
-                if (_LastPenEvent->Sample.TimestampSeconds() < touch->FirstSample().TimestampSeconds() - MAX_DELAY_SEC)
+                if (_PenDownEvent->Sample.TimestampSeconds() < touch->FirstSample().TimestampSeconds() - MAX_DELAY_SEC)
                 {
                     _FingerTouches.push_back(touch);
                     FireTouchTypeChangedEvent(touch);   
@@ -186,40 +187,22 @@ public:
     virtual void ProcessPenEvent(const PenEvent::Ptr & event)
     {
         DebugAssert(CountTouches() == _TouchCount);
-
-        _LastPenEvent = event;
         
-        std::cout << "PenEvent: " << event->ToString() << std::endl;
-
-        if (!_PenTouch && IsPenDown())
+        if (event->Type == PenEventType::PenDown)
         {
-            std::vector<Touch::cPtr>::iterator it = _UnknownTouches.begin();
-            while (it != _UnknownTouches.end())
-            {
-                const Touch::cPtr & touch = *it;
-                
-                double delta = std::abs(_LastPenEvent->Sample.TimestampSeconds() - touch->FirstSample().TimestampSeconds());
-                std::cout << "Pen after Touch, id = " << touch->Id() << " delta= " << delta << std::endl;
-                
-                if (delta < MAX_DELAY_SEC)
-                {
-                    std::cout << "Pen is Touch, id = " << touch->Id() << std::endl;
-                    if (_PenTouch)
-                    {
-                        _FingerTouches.push_back(_PenTouch);
-                    }
+            _PenDownEvent = event;
 
-                    _PenTouch = touch;
-                    FireTouchTypeChangedEvent(touch);
-                }
-                else
-                {
-                    std::cout << "Pen was down but time delta was " << delta << std::endl;
-                    _FingerTouches.push_back(touch);
-                }
-                
-                it = _UnknownTouches.erase(it);
+            Touch::cPtr oldPenTouch = _PenTouch;
+            ComputeDeltas(_PenDownEvent);
+            
+            if (oldPenTouch && oldPenTouch != _PenTouch)
+            {
+                FireTouchTypeChangedEvent(_PenTouch);
             }
+        }
+        else
+        {
+            _PenUpEvent = event;
         }
         
         DebugAssert(CountTouches() == _TouchCount);
