@@ -58,9 +58,10 @@ public:
         return _UnknownTouches.size() + _FingerTouches.size() + (!!_PenTouch ? 1 : 0);
     }
     
-    void ComputeDeltas(const PenEvent::cPtr & penEvent)
+    void ComputeDeltas(const PenEvent::cPtr & penEvent, std::vector<Touch::cPtr> changedTouches)
     {
         double min_delta = std::numeric_limits<double>::max();
+        Touch::cPtr oldPenTouch = _PenTouch;
         
         std::vector<Touch::cPtr>::iterator it = _UnknownTouches.begin();
         while (it != _UnknownTouches.end())
@@ -89,8 +90,16 @@ public:
             else
             {
                 _FingerTouches.push_back(touch);
+                changedTouches.push_back(touch);
+                
                 it = _UnknownTouches.erase(it);
             }
+        }
+        
+        if (oldPenTouch && oldPenTouch != _PenTouch)
+        {
+            changedTouches.push_back(oldPenTouch);
+            changedTouches.push_back(_PenTouch);
         }
     }
 
@@ -105,7 +114,8 @@ public:
         
         if (!_PenTouch && IsPenDown())
         {
-            ComputeDeltas(_PenDownEvent);
+            std::vector<Touch::cPtr> changedTouches;
+            ComputeDeltas(_PenDownEvent, changedTouches);
         }
         
         _TouchCount += touches.size();
@@ -192,12 +202,12 @@ public:
         {
             _PenDownEvent = event;
 
-            Touch::cPtr oldPenTouch = _PenTouch;
-            ComputeDeltas(_PenDownEvent);
+            std::vector<Touch::cPtr> changedTouches;
+            ComputeDeltas(_PenDownEvent, changedTouches);
             
-            if (oldPenTouch && oldPenTouch != _PenTouch)
+            BOOST_FOREACH(const Touch::cPtr & touch, changedTouches)
             {
-                FireTouchTypeChangedEvent(_PenTouch);
+                FireTouchTypeChangedEvent(touch);
             }
         }
         else
