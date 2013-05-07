@@ -95,6 +95,11 @@ public:
         [_vc startTrialSeparation];
     }
     
+    void EngineError(const Event<const std::string &> & event, const std::string & str)
+    {
+        std::cout << str << std::endl;
+    }
+    
 };
 
 
@@ -134,6 +139,7 @@ public:
     [self.canvasController setBrush:@"Rollerball"];
     self.canvasController.view.hidden = NO;
     self.canvasController.paused = NO;
+    self.canvasController.engine->UnexpectedError().AddListener(_TouchObserver, &TouchObserver::EngineError);
     [self.view addSubview:self.canvasController.view];
     [self.view sendSubviewToBack:self.canvasController.view];
 
@@ -562,6 +568,7 @@ public:
             _HighlightedTouches.clear();
             [self.canvasController clearCanvas];
             self.clearAlertView = nil;
+            _StrokeTouch.reset();
             
             self.tipDownCount = 0;
             self.tipUpCount = 0;

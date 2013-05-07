@@ -17,7 +17,7 @@
 using namespace fiftythree::sdk;
 using namespace fiftythree::common;
 
-const double MAX_DELAY_SEC = 0.100;
+const double MAX_DELAY_SEC = 0.300;
 
 class LatencyTouchClassifierImpl : public LatencyTouchClassifier
 {
@@ -84,7 +84,7 @@ public:
                 }
                 else
                 {
-                    it++;
+                    ++it;
                 }
             }
             else
@@ -162,6 +162,14 @@ public:
             if (type == TouchType::Pen)
             {
                 _PenTouch.reset();
+                
+                // No pen event occured during the stroke, so it's a finger
+                if (_PenDownEvent->Sample.TimestampSeconds() < touch->FirstSample().TimestampSeconds() - MAX_DELAY_SEC)
+                {
+                    _FingerTouches.push_back(touch);
+                    FireTouchTypeChangedEvent(touch);
+                    _FingerTouches.erase(std::remove(_FingerTouches.begin(), _FingerTouches.end(), touch), _FingerTouches.end());
+                }
             }
             else if (type == TouchType::Finger)
             {
