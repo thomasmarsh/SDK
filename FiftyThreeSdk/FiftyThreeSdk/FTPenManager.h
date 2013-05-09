@@ -43,8 +43,4 @@ typedef NS_ENUM(NSInteger, FTPenManagerState) {
 - (void)penManager:(FTPenManager *)penManager didUpdateDeviceInfo:(FTPen *)pen;
 - (void)penManager:(FTPenManager *)penManager didUpdateDeviceBatteryLevel:(FTPen *)pen;
 
-@optional
-
-- (void)didDetectMultitaskingGesturesEnabled;
-
 @end
