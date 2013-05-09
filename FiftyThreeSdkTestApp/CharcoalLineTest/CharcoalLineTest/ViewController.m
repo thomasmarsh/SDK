@@ -85,14 +85,26 @@
     [self updateDisplay];
 }
 
+- (void)sendCharacter:(uint8_t)c
+{
+    if (self.pcConnected)
+    {
+        [self.rscManager write:&c Length:sizeof(c)];
+    }
+}
+
 - (void)pen:(FTPen *)pen didPressTip:(FTPenTip)tip
 {
     if (tip == FTPenTip1) {
         //        NSLog(@"Tip1 pressed");
         [self.tip1State setHighlighted:YES];
+        
+        [self sendCharacter:'A'];
     } else if (tip == FTPenTip2) {
         //        NSLog(@"Tip2 pressed");
         [self.tip2State setHighlighted:YES];
+
+        [self sendCharacter:'B'];
     } else {
         NSLog(@"WARNING: Unsupported tip pressed");
     }    
@@ -104,9 +116,13 @@
     if (tip == FTPenTip1) {
         //        NSLog(@"Tip1 released");
         [self.tip1State setHighlighted:NO];
+        
+        [self sendCharacter:'a'];
     } else if (tip == FTPenTip2) {
         //        NSLog(@"Tip1 released");
         [self.tip2State setHighlighted:NO];
+        
+        [self sendCharacter:'b'];
     } else {
         NSLog(@"WARNING: Unsupported tip released");
     }
@@ -254,6 +270,28 @@
     [alertView show];
 }
 
+- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
+{
+    [self sendCharacter:'T'];
+    [self.touchButton setHighlighted:YES];
+}
+
+- (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
+{
+    
+}
+
+- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
+{
+    [self sendCharacter:'t'];
+    [self.touchButton setHighlighted:NO];
+}
+
+- (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event
+{
+    
+}
+
 #pragma mark -
 #pragma mark RSC delegate
 
@@ -261,13 +299,17 @@
 // protocol is the string which matched from the protocol list passed to initWithProtocol:
 - (void) cableConnected:(NSString *)protocol
 {
+    [self.rscManager open];
     
+    self.pcConnected = YES;
+    [self updateDisplay];
 }
 
 // Redpark Serial Cable was disconnected and/or application moved to background
 - (void) cableDisconnected
 {
-    
+    self.pcConnected = NO;
+    [self updateDisplay];
 }
 
 // serial port status has changed
