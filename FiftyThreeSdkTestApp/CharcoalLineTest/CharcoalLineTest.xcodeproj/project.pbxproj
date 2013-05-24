@@ -11,10 +11,6 @@
 		34986FDF174FAF8800A3088E /* libCommon.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 34986FDA174FAF7C00A3088E /* libCommon.a */; };
 		349CF247174ECF9900F9DCA9 /* Paper_Icon-72.png in Resources */ = {isa = PBXBuildFile; fileRef = 349CF241174ECF9900F9DCA9 /* Paper_Icon-72.png */; };
 		349CF248174ECF9900F9DCA9 /* Paper_Icon-72@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 349CF242174ECF9900F9DCA9 /* Paper_Icon-72@2x.png */; };
-		349CF249174ECF9900F9DCA9 /* Paper_Icon-SearchResults.png in Resources */ = {isa = PBXBuildFile; fileRef = 349CF243174ECF9900F9DCA9 /* Paper_Icon-SearchResults.png */; };
-		349CF24A174ECF9900F9DCA9 /* Paper_Icon-SearchResults@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 349CF244174ECF9900F9DCA9 /* Paper_Icon-SearchResults@2x.png */; };
-		349CF24B174ECF9900F9DCA9 /* Paper_Icon-Small.png in Resources */ = {isa = PBXBuildFile; fileRef = 349CF245174ECF9900F9DCA9 /* Paper_Icon-Small.png */; };
-		349CF24C174ECF9900F9DCA9 /* Paper_Icon-Small@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 349CF246174ECF9900F9DCA9 /* Paper_Icon-Small@2x.png */; };
 		6669CFFC173C008C00BB15C3 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6669CFFB173C008C00BB15C3 /* UIKit.framework */; };
 		6669CFFE173C008C00BB15C3 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6669CFFD173C008C00BB15C3 /* Foundation.framework */; };
 		6669D000173C008C00BB15C3 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6669CFFF173C008C00BB15C3 /* CoreGraphics.framework */; };
@@ -87,10 +83,6 @@
 		34986FD4174FAF7B00A3088E /* Common.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Common.xcodeproj; path = ../../../Common/Common.xcodeproj; sourceTree = "<group>"; };
 		349CF241174ECF9900F9DCA9 /* Paper_Icon-72.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Paper_Icon-72.png"; sourceTree = "<group>"; };
 		349CF242174ECF9900F9DCA9 /* Paper_Icon-72@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Paper_Icon-72@2x.png"; sourceTree = "<group>"; };
-		349CF243174ECF9900F9DCA9 /* Paper_Icon-SearchResults.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Paper_Icon-SearchResults.png"; sourceTree = "<group>"; };
-		349CF244174ECF9900F9DCA9 /* Paper_Icon-SearchResults@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Paper_Icon-SearchResults@2x.png"; sourceTree = "<group>"; };
-		349CF245174ECF9900F9DCA9 /* Paper_Icon-Small.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Paper_Icon-Small.png"; sourceTree = "<group>"; };
-		349CF246174ECF9900F9DCA9 /* Paper_Icon-Small@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Paper_Icon-Small@2x.png"; sourceTree = "<group>"; };
 		6669CFF8173C008C00BB15C3 /* CharcoalLineTest.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CharcoalLineTest.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6669CFFB173C008C00BB15C3 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		6669CFFD173C008C00BB15C3 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -221,10 +213,6 @@
 			children = (
 				349CF241174ECF9900F9DCA9 /* Paper_Icon-72.png */,
 				349CF242174ECF9900F9DCA9 /* Paper_Icon-72@2x.png */,
-				349CF243174ECF9900F9DCA9 /* Paper_Icon-SearchResults.png */,
-				349CF244174ECF9900F9DCA9 /* Paper_Icon-SearchResults@2x.png */,
-				349CF245174ECF9900F9DCA9 /* Paper_Icon-Small.png */,
-				349CF246174ECF9900F9DCA9 /* Paper_Icon-Small@2x.png */,
 				6669D003173C008C00BB15C3 /* CharcoalLineTest-Info.plist */,
 				6669D004173C008C00BB15C3 /* InfoPlist.strings */,
 				6669D007173C008C00BB15C3 /* main.mm */,
@@ -396,10 +384,6 @@
 				6669D05C173C066800BB15C3 /* ViewController.xib in Resources */,
 				349CF247174ECF9900F9DCA9 /* Paper_Icon-72.png in Resources */,
 				349CF248174ECF9900F9DCA9 /* Paper_Icon-72@2x.png in Resources */,
-				349CF249174ECF9900F9DCA9 /* Paper_Icon-SearchResults.png in Resources */,
-				349CF24A174ECF9900F9DCA9 /* Paper_Icon-SearchResults@2x.png in Resources */,
-				349CF24B174ECF9900F9DCA9 /* Paper_Icon-Small.png in Resources */,
-				349CF24C174ECF9900F9DCA9 /* Paper_Icon-Small@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
