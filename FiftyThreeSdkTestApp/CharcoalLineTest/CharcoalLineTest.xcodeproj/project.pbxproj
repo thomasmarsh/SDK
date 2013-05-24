@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		34986FD0174FAC8300A3088E /* libFiftyThreeSdk.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 34986FCD174FAC6400A3088E /* libFiftyThreeSdk.a */; };
+		34986FDF174FAF8800A3088E /* libCommon.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 34986FDA174FAF7C00A3088E /* libCommon.a */; };
 		349CF247174ECF9900F9DCA9 /* Paper_Icon-72.png in Resources */ = {isa = PBXBuildFile; fileRef = 349CF241174ECF9900F9DCA9 /* Paper_Icon-72.png */; };
 		349CF248174ECF9900F9DCA9 /* Paper_Icon-72@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 349CF242174ECF9900F9DCA9 /* Paper_Icon-72@2x.png */; };
 		349CF249174ECF9900F9DCA9 /* Paper_Icon-SearchResults.png in Resources */ = {isa = PBXBuildFile; fileRef = 349CF243174ECF9900F9DCA9 /* Paper_Icon-SearchResults.png */; };
@@ -31,13 +33,46 @@
 		6669D058173C01B400BB15C3 /* libRscMgrUniv.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6669D057173C01B400BB15C3 /* libRscMgrUniv.a */; };
 		6669D05A173C038B00BB15C3 /* ExternalAccessory.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6669D059173C038B00BB15C3 /* ExternalAccessory.framework */; };
 		6669D05C173C066800BB15C3 /* ViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6669D05B173C066800BB15C3 /* ViewController.xib */; };
-		6669D05E173C0CCC00BB15C3 /* libFiftyThreeSdk.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6669D05D173C0CCC00BB15C3 /* libFiftyThreeSdk.a */; };
 		6669D060173C0D3900BB15C3 /* CoreBluetooth.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6669D05F173C0D3900BB15C3 /* CoreBluetooth.framework */; };
-		6669D062173C0D4E00BB15C3 /* libCommon.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6669D061173C0D4E00BB15C3 /* libCommon.a */; };
 		6669D064173C0D6E00BB15C3 /* boost.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6669D063173C0D6E00BB15C3 /* boost.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		34986FCC174FAC6400A3088E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 34986FC8174FAC6300A3088E /* FiftyThreeSdk.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 66A8387116E52D840048FFE4;
+			remoteInfo = FiftyThreeSdk;
+		};
+		34986FCE174FAC7E00A3088E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 34986FC8174FAC6300A3088E /* FiftyThreeSdk.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 66A8387016E52D840048FFE4;
+			remoteInfo = FiftyThreeSdk;
+		};
+		34986FD9174FAF7C00A3088E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 34986FD4174FAF7B00A3088E /* Common.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = B96AD1D213949F8F0036028E;
+			remoteInfo = Common;
+		};
+		34986FDB174FAF7C00A3088E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 34986FD4174FAF7B00A3088E /* Common.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = B96AD1DF13949F8F0036028E;
+			remoteInfo = CommonTests;
+		};
+		34986FDD174FAF8300A3088E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 34986FD4174FAF7B00A3088E /* Common.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = B96AD1D113949F8F0036028E;
+			remoteInfo = Common;
+		};
 		6669D023173C008D00BB15C3 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 6669CFF0173C008C00BB15C3 /* Project object */;
@@ -48,6 +83,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		34986FC8174FAC6300A3088E /* FiftyThreeSdk.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = FiftyThreeSdk.xcodeproj; path = ../../FiftyThreeSdk/FiftyThreeSdk.xcodeproj; sourceTree = "<group>"; };
+		34986FD4174FAF7B00A3088E /* Common.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Common.xcodeproj; path = ../../../Common/Common.xcodeproj; sourceTree = "<group>"; };
 		349CF241174ECF9900F9DCA9 /* Paper_Icon-72.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Paper_Icon-72.png"; sourceTree = "<group>"; };
 		349CF242174ECF9900F9DCA9 /* Paper_Icon-72@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Paper_Icon-72@2x.png"; sourceTree = "<group>"; };
 		349CF243174ECF9900F9DCA9 /* Paper_Icon-SearchResults.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Paper_Icon-SearchResults.png"; sourceTree = "<group>"; };
@@ -80,9 +117,7 @@
 		6669D057173C01B400BB15C3 /* libRscMgrUniv.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libRscMgrUniv.a; sourceTree = "<group>"; };
 		6669D059173C038B00BB15C3 /* ExternalAccessory.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ExternalAccessory.framework; path = System/Library/Frameworks/ExternalAccessory.framework; sourceTree = SDKROOT; };
 		6669D05B173C066800BB15C3 /* ViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ViewController.xib; sourceTree = "<group>"; };
-		6669D05D173C0CCC00BB15C3 /* libFiftyThreeSdk.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libFiftyThreeSdk.a; path = "../../../../../../../Library/Developer/Xcode/DerivedData/FiftyThreeSdkTestApp-fqhrggmyvwwfhzgakxbhthwwiptp/Build/Products/Debug-iphoneos/libFiftyThreeSdk.a"; sourceTree = "<group>"; };
 		6669D05F173C0D3900BB15C3 /* CoreBluetooth.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreBluetooth.framework; path = System/Library/Frameworks/CoreBluetooth.framework; sourceTree = SDKROOT; };
-		6669D061173C0D4E00BB15C3 /* libCommon.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libCommon.a; path = "../../../../../../../Library/Developer/Xcode/DerivedData/FiftyThreeSdkTestApp-fqhrggmyvwwfhzgakxbhthwwiptp/Build/Products/Debug-iphoneos/libCommon.a"; sourceTree = "<group>"; };
 		6669D063173C0D6E00BB15C3 /* boost.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = boost.framework; path = ../../../ThirdParty/boost/framework/boost.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -91,10 +126,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				34986FDF174FAF8800A3088E /* libCommon.a in Frameworks */,
+				34986FD0174FAC8300A3088E /* libFiftyThreeSdk.a in Frameworks */,
 				6669D064173C0D6E00BB15C3 /* boost.framework in Frameworks */,
-				6669D062173C0D4E00BB15C3 /* libCommon.a in Frameworks */,
 				6669D060173C0D3900BB15C3 /* CoreBluetooth.framework in Frameworks */,
-				6669D05E173C0CCC00BB15C3 /* libFiftyThreeSdk.a in Frameworks */,
 				6669D05A173C038B00BB15C3 /* ExternalAccessory.framework in Frameworks */,
 				6669CFFC173C008C00BB15C3 /* UIKit.framework in Frameworks */,
 				6669CFFE173C008C00BB15C3 /* Foundation.framework in Frameworks */,
@@ -116,6 +151,23 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		34986FC9174FAC6300A3088E /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				34986FCD174FAC6400A3088E /* libFiftyThreeSdk.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		34986FD5174FAF7B00A3088E /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				34986FDA174FAF7C00A3088E /* libCommon.a */,
+				34986FDC174FAF7C00A3088E /* CommonTests.octest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		6669CFEF173C008C00BB15C3 = {
 			isa = PBXGroup;
 			children = (
@@ -139,10 +191,10 @@
 		6669CFFA173C008C00BB15C3 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				34986FD4174FAF7B00A3088E /* Common.xcodeproj */,
+				34986FC8174FAC6300A3088E /* FiftyThreeSdk.xcodeproj */,
 				6669D063173C0D6E00BB15C3 /* boost.framework */,
-				6669D061173C0D4E00BB15C3 /* libCommon.a */,
 				6669D05F173C0D3900BB15C3 /* CoreBluetooth.framework */,
-				6669D05D173C0CCC00BB15C3 /* libFiftyThreeSdk.a */,
 				6669D059173C038B00BB15C3 /* ExternalAccessory.framework */,
 				6669CFFB173C008C00BB15C3 /* UIKit.framework */,
 				6669CFFD173C008C00BB15C3 /* Foundation.framework */,
@@ -244,6 +296,8 @@
 			buildRules = (
 			);
 			dependencies = (
+				34986FDE174FAF8300A3088E /* PBXTargetDependency */,
+				34986FCF174FAC7E00A3088E /* PBXTargetDependency */,
 			);
 			name = CharcoalLineTest;
 			productName = CharcoalLineTest;
@@ -288,6 +342,16 @@
 			mainGroup = 6669CFEF173C008C00BB15C3;
 			productRefGroup = 6669CFF9173C008C00BB15C3 /* Products */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = 34986FD5174FAF7B00A3088E /* Products */;
+					ProjectRef = 34986FD4174FAF7B00A3088E /* Common.xcodeproj */;
+				},
+				{
+					ProductGroup = 34986FC9174FAC6300A3088E /* Products */;
+					ProjectRef = 34986FC8174FAC6300A3088E /* FiftyThreeSdk.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				6669CFF7173C008C00BB15C3 /* CharcoalLineTest */,
@@ -295,6 +359,30 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		34986FCD174FAC6400A3088E /* libFiftyThreeSdk.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libFiftyThreeSdk.a;
+			remoteRef = 34986FCC174FAC6400A3088E /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		34986FDA174FAF7C00A3088E /* libCommon.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libCommon.a;
+			remoteRef = 34986FD9174FAF7C00A3088E /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		34986FDC174FAF7C00A3088E /* CommonTests.octest */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = CommonTests.octest;
+			remoteRef = 34986FDB174FAF7C00A3088E /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
 		6669CFF6173C008C00BB15C3 /* Resources */ = {
@@ -363,6 +451,16 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		34986FCF174FAC7E00A3088E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = FiftyThreeSdk;
+			targetProxy = 34986FCE174FAC7E00A3088E /* PBXContainerItemProxy */;
+		};
+		34986FDE174FAF8300A3088E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = Common;
+			targetProxy = 34986FDD174FAF8300A3088E /* PBXContainerItemProxy */;
+		};
 		6669D024173C008D00BB15C3 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 6669CFF7173C008C00BB15C3 /* CharcoalLineTest */;
@@ -460,6 +558,10 @@
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "CharcoalLineTest/CharcoalLineTest-Prefix.pch";
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/../../FiftyThreeSdk",
+					"$(SRCROOT)/../../../Common",
+				);
 				INFOPLIST_FILE = "CharcoalLineTest/CharcoalLineTest-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
 				LIBRARY_SEARCH_PATHS = (
@@ -485,6 +587,10 @@
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "CharcoalLineTest/CharcoalLineTest-Prefix.pch";
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/../../FiftyThreeSdk",
+					"$(SRCROOT)/../../../Common",
+				);
 				INFOPLIST_FILE = "CharcoalLineTest/CharcoalLineTest-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
 				LIBRARY_SEARCH_PATHS = (

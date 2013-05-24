@@ -10,12 +10,9 @@
 		661993D416EE6D5400B2BEE9 /* FTBatteryClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 661993D316EE6D5400B2BEE9 /* FTBatteryClient.m */; };
 		663AFED616FA511300681A90 /* TouchClassifierManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 663AFED416FA511300681A90 /* TouchClassifierManager.cpp */; };
 		663AFED916FA6BD800681A90 /* PenEvent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 663AFED716FA6BD800681A90 /* PenEvent.cpp */; };
-		6644313016F3CA3F0049E570 /* FTPenManager+Private.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 66D2B4A116F2A8A900E11FE6 /* FTPenManager+Private.h */; };
-		6644313116F3CA3F0049E570 /* FTPen+Private.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 665C1F5E16F0F23100F1BCB7 /* FTPen+Private.h */; };
 		6644317116F7F9EE0049E570 /* libCommon.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6644317016F7F9EE0049E570 /* libCommon.a */; };
 		6665F81C170F8B6F0027BAD1 /* FTTouchEventLogger.mm in Sources */ = {isa = PBXBuildFile; fileRef = 6665F81B170F8B6F0027BAD1 /* FTTouchEventLogger.mm */; };
 		666DC55E170CF33C00D6B3C2 /* FTApplication.mm in Sources */ = {isa = PBXBuildFile; fileRef = 666DC55D170CF33C00D6B3C2 /* FTApplication.mm */; };
-		666DC560170CF41B00D6B3C2 /* FTApplication.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 666DC55C170CF33C00D6B3C2 /* FTApplication.h */; };
 		66A8387516E52D840048FFE4 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 66A8387416E52D840048FFE4 /* Foundation.framework */; };
 		66B6E3EA16F9255C00251B6A /* LatencyTouchClassifier.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 66B6E3E816F9255C00251B6A /* LatencyTouchClassifier.cpp */; };
 		66BEC2861703B397009207F9 /* FTFirmwareManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 66BEC2851703B397009207F9 /* FTFirmwareManager.m */; };
@@ -24,26 +21,7 @@
 		66D779BA16E57461001C4F55 /* FTPen.m in Sources */ = {isa = PBXBuildFile; fileRef = 66D779B316E57461001C4F55 /* FTPen.m */; };
 		66D779BB16E57461001C4F55 /* FTPenManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 66D779B516E57461001C4F55 /* FTPenManager.m */; };
 		66D779BC16E57461001C4F55 /* TIUpdateManager.mm in Sources */ = {isa = PBXBuildFile; fileRef = 66D779B816E57461001C4F55 /* TIUpdateManager.mm */; };
-		66D779BD16E574CE001C4F55 /* FTPen.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 66D779B116E57461001C4F55 /* FTPen.h */; };
-		66D779BE16E574CE001C4F55 /* FTPenManager.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 66D779B416E57461001C4F55 /* FTPenManager.h */; };
 /* End PBXBuildFile section */
-
-/* Begin PBXCopyFilesBuildPhase section */
-		66A8386F16E52D840048FFE4 /* CopyFiles */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "include/${PRODUCT_NAME}";
-			dstSubfolderSpec = 16;
-			files = (
-				666DC560170CF41B00D6B3C2 /* FTApplication.h in CopyFiles */,
-				6644313016F3CA3F0049E570 /* FTPenManager+Private.h in CopyFiles */,
-				6644313116F3CA3F0049E570 /* FTPen+Private.h in CopyFiles */,
-				66D779BD16E574CE001C4F55 /* FTPen.h in CopyFiles */,
-				66D779BE16E574CE001C4F55 /* FTPenManager.h in CopyFiles */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		661993D216EE6D5400B2BEE9 /* FTBatteryClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FTBatteryClient.h; path = FiftyThreeSdk/FTBatteryClient.h; sourceTree = SOURCE_ROOT; };
@@ -209,7 +187,6 @@
 			buildPhases = (
 				66A8386D16E52D840048FFE4 /* Sources */,
 				66A8386E16E52D840048FFE4 /* Frameworks */,
-				66A8386F16E52D840048FFE4 /* CopyFiles */,
 			);
 			buildRules = (
 			);

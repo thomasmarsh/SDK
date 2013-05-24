@@ -8,6 +8,9 @@
       location = "container:FiftyThreeSdkTestApp.xcodeproj">
    </FileRef>
    <FileRef
+      location = "group:../FiftyThreeSdk/FiftyThreeSdk.xcodeproj">
+   </FileRef>
+   <FileRef
       location = "group:../../Common/Common.xcodeproj">
    </FileRef>
    <FileRef
@@ -15,5 +18,8 @@
    </FileRef>
    <FileRef
       location = "group:../../GlobalSettings/GlobalSettings.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:../../AFNetworking/AFNetworking.xcodeproj">
    </FileRef>
 </Workspace>
