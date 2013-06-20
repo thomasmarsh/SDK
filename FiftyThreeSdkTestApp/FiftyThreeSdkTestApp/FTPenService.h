@@ -1,6 +1,6 @@
 //
 //  FTPenService.h
-//  charcoal-prototype
+//  FiftyThreeSdkTestApp
 //
 //  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
 //
@@ -12,8 +12,8 @@
 @interface FTPenService : NSObject
 
 @property (nonatomic) BOOL secure;
-@property (nonatomic) BOOL tip1Pressed;
-@property (nonatomic) BOOL tip2Pressed;
+@property (nonatomic) BOOL isTipPressed;
+@property (nonatomic) BOOL isEraserPressed;
 @property (nonatomic) id<FTPenServiceDelegate> delegate;
 
 @end

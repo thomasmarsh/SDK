@@ -1,6 +1,6 @@
 //
 //  BTLEPeripheralViewController.mm
-//  charcoal-prototype
+//  FiftyThreeSdkTestApp
 //
 //  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
 //
@@ -67,32 +67,32 @@
 
 - (IBAction)tip1TouchUpInside:(id)sender
 {
-    self.penService.tip1Pressed = NO;
+    self.penService.isTipPressed = NO;
 }
 
 - (IBAction)tip1TouchUpOutside:(id)sender
 {
-    self.penService.tip1Pressed = NO;
+    self.penService.isTipPressed = NO;
 }
 
 - (IBAction)tip1TouchDown:(id)sender
 {
-    self.penService.tip1Pressed = YES;
+    self.penService.isTipPressed = YES;
 }
 
 - (IBAction)tip2TouchUpInside:(id)sender
 {
-    self.penService.tip2Pressed = NO;
+    self.penService.isEraserPressed = NO;
 }
 
 - (IBAction)tip2TouchUpOutside:(id)sender
 {
-    self.penService.tip2Pressed = NO;
+    self.penService.isEraserPressed = NO;
 }
 
 - (IBAction)tip2TouchDown:(id)sender
 {
-    self.penService.tip2Pressed = YES;
+    self.penService.isEraserPressed = YES;
 }
 
 @end

@@ -43,7 +43,8 @@ static const double kPairingReleaseWindowSeconds = 0.100;
 - (id)initWithDelegate:(id<FTPenManagerDelegate>)delegate;
 {
     self = [super init];
-    if (self) {
+    if (self)
+    {
         _state = FTPenManagerStateUnavailable;
         _delegate = delegate;
         _centralManager = [[CBCentralManager alloc] initWithDelegate:self queue:nil];
@@ -57,20 +58,25 @@ static const double kPairingReleaseWindowSeconds = 0.100;
 
 - (void)scan
 {
-    [self.centralManager scanForPeripheralsWithServices:
-     @[[CBUUID UUIDWithString:FT_PEN_SERVICE_UUID]]
-                                                options:nil];
+    NSLog(@"FTPenManager scan");
+
+    NSDictionary *options = @{ CBCentralManagerScanOptionAllowDuplicatesKey : @NO };
+    [self.centralManager scanForPeripheralsWithServices:@[[CBUUID UUIDWithCFUUID:FT_PEN_SERVICE_UUID]]
+                                                options:options];
 }
 
 - (void)startFalsePairingTimer
 {
-    if (self.falsePairingTimer) return;
+    if (self.falsePairingTimer)
+    {
+        return;
+    }
 
     self.falsePairingTimer = [NSTimer scheduledTimerWithTimeInterval:kPairingReleaseWindowSeconds
-                                                         target:self
-                                                       selector:@selector(falsePairingTimerExpired:)
-                                                       userInfo:nil
-                                                        repeats:NO];
+                                                              target:self
+                                                            selector:@selector(falsePairingTimerExpired:)
+                                                            userInfo:nil
+                                                             repeats:NO];
 }
 
 - (void)resetFalsePairingInfo
@@ -287,7 +293,7 @@ static const double kPairingReleaseWindowSeconds = 0.100;
     NSLog(@"Peripheral Connected");
 
     peripheral.delegate = self;
-    [peripheral discoverServices:@[[CBUUID UUIDWithString:FT_PEN_SERVICE_UUID]]];
+    [peripheral discoverServices:@[[CBUUID UUIDWithCFUUID:FT_PEN_SERVICE_UUID]]];
 }
 
 - (void)centralManager:(CBCentralManager *)central didDisconnectPeripheral:(CBPeripheral *)peripheral
@@ -341,11 +347,13 @@ static const double kPairingReleaseWindowSeconds = 0.100;
     // Discover the characteristic we want...
 
     // Loop through the newly filled peripheral.services array, just in case there's more than one.
-    for (CBService *service in peripheral.services) {
+    for (CBService *service in peripheral.services)
+    {
         [peripheral discoverCharacteristics:@[
-         [CBUUID UUIDWithString:FT_PEN_TIP1_STATE_UUID],
-         [CBUUID UUIDWithString:FT_PEN_TIP2_STATE_UUID]
-         ] forService:service];
+         [CBUUID UUIDWithCFUUID:FT_PEN_SERVICE_IS_TIP_PRESSED_UUID],
+         [CBUUID UUIDWithCFUUID:FT_PEN_SERVICE_IS_ERASER_PRESSED_UUID]
+         ]
+                                 forService:service];
     }
 }
 
@@ -364,8 +372,8 @@ static const double kPairingReleaseWindowSeconds = 0.100;
     for (CBCharacteristic *characteristic in service.characteristics) {
 
         // And check if it's the right one
-        if ([characteristic.UUID isEqual:[CBUUID UUIDWithString:FT_PEN_TIP1_STATE_UUID]]
-            || [characteristic.UUID isEqual:[CBUUID UUIDWithString:FT_PEN_TIP2_STATE_UUID]]
+        if ([characteristic.UUID isEqual:[CBUUID UUIDWithCFUUID:FT_PEN_SERVICE_IS_TIP_PRESSED_UUID]]
+            || [characteristic.UUID isEqual:[CBUUID UUIDWithCFUUID:FT_PEN_SERVICE_IS_ERASER_PRESSED_UUID]]
         ) {
 
             // If it is, subscribe to it
@@ -379,35 +387,45 @@ static const double kPairingReleaseWindowSeconds = 0.100;
 {
     NSAssert(peripheral == self.connectedPen.peripheral, @"got wrong pen");
 
-    if (error) {
+    if (error)
+    {
         NSLog(@"Error discovering characteristics: %@", [error localizedDescription]);
         return;
     }
 
     FTPenTip tip;
-    if ([characteristic.UUID isEqual:[CBUUID UUIDWithString:FT_PEN_TIP1_STATE_UUID]]) {
+    if ([characteristic.UUID isEqual:[CBUUID UUIDWithCFUUID:FT_PEN_SERVICE_IS_TIP_PRESSED_UUID]])
+    {
         tip = FTPenTip1;
-    } else if ([characteristic.UUID isEqual:[CBUUID UUIDWithString:FT_PEN_TIP2_STATE_UUID]]) {
+    }
+    else if ([characteristic.UUID isEqual:[CBUUID UUIDWithCFUUID:FT_PEN_SERVICE_IS_ERASER_PRESSED_UUID]])
+    {
         tip = FTPenTip2;
-    } else {
+    }
+    else
+    {
         NSLog(@"Unrecognized characteristic");
         return;
     }
 
-    if (characteristic.value.length == 0) {
+    if (characteristic.value.length == 0)
+    {
         NSLog(@"No data received");
         return;
     }
 
     const char *bytes = characteristic.value.bytes;
-    BOOL pressed = bytes[0] == FT_PEN_TIP_STATE_PRESSED;
+    BOOL pressed = (bytes[0] != 0);
 
     self.connectedPen->_tipPressed[tip] = pressed;
     NSAssert([self.connectedPen isTipPressed:tip] == pressed, @"");
 
-    if (pressed) {
+    if (pressed)
+    {
         [self.connectedPen.delegate pen:self.connectedPen didPressTip:tip];
-    } else {
+    }
+    else
+    {
         [self.connectedPen.delegate pen:self.connectedPen didReleaseTip:tip];
 
         if (tip == FTPenTip1)
@@ -426,26 +444,31 @@ static const double kPairingReleaseWindowSeconds = 0.100;
 {
     NSAssert(peripheral == self.connectedPen.peripheral, @"got wrong pen");
 
-    if (error) {
+    if (error)
+    {
         NSLog(@"Error changing notification state: %@", error.localizedDescription);
         [self cleanup];
         return;
     }
 
-    if (![characteristic.UUID isEqual:[CBUUID UUIDWithString:FT_PEN_TIP1_STATE_UUID]]
-        && ![characteristic.UUID isEqual:[CBUUID UUIDWithString:FT_PEN_TIP2_STATE_UUID]]
-        ) {
+    if (![characteristic.UUID isEqual:[CBUUID UUIDWithCFUUID:FT_PEN_SERVICE_IS_TIP_PRESSED_UUID]] &&
+        ![characteristic.UUID isEqual:[CBUUID UUIDWithCFUUID:FT_PEN_SERVICE_IS_ERASER_PRESSED_UUID]])
+    {
         return;
     }
 
-    if (characteristic.isNotifying) {
+    if (characteristic.isNotifying)
+    {
         NSLog(@"Notification began on %@", characteristic);
 
-        if ([characteristic.UUID isEqual:[CBUUID UUIDWithString:FT_PEN_TIP1_STATE_UUID]]) {
+        if ([characteristic.UUID isEqual:[CBUUID UUIDWithCFUUID:FT_PEN_SERVICE_IS_TIP_PRESSED_UUID]])
+        {
             // "connected" means we have the primary tip notifying
             [self connectedToPen:self.connectedPen];
         }
-    } else {
+    }
+    else
+    {
         NSLog(@"Notification stopped on %@. Disconnecting", characteristic);
         [self.centralManager cancelPeripheralConnection:peripheral];
     }
@@ -587,21 +610,26 @@ static const double kPairingReleaseWindowSeconds = 0.100;
 
 - (void)cleanup
 {
-    if (!self.connectedPen.isConnected) {
+    if (!self.connectedPen.isConnected)
+    {
         return;
     }
 
     // See if we are subscribed to a characteristic on the peripheral
-    if (self.connectedPen.peripheral.services != nil) {
-        for (CBService *service in self.connectedPen.peripheral.services) {
-            if (service.characteristics != nil) {
-                for (CBCharacteristic *characteristic in service.characteristics) {
-                    if ([characteristic.UUID isEqual:[CBUUID UUIDWithString:FT_PEN_TIP1_STATE_UUID]]
-                        || [characteristic.UUID isEqual:[CBUUID UUIDWithString:FT_PEN_TIP2_STATE_UUID]]
-                        ) {
-                        if (characteristic.isNotifying) {
+    if (self.connectedPen.peripheral.services != nil)
+    {
+        for (CBService *service in self.connectedPen.peripheral.services)
+        {
+            if (service.characteristics != nil)
+            {
+                for (CBCharacteristic *characteristic in service.characteristics)
+                {
+                    if ([characteristic.UUID isEqual:[CBUUID UUIDWithCFUUID:FT_PEN_SERVICE_IS_TIP_PRESSED_UUID]] ||
+                        [characteristic.UUID isEqual:[CBUUID UUIDWithCFUUID:FT_PEN_SERVICE_IS_ERASER_PRESSED_UUID]])
+                    {
+                        if (characteristic.isNotifying)
+                        {
                             [self.connectedPen.peripheral setNotifyValue:NO forCharacteristic:characteristic];
-
                             return;
                         }
                     }

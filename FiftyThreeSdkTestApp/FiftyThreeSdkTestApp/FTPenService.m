@@ -1,19 +1,19 @@
 //
 //  FTPenService.m
-//  charcoal-prototype
+//  FiftyThreeSdkTestApp
 //
 //  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
 //
 
-#import "FTPenService.h"
-#include "FTPenServiceUUID.h"
 #import <CoreBluetooth/CoreBluetooth.h>
+#import "FTPenService.h"
+#import "FiftyThreeSdk/FTPenServiceUUID.h"
 
 @interface FTPenService () <CBPeripheralManagerDelegate>
-@property (nonatomic) CBPeripheralManager       *peripheralManager;
-@property (nonatomic) CBMutableService          *penService;
-@property (nonatomic) CBMutableCharacteristic   *tip1Characteristic;
-@property (nonatomic) CBMutableCharacteristic   *tip2Characteristic;
+@property (nonatomic) CBPeripheralManager *peripheralManager;
+@property (nonatomic) CBMutableService *penService;
+@property (nonatomic) CBMutableCharacteristic *isTipPressedCharacteristic;
+@property (nonatomic) CBMutableCharacteristic *isEraserPressedCharacteristic;
 @end
 
 @implementation FTPenService
@@ -53,22 +53,23 @@
     NSLog(@"Registering pen service, secure=%d", secure);
 
     // Register service
-    self.penService = [[CBMutableService alloc] initWithType:[CBUUID UUIDWithString:FT_PEN_SERVICE_UUID]
-                                                                  primary:YES];
+    self.penService = [[CBMutableService alloc] initWithType:[CBUUID UUIDWithCFUUID:FT_PEN_SERVICE_UUID]
+                                                     primary:YES];
 
     CBCharacteristicProperties notifyProperty = secure ? CBCharacteristicPropertyNotifyEncryptionRequired : CBCharacteristicPropertyNotify;
     CBAttributePermissions readPermission = secure ? CBAttributePermissionsReadEncryptionRequired : CBAttributePermissionsReadable;
 
-    self.tip1Characteristic = [[CBMutableCharacteristic alloc] initWithType:[CBUUID UUIDWithString:FT_PEN_TIP1_STATE_UUID]
-                                                                     properties:notifyProperty
-                                                                          value:nil                                                                                        permissions:readPermission];
+    self.isTipPressedCharacteristic = [[CBMutableCharacteristic alloc] initWithType:[CBUUID UUIDWithCFUUID:FT_PEN_SERVICE_IS_TIP_PRESSED_UUID]
+                                                                         properties:notifyProperty
+                                                                              value:nil
+                                                                        permissions:readPermission];
 
-    self.tip2Characteristic = [[CBMutableCharacteristic alloc] initWithType:[CBUUID UUIDWithString:FT_PEN_TIP2_STATE_UUID]
-                                                                properties:notifyProperty
-                                                                    value:nil
-                                                                  permissions:readPermission];
+    self.isEraserPressedCharacteristic = [[CBMutableCharacteristic alloc] initWithType:[CBUUID UUIDWithCFUUID:FT_PEN_SERVICE_IS_ERASER_PRESSED_UUID]
+                                                                            properties:notifyProperty
+                                                                                 value:nil
+                                                                           permissions:readPermission];
 
-    self.penService.characteristics = @[ self.tip1Characteristic, self.tip2Characteristic ];
+    self.penService.characteristics = @[ self.isTipPressedCharacteristic, self.isEraserPressedCharacteristic ];
 
     [self.peripheralManager addService:self.penService];
 }
@@ -78,7 +79,7 @@
     NSLog(@"Pen service registered, start advertising...");
 
     [self.peripheralManager startAdvertising:@{
-         CBAdvertisementDataServiceUUIDsKey : @[[CBUUID UUIDWithString:FT_PEN_SERVICE_UUID]],
+         CBAdvertisementDataServiceUUIDsKey : @[[CBUUID UUIDWithCFUUID:FT_PEN_SERVICE_UUID]],
             CBAdvertisementDataLocalNameKey : @"Charcoal Simulator",
      //CBAdvertisementDataManufacturerDataKey : @"FiftyThree, Inc." // Not allowed
      }];
@@ -117,18 +118,20 @@
     NSLog(@"Got write request");
 }
 
-- (void)setTip1Pressed:(BOOL)tip1Pressed
+- (void)setIsTipPressed:(BOOL)isTipPressed
 {
-    char byte = tip1Pressed ? 1 : 0;
+    char byte = isTipPressed ? 1 : 0;
     [self.peripheralManager updateValue:[NSData dataWithBytes:&byte length:sizeof(byte)]
-                       forCharacteristic:self.tip1Characteristic onSubscribedCentrals:nil];
+                       forCharacteristic:self.isTipPressedCharacteristic
+                   onSubscribedCentrals:nil];
 }
 
-- (void)setTip2Pressed:(BOOL)tip2Pressed
+- (void)setIsEraserPressed:(BOOL)isEraserPressed
 {
-    char byte = tip2Pressed ? 1 : 0;
+    char byte = isEraserPressed ? 1 : 0;
     [self.peripheralManager updateValue:[NSData dataWithBytes:&byte length:sizeof(byte)]
-                      forCharacteristic:self.tip2Characteristic onSubscribedCentrals:nil];
+                      forCharacteristic:self.isEraserPressedCharacteristic
+                   onSubscribedCentrals:nil];
 }
 
 @end

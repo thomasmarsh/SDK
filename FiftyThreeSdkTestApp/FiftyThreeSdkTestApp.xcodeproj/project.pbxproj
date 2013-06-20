@@ -182,7 +182,6 @@
 		6644314916F3D1640049E570 /* FTConnectLatencyTester.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FTConnectLatencyTester.m; path = FiftyThreeSdkTestApp/FTConnectLatencyTester.m; sourceTree = SOURCE_ROOT; };
 		6644314A16F3D1640049E570 /* FTPenService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FTPenService.h; path = FiftyThreeSdkTestApp/FTPenService.h; sourceTree = SOURCE_ROOT; };
 		6644314B16F3D1640049E570 /* FTPenService.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FTPenService.m; path = FiftyThreeSdkTestApp/FTPenService.m; sourceTree = SOURCE_ROOT; };
-		6644314C16F3D1640049E570 /* FTPenServiceUUID.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FTPenServiceUUID.h; path = FiftyThreeSdkTestApp/FTPenServiceUUID.h; sourceTree = SOURCE_ROOT; };
 		6644314D16F3D1640049E570 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = FiftyThreeSdkTestApp/main.m; sourceTree = SOURCE_ROOT; };
 		6644314E16F3D1640049E570 /* MainStoryboard_iPad.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = MainStoryboard_iPad.storyboard; path = FiftyThreeSdkTestApp/MainStoryboard_iPad.storyboard; sourceTree = SOURCE_ROOT; };
 		6644314F16F3D1640049E570 /* MainStoryboard_iPhone.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = MainStoryboard_iPhone.storyboard; path = FiftyThreeSdkTestApp/MainStoryboard_iPhone.storyboard; sourceTree = SOURCE_ROOT; };
@@ -443,7 +442,6 @@
 		66A47C3216D98E7A0016B31C /* pen-sim */ = {
 			isa = PBXGroup;
 			children = (
-				6644314C16F3D1640049E570 /* FTPenServiceUUID.h */,
 				6644315016F3D1640049E570 /* TiUpdateService.h */,
 				6644315116F3D1640049E570 /* TiUpdateService.m */,
 				6644314A16F3D1640049E570 /* FTPenService.h */,
