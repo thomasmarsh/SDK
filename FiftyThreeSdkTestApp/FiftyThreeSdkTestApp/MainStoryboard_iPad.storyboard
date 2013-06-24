@@ -206,6 +206,23 @@
                                             </connections>
                                         </button>
                                     </barButtonItem>
+                                    <barButtonItem style="plain" id="OCf-B9-YYu">
+                                        <button key="customView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="aI6-bP-4Pz">
+                                            <rect key="frame" x="542" y="5" width="124" height="34"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
+                                            <state key="normal" title="Trial Separation">
+                                                <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                                <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                            </state>
+                                            <state key="highlighted">
+                                                <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                            </state>
+                                            <connections>
+                                                <action selector="trialSeparationButtonPressed:" destination="7eE-pW-ZTc" eventType="touchUpInside" id="f4F-KW-md7"/>
+                                            </connections>
+                                        </button>
+                                    </barButtonItem>
                                 </items>
                             </toolbar>
                             <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Label" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="mcn-TJ-2K3">
@@ -270,6 +287,7 @@
                         <outlet property="shareButton" destination="w3t-6E-5Yc" id="fgT-Jo-99f"/>
                         <outlet property="tip1State" destination="aLs-Rl-wQi" id="nyn-fP-hCI"/>
                         <outlet property="tip2State" destination="Fr8-7O-QGt" id="T8J-Wd-mCN"/>
+                        <outlet property="trialSeparationButton" destination="aI6-bP-4Pz" id="O0a-Rx-moT"/>
                         <outlet property="updateFirmwareButton" destination="af2-Ke-cZT" id="l6G-SO-RPR"/>
                     </connections>
                 </viewController>
@@ -321,6 +339,7 @@
                 <relationship kind="action" name="pairButtonTouchUpOutside:"/>
                 <relationship kind="action" name="shareButtonPressed:"/>
                 <relationship kind="action" name="testConnectButtonPressed:"/>
+                <relationship kind="action" name="trialSeparationButtonPressed:"/>
                 <relationship kind="action" name="updateFirmwareButtonPressed:"/>
                 <relationship kind="outlet" name="annotateButton" candidateClass="UIButton"/>
                 <relationship kind="outlet" name="clearButton" candidateClass="UIButton"/>
@@ -332,6 +351,7 @@
                 <relationship kind="outlet" name="testConnectButton" candidateClass="UIButton"/>
                 <relationship kind="outlet" name="tip1State" candidateClass="UIButton"/>
                 <relationship kind="outlet" name="tip2State" candidateClass="UIButton"/>
+                <relationship kind="outlet" name="trialSeparationButton" candidateClass="UIButton"/>
                 <relationship kind="outlet" name="updateFirmwareButton" candidateClass="UIButton"/>
             </relationships>
         </class>
@@ -351,6 +371,24 @@
         </class>
         <class className="NSLayoutConstraint" superclassName="NSObject">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/NSLayoutConstraint.h"/>
+        </class>
+        <class className="ViewController" superclassName="UIViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/ViewController.h"/>
+            <relationships>
+                <relationship kind="action" name="connectButtonPressed:"/>
+                <relationship kind="action" name="infoButtonPressed:"/>
+                <relationship kind="action" name="pairButtonTouchDown:"/>
+                <relationship kind="action" name="pairButtonTouchUpInside:"/>
+                <relationship kind="action" name="pairButtonTouchUpOutside:"/>
+                <relationship kind="outlet" name="connectButton" candidateClass="UIButton"/>
+                <relationship kind="outlet" name="pairButton" candidateClass="UIButton"/>
+                <relationship kind="outlet" name="pcConnectedButton" candidateClass="UIButton"/>
+                <relationship kind="outlet" name="penConnectedButton" candidateClass="UIButton"/>
+                <relationship kind="outlet" name="statusLabel" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="tip1State" candidateClass="UIButton"/>
+                <relationship kind="outlet" name="tip2State" candidateClass="UIButton"/>
+                <relationship kind="outlet" name="touchButton" candidateClass="UIButton"/>
+            </relationships>
         </class>
     </classes>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">

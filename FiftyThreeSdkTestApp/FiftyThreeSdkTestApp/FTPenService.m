@@ -7,7 +7,7 @@
 
 #import <CoreBluetooth/CoreBluetooth.h>
 #import "FTPenService.h"
-#import "FiftyThreeSdk/FTPenServiceUUID.h"
+#import "FiftyThreeSdk/FTServiceUUIDs.h"
 
 @interface FTPenService () <CBPeripheralManagerDelegate>
 @property (nonatomic) CBPeripheralManager *peripheralManager;
@@ -53,18 +53,18 @@
     NSLog(@"Registering pen service, secure=%d", secure);
 
     // Register service
-    self.penService = [[CBMutableService alloc] initWithType:[CBUUID UUIDWithCFUUID:FT_PEN_SERVICE_UUID]
+    self.penService = [[CBMutableService alloc] initWithType:[FTPenServiceUUIDs penService]
                                                      primary:YES];
 
     CBCharacteristicProperties notifyProperty = secure ? CBCharacteristicPropertyNotifyEncryptionRequired : CBCharacteristicPropertyNotify;
     CBAttributePermissions readPermission = secure ? CBAttributePermissionsReadEncryptionRequired : CBAttributePermissionsReadable;
 
-    self.isTipPressedCharacteristic = [[CBMutableCharacteristic alloc] initWithType:[CBUUID UUIDWithCFUUID:FT_PEN_SERVICE_IS_TIP_PRESSED_UUID]
+    self.isTipPressedCharacteristic = [[CBMutableCharacteristic alloc] initWithType:[FTPenServiceUUIDs isTipPressed]
                                                                          properties:notifyProperty
                                                                               value:nil
                                                                         permissions:readPermission];
 
-    self.isEraserPressedCharacteristic = [[CBMutableCharacteristic alloc] initWithType:[CBUUID UUIDWithCFUUID:FT_PEN_SERVICE_IS_ERASER_PRESSED_UUID]
+    self.isEraserPressedCharacteristic = [[CBMutableCharacteristic alloc] initWithType:[FTPenServiceUUIDs isEraserPressed]
                                                                             properties:notifyProperty
                                                                                  value:nil
                                                                            permissions:readPermission];
@@ -79,7 +79,7 @@
     NSLog(@"Pen service registered, start advertising...");
 
     [self.peripheralManager startAdvertising:@{
-         CBAdvertisementDataServiceUUIDsKey : @[[CBUUID UUIDWithCFUUID:FT_PEN_SERVICE_UUID]],
+         CBAdvertisementDataServiceUUIDsKey : @[[FTPenServiceUUIDs penService]],
             CBAdvertisementDataLocalNameKey : @"Charcoal Simulator",
      //CBAdvertisementDataManufacturerDataKey : @"FiftyThree, Inc." // Not allowed
      }];

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3CF2306F177E13910049A9EF /* FTServiceUUIDs.m in Sources */ = {isa = PBXBuildFile; fileRef = 3CF2306E177E13910049A9EF /* FTServiceUUIDs.m */; };
 		661993D416EE6D5400B2BEE9 /* FTBatteryClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 661993D316EE6D5400B2BEE9 /* FTBatteryClient.m */; };
 		663AFED616FA511300681A90 /* TouchClassifierManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 663AFED416FA511300681A90 /* TouchClassifierManager.cpp */; };
 		663AFED916FA6BD800681A90 /* PenEvent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 663AFED716FA6BD800681A90 /* PenEvent.cpp */; };
@@ -48,6 +49,7 @@
 
 /* Begin PBXFileReference section */
 		349A642F174FD5D80071D899 /* Common.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Common.xcodeproj; path = ../../Common/Common.xcodeproj; sourceTree = "<group>"; };
+		3CF2306E177E13910049A9EF /* FTServiceUUIDs.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FTServiceUUIDs.m; path = FiftyThreeSdk/FTServiceUUIDs.m; sourceTree = SOURCE_ROOT; };
 		661993D216EE6D5400B2BEE9 /* FTBatteryClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FTBatteryClient.h; path = FiftyThreeSdk/FTBatteryClient.h; sourceTree = SOURCE_ROOT; };
 		661993D316EE6D5400B2BEE9 /* FTBatteryClient.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FTBatteryClient.m; path = FiftyThreeSdk/FTBatteryClient.m; sourceTree = SOURCE_ROOT; };
 		661993D516EF973900B2BEE9 /* FTError.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FTError.h; path = FiftyThreeSdk/FTError.h; sourceTree = SOURCE_ROOT; };
@@ -78,7 +80,7 @@
 		66D779B316E57461001C4F55 /* FTPen.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FTPen.m; path = FiftyThreeSdk/FTPen.m; sourceTree = SOURCE_ROOT; };
 		66D779B416E57461001C4F55 /* FTPenManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FTPenManager.h; path = FiftyThreeSdk/FTPenManager.h; sourceTree = SOURCE_ROOT; };
 		66D779B516E57461001C4F55 /* FTPenManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FTPenManager.m; path = FiftyThreeSdk/FTPenManager.m; sourceTree = SOURCE_ROOT; };
-		66D779B616E57461001C4F55 /* FTPenServiceUUID.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FTPenServiceUUID.h; path = FiftyThreeSdk/FTPenServiceUUID.h; sourceTree = SOURCE_ROOT; };
+		66D779B616E57461001C4F55 /* FTServiceUUIDs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FTServiceUUIDs.h; path = FiftyThreeSdk/FTServiceUUIDs.h; sourceTree = SOURCE_ROOT; };
 		66D779B716E57461001C4F55 /* TIUpdateManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TIUpdateManager.h; path = FiftyThreeSdk/TIUpdateManager.h; sourceTree = SOURCE_ROOT; };
 		66D779B816E57461001C4F55 /* TIUpdateManager.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = TIUpdateManager.mm; path = FiftyThreeSdk/TIUpdateManager.mm; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
@@ -114,7 +116,8 @@
 				661993D516EF973900B2BEE9 /* FTError.h */,
 				66D779B316E57461001C4F55 /* FTPen.m */,
 				66D779B516E57461001C4F55 /* FTPenManager.m */,
-				66D779B616E57461001C4F55 /* FTPenServiceUUID.h */,
+				66D779B616E57461001C4F55 /* FTServiceUUIDs.h */,
+				3CF2306E177E13910049A9EF /* FTServiceUUIDs.m */,
 				66D779B716E57461001C4F55 /* TIUpdateManager.h */,
 				66D779B816E57461001C4F55 /* TIUpdateManager.mm */,
 				66BEC2841703B397009207F9 /* FTFirmwareManager.h */,
@@ -295,6 +298,7 @@
 				66C83D7C170600BB00789776 /* FTPenAndTouchManager.cpp in Sources */,
 				666DC55E170CF33C00D6B3C2 /* FTApplication.mm in Sources */,
 				6665F81C170F8B6F0027BAD1 /* FTTouchEventLogger.mm in Sources */,
+				3CF2306F177E13910049A9EF /* FTServiceUUIDs.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

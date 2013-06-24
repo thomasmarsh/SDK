@@ -1,6 +1,6 @@
 //
 //  BTLECentralViewController.mm
-//  charcoal-prototype
+//  FiftyThreeSdkTestApp
 //
 //  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
 //
@@ -73,35 +73,33 @@ class TouchObserver;
 
 @end
 
-
 class TouchObserver
 {
 private:
     BTLECentralViewController *_vc;
-    
+
 public:
     TouchObserver(BTLECentralViewController *vc)
     {
         _vc = vc;
     }
-    
+
     void TouchTypeChanged(const Event<const Touch::cPtr &> & event, const Touch::cPtr & touch)
     {
         [_vc touchTypeChanged:touch];
     }
-    
+
     void ShouldStartTrialSeparation(const Event<Unit> & event, Unit unit)
     {
         [_vc startTrialSeparation];
     }
-    
+
     void EngineError(const Event<const std::string &> & event, const std::string & str)
     {
         std::cout << str << std::endl;
     }
-    
-};
 
+};
 
 @implementation BTLECentralViewController
 
@@ -181,7 +179,8 @@ public:
     if (self.penManager.pairedPen && !self.penManager.connectedPen)
     {
         _ConnectTimer = Timer::New();
-        [self.penManager connect];
+        NSAssert(0, @"Unimplemented");
+//        [self.penManager connect];
     }
 }
 
@@ -209,9 +208,9 @@ public:
 - (void)penManager:(FTPenManager *)penManager didUnpairFromPen:(FTPen *)pen
 {
     NSLog(@"didUnpairFromPen name=%@", pen.name);
-    
+
     [self updateDisplay];
-    
+
     [self.currentTest penManager:penManager didUnpairFromPen:pen];
 }
 
@@ -224,9 +223,9 @@ public:
         self.firstConnectDate = [NSDate date];
     }
     self.lastConnectDate = [NSDate date];
-    
+
     _PenAndTouchManager->SetPalmRejectionEnabled(true);
-    
+
     if (_ConnectTimer)
     {
         NSLog(@"connect took %f seconds", _ConnectTimer->ElapsedTimeSeconds());
@@ -254,7 +253,7 @@ public:
 - (void)penManager:(FTPenManager *)penManager didDisconnectFromPen:(FTPen *)pen
 {
     NSLog(@"didDisconnectFromPen name=%@", pen.name);
-    
+
     _PenAndTouchManager->SetPalmRejectionEnabled(false);
 
     [self updateDisplay];
@@ -262,8 +261,8 @@ public:
     [self.currentTest penManager:penManager didDisconnectFromPen:pen];
 }
 
-- (void)pen:(FTPen *)pen didPressTip:(FTPenTip)tip
-{    
+- (void)pen:(FTPen *)pen isTipPressedDidChange:(BOOL)isTipPressed
+{
     // Stats
     self.tipDownCount++;
     if (!self.firstTipDate)
@@ -272,42 +271,30 @@ public:
     }
     self.lastTipDate = [NSDate date];
 
-    if (tip == FTPenTip1) {
-//        NSLog(@"Tip1 pressed");
-        [self.tip1State setHighlighted:YES];
-    } else if (tip == FTPenTip2) {
-//        NSLog(@"Tip2 pressed");
-        [self.tip2State setHighlighted:YES];
-    } else {
-        NSLog(@"WARNING: Unsupported tip pressed");
-    }
-    
-    PenEvent::Ptr event = PenEvent::New([NSProcessInfo processInfo].systemUptime, PenEventType::PenDown, PenTip((PenTip::PenTipEnum)tip));
+    [self.tip1State setHighlighted:isTipPressed];
+
+    PenEvent::Ptr event = PenEvent::New([NSProcessInfo processInfo].systemUptime,
+                                        isTipPressed ? PenEventType::PenDown : PenEventType::PenUp,
+                                        PenTip::Tip1);
+
     _PenAndTouchManager->HandlePenEvent(event);
 }
 
-
-- (void)pen:(FTPen *)pen didReleaseTip:(FTPenTip)tip
+- (void)pen:(FTPen *)pen isEraserPressedDidChange:(BOOL)isEraserPressed
 {
     // Stats
-    self.tipUpCount++;
+    self.tipDownCount++;
     if (!self.firstTipDate)
     {
         self.firstTipDate = [NSDate date];
     }
     self.lastTipDate = [NSDate date];
-    
-    if (tip == FTPenTip1) {
-//        NSLog(@"Tip1 released");
-        [self.tip1State setHighlighted:NO];
-    } else if (tip == FTPenTip2) {
-//        NSLog(@"Tip1 released");
-        [self.tip2State setHighlighted:NO];
-    } else {
-        NSLog(@"WARNING: Unsupported tip released");
-    }
-    
-    PenEvent::Ptr event = PenEvent::New([NSProcessInfo processInfo].systemUptime, PenEventType::PenUp, PenTip((PenTip::PenTipEnum)tip));
+
+    [self.tip2State setHighlighted:isEraserPressed];
+
+    PenEvent::Ptr event = PenEvent::New([NSProcessInfo processInfo].systemUptime,
+                                        isEraserPressed ? PenEventType::PenDown : PenEventType::PenUp,
+                                        PenTip::Tip2);
     _PenAndTouchManager->HandlePenEvent(event);
 }
 
@@ -366,7 +353,7 @@ public:
 {
     if (self.penManager.connectedPen)
     {
-        if (self.penManager.connectedPen.isConnected)
+        if (self.penManager.connectedPen.isReady)
         {
             [self.pairingStatusLabel setText:[NSString stringWithFormat:@"Connected to %@", self.penManager.pairedPen.name]];
         }
@@ -391,15 +378,17 @@ public:
     if (self.penManager.connectedPen)
     {
         [self.connectButton setTitle:@"Disconnect" forState:UIControlStateNormal];
-        [self.updateFirmwareButton setHidden:NO];
+        self.updateFirmwareButton.hidden = NO;
+//        self.trialSeparationButton.hidden = NO;
     }
     else
     {
         [self.connectButton setTitle:@"Connect" forState:UIControlStateNormal];
-        [self.updateFirmwareButton setHidden:YES];
-        
-        [self.tip1State setHighlighted:NO];
-        [self.tip2State setHighlighted:NO];
+        self.updateFirmwareButton.hidden = YES;
+//        self.trialSeparationButton.hidden = YES;
+
+        self.tip1State.highlighted = NO;
+        self.tip2State.highlighted = NO;
     }
 
     if (self.annotationMode)
@@ -417,26 +406,26 @@ public:
 
     if (self.penManager.pairedPen)
     {
-        [self.testConnectButton setHidden:NO];
-        [self.connectButton setHidden:NO];
+        self.testConnectButton.hidden = NO;
+        self.connectButton.hidden = NO;
     }
     else
     {
-        [self.testConnectButton setHidden:YES];
-        [self.connectButton setHidden:YES];
+        self.testConnectButton.hidden = YES;
+        self.connectButton.hidden = YES;
     }
 }
 
 - (IBAction)pairButtonPressed:(id)sender
 {
-    [self.penManager startPairing];
+    [self.penManager pairingSpotWasPressed];
     self.pairing = YES;
     [self updateDisplay];
 }
 
 - (IBAction)pairButtonReleased:(id)sender
 {
-    [self.penManager stopPairing];
+    [self.penManager pairingSpotWasReleased];
     self.pairing = NO;
     [self updateDisplay];
 }
@@ -491,6 +480,11 @@ public:
 - (IBAction)updateFirmwareButtonPressed:(id)sender
 {
     [self queryFirmwareUpdate:YES];
+}
+
+- (IBAction)trialSeparationButtonPressed:(id)sender
+{
+    [self startTrialSeparation];
 }
 
 - (void)showUpdateStartView
@@ -569,12 +563,12 @@ public:
             [self.canvasController clearCanvas];
             self.clearAlertView = nil;
             _StrokeTouch.reset();
-            
+
             self.tipDownCount = 0;
             self.tipUpCount = 0;
             self.firstTipDate = nil;
             self.lastTipDate = nil;
-            
+
             self.connectCount = 0;
             self.firstConnectDate = nil;
             self.lastConnectDate = nil;
@@ -643,7 +637,7 @@ public:
     {
         [self setInkColorBlack];
     }
-    
+
     [self drawStrokeFromTouch:touch];
 }
 
@@ -755,7 +749,7 @@ public:
     if ([self shouldProcessTouches:touches])
     {
         static_pointer_cast<TouchManagerObjC>(TouchManager::Instance())->ProcessTouches(touches);
-        
+
         for (UITouch *uiTouch in touches)
         {
             Touch::cPtr touch = static_pointer_cast<TouchTrackerObjC>(TouchTracker::Instance())->TouchForUITouch(uiTouch);
@@ -774,7 +768,7 @@ public:
     {
         [self didDetectMultitaskingGesturesEnabled];
     }
-    
+
     if (self.annotationMode)
     {
         _SelectedTouch.reset();
@@ -805,13 +799,13 @@ public:
 - (void)touchTypeChanged:(const Touch::cPtr &)touch
 {
     DebugAssert(self.penManager.connectedPen);
-    
+
     if (_StrokeTouch == touch)
     {
         if (![self shouldDrawTouch:touch])
         {
             _StrokeTouch.reset();
-            
+
             [self.canvasController cancelStroke];
         }
     }
@@ -821,9 +815,9 @@ public:
         {
             [self.canvasController cancelStroke];
         }
-        
+
         _StrokeTouch = touch;
-    
+
         [self drawStrokeFromTouch:touch];
     }
 }
@@ -832,7 +826,7 @@ public:
 {
     NSDateFormatter *format = [[NSDateFormatter alloc] init];
     [format setDateFormat:@"MMM dd, yyyy HH:mm:ss"];
-    
+
     FTPen* pen = self.penManager.connectedPen;
     NSString *info = [NSString stringWithFormat:@"\
 Manufacturer = %@\n \
@@ -919,4 +913,5 @@ Last Connect Date = %@\n \
         [self displayComposerSheet];
     }
 }
+
 @end

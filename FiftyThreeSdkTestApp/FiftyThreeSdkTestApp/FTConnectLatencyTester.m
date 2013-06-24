@@ -116,9 +116,11 @@
 {
     NSLog(@"doConnect (count=%d)", _connectCount);
 
-    if (self.connectCount < CONNECT_REPS) {
+    if (self.connectCount < CONNECT_REPS)
+    {
         self.startTime = [self currentTimeMillis];
-        [self.penManager connect];
+        NSAssert(0, @"unimplemented");
+//        [self.penManager connect];
     }
 }
 

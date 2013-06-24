@@ -1,6 +1,6 @@
 //
 //  BTLECentralViewController.h
-//  charcoal-prototype
+//  FiftyThreeSdkTestApp
 //
 //  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
 //
@@ -19,17 +19,26 @@
 - (IBAction)pairButtonTouchUpInside:(id)sender;
 - (IBAction)pairButtonTouchUpOutside:(id)sender;
 - (IBAction)testConnectButtonPressed:(id)sender;
+
 @property (weak, nonatomic) IBOutlet UIButton *connectButton;
 - (IBAction)connectButtonPressed:(id)sender;
+
 @property (weak, nonatomic) IBOutlet UIButton *updateFirmwareButton;
 - (IBAction)updateFirmwareButtonPressed:(id)sender;
+
+@property (weak, nonatomic) IBOutlet UIButton *trialSeparationButton;
+- (IBAction)trialSeparationButtonPressed:(id)sender;
+
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *infoButton;
 - (IBAction)infoButtonPressed:(id)sender;
+
 @property (weak, nonatomic) IBOutlet UIButton *clearButton;
 - (IBAction)clearButtonPressed:(id)sender;
+
 @property (weak, nonatomic) IBOutlet UIButton *annotateButton;
 - (IBAction)annotateButtonPressed:(id)sender;
-- (IBAction)shareButtonPressed:(id)sender;
+
 @property (weak, nonatomic) IBOutlet UIButton *shareButton;
+- (IBAction)shareButtonPressed:(id)sender;
 
 @end

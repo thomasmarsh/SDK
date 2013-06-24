@@ -27,10 +27,11 @@ typedef struct
     uint16_t productVersion;
 } PnPID;
 
-@property (nonatomic, readonly) NSString *name;
-@property (nonatomic, readonly) BOOL isConnected;
+@property (nonatomic, readonly) BOOL isReady;
+
 @property (nonatomic, weak) id<FTPenDelegate> delegate;
 
+@property (nonatomic, readonly) NSString *name;
 @property (nonatomic, readonly) NSString *manufacturerName;
 @property (nonatomic, readonly) NSString *modelNumber;
 @property (nonatomic, readonly) NSString *serialNumber;
@@ -42,13 +43,14 @@ typedef struct
 @property (nonatomic, readonly) PnPID pnpId;
 @property (nonatomic, readonly) NSInteger batteryLevel;
 
-- (BOOL)isTipPressed:(FTPenTip)tip;
+@property (nonatomic, readonly) BOOL isTipPressed;
+@property (nonatomic, readonly) BOOL isEraserPressed;
 
 @end
 
 @protocol FTPenDelegate <NSObject>
 
-- (void)pen:(FTPen *)pen didPressTip:(FTPenTip)tip;
-- (void)pen:(FTPen *)pen didReleaseTip:(FTPenTip)tip;
+- (void)pen:(FTPen *)pen isTipPressedDidChange:(BOOL)isTipPressed;
+- (void)pen:(FTPen *)pen isEraserPressedDidChange:(BOOL)isEraserPressed;
 
 @end

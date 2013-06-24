@@ -18,15 +18,18 @@ typedef NS_ENUM(NSInteger, FTPenManagerState) {
 @interface FTPenManager : NSObject
 
 @property(nonatomic, weak) id<FTPenManagerDelegate> delegate;
-@property(nonatomic, readonly) FTPen* pairedPen;
-@property(nonatomic, readonly) FTPen* connectedPen;
+@property(nonatomic, readonly) FTPen *pairedPen;
+@property(nonatomic, readonly) FTPen *connectedPen;
 @property(nonatomic, readonly) FTPenManagerState state;
 @property (nonatomic) BOOL autoConnect;
 
+//@property (nonatomic) BOOL isPairingSpotPressed;
+
 - (id)initWithDelegate:(id<FTPenManagerDelegate>)delegate;
-- (void)startPairing;
-- (void)stopPairing;
-- (void)connect;
+
+- (void)pairingSpotWasPressed;
+- (void)pairingSpotWasReleased;
+
 - (void)disconnect;
 - (void)deletePairedPen:(FTPen *)pen;
 
