@@ -12,7 +12,7 @@
 
 @protocol FTPenPrivateDelegate
 
-- (void)pen:(FTPen *)pen didChangeIsReadyState:(BOOL)isReady;
+- (void)pen:(FTPen *)pen isReadyDidChange:(BOOL)isReady;
 
 @end
 

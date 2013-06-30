@@ -96,15 +96,12 @@ static const double kPairingReleaseWindowSeconds = 0.100;
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(penIsTipPressedDidChange:)
                                                      name:kFTPenIsTipPressedDidChangeNotificationName
-                                                   object:_pen];
+                                                   object:nil];
     }
 }
 
 - (void)penIsTipPressedDidChange:(NSNotification *)notification
 {
-    NSAssert(notification.object == self.pen,
-             @"Should only be registered for notification from the current pen");
-
     if (!self.pen.isTipPressed && self.pen.lastTipReleaseTime)
     {
         if (self.connectionState == ConnectionState_Engaged)
@@ -283,6 +280,12 @@ static const double kPairingReleaseWindowSeconds = 0.100;
     if (self.connectionState == ConnectionState_Dating)
     {
         [self transitionConnectionStateToSingle];
+    }
+    else if (self.connectionState == ConnectionState_Dating_AttemptingConnection)
+    {
+        // If we were in the middle of connecting, but the pairing spot was released prematurely, then cancel
+        // the connection. The pen must be connected and ready in order to transition to the "engaged" state.
+        [self transitionConnectionStateToAwaitingDisconnection];
     }
     else if (self.connectionState == ConnectionState_Engaged)
     {
@@ -578,15 +581,15 @@ static const double kPairingReleaseWindowSeconds = 0.100;
 
 #pragma mark - FTPenPrivateDelegate
 
-- (void)pen:(FTPen *)pen didChangeIsReadyState:(BOOL)isReady
+- (void)pen:(FTPen *)pen isReadyDidChange:(BOOL)isReady
 {
-    NSLog(@"Pen is ready.");
+    if (isReady)
+    {
+        NSLog(@"Pen is ready.");
 
-    [self.delegate penManager:self didConnectToPen:self.pen];
-
-    // TODO: should enter engaged state before becoming married.
-
-    [self transitionConnectionStateToEngaged];
+        [self.delegate penManager:self didConnectToPen:self.pen];
+        [self transitionConnectionStateToEngaged];
+    }
 }
 
 #pragma mark - CBCentralManagerDelegate

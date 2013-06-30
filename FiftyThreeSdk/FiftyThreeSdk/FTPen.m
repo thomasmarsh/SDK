@@ -11,23 +11,19 @@
 #import "FTServiceUUIDs.h"
 #import "FTDeviceInfoClient.h"
 #import "FTBatteryClient.h"
+#import "FTPeripheralDelegate.h"
+#import "FTPenServiceClient.h"
+#import "FTPenDebugServiceClient.h"
 
-NSString * const kFTPenIsTipPressedDidChangeNotificationName = @"com.fiftythree.pen.isTipPressedDidChange";
-NSString * const kFTPenIsEraserPressedDidChangeNotificationName = @"com.fiftythree.pen.isEraserPressedDidChange";
-
-static NSString * const kPeripheralIsConnectedKeyPath = @"isConnected";
-
-@interface FTPen () <CBPeripheralDelegate>
+@interface FTPen () <FTPenServiceClientDelegate, FTPenDebugServiceClientDelegate>
 
 @property (nonatomic) CBCentralManager *centralManager;
+@property (nonatomic) FTPeripheralDelegate *peripheralDelegate;
+
+@property (nonatomic) FTPenServiceClient *penServiceClient;
+@property (nonatomic) FTPenDebugServiceClient *penDebugServiceClient;
 
 @property (nonatomic, readwrite) BOOL isReady;
-
-@property (nonatomic, readwrite) NSDate *lastTipReleaseTime;
-
-@property (nonatomic) CBCharacteristic *isTipPressedCharacteristic;
-@property (nonatomic) CBCharacteristic *isEraserPressedCharacteristic;
-@property (nonatomic) CBCharacteristic *deviceStateCharacteristic;
 
 @property (nonatomic, readwrite) NSString *name;
 @property (nonatomic, readwrite) NSString *manufacturer;
@@ -52,9 +48,23 @@ static NSString * const kPeripheralIsConnectedKeyPath = @"isConnected";
     if (self)
     {
         _centralManager = centralManager;
-
         _peripheral = peripheral;
-        _peripheral.delegate = self;
+
+        _peripheralDelegate = [[FTPeripheralDelegate alloc] init];
+        _peripheral.delegate = _peripheralDelegate;
+
+        // Pen Service client
+        _penServiceClient = [[FTPenServiceClient alloc] init];
+        _penServiceClient.delegate = self;
+        [_peripheralDelegate addServiceClient:_penServiceClient];
+
+        // Pen Debug Service client
+#ifdef DEBUG
+        _penDebugServiceClient = [[FTPenDebugServiceClient alloc] init];
+        _penDebugServiceClient.delegate = self;
+        [_peripheralDelegate addServiceClient:_penDebugServiceClient];
+#endif
+
     }
 
     return self;
@@ -64,265 +74,59 @@ static NSString * const kPeripheralIsConnectedKeyPath = @"isConnected";
 
 - (BOOL)isTipPressed
 {
-    if (self.isTipPressedCharacteristic)
-    {
-        return ((const char *)self.isTipPressedCharacteristic.value.bytes)[0] != 0;
-    }
-
-    return NO;
+    return self.penServiceClient.isTipPressed;
 }
 
 - (BOOL)isEraserPressed
 {
-    if (self.isEraserPressedCharacteristic)
-    {
-        return ((const char *)self.isEraserPressedCharacteristic.value.bytes)[0] != 0;
-    }
+    return self.penServiceClient.isEraserPressed;
+}
 
-    return NO;
+- (NSDate *)lastTipReleaseTime
+{
+    return self.penServiceClient.lastTipReleaseTime;
 }
 
 #pragma mark -
 
 - (void)peripheralConnectionStatusDidChange
 {
+    NSArray *servicesToBeDiscovered = [self.peripheralDelegate peripheral:self.peripheral
+                                                     isConnectedDidChange:self.peripheral.isConnected];
+
     if (self.peripheral.isConnected)
     {
         NSLog(@"Peripheral is connected.");
 
-        [self discoverPeripheralServices];
+        [self.peripheral discoverServices:servicesToBeDiscovered];
     }
     else
     {
         NSLog(@"Peripheral was disconnected.");
 
-        [self handleDisconnection];
+        NSAssert(servicesToBeDiscovered.count == 0,
+                 @"Should not attempt to discover services if not connected");
     }
 }
 
-// Initiates the discovery of services on the peripheral. Only discovers debug services in the debug build
-// configuration.
-- (void)discoverPeripheralServices
+#pragma mark - FTPenServiceClientDelegate
+
+- (void)penServiceClient:(FTPenServiceClient *)penServiceClient isReadyDidChange:(BOOL)isReady
 {
-    NSAssert(self.peripheral, @"Peripheral is non-nil");
-
-    NSLog(@"Attempting to discover services for peripheral.");
-
-    NSMutableArray *serviceUUIDs = [NSMutableArray array];
-    [serviceUUIDs addObject:[FTPenServiceUUIDs penService]];
-
-#ifdef DEBUG
-    [serviceUUIDs addObject:[FTPenDebugServiceUUIDs penDebugService]];
-#endif
-
-    [self.peripheral discoverServices:serviceUUIDs];
+    [self.privateDelegate pen:self isReadyDidChange:isReady];
 }
 
-- (void)handleDisconnection
+- (void)penServiceClient:(FTPenServiceClient *)penServiceClient isTipPressedDidChange:(BOOL)isTipPressed
 {
-    self.isTipPressedCharacteristic = nil;
-    self.isEraserPressedCharacteristic = nil;
-    self.deviceStateCharacteristic = nil;
+    [self.delegate pen:self isTipPressedDidChange:isTipPressed];
 }
 
-#pragma mark - CBPeripheralDelegate
-
-- (void)peripheral:(CBPeripheral *)peripheral didDiscoverServices:(NSError *)error
+- (void)penServiceClient:(FTPenServiceClient *)penServiceClient isEraserPressedDidChange:(BOOL)isEraserPressed
 {
-    if (error)
-    {
-        NSLog(@"Error discovering services: %@", [error localizedDescription]);
-        // TODO: Report failed state
-        return;
-    }
-
-    NSMutableString *serviceNames = [NSMutableString string];
-
-    // Discover the characteristics of each discovered service.
-    // TODO: Is it more efficient to discover these incrementally, only discovering the required ones
-    // initially?
-    for (CBService *service in peripheral.services)
-    {
-        NSArray *characteristics;
-
-        if ([service.UUID isEqual:[FTPenServiceUUIDs penService]])
-        {
-            characteristics = @[[FTPenServiceUUIDs isTipPressed],
-                                [FTPenServiceUUIDs isEraserPressed],
-                                [FTPenServiceUUIDs shouldSwing],
-                                [FTPenServiceUUIDs shouldPowerOff],
-                                [FTPenServiceUUIDs batteryVoltage],
-                                [FTPenServiceUUIDs inactivityTime]
-                                ];
-
-            [peripheral discoverCharacteristics:characteristics forService:service];
-        }
-        else if ([service.UUID isEqual:[FTPenDebugServiceUUIDs penDebugService]])
-        {
-#ifndef DEBUG
-            NSAssert(NO, @"Should not discover debug service in non-debug builds.");
-#endif
-
-            characteristics = @[[FTPenDebugServiceUUIDs deviceState],
-                                [FTPenDebugServiceUUIDs tipPressure],
-                                [FTPenDebugServiceUUIDs erasurePressure],
-                                [FTPenDebugServiceUUIDs longPressTime],
-                                [FTPenDebugServiceUUIDs connectionTime]
-                                ];
-        }
-
-        if (characteristics)
-        {
-            [peripheral discoverCharacteristics:characteristics forService:service];
-        }
-        else
-        {
-            NSAssert(NO, @"Discovered only expected services.");
-        }
-    }
-
-    for (int i = 0; i < peripheral.services.count; i++)
-    {
-        NSString *serviceName = FTNameForServiceUUID(((CBService *)peripheral.services[i]).UUID);
-
-        if (i == peripheral.services.count - 1)
-        {
-            [serviceNames appendString:serviceName];
-        }
-        else
-        {
-            [serviceNames appendFormat:@"%@, ", serviceName];
-        }
-    }
-
-    NSLog(@"Did discover service(s): %@.", serviceNames);
+    [self.delegate pen:self isEraserPressedDidChange:isEraserPressed];
 }
 
-- (void)peripheral:(CBPeripheral *)peripheral didDiscoverCharacteristicsForService:(CBService *)service
-             error:(NSError *)error
-{
-    NSLog(@"Pen did discover characterisitics for service: %@", FTNameForServiceUUID(service.UUID));
-
-    if (error || service.characteristics.count == 0)
-    {
-        NSLog(@"Error discovering characteristics: %@", [error localizedDescription]);
-        // TODO: Report failed state
-        return;
-    }
-
-    for (CBCharacteristic *characteristic in service.characteristics)
-    {
-        // IsTipPressed
-        if (!self.isTipPressedCharacteristic &&
-            [characteristic.UUID isEqual:[FTPenServiceUUIDs isTipPressed]])
-        {
-            self.isTipPressedCharacteristic = characteristic;
-            [peripheral setNotifyValue:YES forCharacteristic:characteristic];
-        }
-
-        // IsEraserPressed
-        if (!self.isEraserPressedCharacteristic &&
-            [characteristic.UUID isEqual:[FTPenServiceUUIDs isEraserPressed]])
-        {
-            self.isEraserPressedCharacteristic = characteristic;
-            [peripheral setNotifyValue:YES forCharacteristic:characteristic];
-        }
-
-        // DeviceState
-        if (!self.deviceStateCharacteristic &&
-            [characteristic.UUID isEqual:[FTPenDebugServiceUUIDs deviceState]])
-        {
-            self.deviceStateCharacteristic = characteristic;
-            [peripheral setNotifyValue:YES forCharacteristic:characteristic];
-        }
-    }
-}
-
-- (void)peripheral:(CBPeripheral *)peripheral didUpdateValueForCharacteristic:(CBCharacteristic *)characteristic
-             error:(NSError *)error
-{
-    if (error)
-    {
-        NSLog(@"Error discovering characteristics: %@.", [error localizedDescription]);
-        // TODO: Report failed state
-        return;
-    }
-
-    if ([characteristic.UUID isEqual:[FTPenServiceUUIDs isTipPressed]])
-    {
-        BOOL isTipPressed = self.isTipPressed;
-
-        // TODO: Assumes tip was initially pressed... may not be the case?
-        if (!isTipPressed)
-        {
-            self.lastTipReleaseTime = [NSDate date];
-        }
-
-        [self.delegate pen:self isTipPressedDidChange:isTipPressed];
-        [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenIsTipPressedDidChangeNotificationName
-                                                            object:self];
-
-        NSLog(@"IsTipPressed characteristic changed: %d.", isTipPressed);
-    }
-    else if ([characteristic.UUID isEqual:[FTPenServiceUUIDs isEraserPressed]])
-    {
-        BOOL isEraserPressed = self.isEraserPressed;
-        [self.delegate pen:self isEraserPressedDidChange:isEraserPressed];
-        [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenIsEraserPressedDidChangeNotificationName
-                                                            object:self];
-
-        NSLog(@"IsEraserPressed characteristic changed: %d.", isEraserPressed);
-    }
-    else if ([characteristic.UUID isEqual:[FTPenDebugServiceUUIDs deviceState]])
-    {
-        const int state = ((const char *)characteristic.value.bytes)[0];
-        NSLog(@"Device State Changed: %d.", state);
-    }
-    else
-    {
-        NSAssert(NO, @"Should only see updates for expected characteristics.");
-    }
-}
-
-- (void)peripheral:(CBPeripheral *)peripheral didUpdateNotificationStateForCharacteristic:(CBCharacteristic *)characteristic
-             error:(NSError *)error
-{
-    if (error)
-    {
-        NSLog(@"Error changing notification state: %@.", error.localizedDescription);
-        // TODO: Report failed state
-        return;
-    }
-
-    if (![characteristic.UUID isEqual:[FTPenServiceUUIDs isTipPressed]] &&
-        ![characteristic.UUID isEqual:[FTPenServiceUUIDs isEraserPressed]])
-    {
-        return;
-    }
-
-    if (characteristic.isNotifying)
-    {
-        NSLog(@"Notification began on charateristic: %@.", FTNameForServiceUUID(characteristic.UUID));
-
-        if ([characteristic.UUID isEqual:[FTPenServiceUUIDs isTipPressed]])
-        {
-            self.isReady = YES;
-        }
-    }
-    else
-    {
-        NSLog(@"Notification stopped on characteristic: %@. Disconnecting.",
-              FTNameForServiceUUID(characteristic.UUID));
-
-        [self.centralManager cancelPeripheralConnection:peripheral];
-    }
-}
-
-- (void)peripheral:(CBPeripheral *)peripheral didWriteValueForCharacteristic:(CBCharacteristic *)characteristic
-             error:(NSError *)error
-{
-    NSLog(@"CBPeripheral didWriteValueForCharacteristic");
-}
+#pragma mark - FTPenDebugServiceClientDelegate
 
 #pragma mark -
 
@@ -330,7 +134,7 @@ static NSString * const kPeripheralIsConnectedKeyPath = @"isConnected";
 {
     _isReady = isReady;
 
-    [self.privateDelegate pen:self didChangeIsReadyState:isReady];
+    [self.privateDelegate pen:self isReadyDidChange:isReady];
 }
 
 - (void)updateData:(NSDictionary *)data

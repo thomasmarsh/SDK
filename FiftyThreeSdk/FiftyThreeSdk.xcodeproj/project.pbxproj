@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3C2F9C3A1780758300A5FFBC /* FTPeripheralDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 3C2F9C391780758300A5FFBC /* FTPeripheralDelegate.m */; };
+		3C2F9C3D1780786F00A5FFBC /* FTPenServiceClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 3C2F9C3C1780786F00A5FFBC /* FTPenServiceClient.m */; };
+		3C2F9C411780802600A5FFBC /* FTServiceClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 3C2F9C401780802600A5FFBC /* FTServiceClient.m */; };
+		3C2F9C441780A7BA00A5FFBC /* FTPenDebugServiceClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 3C2F9C431780A7BA00A5FFBC /* FTPenDebugServiceClient.m */; };
 		3CF2306F177E13910049A9EF /* FTServiceUUIDs.m in Sources */ = {isa = PBXBuildFile; fileRef = 3CF2306E177E13910049A9EF /* FTServiceUUIDs.m */; };
 		661993D416EE6D5400B2BEE9 /* FTBatteryClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 661993D316EE6D5400B2BEE9 /* FTBatteryClient.m */; };
 		663AFED616FA511300681A90 /* TouchClassifierManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 663AFED416FA511300681A90 /* TouchClassifierManager.cpp */; };
@@ -49,6 +53,14 @@
 
 /* Begin PBXFileReference section */
 		349A642F174FD5D80071D899 /* Common.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Common.xcodeproj; path = ../../Common/Common.xcodeproj; sourceTree = "<group>"; };
+		3C2F9C381780758300A5FFBC /* FTPeripheralDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FTPeripheralDelegate.h; path = FiftyThreeSdk/FTPeripheralDelegate.h; sourceTree = SOURCE_ROOT; };
+		3C2F9C391780758300A5FFBC /* FTPeripheralDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FTPeripheralDelegate.m; path = FiftyThreeSdk/FTPeripheralDelegate.m; sourceTree = SOURCE_ROOT; };
+		3C2F9C3B1780786F00A5FFBC /* FTPenServiceClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FTPenServiceClient.h; path = FiftyThreeSdk/FTPenServiceClient.h; sourceTree = SOURCE_ROOT; };
+		3C2F9C3C1780786F00A5FFBC /* FTPenServiceClient.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FTPenServiceClient.m; path = FiftyThreeSdk/FTPenServiceClient.m; sourceTree = SOURCE_ROOT; };
+		3C2F9C3F1780802600A5FFBC /* FTServiceClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FTServiceClient.h; path = FiftyThreeSdk/FTServiceClient.h; sourceTree = SOURCE_ROOT; };
+		3C2F9C401780802600A5FFBC /* FTServiceClient.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FTServiceClient.m; path = FiftyThreeSdk/FTServiceClient.m; sourceTree = SOURCE_ROOT; };
+		3C2F9C421780A7BA00A5FFBC /* FTPenDebugServiceClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FTPenDebugServiceClient.h; path = FiftyThreeSdk/FTPenDebugServiceClient.h; sourceTree = SOURCE_ROOT; };
+		3C2F9C431780A7BA00A5FFBC /* FTPenDebugServiceClient.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FTPenDebugServiceClient.m; path = FiftyThreeSdk/FTPenDebugServiceClient.m; sourceTree = SOURCE_ROOT; };
 		3CF2306E177E13910049A9EF /* FTServiceUUIDs.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FTServiceUUIDs.m; path = FiftyThreeSdk/FTServiceUUIDs.m; sourceTree = SOURCE_ROOT; };
 		661993D216EE6D5400B2BEE9 /* FTBatteryClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FTBatteryClient.h; path = FiftyThreeSdk/FTBatteryClient.h; sourceTree = SOURCE_ROOT; };
 		661993D316EE6D5400B2BEE9 /* FTBatteryClient.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FTBatteryClient.m; path = FiftyThreeSdk/FTBatteryClient.m; sourceTree = SOURCE_ROOT; };
@@ -106,6 +118,21 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		3C2F9C3E17807FCF00A5FFBC /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				3C2F9C421780A7BA00A5FFBC /* FTPenDebugServiceClient.h */,
+				3C2F9C431780A7BA00A5FFBC /* FTPenDebugServiceClient.m */,
+				3C2F9C3B1780786F00A5FFBC /* FTPenServiceClient.h */,
+				3C2F9C3C1780786F00A5FFBC /* FTPenServiceClient.m */,
+				3C2F9C3F1780802600A5FFBC /* FTServiceClient.h */,
+				3C2F9C401780802600A5FFBC /* FTServiceClient.m */,
+				66D779B616E57461001C4F55 /* FTServiceUUIDs.h */,
+				3CF2306E177E13910049A9EF /* FTServiceUUIDs.m */,
+			);
+			name = Services;
+			sourceTree = "<group>";
+		};
 		6665F819170F8AC90027BAD1 /* PenManager */ = {
 			isa = PBXGroup;
 			children = (
@@ -116,8 +143,8 @@
 				661993D516EF973900B2BEE9 /* FTError.h */,
 				66D779B316E57461001C4F55 /* FTPen.m */,
 				66D779B516E57461001C4F55 /* FTPenManager.m */,
-				66D779B616E57461001C4F55 /* FTServiceUUIDs.h */,
-				3CF2306E177E13910049A9EF /* FTServiceUUIDs.m */,
+				3C2F9C381780758300A5FFBC /* FTPeripheralDelegate.h */,
+				3C2F9C391780758300A5FFBC /* FTPeripheralDelegate.m */,
 				66D779B716E57461001C4F55 /* TIUpdateManager.h */,
 				66D779B816E57461001C4F55 /* TIUpdateManager.mm */,
 				66BEC2841703B397009207F9 /* FTFirmwareManager.h */,
@@ -164,6 +191,7 @@
 		66A8387616E52D840048FFE4 /* FiftyThreeSdk */ = {
 			isa = PBXGroup;
 			children = (
+				3C2F9C3E17807FCF00A5FFBC /* Services */,
 				6665F819170F8AC90027BAD1 /* PenManager */,
 				666DC55B170CF31E00D6B3C2 /* AppSupport */,
 				66B6E3E316F9237800251B6A /* TouchClassifiers */,
@@ -299,6 +327,10 @@
 				666DC55E170CF33C00D6B3C2 /* FTApplication.mm in Sources */,
 				6665F81C170F8B6F0027BAD1 /* FTTouchEventLogger.mm in Sources */,
 				3CF2306F177E13910049A9EF /* FTServiceUUIDs.m in Sources */,
+				3C2F9C3A1780758300A5FFBC /* FTPeripheralDelegate.m in Sources */,
+				3C2F9C3D1780786F00A5FFBC /* FTPenServiceClient.m in Sources */,
+				3C2F9C411780802600A5FFBC /* FTServiceClient.m in Sources */,
+				3C2F9C441780A7BA00A5FFBC /* FTPenDebugServiceClient.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
