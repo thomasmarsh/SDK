@@ -176,7 +176,7 @@ public:
 
 - (void)connect
 {
-    if (self.penManager.pairedPen && !self.penManager.connectedPen)
+    if (self.penManager.pen && !self.penManager.pen)
     {
         _ConnectTimer = Timer::New();
         NSAssert(0, @"Unimplemented");
@@ -198,7 +198,7 @@ public:
 
 - (void)penManager:(FTPenManager *)penManager didPairWithPen:(FTPen *)pen
 {
-    NSLog(@"didPairWithPen name=%@", pen.name);
+//    NSLog(@"didPairWithPen name=%@", pen.name);
 
     [self updateDisplay];
 
@@ -207,7 +207,7 @@ public:
 
 - (void)penManager:(FTPenManager *)penManager didUnpairFromPen:(FTPen *)pen
 {
-    NSLog(@"didUnpairFromPen name=%@", pen.name);
+//    NSLog(@"didUnpairFromPen name=%@", pen.name);
 
     [self updateDisplay];
 
@@ -232,7 +232,7 @@ public:
         _ConnectTimer.reset();
     }
 
-    NSLog(@"didConnectToPen name=%@", pen.name);
+//    NSLog(@"didConnectToPen name=%@", pen.name);
 
     pen.delegate = self;
 
@@ -243,7 +243,7 @@ public:
 
 - (void)penManager:(FTPenManager *)penManager didFailConnectToPen:(FTPen *)pen
 {
-    NSLog(@"didFailConnectToPen name=%@", pen.name);
+//    NSLog(@"didFailConnectToPen name=%@", pen.name);
 
     [self updateDisplay];
 
@@ -252,7 +252,7 @@ public:
 
 - (void)penManager:(FTPenManager *)penManager didDisconnectFromPen:(FTPen *)pen
 {
-    NSLog(@"didDisconnectFromPen name=%@", pen.name);
+//    NSLog(@"didDisconnectFromPen name=%@", pen.name);
 
     _PenAndTouchManager->SetPalmRejectionEnabled(false);
 
@@ -351,31 +351,34 @@ public:
 
 - (void)updateDisplay
 {
-    if (self.penManager.connectedPen)
+    if (self.penManager.pen)
     {
-        if (self.penManager.connectedPen.isReady)
+        if (self.penManager.pen.isReady)
         {
-            [self.pairingStatusLabel setText:[NSString stringWithFormat:@"Connected to %@", self.penManager.pairedPen.name]];
+            [self.pairingStatusLabel setText:[NSString stringWithFormat:@"Connected to %@",
+                                              self.penManager.pen.name]];
         }
         else
         {
-            [self.pairingStatusLabel setText:[NSString stringWithFormat:@"Connecting to %@", self.penManager.pairedPen.name]];
+            [self.pairingStatusLabel setText:[NSString stringWithFormat:@"Connecting to %@",
+                                              self.penManager.pen.name]];
         }
     }
-    else if (self.pairing)
-    {
-        [self.pairingStatusLabel setText:@"Pairing"];
-    }
-    else if (self.penManager.pairedPen)
-    {
-        [self.pairingStatusLabel setText:[NSString stringWithFormat:@"Paired with %@", self.penManager.pairedPen.name]];
-    }
-    else
-    {
-        [self.pairingStatusLabel setText:@"Unpaired"];
-    }
+//    else if (self.pairing)
+//    {
+//        [self.pairingStatusLabel setText:@"Pairing"];
+//    }
+//    else if (self.penManager.pen)
+//    {
+//        [self.pairingStatusLabel setText:[NSString stringWithFormat:@"Paired with %@",
+//                                          self.penManager.pen.name]];
+//    }
+//    else
+//    {
+//        [self.pairingStatusLabel setText:@"Unpaired"];
+//    }
 
-    if (self.penManager.connectedPen)
+    if (self.penManager.pen)
     {
         [self.connectButton setTitle:@"Disconnect" forState:UIControlStateNormal];
         self.updateFirmwareButton.hidden = NO;
@@ -404,7 +407,7 @@ public:
         [self setInkColorBlack];
     }
 
-    if (self.penManager.pairedPen)
+    if (self.penManager.pen)
     {
         self.testConnectButton.hidden = NO;
         self.connectButton.hidden = NO;
@@ -455,7 +458,7 @@ public:
 
 - (IBAction)connectButtonPressed:(id)sender
 {
-    if (!self.penManager.connectedPen)
+    if (!self.penManager.pen)
     {
         [self connect];
     }
@@ -472,7 +475,7 @@ public:
 
 - (IBAction)unpairButtonPressed:(id)sender
 {
-    [self.penManager deletePairedPen:self.penManager.pairedPen];
+//    [self.penManager deletePairedPen:self.penManager.pairedPen];
 
     [self updateDisplay];
 }
@@ -497,7 +500,7 @@ public:
 {
     NSLog(@"Checking for updates...");
 
-    if ([self.penManager isUpdateAvailableForPen:self.penManager.connectedPen])
+    if ([self.penManager isUpdateAvailableForPen:self.penManager.pen])
     {
         NSLog(@"Update available");
 
@@ -512,7 +515,7 @@ public:
 - (void)queryFirmwareUpdate:(BOOL)forced
 {
     if (forced
-        || [self.penManager isUpdateAvailableForPen:self.penManager.connectedPen])
+        || [self.penManager isUpdateAvailableForPen:self.penManager.pen])
      {
          [self showUpdateStartView];
      }
@@ -530,7 +533,7 @@ public:
     self.updateProgressView = [[UIAlertView alloc] initWithTitle:@"Firmware Update" message:[NSString stringWithFormat:kUpdateProgressViewMessage, 0., 0, 0] delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:nil, nil];
     [self.updateProgressView show];
 
-    [self.penManager updateFirmwareForPen:self.penManager.connectedPen];
+    [self.penManager updateFirmwareForPen:self.penManager.pen];
 }
 
 - (void)didDetectMultitaskingGesturesEnabled
@@ -665,7 +668,7 @@ public:
 
 - (BOOL)shouldDrawTouch:(const Touch::cPtr &)touch
 {
-    if (self.penManager.connectedPen)
+    if (self.penManager.pen)
     {
         TouchType type = _PenAndTouchManager->GetTouchType(touch);
 
@@ -798,7 +801,7 @@ public:
 
 - (void)touchTypeChanged:(const Touch::cPtr &)touch
 {
-    DebugAssert(self.penManager.connectedPen);
+    DebugAssert(self.penManager.pen);
 
     if (_StrokeTouch == touch)
     {
@@ -827,7 +830,7 @@ public:
     NSDateFormatter *format = [[NSDateFormatter alloc] init];
     [format setDateFormat:@"MMM dd, yyyy HH:mm:ss"];
 
-    FTPen* pen = self.penManager.connectedPen;
+    FTPen* pen = self.penManager.pen;
     NSString *info = [NSString stringWithFormat:@"\
 Manufacturer = %@\n \
 Model Number = %@\n \

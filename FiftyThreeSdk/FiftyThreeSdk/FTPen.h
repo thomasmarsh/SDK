@@ -7,18 +7,6 @@
 
 #import <Foundation/Foundation.h>
 
-typedef NS_ENUM(NSInteger, FTPenTip) {
-    FTPenTip1,
-    FTPenTip2
-};
-
-@protocol FTPenDelegate;
-@class UIView;
-
-@interface FTPen : NSObject
-{
-}
-
 typedef struct
 {
     uint8_t vendorIdSource;
@@ -26,6 +14,13 @@ typedef struct
     uint16_t productId;
     uint16_t productVersion;
 } PnPID;
+
+extern NSString * const kFTPenIsTipPressedDidChangeNotificationName;
+extern NSString * const kFTPenIsEraserPressedDidChangeNotificationName;
+
+@protocol FTPenDelegate;
+
+@interface FTPen : NSObject
 
 @property (nonatomic, readonly) BOOL isReady;
 
@@ -45,6 +40,7 @@ typedef struct
 
 @property (nonatomic, readonly) BOOL isTipPressed;
 @property (nonatomic, readonly) BOOL isEraserPressed;
+@property (nonatomic, readonly) NSDate *lastTipReleaseTime;
 
 @end
 

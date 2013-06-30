@@ -21,9 +21,10 @@ typedef enum
     ConnectionState_Dating,
     ConnectionState_Dating_AttemptingConnection,
     ConnectionState_Engaged_WaitingForTipRelease,
-    ConnectionState_Engaged_WaitingForTouchEnd,
+    ConnectionState_Engaged_WaitingForPairingSpotRelease,
     ConnectionState_Engaged,
     ConnectionState_Married,
+    ConnectionState_AwaitingDisconnection,
 } ConnectionState;
 
 NSString *ConnectionStateString(ConnectionState connectionState)
@@ -35,8 +36,9 @@ NSString *ConnectionStateString(ConnectionState connectionState)
         case ConnectionState_Dating_AttemptingConnection: return @"ConnectionState_Dating_AttemptingConnection";
         case ConnectionState_Engaged: return @"ConnectionState_Engaged";
         case ConnectionState_Engaged_WaitingForTipRelease: return @"ConnectionState_Engaged_WaitingForTipRelease";
-        case ConnectionState_Engaged_WaitingForTouchEnd: return @"ConnectionState_Engaged_WaitingForTouchEnd";
+        case ConnectionState_Engaged_WaitingForPairingSpotRelease: return @"ConnectionState_Engaged_WaitingForPairingSpotRelease";
         case ConnectionState_Married: return @"ConnectionState_Married";
+        case ConnectionState_AwaitingDisconnection: return @"ConectionState_AwaitingDisconnection";
         default:
             return nil;
     }
@@ -49,25 +51,16 @@ static const double kPairingReleaseWindowSeconds = 0.100;
 @interface FTPenManager () <CBCentralManagerDelegate, FTPenPrivateDelegate, TIUpdateManagerDelegate>
 
 @property (nonatomic) CBCentralManager *centralManager;
-@property (nonatomic) ConnectionState connectionState;
+@property (nonatomic) TIUpdateManager *updateManager;
 
-// TODO: Change name. Could be connecting, not connected.
-@property (nonatomic, readwrite) FTPen *pen;
+@property (nonatomic, readwrite) FTPenManagerState state;
+@property (nonatomic) ConnectionState connectionState;
 
 @property (nonatomic) BOOL isScanningForPeripherals;
 
-@property (nonatomic) TIUpdateManager *updateManager;
-@property (nonatomic, readwrite) FTPenManagerState state;
-@property (nonatomic) NSTimer *pairingTimer;
-@property (nonatomic) NSTimer *trialSeparationTimer;
-@property (nonatomic) NSTimer *falsePairingTimer;
-@property (nonatomic) int maxRSSI;
-@property (nonatomic) FTPen *closestPen;
-@property (nonatomic) NSDate *lastReleaseTime;
-@property (nonatomic) NSDate *stopPairingTime;
-@property (nonatomic, readwrite) FTPen *pairedPen;
-@property (nonatomic, readwrite) BOOL pairing;
-@property (nonatomic, readwrite) BOOL newlyPaired;
+@property (nonatomic) NSDate *lastPairingSpotReleaseTime;
+
+@property (nonatomic, readwrite) FTPen *pen;
 
 @end
 
@@ -96,6 +89,33 @@ static const double kPairingReleaseWindowSeconds = 0.100;
     _pen.privateDelegate = nil;
     _pen = pen;
     _pen.privateDelegate = self;
+
+    [[NSNotificationCenter defaultCenter] removeObserver:kFTPenIsTipPressedDidChangeNotificationName];
+    if (_pen)
+    {
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(penIsTipPressedDidChange:)
+                                                     name:kFTPenIsTipPressedDidChangeNotificationName
+                                                   object:_pen];
+    }
+}
+
+- (void)penIsTipPressedDidChange:(NSNotification *)notification
+{
+    NSAssert(notification.object == self.pen,
+             @"Should only be registered for notification from the current pen");
+
+    if (!self.pen.isTipPressed && self.pen.lastTipReleaseTime)
+    {
+        if (self.connectionState == ConnectionState_Engaged)
+        {
+            [self transitionConnectionStateToEngaged_WaitingForPairPairingSpotRelease];
+        }
+        else if (self.connectionState == ConnectionState_Engaged_WaitingForTipRelease)
+        {
+            [self transitionConnectionStateFromEngagedSubstate];
+        }
+    }
 }
 
 #pragma mark - ConnectionState
@@ -146,7 +166,23 @@ static const double kPairingReleaseWindowSeconds = 0.100;
 
 - (void)transitionConnectionStateToSingle
 {
+    // TODO: enumerate possible states from which we may be transitioning
+
     self.connectionState = ConnectionState_Single;
+}
+
+- (void)transitionConnectionStateToAwaitingDisconnection
+{
+    if (self.pen)
+    {
+        [self.centralManager cancelPeripheralConnection:self.pen.peripheral];
+
+        self.connectionState = ConnectionState_AwaitingDisconnection;
+    }
+    else
+    {
+        [self transitionConnectionStateToSingle];
+    }
 }
 
 - (void)transitionConnectionStateToDating
@@ -178,6 +214,52 @@ static const double kPairingReleaseWindowSeconds = 0.100;
     self.connectionState = ConnectionState_Engaged;
 }
 
+- (void)transitionConnectionStateToEngaged_WaitingForTipRelease
+{
+    NSAssert(self.connectionState == ConnectionState_Engaged, @"");
+
+    self.connectionState = ConnectionState_Engaged_WaitingForTipRelease;
+}
+
+- (void)transitionConnectionStateToEngaged_WaitingForPairPairingSpotRelease
+{
+    NSAssert(self.connectionState == ConnectionState_Engaged, @"");
+
+    self.connectionState = ConnectionState_Engaged_WaitingForPairingSpotRelease;
+}
+
+- (void)transitionConnectionStateFromEngagedSubstate
+{
+    NSAssert(self.connectionState == ConnectionState_Engaged_WaitingForPairingSpotRelease ||
+             self.connectionState == ConnectionState_Engaged_WaitingForTipRelease, @"");
+    NSAssert(self.lastPairingSpotReleaseTime && self.pen.lastTipReleaseTime, @"");
+
+    static const NSTimeInterval kTipAndPairingSpotReleaseTimeDifferenceThreshold = 0.1;
+
+    NSDate *t0 = self.lastPairingSpotReleaseTime;
+    NSDate *t1 = self.pen.lastTipReleaseTime;
+    NSTimeInterval tipAndPairingSpoteReleaseTimeDifference = fabs([t0 timeIntervalSinceDate:t1]);
+    NSLog(@"Difference in pairing spot and tip press release times (ms): %f.",
+          tipAndPairingSpoteReleaseTimeDifference * 1000.0);
+
+    if (tipAndPairingSpoteReleaseTimeDifference < kTipAndPairingSpotReleaseTimeDifferenceThreshold)
+    {
+        [self transitionConnectionStateToMarried];
+    }
+    else
+    {
+        [self transitionConnectionStateToAwaitingDisconnection];
+    }
+}
+
+- (void)transitionConnectionStateToMarried
+{
+    NSAssert(self.connectionState == ConnectionState_Engaged_WaitingForPairingSpotRelease ||
+             self.connectionState == ConnectionState_Engaged_WaitingForTipRelease, @"");
+
+    self.connectionState = ConnectionState_Married;
+}
+
 #pragma mark - Pairing Spot
 
 - (void)pairingSpotWasPressed
@@ -196,9 +278,19 @@ static const double kPairingReleaseWindowSeconds = 0.100;
 
     self.isScanningForPeripherals = NO;
 
+    self.lastPairingSpotReleaseTime = [NSDate date];
+
     if (self.connectionState == ConnectionState_Dating)
     {
         [self transitionConnectionStateToSingle];
+    }
+    else if (self.connectionState == ConnectionState_Engaged)
+    {
+        [self transitionConnectionStateToEngaged_WaitingForTipRelease];
+    }
+    else if (self.connectionState == ConnectionState_Engaged_WaitingForPairingSpotRelease)
+    {
+        [self transitionConnectionStateFromEngagedSubstate];
     }
 }
 
@@ -344,49 +436,49 @@ static const double kPairingReleaseWindowSeconds = 0.100;
     [self.delegate penManagerDidUpdateState:self];
 }
 
-- (void)savePairedPen:(FTPen *)pen
-{
-    NSAssert(pen, nil);
-
-    CFUUIDRef uuid = pen.peripheral.UUID;
-    NSString* uuidString = uuid != nil ? CFBridgingRelease(CFUUIDCreateString(NULL, uuid)) : nil;
-
-    [[NSUserDefaults standardUserDefaults] setValue:uuidString
-                                             forKey:kPairedPenUuidDefaultsKey];
-    [[NSUserDefaults standardUserDefaults] synchronize];
-}
-
-- (void)loadPairedPen
-{
-    NSString *uuid = [[NSUserDefaults standardUserDefaults] stringForKey:kPairedPenUuidDefaultsKey];
-    if (uuid) {
-        [self.centralManager retrievePeripherals:@[CFBridgingRelease(CFUUIDCreateFromString(NULL, (CFStringRef)uuid))]];
-    } else {
-        [self updateState:FTPenManagerStateAvailable];
-    }
-}
-
-- (void)deletePairedPen:(FTPen *)pen
-{
-    NSAssert(pen, nil);
-
-    if (self.pen == pen)
-    {
-        [self disconnect];
-    }
-
-    if (self.pairedPen == pen)
-    {
-        self.pairedPen = nil;
-
-        [[NSUserDefaults standardUserDefaults] setValue:nil
-                                                 forKey:kPairedPenUuidDefaultsKey];
-        [[NSUserDefaults standardUserDefaults] synchronize];
-
-        [self.delegate penManager:self didUnpairFromPen:pen];
-    }
-}
-
+//- (void)savePairedPen:(FTPen *)pen
+//{
+//    NSAssert(pen, nil);
+//
+//    CFUUIDRef uuid = pen.peripheral.UUID;
+//    NSString* uuidString = uuid != nil ? CFBridgingRelease(CFUUIDCreateString(NULL, uuid)) : nil;
+//
+//    [[NSUserDefaults standardUserDefaults] setValue:uuidString
+//                                             forKey:kPairedPenUuidDefaultsKey];
+//    [[NSUserDefaults standardUserDefaults] synchronize];
+//}
+//
+//- (void)loadPairedPen
+//{
+//    NSString *uuid = [[NSUserDefaults standardUserDefaults] stringForKey:kPairedPenUuidDefaultsKey];
+//    if (uuid) {
+//        [self.centralManager retrievePeripherals:@[CFBridgingRelease(CFUUIDCreateFromString(NULL, (CFStringRef)uuid))]];
+//    } else {
+//        [self updateState:FTPenManagerStateAvailable];
+//    }
+//}
+//
+//- (void)deletePairedPen:(FTPen *)pen
+//{
+//    NSAssert(pen, nil);
+//
+//    if (self.pen == pen)
+//    {
+//        [self disconnect];
+//    }
+//
+//    if (self.pairedPen == pen)
+//    {
+//        self.pairedPen = nil;
+//
+//        [[NSUserDefaults standardUserDefaults] setValue:nil
+//                                                 forKey:kPairedPenUuidDefaultsKey];
+//        [[NSUserDefaults standardUserDefaults] synchronize];
+//
+//        [self.delegate penManager:self didUnpairFromPen:pen];
+//    }
+//}
+//
 //- (void)didConnectToPen:(FTPen *)pen
 //{
 //    NSAssert(pen, nil);
@@ -501,14 +593,8 @@ static const double kPairingReleaseWindowSeconds = 0.100;
 
 - (void)centralManagerDidUpdateState:(CBCentralManager *)central
 {
-    if (central.state == CBCentralManagerStatePoweredOn)
-    {
-        [self loadPairedPen];
-    }
-    else
-    {
-        [self updateState:FTPenManagerStateUnavailable];
-    }
+    // TODO: Handle the other cases gracefully.
+    NSAssert(central.state == CBCentralManagerStatePoweredOn, @"Assume central manager state = powered on");
 }
 
 - (void)centralManager:(CBCentralManager *)central
@@ -579,10 +665,7 @@ static const double kPairingReleaseWindowSeconds = 0.100;
 - (void)centralManager:(CBCentralManager *)central didDisconnectPeripheral:(CBPeripheral *)peripheral
                  error:(NSError *)error
 {
-    FTPen *pen = self.pen;
-    self.pen = nil;
-
-    [pen peripheralConnectionStatusDidChange];
+    NSAssert(peripheral == self.pen.peripheral, @"");
 
     if (self.updateManager)
     {
@@ -597,6 +680,11 @@ static const double kPairingReleaseWindowSeconds = 0.100;
             self.updateManager = nil;
         }
     }
+
+    FTPen *pen = self.pen;
+    self.pen = nil;
+
+    [pen peripheralConnectionStatusDidChange];
 
     [self.delegate penManager:self didDisconnectFromPen:pen];
 

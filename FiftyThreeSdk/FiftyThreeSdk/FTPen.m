@@ -12,6 +12,9 @@
 #import "FTDeviceInfoClient.h"
 #import "FTBatteryClient.h"
 
+NSString * const kFTPenIsTipPressedDidChangeNotificationName = @"com.fiftythree.pen.isTipPressedDidChange";
+NSString * const kFTPenIsEraserPressedDidChangeNotificationName = @"com.fiftythree.pen.isEraserPressedDidChange";
+
 static NSString * const kPeripheralIsConnectedKeyPath = @"isConnected";
 
 @interface FTPen () <CBPeripheralDelegate>
@@ -19,6 +22,8 @@ static NSString * const kPeripheralIsConnectedKeyPath = @"isConnected";
 @property (nonatomic) CBCentralManager *centralManager;
 
 @property (nonatomic, readwrite) BOOL isReady;
+
+@property (nonatomic, readwrite) NSDate *lastTipReleaseTime;
 
 @property (nonatomic) CBCharacteristic *isTipPressedCharacteristic;
 @property (nonatomic) CBCharacteristic *isEraserPressedCharacteristic;
@@ -89,7 +94,7 @@ static NSString * const kPeripheralIsConnectedKeyPath = @"isConnected";
     }
     else
     {
-        NSLog(@"peripheral disconnected");
+        NSLog(@"Peripheral was disconnected.");
 
         [self handleDisconnection];
     }
@@ -142,8 +147,7 @@ static NSString * const kPeripheralIsConnectedKeyPath = @"isConnected";
 
         if ([service.UUID isEqual:[FTPenServiceUUIDs penService]])
         {
-            characteristics = @[
-                                [FTPenServiceUUIDs isTipPressed],
+            characteristics = @[[FTPenServiceUUIDs isTipPressed],
                                 [FTPenServiceUUIDs isEraserPressed],
                                 [FTPenServiceUUIDs shouldSwing],
                                 [FTPenServiceUUIDs shouldPowerOff],
@@ -159,8 +163,7 @@ static NSString * const kPeripheralIsConnectedKeyPath = @"isConnected";
             NSAssert(NO, @"Should not discover debug service in non-debug builds.");
 #endif
 
-            characteristics = @[
-                                [FTPenDebugServiceUUIDs deviceState],
+            characteristics = @[[FTPenDebugServiceUUIDs deviceState],
                                 [FTPenDebugServiceUUIDs tipPressure],
                                 [FTPenDebugServiceUUIDs erasurePressure],
                                 [FTPenDebugServiceUUIDs longPressTime],
@@ -248,7 +251,16 @@ static NSString * const kPeripheralIsConnectedKeyPath = @"isConnected";
     if ([characteristic.UUID isEqual:[FTPenServiceUUIDs isTipPressed]])
     {
         BOOL isTipPressed = self.isTipPressed;
+
+        // TODO: Assumes tip was initially pressed... may not be the case?
+        if (!isTipPressed)
+        {
+            self.lastTipReleaseTime = [NSDate date];
+        }
+
         [self.delegate pen:self isTipPressedDidChange:isTipPressed];
+        [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenIsTipPressedDidChangeNotificationName
+                                                            object:self];
 
         NSLog(@"IsTipPressed characteristic changed: %d.", isTipPressed);
     }
@@ -256,6 +268,8 @@ static NSString * const kPeripheralIsConnectedKeyPath = @"isConnected";
     {
         BOOL isEraserPressed = self.isEraserPressed;
         [self.delegate pen:self isEraserPressedDidChange:isEraserPressed];
+        [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenIsEraserPressedDidChangeNotificationName
+                                                            object:self];
 
         NSLog(@"IsEraserPressed characteristic changed: %d.", isEraserPressed);
     }
