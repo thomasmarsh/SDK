@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="2.0" toolsVersion="3084" systemVersion="12D78" targetRuntime="iOS.CocoaTouch.iPad" propertyAccessControl="none" useAutolayout="YES" initialViewController="ElL-cK-gOP">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="2.0" toolsVersion="3084" systemVersion="12E55" targetRuntime="iOS.CocoaTouch.iPad" propertyAccessControl="none" useAutolayout="YES" initialViewController="ElL-cK-gOP">
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="2083"/>
     </dependencies>
@@ -7,7 +7,7 @@
         <!--View Controller-->
         <scene sceneID="4">
             <objects>
-                <viewController id="2" customClass="ViewController" sceneMemberID="viewController">
+                <viewController id="2" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="5">
                         <rect key="frame" x="0.0" y="64" width="768" height="960"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -326,71 +326,6 @@
             <point key="canvasLocation" x="-236" y="-111"/>
         </scene>
     </scenes>
-    <classes>
-        <class className="BTLECentralViewController" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/BTLECentralViewController.h"/>
-            <relationships>
-                <relationship kind="action" name="annotateButtonPressed:"/>
-                <relationship kind="action" name="clearButtonPressed:"/>
-                <relationship kind="action" name="connectButtonPressed:"/>
-                <relationship kind="action" name="infoButtonPressed:"/>
-                <relationship kind="action" name="pairButtonTouchDown:"/>
-                <relationship kind="action" name="pairButtonTouchUpInside:"/>
-                <relationship kind="action" name="pairButtonTouchUpOutside:"/>
-                <relationship kind="action" name="shareButtonPressed:"/>
-                <relationship kind="action" name="testConnectButtonPressed:"/>
-                <relationship kind="action" name="trialSeparationButtonPressed:"/>
-                <relationship kind="action" name="updateFirmwareButtonPressed:"/>
-                <relationship kind="outlet" name="annotateButton" candidateClass="UIButton"/>
-                <relationship kind="outlet" name="clearButton" candidateClass="UIButton"/>
-                <relationship kind="outlet" name="connectButton" candidateClass="UIButton"/>
-                <relationship kind="outlet" name="infoButton" candidateClass="UIBarButtonItem"/>
-                <relationship kind="outlet" name="pairButton" candidateClass="UIButton"/>
-                <relationship kind="outlet" name="pairingStatusLabel" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="shareButton" candidateClass="UIButton"/>
-                <relationship kind="outlet" name="testConnectButton" candidateClass="UIButton"/>
-                <relationship kind="outlet" name="tip1State" candidateClass="UIButton"/>
-                <relationship kind="outlet" name="tip2State" candidateClass="UIButton"/>
-                <relationship kind="outlet" name="trialSeparationButton" candidateClass="UIButton"/>
-                <relationship kind="outlet" name="updateFirmwareButton" candidateClass="UIButton"/>
-            </relationships>
-        </class>
-        <class className="BTLEPeripheralViewController" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/BTLEPeripheralViewController.h"/>
-            <relationships>
-                <relationship kind="action" name="secureSwitchChanged:"/>
-                <relationship kind="action" name="tip1TouchDown:"/>
-                <relationship kind="action" name="tip1TouchUpInside:"/>
-                <relationship kind="action" name="tip1TouchUpOutside:"/>
-                <relationship kind="action" name="tip2TouchDown:"/>
-                <relationship kind="action" name="tip2TouchUpInside:"/>
-                <relationship kind="action" name="tip2TouchUpOutside:"/>
-                <relationship kind="outlet" name="connectionStatusLabel" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="secureSwitch" candidateClass="UISwitch"/>
-            </relationships>
-        </class>
-        <class className="NSLayoutConstraint" superclassName="NSObject">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/NSLayoutConstraint.h"/>
-        </class>
-        <class className="ViewController" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ViewController.h"/>
-            <relationships>
-                <relationship kind="action" name="connectButtonPressed:"/>
-                <relationship kind="action" name="infoButtonPressed:"/>
-                <relationship kind="action" name="pairButtonTouchDown:"/>
-                <relationship kind="action" name="pairButtonTouchUpInside:"/>
-                <relationship kind="action" name="pairButtonTouchUpOutside:"/>
-                <relationship kind="outlet" name="connectButton" candidateClass="UIButton"/>
-                <relationship kind="outlet" name="pairButton" candidateClass="UIButton"/>
-                <relationship kind="outlet" name="pcConnectedButton" candidateClass="UIButton"/>
-                <relationship kind="outlet" name="penConnectedButton" candidateClass="UIButton"/>
-                <relationship kind="outlet" name="statusLabel" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="tip1State" candidateClass="UIButton"/>
-                <relationship kind="outlet" name="tip2State" candidateClass="UIButton"/>
-                <relationship kind="outlet" name="touchButton" candidateClass="UIButton"/>
-            </relationships>
-        </class>
-    </classes>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
         <simulatedStatusBarMetrics key="statusBar" statusBarStyle="blackTranslucent"/>
         <simulatedOrientationMetrics key="orientation"/>
