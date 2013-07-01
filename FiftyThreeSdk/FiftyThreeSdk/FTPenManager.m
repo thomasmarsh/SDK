@@ -11,7 +11,6 @@
 #include "FTServiceUUIDs.h"
 #import "FTPen.h"
 #import "FTPen+Private.h"
-#import "FTDeviceInfoClient.h"
 #import "TIUpdateManager.h"
 #import "FTFirmwareManager.h"
 

@@ -70,7 +70,7 @@
     return [CBUUID UUIDWithCFUUID:FT_PEN_SERVICE_INACTIVITY_TIME_UUID];
 }
 
-+ (NSString *)nameForPenServiceUUID:(CBUUID *)UUID
++ (NSString *)nameForUUID:(CBUUID *)UUID
 {
     NSDictionary *UUIDs = @{ [FTPenServiceUUIDs penService] : @"PenService",
                              [FTPenServiceUUIDs isTipPressed] : @"IsTipPressed",
@@ -141,7 +141,7 @@
     return [CBUUID UUIDWithCFUUID:FT_PEN_DEBUG_SERVICE_CONNECTION_TIME_UUID];
 }
 
-+ (NSString *)nameForPenDebugServiceUUID:(CBUUID *)UUID
++ (NSString *)nameForUUID:(CBUUID *)UUID
 {
     NSDictionary *UUIDs = @{ [FTPenDebugServiceUUIDs penDebugService] : @"PenDebugService",
                              [FTPenDebugServiceUUIDs deviceState] : @"DeviceState",
@@ -156,12 +156,86 @@
 
 @end
 
+@implementation FTDeviceInfoServiceUUIDs
+
++ (CBUUID *)deviceInfoService
+{
+    return [CBUUID UUIDWithString:@"0x180A"];
+}
+
++ (CBUUID *)manufacturerName
+{
+    return [CBUUID UUIDWithString:@"0x2A29"];
+}
+
++ (CBUUID *)modelNumber
+{
+    return [CBUUID UUIDWithString:@"0x2A24"];
+}
+
++ (CBUUID *)serialNumber
+{
+    return [CBUUID UUIDWithString:@"0x2A25"];
+}
+
++ (CBUUID *)firmwareRevision
+{
+    return [CBUUID UUIDWithString:@"0x2A26"];
+}
+
++ (CBUUID *)hardwareRevision
+{
+    return [CBUUID UUIDWithString:@"0x2A27"];
+}
+
++ (CBUUID *)softwareRevision
+{
+    return [CBUUID UUIDWithString:@"0x2A28"];
+}
+
++ (CBUUID *)systemID
+{
+    return [CBUUID UUIDWithString:@"0x2A23"];
+}
+
++ (CBUUID *)IEEECertificationData
+{
+    return [CBUUID UUIDWithString:@"0x2A2A"];
+}
+
++ (CBUUID *)PnPID
+{
+    return [CBUUID UUIDWithString:@"0x2A50"];
+}
+
++ (NSString *)nameForUUID:(CBUUID *)UUID
+{
+    NSDictionary *UUIDs = @{ [FTDeviceInfoServiceUUIDs deviceInfoService] : @"DeviceInfoService",
+                             [FTDeviceInfoServiceUUIDs manufacturerName] : @"ManufacturerName",
+                             [FTDeviceInfoServiceUUIDs modelNumber] : @"ModelNumber",
+                             [FTDeviceInfoServiceUUIDs serialNumber] : @"SerialNumber",
+                             [FTDeviceInfoServiceUUIDs firmwareRevision] : @"FirmwareRevision",
+                             [FTDeviceInfoServiceUUIDs hardwareRevision] : @"HardwareRevision",
+                             [FTDeviceInfoServiceUUIDs softwareRevision] : @"SoftwareRevision",
+                             [FTDeviceInfoServiceUUIDs systemID] : @"SystemID",
+                             [FTDeviceInfoServiceUUIDs IEEECertificationData] : @"IEEECertificationData",
+                             [FTDeviceInfoServiceUUIDs PnPID] : @"PnPId"};
+
+    return [UUIDs objectForKey:UUID];
+}
+
+@end
+
 NSString *FTNameForServiceUUID(CBUUID *UUID)
 {
-    NSString *name = [FTPenServiceUUIDs nameForPenServiceUUID:UUID];
+    NSString *name = [FTPenServiceUUIDs nameForUUID:UUID];
     if (!name)
     {
-        name = [FTPenDebugServiceUUIDs nameForPenDebugServiceUUID:UUID];
+        name = [FTPenDebugServiceUUIDs nameForUUID:UUID];
+    }
+    if (!name)
+    {
+        name = [FTDeviceInfoServiceUUIDs nameForUUID:UUID];
     }
 
     return name;

@@ -2,8 +2,7 @@
 //  ViewController.m
 //  CharcoalLineTest
 //
-//  Created by Adam on 5/9/13.
-//  Copyright (c) 2013 FiftyThree. All rights reserved.
+//  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
 //
 
 #import "ViewController.h"
@@ -24,11 +23,11 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-	// Do any additional setup after loading the view, typically from a nib.
-    
+    // Do any additional setup after loading the view, typically from a nib.
+
     _rscManager = [[RscMgr alloc] init];
     [_rscManager setDelegate:self];
-    
+
     _penManager = [[FTPenManager alloc] initWithDelegate:self];
     _penManager.autoConnect = NO;
 }
@@ -42,7 +41,6 @@
 #pragma mark -
 #pragma mark FTPenManagerDelegate
 
-
 - (void)penManagerDidUpdateState:(FTPenManager *)penManager
 {
     [self updateDisplay];
@@ -51,37 +49,37 @@
 - (void)penManager:(FTPenManager *)penManager didPairWithPen:(FTPen *)pen
 {
     NSLog(@"didPairWithPen name=%@", pen.name);
-    
+
     [self updateDisplay];
 }
 
 - (void)penManager:(FTPenManager *)penManager didUnpairFromPen:(FTPen *)pen
 {
     NSLog(@"didUnpairFromPen name=%@", pen.name);
-    
+
     [self updateDisplay];
 }
 
 - (void)penManager:(FTPenManager *)penManager didConnectToPen:(FTPen *)pen
 {
     NSLog(@"didConnectToPen name=%@", pen.name);
-    
+
     pen.delegate = self;
-    
+
     [self updateDisplay];
 }
 
 - (void)penManager:(FTPenManager *)penManager didFailConnectToPen:(FTPen *)pen
 {
     NSLog(@"didFailConnectToPen name=%@", pen.name);
-    
+
     [self updateDisplay];
 }
 
 - (void)penManager:(FTPenManager *)penManager didDisconnectFromPen:(FTPen *)pen
 {
     NSLog(@"didDisconnectFromPen name=%@", pen.name);
-    
+
     [self updateDisplay];
 }
 
@@ -98,7 +96,7 @@
     if (tip == FTPenTip1) {
         //        NSLog(@"Tip1 pressed");
         [self.tip1State setHighlighted:YES];
-        
+
         [self sendCharacter:'A'];
     } else if (tip == FTPenTip2) {
         //        NSLog(@"Tip2 pressed");
@@ -107,21 +105,20 @@
         [self sendCharacter:'B'];
     } else {
         NSLog(@"WARNING: Unsupported tip pressed");
-    }    
+    }
 }
-
 
 - (void)pen:(FTPen *)pen didReleaseTip:(FTPenTip)tip
 {
     if (tip == FTPenTip1) {
         //        NSLog(@"Tip1 released");
         [self.tip1State setHighlighted:NO];
-        
+
         [self sendCharacter:'a'];
     } else if (tip == FTPenTip2) {
         //        NSLog(@"Tip1 released");
         [self.tip2State setHighlighted:NO];
-        
+
         [self sendCharacter:'b'];
     } else {
         NSLog(@"WARNING: Unsupported tip released");
@@ -136,12 +133,12 @@
     NSLog(@"firmware revision = %@", pen.firmwareRevision);
     NSLog(@"hardware revision = %@", pen.hardwareRevision);
     NSLog(@"software revision = %@", pen.softwareRevision);
-    NSLog(@"system id = %@", pen.systemId);
+    NSLog(@"system id = %@", pen.systemID);
     NSLog(@"PnPID.vendorId = %d", pen.pnpId.vendorId);
     NSLog(@"PnPID.vendorIdSource = %d", pen.pnpId.vendorIdSource);
     NSLog(@"PnPID.productId = %d", pen.pnpId.productId);
     NSLog(@"PnPID.productVersion = %d", pen.pnpId.productVersion);
-    
+
     [self updateDisplay];
 }
 
@@ -180,7 +177,7 @@
     {
         [self.statusLabel setText:@"Unpaired"];
     }
-    
+
     if (self.penManager.connectedPen)
     {
         [self.connectButton setTitle:@"Disconnect" forState:UIControlStateNormal];
@@ -189,11 +186,11 @@
     else
     {
         [self.connectButton setTitle:@"Connect" forState:UIControlStateNormal];
-        
+
         [self.tip1State setHighlighted:NO];
         [self.tip2State setHighlighted:NO];
     }
-    
+
     if (self.penManager.pairedPen)
     {
 //        [self.connectButton setHidden:NO];
@@ -202,7 +199,7 @@
     {
 //        [self.connectButton setHidden:YES];
     }
-    
+
     [self.pcConnectedButton setHighlighted:!self.pcConnected];
     [self.penConnectedButton setHighlighted:!self.penManager.connectedPen];
 }
@@ -252,7 +249,7 @@
 {
     NSDateFormatter *format = [[NSDateFormatter alloc] init];
     [format setDateFormat:@"MMM dd, yyyy HH:mm:ss"];
-    
+
     FTPen* pen = self.penManager.connectedPen;
     NSString *info = [NSString stringWithFormat:@"\
                       Manufacturer = %@\n \
@@ -263,9 +260,16 @@
                       Software Revision = %@\n \
                       System ID = %@\n \
                       Battery Level = %lu\n \
-                      \n", pen.manufacturerName, pen.modelNumber, pen.serialNumber, pen.firmwareRevision, pen.hardwareRevision,
-                       pen.softwareRevision, pen.systemId, (long)pen.batteryLevel];
-    
+                      \n",
+                      pen.manufacturerName,
+                      pen.modelNumber,
+                      pen.serialNumber,
+                      pen.firmwareRevision,
+                      pen.hardwareRevision,
+                      pen.softwareRevision,
+                      pen.systemID,
+                      (long)pen.batteryLevel];
+
     UIAlertView* alertView = [[UIAlertView alloc] initWithTitle:@"Device Information" message:info delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
     [alertView show];
 }
@@ -278,7 +282,7 @@
 
 - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
 {
-    
+
 }
 
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
@@ -289,7 +293,7 @@
 
 - (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event
 {
-    
+
 }
 
 #pragma mark -
@@ -300,7 +304,7 @@
 - (void) cableConnected:(NSString *)protocol
 {
     [self.rscManager open];
-    
+
     self.pcConnected = YES;
     [self updateDisplay];
 }
@@ -316,13 +320,13 @@
 // user can call getModemStatus or getPortStatus to get current state
 - (void) portStatusChanged
 {
-    
+
 }
 
 // bytes are available to be read (user should call read:, getDataFromBytesAvailable, or getStringFromBytesAvailable)
 - (void) readBytesAvailable:(UInt32)length
 {
-    
+
 }
 
 @end

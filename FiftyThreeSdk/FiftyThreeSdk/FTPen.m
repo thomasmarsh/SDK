@@ -9,11 +9,11 @@
 #import "FTPen+Private.h"
 #import <CoreBluetooth/CoreBluetooth.h>
 #import "FTServiceUUIDs.h"
-#import "FTDeviceInfoClient.h"
-#import "FTBatteryClient.h"
+#import "FTDeviceInfoServiceClient.h"
 #import "FTPeripheralDelegate.h"
 #import "FTPenServiceClient.h"
 #import "FTPenDebugServiceClient.h"
+#import "FTDeviceInfoServiceClient.h"
 
 @interface FTPen () <FTPenServiceClientDelegate, FTPenDebugServiceClientDelegate>
 
@@ -22,14 +22,12 @@
 
 @property (nonatomic) FTPenServiceClient *penServiceClient;
 @property (nonatomic) FTPenDebugServiceClient *penDebugServiceClient;
+@property (nonatomic) FTDeviceInfoServiceClient *deviceInfoServiceClient;
 
 @property (nonatomic, readwrite) BOOL isReady;
 
 @property (nonatomic, readwrite) NSString *name;
 @property (nonatomic, readwrite) NSString *manufacturer;
-
-@property (nonatomic) FTDeviceInfoClient *deviceInfoClient;
-@property (nonatomic) FTBatteryClient *batteryClient;
 
 @end
 
@@ -65,6 +63,8 @@
         [_peripheralDelegate addServiceClient:_penDebugServiceClient];
 #endif
 
+        _deviceInfoServiceClient = [[FTDeviceInfoServiceClient alloc] init];
+        [_peripheralDelegate addServiceClient:_deviceInfoServiceClient];
     }
 
     return self;
@@ -143,22 +143,6 @@
     _manufacturer = [data objectForKey:CBAdvertisementDataManufacturerDataKey];
 }
 
-- (void)getInfo:(void(^)(FTPen *client, NSError *error))complete;
-{
-    _deviceInfoClient = [[FTDeviceInfoClient alloc] initWithPeripheral:_peripheral];
-    [_deviceInfoClient getInfo:^(FTDeviceInfoClient *client, NSError *error) {
-        complete(self, error);
-    }];
-}
-
-- (void)getBattery:(void(^)(FTPen *client, NSError *error))complete;
-{
-    _batteryClient = [[FTBatteryClient alloc] initWithPeripheral:_peripheral];
-    [_batteryClient getBatteryLevel:^(FTBatteryClient *client, NSError *error) {
-        complete(self, error);
-    }];
-}
-
 - (NSString *)name
 {
     return _name ? _name : self.peripheral.name;
@@ -166,52 +150,49 @@
 
 - (NSString *)manufacturerName
 {
-    return _deviceInfoClient.manufacturerName ? _deviceInfoClient.manufacturerName : _manufacturer;
+    return (self.deviceInfoServiceClient.manufacturerName ?
+            self.deviceInfoServiceClient.manufacturerName :
+            _manufacturer);
 }
 
 - (NSString *)modelNumber
 {
-    return _deviceInfoClient.modelNumber;
+    return self.deviceInfoServiceClient.modelNumber;
 }
 
 - (NSString *)serialNumber
 {
-    return _deviceInfoClient.serialNumber;
+    return self.deviceInfoServiceClient.serialNumber;
 }
 
 - (NSString *)firmwareRevision
 {
-    return _deviceInfoClient.firmwareRevision;
+    return self.deviceInfoServiceClient.firmwareRevision;
 }
 
 - (NSString *)hardwareRevision
 {
-    return _deviceInfoClient.hardwareRevision;
+    return self.deviceInfoServiceClient.hardwareRevision;
 }
 
 - (NSString *)softwareRevision
 {
-    return _deviceInfoClient.softwareRevision;
+    return self.deviceInfoServiceClient.softwareRevision;
 }
 
-- (NSString *)systemId
+- (NSString *)systemID
 {
-    return _deviceInfoClient.systemId;
+    return self.deviceInfoServiceClient.systemID;
 }
 
-- (NSData *)certificationData
+- (NSData *)IEEECertificationData
 {
-    return _deviceInfoClient.certificationData;
+    return self.deviceInfoServiceClient.IEEECertificationData;
 }
 
 - (PnPID)pnpId
 {
-    return _deviceInfoClient.pnpId;
-}
-
-- (NSInteger)batteryLevel
-{
-    return _batteryClient.batteryLevel;
+    return self.deviceInfoServiceClient.PnPID;
 }
 
 @end

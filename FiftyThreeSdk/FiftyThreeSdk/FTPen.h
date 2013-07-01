@@ -7,7 +7,7 @@
 
 #import <Foundation/Foundation.h>
 
-typedef struct
+typedef struct PnPID
 {
     uint8_t vendorIdSource;
     uint16_t vendorId;
@@ -33,10 +33,9 @@ extern NSString * const kFTPenIsEraserPressedDidChangeNotificationName;
 @property (nonatomic, readonly) NSString *firmwareRevision;
 @property (nonatomic, readonly) NSString *hardwareRevision;
 @property (nonatomic, readonly) NSString *softwareRevision;
-@property (nonatomic, readonly) NSString *systemId;
-@property (nonatomic, readonly) NSString *certificationData;
-@property (nonatomic, readonly) PnPID pnpId;
-@property (nonatomic, readonly) NSInteger batteryLevel;
+@property (nonatomic, readonly) NSString *systemID;
+@property (nonatomic, readonly) NSString *IEEECertificationData;
+@property (nonatomic, readonly) PnPID PnPID;
 
 @property (nonatomic, readonly) BOOL isTipPressed;
 @property (nonatomic, readonly) BOOL isEraserPressed;

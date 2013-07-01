@@ -28,8 +28,4 @@
 
 - (void)updateData:(NSDictionary *)data;
 
-- (void)getInfo:(void(^)(FTPen *client, NSError *error))complete;
-
-- (void)getBattery:(void(^)(FTPen *client, NSError *error))complete;
-
 @end

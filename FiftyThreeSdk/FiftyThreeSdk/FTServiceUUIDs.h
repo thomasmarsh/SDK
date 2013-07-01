@@ -19,7 +19,7 @@
 + (CBUUID *)batteryVoltage;
 + (CBUUID *)inactivityTime;
 
-+ (NSString *)nameForPenServiceUUID:(CBUUID *)UUID;
++ (NSString *)nameForUUID:(CBUUID *)UUID;
 
 @end
 
@@ -32,7 +32,26 @@
 + (CBUUID *)longPressTime;
 + (CBUUID *)connectionTime;
 
-+ (NSString *)nameForPenDebugServiceUUID:(CBUUID *)UUID;
++ (NSString *)nameForUUID:(CBUUID *)UUID;
+
+@end
+
+@interface FTDeviceInfoServiceUUIDs :NSObject
+
++ (CBUUID *)deviceInfoService;
++ (CBUUID *)manufacturerName;
++ (CBUUID *)modelNumber;
++ (CBUUID *)serialNumber;
+
++ (CBUUID *)firmwareRevision;
++ (CBUUID *)hardwareRevision;
++ (CBUUID *)softwareRevision;
+
++ (CBUUID *)systemID;
++ (CBUUID *)IEEECertificationData;
++ (CBUUID *)PnPID;
+
++ (NSString *)nameForUUID:(CBUUID *)UUID;
 
 @end
 

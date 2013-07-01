@@ -306,11 +306,11 @@ public:
     NSLog(@"firmware revision = %@", pen.firmwareRevision);
     NSLog(@"hardware revision = %@", pen.hardwareRevision);
     NSLog(@"software revision = %@", pen.softwareRevision);
-    NSLog(@"system id = %@", pen.systemId);
-    NSLog(@"PnPID.vendorId = %d", pen.pnpId.vendorId);
-    NSLog(@"PnPID.vendorIdSource = %d", pen.pnpId.vendorIdSource);
-    NSLog(@"PnPID.productId = %d", pen.pnpId.productId);
-    NSLog(@"PnPID.productVersion = %d", pen.pnpId.productVersion);
+    NSLog(@"system id = %@", pen.systemID);
+    NSLog(@"PnPID.vendorId = %d", pen.PnPID.vendorId);
+    NSLog(@"PnPID.vendorIdSource = %d", pen.PnPID.vendorIdSource);
+    NSLog(@"PnPID.productId = %d", pen.PnPID.productId);
+    NSLog(@"PnPID.productVersion = %d", pen.PnPID.productVersion);
 
     [self updateDisplay];
 }
@@ -324,7 +324,7 @@ public:
 
 - (void)penManager:(FTPenManager *)penManager didUpdateDeviceBatteryLevel:(FTPen *)pen;
 {
-    NSLog(@"battery level = %d", pen.batteryLevel);
+//    NSLog(@"battery level = %d", pen.batteryLevel);
 }
 
 - (void)penManager:(FTPenManager *)manager didFinishUpdate:(NSError *)error
@@ -850,7 +850,7 @@ Connect Count = %lu\n \
 First Connect Date = %@\n \
 Last Connect Date = %@\n \
                       ", pen.manufacturerName, pen.modelNumber, pen.serialNumber, pen.firmwareRevision, pen.hardwareRevision,
-                      pen.softwareRevision, pen.systemId, (long)pen.batteryLevel,
+                      pen.softwareRevision, pen.systemID, 0UL,
                       self.tipDownCount, self.tipUpCount, [format stringFromDate:self.firstTipDate], [format stringFromDate:self.lastTipDate],
                       self.connectCount, [format stringFromDate:self.firstConnectDate], [format stringFromDate:self.lastConnectDate]];
 
