@@ -54,7 +54,7 @@ NSString * const kFTPenIsEraserPressedDidChangeNotificationName = @"com.fiftythr
         _peripheral.delegate = _peripheralDelegate;
 
         // Pen Service client
-        _penServiceClient = [[FTPenServiceClient alloc] init];
+        _penServiceClient = [[FTPenServiceClient alloc] initWithPeripheral:_peripheral];
         _penServiceClient.delegate = self;
         [_peripheralDelegate addServiceClient:_penServiceClient];
 
@@ -92,6 +92,26 @@ NSString * const kFTPenIsEraserPressedDidChangeNotificationName = @"com.fiftythr
 - (NSDate *)lastTipReleaseTime
 {
     return self.penServiceClient.lastTipReleaseTime;
+}
+
+- (BOOL)shouldSwing
+{
+    return self.penServiceClient.shouldSwing;
+}
+
+- (void)setShouldSwing:(BOOL)shouldSwing
+{
+    self.penServiceClient.shouldSwing = shouldSwing;
+}
+
+- (BOOL)shouldPowerOff
+{
+    return self.penServiceClient.shouldPowerOff;
+}
+
+- (void)setShouldPowerOff:(BOOL)shouldPowerOff
+{
+    self.penServiceClient.shouldPowerOff = shouldPowerOff;
 }
 
 #pragma mark -

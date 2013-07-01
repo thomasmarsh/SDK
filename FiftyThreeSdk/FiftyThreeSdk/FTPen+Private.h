@@ -14,6 +14,9 @@
 
 @property (nonatomic) CBPeripheral *peripheral;
 
+@property (nonatomic) BOOL shouldSwing;
+@property (nonatomic) BOOL shouldPowerOff;
+
 - (id)initWithCentralManager:(CBCentralManager *)centralManager
                   peripheral:(CBPeripheral *)peripheral;
 

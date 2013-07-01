@@ -10,9 +10,13 @@
 
 @interface FTPenServiceClient ()
 
+@property (nonatomic) CBPeripheral *peripheral;
+
 @property (nonatomic) CBService *penService;
 @property (nonatomic) CBCharacteristic *isTipPressedCharacteristic;
 @property (nonatomic) CBCharacteristic *isEraserPressedCharacteristic;
+@property (nonatomic) CBCharacteristic *shouldSwingCharacteristic;
+@property (nonatomic) CBCharacteristic *shouldPowerOffCharacteristic;
 
 @property (nonatomic, readwrite) NSDate *lastTipReleaseTime;
 
@@ -21,6 +25,16 @@
 @end
 
 @implementation FTPenServiceClient
+
+- (id)initWithPeripheral:(CBPeripheral *)peripheral
+{
+    self = [super init];
+    if (self)
+    {
+        _peripheral = peripheral;
+    }
+    return self;
+}
 
 - (BOOL)isTipPressed
 {
@@ -49,6 +63,48 @@
     [self.delegate penServiceClient:self isReadyDidChange:isReady];
 }
 
+- (BOOL)shouldSwing
+{
+    if (self.shouldSwing)
+    {
+        return ((const char *)self.shouldSwingCharacteristic.value.bytes)[0] != 0;
+    }
+
+    return NO;
+}
+
+- (void)setShouldSwing:(BOOL)shouldSwing
+{
+    if (self.shouldSwingCharacteristic)
+    {
+        NSData *data = [NSData dataWithBytes:shouldSwing ? "1" : "0" length:1];
+        [self.peripheral writeValue:data
+                  forCharacteristic:self.shouldSwingCharacteristic
+                               type:CBCharacteristicWriteWithResponse];
+    }
+}
+
+- (BOOL)shouldPowerOff
+{
+    if (self.shouldPowerOffCharacteristic)
+    {
+        return ((const char *)self.shouldPowerOffCharacteristic.value.bytes)[0] != 0;
+    }
+
+    return NO;
+}
+
+- (void)setShouldPowerOff:(BOOL)shouldPowerOff
+{
+    if (self.shouldPowerOffCharacteristic)
+    {
+        NSData *data = [NSData dataWithBytes:shouldPowerOff ? "1" : "0" length:1];
+        [self.peripheral writeValue:data
+                  forCharacteristic:self.shouldPowerOffCharacteristic
+                               type:CBCharacteristicWriteWithResponse];
+    }
+}
+
 #pragma mark - FTServiceClient
 
 - (NSArray *)peripheral:(CBPeripheral *)peripheral isConnectedDidChange:(BOOL)isConnected
@@ -60,18 +116,10 @@
     else
     {
         self.penService = nil;
-
-        if (self.isTipPressedCharacteristic)
-        {
-            [peripheral setNotifyValue:NO forCharacteristic:self.isTipPressedCharacteristic];
-            self.isTipPressedCharacteristic = nil;
-        }
-
-        if (self.isEraserPressedCharacteristic)
-        {
-            [peripheral setNotifyValue:NO forCharacteristic:self.isEraserPressedCharacteristic];
-            self.isEraserPressedCharacteristic = nil;
-        }
+        self.isTipPressedCharacteristic = nil;
+        self.isEraserPressedCharacteristic = nil;
+        self.shouldSwingCharacteristic = nil;
+        self.shouldPowerOffCharacteristic = nil;
 
         return nil;
     }
@@ -128,6 +176,22 @@
             self.isEraserPressedCharacteristic = characteristic;
             [peripheral setNotifyValue:YES forCharacteristic:characteristic];
         }
+
+        // ShouldSwing
+        if (!self.shouldSwingCharacteristic &&
+            [characteristic.UUID isEqual:[FTPenServiceUUIDs shouldSwing]])
+        {
+            self.shouldSwingCharacteristic = characteristic;
+            [peripheral setNotifyValue:YES forCharacteristic:characteristic];
+        }
+
+        // ShouldPowerOff
+        if (!self.shouldPowerOffCharacteristic &&
+            [characteristic.UUID isEqual:[FTPenServiceUUIDs shouldPowerOff]])
+        {
+            self.shouldPowerOffCharacteristic = characteristic;
+            [peripheral setNotifyValue:YES forCharacteristic:characteristic];
+        }
     }
 }
 
@@ -141,7 +205,7 @@
         return;
     }
 
-    if ([characteristic.UUID isEqual:[FTPenServiceUUIDs isTipPressed]])
+    if ([characteristic isEqual:self.isTipPressedCharacteristic])
     {
         BOOL isTipPressed = self.isTipPressed;
 
@@ -155,7 +219,7 @@
 
         NSLog(@"IsTipPressed characteristic changed: %d.", isTipPressed);
     }
-    else if ([characteristic.UUID isEqual:[FTPenServiceUUIDs isEraserPressed]])
+    else if ([characteristic isEqual:self.isEraserPressedCharacteristic])
     {
         BOOL isEraserPressed = self.isEraserPressed;
         [self.delegate penServiceClient:self isEraserPressedDidChange:isEraserPressed];
@@ -174,22 +238,16 @@
         return;
     }
 
-    if (![characteristic.UUID isEqual:[FTPenServiceUUIDs isTipPressed]] &&
-        ![characteristic.UUID isEqual:[FTPenServiceUUIDs isEraserPressed]])
-    {
-        return;
-    }
-
     if (characteristic.isNotifying)
     {
-        if ([characteristic.UUID isEqual:[FTPenServiceUUIDs isTipPressed]])
+        if ([characteristic isEqual:self.isTipPressedCharacteristic])
         {
             self.isReady = YES;
         }
     }
     else
     {
-        if ([characteristic.UUID isEqual:[FTPenServiceUUIDs isTipPressed]])
+        if ([characteristic isEqual:self.isTipPressedCharacteristic])
         {
             self.isReady = NO;
         }

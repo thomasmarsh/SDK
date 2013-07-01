@@ -12,12 +12,16 @@
 
 @interface FTPenServiceClient : FTServiceClient
 
+- (id)initWithPeripheral:(CBPeripheral *)peripheral;
+
 @property (nonatomic, weak) id<FTPenServiceClientDelegate> delegate;
 
 @property (nonatomic, readonly) BOOL isReady;
 @property (nonatomic, readonly) BOOL isTipPressed;
 @property (nonatomic, readonly) BOOL isEraserPressed;
 @property (nonatomic, readonly) NSDate *lastTipReleaseTime;
+@property (nonatomic) BOOL shouldSwing;
+@property (nonatomic) BOOL shouldPowerOff;
 
 @end
 

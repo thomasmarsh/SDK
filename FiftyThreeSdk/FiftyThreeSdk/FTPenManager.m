@@ -586,7 +586,7 @@ static const double kPairingReleaseWindowSeconds = 0.100;
 {
     NSLog(@"Start trial separation.");
 
-    [self writeBoolValue:YES forCharacteristicWithUUID:[FTPenServiceUUIDs shouldSwing]];
+    self.pen.shouldSwing = YES;
 }
 
 - (void)stopTrialSeparation:(NSTimer *)timer
@@ -782,49 +782,6 @@ static const double kPairingReleaseWindowSeconds = 0.100;
     {
         id<FTPenManagerDelegatePrivate> d = (id<FTPenManagerDelegatePrivate>)self.delegate;
         [d penManager:self didUpdatePercentComplete:percent];
-    }
-}
-
-#pragma mark - Characteristics
-
-// Finds the characteristic with the given UUID on the connected pen.
-- (CBCharacteristic *)findCharacteristicWithUUID:(CBUUID *)characteristicUUID
-{
-    if (self.pen && self.pen.peripheral)
-    {
-        CBPeripheral *peripheral = self.pen.peripheral;
-
-        for (CBService *service in peripheral.services)
-        {
-            for (CBCharacteristic *characteristic in service.characteristics)
-            {
-                if ([characteristic isEqual:characteristicUUID])
-                {
-                    return characteristic;
-                }
-            }
-        }
-    }
-
-    return nil;
-}
-
-// Writes a boolean value to the connected pen for the characteristic with the given UUID.
-- (void)writeBoolValue:(BOOL)value forCharacteristicWithUUID:(CBUUID *)characteristicUUID
-{
-    if (self.pen && self.pen.peripheral)
-    {
-        CBPeripheral *peripheral = self.pen.peripheral;
-
-        CBCharacteristic *characteristic = [self findCharacteristicWithUUID:characteristicUUID];
-        if (characteristic)
-        {
-            NSLog(@"CBPeripheral writeValue:forCharacterisitic");
-            NSData *data = [NSData dataWithBytes:value ? "1" : "0" length:1];
-            [peripheral writeValue:data
-                 forCharacteristic:characteristic
-                              type:CBCharacteristicWriteWithResponse];
-        }
     }
 }
 
