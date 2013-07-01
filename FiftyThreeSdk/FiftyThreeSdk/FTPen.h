@@ -15,6 +15,7 @@ typedef struct PnPID
     uint16_t productVersion;
 } PnPID;
 
+extern NSString * const kFTPenIsReadyDidChangeNotificationName;
 extern NSString * const kFTPenIsTipPressedDidChangeNotificationName;
 extern NSString * const kFTPenIsEraserPressedDidChangeNotificationName;
 
@@ -45,6 +46,7 @@ extern NSString * const kFTPenIsEraserPressedDidChangeNotificationName;
 
 @protocol FTPenDelegate <NSObject>
 
+- (void)pen:(FTPen *)pen isReadyDidChange:(BOOL)isReady;
 - (void)pen:(FTPen *)pen isTipPressedDidChange:(BOOL)isTipPressed;
 - (void)pen:(FTPen *)pen isEraserPressedDidChange:(BOOL)isEraserPressed;
 

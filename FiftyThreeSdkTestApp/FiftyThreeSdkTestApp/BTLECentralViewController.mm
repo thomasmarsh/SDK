@@ -189,6 +189,8 @@ public:
     [self connect];
 }
 
+#pragma mark - FTPenManagerDelegate
+
 - (void)penManagerDidUpdateState:(FTPenManager *)penManager
 {
     [self connect];
@@ -261,6 +263,35 @@ public:
     [self.currentTest penManager:penManager didDisconnectFromPen:pen];
 }
 
+- (void)penManager:(FTPenManager *)manager didFinishUpdate:(NSError *)error
+{
+    NSLog(@"didFinishUpdate");
+
+    [self.updateProgressView dismissWithClickedButtonIndex:0 animated:NO];
+    self.updateProgressView = nil;
+}
+
+- (void)penManager:(FTPenManager *)manager didUpdatePercentComplete:(float)percent
+{
+    NSLog(@"didUpdatePercentComplete %f", percent);
+
+    NSTimeInterval elapsed = -[self.updateStart timeIntervalSinceNow];
+    float totalTime = elapsed / (percent / 100.0);
+    float remainingTime = totalTime - (totalTime * percent / 100.0);
+    int minutes = (int)remainingTime / 60;
+    int seconds = (int)remainingTime % 60;
+
+    self.updateProgressView.message = [NSString stringWithFormat:kUpdateProgressViewMessage, percent, minutes, seconds];
+    [self.updateProgressView show];
+}
+
+#pragma mark - FTPenDelegate
+
+- (void)pen:(FTPen *)pen isReadyDidChange:(BOOL)isReady
+{
+    [self updateDisplay];
+}
+
 - (void)pen:(FTPen *)pen isTipPressedDidChange:(BOOL)isTipPressed
 {
     // Stats
@@ -298,6 +329,8 @@ public:
     _PenAndTouchManager->HandlePenEvent(event);
 }
 
+#pragma mark -
+
 - (void)displayPenInfo:(FTPen *)pen
 {
     NSLog(@"manufacturer = %@", pen.manufacturerName);
@@ -315,40 +348,6 @@ public:
     [self updateDisplay];
 }
 
-- (void)penManager:(FTPenManager *)penManager didUpdateDeviceInfo:(FTPen *)pen
-{
-    [self displayPenInfo:pen];
-
-    [self checkForUpdates];
-}
-
-- (void)penManager:(FTPenManager *)penManager didUpdateDeviceBatteryLevel:(FTPen *)pen;
-{
-//    NSLog(@"battery level = %d", pen.batteryLevel);
-}
-
-- (void)penManager:(FTPenManager *)manager didFinishUpdate:(NSError *)error
-{
-    NSLog(@"didFinishUpdate");
-
-    [self.updateProgressView dismissWithClickedButtonIndex:0 animated:NO];
-    self.updateProgressView = nil;
-}
-
-- (void)penManager:(FTPenManager *)manager didUpdatePercentComplete:(float)percent
-{
-    NSLog(@"didUpdatePercentComplete %f", percent);
-
-    NSTimeInterval elapsed = -[self.updateStart timeIntervalSinceNow];
-    float totalTime = elapsed / (percent / 100.0);
-    float remainingTime = totalTime - (totalTime * percent / 100.0);
-    int minutes = (int)remainingTime / 60;
-    int seconds = (int)remainingTime % 60;
-
-    self.updateProgressView.message = [NSString stringWithFormat:kUpdateProgressViewMessage, percent, minutes, seconds];
-    [self.updateProgressView show];
-}
-
 - (void)updateDisplay
 {
     if (self.penManager.pen)
@@ -364,31 +363,22 @@ public:
                                               self.penManager.pen.name]];
         }
     }
-//    else if (self.pairing)
-//    {
-//        [self.pairingStatusLabel setText:@"Pairing"];
-//    }
-//    else if (self.penManager.pen)
-//    {
-//        [self.pairingStatusLabel setText:[NSString stringWithFormat:@"Paired with %@",
-//                                          self.penManager.pen.name]];
-//    }
-//    else
-//    {
-//        [self.pairingStatusLabel setText:@"Unpaired"];
-//    }
+    else
+    {
+        [self.pairingStatusLabel setText:@"Disconnected"];
+    }
 
     if (self.penManager.pen)
     {
         [self.connectButton setTitle:@"Disconnect" forState:UIControlStateNormal];
         self.updateFirmwareButton.hidden = NO;
-//        self.trialSeparationButton.hidden = NO;
+        self.trialSeparationButton.hidden = NO;
     }
     else
     {
         [self.connectButton setTitle:@"Connect" forState:UIControlStateNormal];
         self.updateFirmwareButton.hidden = YES;
-//        self.trialSeparationButton.hidden = YES;
+        self.trialSeparationButton.hidden = YES;
 
         self.tip1State.highlighted = NO;
         self.tip2State.highlighted = NO;

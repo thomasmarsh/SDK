@@ -15,6 +15,10 @@
 #import "FTPenDebugServiceClient.h"
 #import "FTDeviceInfoServiceClient.h"
 
+NSString * const kFTPenIsReadyDidChangeNotificationName = @"com.fiftythree.pen.isReadyDidChange";
+NSString * const kFTPenIsTipPressedDidChangeNotificationName = @"com.fiftythree.pen.isTipPressedDidChange";
+NSString * const kFTPenIsEraserPressedDidChangeNotificationName = @"com.fiftythree.pen.isEraserPressedDidChange";
+
 @interface FTPen () <FTPenServiceClientDelegate, FTPenDebugServiceClientDelegate>
 
 @property (nonatomic) CBCentralManager *centralManager;
@@ -23,8 +27,6 @@
 @property (nonatomic) FTPenServiceClient *penServiceClient;
 @property (nonatomic) FTPenDebugServiceClient *penDebugServiceClient;
 @property (nonatomic) FTDeviceInfoServiceClient *deviceInfoServiceClient;
-
-@property (nonatomic, readwrite) BOOL isReady;
 
 @property (nonatomic, readwrite) NSString *name;
 @property (nonatomic, readwrite) NSString *manufacturer;
@@ -72,6 +74,11 @@
 
 #pragma mark - Properties
 
+- (BOOL)isReady
+{
+    return self.penServiceClient.isReady;
+}
+
 - (BOOL)isTipPressed
 {
     return self.penServiceClient.isTipPressed;
@@ -113,29 +120,40 @@
 
 - (void)penServiceClient:(FTPenServiceClient *)penServiceClient isReadyDidChange:(BOOL)isReady
 {
-    [self.privateDelegate pen:self isReadyDidChange:isReady];
+    [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenIsReadyDidChangeNotificationName
+                                                        object:self];
+
+    if ([self.delegate respondsToSelector:@selector(pen:isReadyDidChange:)])
+    {
+        [self.delegate pen:self isReadyDidChange:isReady];
+    }
 }
 
 - (void)penServiceClient:(FTPenServiceClient *)penServiceClient isTipPressedDidChange:(BOOL)isTipPressed
 {
-    [self.delegate pen:self isTipPressedDidChange:isTipPressed];
+    [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenIsTipPressedDidChangeNotificationName
+                                                        object:self];
+
+    if ([self.delegate respondsToSelector:@selector(pen:isTipPressedDidChange:)])
+    {
+        [self.delegate pen:self isTipPressedDidChange:isTipPressed];
+    }
 }
 
 - (void)penServiceClient:(FTPenServiceClient *)penServiceClient isEraserPressedDidChange:(BOOL)isEraserPressed
 {
-    [self.delegate pen:self isEraserPressedDidChange:isEraserPressed];
+    [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenIsEraserPressedDidChangeNotificationName
+                                                        object:self];
+
+    if ([self.delegate respondsToSelector:@selector(pen:isEraserPressedDidChange:)])
+    {
+        [self.delegate pen:self isEraserPressedDidChange:isEraserPressed];
+    }
 }
 
 #pragma mark - FTPenDebugServiceClientDelegate
 
 #pragma mark -
-
-- (void)setIsReady:(BOOL)isReady
-{
-    _isReady = isReady;
-
-    [self.privateDelegate pen:self isReadyDidChange:isReady];
-}
 
 - (void)updateData:(NSDictionary *)data
 {

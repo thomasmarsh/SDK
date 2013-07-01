@@ -8,9 +8,6 @@
 #import "FTPenServiceClient.h"
 #import "FTServiceUUIDs.h"
 
-NSString * const kFTPenIsTipPressedDidChangeNotificationName = @"com.fiftythree.pen.isTipPressedDidChange";
-NSString * const kFTPenIsEraserPressedDidChangeNotificationName = @"com.fiftythree.pen.isEraserPressedDidChange";
-
 @interface FTPenServiceClient ()
 
 @property (nonatomic) CBService *penService;
@@ -155,8 +152,6 @@ NSString * const kFTPenIsEraserPressedDidChangeNotificationName = @"com.fiftythr
         }
 
         [self.delegate penServiceClient:self isTipPressedDidChange:isTipPressed];
-        [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenIsTipPressedDidChangeNotificationName
-                                                            object:self];
 
         NSLog(@"IsTipPressed characteristic changed: %d.", isTipPressed);
     }
@@ -164,8 +159,6 @@ NSString * const kFTPenIsEraserPressedDidChangeNotificationName = @"com.fiftythr
     {
         BOOL isEraserPressed = self.isEraserPressed;
         [self.delegate penServiceClient:self isEraserPressedDidChange:isEraserPressed];
-        [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenIsEraserPressedDidChangeNotificationName
-                                                            object:self];
 
         NSLog(@"IsEraserPressed characteristic changed: %d.", isEraserPressed);
     }

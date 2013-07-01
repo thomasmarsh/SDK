@@ -47,7 +47,7 @@ NSString * const kPairedPenUuidDefaultsKey = @"PairedPenUuid";
 static const int kInterruptedUpdateDelayMax = 30;
 static const double kPairingReleaseWindowSeconds = 0.100;
 
-@interface FTPenManager () <CBCentralManagerDelegate, FTPenPrivateDelegate, TIUpdateManagerDelegate>
+@interface FTPenManager () <CBCentralManagerDelegate, TIUpdateManagerDelegate>
 
 @property (nonatomic) CBCentralManager *centralManager;
 @property (nonatomic) TIUpdateManager *updateManager;
@@ -85,17 +85,33 @@ static const double kPairingReleaseWindowSeconds = 0.100;
 
 - (void)setPen:(FTPen *)pen
 {
-    _pen.privateDelegate = nil;
     _pen = pen;
-    _pen.privateDelegate = self;
 
+    [[NSNotificationCenter defaultCenter] removeObserver:kFTPenIsReadyDidChangeNotificationName];
     [[NSNotificationCenter defaultCenter] removeObserver:kFTPenIsTipPressedDidChangeNotificationName];
+
     if (_pen)
     {
         [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(penIsReadyDidChange:)
+                                                     name:kFTPenIsReadyDidChangeNotificationName
+                                                   object:_pen];
+
+        [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(penIsTipPressedDidChange:)
                                                      name:kFTPenIsTipPressedDidChangeNotificationName
-                                                   object:nil];
+                                                   object:_pen];
+    }
+}
+
+- (void)penIsReadyDidChange:(NSNotification *)notification
+{
+    if (self.pen.isReady)
+    {
+        NSLog(@"Pen is ready.");
+
+        [self.delegate penManager:self didConnectToPen:self.pen];
+        [self transitionConnectionStateToEngaged];
     }
 }
 
@@ -576,19 +592,6 @@ static const double kPairingReleaseWindowSeconds = 0.100;
 - (void)stopTrialSeparation:(NSTimer *)timer
 {
     NSLog(@"Stop trial separation.");
-}
-
-#pragma mark - FTPenPrivateDelegate
-
-- (void)pen:(FTPen *)pen isReadyDidChange:(BOOL)isReady
-{
-    if (isReady)
-    {
-        NSLog(@"Pen is ready.");
-
-        [self.delegate penManager:self didConnectToPen:self.pen];
-        [self transitionConnectionStateToEngaged];
-    }
 }
 
 #pragma mark - CBCentralManagerDelegate
