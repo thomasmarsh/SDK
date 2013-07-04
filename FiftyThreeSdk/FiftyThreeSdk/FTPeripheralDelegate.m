@@ -87,6 +87,10 @@
         for (int i = 0; i < peripheral.services.count; i++)
         {
             NSString *serviceName = FTNameForServiceUUID(((CBService *)peripheral.services[i]).UUID);
+            if (!serviceName)
+            {
+                serviceName = @"(Unknown)";
+            }
 
             if (i == peripheral.services.count - 1)
             {

@@ -15,6 +15,7 @@
 #import "FTPenDebugServiceClient.h"
 #import "FTDeviceInfoServiceClient.h"
 
+NSString * const kFTPenDidEncounterErrorNotificationName = @"com.fiftythree.pen.didEncounterError";
 NSString * const kFTPenIsReadyDidChangeNotificationName = @"com.fiftythree.pen.isReadyDidChange";
 NSString * const kFTPenIsTipPressedDidChangeNotificationName = @"com.fiftythree.pen.isTipPressedDidChange";
 NSString * const kFTPenIsEraserPressedDidChangeNotificationName = @"com.fiftythree.pen.isEraserPressedDidChange";
@@ -137,6 +138,15 @@ NSString * const kFTPenIsEraserPressedDidChangeNotificationName = @"com.fiftythr
 }
 
 #pragma mark - FTPenServiceClientDelegate
+
+- (void)penServiceClient:(FTPenServiceClient *)penServiceClient didEncounterError:(NSError *)error
+{
+    NSLog(@"Pen did encounter error: \"%@\".", error.localizedDescription);
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenDidEncounterErrorNotificationName
+                                                        object:self];
+
+}
 
 - (void)penServiceClient:(FTPenServiceClient *)penServiceClient isReadyDidChange:(BOOL)isReady
 {

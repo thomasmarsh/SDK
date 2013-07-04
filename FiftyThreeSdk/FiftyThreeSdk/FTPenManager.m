@@ -87,11 +87,17 @@ static const double kPairingReleaseWindowSeconds = 0.100;
 {
     _pen = pen;
 
+    [[NSNotificationCenter defaultCenter] removeObserver:kFTPenDidEncounterErrorNotificationName];
     [[NSNotificationCenter defaultCenter] removeObserver:kFTPenIsReadyDidChangeNotificationName];
     [[NSNotificationCenter defaultCenter] removeObserver:kFTPenIsTipPressedDidChangeNotificationName];
 
     if (_pen)
     {
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(penDidEncounterError:)
+                                                     name:kFTPenDidEncounterErrorNotificationName
+                                                   object:_pen];
+
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(penIsReadyDidChange:)
                                                      name:kFTPenIsReadyDidChangeNotificationName
@@ -104,11 +110,38 @@ static const double kPairingReleaseWindowSeconds = 0.100;
     }
 }
 
+- (void)penDidEncounterError:(NSNotification *)notification
+{
+    [self handleError];
+}
+
+- (void)handleError
+{
+    NSLog(@"Pen did encounter error. Disconnecting.");
+
+    if (self.connectionState == ConnectionState_Single)
+    {
+
+    }
+    else if (self.connectionState == ConnectionState_AwaitingDisconnection)
+    {
+
+    }
+    else if (self.connectionState == ConnectionState_Dating)
+    {
+        [self transitionConnectionStateToSingle];
+    }
+    else
+    {
+        [self transitionConnectionStateToAwaitingDisconnection];
+    }
+}
+
 - (void)penIsReadyDidChange:(NSNotification *)notification
 {
     if (self.pen.isReady)
     {
-        NSLog(@"Pen is ready.");
+        NSLog(@"Pen is ready");
 
         [self.delegate penManager:self didConnectToPen:self.pen];
         [self transitionConnectionStateToEngaged];

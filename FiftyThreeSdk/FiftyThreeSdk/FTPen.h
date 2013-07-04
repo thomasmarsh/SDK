@@ -15,6 +15,7 @@ typedef struct PnPID
     uint16_t productVersion;
 } PnPID;
 
+extern NSString * const kFTPenDidEncounterErrorNotificationName;
 extern NSString * const kFTPenIsReadyDidChangeNotificationName;
 extern NSString * const kFTPenIsTipPressedDidChangeNotificationName;
 extern NSString * const kFTPenIsEraserPressedDidChangeNotificationName;

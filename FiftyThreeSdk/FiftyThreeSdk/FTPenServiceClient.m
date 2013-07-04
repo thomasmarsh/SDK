@@ -7,6 +7,7 @@
 
 #import "FTPenServiceClient.h"
 #import "FTServiceUUIDs.h"
+#import "FTError.h"
 
 @interface FTPenServiceClient ()
 
@@ -207,24 +208,53 @@
 
     if ([characteristic isEqual:self.isTipPressedCharacteristic])
     {
+        // To avoid race conditions, it's crucial that we start listening for changes in the characteristic
+        // before reading its value for the first time.
+        NSAssert(self.isTipPressedCharacteristic.isNotifying,
+                 @"The IsTipPressed characteristic must be notifying before we first read its value.");
+
         BOOL isTipPressed = self.isTipPressed;
+        NSLog(@"IsTipPressed did update value: %d.", isTipPressed);
 
-        // TODO: Assumes tip was initially pressed... may not be the case?
-        if (!isTipPressed)
+        if (self.isReady)
         {
-            self.lastTipReleaseTime = [NSDate date];
+            if (!isTipPressed)
+            {
+                self.lastTipReleaseTime = [NSDate date];
+            }
+
+            // This must be called *after* updating the lastTipReleaseTime property since the delegate code
+            // may need to take that property into account.
+            [self.delegate penServiceClient:self isTipPressedDidChange:isTipPressed];
         }
-
-        [self.delegate penServiceClient:self isTipPressedDidChange:isTipPressed];
-
-        NSLog(@"IsTipPressed characteristic changed: %d.", isTipPressed);
+        else
+        {
+            if (isTipPressed)
+            {
+                self.isReady = YES;
+            }
+            else
+            {
+                NSDictionary *userInfo = @{ NSLocalizedDescriptionKey :
+                                                @"The pen tip must be pressed to finalize the connection." };
+                NSError *error = [NSError errorWithDomain:kFiftyThreeErrorDomain
+                                                     code:FTPenErrorConnectionFailedTipNotPressed
+                                                 userInfo:userInfo];
+                [self.delegate penServiceClient:self didEncounterError:error];
+            }
+        }
     }
     else if ([characteristic isEqual:self.isEraserPressedCharacteristic])
     {
+        // To avoid race conditions, it's crucial that we start listening for changes in the characteristic
+        // before reading its value for the first time.
+        NSAssert(self.isEraserPressedCharacteristic.isNotifying,
+                 @"The IsEraserPressed characteristic must be notifying before we first read its value.");
+
         BOOL isEraserPressed = self.isEraserPressed;
         [self.delegate penServiceClient:self isEraserPressedDidChange:isEraserPressed];
 
-        NSLog(@"IsEraserPressed characteristic changed: %d.", isEraserPressed);
+        NSLog(@"IsEraserPressed did update value: %d.", isEraserPressed);
     }
 }
 
@@ -240,17 +270,18 @@
 
     if (characteristic.isNotifying)
     {
-        if ([characteristic isEqual:self.isTipPressedCharacteristic])
+        // Once we start listening for changes in the characteristic it's safe to read its value. (We avoid
+        // the opposite order since that might lead to a race condidtion where we miss a change in the
+        // characteristic.)
+        if ([characteristic isEqual:self.isTipPressedCharacteristic] ||
+            [characteristic isEqual:self.isEraserPressedCharacteristic])
         {
-            self.isReady = YES;
+            [peripheral readValueForCharacteristic:characteristic];
         }
     }
     else
     {
-        if ([characteristic isEqual:self.isTipPressedCharacteristic])
-        {
-            self.isReady = NO;
-        }
+        // TODO: Is this an error case that needs to be handled.
     }
 }
 
