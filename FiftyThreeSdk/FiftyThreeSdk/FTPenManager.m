@@ -14,6 +14,10 @@
 #import "TIUpdateManager.h"
 #import "FTFirmwareManager.h"
 
+static const int kInterruptedUpdateDelayMax = 30;
+
+static const NSTimeInterval kTipAndPairingSpotReleaseTimeDifferenceThreshold = 0.1;
+
 typedef enum
 {
     ConnectionState_Single,
@@ -43,9 +47,8 @@ NSString *ConnectionStateString(ConnectionState connectionState)
     }
 }
 
-NSString * const kPairedPenUuidDefaultsKey = @"PairedPenUuid";
-static const int kInterruptedUpdateDelayMax = 30;
-static const double kPairingReleaseWindowSeconds = 0.100;
+//NSString * const kPairedPenUuidDefaultsKey = @"PairedPenUuid";
+//static const double kPairingReleaseWindowSeconds = 0.100;
 
 @interface FTPenManager () <CBCentralManagerDelegate, TIUpdateManagerDelegate>
 
@@ -56,6 +59,8 @@ static const double kPairingReleaseWindowSeconds = 0.100;
 @property (nonatomic) ConnectionState connectionState;
 
 @property (nonatomic) BOOL isScanningForPeripherals;
+
+@property (nonatomic) NSTimer *maxEngagedSubstateDurationTimer;
 
 @property (nonatomic) NSDate *lastPairingSpotReleaseTime;
 
@@ -174,6 +179,13 @@ static const double kPairingReleaseWindowSeconds = 0.100;
 
     _connectionState = connectionState;
 
+    if (self.connectionState != ConnectionState_Engaged_WaitingForPairingSpotRelease &&
+        self.connectionState != ConnectionState_Engaged_WaitingForTipRelease)
+    {
+        [self.maxEngagedSubstateDurationTimer invalidate];
+        self.maxEngagedSubstateDurationTimer = nil;
+    }
+
     [self verifyInternalConsistency];
 }
 
@@ -191,7 +203,7 @@ static const double kPairingReleaseWindowSeconds = 0.100;
         {
             NSAssert(self.pen, @"");
         }
-    }
+    };
 
     switch (self.connectionState)
     {
@@ -204,7 +216,21 @@ static const double kPairingReleaseWindowSeconds = 0.100;
         {
             NSAssert(!self.isScanningForPeripherals, @"");
         }
-    }
+    };
+
+    switch (self.connectionState)
+    {
+        case ConnectionState_Engaged_WaitingForPairingSpotRelease:
+        case ConnectionState_Engaged_WaitingForTipRelease:
+        {
+            NSAssert(self.maxEngagedSubstateDurationTimer, @"");
+            break;
+        }
+        default:
+        {
+            NSAssert(!self.maxEngagedSubstateDurationTimer, @"");
+        }
+    };
 }
 
 #pragma mark - State Transitions
@@ -263,12 +289,16 @@ static const double kPairingReleaseWindowSeconds = 0.100;
 {
     NSAssert(self.connectionState == ConnectionState_Engaged, @"");
 
+    [self startMaxEngagedSubstateDurationTimer];
+
     self.connectionState = ConnectionState_Engaged_WaitingForTipRelease;
 }
 
 - (void)transitionConnectionStateToEngaged_WaitingForPairPairingSpotRelease
 {
     NSAssert(self.connectionState == ConnectionState_Engaged, @"");
+
+    [self startMaxEngagedSubstateDurationTimer];
 
     self.connectionState = ConnectionState_Engaged_WaitingForPairingSpotRelease;
 }
@@ -278,8 +308,6 @@ static const double kPairingReleaseWindowSeconds = 0.100;
     NSAssert(self.connectionState == ConnectionState_Engaged_WaitingForPairingSpotRelease ||
              self.connectionState == ConnectionState_Engaged_WaitingForTipRelease, @"");
     NSAssert(self.lastPairingSpotReleaseTime && self.pen.lastTipReleaseTime, @"");
-
-    static const NSTimeInterval kTipAndPairingSpotReleaseTimeDifferenceThreshold = 0.1;
 
     NSDate *t0 = self.lastPairingSpotReleaseTime;
     NSDate *t1 = self.pen.lastTipReleaseTime;
@@ -303,6 +331,31 @@ static const double kPairingReleaseWindowSeconds = 0.100;
              self.connectionState == ConnectionState_Engaged_WaitingForTipRelease, @"");
 
     self.connectionState = ConnectionState_Married;
+}
+
+#pragma mark - Max engaged substate duration timer
+
+// Start a timer that fires if the amount of time spent in one of the engaged substates ("waiting for pairing
+// spot release" or "waiting for tip release") exceeds the threshold. The idea is that we never want to wait
+// indefinitely for a tip or pairing spot release that may never come. Better to boot out early if we know
+// that even if it did come, it would be too late.
+- (void)startMaxEngagedSubstateDurationTimer
+{
+    self.maxEngagedSubstateDurationTimer = [NSTimer scheduledTimerWithTimeInterval:kTipAndPairingSpotReleaseTimeDifferenceThreshold
+                                                                            target:self
+                                                                          selector:@selector(maxEngagedSubstateDurationTimerFired:)
+                                                                          userInfo:nil
+                                                                           repeats:NO];
+}
+
+- (void)maxEngagedSubstateDurationTimerFired:(NSTimer *)timer
+{
+    NSAssert(self.connectionState == ConnectionState_Engaged_WaitingForPairingSpotRelease ||
+             self.connectionState == ConnectionState_Engaged_WaitingForTipRelease, @"");
+
+    NSLog(@"Max duration in engaged substate exceeded. Disconnecting.");
+
+    [self transitionConnectionStateToAwaitingDisconnection];
 }
 
 #pragma mark - Pairing Spot
