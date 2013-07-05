@@ -8,6 +8,9 @@
 #import "AppDelegate.h"
 
 #import "TiUpdateService.h"
+#import "TestFlightSDK/TestFlight.h"
+
+NSString * const kTestFlightAppToken = @"31bae22e-0b47-4ffe-9725-ba3f23d234f7";
 
 @interface AppDelegate ()
 @end
@@ -23,8 +26,16 @@
     self.window.rootViewController = self.viewController;
     [self.window makeKeyAndVisible];
      */
-
+    
+    [self configureAnalytics];
+    
     return YES;
+}
+
+- (void)configureAnalytics
+{
+    [TestFlight setOptions:@{ @"logToSTDERR" : @(NO) }];
+    [TestFlight takeOff:kTestFlightAppToken];
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application
