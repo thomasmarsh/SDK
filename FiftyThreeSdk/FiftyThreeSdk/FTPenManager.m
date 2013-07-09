@@ -16,7 +16,7 @@
 
 static const int kInterruptedUpdateDelayMax = 30;
 
-static const NSTimeInterval kTipAndPairingSpotReleaseTimeDifferenceThreshold = 0.1;
+static const NSTimeInterval kTipAndPairingSpotReleaseTimeDifferenceThreshold = 0.5;
 
 typedef enum
 {
