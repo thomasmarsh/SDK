@@ -34,20 +34,20 @@
 
 + (CBUUID *)penService
 {
-//    return [CBUUID UUIDWithCFUUID:FT_PEN_SERVICE_UUID];
-    return [CBUUID UUIDWithString:@"FFF0"];
+    return [CBUUID UUIDWithCFUUID:FT_PEN_SERVICE_UUID];
+//    return [CBUUID UUIDWithString:@"FFF0"];
 }
 
 + (CBUUID *)isTipPressed
 {
-//    return [CBUUID UUIDWithCFUUID:FT_PEN_SERVICE_IS_TIP_PRESSED_UUID];
-    return [CBUUID UUIDWithString:@"FFF2"];
+    return [CBUUID UUIDWithCFUUID:FT_PEN_SERVICE_IS_TIP_PRESSED_UUID];
+//    return [CBUUID UUIDWithString:@"FFF2"];
 }
 
 + (CBUUID *)isEraserPressed
 {
-//    return [CBUUID UUIDWithCFUUID:FT_PEN_SERVICE_IS_ERASER_PRESSED_UUID];
-    return [CBUUID UUIDWithString:@"FFF1"];
+    return [CBUUID UUIDWithCFUUID:FT_PEN_SERVICE_IS_ERASER_PRESSED_UUID];
+//    return [CBUUID UUIDWithString:@"FFF1"];
 }
 
 + (CBUUID *)shouldSwing
