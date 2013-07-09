@@ -183,7 +183,6 @@
             [characteristic.UUID isEqual:[FTPenServiceUUIDs shouldSwing]])
         {
             self.shouldSwingCharacteristic = characteristic;
-            [peripheral setNotifyValue:YES forCharacteristic:characteristic];
         }
 
         // ShouldPowerOff
@@ -191,7 +190,6 @@
             [characteristic.UUID isEqual:[FTPenServiceUUIDs shouldPowerOff]])
         {
             self.shouldPowerOffCharacteristic = characteristic;
-            [peripheral setNotifyValue:YES forCharacteristic:characteristic];
         }
     }
 }

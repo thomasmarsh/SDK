@@ -28,12 +28,7 @@
     else
     {
         self.penDebugService = nil;
-
-        if (self.deviceStateCharacteristic)
-        {
-            [peripheral setNotifyValue:NO forCharacteristic:self.deviceStateCharacteristic];
-            self.deviceStateCharacteristic = nil;
-        }
+        self.deviceStateCharacteristic = nil;
 
         return nil;
     }
