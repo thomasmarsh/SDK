@@ -18,6 +18,7 @@ static const int kInterruptedUpdateDelayMax = 30;
 
 static const NSTimeInterval kTipAndPairingSpotReleaseTimeDifferenceThreshold = 0.5;
 static const NSTimeInterval kSwingingPeripheralPollingTimeInterval = 0.1;
+static const NSTimeInterval kSeparatedPeripheralInactivityTimeInterval = 1.0 * 60.0;
 
 typedef enum
 {
@@ -30,6 +31,7 @@ typedef enum
     ConnectionState_Married,
     ConnectionState_Swinging,
     ConnectionState_Reconciling,
+    ConnectionState_Separated,
     ConnectionState_AwaitingDisconnection,
 } ConnectionState;
 
@@ -46,6 +48,7 @@ NSString *ConnectionStateString(ConnectionState connectionState)
         case ConnectionState_Married: return @"ConnectionState_Married";
         case ConnectionState_Swinging: return @"ConnectionState_Swinging";
         case ConnectionState_Reconciling: return @"ConnectionState_Reconciling";
+        case ConnectionState_Separated: return @"ConnectionState_Separated";
         case ConnectionState_AwaitingDisconnection: return @"ConectionState_AwaitingDisconnection";
         default:
             return nil;
@@ -73,6 +76,9 @@ NSString *ConnectionStateString(ConnectionState connectionState)
 
 @property (nonatomic) CBUUID *swingingPeripheralUUID;
 @property (nonatomic) NSTimer *swingingPeripheralPollingTimer;
+
+@property (nonatomic) CBUUID *separatedPeripheralUUID;
+@property (nonatomic) NSTimer *separatedPeripheralInactivityTimer;
 
 @end
 
@@ -160,7 +166,8 @@ NSString *ConnectionStateString(ConnectionState connectionState)
         {
             [self transitionConnectionStateToEngaged];
         }
-        else if (self.connectionState == ConnectionState_Reconciling)
+        else if (self.connectionState == ConnectionState_Reconciling ||
+                 self.connectionState == ConnectionState_Separated)
         {
             [self transitionConnectionStateToMarried];
         }
@@ -191,21 +198,39 @@ NSString *ConnectionStateString(ConnectionState connectionState)
           ConnectionStateString(_connectionState),
           ConnectionStateString(connectionState));
 
+    switch (self.connectionState)
+    {
+        case ConnectionState_Engaged_WaitingForPairingSpotRelease:
+        case ConnectionState_Engaged_WaitingForTipRelease:
+        {
+            [self.maxEngagedSubstateDurationTimer invalidate];
+            self.maxEngagedSubstateDurationTimer = nil;
+
+            break;
+        }
+        case ConnectionState_Swinging:
+        {
+            [self.swingingPeripheralPollingTimer invalidate];
+            self.swingingPeripheralPollingTimer = nil;
+            self.swingingPeripheralUUID = nil;
+
+            break;
+        }
+        case ConnectionState_Separated:
+        {
+            [self.separatedPeripheralInactivityTimer invalidate];
+            self.separatedPeripheralInactivityTimer = nil;
+            self.separatedPeripheralUUID = nil;
+
+            self.isScanningForPeripherals = NO;
+
+            break;
+        }
+        default:
+            break;
+    }
+
     _connectionState = connectionState;
-
-    if (self.connectionState != ConnectionState_Engaged_WaitingForPairingSpotRelease &&
-        self.connectionState != ConnectionState_Engaged_WaitingForTipRelease)
-    {
-        [self.maxEngagedSubstateDurationTimer invalidate];
-        self.maxEngagedSubstateDurationTimer = nil;
-    }
-
-    if (self.connectionState != ConnectionState_Swinging)
-    {
-        [self.swingingPeripheralPollingTimer invalidate];
-        self.swingingPeripheralPollingTimer = nil;
-        self.swingingPeripheralUUID = nil;
-    }
 
     [self verifyInternalConsistency];
 }
@@ -216,6 +241,7 @@ NSString *ConnectionStateString(ConnectionState connectionState)
     {
         case ConnectionState_Single:
         case ConnectionState_Dating:
+        case ConnectionState_Separated:
         {
             NSAssert(!self.pen, @"");
             break;
@@ -223,12 +249,14 @@ NSString *ConnectionStateString(ConnectionState connectionState)
         default:
         {
             NSAssert(self.pen, @"");
+            break;
         }
     };
 
     switch (self.connectionState)
     {
         case ConnectionState_Dating:
+        case ConnectionState_Separated:
         {
             NSAssert(self.isScanningForPeripherals, @"");
             break;
@@ -241,6 +269,7 @@ NSString *ConnectionStateString(ConnectionState connectionState)
         default:
         {
             NSAssert(!self.isScanningForPeripherals, @"");
+            break;
         }
     };
 
@@ -255,6 +284,7 @@ NSString *ConnectionStateString(ConnectionState connectionState)
         default:
         {
             NSAssert(!self.maxEngagedSubstateDurationTimer, @"");
+            break;
         }
     };
 
@@ -270,8 +300,25 @@ NSString *ConnectionStateString(ConnectionState connectionState)
         {
             NSAssert(!self.swingingPeripheralUUID, @"");
             NSAssert(!self.swingingPeripheralPollingTimer, @"");
+            break;
         }
     };
+
+    switch (self.connectionState)
+    {
+        case ConnectionState_Separated:
+        {
+            NSAssert(self.separatedPeripheralInactivityTimer, @"");
+            NSAssert(self.separatedPeripheralUUID, @"");
+            break;
+        }
+        default:
+        {
+            NSAssert(!self.separatedPeripheralInactivityTimer, @"");
+            NSAssert(!self.separatedPeripheralUUID, @"");
+            break;
+        }
+    }
 }
 
 #pragma mark - State Transitions
@@ -299,7 +346,8 @@ NSString *ConnectionStateString(ConnectionState connectionState)
 
 - (void)transitionConnectionStateToDating
 {
-    NSAssert(self.connectionState == ConnectionState_Single, @"");
+    NSAssert(self.connectionState == ConnectionState_Single ||
+             self.connectionState == ConnectionState_Separated, @"");
 
     self.isScanningForPeripherals = YES;
 
@@ -406,7 +454,8 @@ NSString *ConnectionStateString(ConnectionState connectionState)
 
 - (void)transitionConnectionStateToReconciling:(CBPeripheral *)peripheral
 {
-    NSAssert(self.connectionState == ConnectionState_Swinging, @"");
+    NSAssert(self.connectionState == ConnectionState_Swinging ||
+             self.connectionState == ConnectionState_Separated, @"");
 
     self.isScanningForPeripherals = NO;
 
@@ -416,6 +465,29 @@ NSString *ConnectionStateString(ConnectionState connectionState)
     [self.centralManager connectPeripheral:peripheral options:nil];
 
     self.connectionState = ConnectionState_Reconciling;
+}
+
+- (void)transitionConnectionStateToSeparated
+{
+    NSAssert(self.connectionState == ConnectionState_Married ||
+             self.connectionState == ConnectionState_Reconciling, @"");
+
+    self.isScanningForPeripherals = YES;
+
+    self.separatedPeripheralInactivityTimer = [NSTimer scheduledTimerWithTimeInterval:kSeparatedPeripheralInactivityTimeInterval
+                                                                               target:self
+                                                                             selector:@selector(separatedPeripheralInactivityTimerFired:)
+                                                                             userInfo:nil
+                                                                              repeats:NO];
+
+    self.connectionState = ConnectionState_Separated;
+}
+
+- (void)separatedPeripheralInactivityTimerFired:(NSTimer *)timer
+{
+    NSAssert(self.connectionState == ConnectionState_Separated, @"");
+
+    [self transitionConnectionStateToSingle];
 }
 
 #pragma mark - Max engaged substate duration timer
@@ -450,6 +522,10 @@ NSString *ConnectionStateString(ConnectionState connectionState)
     NSLog(@"Pairing spot was pressed.");
 
     if (self.connectionState == ConnectionState_Single)
+    {
+        [self transitionConnectionStateToDating];
+    }
+    else if (self.connectionState == ConnectionState_Separated)
     {
         [self transitionConnectionStateToDating];
     }
@@ -557,6 +633,15 @@ NSString *ConnectionStateString(ConnectionState connectionState)
             [self transitionConnectionStateToReconciling:peripheral];
         }
     }
+    else if (self.connectionState == ConnectionState_Separated)
+    {
+        if (peripheral.UUID &&
+            [[CBUUID UUIDWithCFUUID:peripheral.UUID] isEqual:self.separatedPeripheralUUID] &&
+            [self isPeripheralReconciling:advertisementData])
+        {
+            [self transitionConnectionStateToReconciling:peripheral];
+        }
+    }
 }
 
 - (void)centralManager:(CBCentralManager *)central didFailToConnectPeripheral:(CBPeripheral *)peripheral
@@ -580,11 +665,6 @@ NSString *ConnectionStateString(ConnectionState connectionState)
     if (self.pen.peripheral == peripheral)
     {
         [self.pen peripheralConnectionStatusDidChange];
-
-        if (self.connectionState == ConnectionState_Reconciling)
-        {
-
-        }
     }
     else
     {
@@ -595,32 +675,48 @@ NSString *ConnectionStateString(ConnectionState connectionState)
 - (void)centralManager:(CBCentralManager *)central didDisconnectPeripheral:(CBPeripheral *)peripheral
                  error:(NSError *)error
 {
-    NSAssert(peripheral == self.pen.peripheral, @"");
+    NSAssert(self.pen.peripheral.UUID, @"Peripheral UUID non-null.");
 
-    if (self.updateManager)
+    if (peripheral == self.pen.peripheral)
     {
-        if (-[self.updateManager.updateStartTime timeIntervalSinceNow] < kInterruptedUpdateDelayMax)
+        if (self.updateManager)
         {
-            NSLog(@"Disconnected while performing update, attempting reconnect");
+            if (-[self.updateManager.updateStartTime timeIntervalSinceNow] < kInterruptedUpdateDelayMax)
+            {
+                NSLog(@"Disconnected while performing update, attempting reconnect");
 
-            [self performSelectorOnMainThread:@selector(connect) withObject:nil waitUntilDone:NO];
+                [self performSelectorOnMainThread:@selector(connect) withObject:nil waitUntilDone:NO];
+            }
+            else
+            {
+                self.updateManager = nil;
+            }
         }
-        else
+
+        FTPen *pen = self.pen;
+        self.pen = nil;
+
+        [pen peripheralConnectionStatusDidChange];
+
+        [self.delegate penManager:self didDisconnectFromPen:pen];
+
+        if (self.connectionState != ConnectionState_Swinging)
         {
-            self.updateManager = nil;
+            if (self.connectionState == ConnectionState_Married)
+            {
+                self.separatedPeripheralUUID = [CBUUID UUIDWithCFUUID:pen.peripheral.UUID];
+                [self transitionConnectionStateToSeparated];
+            }
+            else if (self.connectionState == ConnectionState_Reconciling)
+            {
+                self.separatedPeripheralUUID = [CBUUID UUIDWithCFUUID:pen.peripheral.UUID];
+                [self transitionConnectionStateToSeparated];
+            }
+            else
+            {
+                [self transitionConnectionStateToSingle];
+            }
         }
-    }
-
-    FTPen *pen = self.pen;
-    self.pen = nil;
-
-    [pen peripheralConnectionStatusDidChange];
-
-    [self.delegate penManager:self didDisconnectFromPen:pen];
-
-    if (self.connectionState != ConnectionState_Swinging)
-    {
-        [self transitionConnectionStateToSingle];
     }
 }
 
