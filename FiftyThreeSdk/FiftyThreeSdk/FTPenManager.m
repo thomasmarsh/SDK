@@ -17,6 +17,7 @@
 static const int kInterruptedUpdateDelayMax = 30;
 
 static const NSTimeInterval kTipAndPairingSpotReleaseTimeDifferenceThreshold = 0.5;
+static const NSTimeInterval kSwingingPeripheralPollingTimeInterval = 0.1;
 
 typedef enum
 {
@@ -27,6 +28,8 @@ typedef enum
     ConnectionState_Engaged_WaitingForPairingSpotRelease,
     ConnectionState_Engaged,
     ConnectionState_Married,
+    ConnectionState_Swinging,
+    ConnectionState_Reconciling,
     ConnectionState_AwaitingDisconnection,
 } ConnectionState;
 
@@ -41,6 +44,8 @@ NSString *ConnectionStateString(ConnectionState connectionState)
         case ConnectionState_Engaged_WaitingForTipRelease: return @"ConnectionState_Engaged_WaitingForTipRelease";
         case ConnectionState_Engaged_WaitingForPairingSpotRelease: return @"ConnectionState_Engaged_WaitingForPairingSpotRelease";
         case ConnectionState_Married: return @"ConnectionState_Married";
+        case ConnectionState_Swinging: return @"ConnectionState_Swinging";
+        case ConnectionState_Reconciling: return @"ConnectionState_Reconciling";
         case ConnectionState_AwaitingDisconnection: return @"ConectionState_AwaitingDisconnection";
         default:
             return nil;
@@ -65,6 +70,9 @@ NSString *ConnectionStateString(ConnectionState connectionState)
 @property (nonatomic) NSDate *lastPairingSpotReleaseTime;
 
 @property (nonatomic, readwrite) FTPen *pen;
+
+@property (nonatomic) CBUUID *swingingPeripheralUUID;
+@property (nonatomic) NSTimer *swingingPeripheralPollingTimer;
 
 @end
 
@@ -148,8 +156,14 @@ NSString *ConnectionStateString(ConnectionState connectionState)
     {
         NSLog(@"Pen is ready");
 
-        [self.delegate penManager:self didConnectToPen:self.pen];
-        [self transitionConnectionStateToEngaged];
+        if (self.connectionState == ConnectionState_Dating_AttemptingConnection)
+        {
+            [self transitionConnectionStateToEngaged];
+        }
+        else if (self.connectionState == ConnectionState_Reconciling)
+        {
+            [self transitionConnectionStateToMarried];
+        }
     }
 }
 
@@ -186,6 +200,13 @@ NSString *ConnectionStateString(ConnectionState connectionState)
         self.maxEngagedSubstateDurationTimer = nil;
     }
 
+    if (self.connectionState != ConnectionState_Swinging)
+    {
+        [self.swingingPeripheralPollingTimer invalidate];
+        self.swingingPeripheralPollingTimer = nil;
+        self.swingingPeripheralUUID = nil;
+    }
+
     [self verifyInternalConsistency];
 }
 
@@ -212,6 +233,11 @@ NSString *ConnectionStateString(ConnectionState connectionState)
             NSAssert(self.isScanningForPeripherals, @"");
             break;
         }
+        case ConnectionState_Reconciling:
+        {
+            // isScanningForPeripherals can be either true or false
+            break;
+        }
         default:
         {
             NSAssert(!self.isScanningForPeripherals, @"");
@@ -229,6 +255,21 @@ NSString *ConnectionStateString(ConnectionState connectionState)
         default:
         {
             NSAssert(!self.maxEngagedSubstateDurationTimer, @"");
+        }
+    };
+
+    switch (self.connectionState)
+    {
+        case ConnectionState_Swinging:
+        {
+            NSAssert(self.swingingPeripheralUUID, @"");
+            NSAssert(self.swingingPeripheralPollingTimer, @"");
+            break;
+        }
+        default:
+        {
+            NSAssert(!self.swingingPeripheralUUID, @"");
+            NSAssert(!self.swingingPeripheralPollingTimer, @"");
         }
     };
 }
@@ -328,9 +369,53 @@ NSString *ConnectionStateString(ConnectionState connectionState)
 - (void)transitionConnectionStateToMarried
 {
     NSAssert(self.connectionState == ConnectionState_Engaged_WaitingForPairingSpotRelease ||
-             self.connectionState == ConnectionState_Engaged_WaitingForTipRelease, @"");
+             self.connectionState == ConnectionState_Engaged_WaitingForTipRelease ||
+             self.connectionState == ConnectionState_Reconciling, @"");
+
+    [self.delegate penManager:self didConnectToPen:self.pen];
 
     self.connectionState = ConnectionState_Married;
+}
+
+- (void)transitionConnectionStateToSwinging
+{
+    NSAssert(self.connectionState == ConnectionState_Married, @"");
+    NSAssert(self.pen.peripheral.isConnected, @"Peripheral is connected");
+    NSAssert(self.pen.peripheral.UUID, @"Peripheral has non-null UUID");
+
+    self.swingingPeripheralUUID = [CBUUID UUIDWithCFUUID:self.pen.peripheral.UUID];
+    self.pen.shouldSwing = YES;
+
+    self.swingingPeripheralPollingTimer = [NSTimer scheduledTimerWithTimeInterval:kSwingingPeripheralPollingTimeInterval
+                                                                           target:self
+                                                                         selector:@selector(swingingPeripheralPollingTimerFired:)
+                                                                         userInfo:nil
+                                                                          repeats:YES];
+
+    self.connectionState = ConnectionState_Swinging;
+}
+
+- (void)swingingPeripheralPollingTimerFired:(NSTimer *)timer
+{
+    // TODO: This means the peripheral has not yet been disconnected. We should handle this more gracefully.
+    if (!self.pen)
+    {
+        self.isScanningForPeripherals = !self.isScanningForPeripherals;
+    }
+}
+
+- (void)transitionConnectionStateToReconciling:(CBPeripheral *)peripheral
+{
+    NSAssert(self.connectionState == ConnectionState_Swinging, @"");
+
+    self.isScanningForPeripherals = NO;
+
+    self.pen = [[FTPen alloc] initWithCentralManager:self.centralManager peripheral:peripheral];
+    self.pen.requiresTipBePressedToBecomeReady = NO;
+
+    [self.centralManager connectPeripheral:peripheral options:nil];
+
+    self.connectionState = ConnectionState_Reconciling;
 }
 
 #pragma mark - Max engaged substate duration timer
@@ -398,128 +483,6 @@ NSString *ConnectionStateString(ConnectionState connectionState)
     }
 }
 
-//
-//- (void)startFalsePairingTimer
-//{
-//    if (self.falsePairingTimer)
-//    {
-//        return;
-//    }
-//
-//    self.falsePairingTimer = [NSTimer scheduledTimerWithTimeInterval:kPairingReleaseWindowSeconds
-//                                                              target:self
-//                                                            selector:@selector(falsePairingTimerExpired:)
-//                                                            userInfo:nil
-//                                                             repeats:NO];
-//}
-//
-//- (void)resetFalsePairingInfo
-//{
-//    if (self.falsePairingTimer)
-//    {
-//        [self.falsePairingTimer invalidate];
-//        self.falsePairingTimer = nil;
-//    }
-//
-//    self.lastReleaseTime = nil;
-//    self.stopPairingTime = nil;
-//}
-//
-//- (void)falsePairingTimerExpired:(NSTimer *)timer
-//{
-//    self.falsePairingTimer = nil;
-//
-//    NSTimeInterval diff = ABS([self.lastReleaseTime timeIntervalSinceDate:self.stopPairingTime]);
-//    NSLog(@"checkForFalsePairing, diff=%g", diff);
-//    if (self.lastReleaseTime == 0
-//        || self.stopPairingTime == 0
-//        || diff > kPairingReleaseWindowSeconds)
-//    {
-//        if (self.pairedPen)
-//        {
-//            [self deletePairedPen:self.pairedPen];
-//        }
-//    }
-//
-//    [self endPairingProcess];
-//}
-//
-// For clients only, internal code should call endPairingProcess
-//- (void)stopPairing
-//{
-//    self.stopPairingTime = [NSDate date];
-//    if (!self.newlyPaired)
-//    {
-//        [self endPairingProcess];
-//    }
-//    else
-//    {
-//        [self startFalsePairingTimer];
-//    }
-//}
-//
-//- (void)endPairingProcess
-//{
-//    NSLog(@"endPairingProcess");
-//
-//    [self resetFalsePairingInfo];
-//
-//    [self.pairingTimer invalidate];
-//    self.pairingTimer = nil;
-//
-//    self.pairing = NO;
-//    self.newlyPaired = NO;
-//    [self.centralManager stopScan];
-//
-//    [self reconnect];
-//}
-//
-//- (void)pairingTimerExpired:(NSTimer *)timer
-//{
-//    NSLog(@"pairingTimerExpired");
-//
-//    self.pairingTimer = nil;
-//
-//    if (self.trialSeparationTimer)
-//    {
-//        // We didn't find it, so unpair
-//        NSLog(@"Removing paired device");
-//
-//        [self.trialSeparationTimer invalidate];
-//        self.trialSeparationTimer = nil;
-//        if (self.pairedPen)
-//        {
-//            [self deletePairedPen:self.pairedPen];
-//        }
-//
-//        [self endPairingProcess];
-//    }
-//    else if (self.closestPen)
-//    {
-//        [self connectPen:self.closestPen];
-//    }
-//}
-//
-//- (void)connect
-//{
-//    if (!self.pen && self.pairedPen)
-//    {
-//        [self connectPen:self.pairedPen];
-//    }
-//}
-//
-//- (void)reconnect
-//{
-//    if (self.autoConnect
-//        && !self.pen
-//        && !self.pairing
-//        && !self.trialSeparationTimer)
-//    {
-//        NSLog(@"auto reconnect");
-//        [self connect];
-//    }
-//}
-
 - (void)disconnect
 {
     if (self.pen)
@@ -540,144 +503,12 @@ NSString *ConnectionStateString(ConnectionState connectionState)
     [self.delegate penManagerDidUpdateState:self];
 }
 
-//- (void)savePairedPen:(FTPen *)pen
-//{
-//    NSAssert(pen, nil);
-//
-//    CFUUIDRef uuid = pen.peripheral.UUID;
-//    NSString* uuidString = uuid != nil ? CFBridgingRelease(CFUUIDCreateString(NULL, uuid)) : nil;
-//
-//    [[NSUserDefaults standardUserDefaults] setValue:uuidString
-//                                             forKey:kPairedPenUuidDefaultsKey];
-//    [[NSUserDefaults standardUserDefaults] synchronize];
-//}
-//
-//- (void)loadPairedPen
-//{
-//    NSString *uuid = [[NSUserDefaults standardUserDefaults] stringForKey:kPairedPenUuidDefaultsKey];
-//    if (uuid) {
-//        [self.centralManager retrievePeripherals:@[CFBridgingRelease(CFUUIDCreateFromString(NULL, (CFStringRef)uuid))]];
-//    } else {
-//        [self updateState:FTPenManagerStateAvailable];
-//    }
-//}
-//
-//- (void)deletePairedPen:(FTPen *)pen
-//{
-//    NSAssert(pen, nil);
-//
-//    if (self.pen == pen)
-//    {
-//        [self disconnect];
-//    }
-//
-//    if (self.pairedPen == pen)
-//    {
-//        self.pairedPen = nil;
-//
-//        [[NSUserDefaults standardUserDefaults] setValue:nil
-//                                                 forKey:kPairedPenUuidDefaultsKey];
-//        [[NSUserDefaults standardUserDefaults] synchronize];
-//
-//        [self.delegate penManager:self didUnpairFromPen:pen];
-//    }
-//}
-//
-//- (void)didConnectToPen:(FTPen *)pen
-//{
-//    NSAssert(pen, nil);
-//
-//    if (self.pairing)
-//    {
-//        self.pairedPen = pen;
-//        self.newlyPaired = YES;
-//
-//        [self savePairedPen:pen];
-//
-//        [self.delegate penManager:self didPairWithPen:self.pairedPen];
-//    }
-//
-//    if (self.updateManager)
-//    {
-//        if (-[self.updateManager.updateStartTime timeIntervalSinceNow] < kInterruptedUpdateDelayMax)
-//        {
-//            [self updateFirmwareForPen:self.pen];
-//            return;
-//        }
-//        else
-//        {
-//            self.updateManager = nil;
-//        }
-//    }
-//
-//    [self.delegate penManager:self didConnectToPen:self.pairedPen];
-//
-//    // Now that we are connected update the device info
-//    [self.pen getInfo:^(FTPen *client, NSError *error) {
-//        if (error) {
-//            // We failed to get info, but that's ok, continue anyway
-//            NSLog(@"Failed to get device info, error=%@", [error localizedDescription]);
-//        }
-//
-//        if (!self.pen) return;
-//        [self.delegate penManager:self didUpdateDeviceInfo:self.pen];
-//
-//        [self.pen getBattery:^(FTPen *client, NSError *error) {
-//            if (error) {
-//                // We failed to get info, but that's ok, continue anyway
-//                NSLog(@"Failed to get device info, error=%@", [error localizedDescription]);
-//            }
-//
-//            if (!self.pen) return;
-//            [self.delegate penManager:self didUpdateDeviceBatteryLevel:self.pen];
-//        }];
-//    }];
-//}
-//
-//- (void)cleanup
-//{
-//    if (!self.pen.peripheral.isConnected)
-//    {
-//        return;
-//    }
-//
-//    // See if we are subscribed to a characteristic on the peripheral
-//    if (self.pen.peripheral.services != nil)
-//    {
-//        for (CBService *service in self.pen.peripheral.services)
-//        {
-//            if (service.characteristics != nil)
-//            {
-//                for (CBCharacteristic *characteristic in service.characteristics)
-//                {
-//                    if ([characteristic.UUID isEqual:[FTPenServiceUUIDs isTipPressed]] ||
-//                        [characteristic.UUID isEqual:[FTPenServiceUUIDs isEraserPressed]])
-//                    {
-//                        if (characteristic.isNotifying)
-//                        {
-//                            [self.pen.peripheral setNotifyValue:NO forCharacteristic:characteristic];
-//                            return;
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//    }
-//
-//    // If we've got this far, we're connected, but we're not subscribed, so we just disconnect
-//    [self.centralManager cancelPeripheralConnection:self.pen.peripheral];
-//}
-
 - (void)startTrialSeparation
 {
-    NSLog(@"Start trial separation.");
-
-    self.pen.shouldSwing = YES;
-}
-
-- (void)stopTrialSeparation:(NSTimer *)timer
-{
-    NSLog(@"Stop trial separation.");
+    if (self.connectionState == ConnectionState_Married)
+    {
+        [self transitionConnectionStateToSwinging];
+    }
 }
 
 #pragma mark - CBCentralManagerDelegate
@@ -688,42 +519,44 @@ NSString *ConnectionStateString(ConnectionState connectionState)
     NSAssert(central.state == CBCentralManagerStatePoweredOn, @"Assume central manager state = powered on");
 }
 
+- (BOOL)isPeripheralReconciling:(NSDictionary *)advertisementData
+{
+    // TODO: Should we explicitly only consider the least significant bit?
+    NSData *manufacturerData = advertisementData[CBAdvertisementDataManufacturerDataKey];
+    for (int i = 0; i < manufacturerData.length; i++)
+    {
+        if (((char *)manufacturerData.bytes)[i])
+        {
+            return YES;
+        }
+    }
+    return NO;
+}
+
 - (void)centralManager:(CBCentralManager *)central
  didDiscoverPeripheral:(CBPeripheral *)peripheral
      advertisementData:(NSDictionary *)advertisementData
                   RSSI:(NSNumber *)RSSI
 {
-    NSLog(@"Discovered peripheral with name: \"%@\" and RSSI: %d.", peripheral.name, [RSSI integerValue]);
+    NSLog(@"Discovered peripheral with name: \"%@\" IsReconciling: %d RSSI: %d.",
+          peripheral.name,
+          [self isPeripheralReconciling:advertisementData],
+          [RSSI integerValue]);
+//    NSLog(@"Advertisement data: %@", advertisementData);
 
     if (self.connectionState == ConnectionState_Dating)
     {
         [self transitionConnectionStateToDating_AttemptingConnection:peripheral];
     }
-
-//    int rssiValue = [RSSI integerValue];
-//    if (self.trialSeparationTimer && self.pairedPen)
-//    {
-//        self.trialSeparationTimer = nil;
-//
-//        [self endPairingProcess];
-//        return;
-//    }
-//
-//    if (self.closestPen.peripheral == peripheral)
-//    {
-//        [self.closestPen updateData:advertisementData];
-//    }
-//    else if (rssiValue > self.maxRSSI || self.maxRSSI == 0)
-//    {
-//        self.maxRSSI = rssiValue;
-//        self.closestPen = [[FTPen alloc] initWithPeripheral:peripheral data:advertisementData];
-//    }
-//
-//    if (self.pairing && !self.pairingTimer)
-//    {
-//        // Timer already expired without finding a pen, so connect immediately.
-//        [self connectPen:self.closestPen];
-//    }
+    else if (self.connectionState == ConnectionState_Swinging)
+    {
+        if (peripheral.UUID &&
+            [[CBUUID UUIDWithCFUUID:peripheral.UUID] isEqual:self.swingingPeripheralUUID] &&
+            [self isPeripheralReconciling:advertisementData])
+        {
+            [self transitionConnectionStateToReconciling:peripheral];
+        }
+    }
 }
 
 - (void)centralManager:(CBCentralManager *)central didFailToConnectPeripheral:(CBPeripheral *)peripheral
@@ -741,11 +574,17 @@ NSString *ConnectionStateString(ConnectionState connectionState)
 
 - (void)centralManager:(CBCentralManager *)central didConnectPeripheral:(CBPeripheral *)peripheral
 {
-    NSAssert(self.connectionState == ConnectionState_Dating_AttemptingConnection, @"");
+    NSAssert(self.connectionState == ConnectionState_Dating_AttemptingConnection ||
+             self.connectionState == ConnectionState_Reconciling, @"");
 
     if (self.pen.peripheral == peripheral)
     {
         [self.pen peripheralConnectionStatusDidChange];
+
+        if (self.connectionState == ConnectionState_Reconciling)
+        {
+
+        }
     }
     else
     {
@@ -779,7 +618,10 @@ NSString *ConnectionStateString(ConnectionState connectionState)
 
     [self.delegate penManager:self didDisconnectFromPen:pen];
 
-    [self transitionConnectionStateToSingle];
+    if (self.connectionState != ConnectionState_Swinging)
+    {
+        [self transitionConnectionStateToSingle];
+    }
 }
 
 - (void)centralManager:(CBCentralManager *)central didRetrievePeripherals:(NSArray *)peripherals

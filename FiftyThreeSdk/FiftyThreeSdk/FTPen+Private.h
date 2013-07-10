@@ -14,6 +14,7 @@
 
 @property (nonatomic) CBPeripheral *peripheral;
 
+@property (nonatomic) BOOL requiresTipBePressedToBecomeReady;
 @property (nonatomic) BOOL shouldSwing;
 @property (nonatomic) BOOL shouldPowerOff;
 

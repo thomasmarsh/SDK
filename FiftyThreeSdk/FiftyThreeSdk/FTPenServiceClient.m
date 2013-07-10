@@ -33,6 +33,7 @@
     if (self)
     {
         _peripheral = peripheral;
+        _requiresTipBePressedToBecomeReady = YES;
     }
     return self;
 }
@@ -227,7 +228,7 @@
         }
         else
         {
-            if (isTipPressed)
+            if (!self.requiresTipBePressedToBecomeReady || isTipPressed)
             {
                 self.isReady = YES;
             }

@@ -20,6 +20,9 @@
 @property (nonatomic, readonly) BOOL isTipPressed;
 @property (nonatomic, readonly) BOOL isEraserPressed;
 @property (nonatomic, readonly) NSDate *lastTipReleaseTime;
+
+// Defaults to YES
+@property (nonatomic) BOOL requiresTipBePressedToBecomeReady;
 @property (nonatomic) BOOL shouldSwing;
 @property (nonatomic) BOOL shouldPowerOff;
 

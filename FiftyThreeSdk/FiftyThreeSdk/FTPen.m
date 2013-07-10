@@ -95,6 +95,16 @@ NSString * const kFTPenIsEraserPressedDidChangeNotificationName = @"com.fiftythr
     return self.penServiceClient.lastTipReleaseTime;
 }
 
+- (BOOL)requiresTipBePressedToBecomeReady
+{
+    return self.penServiceClient.requiresTipBePressedToBecomeReady;
+}
+
+- (void)setRequiresTipBePressedToBecomeReady:(BOOL)requiresTipBePressedToBecomeReady
+{
+    self.penServiceClient.requiresTipBePressedToBecomeReady = requiresTipBePressedToBecomeReady;
+}
+
 - (BOOL)shouldSwing
 {
     return self.penServiceClient.shouldSwing;
