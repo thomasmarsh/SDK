@@ -16,9 +16,10 @@
 
 static const int kInterruptedUpdateDelayMax = 30;
 
-static const NSTimeInterval kTipAndPairingSpotReleaseTimeDifferenceThreshold = 0.5;
-static const NSTimeInterval kSwingingPeripheralPollingTimeInterval = 0.1;
-static const NSTimeInterval kSeparatedPeripheralInactivityTimeInterval = 1.0 * 60.0;
+static const NSTimeInterval kEngagedStateTimeout = 0.5;
+static const NSTimeInterval kSwingingStatePollingInterval = 0.1;
+static const NSTimeInterval kSwingingStateTimeout = 10.0;
+static const NSTimeInterval kSeparatedStateTimeout = 1.0 * 60.0;
 
 typedef enum
 {
@@ -32,7 +33,7 @@ typedef enum
     ConnectionState_Swinging,
     ConnectionState_Reconciling,
     ConnectionState_Separated,
-    ConnectionState_AwaitingDisconnection,
+    ConnectionState_Disconnecting,
 } ConnectionState;
 
 NSString *ConnectionStateString(ConnectionState connectionState)
@@ -49,7 +50,7 @@ NSString *ConnectionStateString(ConnectionState connectionState)
         case ConnectionState_Swinging: return @"ConnectionState_Swinging";
         case ConnectionState_Reconciling: return @"ConnectionState_Reconciling";
         case ConnectionState_Separated: return @"ConnectionState_Separated";
-        case ConnectionState_AwaitingDisconnection: return @"ConectionState_AwaitingDisconnection";
+        case ConnectionState_Disconnecting: return @"ConectionState_Disconnection";
         default:
             return nil;
     }
@@ -68,8 +69,6 @@ NSString *ConnectionStateString(ConnectionState connectionState)
 
 @property (nonatomic) BOOL isScanningForPeripherals;
 
-@property (nonatomic) NSTimer *maxEngagedSubstateDurationTimer;
-
 @property (nonatomic) NSDate *lastPairingSpotReleaseTime;
 
 @property (nonatomic, readwrite) FTPen *pen;
@@ -78,7 +77,8 @@ NSString *ConnectionStateString(ConnectionState connectionState)
 @property (nonatomic) NSTimer *swingingPeripheralPollingTimer;
 
 @property (nonatomic) CBUUID *separatedPeripheralUUID;
-@property (nonatomic) NSTimer *separatedPeripheralInactivityTimer;
+
+@property (nonatomic) NSTimer *stateTimeoutTimer;
 
 @end
 
@@ -142,7 +142,7 @@ NSString *ConnectionStateString(ConnectionState connectionState)
     {
 
     }
-    else if (self.connectionState == ConnectionState_AwaitingDisconnection)
+    else if (self.connectionState == ConnectionState_Disconnecting)
     {
 
     }
@@ -152,7 +152,7 @@ NSString *ConnectionStateString(ConnectionState connectionState)
     }
     else
     {
-        [self transitionConnectionStateToAwaitingDisconnection];
+        [self transitionConnectionStateToDisconnecting];
     }
 }
 
@@ -200,14 +200,6 @@ NSString *ConnectionStateString(ConnectionState connectionState)
 
     switch (self.connectionState)
     {
-        case ConnectionState_Engaged_WaitingForPairingSpotRelease:
-        case ConnectionState_Engaged_WaitingForTipRelease:
-        {
-            [self.maxEngagedSubstateDurationTimer invalidate];
-            self.maxEngagedSubstateDurationTimer = nil;
-
-            break;
-        }
         case ConnectionState_Swinging:
         {
             [self.swingingPeripheralPollingTimer invalidate];
@@ -218,8 +210,6 @@ NSString *ConnectionStateString(ConnectionState connectionState)
         }
         case ConnectionState_Separated:
         {
-            [self.separatedPeripheralInactivityTimer invalidate];
-            self.separatedPeripheralInactivityTimer = nil;
             self.separatedPeripheralUUID = nil;
 
             self.isScanningForPeripherals = NO;
@@ -232,7 +222,66 @@ NSString *ConnectionStateString(ConnectionState connectionState)
 
     _connectionState = connectionState;
 
+    switch (self.connectionState)
+    {
+        case ConnectionState_Engaged_WaitingForPairingSpotRelease:
+        case ConnectionState_Engaged_WaitingForTipRelease:
+        {
+            [self startStateTimeoutTimer:kEngagedStateTimeout];
+            break;
+        }
+        case ConnectionState_Separated:
+        {
+            [self startStateTimeoutTimer:kSeparatedStateTimeout];
+            break;
+        }
+        case ConnectionState_Swinging:
+        {
+            [self startStateTimeoutTimer:kSwingingStateTimeout];
+            break;
+        }
+        default:
+        {
+            [self.stateTimeoutTimer invalidate];
+            self.stateTimeoutTimer = nil;
+        }
+    };
+
     [self verifyInternalConsistency];
+}
+
+- (void)startStateTimeoutTimer:(NSTimeInterval)timeoutTimeInterval
+{
+    [self.stateTimeoutTimer invalidate];
+    self.stateTimeoutTimer = [NSTimer scheduledTimerWithTimeInterval:timeoutTimeInterval
+                                                              target:self
+                                                            selector:@selector(stateTimeoutTimerFired:)
+                                                            userInfo:nil
+                                                             repeats:NO];
+}
+
+- (void)stateTimeoutTimerFired:(NSTimer *)timer
+{
+    switch (self.connectionState)
+    {
+        case ConnectionState_Engaged_WaitingForPairingSpotRelease:
+        case ConnectionState_Engaged_WaitingForTipRelease:
+        {
+            [self transitionConnectionStateToDisconnecting];
+            break;
+        }
+        case ConnectionState_Separated:
+        case ConnectionState_Swinging:
+        {
+            [self transitionConnectionStateToSingle];
+            break;
+        }
+        default:
+        {
+            NSAssert(NO, @"Unexpected state received timeout.");
+            break;
+        }
+    }
 }
 
 - (void)verifyInternalConsistency
@@ -275,21 +324,6 @@ NSString *ConnectionStateString(ConnectionState connectionState)
 
     switch (self.connectionState)
     {
-        case ConnectionState_Engaged_WaitingForPairingSpotRelease:
-        case ConnectionState_Engaged_WaitingForTipRelease:
-        {
-            NSAssert(self.maxEngagedSubstateDurationTimer, @"");
-            break;
-        }
-        default:
-        {
-            NSAssert(!self.maxEngagedSubstateDurationTimer, @"");
-            break;
-        }
-    };
-
-    switch (self.connectionState)
-    {
         case ConnectionState_Swinging:
         {
             NSAssert(self.swingingPeripheralUUID, @"");
@@ -308,13 +342,11 @@ NSString *ConnectionStateString(ConnectionState connectionState)
     {
         case ConnectionState_Separated:
         {
-            NSAssert(self.separatedPeripheralInactivityTimer, @"");
             NSAssert(self.separatedPeripheralUUID, @"");
             break;
         }
         default:
         {
-            NSAssert(!self.separatedPeripheralInactivityTimer, @"");
             NSAssert(!self.separatedPeripheralUUID, @"");
             break;
         }
@@ -330,13 +362,13 @@ NSString *ConnectionStateString(ConnectionState connectionState)
     self.connectionState = ConnectionState_Single;
 }
 
-- (void)transitionConnectionStateToAwaitingDisconnection
+- (void)transitionConnectionStateToDisconnecting
 {
     if (self.pen)
     {
         [self.centralManager cancelPeripheralConnection:self.pen.peripheral];
 
-        self.connectionState = ConnectionState_AwaitingDisconnection;
+        self.connectionState = ConnectionState_Disconnecting;
     }
     else
     {
@@ -378,16 +410,12 @@ NSString *ConnectionStateString(ConnectionState connectionState)
 {
     NSAssert(self.connectionState == ConnectionState_Engaged, @"");
 
-    [self startMaxEngagedSubstateDurationTimer];
-
     self.connectionState = ConnectionState_Engaged_WaitingForTipRelease;
 }
 
 - (void)transitionConnectionStateToEngaged_WaitingForPairPairingSpotRelease
 {
     NSAssert(self.connectionState == ConnectionState_Engaged, @"");
-
-    [self startMaxEngagedSubstateDurationTimer];
 
     self.connectionState = ConnectionState_Engaged_WaitingForPairingSpotRelease;
 }
@@ -404,13 +432,13 @@ NSString *ConnectionStateString(ConnectionState connectionState)
     NSLog(@"Difference in pairing spot and tip press release times (ms): %f.",
           tipAndPairingSpoteReleaseTimeDifference * 1000.0);
 
-    if (tipAndPairingSpoteReleaseTimeDifference < kTipAndPairingSpotReleaseTimeDifferenceThreshold)
+    if (tipAndPairingSpoteReleaseTimeDifference < kEngagedStateTimeout)
     {
         [self transitionConnectionStateToMarried];
     }
     else
     {
-        [self transitionConnectionStateToAwaitingDisconnection];
+        [self transitionConnectionStateToDisconnecting];
     }
 }
 
@@ -434,16 +462,16 @@ NSString *ConnectionStateString(ConnectionState connectionState)
     self.swingingPeripheralUUID = [CBUUID UUIDWithCFUUID:self.pen.peripheral.UUID];
     self.pen.shouldSwing = YES;
 
-    self.swingingPeripheralPollingTimer = [NSTimer scheduledTimerWithTimeInterval:kSwingingPeripheralPollingTimeInterval
+    self.swingingPeripheralPollingTimer = [NSTimer scheduledTimerWithTimeInterval:kSwingingStatePollingInterval
                                                                            target:self
-                                                                         selector:@selector(swingingPeripheralPollingTimerFired:)
+                                                                         selector:@selector(swingingStatePollingTimerFired:)
                                                                          userInfo:nil
                                                                           repeats:YES];
 
     self.connectionState = ConnectionState_Swinging;
 }
 
-- (void)swingingPeripheralPollingTimerFired:(NSTimer *)timer
+- (void)swingingStatePollingTimerFired:(NSTimer *)timer
 {
     // TODO: This means the peripheral has not yet been disconnected. We should handle this more gracefully.
     if (!self.pen)
@@ -467,18 +495,15 @@ NSString *ConnectionStateString(ConnectionState connectionState)
     self.connectionState = ConnectionState_Reconciling;
 }
 
-- (void)transitionConnectionStateToSeparated
+- (void)transitionConnectionStateToSeparated:(FTPen *)pen
 {
     NSAssert(self.connectionState == ConnectionState_Married ||
              self.connectionState == ConnectionState_Reconciling, @"");
+    NSAssert(pen.peripheral.UUID, @"Peripheral has a non-null UUID.");
 
     self.isScanningForPeripherals = YES;
 
-    self.separatedPeripheralInactivityTimer = [NSTimer scheduledTimerWithTimeInterval:kSeparatedPeripheralInactivityTimeInterval
-                                                                               target:self
-                                                                             selector:@selector(separatedPeripheralInactivityTimerFired:)
-                                                                             userInfo:nil
-                                                                              repeats:NO];
+    self.separatedPeripheralUUID = [CBUUID UUIDWithCFUUID:pen.peripheral.UUID];
 
     self.connectionState = ConnectionState_Separated;
 }
@@ -488,31 +513,6 @@ NSString *ConnectionStateString(ConnectionState connectionState)
     NSAssert(self.connectionState == ConnectionState_Separated, @"");
 
     [self transitionConnectionStateToSingle];
-}
-
-#pragma mark - Max engaged substate duration timer
-
-// Start a timer that fires if the amount of time spent in one of the engaged substates ("waiting for pairing
-// spot release" or "waiting for tip release") exceeds the threshold. The idea is that we never want to wait
-// indefinitely for a tip or pairing spot release that may never come. Better to boot out early if we know
-// that even if it did come, it would be too late.
-- (void)startMaxEngagedSubstateDurationTimer
-{
-    self.maxEngagedSubstateDurationTimer = [NSTimer scheduledTimerWithTimeInterval:kTipAndPairingSpotReleaseTimeDifferenceThreshold
-                                                                            target:self
-                                                                          selector:@selector(maxEngagedSubstateDurationTimerFired:)
-                                                                          userInfo:nil
-                                                                           repeats:NO];
-}
-
-- (void)maxEngagedSubstateDurationTimerFired:(NSTimer *)timer
-{
-    NSAssert(self.connectionState == ConnectionState_Engaged_WaitingForPairingSpotRelease ||
-             self.connectionState == ConnectionState_Engaged_WaitingForTipRelease, @"");
-
-    NSLog(@"Max duration in engaged substate exceeded. Disconnecting.");
-
-    [self transitionConnectionStateToAwaitingDisconnection];
 }
 
 #pragma mark - Pairing Spot
@@ -547,7 +547,7 @@ NSString *ConnectionStateString(ConnectionState connectionState)
     {
         // If we were in the middle of connecting, but the pairing spot was released prematurely, then cancel
         // the connection. The pen must be connected and ready in order to transition to the "engaged" state.
-        [self transitionConnectionStateToAwaitingDisconnection];
+        [self transitionConnectionStateToDisconnecting];
     }
     else if (self.connectionState == ConnectionState_Engaged)
     {
@@ -704,13 +704,11 @@ NSString *ConnectionStateString(ConnectionState connectionState)
         {
             if (self.connectionState == ConnectionState_Married)
             {
-                self.separatedPeripheralUUID = [CBUUID UUIDWithCFUUID:pen.peripheral.UUID];
-                [self transitionConnectionStateToSeparated];
+                [self transitionConnectionStateToSeparated:pen];
             }
             else if (self.connectionState == ConnectionState_Reconciling)
             {
-                self.separatedPeripheralUUID = [CBUUID UUIDWithCFUUID:pen.peripheral.UUID];
-                [self transitionConnectionStateToSeparated];
+                [self transitionConnectionStateToSeparated:pen];
             }
             else
             {
