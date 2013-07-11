@@ -206,6 +206,8 @@ NSString *ConnectionStateString(ConnectionState connectionState)
             self.swingingPeripheralPollingTimer = nil;
             self.swingingPeripheralUUID = nil;
 
+            self.isScanningForPeripherals = NO;
+
             break;
         }
         case ConnectionState_Separated:
@@ -222,6 +224,13 @@ NSString *ConnectionStateString(ConnectionState connectionState)
 
     _connectionState = connectionState;
 
+    [self resetStateTimeoutTimer];
+
+    [self verifyInternalConsistency];
+}
+
+- (void)resetStateTimeoutTimer
+{
     switch (self.connectionState)
     {
         case ConnectionState_Engaged_WaitingForPairingSpotRelease:
@@ -246,8 +255,6 @@ NSString *ConnectionStateString(ConnectionState connectionState)
             self.stateTimeoutTimer = nil;
         }
     };
-
-    [self verifyInternalConsistency];
 }
 
 - (void)startStateTimeoutTimer:(NSTimeInterval)timeoutTimeInterval
@@ -618,26 +625,36 @@ NSString *ConnectionStateString(ConnectionState connectionState)
           peripheral.name,
           [self isPeripheralReconciling:advertisementData],
           [RSSI integerValue]);
-//    NSLog(@"Advertisement data: %@", advertisementData);
+
+    BOOL isPeripheralReconciling = [self isPeripheralReconciling:advertisementData];
 
     if (self.connectionState == ConnectionState_Dating)
     {
-        [self transitionConnectionStateToDating_AttemptingConnection:peripheral];
+        if (!isPeripheralReconciling)
+        {
+            [self transitionConnectionStateToDating_AttemptingConnection:peripheral];
+        }
     }
     else if (self.connectionState == ConnectionState_Swinging)
     {
         if (peripheral.UUID &&
-            [[CBUUID UUIDWithCFUUID:peripheral.UUID] isEqual:self.swingingPeripheralUUID] &&
-            [self isPeripheralReconciling:advertisementData])
+            [[CBUUID UUIDWithCFUUID:peripheral.UUID] isEqual:self.swingingPeripheralUUID])
         {
-            [self transitionConnectionStateToReconciling:peripheral];
+            if (isPeripheralReconciling)
+            {
+                [self transitionConnectionStateToReconciling:peripheral];
+            }
+            else
+            {
+                [self resetStateTimeoutTimer];
+            }
         }
     }
     else if (self.connectionState == ConnectionState_Separated)
     {
         if (peripheral.UUID &&
             [[CBUUID UUIDWithCFUUID:peripheral.UUID] isEqual:self.separatedPeripheralUUID] &&
-            [self isPeripheralReconciling:advertisementData])
+            isPeripheralReconciling)
         {
             [self transitionConnectionStateToReconciling:peripheral];
         }
