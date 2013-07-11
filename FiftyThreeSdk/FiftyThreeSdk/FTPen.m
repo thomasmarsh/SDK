@@ -59,15 +59,15 @@ NSString * const kFTPenIsEraserPressedDidChangeNotificationName = @"com.fiftythr
         _penServiceClient.delegate = self;
         [_peripheralDelegate addServiceClient:_penServiceClient];
 
-        // Pen Debug Service client
-#ifdef DEBUG
-        _penDebugServiceClient = [[FTPenDebugServiceClient alloc] init];
-        _penDebugServiceClient.delegate = self;
-        [_peripheralDelegate addServiceClient:_penDebugServiceClient];
-#endif
-
-        _deviceInfoServiceClient = [[FTDeviceInfoServiceClient alloc] init];
-        [_peripheralDelegate addServiceClient:_deviceInfoServiceClient];
+//        // Pen Debug Service client
+//#ifdef DEBUG
+//        _penDebugServiceClient = [[FTPenDebugServiceClient alloc] init];
+//        _penDebugServiceClient.delegate = self;
+//        [_peripheralDelegate addServiceClient:_penDebugServiceClient];
+//#endif
+//
+//        _deviceInfoServiceClient = [[FTDeviceInfoServiceClient alloc] init];
+//        [_peripheralDelegate addServiceClient:_deviceInfoServiceClient];
     }
 
     return self;

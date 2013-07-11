@@ -141,10 +141,14 @@
             NSArray *characteristics = @[[FTPenServiceUUIDs isTipPressed],
                                          [FTPenServiceUUIDs isEraserPressed],
                                          [FTPenServiceUUIDs shouldSwing],
-                                         [FTPenServiceUUIDs shouldPowerOff],
-                                         [FTPenServiceUUIDs batteryVoltage],
-                                         [FTPenServiceUUIDs inactivityTime]
                                          ];
+//            NSArray *characteristics = @[[FTPenServiceUUIDs isTipPressed],
+//                                         [FTPenServiceUUIDs isEraserPressed],
+//                                         [FTPenServiceUUIDs shouldSwing],
+//                                         [FTPenServiceUUIDs shouldPowerOff],
+//                                         [FTPenServiceUUIDs batteryVoltage],
+//                                         [FTPenServiceUUIDs inactivityTime]
+//                                         ];
 
             [peripheral discoverCharacteristics:characteristics forService:self.penService];
         }
