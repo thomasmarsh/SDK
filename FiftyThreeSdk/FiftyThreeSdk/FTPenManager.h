@@ -20,12 +20,9 @@ typedef NS_ENUM(NSInteger, FTPenManagerState) {
 @property(nonatomic, weak) id<FTPenManagerDelegate> delegate;
 @property(nonatomic, readonly) FTPen *pen;
 @property(nonatomic, readonly) FTPenManagerState state;
-@property (nonatomic) BOOL autoConnect;
+@property (nonatomic) BOOL isPairingSpotPressed;
 
 - (id)initWithDelegate:(id<FTPenManagerDelegate>)delegate;
-
-- (void)pairingSpotWasPressed;
-- (void)pairingSpotWasReleased;
 
 - (void)disconnect;
 
@@ -34,10 +31,9 @@ typedef NS_ENUM(NSInteger, FTPenManagerState) {
 @protocol FTPenManagerDelegate <NSObject>
 
 - (void)penManagerDidUpdateState:(FTPenManager *)penManager;
-- (void)penManager:(FTPenManager *)penManager didPairWithPen:(FTPen *)pen;
-- (void)penManager:(FTPenManager *)penManager didUnpairFromPen:(FTPen *)pen;
+- (void)penManager:(FTPenManager *)penManager didBegingConnectingToPen:(FTPen *)pen;
 - (void)penManager:(FTPenManager *)penManager didConnectToPen:(FTPen *)pen;
-- (void)penManager:(FTPenManager *)penManager didFailConnectToPen:(FTPen *)pen;
+- (void)penManager:(FTPenManager *)penManager didFailToConnectToPen:(FTPen *)pen;
 - (void)penManager:(FTPenManager *)penManager didDisconnectFromPen:(FTPen *)pen;
 - (void)penManager:(FTPenManager *)penManager didUpdateDeviceInfo:(FTPen *)pen;
 

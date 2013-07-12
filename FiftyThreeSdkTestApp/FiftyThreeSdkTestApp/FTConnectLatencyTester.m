@@ -1,6 +1,6 @@
 //
 //  FTConnectLatencyTester.m
-//  charcoal-prototype
+//  FiftyThreeSdkTestApp
 //
 //  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
 //
@@ -48,14 +48,9 @@
 
 - (void)penManagerDidUpdateState:(FTPenManager *)penManager;
 {
-
 }
 
-- (void)penManager:(FTPenManager *)penManager didPairWithPen:(FTPen *)pen
-{
-}
-
-- (void)penManager:(FTPenManager *)penManager didUnpairFromPen:(FTPen *)pen
+- (void)penManager:(FTPenManager *)penManager didBegingConnectingToPen:(FTPen *)pen
 {
 }
 
@@ -84,7 +79,7 @@
     [self.penManager disconnect];
 }
 
-- (void)penManager:(FTPenManager *)penManager didFailConnectToPen:(FTPen *)pen
+- (void)penManager:(FTPenManager *)penManager didFailToConnectToPen:(FTPen *)pen
 {
 }
 

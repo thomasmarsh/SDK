@@ -141,6 +141,7 @@
             NSArray *characteristics = @[[FTPenServiceUUIDs isTipPressed],
                                          [FTPenServiceUUIDs isEraserPressed],
                                          [FTPenServiceUUIDs shouldSwing],
+                                         [FTPenServiceUUIDs shouldPowerOff]
                                          ];
 //            NSArray *characteristics = @[[FTPenServiceUUIDs isTipPressed],
 //                                         [FTPenServiceUUIDs isEraserPressed],

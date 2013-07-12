@@ -115,7 +115,6 @@ public:
     self.view.multipleTouchEnabled = YES;
 
     _penManager = [[FTPenManager alloc] initWithDelegate:self];
-    _penManager.autoConnect = YES;
 
     _PenAndTouchManager = FTPenAndTouchManager::New();
     _PenAndTouchManager->RegisterForEvents();
@@ -198,26 +197,17 @@ public:
     [self updateDisplay];
 }
 
-- (void)penManager:(FTPenManager *)penManager didPairWithPen:(FTPen *)pen
+- (void)penManager:(FTPenManager *)penManager didBegingConnectingToPen:(FTPen *)pen
 {
-//    NSLog(@"didPairWithPen name=%@", pen.name);
+    pen.delegate = self;
 
     [self updateDisplay];
-
-    [self.currentTest penManager:penManager didPairWithPen:pen];
-}
-
-- (void)penManager:(FTPenManager *)penManager didUnpairFromPen:(FTPen *)pen
-{
-//    NSLog(@"didUnpairFromPen name=%@", pen.name);
-
-    [self updateDisplay];
-
-    [self.currentTest penManager:penManager didUnpairFromPen:pen];
 }
 
 - (void)penManager:(FTPenManager *)penManager didConnectToPen:(FTPen *)pen
 {
+    NSAssert(pen.delegate == self, @"Did previously set delegate to self.");
+
     // Stats
     self.connectCount++;
     if (!self.firstConnectDate)
@@ -236,20 +226,18 @@ public:
 
 //    NSLog(@"didConnectToPen name=%@", pen.name);
 
-    pen.delegate = self;
-
     [self updateDisplay];
 
     [self.currentTest penManager:penManager didConnectToPen:pen];
 }
 
-- (void)penManager:(FTPenManager *)penManager didFailConnectToPen:(FTPen *)pen
+- (void)penManager:(FTPenManager *)penManager didFailToConnectToPen:(FTPen *)pen
 {
 //    NSLog(@"didFailConnectToPen name=%@", pen.name);
 
     [self updateDisplay];
 
-    [self.currentTest penManager:penManager didFailConnectToPen:pen];
+    [self.currentTest penManager:penManager didFailToConnectToPen:pen];
 }
 
 - (void)penManager:(FTPenManager *)penManager didDisconnectFromPen:(FTPen *)pen
@@ -262,6 +250,15 @@ public:
 
     [self.currentTest penManager:penManager didDisconnectFromPen:pen];
 }
+
+- (void)penManager:(FTPenManager *)penManager didUpdateDeviceInfo:(FTPen *)pen
+{
+    [self updateDisplay];
+
+    [self.currentTest penManager:penManager didUpdateDeviceInfo:pen];
+}
+
+#pragma mark - FTPenManagerDelegatePrivate
 
 - (void)penManager:(FTPenManager *)manager didFinishUpdate:(NSError *)error
 {
@@ -411,14 +408,14 @@ public:
 
 - (IBAction)pairButtonPressed:(id)sender
 {
-    [self.penManager pairingSpotWasPressed];
+    self.penManager.isPairingSpotPressed = YES;
     self.pairing = YES;
     [self updateDisplay];
 }
 
 - (IBAction)pairButtonReleased:(id)sender
 {
-    [self.penManager pairingSpotWasReleased];
+    self.penManager.isPairingSpotPressed = NO;
     self.pairing = NO;
     [self updateDisplay];
 }

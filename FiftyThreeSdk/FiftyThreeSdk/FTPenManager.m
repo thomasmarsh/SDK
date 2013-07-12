@@ -50,7 +50,7 @@ NSString *ConnectionStateString(ConnectionState connectionState)
         case ConnectionState_Swinging: return @"ConnectionState_Swinging";
         case ConnectionState_Reconciling: return @"ConnectionState_Reconciling";
         case ConnectionState_Separated: return @"ConnectionState_Separated";
-        case ConnectionState_Disconnecting: return @"ConectionState_Disconnection";
+        case ConnectionState_Disconnecting: return @"ConectionState_Disconnecting";
         default:
             return nil;
     }
@@ -403,6 +403,8 @@ NSString *ConnectionStateString(ConnectionState connectionState)
 
     [self.centralManager connectPeripheral:peripheral options:nil];
 
+    [self.delegate penManager:self didBegingConnectingToPen:self.pen];
+
     self.connectionState = ConnectionState_Dating_AttemptingConnection;
 }
 
@@ -499,6 +501,8 @@ NSString *ConnectionStateString(ConnectionState connectionState)
 
     [self.centralManager connectPeripheral:peripheral options:nil];
 
+    [self.delegate penManager:self didBegingConnectingToPen:self.pen];
+
     self.connectionState = ConnectionState_Reconciling;
 }
 
@@ -524,6 +528,20 @@ NSString *ConnectionStateString(ConnectionState connectionState)
 
 #pragma mark - Pairing Spot
 
+- (void)setIsPairingSpotPressed:(BOOL)isPairingSpotPressed
+{
+    _isPairingSpotPressed = isPairingSpotPressed;
+
+    if (isPairingSpotPressed)
+    {
+        [self pairingSpotWasPressed];
+    }
+    else
+    {
+        [self pairingSpotWasReleased];
+    }
+}
+
 - (void)pairingSpotWasPressed
 {
     NSLog(@"Pairing spot was pressed.");
@@ -535,6 +553,13 @@ NSString *ConnectionStateString(ConnectionState connectionState)
     else if (self.connectionState == ConnectionState_Separated)
     {
         [self transitionConnectionStateToDating];
+    }
+    else if (self.connectionState == ConnectionState_Married)
+    {
+        NSAssert(self.pen.peripheral.isConnected, @"Pen peripheral is connected.");
+        self.pen.shouldPowerOff = YES;
+
+        [self transitionConnectionStateToDisconnecting];
     }
 }
 
@@ -668,7 +693,7 @@ NSString *ConnectionStateString(ConnectionState connectionState)
 
     NSLog(@"Failed to connect to peripheral: %@. (%@).", peripheral, [error localizedDescription]);
 
-    [self.delegate penManager:self didFailConnectToPen:self.pen];
+    [self.delegate penManager:self didFailToConnectToPen:self.pen];
 
     self.pen = nil;
     self.state = ConnectionState_Single;
@@ -730,6 +755,11 @@ NSString *ConnectionStateString(ConnectionState connectionState)
             else
             {
                 [self transitionConnectionStateToSingle];
+
+                if (self.isPairingSpotPressed)
+                {
+                    [self transitionConnectionStateToDating];
+                }
             }
         }
     }
