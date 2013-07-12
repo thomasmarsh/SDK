@@ -17,7 +17,7 @@
 static const int kInterruptedUpdateDelayMax = 30;
 
 static const NSTimeInterval kEngagedStateTimeout = 0.5;
-static const NSTimeInterval kSwingingStatePollingInterval = 0.1;
+static const NSTimeInterval kIsScanningForPeripheralsToggleTimerInterval = 0.1;
 static const NSTimeInterval kSwingingStateTimeout = 10.0;
 static const NSTimeInterval kSeparatedStateTimeout = 1.0 * 60.0;
 
@@ -59,6 +59,13 @@ NSString *ConnectionStateString(ConnectionState connectionState)
 //NSString * const kPairedPenUuidDefaultsKey = @"PairedPenUuid";
 //static const double kPairingReleaseWindowSeconds = 0.100;
 
+typedef enum
+{
+    ScanningStateDisabled,
+    ScanningStateEnabled,
+    ScanningStateEnabledWithPolling
+} ScanningState;
+
 @interface FTPenManager () <CBCentralManagerDelegate, TIUpdateManagerDelegate>
 
 @property (nonatomic) CBCentralManager *centralManager;
@@ -67,14 +74,16 @@ NSString *ConnectionStateString(ConnectionState connectionState)
 @property (nonatomic, readwrite) FTPenManagerState state;
 @property (nonatomic) ConnectionState connectionState;
 
+@property (nonatomic, readwrite) FTPen *pen;
+
+@property (nonatomic) ScanningState scanningState;
+
 @property (nonatomic) BOOL isScanningForPeripherals;
+@property (nonatomic) NSTimer *isScanningForPeripheralsToggleTimer;
 
 @property (nonatomic) NSDate *lastPairingSpotReleaseTime;
 
-@property (nonatomic, readwrite) FTPen *pen;
-
 @property (nonatomic) CBUUID *swingingPeripheralUUID;
-@property (nonatomic) NSTimer *swingingPeripheralPollingTimer;
 
 @property (nonatomic) CBUUID *separatedPeripheralUUID;
 
@@ -200,21 +209,23 @@ NSString *ConnectionStateString(ConnectionState connectionState)
 
     switch (self.connectionState)
     {
+        case ConnectionState_Dating:
+        {
+            self.scanningState = ScanningStateDisabled;
+
+            break;
+        }
         case ConnectionState_Swinging:
         {
-            [self.swingingPeripheralPollingTimer invalidate];
-            self.swingingPeripheralPollingTimer = nil;
+            self.scanningState = ScanningStateDisabled;
             self.swingingPeripheralUUID = nil;
-
-            self.isScanningForPeripherals = NO;
 
             break;
         }
         case ConnectionState_Separated:
         {
+            self.scanningState = ScanningStateDisabled;
             self.separatedPeripheralUUID = nil;
-
-            self.isScanningForPeripherals = NO;
 
             break;
         }
@@ -311,20 +322,21 @@ NSString *ConnectionStateString(ConnectionState connectionState)
 
     switch (self.connectionState)
     {
-        case ConnectionState_Dating:
         case ConnectionState_Separated:
         {
-            NSAssert(self.isScanningForPeripherals, @"");
+            NSAssert(self.scanningState == ScanningStateEnabled, @"");
             break;
         }
-        case ConnectionState_Reconciling:
+        case ConnectionState_Dating:
+        case ConnectionState_Swinging:
         {
-            // isScanningForPeripherals can be either true or false
+            NSAssert(self.scanningState == ScanningStateEnabled ||
+                     self.scanningState == ScanningStateEnabledWithPolling, @"");
             break;
         }
         default:
         {
-            NSAssert(!self.isScanningForPeripherals, @"");
+            NSAssert(self.scanningState == ScanningStateDisabled, @"");
             break;
         }
     };
@@ -334,13 +346,11 @@ NSString *ConnectionStateString(ConnectionState connectionState)
         case ConnectionState_Swinging:
         {
             NSAssert(self.swingingPeripheralUUID, @"");
-            NSAssert(self.swingingPeripheralPollingTimer, @"");
             break;
         }
         default:
         {
             NSAssert(!self.swingingPeripheralUUID, @"");
-            NSAssert(!self.swingingPeripheralPollingTimer, @"");
             break;
         }
     };
@@ -388,7 +398,7 @@ NSString *ConnectionStateString(ConnectionState connectionState)
     NSAssert(self.connectionState == ConnectionState_Single ||
              self.connectionState == ConnectionState_Separated, @"");
 
-    self.isScanningForPeripherals = YES;
+    self.scanningState = ScanningStateEnabled;
 
     self.connectionState = ConnectionState_Dating;
 }
@@ -396,8 +406,6 @@ NSString *ConnectionStateString(ConnectionState connectionState)
 - (void)transitionConnectionStateToDating_AttemptingConnection:(CBPeripheral *)peripheral
 {
     NSAssert(self.connectionState == ConnectionState_Dating, @"");
-
-    self.isScanningForPeripherals = NO;
 
     self.pen = [[FTPen alloc] initWithCentralManager:self.centralManager peripheral:peripheral];
 
@@ -471,30 +479,15 @@ NSString *ConnectionStateString(ConnectionState connectionState)
     self.swingingPeripheralUUID = [CBUUID UUIDWithCFUUID:self.pen.peripheral.UUID];
     self.pen.shouldSwing = YES;
 
-    self.swingingPeripheralPollingTimer = [NSTimer scheduledTimerWithTimeInterval:kSwingingStatePollingInterval
-                                                                           target:self
-                                                                         selector:@selector(swingingStatePollingTimerFired:)
-                                                                         userInfo:nil
-                                                                          repeats:YES];
+    self.scanningState = ScanningStateEnabledWithPolling;
 
     self.connectionState = ConnectionState_Swinging;
-}
-
-- (void)swingingStatePollingTimerFired:(NSTimer *)timer
-{
-    // TODO: This means the peripheral has not yet been disconnected. We should handle this more gracefully.
-    if (!self.pen)
-    {
-        self.isScanningForPeripherals = !self.isScanningForPeripherals;
-    }
 }
 
 - (void)transitionConnectionStateToReconciling:(CBPeripheral *)peripheral
 {
     NSAssert(self.connectionState == ConnectionState_Swinging ||
              self.connectionState == ConnectionState_Separated, @"");
-
-    self.isScanningForPeripherals = NO;
 
     self.pen = [[FTPen alloc] initWithCentralManager:self.centralManager peripheral:peripheral];
     self.pen.requiresTipBePressedToBecomeReady = NO;
@@ -512,7 +505,7 @@ NSString *ConnectionStateString(ConnectionState connectionState)
              self.connectionState == ConnectionState_Reconciling, @"");
     NSAssert(pen.peripheral.UUID, @"Peripheral has a non-null UUID.");
 
-    self.isScanningForPeripherals = YES;
+    self.scanningState = ScanningStateEnabled;
 
     self.separatedPeripheralUUID = [CBUUID UUIDWithCFUUID:pen.peripheral.UUID];
 
@@ -557,7 +550,7 @@ NSString *ConnectionStateString(ConnectionState connectionState)
     else if (self.connectionState == ConnectionState_Married)
     {
         NSAssert(self.pen.peripheral.isConnected, @"Pen peripheral is connected.");
-        self.pen.shouldPowerOff = YES;
+//        self.pen.shouldPowerOff = YES;
 
         [self transitionConnectionStateToDisconnecting];
     }
@@ -566,8 +559,6 @@ NSString *ConnectionStateString(ConnectionState connectionState)
 - (void)pairingSpotWasReleased
 {
     NSLog(@"Pairing spot was released.");
-
-    self.isScanningForPeripherals = NO;
 
     self.lastPairingSpotReleaseTime = [NSDate date];
 
@@ -854,7 +845,59 @@ NSString *ConnectionStateString(ConnectionState connectionState)
     }
 }
 
-#pragma mark - Peripheral Scanning
+#pragma mark - Scanning
+
+- (void)setScanningState:(ScanningState)scanningState
+{
+    if (_scanningState != scanningState)
+    {
+        _scanningState = scanningState;
+
+        if (scanningState == ScanningStateDisabled)
+        {
+            self.isScanningForPeripherals = NO;
+            [self invalidateIsScanningForPeripheralsToggleTimer];
+        }
+        else if (scanningState == ScanningStateEnabled)
+        {
+            self.isScanningForPeripherals = YES;
+            [self invalidateIsScanningForPeripheralsToggleTimer];
+        }
+        else if (scanningState == ScanningStateEnabledWithPolling)
+        {
+            self.isScanningForPeripherals = YES;
+            [self startIsScanningForPeripheralsToggleTimer];
+        }
+        else
+        {
+            NSAssert(NO, @"Unexpected scanning state");
+        }
+    }
+}
+
+- (void)invalidateIsScanningForPeripheralsToggleTimer
+{
+    [self.isScanningForPeripheralsToggleTimer invalidate];
+    self.isScanningForPeripheralsToggleTimer = nil;
+}
+
+- (void)startIsScanningForPeripheralsToggleTimer
+{
+    self.isScanningForPeripheralsToggleTimer = [NSTimer scheduledTimerWithTimeInterval:kIsScanningForPeripheralsToggleTimerInterval
+                                                                                target:self
+                                                                              selector:@selector(isScanningForPeripheralsToggleTimerFired:)
+                                                                              userInfo:nil
+                                                                               repeats:YES];
+}
+
+- (void)isScanningForPeripheralsToggleTimerFired:(NSTimer *)timer
+{
+    // TODO: This means the peripheral has not yet been disconnected. We should handle this more gracefully.
+    if (!self.pen)
+    {
+        self.isScanningForPeripherals = !self.isScanningForPeripherals;
+    }
+}
 
 - (void)setIsScanningForPeripherals:(BOOL)isScanningForPeripherals
 {
