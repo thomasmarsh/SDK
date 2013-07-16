@@ -29,7 +29,6 @@
     [_rscManager setDelegate:self];
 
     _penManager = [[FTPenManager alloc] initWithDelegate:self];
-    _penManager.autoConnect = NO;
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -66,16 +65,23 @@
     [self updateDisplay];
 }
 
-- (void)penManager:(FTPenManager *)penManager didConnectToPen:(FTPen *)pen
+- (void)penManager:(FTPenManager *)penManager didBegingConnectingToPen:(FTPen *)pen
 {
-    NSLog(@"didConnectToPen name=%@", pen.name);
+    NSLog(@"didBeginConnectingToPen name=%@", pen.name);
 
     pen.delegate = self;
 
     [self updateDisplay];
 }
 
-- (void)penManager:(FTPenManager *)penManager didFailConnectToPen:(FTPen *)pen
+- (void)penManager:(FTPenManager *)penManager didConnectToPen:(FTPen *)pen
+{
+    NSLog(@"didConnectToPen name=%@", pen.name);
+
+    [self updateDisplay];
+}
+
+- (void)penManager:(FTPenManager *)penManager didFailToConnectToPen:(FTPen *)pen
 {
     NSLog(@"didFailConnectToPen name=%@", pen.name);
 
@@ -179,14 +185,14 @@
 
 - (IBAction)pairButtonPressed:(id)sender
 {
-    [self.penManager pairingSpotWasPressed];
+    self.penManager.isPairingSpotPressed = YES;
     self.pairing = YES;
     [self updateDisplay];
 }
 
 - (IBAction)pairButtonReleased:(id)sender
 {
-    [self.penManager pairingSpotWasReleased];
+    self.penManager.isPairingSpotPressed = NO;
     self.pairing = NO;
     [self updateDisplay];
 }
@@ -208,6 +214,10 @@
 
 - (IBAction)connectButtonPressed:(id)sender
 {
+    if (self.penManager.pen)
+    {
+        [self.penManager disconnect];
+    }
 }
 
 - (IBAction)infoButtonPressed:(id)sender
