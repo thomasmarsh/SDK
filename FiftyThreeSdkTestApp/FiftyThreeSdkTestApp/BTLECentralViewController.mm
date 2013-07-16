@@ -602,11 +602,11 @@ public:
 {
     BOOST_FOREACH(const InputSample & sample, *touch->History())
     {
-        if (sample == touch->History()->front())
+        if (&sample == &touch->History()->front())
         {
             [self.canvasController beginStroke:sample];
         }
-        else if (sample == touch->History()->back())
+        else if (&sample == &touch->History()->back())
         {
             [self.canvasController endStroke:sample];
         }

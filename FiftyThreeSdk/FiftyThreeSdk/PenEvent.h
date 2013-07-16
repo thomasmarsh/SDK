@@ -38,7 +38,6 @@ public:
 
     std::string ToString() const;
     static PenEvent::Ptr FromString(const std::string & s);
-    bool operator==(const PenEvent &other) const;
 
 protected:
     ~PenEvent() {}

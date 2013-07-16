@@ -38,13 +38,6 @@ PenEvent::Ptr PenEvent::FromString(const std::string & s)
     return event;
 }
 
-bool PenEvent::operator==(const PenEvent &other) const
-{
-    return Type == other.Type &&
-    Tip == other.Tip &&
-    Sample == other.Sample;
-}
-
 class PenEventImpl : public PenEvent
 {
 public:
