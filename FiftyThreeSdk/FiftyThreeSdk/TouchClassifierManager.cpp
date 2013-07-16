@@ -12,8 +12,8 @@
 #include <boost/shared_ptr.hpp>
 #include <vector>
 #include <set>
-#include "Common/PenManager.h"
-#include "Common/TouchManager.h"
+#include "Common/Touch/PenManager.h"
+#include "Common/Touch/TouchManager.h"
 #include "Common/Asserts.h"
 
 #include "TouchClassifier.h"

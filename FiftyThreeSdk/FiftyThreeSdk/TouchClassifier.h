@@ -9,8 +9,8 @@
 
 #include <boost/smart_ptr.hpp>
 #include <set>
-#include "Common/TouchManager.h"
-#include "Common/PenManager.h"
+#include "Common/Touch/TouchManager.h"
+#include "Common/Touch/PenManager.h"
 #include "FTPenAndTouchManager.h"
 
 #include "PenEvent.h"

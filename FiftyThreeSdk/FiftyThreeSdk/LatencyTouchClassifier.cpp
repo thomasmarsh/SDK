@@ -12,7 +12,7 @@
 #include <vector>
 #include <boost/foreach.hpp>
 
-#include "Common/TouchManager.h"
+#include "Common/Touch/TouchManager.h"
 
 using namespace fiftythree::sdk;
 using namespace fiftythree::common;

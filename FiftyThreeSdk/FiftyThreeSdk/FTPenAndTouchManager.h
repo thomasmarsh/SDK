@@ -9,7 +9,7 @@
 
 #include <boost/smart_ptr.hpp>
 
-#include "Common/Touch.h"
+#include "Common/Touch/Touch.h"
 #include "FTTouchEventLogger.h"
 
 namespace fiftythree

@@ -6,7 +6,7 @@
 //
 
 #import "FTApplication.h"
-#import "Common/TouchTracker.h"
+#import "Common/Touch/TouchTracker.h"
 
 using namespace fiftythree::common;
 using namespace boost;

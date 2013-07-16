@@ -129,7 +129,7 @@ public:
 
             BOOST_FOREACH(const InputSample & sample, *candidate->History())
             {
-                float distance = Distance<float, Eigen::Vector2f>(touchLocation, sample.Location());
+                float distance = (touchLocation - sample.Location()).norm();
 
                 if (distance < nearestDistance && distance < 20.f)
                 {

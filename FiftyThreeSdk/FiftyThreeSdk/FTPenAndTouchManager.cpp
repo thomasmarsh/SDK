@@ -12,8 +12,8 @@
 #include <boost/unordered_map.hpp>
 
 #include "Common/NoCopy.h"
-#include "Common/TouchManager.h"
-#include "Common/PenManager.h"
+#include "Common/Touch/TouchManager.h"
+#include "Common/Touch/PenManager.h"
 #include "Common/Mathiness.h"
 #include "Common/DispatchTimer.h"
 

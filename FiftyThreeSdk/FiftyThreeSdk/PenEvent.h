@@ -11,7 +11,7 @@
 #include "Common/NoCopy.h"
 #include "Common/Enum.h"
 
-#include "Common/PenManager.h"
+#include "Common/Touch/PenManager.h"
 
 namespace fiftythree
 {

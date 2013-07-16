@@ -10,9 +10,9 @@
 #import "FiftyThreeSdk/FTPenManager+Private.h"
 #import "FTConnectLatencyTester.h"
 #include "Canvas/GLCanvasController.h"
-#include "Common/InputSample.h"
-#include "Common/TouchManager.h"
-#include "Common/TouchTracker.h"
+#include "Common/Touch/InputSample.h"
+#include "Common/Touch/TouchManager.h"
+#include "Common/Touch/TouchTracker.h"
 #include "Common/Timer.h"
 
 #include "FiftyThreeSdk/FTPenAndTouchManager.h"
