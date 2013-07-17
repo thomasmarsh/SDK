@@ -5,9 +5,9 @@
 //  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
 //
 
-#import "ViewController.h"
-#import "RscMgr.h"
 #import "FiftyThreeSdk/FTPenManager.h"
+#import "RscMgr.h"
+#import "ViewController.h"
 
 @interface ViewController () <RscMgrDelegate, FTPenManagerDelegate, FTPenDelegate>
 
@@ -46,51 +46,13 @@
 
 #pragma mark - FTPenManagerDelegate
 
-- (void)penManagerDidUpdateState:(FTPenManager *)penManager
+- (void)penManager:(FTPenManager *)penManager didUpdateState:(FTPenManagerState)state
 {
-    [self updateDisplay];
-}
-
-- (void)penManager:(FTPenManager *)penManager didPairWithPen:(FTPen *)pen
-{
-    NSLog(@"didPairWithPen name=%@", pen.name);
-
-    [self updateDisplay];
-}
-
-- (void)penManager:(FTPenManager *)penManager didUnpairFromPen:(FTPen *)pen
-{
-    NSLog(@"didUnpairFromPen name=%@", pen.name);
-
-    [self updateDisplay];
-}
-
-- (void)penManager:(FTPenManager *)penManager didBegingConnectingToPen:(FTPen *)pen
-{
-    NSLog(@"didBeginConnectingToPen name=%@", pen.name);
-
-    pen.delegate = self;
-
-    [self updateDisplay];
-}
-
-- (void)penManager:(FTPenManager *)penManager didConnectToPen:(FTPen *)pen
-{
-    NSLog(@"didConnectToPen name=%@", pen.name);
-
-    [self updateDisplay];
-}
-
-- (void)penManager:(FTPenManager *)penManager didFailToConnectToPen:(FTPen *)pen
-{
-    NSLog(@"didFailConnectToPen name=%@", pen.name);
-
-    [self updateDisplay];
-}
-
-- (void)penManager:(FTPenManager *)penManager didDisconnectFromPen:(FTPen *)pen
-{
-    NSLog(@"didDisconnectFromPen name=%@", pen.name);
+    if (state == FTPenManagerStateConnecting)
+    {
+        NSAssert(penManager.pen, @"pen is non-nil");
+        penManager.pen.delegate = self;
+    }
 
     [self updateDisplay];
 }
@@ -150,37 +112,36 @@
 
 - (void)updateDisplay
 {
-    if (self.penManager.pen)
-    {
-        if (self.penManager.pen.isReady)
-        {
-            [self.statusLabel setText:[NSString stringWithFormat:@"Connected to %@", self.penManager.pen.name]];
-        }
-        else
-        {
-            [self.statusLabel setText:[NSString stringWithFormat:@"Connecting to %@", self.penManager.pen.name]];
-        }
-    }
-    else
+    if (self.penManager.state == FTPenManagerStateDisconnected ||
+        self.penManager.state == FTPenManagerStateNeverConnected)
     {
         [self.statusLabel setText:@"Disconnected"];
     }
+    else if (self.penManager.state == FTPenManagerStateConnecting)
+    {
+        [self.statusLabel setText:[NSString stringWithFormat:@"Connecting to %@", self.penManager.pen.name]];
+    }
+    else if (self.penManager.state == FTPenManagerStateConnected)
+    {
+        [self.statusLabel setText:[NSString stringWithFormat:@"Connected to %@", self.penManager.pen.name]];
+    }
 
-    if (self.penManager.pen)
+    if (self.penManager.state == FTPenManagerStateConnected)
     {
         [self.connectButton setTitle:@"Disconnect" forState:UIControlStateNormal];
-//        [self.updateFirmwareButton setHidden:NO];
+        self.penConnectedButton.highlighted = YES;
+        self.connectButton.hidden = NO;
     }
     else
     {
-        [self.connectButton setTitle:@"Connect" forState:UIControlStateNormal];
+        self.penConnectedButton.highlighted = NO;
+        self.connectButton.hidden = YES;
 
-        [self.tip1State setHighlighted:NO];
-        [self.tip2State setHighlighted:NO];
+        self.tip1State.highlighted = NO;
+        self.tip2State.highlighted = NO;
     }
 
-    [self.pcConnectedButton setHighlighted:!self.pcConnected];
-    [self.penConnectedButton setHighlighted:!self.penManager.pen];
+    [self.pcConnectedButton setHighlighted:self.pcConnected];
 }
 
 - (IBAction)pairButtonPressed:(id)sender

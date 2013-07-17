@@ -5,14 +5,15 @@
 //  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
 //
 
-#import "FTPenManager.h"
-#import "FTPenManager+Private.h"
 #import <CoreBluetooth/CoreBluetooth.h>
-#include "FTServiceUUIDs.h"
-#import "FTPen.h"
-#import "FTPen+Private.h"
-#import "TIUpdateManager.h"
+
 #import "FTFirmwareManager.h"
+#import "FTPen+Private.h"
+#import "FTPen.h"
+#import "FTPenManager+Private.h"
+#import "FTPenManager.h"
+#import "FTServiceUUIDs.h"
+#import "TIUpdateManager.h"
 #import "TransitionKit.h"
 
 static const int kInterruptedUpdateDelayMax = 30;
@@ -99,7 +100,7 @@ typedef enum
 
         _centralManager = [[CBCentralManager alloc] initWithDelegate:self queue:nil];
 
-        _state = FTPenManagerStateUnavailable;
+        _state = FTPenManagerStateNeverConnected;
 
         _scanningState = ScanningStateDisabled;
 
@@ -122,6 +123,16 @@ typedef enum
 }
 
 #pragma mark - Properties
+
+- (void)setState:(FTPenManagerState)state
+{
+    if (_state != state)
+    {
+        _state = state;
+
+        [self.delegate penManager:self didUpdateState:state];
+    }
+}
 
 - (void)setPen:(FTPen *)pen
 {
@@ -225,14 +236,14 @@ typedef enum
         NSAssert(weakSelf.pen, @"pen is non-null");
 
         [weakSelf.centralManager connectPeripheral:weakSelf.pen.peripheral options:nil];
-
-        [weakSelf.delegate penManager:weakSelf didBegingConnectingToPen:weakSelf.pen];
     };
 
     // Single
     TKState *singleState = [TKState stateWithName:kSingleStateName];
     [singleState setDidEnterStateBlock:^(TKState *state, TKStateMachine *stateMachine)
     {
+        weakSelf.state = FTPenManagerStateDisconnected;
+
         // If we enter the single state and discover that the pairing spot is currently pressed, then
         // proceed directly to the dating state.
         if (weakSelf.isPairingSpotPressed)
@@ -245,6 +256,8 @@ typedef enum
     TKState *datingState = [TKState stateWithName:kDatingStateName];
     [datingState setDidEnterStateBlock:^(TKState *state, TKStateMachine *stateMachine)
     {
+        weakSelf.state = FTPenManagerStateDisconnected;
+
         weakSelf.scanningState = ScanningStateEnabled;
     }];
     [datingState setDidExitStateBlock:^(TKState *state, TKStateMachine *stateMachine)
@@ -256,17 +269,25 @@ typedef enum
     TKState *datingAttemptingConnectionState = [TKState stateWithName:kDatingAttemptingConnectiongStateName];
     [datingAttemptingConnectionState setDidEnterStateBlock:^(TKState *state, TKStateMachine *stateMachine)
     {
+        weakSelf.state = FTPenManagerStateConnecting;
+
         attemptingConnectionCommon();
     }];
 
     // Engaged
     TKState *engagedState = [TKState stateWithName:kEngagedStateName];
+    [engagedState setDidEnterStateBlock:^(TKState *state, TKStateMachine *stateMachine)
+    {
+        weakSelf.state = FTPenManagerStateConnected;
+    }];
 
     // Engaged - Waiting for Tip Release
     TKState *engagedWaitingForTipReleaseState = [TKState stateWithName:kEngagedWaitingForTipReleaseStateName
                                                     andTimeoutDuration:kEngagedStateTimeout];
     [engagedWaitingForTipReleaseState setTimeoutExpiredBlock:^(TKState *state, TKStateMachine *stateMachine)
     {
+        weakSelf.state = FTPenManagerStateConnected;
+
         [weakSelf fireStateMachineEvent:kDisconnectAndBecomeSingleEventName];
     }];
 
@@ -276,20 +297,22 @@ typedef enum
     [engagedWaitingForPairingSpotReleaseState setTimeoutExpiredBlock:^(TKState *state,
                                                                        TKStateMachine *stateMachine)
     {
+        weakSelf.state = FTPenManagerStateConnected;
+
         [weakSelf fireStateMachineEvent:kDisconnectAndBecomeSingleEventName];
     }];
 
     // Married
     TKState *marriedState = [TKState stateWithName:kMarriedStateName];
-    [marriedState setDidEnterStateBlock:^(TKState *state, TKStateMachine *stateMachine)
-    {
-        [weakSelf.delegate penManager:weakSelf didConnectToPen:weakSelf.pen];
+    [marriedState setDidEnterStateBlock:^(TKState *state, TKStateMachine *stateMachine) {
+        weakSelf.state = FTPenManagerStateConnected;
     }];
 
     // Preparing to Swing
     TKState *preparingToSwingState = [TKState stateWithName:kPreparingToSwingStateName];
-    [preparingToSwingState setDidEnterStateBlock:^(TKState *state, TKStateMachine *stateMachine)
-    {
+    [preparingToSwingState setDidEnterStateBlock:^(TKState *state, TKStateMachine *stateMachine) {
+        weakSelf.state = FTPenManagerStateDisconnected;
+
         weakSelf.swingingPeripheralUUID = [CBUUID UUIDWithCFUUID:self.pen.peripheral.UUID];
         weakSelf.pen.shouldSwing = YES;
     }];
@@ -299,6 +322,8 @@ typedef enum
                                  andTimeoutDuration:kSwingingStateTimeout];
     [swingingState setDidEnterStateBlock:^(TKState *state, TKStateMachine *stateMachine)
     {
+        weakSelf.state = FTPenManagerStateDisconnected;
+
         weakSelf.scanningState = ScanningStateEnabledWithPolling;
     }];
     [swingingState setDidExitStateBlock:^(TKState *state, TKStateMachine *stateMachine)
@@ -315,6 +340,8 @@ typedef enum
     TKState *swingingAttemptingConnectionState = [TKState stateWithName:kSwingingAttemptingConnectionStateName];
     [swingingAttemptingConnectionState setDidEnterStateBlock:^(TKState *state, TKStateMachine *stateMachine)
     {
+        weakSelf.state = FTPenManagerStateConnecting;
+
         weakSelf.pen.requiresTipBePressedToBecomeReady = NO;
 
         attemptingConnectionCommon();
@@ -325,6 +352,8 @@ typedef enum
                                   andTimeoutDuration:kSeparatedStateTimeout];
     [separatedState setDidEnterStateBlock:^(TKState *state, TKStateMachine *stateMachine)
     {
+        weakSelf.state = FTPenManagerStateDisconnected;
+
         weakSelf.scanningState = ScanningStateEnabled;
     }];
     [separatedState setDidExitStateBlock:^(TKState *state, TKStateMachine *stateMachine)
@@ -340,16 +369,20 @@ typedef enum
     TKState *separatedAttemptingConnectionState = [TKState stateWithName:kSeparatedAttemptingConnectionStateName];
     [separatedAttemptingConnectionState setDidEnterStateBlock:^(TKState *state, TKStateMachine *stateMachine)
     {
+        weakSelf.state = FTPenManagerStateConnecting;
+
         weakSelf.pen.requiresTipBePressedToBecomeReady = NO;
 
         attemptingConnectionCommon();
     }];
 
-    // Disconnecting
+    // Disconnecting and Becoming Single
     TKState *disconnectingAndBecomingSingleState = [TKState stateWithName:kDisconnectingAndBecomingSingleStateName];
     [disconnectingAndBecomingSingleState setDidEnterStateBlock:^(TKState *state, TKStateMachine *stateMachine)
     {
         NSAssert(weakSelf.pen, @"pen is non-nil");
+
+        weakSelf.state = FTPenManagerStateDisconnected;
 
         if (weakSelf.pen.peripheral.isConnected)
         {
@@ -693,7 +726,7 @@ typedef enum
 
         [pen peripheralConnectionStatusDidChange];
 
-        [self.delegate penManager:self didDisconnectFromPen:self.pen];
+        self.state = FTPenManagerStateDisconnected;
 
         if ([self currentStateHasName:kDisconnectingAndBecomingSingleStateName])
         {

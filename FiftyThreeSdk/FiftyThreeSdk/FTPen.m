@@ -5,15 +5,15 @@
 //  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
 //
 
-#import "FTPen.h"
-#import "FTPen+Private.h"
 #import <CoreBluetooth/CoreBluetooth.h>
-#import "FTServiceUUIDs.h"
+
 #import "FTDeviceInfoServiceClient.h"
-#import "FTPeripheralDelegate.h"
-#import "FTPenServiceClient.h"
+#import "FTPen+Private.h"
+#import "FTPen.h"
 #import "FTPenDebugServiceClient.h"
-#import "FTDeviceInfoServiceClient.h"
+#import "FTPenServiceClient.h"
+#import "FTPeripheralDelegate.h"
+#import "FTServiceUUIDs.h"
 
 NSString * const kFTPenDidEncounterErrorNotificationName = @"com.fiftythree.pen.didEncounterError";
 NSString * const kFTPenIsReadyDidChangeNotificationName = @"com.fiftythree.pen.isReadyDidChange";
@@ -66,8 +66,8 @@ NSString * const kFTPenIsEraserPressedDidChangeNotificationName = @"com.fiftythr
 //        [_peripheralDelegate addServiceClient:_penDebugServiceClient];
 //#endif
 //
-//        _deviceInfoServiceClient = [[FTDeviceInfoServiceClient alloc] init];
-//        [_peripheralDelegate addServiceClient:_deviceInfoServiceClient];
+        _deviceInfoServiceClient = [[FTDeviceInfoServiceClient alloc] init];
+        [_peripheralDelegate addServiceClient:_deviceInfoServiceClient];
     }
 
     return self;
@@ -254,4 +254,3 @@ NSString * const kFTPenIsEraserPressedDidChangeNotificationName = @"com.fiftythr
 }
 
 @end
-

@@ -5,25 +5,25 @@
 //  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
 //
 
-#import "BTLECentralViewController.h"
-#import "FiftyThreeSdk/FTPenManager.h"
-#import "FiftyThreeSdk/FTPenManager+Private.h"
-#import "FTConnectLatencyTester.h"
-#include "Canvas/GLCanvasController.h"
-#include "Common/Touch/InputSample.h"
-#include "Common/Touch/TouchManager.h"
-#include "Common/Touch/TouchTracker.h"
-#include "Common/Timer.h"
-
-#include "FiftyThreeSdk/FTPenAndTouchManager.h"
-#include "FiftyThreeSdk/FTTouchEventLogger.h"
-#import <MessageUI/MessageUI.h>
-
-#import <CoreBluetooth/CoreBluetooth.h>
-
 #include <boost/foreach.hpp>
 #include <boost/smart_ptr.hpp>
 #include <sstream>
+
+#include "Canvas/GLCanvasController.h"
+#include "Common/Timer.h"
+#include "Common/Touch/InputSample.h"
+#include "Common/Touch/TouchManager.h"
+#include "Common/Touch/TouchTracker.h"
+#include "FiftyThreeSdk/FTPenAndTouchManager.h"
+#include "FiftyThreeSdk/FTTouchEventLogger.h"
+
+#import <CoreBluetooth/CoreBluetooth.h>
+#import <MessageUI/MessageUI.h>
+
+#import "BTLECentralViewController.h"
+#import "FiftyThreeSdk/FTPenManager+Private.h"
+#import "FiftyThreeSdk/FTPenManager.h"
+#import "FTConnectLatencyTester.h"
 
 using namespace fiftythree::common;
 using namespace fiftythree::canvas;
@@ -114,8 +114,6 @@ public:
 
     self.view.multipleTouchEnabled = YES;
 
-    _penManager = [[FTPenManager alloc] initWithDelegate:self];
-
     _PenAndTouchManager = FTPenAndTouchManager::New();
     _PenAndTouchManager->RegisterForEvents();
     _EventLogger = FTTouchEventLogger::New();
@@ -124,6 +122,8 @@ public:
     _TouchObserver = make_shared<TouchObserver>(self);
     _PenAndTouchManager->TouchTypeChanged().AddListener(_TouchObserver, &TouchObserver::TouchTypeChanged);
     _PenAndTouchManager->ShouldStartTrialSeparation().AddListener(_TouchObserver, &TouchObserver::ShouldStartTrialSeparation);
+
+    _penManager = [[FTPenManager alloc] initWithDelegate:self];
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -173,89 +173,53 @@ public:
     // Dispose of any resources that can be recreated.
 }
 
-- (void)connect
-{
-    if (self.penManager.pen && !self.penManager.pen)
-    {
-        _ConnectTimer = Timer::New();
-        NSAssert(0, @"Unimplemented");
-//        [self.penManager connect];
-    }
-}
-
 - (void)applicationWillEnterForeground:(NSNotification *)notification
 {
-    [self connect];
 }
 
 #pragma mark - FTPenManagerDelegate
 
-- (void)penManagerDidUpdateState:(FTPenManager *)penManager
+- (void)penManager:(FTPenManager *)penManager didUpdateState:(FTPenManagerState)state
 {
-    [self connect];
-
-    [self updateDisplay];
-}
-
-- (void)penManager:(FTPenManager *)penManager didBegingConnectingToPen:(FTPen *)pen
-{
-    pen.delegate = self;
-
-    [self updateDisplay];
-}
-
-- (void)penManager:(FTPenManager *)penManager didConnectToPen:(FTPen *)pen
-{
-    NSAssert(pen.delegate == self, @"Did previously set delegate to self.");
-
-    // Stats
-    self.connectCount++;
-    if (!self.firstConnectDate)
+    if (penManager.state == FTPenManagerStateNeverConnected)
     {
-        self.firstConnectDate = [NSDate date];
+        _PenAndTouchManager->SetPalmRejectionEnabled(false);
     }
-    self.lastConnectDate = [NSDate date];
-
-    _PenAndTouchManager->SetPalmRejectionEnabled(true);
-
-    if (_ConnectTimer)
+    else if (penManager.state == FTPenManagerStateDisconnected)
     {
-        NSLog(@"connect took %f seconds", _ConnectTimer->ElapsedTimeSeconds());
-        _ConnectTimer.reset();
+        _PenAndTouchManager->SetPalmRejectionEnabled(false);
+    }
+    else if (penManager.state == FTPenManagerStateConnecting)
+    {
+        NSAssert(penManager.pen, @"Pen is non-nil");
+
+        penManager.pen.delegate = self;
+    }
+    else if (penManager.state == FTPenManagerStateConnected)
+    {
+        // Stats
+        self.connectCount++;
+        if (!self.firstConnectDate)
+        {
+            self.firstConnectDate = [NSDate date];
+        }
+        self.lastConnectDate = [NSDate date];
+
+        _PenAndTouchManager->SetPalmRejectionEnabled(true);
+
+        if (_ConnectTimer)
+        {
+            NSLog(@"connect took %f seconds", _ConnectTimer->ElapsedTimeSeconds());
+            _ConnectTimer.reset();
+        }
     }
 
-//    NSLog(@"didConnectToPen name=%@", pen.name);
-
     [self updateDisplay];
-
-    [self.currentTest penManager:penManager didConnectToPen:pen];
-}
-
-- (void)penManager:(FTPenManager *)penManager didFailToConnectToPen:(FTPen *)pen
-{
-//    NSLog(@"didFailConnectToPen name=%@", pen.name);
-
-    [self updateDisplay];
-
-    [self.currentTest penManager:penManager didFailToConnectToPen:pen];
-}
-
-- (void)penManager:(FTPenManager *)penManager didDisconnectFromPen:(FTPen *)pen
-{
-//    NSLog(@"didDisconnectFromPen name=%@", pen.name);
-
-    _PenAndTouchManager->SetPalmRejectionEnabled(false);
-
-    [self updateDisplay];
-
-    [self.currentTest penManager:penManager didDisconnectFromPen:pen];
 }
 
 - (void)penManager:(FTPenManager *)penManager didUpdateDeviceInfo:(FTPen *)pen
 {
     [self updateDisplay];
-
-    [self.currentTest penManager:penManager didUpdateDeviceInfo:pen];
 }
 
 #pragma mark - FTPenManagerDelegatePrivate
@@ -347,33 +311,32 @@ public:
 
 - (void)updateDisplay
 {
-    if (self.penManager.pen)
-    {
-        if (self.penManager.pen.isReady)
-        {
-            [self.pairingStatusLabel setText:[NSString stringWithFormat:@"Connected to %@",
-                                              self.penManager.pen.name]];
-        }
-        else
-        {
-            [self.pairingStatusLabel setText:[NSString stringWithFormat:@"Connecting to %@",
-                                              self.penManager.pen.name]];
-        }
-    }
-    else
+    if (self.penManager.state == FTPenManagerStateDisconnected ||
+        self.penManager.state == FTPenManagerStateNeverConnected)
     {
         [self.pairingStatusLabel setText:@"Disconnected"];
     }
+    else if (self.penManager.state == FTPenManagerStateConnecting)
+    {
+        [self.pairingStatusLabel setText:[NSString stringWithFormat:@"Connecting to %@",
+                                          self.penManager.pen.name]];
+    }
+    else if (self.penManager.state == FTPenManagerStateConnected)
+    {
+        [self.pairingStatusLabel setText:[NSString stringWithFormat:@"Connected to %@",
+                                          self.penManager.pen.name]];
+    }
 
-    if (self.penManager.pen)
+    if (self.penManager.state == FTPenManagerStateConnected)
     {
         [self.connectButton setTitle:@"Disconnect" forState:UIControlStateNormal];
+        self.connectButton.hidden = NO;
         self.updateFirmwareButton.hidden = NO;
         self.trialSeparationButton.hidden = NO;
     }
     else
     {
-        [self.connectButton setTitle:@"Connect" forState:UIControlStateNormal];
+        self.connectButton.hidden = YES;
         self.updateFirmwareButton.hidden = YES;
         self.trialSeparationButton.hidden = YES;
 
@@ -394,16 +357,7 @@ public:
         [self setInkColorBlack];
     }
 
-    if (self.penManager.pen)
-    {
-        self.testConnectButton.hidden = NO;
-        self.connectButton.hidden = NO;
-    }
-    else
-    {
-        self.testConnectButton.hidden = YES;
-        self.connectButton.hidden = YES;
-    }
+    self.testConnectButton.hidden = YES;
 }
 
 - (IBAction)pairButtonPressed:(id)sender
@@ -444,18 +398,6 @@ public:
 }
 
 - (IBAction)connectButtonPressed:(id)sender
-{
-    if (!self.penManager.pen)
-    {
-        [self connect];
-    }
-    else
-    {
-        [self.penManager disconnect];
-    }
-}
-
-- (IBAction)disconnectButtonPressed:(id)sender
 {
     [self.penManager disconnect];
 }
@@ -566,7 +508,7 @@ public:
     }
 }
 
-- (BOOL) shouldProcessTouches: (NSSet *)touches
+- (BOOL)shouldProcessTouches:(NSSet *)touches
 {
     BOOL contained = NO;
     for (UITouch *t in touches)
