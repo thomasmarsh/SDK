@@ -16,6 +16,8 @@
 #import "TIUpdateManager.h"
 #import "TransitionKit.h"
 
+NSString * const kFTPenManagerDidUpdateState = @"com.fiftythree.penManager.didUpdateState";
+
 static const int kInterruptedUpdateDelayMax = 30;
 
 static const NSTimeInterval kEngagedStateTimeout = 0.5;
@@ -100,7 +102,7 @@ typedef enum
 
         _centralManager = [[CBCentralManager alloc] initWithDelegate:self queue:nil];
 
-        _state = FTPenManagerStateNeverConnected;
+        _state = FTPenManagerStateUnpaired;
 
         _scanningState = ScanningStateDisabled;
 
@@ -131,6 +133,9 @@ typedef enum
         _state = state;
 
         [self.delegate penManager:self didUpdateState:state];
+
+        [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenManagerDidUpdateState
+                                                            object:self];
     }
 }
 
@@ -242,7 +247,7 @@ typedef enum
     TKState *singleState = [TKState stateWithName:kSingleStateName];
     [singleState setDidEnterStateBlock:^(TKState *state, TKStateMachine *stateMachine)
     {
-        weakSelf.state = FTPenManagerStateDisconnected;
+        weakSelf.state = FTPenManagerStateUnpaired;
 
         // If we enter the single state and discover that the pairing spot is currently pressed, then
         // proceed directly to the dating state.
@@ -256,7 +261,7 @@ typedef enum
     TKState *datingState = [TKState stateWithName:kDatingStateName];
     [datingState setDidEnterStateBlock:^(TKState *state, TKStateMachine *stateMachine)
     {
-        weakSelf.state = FTPenManagerStateDisconnected;
+        weakSelf.state = FTPenManagerStateUnpaired;
 
         weakSelf.scanningState = ScanningStateEnabled;
     }];
@@ -340,7 +345,7 @@ typedef enum
     TKState *swingingAttemptingConnectionState = [TKState stateWithName:kSwingingAttemptingConnectionStateName];
     [swingingAttemptingConnectionState setDidEnterStateBlock:^(TKState *state, TKStateMachine *stateMachine)
     {
-        weakSelf.state = FTPenManagerStateConnecting;
+        weakSelf.state = FTPenManagerStateReconnecting;
 
         weakSelf.pen.requiresTipBePressedToBecomeReady = NO;
 
@@ -366,10 +371,11 @@ typedef enum
         [weakSelf fireStateMachineEvent:kBecomeSingleEventName];
     }];
 
+    // Separated - Attempting Connection
     TKState *separatedAttemptingConnectionState = [TKState stateWithName:kSeparatedAttemptingConnectionStateName];
     [separatedAttemptingConnectionState setDidEnterStateBlock:^(TKState *state, TKStateMachine *stateMachine)
     {
-        weakSelf.state = FTPenManagerStateConnecting;
+        weakSelf.state = FTPenManagerStateReconnecting;
 
         weakSelf.pen.requiresTipBePressedToBecomeReady = NO;
 
@@ -380,9 +386,7 @@ typedef enum
     TKState *disconnectingAndBecomingSingleState = [TKState stateWithName:kDisconnectingAndBecomingSingleStateName];
     [disconnectingAndBecomingSingleState setDidEnterStateBlock:^(TKState *state, TKStateMachine *stateMachine)
     {
-        NSAssert(weakSelf.pen, @"pen is non-nil");
-
-        weakSelf.state = FTPenManagerStateDisconnected;
+        weakSelf.state = FTPenManagerStateUnpaired;
 
         if (weakSelf.pen.peripheral.isConnected)
         {

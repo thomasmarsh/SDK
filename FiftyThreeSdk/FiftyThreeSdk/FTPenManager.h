@@ -13,11 +13,14 @@
 
 typedef NS_ENUM(NSInteger, FTPenManagerState)
 {
-    FTPenManagerStateNeverConnected,
+    FTPenManagerStateUnpaired,
     FTPenManagerStateConnecting,
+    FTPenManagerStateReconnecting,
     FTPenManagerStateConnected,
     FTPenManagerStateDisconnected
 };
+
+extern NSString * const kFTPenManagerDidUpdateState;
 
 @protocol FTPenManagerDelegate;
 

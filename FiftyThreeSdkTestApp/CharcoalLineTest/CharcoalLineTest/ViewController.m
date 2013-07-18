@@ -113,7 +113,7 @@
 - (void)updateDisplay
 {
     if (self.penManager.state == FTPenManagerStateDisconnected ||
-        self.penManager.state == FTPenManagerStateNeverConnected)
+        self.penManager.state == FTPenManagerStateUnpaired)
     {
         [self.statusLabel setText:@"Disconnected"];
     }
