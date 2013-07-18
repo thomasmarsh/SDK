@@ -614,8 +614,7 @@ typedef enum
 
 - (void)centralManagerDidUpdateState:(CBCentralManager *)central
 {
-    // TODO: Handle the other cases gracefully.
-    NSAssert(central.state == CBCentralManagerStatePoweredOn, @"Assume central manager state = powered on");
+    // TODO: Handle cases where the central manager state is not CBCentralManagerStatePoweredOn
 }
 
 - (BOOL)isPeripheralReconciling:(NSDictionary *)advertisementData
