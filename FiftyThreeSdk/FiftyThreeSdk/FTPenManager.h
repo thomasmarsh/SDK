@@ -20,7 +20,7 @@ typedef NS_ENUM(NSInteger, FTPenManagerState)
     FTPenManagerStateDisconnected
 };
 
-extern NSString * const kFTPenManagerDidUpdateState;
+extern NSString * const kFTPenManagerDidUpdateStateNotificationName;
 
 @protocol FTPenManagerDelegate;
 

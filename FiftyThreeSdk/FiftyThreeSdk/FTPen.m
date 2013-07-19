@@ -90,6 +90,11 @@ NSString * const kFTPenIsEraserPressedDidChangeNotificationName = @"com.fiftythr
     return self.penServiceClient.isEraserPressed;
 }
 
+- (BOOL)isPoweringOff
+{
+    return self.penServiceClient.isPoweringOff;
+}
+
 - (NSDate *)lastTipReleaseTime
 {
     return self.penServiceClient.lastTipReleaseTime;
@@ -105,24 +110,14 @@ NSString * const kFTPenIsEraserPressedDidChangeNotificationName = @"com.fiftythr
     self.penServiceClient.requiresTipBePressedToBecomeReady = requiresTipBePressedToBecomeReady;
 }
 
-- (BOOL)shouldSwing
+- (void)startSwinging
 {
-    return self.penServiceClient.shouldSwing;
+    [self.penServiceClient startSwinging];
 }
 
-- (void)setShouldSwing:(BOOL)shouldSwing
+- (void)powerOff
 {
-    self.penServiceClient.shouldSwing = shouldSwing;
-}
-
-- (BOOL)shouldPowerOff
-{
-    return self.penServiceClient.shouldPowerOff;
-}
-
-- (void)setShouldPowerOff:(BOOL)shouldPowerOff
-{
-    self.penServiceClient.shouldPowerOff = shouldPowerOff;
+    [self.penServiceClient powerOff];
 }
 
 #pragma mark -

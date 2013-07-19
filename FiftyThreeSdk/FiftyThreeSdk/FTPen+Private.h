@@ -5,6 +5,8 @@
 //  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
 //
 
+#pragma once
+
 #import "FTPen.h"
 
 @class CBCentralManager;
@@ -13,10 +15,8 @@
 @interface FTPen ()
 
 @property (nonatomic) CBPeripheral *peripheral;
-
 @property (nonatomic) BOOL requiresTipBePressedToBecomeReady;
-@property (nonatomic) BOOL shouldSwing;
-@property (nonatomic) BOOL shouldPowerOff;
+@property (nonatomic, readonly) BOOL isPoweringOff;
 
 - (id)initWithCentralManager:(CBCentralManager *)centralManager
                   peripheral:(CBPeripheral *)peripheral;
@@ -24,5 +24,8 @@
 - (void)peripheralConnectionStatusDidChange;
 
 - (void)updateData:(NSDictionary *)data;
+
+- (void)startSwinging;
+- (void)powerOff;
 
 @end

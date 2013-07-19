@@ -5,9 +5,9 @@
 //  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
 //
 
+#import "FTError.h"
 #import "FTPenServiceClient.h"
 #import "FTServiceUUIDs.h"
-#import "FTError.h"
 
 @interface FTPenServiceClient ()
 
@@ -22,6 +22,7 @@
 @property (nonatomic, readwrite) NSDate *lastTipReleaseTime;
 
 @property (nonatomic) BOOL isReady;
+@property (nonatomic) BOOL shouldPowerOff;
 
 @end
 
@@ -65,45 +66,35 @@
     [self.delegate penServiceClient:self isReadyDidChange:isReady];
 }
 
-- (BOOL)shouldSwing
-{
-    if (self.shouldSwing)
-    {
-        return ((const char *)self.shouldSwingCharacteristic.value.bytes)[0] != 0;
-    }
-
-    return NO;
-}
-
-- (void)setShouldSwing:(BOOL)shouldSwing
+- (void)startSwinging
 {
     if (self.shouldSwingCharacteristic)
     {
-        NSData *data = [NSData dataWithBytes:shouldSwing ? "1" : "0" length:1];
+        NSData *data = [NSData dataWithBytes:"1" length:1];
         [self.peripheral writeValue:data
                   forCharacteristic:self.shouldSwingCharacteristic
                                type:CBCharacteristicWriteWithResponse];
     }
-}
-
-- (BOOL)shouldPowerOff
-{
-    if (self.shouldPowerOffCharacteristic)
+    else
     {
-        return ((const char *)self.shouldPowerOffCharacteristic.value.bytes)[0] != 0;
+        NSLog(@"ShouldSwing characteristic not initialized.");
     }
-
-    return NO;
 }
 
-- (void)setShouldPowerOff:(BOOL)shouldPowerOff
+- (void)powerOff
 {
+    _isPoweringOff = YES;
+
     if (self.shouldPowerOffCharacteristic)
     {
-        NSData *data = [NSData dataWithBytes:shouldPowerOff ? "1" : "0" length:1];
+        NSData *data = [NSData dataWithBytes:"1" length:1];
         [self.peripheral writeValue:data
                   forCharacteristic:self.shouldPowerOffCharacteristic
                                type:CBCharacteristicWriteWithResponse];
+    }
+    else
+    {
+        NSLog(@"ShouldPowerOff characteristic not initialized.");
     }
 }
 

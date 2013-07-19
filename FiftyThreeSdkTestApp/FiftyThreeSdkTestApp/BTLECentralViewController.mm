@@ -181,7 +181,7 @@ public:
 
 - (void)penManager:(FTPenManager *)penManager didUpdateState:(FTPenManagerState)state
 {
-    if (penManager.state == FTPenManagerStateNeverConnected)
+    if (penManager.state == FTPenManagerStateUnpaired)
     {
         _PenAndTouchManager->SetPalmRejectionEnabled(false);
     }
@@ -312,7 +312,7 @@ public:
 - (void)updateDisplay
 {
     if (self.penManager.state == FTPenManagerStateDisconnected ||
-        self.penManager.state == FTPenManagerStateNeverConnected)
+        self.penManager.state == FTPenManagerStateUnpaired)
     {
         [self.pairingStatusLabel setText:@"Disconnected"];
     }

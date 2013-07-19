@@ -16,7 +16,7 @@
 #import "TIUpdateManager.h"
 #import "TransitionKit.h"
 
-NSString * const kFTPenManagerDidUpdateState = @"com.fiftythree.penManager.didUpdateState";
+NSString * const kFTPenManagerDidUpdateStateNotificationName = @"com.fiftythree.penManager.didUpdateState";
 
 static const int kInterruptedUpdateDelayMax = 30;
 
@@ -24,6 +24,7 @@ static const NSTimeInterval kEngagedStateTimeout = 0.5;
 static const NSTimeInterval kIsScanningForPeripheralsToggleTimerInterval = 0.1;
 static const NSTimeInterval kSwingingStateTimeout = 10.0;
 static const NSTimeInterval kSeparatedStateTimeout = 1.0 * 60.0;
+static const NSTimeInterval kMarriedWaitingForLongPressToDisconnectTimeout = 2.0;
 
 static NSString *const kSingleStateName = @"Single";
 static NSString *const kDatingStateName = @"Dating";
@@ -32,6 +33,7 @@ static NSString *const kEngagedStateName = @"Engaged";
 static NSString *const kEngagedWaitingForTipReleaseStateName = @"EngagedWaitingForTipRelease";
 static NSString *const kEngagedWaitingForPairingSpotReleaseStateName = @"EngagedWaitingForPairingSpotRelease";
 static NSString *const kMarriedStateName = @"Married";
+static NSString *const kMarriedWaitingForLongPressToDisconnect = @"MarriedWaitingForLongPressToDisconnect";
 static NSString *const kDisconnectingAndBecomingSingleStateName = @"DisconnectingAndBecomingSingle";
 
 static NSString *const kPreparingToSwingStateName = @"PreparingToSwing";
@@ -48,6 +50,8 @@ static NSString *const kBecomeEngagedEventName = @"BecomeEngaged";
 static NSString *const kWaitForTipReleaseEventName = @"WaitForTipRelease";
 static NSString *const kWaitForPairingSpotReleaseEventName = @"WaitForPairingSpotRelease";
 static NSString *const kBecomeMarriedEventName = @"BecomeMarried";
+static NSString *const kWaitForLongPressToDisconnect = @"WaitForLongPressToDisconnect";
+static NSString *const kReturnToMarriedEventName = @"ReturnToMarried";
 static NSString *const kDisconnectAndBecomeSingleEventName = @"DisconnectAndBecomeSingle";
 static NSString *const kCompleteDisconnectionAndBecomeSingleEventName = @"CompleteDisconnectAndBecomeSingle";
 static NSString *const kPrepareToSwingEventName = @"PrepareToSwing";
@@ -134,7 +138,7 @@ typedef enum
 
         [self.delegate penManager:self didUpdateState:state];
 
-        [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenManagerDidUpdateState
+        [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenManagerDidUpdateStateNotificationName
                                                             object:self];
     }
 }
@@ -313,13 +317,33 @@ typedef enum
         weakSelf.state = FTPenManagerStateConnected;
     }];
 
+    // Married - Waiting for Long Press to Disconnect
+    TKState *marriedWaitingForLongPressToDisconnectState = [TKState stateWithName:kMarriedWaitingForLongPressToDisconnect
+                                                               andTimeoutDuration:kMarriedWaitingForLongPressToDisconnectTimeout];
+    [marriedWaitingForLongPressToDisconnectState setTimeoutExpiredBlock:^(TKState *state, TKStateMachine *stateMachine) {
+
+        NSAssert(weakSelf.pen, @"pen is non-nil");
+        NSAssert(weakSelf.pen.peripheral, @"pen peripheral is connected");
+
+        [weakSelf.pen powerOff];
+
+        [weakSelf fireStateMachineEvent:kDisconnectAndBecomeSingleEventName];
+    }];
+    [marriedWaitingForLongPressToDisconnectState setDidEnterStateBlock:^(TKState *state, TKStateMachine *stateMachine)
+    {
+        NSAssert(weakSelf.pen, @"pen is non-nil");
+        NSAssert(weakSelf.pen.peripheral.isConnected, @"pen peripheral is connected");
+
+        weakSelf.state = FTPenManagerStateConnected;
+    }];
+
     // Preparing to Swing
     TKState *preparingToSwingState = [TKState stateWithName:kPreparingToSwingStateName];
     [preparingToSwingState setDidEnterStateBlock:^(TKState *state, TKStateMachine *stateMachine) {
         weakSelf.state = FTPenManagerStateDisconnected;
 
         weakSelf.swingingPeripheralUUID = [CBUUID UUIDWithCFUUID:self.pen.peripheral.UUID];
-        weakSelf.pen.shouldSwing = YES;
+        [weakSelf.pen startSwinging];
     }];
 
     // Swinging
@@ -390,7 +414,10 @@ typedef enum
 
         if (weakSelf.pen.peripheral.isConnected)
         {
-            [weakSelf.centralManager cancelPeripheralConnection:weakSelf.pen.peripheral];
+            if (!weakSelf.pen.isPoweringOff)
+            {
+                [weakSelf.centralManager cancelPeripheralConnection:weakSelf.pen.peripheral];
+            }
         }
         else
         {
@@ -406,6 +433,7 @@ typedef enum
      engagedWaitingForTipReleaseState,
      engagedWaitingForPairingSpotReleaseState,
      marriedState,
+     marriedWaitingForLongPressToDisconnectState,
      preparingToSwingState,
      swingingState,
      swingingAttemptingConnectionState,
@@ -444,12 +472,19 @@ typedef enum
                                    swingingAttemptingConnectionState,
                                    separatedAttemptingConnectionState]
                                                  toState:marriedState];
+    TKEvent *waitForLongPressToDisconnectEvent = [TKEvent eventWithName:kWaitForLongPressToDisconnect
+                                                transitioningFromStates:@[marriedState]
+                                                                toState:marriedWaitingForLongPressToDisconnectState];
+    TKEvent *returnToMarriedEvent = [TKEvent eventWithName:kReturnToMarriedEventName
+                                   transitioningFromStates:@[marriedWaitingForLongPressToDisconnectState]
+                                                   toState:marriedState];
     TKEvent *disconnectAndBecomeSingleEvent = [TKEvent eventWithName:kDisconnectAndBecomeSingleEventName
                                              transitioningFromStates:@[
                                                datingAttemptingConnectionState,
                                                engagedWaitingForPairingSpotReleaseState,
                                                engagedWaitingForTipReleaseState,
-                                               marriedState]
+                                               marriedState,
+                                               marriedWaitingForLongPressToDisconnectState]
                                                              toState:disconnectingAndBecomingSingleState];
     TKEvent *completeDisconnectAndBecomeSingleEvent = [TKEvent eventWithName:kCompleteDisconnectionAndBecomeSingleEventName
                                                      transitioningFromStates:@[disconnectingAndBecomingSingleState]
@@ -479,6 +514,8 @@ typedef enum
      waitForTipReleaseEvent,
      waitForPairingSpotReleaseEvent,
      becomeMarriedEvent,
+     waitForLongPressToDisconnectEvent,
+     returnToMarriedEvent,
      disconnectAndBecomeSingleEvent,
      completeDisconnectAndBecomeSingleEvent,
      prepareToSwingEvent,
@@ -541,10 +578,7 @@ typedef enum
     {
         NSAssert(self.pen.peripheral.isConnected, @"Pen peripheral is connected");
 
-        // TODO: Is this causing the pen's to brick?
-//        self.pen.shouldPowerOff = YES;
-
-        [self fireStateMachineEvent:kDisconnectAndBecomeSingleEventName];
+        [self fireStateMachineEvent:kWaitForLongPressToDisconnect];
     }
 }
 
@@ -571,6 +605,10 @@ typedef enum
     else if ([self currentStateHasName:kEngagedWaitingForPairingSpotReleaseStateName])
     {
         [self comparePairingSpotAndTipReleaseTimesAndTransitionState];
+    }
+    else if ([self currentStateHasName:kMarriedWaitingForLongPressToDisconnect])
+    {
+        [self fireStateMachineEvent:kReturnToMarriedEventName];
     }
 }
 
@@ -740,6 +778,7 @@ typedef enum
             [self fireStateMachineEvent:kSwingEventName];
         }
         else if ([self currentStateHasName:kMarriedStateName] ||
+                 [self currentStateHasName:kMarriedWaitingForLongPressToDisconnect] ||
                  [self currentStateHasName:kSeparatedAttemptingConnectionStateName])
         {
             self.separatedPeripheralUUID = [CBUUID UUIDWithCFUUID:pen.peripheral.UUID];
