@@ -255,10 +255,10 @@ typedef enum
 
         // If we enter the single state and discover that the pairing spot is currently pressed, then
         // proceed directly to the dating state.
-        if (weakSelf.isPairingSpotPressed)
-        {
-            [weakSelf fireStateMachineEvent:kBeginDatingEventName];
-        }
+//        if (weakSelf.isPairingSpotPressed)
+//        {
+//            [weakSelf fireStateMachineEvent:kBeginDatingEventName];
+//        }
     }];
 
     // Dating
