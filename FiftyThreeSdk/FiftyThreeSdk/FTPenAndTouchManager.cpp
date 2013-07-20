@@ -5,21 +5,19 @@
 //  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
 //
 
-#include "FTPenAndTouchManager.h"
-
-#include <boost/smart_ptr.hpp>
 #include <boost/foreach.hpp>
+#include <boost/smart_ptr.hpp>
 #include <boost/unordered_map.hpp>
 
-#include "Common/NoCopy.h"
-#include "Common/Touch/TouchManager.h"
-#include "Common/Touch/PenManager.h"
-#include "Common/Mathiness.h"
 #include "Common/DispatchTimer.h"
-
-#include "TouchClassifierManager.h"
-#include "LatencyTouchClassifier.h"
+#include "Common/Mathiness.h"
+#include "Common/NoCopy.h"
+#include "Common/Touch/PenManager.h"
+#include "Common/Touch/TouchTracker.h"
+#include "FTPenAndTouchManager.h"
 #include "FTTouchEventLogger.h"
+#include "LatencyTouchClassifier.h"
+#include "TouchClassifierManager.h"
 
 using namespace fiftythree::sdk;
 using namespace fiftythree::common;
@@ -45,7 +43,7 @@ public:
     {
         _ClassifierManager = TouchClassifierManager::New();
         _ClassifierManager->AddClassifier(LatencyTouchClassifier::New());
-        
+
         _TrialSeparationTimer = DispatchTimer::New();
         _TrialSeparationTimer->New();
         _TrialSeparationTimer->SetCallback(bind(&FTPenAndTouchManagerImpl::TrialSeparationTimerExpired, this));
@@ -54,7 +52,7 @@ public:
     ~FTPenAndTouchManagerImpl()
     {
     }
-    
+
     void SetPalmRejectionEnabled(bool enabled)
     {
         _PalmRejectionEnabled = enabled;
@@ -63,21 +61,21 @@ public:
     void RegisterForEvents()
     {
         _ClassifierManager->TouchTypeChanged().AddListener(shared_from_this(), &FTPenAndTouchManagerImpl::HandleTouchTypeChanged);
-        
-        TouchManager::Instance()->TouchesBegan().AddListener(shared_from_this(), &FTPenAndTouchManagerImpl::TouchesBegan);
-        TouchManager::Instance()->TouchesMoved().AddListener(shared_from_this(), &FTPenAndTouchManagerImpl::TouchesMoved);
-        TouchManager::Instance()->TouchesEnded().AddListener(shared_from_this(), &FTPenAndTouchManagerImpl::TouchesEnded);
-        TouchManager::Instance()->TouchesCancelled().AddListener(shared_from_this(), &FTPenAndTouchManagerImpl::TouchesCancelled);
+
+        TouchTracker::Instance()->TouchesBegan().AddListener(shared_from_this(), &FTPenAndTouchManagerImpl::TouchesBegan);
+        TouchTracker::Instance()->TouchesMoved().AddListener(shared_from_this(), &FTPenAndTouchManagerImpl::TouchesMoved);
+        TouchTracker::Instance()->TouchesEnded().AddListener(shared_from_this(), &FTPenAndTouchManagerImpl::TouchesEnded);
+        TouchTracker::Instance()->TouchesCancelled().AddListener(shared_from_this(), &FTPenAndTouchManagerImpl::TouchesCancelled);
     }
 
     void UnregisterForEvents()
     {
         _ClassifierManager->TouchTypeChanged().RemoveListener(shared_from_this());
-        
-        TouchManager::Instance()->TouchesBegan().RemoveListener(shared_from_this());
-        TouchManager::Instance()->TouchesMoved().RemoveListener(shared_from_this());
-        TouchManager::Instance()->TouchesEnded().RemoveListener(shared_from_this());
-        TouchManager::Instance()->TouchesCancelled().RemoveListener(shared_from_this());
+
+        TouchTracker::Instance()->TouchesBegan().RemoveListener(shared_from_this());
+        TouchTracker::Instance()->TouchesMoved().RemoveListener(shared_from_this());
+        TouchTracker::Instance()->TouchesEnded().RemoveListener(shared_from_this());
+        TouchTracker::Instance()->TouchesCancelled().RemoveListener(shared_from_this());
     }
 
     void SetLogger(FTTouchEventLogger::Ptr logger)
@@ -88,7 +86,7 @@ public:
     void TouchesBegan(const TouchesSetEvent & sender, const TouchesSet & touches)
     {
         StopTimer(_TrialSeparationTimer);
-        
+
         BOOST_FOREACH(const Touch::cPtr & touch, touches)
         {
             _Touches[touch] = TouchType::Unknown;
@@ -158,7 +156,7 @@ public:
                 StopTimer(_TrialSeparationTimer);
             }
         }
-        
+
         if (_Logger) _Logger->HandlePenEvent(event);
 
         if (_PalmRejectionEnabled)
@@ -166,7 +164,7 @@ public:
             _ClassifierManager->ProcessPenEvent(event);
         }
     }
-    
+
     void StopTimer(const DispatchTimer::Ptr & timer)
     {
         if (timer->IsActive())
@@ -193,18 +191,18 @@ public:
     {
         return _TouchTypeChangedEvent;
     }
-    
+
     Event<Unit> & ShouldStartTrialSeparation()
     {
         return _ShouldStartTrialSeparation;
     }
-    
+
     void TrialSeparationTimerExpired(void)
     {
         _TrialSeparationTimer->Stop();
         _ShouldStartTrialSeparation.Fire(Unit());
     }
-    
+
     void HandleTouchTypeChanged(const Event<const Touch::cPtr &> & event, const Touch::cPtr & touch)
     {
         _TouchTypeChangedEvent.Fire(touch);
