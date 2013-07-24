@@ -22,9 +22,9 @@ static const int kInterruptedUpdateDelayMax = 30;
 
 static const NSTimeInterval kEngagedStateTimeout = 0.5;
 static const NSTimeInterval kIsScanningForPeripheralsToggleTimerInterval = 0.1;
-static const NSTimeInterval kSwingingStateTimeout = 10.0;
-static const NSTimeInterval kSeparatedStateTimeout = 1.0 * 60.0;
-static const NSTimeInterval kMarriedWaitingForLongPressToDisconnectTimeout = 2.0;
+static const NSTimeInterval kSwingingStateTimeout = 4.0;
+static const NSTimeInterval kSeparatedStateTimeout = 10.0 * 60.0;
+static const NSTimeInterval kMarriedWaitingForLongPressToDisconnectTimeout = 1.5;
 
 static NSString *const kSingleStateName = @"Single";
 static NSString *const kDatingStateName = @"Dating";
