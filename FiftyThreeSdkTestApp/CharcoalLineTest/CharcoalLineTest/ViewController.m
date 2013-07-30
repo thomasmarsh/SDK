@@ -15,6 +15,7 @@
 @property (nonatomic) FTPenManager *penManager;
 @property (nonatomic) BOOL pairing;
 @property (nonatomic) BOOL pcConnected;
+@property (nonatomic) NSMutableString *commandBuffer;
 
 @end
 
@@ -262,7 +263,51 @@
 // bytes are available to be read (user should call read:, getDataFromBytesAvailable, or getStringFromBytesAvailable)
 - (void)readBytesAvailable:(UInt32)length
 {
+    if (!self.commandBuffer)
+    {
+        self.commandBuffer = [NSMutableString string];
+    }
 
+    [self.commandBuffer appendFormat:@"%@", [self.rscManager getStringFromBytesAvailable]];
+
+    [self parseCommandBuffer];
+}
+
+- (void)parseCommandBuffer
+{
+    NSArray *commands = [self.commandBuffer componentsSeparatedByString:@"\n"];
+
+    if ([commands[0] isEqualToString:self.commandBuffer])
+    {
+        return;
+    }
+
+    if ([commands[commands.count - 1] isEqualToString:@""])
+    {
+        self.commandBuffer = nil;
+    }
+    else
+    {
+        self.commandBuffer = [NSMutableString stringWithString:commands[commands.count - 1]];
+        commands = [commands subarrayWithRange:NSMakeRange(0, commands.count - 1)];
+    }
+
+    if (commands.count > 0)
+    {
+        for (NSString *command in commands)
+        {
+            if (![command isEqualToString:@""])
+            {
+                [self executeCommand:command];
+            }
+        }
+    }
+}
+
+- (void)executeCommand:(NSString *)command
+{
+    [self.rscManager write:(UInt8 *)command.UTF8String length:command.length];
+    [self.rscManager write:(UInt8 *)"\n" length:1];
 }
 
 @end
