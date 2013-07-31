@@ -19,6 +19,7 @@
 @property (weak, nonatomic) IBOutlet UIButton *penConnectedButton;
 @property (weak, nonatomic) IBOutlet UIButton *connectButton;
 @property (weak, nonatomic) IBOutlet UIButton *touchButton;
+@property (weak, nonatomic) IBOutlet UILabel *deviceInfoLabel;
 
 - (IBAction)pairButtonTouchUpInside:(id)sender;
 - (IBAction)pairButtonTouchUpOutside:(id)sender;

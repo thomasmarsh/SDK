@@ -17,6 +17,7 @@
 - (void)didWriteManufacturingID;
 - (void)didFailToWriteManufacturingID;
 - (void)didReadManufacturingID:(NSString *)manufacturingID;
+- (void)didUpdateDeviceInfo;
 
 @end
 

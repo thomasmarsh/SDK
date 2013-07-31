@@ -101,6 +101,21 @@
     [self sendString:[NSString stringWithFormat:@"Retrieved Manufacturing ID: \"%@\"", manufacturingID]];
 }
 
+- (void)didUpdateDeviceInfo
+{
+    FTPen *pen = self.penManager.pen;
+
+    NSMutableString *deviceInfo = [NSMutableString string];
+    [deviceInfo appendFormat:@"manufacturer: %@\n", pen.manufacturerName];
+    [deviceInfo appendFormat:@"model number: %@\n", pen.modelNumber];
+    [deviceInfo appendFormat:@"serial number: %@\n", pen.serialNumber];
+    [deviceInfo appendFormat:@"firmware revision: %@\n", pen.firmwareRevision];
+    [deviceInfo appendFormat:@"hardware revision: %@\n", pen.hardwareRevision];
+    [deviceInfo appendFormat:@"software revision: %@\n", pen.softwareRevision];
+
+    self.deviceInfoLabel.text = deviceInfo;
+}
+
 #pragma mark -
 
 - (void)displayPenInfo:(FTPen *)pen

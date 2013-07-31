@@ -20,7 +20,7 @@ NSString * const kFTPenIsReadyDidChangeNotificationName = @"com.fiftythree.pen.i
 NSString * const kFTPenIsTipPressedDidChangeNotificationName = @"com.fiftythree.pen.isTipPressedDidChange";
 NSString * const kFTPenIsEraserPressedDidChangeNotificationName = @"com.fiftythree.pen.isEraserPressedDidChange";
 
-@interface FTPen () <FTPenServiceClientDelegate, FTPenDebugServiceClientDelegate>
+@interface FTPen () <FTPenServiceClientDelegate, FTPenDebugServiceClientDelegate, FTDeviceInfoServiceClientDelegate>
 
 @property (nonatomic) CBCentralManager *centralManager;
 @property (nonatomic) FTPeripheralDelegate *peripheralDelegate;
@@ -68,6 +68,7 @@ NSString * const kFTPenIsEraserPressedDidChangeNotificationName = @"com.fiftythr
 
         // Device Info Service client
         _deviceInfoServiceClient = [[FTDeviceInfoServiceClient alloc] init];
+        _deviceInfoServiceClient.delegate = self;
         [_peripheralDelegate addServiceClient:_deviceInfoServiceClient];
     }
 
@@ -212,6 +213,13 @@ NSString * const kFTPenIsEraserPressedDidChangeNotificationName = @"com.fiftythr
 - (void)didReadManufacturingID:(NSString *)manufacturingID
 {
     [self.privateDelegate didReadManufacturingID:manufacturingID];
+}
+
+#pragma mark - FTDeviceInfoServiceClientDelegate
+
+- (void)deviceInfoServiceClientDidUpdateDeviceInfo:(FTDeviceInfoServiceClient *)deviceInfoServiceClient
+{
+    [self.privateDelegate didUpdateDeviceInfo];
 }
 
 #pragma mark -
