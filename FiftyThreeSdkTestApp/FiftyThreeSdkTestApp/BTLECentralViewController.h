@@ -5,6 +5,8 @@
 //  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
 //
 
+#pragma once
+
 #import <UIKit/UIKit.h>
 
 @interface BTLECentralViewController : UIViewController
@@ -12,8 +14,8 @@
 @property (weak, nonatomic) IBOutlet UILabel *pairingStatusLabel;
 @property (weak, nonatomic) IBOutlet UIButton *pairButton;
 @property (weak, nonatomic) IBOutlet UIButton *testConnectButton;
-@property (weak, nonatomic) IBOutlet UIButton *tip1State;
-@property (weak, nonatomic) IBOutlet UIButton *tip2State;
+@property (weak, nonatomic) IBOutlet UIButton *tipStateButton;
+@property (weak, nonatomic) IBOutlet UIButton *eraserStateButton;
 
 - (IBAction)pairButtonTouchDown:(id)sender;
 - (IBAction)pairButtonTouchUpInside:(id)sender;

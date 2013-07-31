@@ -74,13 +74,13 @@
 
 - (void)pen:(FTPen *)pen isTipPressedDidChange:(BOOL)isTipPressed
 {
-    self.tip1State.highlighted = isTipPressed;
+    self.tipStateButton.highlighted = isTipPressed;
     [self sendCharacter:isTipPressed ? 'A' : 'a'];
 }
 
 - (void)pen:(FTPen *)pen isEraserPressedDidChange:(BOOL)isEraserPressed
 {
-    self.tip2State.highlighted = isEraserPressed;
+    self.eraserStateButton.highlighted = isEraserPressed;
     [self sendCharacter:isEraserPressed ? 'B' : 'b'];
 }
 
@@ -149,8 +149,8 @@
         self.penConnectedButton.highlighted = NO;
         self.connectButton.hidden = YES;
 
-        self.tip1State.highlighted = NO;
-        self.tip2State.highlighted = NO;
+        self.tipStateButton.highlighted = NO;
+        self.eraserStateButton.highlighted = NO;
     }
 
     [self.pcConnectedButton setHighlighted:self.pcConnected];

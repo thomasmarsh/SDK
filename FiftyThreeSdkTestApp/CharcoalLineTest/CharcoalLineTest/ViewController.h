@@ -2,17 +2,18 @@
 //  ViewController.h
 //  CharcoalLineTest
 //
-//  Created by Adam on 5/9/13.
-//  Copyright (c) 2013 FiftyThree. All rights reserved.
+//  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
 //
+
+#pragma once
 
 #import <UIKit/UIKit.h>
 
 @interface ViewController : UIViewController
 
 @property (weak, nonatomic) IBOutlet UILabel *statusLabel;
-@property (weak, nonatomic) IBOutlet UIButton *tip1State;
-@property (weak, nonatomic) IBOutlet UIButton *tip2State;
+@property (weak, nonatomic) IBOutlet UIButton *tipStateButton;
+@property (weak, nonatomic) IBOutlet UIButton *eraserStateButton;
 @property (weak, nonatomic) IBOutlet UIButton *pairButton;
 @property (weak, nonatomic) IBOutlet UIButton *pcConnectedButton;
 @property (weak, nonatomic) IBOutlet UIButton *penConnectedButton;

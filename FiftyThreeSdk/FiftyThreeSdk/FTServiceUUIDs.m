@@ -135,7 +135,7 @@
     return [CBUUID UUIDWithCFUUID:FT_PEN_DEBUG_SERVICE_TIP_PRESSURE_UUID];
 }
 
-+ (CBUUID *)erasurePressure
++ (CBUUID *)eraserPressure
 {
     return [CBUUID UUIDWithCFUUID:FT_PEN_DEBUG_SERVICE_ERASER_PRESSURE_UUID];
 }
@@ -170,7 +170,7 @@
     NSDictionary *UUIDs = @{ [FTPenDebugServiceUUIDs penDebugService] : @"PenDebugService",
                              [FTPenDebugServiceUUIDs deviceState] : @"DeviceState",
                              [FTPenDebugServiceUUIDs tipPressure] : @"TipPressure",
-                             [FTPenDebugServiceUUIDs erasurePressure] : @"ErasurePressure",
+                             [FTPenDebugServiceUUIDs eraserPressure] : @"EraserPressure",
                              [FTPenDebugServiceUUIDs longPressTime] : @"LongPressTime",
                              [FTPenDebugServiceUUIDs connectionTime] : @"ConnectionTime",
                              [FTPenDebugServiceUUIDs numFailedConnections] : @"NumFailedConnections",

@@ -16,7 +16,7 @@
 
 @property (nonatomic) CBCharacteristic *deviceStateCharacteristic;
 @property (nonatomic) CBCharacteristic *tipPressureCharacteristic;
-@property (nonatomic) CBCharacteristic *erasurePressureCharacteristic;
+@property (nonatomic) CBCharacteristic *eraserPressureCharacteristic;
 @property (nonatomic) CBCharacteristic *longPressTimeCharacteristic;
 @property (nonatomic) CBCharacteristic *connectionTimeCharacteristic;
 @property (nonatomic) CBCharacteristic *numFailedConnectionsCharacteristic;
@@ -96,7 +96,7 @@
         {
             NSArray *characteristics = @[[FTPenDebugServiceUUIDs deviceState],
                                          [FTPenDebugServiceUUIDs tipPressure],
-                                         [FTPenDebugServiceUUIDs erasurePressure],
+                                         [FTPenDebugServiceUUIDs eraserPressure],
                                          [FTPenDebugServiceUUIDs longPressTime],
                                          [FTPenDebugServiceUUIDs connectionTime],
                                          [FTPenDebugServiceUUIDs numFailedConnections],
@@ -132,13 +132,13 @@
                  [characteristic.UUID isEqual:[FTPenDebugServiceUUIDs tipPressure]])
         {
             self.tipPressureCharacteristic = characteristic;
-            [peripheral setNotifyValue:YES forCharacteristic:characteristic];
+//            [peripheral setNotifyValue:YES forCharacteristic:characteristic];
         }
-        else if (!self.erasurePressureCharacteristic &&
-                 [characteristic.UUID isEqual:[FTPenDebugServiceUUIDs erasurePressure]])
+        else if (!self.eraserPressureCharacteristic &&
+                 [characteristic.UUID isEqual:[FTPenDebugServiceUUIDs eraserPressure]])
         {
-            self.erasurePressureCharacteristic = characteristic;
-            [peripheral setNotifyValue:YES forCharacteristic:characteristic];
+            self.eraserPressureCharacteristic = characteristic;
+//            [peripheral setNotifyValue:YES forCharacteristic:characteristic];
         }
         else if (!self.longPressTimeCharacteristic &&
                  [characteristic.UUID isEqual:[FTPenDebugServiceUUIDs longPressTime]])

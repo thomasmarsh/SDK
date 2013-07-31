@@ -23,18 +23,17 @@
 @interface FTPen ()
 
 @property (nonatomic, weak) id<FTPenPrivateDelegate> privateDelegate;
-@property (nonatomic) CBPeripheral *peripheral;
-@property (nonatomic) BOOL requiresTipBePressedToBecomeReady;
+@property (nonatomic, readonly) CBPeripheral *peripheral;
 @property (nonatomic, readonly) BOOL isPoweringOff;
+@property (nonatomic) BOOL requiresTipBePressedToBecomeReady;
 
 - (id)initWithCentralManager:(CBCentralManager *)centralManager
                   peripheral:(CBPeripheral *)peripheral;
 
 - (void)peripheralConnectionStatusDidChange;
 
-- (void)updateData:(NSDictionary *)data;
-
 - (void)startSwinging;
+
 - (void)powerOff;
 
 // Gets the Manufacturing ID, which is the combination of the SKU and SN.

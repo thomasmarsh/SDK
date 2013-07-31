@@ -263,7 +263,7 @@ public:
     }
     self.lastTipDate = [NSDate date];
 
-    [self.tip1State setHighlighted:isTipPressed];
+    [self.tipStateButton setHighlighted:isTipPressed];
 
     PenEvent::Ptr event = PenEvent::New([NSProcessInfo processInfo].systemUptime,
                                         isTipPressed ? PenEventType::PenDown : PenEventType::PenUp,
@@ -282,7 +282,7 @@ public:
     }
     self.lastTipDate = [NSDate date];
 
-    [self.tip2State setHighlighted:isEraserPressed];
+    [self.eraserStateButton setHighlighted:isEraserPressed];
 
     PenEvent::Ptr event = PenEvent::New([NSProcessInfo processInfo].systemUptime,
                                         isEraserPressed ? PenEventType::PenDown : PenEventType::PenUp,
@@ -340,8 +340,8 @@ public:
         self.updateFirmwareButton.hidden = YES;
         self.trialSeparationButton.hidden = YES;
 
-        self.tip1State.highlighted = NO;
-        self.tip2State.highlighted = NO;
+        self.tipStateButton.highlighted = NO;
+        self.eraserStateButton.highlighted = NO;
     }
 
     if (self.annotationMode)
@@ -610,6 +610,7 @@ public:
 }
 
 #pragma mark - UIKIt Touches
+
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
 {
     if (self.annotationMode)
@@ -722,6 +723,8 @@ public:
         }
     }
 }
+
+#pragma mark -
 
 - (void)startTrialSeparation
 {

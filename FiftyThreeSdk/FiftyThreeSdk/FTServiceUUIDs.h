@@ -28,7 +28,7 @@
 + (CBUUID *)penDebugService;
 + (CBUUID *)deviceState;
 + (CBUUID *)tipPressure;
-+ (CBUUID *)erasurePressure;
++ (CBUUID *)eraserPressure;
 + (CBUUID *)longPressTime;
 + (CBUUID *)connectionTime;
 + (CBUUID *)numFailedConnections;

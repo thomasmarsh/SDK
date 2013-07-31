@@ -216,12 +216,6 @@ NSString * const kFTPenIsEraserPressedDidChangeNotificationName = @"com.fiftythr
 
 #pragma mark -
 
-- (void)updateData:(NSDictionary *)data
-{
-    _name = [data objectForKey:CBAdvertisementDataLocalNameKey];
-    _manufacturer = [data objectForKey:CBAdvertisementDataManufacturerDataKey];
-}
-
 - (NSString *)name
 {
     return _name ? _name : self.peripheral.name;

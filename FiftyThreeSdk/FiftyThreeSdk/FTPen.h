@@ -5,6 +5,8 @@
 //  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
 //
 
+#pragma once
+
 #import <Foundation/Foundation.h>
 
 typedef struct PnPID
@@ -24,9 +26,9 @@ extern NSString * const kFTPenIsEraserPressedDidChangeNotificationName;
 
 @interface FTPen : NSObject
 
-@property (nonatomic, readonly) BOOL isReady;
-
 @property (nonatomic, weak) id<FTPenDelegate> delegate;
+
+@property (nonatomic, readonly) BOOL isReady;
 
 @property (nonatomic, readonly) NSString *name;
 @property (nonatomic, readonly) NSString *manufacturerName;
