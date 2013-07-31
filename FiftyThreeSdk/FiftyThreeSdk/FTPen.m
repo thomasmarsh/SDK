@@ -59,13 +59,14 @@ NSString * const kFTPenIsEraserPressedDidChangeNotificationName = @"com.fiftythr
         _penServiceClient.delegate = self;
         [_peripheralDelegate addServiceClient:_penServiceClient];
 
-//        // Pen Debug Service client
-//#ifdef DEBUG
-//        _penDebugServiceClient = [[FTPenDebugServiceClient alloc] init];
-//        _penDebugServiceClient.delegate = self;
-//        [_peripheralDelegate addServiceClient:_penDebugServiceClient];
-//#endif
-//
+#ifdef DEBUG
+        // Pen Debug Service client
+        _penDebugServiceClient = [[FTPenDebugServiceClient alloc] initWithPeripheral:_peripheral];
+        _penDebugServiceClient.delegate = self;
+        [_peripheralDelegate addServiceClient:_penDebugServiceClient];
+#endif
+
+        // Device Info Service client
         _deviceInfoServiceClient = [[FTDeviceInfoServiceClient alloc] init];
         [_peripheralDelegate addServiceClient:_deviceInfoServiceClient];
     }
@@ -118,6 +119,16 @@ NSString * const kFTPenIsEraserPressedDidChangeNotificationName = @"com.fiftythr
 - (void)powerOff
 {
     [self.penServiceClient powerOff];
+}
+
+- (void)getManufacturingID
+{
+    [self.penDebugServiceClient getManufacturingID];
+}
+
+- (void)setManufacturingID:(NSString *)manufacturingID
+{
+    [self.penDebugServiceClient setManufacturingID:manufacturingID];
 }
 
 #pragma mark -
@@ -187,6 +198,21 @@ NSString * const kFTPenIsEraserPressedDidChangeNotificationName = @"com.fiftythr
 }
 
 #pragma mark - FTPenDebugServiceClientDelegate
+
+- (void)didWriteManufacturingID
+{
+    [self.privateDelegate didWriteManufacturingID];
+}
+
+- (void)didFailToWriteManufacturingID
+{
+    [self.privateDelegate didFailToWriteManufacturingID];
+}
+
+- (void)didReadManufacturingID:(NSString *)manufacturingID
+{
+    [self.privateDelegate didReadManufacturingID:manufacturingID];
+}
 
 #pragma mark -
 

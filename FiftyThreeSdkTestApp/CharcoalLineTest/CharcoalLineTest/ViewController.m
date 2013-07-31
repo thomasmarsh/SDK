@@ -5,11 +5,12 @@
 //  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
 //
 
+#import "FiftyThreeSdk/FTPen+Private.h"
 #import "FiftyThreeSdk/FTPenManager.h"
 #import "RscMgr.h"
 #import "ViewController.h"
 
-@interface ViewController () <RscMgrDelegate, FTPenManagerDelegate, FTPenDelegate>
+@interface ViewController () <RscMgrDelegate, FTPenManagerDelegate, FTPenDelegate, FTPenPrivateDelegate>
 
 @property (nonatomic) RscMgr *rscManager;
 @property (nonatomic) FTPenManager *penManager;
@@ -53,6 +54,7 @@
     {
         NSAssert(penManager.pen, @"pen is non-nil");
         penManager.pen.delegate = self;
+        penManager.pen.privateDelegate = self;
     }
 
     [self updateDisplay];
@@ -61,14 +63,6 @@
 - (void)penManager:(FTPenManager *)penManager didUpdateDeviceInfo:(FTPen *)pen
 {
     [self displayPenInfo:pen];
-}
-
-- (void)sendCharacter:(uint8_t)c
-{
-    if (self.pcConnected)
-    {
-        [self.rscManager write:&c Length:sizeof(c)];
-    }
 }
 
 #pragma mark - FTPenDelegate
@@ -88,6 +82,23 @@
 {
     self.tip2State.highlighted = isEraserPressed;
     [self sendCharacter:isEraserPressed ? 'B' : 'b'];
+}
+
+#pragma mark - FTPenPrivateDelegate
+
+- (void)didWriteManufacturingID
+{
+    [self sendString:@"Successfully wrote Manufacturing ID."];
+}
+
+- (void)didFailToWriteManufacturingID
+{
+    [self reportError:@"Failed to write Manufacturing ID."];
+}
+
+- (void)didReadManufacturingID:(NSString *)manufacturingID
+{
+    [self sendString:[NSString stringWithFormat:@"Retrieved Manufacturing ID: \"%@\"", manufacturingID]];
 }
 
 #pragma mark -
@@ -268,10 +279,20 @@
         self.commandBuffer = [NSMutableString string];
     }
 
-    [self.commandBuffer appendFormat:@"%@", [self.rscManager getStringFromBytesAvailable]];
+    NSString *input = [self.rscManager getStringFromBytesAvailable];
+
+    // Echo received (typed) chars back to serial port (terminal user)
+    [self.rscManager write:(UInt8 *)input.UTF8String length:input.length];
+
+    // Remove all CRs from the input
+    input = [input stringByReplacingOccurrencesOfString:@"\r" withString:@""];
+
+    [self.commandBuffer appendFormat:@"%@", input];
 
     [self parseCommandBuffer];
 }
+
+#pragma mark -
 
 - (void)parseCommandBuffer
 {
@@ -306,8 +327,76 @@
 
 - (void)executeCommand:(NSString *)command
 {
-    [self.rscManager write:(UInt8 *)command.UTF8String length:command.length];
-    [self.rscManager write:(UInt8 *)"\n" length:1];
+    if ([command canBeConvertedToEncoding:NSASCIIStringEncoding])
+    {
+        NSString * const kSetIdCommandPrefix = @"set id ";
+        NSString * const kGetIdCommand = @"get id";
+        static const int kIdLength = 15;
+
+        if ([command hasPrefix:kSetIdCommandPrefix])
+        {
+            if (command.length == kSetIdCommandPrefix.length + kIdLength)
+            {
+                NSString *manufacturingID = [command substringWithRange:NSMakeRange(command.length - kIdLength,
+                                                                                    kIdLength)];
+
+                if (self.penManager.state == FTPenManagerStateConnected)
+                {
+                    [self.penManager.pen setManufacturingID:manufacturingID];
+                    [self sendString:[NSString stringWithFormat:@"Set Manufacturing ID: \"%@\"", manufacturingID]];
+                }
+                else
+                {
+                    [self reportError:@"Pen must be connected to set Manufacturing ID."];
+                }
+            }
+            else
+            {
+                [self reportError:@"Invalid ID length."];
+            }
+        }
+        else if ([command isEqualToString:kGetIdCommand])
+        {
+            if (self.penManager.state == FTPenManagerStateConnected)
+            {
+                [self.penManager.pen getManufacturingID];
+            }
+        }
+        else
+        {
+            [self reportError:@"Unknown command."];
+        }
+    }
+    else
+    {
+        [self reportError:@"Non-ASCII character encountered."];
+    }
+}
+
+- (void)sendCharacter:(uint8_t)c
+{
+    if (self.pcConnected)
+    {
+        [self.rscManager write:&c length:sizeof(c)];
+    }
+}
+
+- (void)sendString:(NSString *)string
+{
+    NSAssert([string canBeConvertedToEncoding:NSASCIIStringEncoding], @"String must be ASCII");
+
+    if (self.pcConnected)
+    {
+        NSString *newlineTerminatedString = [string stringByAppendingString:@"\r\n"];
+
+        [self.rscManager write:(UInt8 *)newlineTerminatedString.UTF8String
+                        length:newlineTerminatedString.length];
+    }
+}
+
+- (void)reportError:(NSString *)description
+{
+    [self sendString:[NSString stringWithFormat:@"ERROR: %@", description]];
 }
 
 @end

@@ -109,6 +109,15 @@
 // 31F51EB8-050D-4E4D-A549-397459259B77
 #define FT_PEN_DEBUG_SERVICE_CONNECTION_TIME_UUID CFUUIDGetConstantUUIDWithBytes(kCFAllocatorSystemDefault, 0x31, 0xF5, 0x1E, 0xB8, 0x05, 0x0D, 0x4E, 0x4D, 0xA5, 0x49, 0x39, 0x74, 0x59, 0x25, 0x9B, 0x77)
 
+// 2B9066F7-6C2C-43C0-9B93-1B6EB9B11A01
+#define FT_PEN_DEBUG_SERVICE_NUM_FAILED_CONN_UUID CFUUIDGetConstantUUIDWithBytes(kCFAllocatorSystemDefault, 0x2B, 0x90, 0x66, 0xF7, 0x6C, 0x2C, 0x43, 0xC0, 0x9B, 0x93, 0x1B, 0x6E, 0xB9, 0xB1, 0x1A, 0x01)
+
+// 0976668C-001F-4744-8335-0E147B697CAE
+#define FT_PEN_DEBUG_SERVICE_MANUF_ID_STRING_UUID CFUUIDGetConstantUUIDWithBytes(kCFAllocatorSystemDefault, 0x09, 0x76, 0x66, 0x8C, 0x00, 0x1F, 0x47, 0x44, 0x83, 0x35, 0x0E, 0x14, 0x7B, 0x69, 0x7C, 0xAE)
+
+// 5749A836-6E3A-4CA5-B8CA-225A4C635D8E
+#define FT_PEN_DEBUG_SERVICE_LAST_ERROR_CODE_UUID CFUUIDGetConstantUUIDWithBytes(kCFAllocatorSystemDefault, 0x57, 0x49, 0xA8, 0x36, 0x6E, 0x3A, 0x4C, 0xA5, 0xB8, 0xCA, 0x22, 0x5A, 0x4C, 0x63, 0x5D, 0x8E)
+
 @implementation FTPenDebugServiceUUIDs
 
 + (CBUUID *)penDebugService
@@ -141,6 +150,21 @@
     return [CBUUID UUIDWithCFUUID:FT_PEN_DEBUG_SERVICE_CONNECTION_TIME_UUID];
 }
 
++ (CBUUID *)numFailedConnections
+{
+    return [CBUUID UUIDWithCFUUID:FT_PEN_DEBUG_SERVICE_NUM_FAILED_CONN_UUID];
+}
+
++ (CBUUID *)manufacturingID
+{
+    return [CBUUID UUIDWithCFUUID:FT_PEN_DEBUG_SERVICE_MANUF_ID_STRING_UUID];
+}
+
++ (CBUUID *)lastErrorCode
+{
+    return [CBUUID UUIDWithCFUUID:FT_PEN_DEBUG_SERVICE_LAST_ERROR_CODE_UUID];
+}
+
 + (NSString *)nameForUUID:(CBUUID *)UUID
 {
     NSDictionary *UUIDs = @{ [FTPenDebugServiceUUIDs penDebugService] : @"PenDebugService",
@@ -148,7 +172,10 @@
                              [FTPenDebugServiceUUIDs tipPressure] : @"TipPressure",
                              [FTPenDebugServiceUUIDs erasurePressure] : @"ErasurePressure",
                              [FTPenDebugServiceUUIDs longPressTime] : @"LongPressTime",
-                             [FTPenDebugServiceUUIDs connectionTime] : @"ConnectionTime"
+                             [FTPenDebugServiceUUIDs connectionTime] : @"ConnectionTime",
+                             [FTPenDebugServiceUUIDs numFailedConnections] : @"NumFailedConnections",
+                             [FTPenDebugServiceUUIDs manufacturingID] : @"ManufacturingID",
+                             [FTPenDebugServiceUUIDs lastErrorCode] : @"LastErrorCode"
                              };
 
     return [UUIDs objectForKey:UUID];

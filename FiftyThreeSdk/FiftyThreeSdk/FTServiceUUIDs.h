@@ -31,6 +31,9 @@
 + (CBUUID *)erasurePressure;
 + (CBUUID *)longPressTime;
 + (CBUUID *)connectionTime;
++ (CBUUID *)numFailedConnections;
++ (CBUUID *)manufacturingID;
++ (CBUUID *)lastErrorCode;
 
 + (NSString *)nameForUUID:(CBUUID *)UUID;
 

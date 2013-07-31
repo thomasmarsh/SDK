@@ -6,8 +6,8 @@
 //
 
 #import "BTLEPeripheralViewController.h"
-#import "TiUpdateService.h"
 #import "FTPenService.h"
+#import "TiUpdateService.h"
 
 @interface BTLEPeripheralViewController () <FTPenServiceDelegate>
 
@@ -62,37 +62,30 @@
 }
 
 - (IBAction)secureSwitchChanged:(id)sender {
-    self.penService.secure = self.secureSwitch.on;
 }
 
 - (IBAction)tip1TouchUpInside:(id)sender
 {
-    self.penService.isTipPressed = NO;
 }
 
 - (IBAction)tip1TouchUpOutside:(id)sender
 {
-    self.penService.isTipPressed = NO;
 }
 
 - (IBAction)tip1TouchDown:(id)sender
 {
-    self.penService.isTipPressed = YES;
 }
 
 - (IBAction)tip2TouchUpInside:(id)sender
 {
-    self.penService.isEraserPressed = NO;
 }
 
 - (IBAction)tip2TouchUpOutside:(id)sender
 {
-    self.penService.isEraserPressed = NO;
 }
 
 - (IBAction)tip2TouchDown:(id)sender
 {
-    self.penService.isEraserPressed = YES;
 }
 
 @end

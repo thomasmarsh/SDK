@@ -10,12 +10,54 @@
 
 @interface FTPenDebugServiceClient ()
 
+@property (nonatomic) CBPeripheral *peripheral;
+
 @property (nonatomic) CBService *penDebugService;
+
 @property (nonatomic) CBCharacteristic *deviceStateCharacteristic;
+@property (nonatomic) CBCharacteristic *tipPressureCharacteristic;
+@property (nonatomic) CBCharacteristic *erasurePressureCharacteristic;
+@property (nonatomic) CBCharacteristic *longPressTimeCharacteristic;
+@property (nonatomic) CBCharacteristic *connectionTimeCharacteristic;
+@property (nonatomic) CBCharacteristic *numFailedConnectionsCharacteristic;
+@property (nonatomic) CBCharacteristic *manufacturingIDCharacteristic;
+@property (nonatomic) CBCharacteristic *lastErrorCodeCharacteristic;
 
 @end
 
 @implementation FTPenDebugServiceClient
+
+- (id)initWithPeripheral:(CBPeripheral *)peripheral
+{
+    self = [super init];
+    if (self)
+    {
+        _peripheral = peripheral;
+    }
+    return self;
+}
+
+- (void)setManufacturingID:(NSString *)manufacturingID
+{
+    NSAssert([manufacturingID canBeConvertedToEncoding:NSASCIIStringEncoding],
+             @"Manufacturing ID must be ASCII");
+    NSAssert(manufacturingID.length == 15, @"Manufacturing ID must be 15 characters");
+
+    if (self.manufacturingIDCharacteristic)
+    {
+        [self.peripheral writeValue:[manufacturingID dataUsingEncoding:NSASCIIStringEncoding]
+                  forCharacteristic:self.manufacturingIDCharacteristic
+                               type:CBCharacteristicWriteWithResponse];
+    }
+}
+
+- (void)getManufacturingID
+{
+    if (self.manufacturingIDCharacteristic)
+    {
+        [self.peripheral readValueForCharacteristic:self.manufacturingIDCharacteristic];
+    }
+}
 
 #pragma mark - FTServiceClient
 
@@ -52,13 +94,15 @@
 
         if (self.penDebugService)
         {
-//            NSArray *characteristics = @[[FTPenDebugServiceUUIDs deviceState],
-//                                         [FTPenDebugServiceUUIDs tipPressure],
-//                                         [FTPenDebugServiceUUIDs erasurePressure],
-//                                         [FTPenDebugServiceUUIDs longPressTime],
-//                                         [FTPenDebugServiceUUIDs connectionTime]
-//                                         ];
-            NSArray *characteristics = @[[FTPenDebugServiceUUIDs deviceState]];
+            NSArray *characteristics = @[[FTPenDebugServiceUUIDs deviceState],
+                                         [FTPenDebugServiceUUIDs tipPressure],
+                                         [FTPenDebugServiceUUIDs erasurePressure],
+                                         [FTPenDebugServiceUUIDs longPressTime],
+                                         [FTPenDebugServiceUUIDs connectionTime],
+                                         [FTPenDebugServiceUUIDs numFailedConnections],
+                                         [FTPenDebugServiceUUIDs manufacturingID],
+                                         [FTPenDebugServiceUUIDs lastErrorCode]
+                                         ];
 
             [peripheral discoverCharacteristics:characteristics forService:self.penDebugService];
         }
@@ -84,6 +128,43 @@
             self.deviceStateCharacteristic = characteristic;
             [peripheral setNotifyValue:YES forCharacteristic:characteristic];
         }
+        else if (!self.tipPressureCharacteristic &&
+                 [characteristic.UUID isEqual:[FTPenDebugServiceUUIDs tipPressure]])
+        {
+            self.tipPressureCharacteristic = characteristic;
+            [peripheral setNotifyValue:YES forCharacteristic:characteristic];
+        }
+        else if (!self.erasurePressureCharacteristic &&
+                 [characteristic.UUID isEqual:[FTPenDebugServiceUUIDs erasurePressure]])
+        {
+            self.erasurePressureCharacteristic = characteristic;
+            [peripheral setNotifyValue:YES forCharacteristic:characteristic];
+        }
+        else if (!self.longPressTimeCharacteristic &&
+                 [characteristic.UUID isEqual:[FTPenDebugServiceUUIDs longPressTime]])
+        {
+            self.longPressTimeCharacteristic = characteristic;
+        }
+        else if (!self.connectionTimeCharacteristic &&
+                 [characteristic.UUID isEqual:[FTPenDebugServiceUUIDs connectionTime]])
+        {
+            self.connectionTimeCharacteristic = characteristic;
+        }
+        else if (!self.numFailedConnectionsCharacteristic &&
+                 [characteristic.UUID isEqual:[FTPenDebugServiceUUIDs numFailedConnections]])
+        {
+            self.numFailedConnectionsCharacteristic = characteristic;
+        }
+        else if (!self.manufacturingIDCharacteristic &&
+                 [characteristic.UUID isEqual:[FTPenDebugServiceUUIDs manufacturingID]])
+        {
+            self.manufacturingIDCharacteristic = characteristic;
+        }
+        else if (!self.lastErrorCodeCharacteristic &&
+                 [characteristic.UUID isEqual:[FTPenDebugServiceUUIDs lastErrorCode]])
+        {
+            self.lastErrorCodeCharacteristic = characteristic;
+        }
     }
 }
 
@@ -101,6 +182,11 @@
     {
         const int state = ((const char *)characteristic.value.bytes)[0];
         NSLog(@"DeviceState changed: %d.", state);
+    }
+    else if ([characteristic.UUID isEqual:[FTPenDebugServiceUUIDs manufacturingID]])
+    {
+        NSString *manufacturingID = [[NSString alloc] initWithData:characteristic.value encoding:NSASCIIStringEncoding];
+        [self.delegate didReadManufacturingID:manufacturingID];
     }
 }
 
@@ -124,6 +210,18 @@
 - (void)peripheral:(CBPeripheral *)peripheral didWriteValueForCharacteristic:(CBCharacteristic *)characteristic
              error:(NSError *)error
 {
+    if (characteristic == self.manufacturingIDCharacteristic)
+    {
+        if (error)
+        {
+            [self.delegate didFailToWriteManufacturingID];
+        }
+        else
+        {
+            [self.delegate didWriteManufacturingID];
+        }
+
+    }
 }
 
 @end
