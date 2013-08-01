@@ -18,6 +18,7 @@
 @property (weak, nonatomic) IBOutlet UIButton *pcConnectedButton;
 @property (weak, nonatomic) IBOutlet UIButton *penConnectedButton;
 @property (weak, nonatomic) IBOutlet UIButton *connectButton;
+@property (weak, nonatomic) IBOutlet UIButton *updateFirmwareButton;
 @property (weak, nonatomic) IBOutlet UIButton *touchButton;
 @property (weak, nonatomic) IBOutlet UILabel *deviceInfoLabel;
 
@@ -26,5 +27,6 @@
 - (IBAction)pairButtonTouchDown:(id)sender;
 - (IBAction)infoButtonPressed:(id)sender;
 - (IBAction)connectButtonPressed:(id)sender;
+- (IBAction)updateFirmwareButtonTouchUpInside:(id)sender;
 
 @end

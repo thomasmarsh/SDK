@@ -225,16 +225,12 @@ public:
 
 - (void)penManager:(FTPenManager *)manager didFinishUpdate:(NSError *)error
 {
-    NSLog(@"didFinishUpdate");
-
     [self.firmwareUpdateProgressView dismiss];
     self.firmwareUpdateProgressView = nil;
 }
 
 - (void)penManager:(FTPenManager *)manager didUpdatePercentComplete:(float)percent
 {
-    NSLog(@"didUpdatePercentComplete %f", percent);
-
     self.firmwareUpdateProgressView.percentComplete = percent;
 }
 
@@ -449,9 +445,11 @@ public:
 
 - (void)updateFirmware
 {
-    self.firmwareUpdateProgressView = [FTFirmwareUpdateProgressView start];
-
-    [self.penManager updateFirmwareForPen:self.penManager.pen];
+    if ([self.penManager updateFirmwareForPen:self.penManager.pen])
+    {
+        self.firmwareUpdateProgressView = [FTFirmwareUpdateProgressView start];
+        self.firmwareUpdateProgressView.delegate = self;
+    }
 }
 
 - (void)didDetectMultitaskingGesturesEnabled

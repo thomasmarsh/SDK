@@ -7,6 +7,13 @@
 
 #import "FTFirmwareManager.h"
 
+NSString *applicationDocumentsDirectory()
+{
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *basePath = ([paths count] > 0) ? [paths objectAtIndex:0] : nil;
+    return basePath;
+}
+
 @implementation FTFirmwareManager
 
 + (NSInteger)versionForModel:(NSString *)model imageType:(FTFirmwareImageType)imageType
@@ -33,13 +40,14 @@
 + (NSString *)filePathForModel:(NSString *)model imageType:(FTFirmwareImageType)imageType
 {
     model = [model lowercaseString];
-    
+
     // map model to image name
     NSDictionary* modelMap = @{
-                          @"es1" : @"charcoal",
-                          @"es2" : @"charcoal",
-                          @"charcoal" : @"charcoal"
-                          };
+                               @"es1" : @"charcoal",
+//                               @"es2" : @"charcoal",
+                               @"es3" : @"charcoal",
+//                               @"charcoal" : @"charcoal"
+                               };
 
     NSString *imagePrefix = [modelMap valueForKey:model];
     if (!imagePrefix)
@@ -47,17 +55,27 @@
         return nil;
     }
 
-    NSString *imageFileName;
     if (imageType == Factory)
     {
-        imageFileName = [imagePrefix stringByAppendingString:@"-factory"];
+        return [[NSBundle mainBundle] pathForResource:[imagePrefix stringByAppendingString:@"-factory"]
+                                               ofType:@"bin"];
     }
     else
     {
-        imageFileName = [imagePrefix stringByAppendingString:@"-upgrade"];
+        NSString *baseFilename = [imagePrefix stringByAppendingString:@"-upgrade"];
+        NSString *filename = [baseFilename stringByAppendingPathExtension:@"bin"];
+
+        NSString *documentsDirImagePath = [applicationDocumentsDirectory() stringByAppendingPathComponent:filename];
+        if ([[NSFileManager defaultManager] fileExistsAtPath:documentsDirImagePath])
+        {
+            return documentsDirImagePath;
+        }
+        else
+        {
+            return [[NSBundle mainBundle] pathForResource:[imagePrefix stringByAppendingString:@"-upgrade"]
+                                                   ofType:@"bin"];
+        }
     }
-    
-    return [[NSBundle mainBundle] pathForResource:imageFileName ofType:@"bin"];
 }
 
 @end

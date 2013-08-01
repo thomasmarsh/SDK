@@ -7,13 +7,16 @@
 
 #import "FiftyThreeSdk/FTPen+Private.h"
 #import "FiftyThreeSdk/FTPenManager.h"
+#import "FiftyThreeSdk/FTPenManager+Private.h"
+#import "FiftyThreeSdk/FTFirmwareUpdateProgressView.h"
 #import "RscMgr.h"
 #import "ViewController.h"
 
-@interface ViewController () <RscMgrDelegate, FTPenManagerDelegate, FTPenDelegate, FTPenPrivateDelegate>
+@interface ViewController () <UIAlertViewDelegate, RscMgrDelegate, FTPenManagerDelegate, FTPenManagerDelegatePrivate, FTPenDelegate, FTPenPrivateDelegate>
 
 @property (nonatomic) RscMgr *rscManager;
 @property (nonatomic) FTPenManager *penManager;
+@property (nonatomic) FTFirmwareUpdateProgressView *firmwareUpdateProgressView;
 @property (nonatomic) BOOL pairing;
 @property (nonatomic) BOOL pcConnected;
 @property (nonatomic) NSMutableString *commandBuffer;
@@ -46,6 +49,17 @@
     // Dispose of any resources that can be recreated.
 }
 
+#pragma mark - UIAlertViewDelegate
+
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    if (alertView == self.firmwareUpdateProgressView)
+    {
+        [self.penManager disconnect];
+        self.firmwareUpdateProgressView = nil;
+    }
+}
+
 #pragma mark - FTPenManagerDelegate
 
 - (void)penManager:(FTPenManager *)penManager didUpdateState:(FTPenManagerState)state
@@ -63,6 +77,19 @@
 - (void)penManager:(FTPenManager *)penManager didUpdateDeviceInfo:(FTPen *)pen
 {
     [self displayPenInfo:pen];
+}
+
+#pragma mark - FTPenManagerDelegatePrivate
+
+- (void)penManager:(FTPenManager *)manager didFinishUpdate:(NSError *)error
+{
+    [self.firmwareUpdateProgressView dismiss];
+    self.firmwareUpdateProgressView = nil;
+}
+
+- (void)penManager:(FTPenManager *)manager didUpdatePercentComplete:(float)percent
+{
+    self.firmwareUpdateProgressView.percentComplete = percent;
 }
 
 #pragma mark - FTPenDelegate
@@ -158,11 +185,13 @@
         [self.connectButton setTitle:@"Disconnect" forState:UIControlStateNormal];
         self.penConnectedButton.highlighted = YES;
         self.connectButton.hidden = NO;
+        self.updateFirmwareButton.hidden = NO;
     }
     else
     {
         self.penConnectedButton.highlighted = NO;
         self.connectButton.hidden = YES;
+        self.updateFirmwareButton.hidden = YES;
 
         self.tipStateButton.highlighted = NO;
         self.eraserStateButton.highlighted = NO;
@@ -188,6 +217,15 @@
 - (IBAction)pairButtonTouchDown:(id)sender
 {
     return [self pairButtonPressed:sender];
+}
+
+- (IBAction)updateFirmwareButtonTouchUpInside:(id)sender
+{
+    if ([self.penManager updateFirmwareForPen:self.penManager.pen])
+    {
+        self.firmwareUpdateProgressView = [FTFirmwareUpdateProgressView start];
+        self.firmwareUpdateProgressView.delegate = self;
+    }
 }
 
 - (IBAction)pairButtonTouchUpInside:(id)sender
