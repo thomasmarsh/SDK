@@ -82,7 +82,10 @@
 
 - (void)penManager:(FTPenManager *)penManager didUpdateState:(FTPenManagerState)state
 {
-    if (state == FTPenManagerStateConnecting)
+    NSLog(@"penManager didUpdateState: %d", state);
+
+    if (state == FTPenManagerStateConnecting ||
+        state == FTPenManagerStateReconnecting)
     {
         NSAssert(penManager.pen, @"pen is non-nil");
         penManager.pen.delegate = self;

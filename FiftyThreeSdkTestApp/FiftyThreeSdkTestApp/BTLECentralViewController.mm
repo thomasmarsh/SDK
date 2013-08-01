@@ -189,7 +189,8 @@ public:
     {
         _PenAndTouchManager->SetPalmRejectionEnabled(false);
     }
-    else if (penManager.state == FTPenManagerStateConnecting)
+    else if (penManager.state == FTPenManagerStateConnecting ||
+             penManager.state == FTPenManagerStateReconnecting)
     {
         NSAssert(penManager.pen, @"Pen is non-nil");
 
