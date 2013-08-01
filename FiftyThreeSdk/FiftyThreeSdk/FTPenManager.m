@@ -826,36 +826,15 @@ typedef enum
     return availableVersion > existingVersion;
 }
 
-- (BOOL)updateFirmwareForPen:(FTPen *)pen
+- (void)updateFirmwareForPen:(NSString *)firmwareImagePath;
 {
-    NSAssert(pen, nil);
+    NSAssert(firmwareImagePath, @"firmwareImagePath must be non-nil");
+    NSAssert(self.pen, @"pen must be non-nill");
 
-    FTFirmwareImageType imageType;
-//    if ([self isUpdateAvailableForPen:pen imageType:Factory])
-//    {
-//        imageType = Factory;
-//    }
-//    else if ([self isUpdateAvailableForPen:pen imageType:Upgrade])
-//    {
-        imageType = Upgrade;
-//    }
-//    else
-//    {
-//        return;
-//    }
+    self.updateManager = [[TIUpdateManager alloc] initWithPeripheral:self.pen.peripheral
+                                                            delegate:self]; // BUGBUG - ugly cast
 
-    NSString *filePath = [FTFirmwareManager filePathForModel:pen.modelNumber imageType:imageType];
-    
-    if (filePath)
-    {
-        self.updateManager = [[TIUpdateManager alloc] initWithPeripheral:pen.peripheral delegate:self]; // BUGBUG - ugly cast
-
-        [self.updateManager updateImage:filePath];
-        
-        return YES;
-    }
-
-    return NO;
+    [self.updateManager updateImage:firmwareImagePath];
 }
 
 #pragma mark - TIUpdateManagerDelegate

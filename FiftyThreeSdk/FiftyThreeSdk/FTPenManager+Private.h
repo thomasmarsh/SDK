@@ -20,7 +20,7 @@ typedef NS_ENUM(NSInteger, FTFirmwareImageType) {
 
 - (BOOL)isUpdateAvailableForPen:(FTPen *)pen;
 
-- (BOOL)updateFirmwareForPen:(FTPen *)pen;
+- (void)updateFirmwareForPen:(NSString *)firmwareImagePath;
 
 - (void)startTrialSeparation;
 

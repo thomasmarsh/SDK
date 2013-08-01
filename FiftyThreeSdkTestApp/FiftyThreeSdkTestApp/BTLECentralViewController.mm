@@ -21,6 +21,7 @@
 #import <MessageUI/MessageUI.h>
 
 #import "BTLECentralViewController.h"
+#import "FiftyThreeSdk/FTFirmwareManager.h"
 #import "FiftyThreeSdk/FTFirmwareUpdateProgressView.h"
 #import "FiftyThreeSdk/FTPenManager+Private.h"
 #import "FiftyThreeSdk/FTPenManager.h"
@@ -445,8 +446,11 @@ public:
 
 - (void)updateFirmware
 {
-    if ([self.penManager updateFirmwareForPen:self.penManager.pen])
+    NSString *firmwareImagePath = [FTFirmwareManager filePathForImageType:Upgrade];
+
+    if (firmwareImagePath)
     {
+        [self.penManager updateFirmwareForPen:firmwareImagePath];
         self.firmwareUpdateProgressView = [FTFirmwareUpdateProgressView start];
         self.firmwareUpdateProgressView.delegate = self;
     }

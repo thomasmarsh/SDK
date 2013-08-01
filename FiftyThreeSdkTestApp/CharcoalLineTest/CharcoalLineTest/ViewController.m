@@ -5,6 +5,7 @@
 //  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
 //
 
+#import "FiftyThreeSdk/FTFirmwareManager.h"
 #import "FiftyThreeSdk/FTFirmwareUpdateProgressView.h"
 #import "FiftyThreeSdk/FTPen+Private.h"
 #import "FiftyThreeSdk/FTPenManager+Private.h"
@@ -58,8 +59,11 @@
     {
         if (buttonIndex == 1)
         {
-            if ([self.penManager updateFirmwareForPen:self.penManager.pen])
+            NSString *firmwareImagePath = [self firmwareImagePath];
+
+            if (firmwareImagePath)
             {
+                [self.penManager updateFirmwareForPen:firmwareImagePath];
                 self.firmwareUpdateProgressView = [FTFirmwareUpdateProgressView start];
                 self.firmwareUpdateProgressView.delegate = self;
             }
@@ -235,17 +239,28 @@
     return [self pairButtonPressed:sender];
 }
 
+- (NSString *)firmwareImagePath
+{
+    return [FTFirmwareManager filePathForImageType:Upgrade];
+}
+
 - (IBAction)updateFirmwareButtonTouchUpInside:(id)sender
 {
     if (!self.firmwareUpdateConfirmAlertView &&
         !self.firmwareUpdateProgressView)
     {
-        self.firmwareUpdateConfirmAlertView = [[UIAlertView alloc] initWithTitle:@"Update Firmware"
-                                                                         message:@"Update firmware?"
-                                                                        delegate:self
-                                                               cancelButtonTitle:@"No"
-                                                               otherButtonTitles:@"Yes", nil];
-        [self.firmwareUpdateConfirmAlertView show];
+        NSString *firmwareUpdateImage = [self firmwareImagePath];
+        if (firmwareUpdateImage)
+        {
+            NSString *message = [NSString stringWithFormat:@"Update with the following image?\n\n%@",
+                                 [firmwareUpdateImage lastPathComponent]];
+            self.firmwareUpdateConfirmAlertView = [[UIAlertView alloc] initWithTitle:@"Update Firmware"
+                                                                             message:message
+                                                                            delegate:self
+                                                                   cancelButtonTitle:@"No"
+                                                                   otherButtonTitles:@"Yes", nil];
+            [self.firmwareUpdateConfirmAlertView show];
+        }
     }
 }
 
