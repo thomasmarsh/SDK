@@ -73,8 +73,8 @@
     }
     else if (alertView == self.firmwareUpdateProgressView)
     {
-        [self.penManager disconnect];
         self.firmwareUpdateProgressView = nil;
+        [self.penManager disconnect];
     }
 }
 
