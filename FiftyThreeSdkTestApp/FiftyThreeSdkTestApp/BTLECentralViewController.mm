@@ -21,6 +21,7 @@
 #import <MessageUI/MessageUI.h>
 
 #import "BTLECentralViewController.h"
+#import "FiftyThreeSdk/FTFirmwareUpdateProgressView.h"
 #import "FiftyThreeSdk/FTPenManager+Private.h"
 #import "FiftyThreeSdk/FTPenManager.h"
 #import "FTConnectLatencyTester.h"
@@ -33,8 +34,6 @@ using boost::dynamic_pointer_cast;
 using boost::shared_ptr;
 using boost::make_shared;
 using std::stringstream;
-
-NSString * const kUpdateProgressViewMessage = @"%.1f%% Complete\nTime Remaining: %02d:%02d";
 
 class TouchObserver;
 
@@ -55,7 +54,7 @@ class TouchObserver;
 
 @property (nonatomic) FTPenManager *penManager;
 @property (nonatomic) id currentTest;
-@property (nonatomic) UIAlertView *updateProgressView;
+@property (nonatomic) FTFirmwareUpdateProgressView *firmwareUpdateProgressView;
 @property (nonatomic) UIAlertView *updateStartView;
 @property (nonatomic) UIAlertView *clearAlertView;
 @property (nonatomic) NSDate *updateStart;
@@ -228,22 +227,15 @@ public:
 {
     NSLog(@"didFinishUpdate");
 
-    [self.updateProgressView dismissWithClickedButtonIndex:0 animated:NO];
-    self.updateProgressView = nil;
+    [self.firmwareUpdateProgressView dismiss];
+    self.firmwareUpdateProgressView = nil;
 }
 
 - (void)penManager:(FTPenManager *)manager didUpdatePercentComplete:(float)percent
 {
     NSLog(@"didUpdatePercentComplete %f", percent);
 
-    NSTimeInterval elapsed = -[self.updateStart timeIntervalSinceNow];
-    float totalTime = elapsed / (percent / 100.0);
-    float remainingTime = totalTime - (totalTime * percent / 100.0);
-    int minutes = (int)remainingTime / 60;
-    int seconds = (int)remainingTime % 60;
-
-    self.updateProgressView.message = [NSString stringWithFormat:kUpdateProgressViewMessage, percent, minutes, seconds];
-    [self.updateProgressView show];
+    self.firmwareUpdateProgressView.percentComplete = percent;
 }
 
 #pragma mark - FTPenDelegate
@@ -457,26 +449,27 @@ public:
 
 - (void)updateFirmware
 {
-    self.updateStart = [NSDate date];
-
-    self.updateProgressView = [[UIAlertView alloc] initWithTitle:@"Firmware Update" message:[NSString stringWithFormat:kUpdateProgressViewMessage, 0., 0, 0] delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:nil, nil];
-    [self.updateProgressView show];
+    self.firmwareUpdateProgressView = [FTFirmwareUpdateProgressView start];
 
     [self.penManager updateFirmwareForPen:self.penManager.pen];
 }
 
 - (void)didDetectMultitaskingGesturesEnabled
 {
-    UIAlertView* alertView = [[UIAlertView alloc] initWithTitle:@"Warning" message:@"Multitasking Gestures detected. For the best experience, turn them Off in the Settings app under General" delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
+    UIAlertView* alertView = [[UIAlertView alloc] initWithTitle:@"Warning"
+                                                        message:@"Multitasking Gestures detected. For the best experience, turn them Off in the Settings app under General"
+                                                       delegate:nil
+                                              cancelButtonTitle:@"Ok"
+                                              otherButtonTitles:nil];
     [alertView show];
 }
 
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
 {
-    if (alertView == self.updateProgressView)
+    if (alertView == self.firmwareUpdateProgressView)
     {
         [self.penManager disconnect];
-        self.updateProgressView = nil;
+        self.firmwareUpdateProgressView = nil;
     }
     else if (alertView == self.updateStartView)
     {
