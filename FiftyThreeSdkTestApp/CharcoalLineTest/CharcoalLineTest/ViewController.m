@@ -154,12 +154,13 @@
     FTPen *pen = self.penManager.pen;
 
     NSMutableString *deviceInfo = [NSMutableString string];
-    [deviceInfo appendFormat:@"manufacturer: %@\n", pen.manufacturerName];
-    [deviceInfo appendFormat:@"model number: %@\n", pen.modelNumber];
-    [deviceInfo appendFormat:@"serial number: %@\n", pen.serialNumber];
-    [deviceInfo appendFormat:@"firmware revision: %@\n", pen.firmwareRevision];
-    [deviceInfo appendFormat:@"hardware revision: %@\n", pen.hardwareRevision];
-    [deviceInfo appendFormat:@"software revision: %@\n", pen.softwareRevision];
+    [deviceInfo appendFormat:@"Manufacturer: %@\n", pen.manufacturerName];
+    [deviceInfo appendFormat:@"SKU: %@\n", pen.modelNumber];
+    [deviceInfo appendFormat:@"Serial Number: %@\n", pen.serialNumber];
+    [deviceInfo appendFormat:@"Hardware Rev: %@\n", pen.hardwareRevision];
+    [deviceInfo appendFormat:@"Factory Firmware Rev: %@\n", pen.firmwareRevision];
+    [deviceInfo appendFormat:@"Upgrade Firmware Rev: %@\n", pen.softwareRevision];
+    [deviceInfo appendFormat:@"* currently running\n"];
 
     self.deviceInfoLabel.text = deviceInfo;
 }
