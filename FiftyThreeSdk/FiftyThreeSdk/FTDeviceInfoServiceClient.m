@@ -136,12 +136,14 @@
                  [characteristic.UUID isEqual:[FTDeviceInfoServiceUUIDs modelNumber]])
         {
             self.modelNumberCharateristic = characteristic;
+            [self.peripheral setNotifyValue:YES forCharacteristic:characteristic];
             [peripheral readValueForCharacteristic:characteristic];
         }
         else if (!self.serialNumberCharateristic &&
                  [characteristic.UUID isEqual:[FTDeviceInfoServiceUUIDs serialNumber]])
         {
             self.serialNumberCharateristic = characteristic;
+            [self.peripheral setNotifyValue:YES forCharacteristic:characteristic];
             [peripheral readValueForCharacteristic:characteristic];
         }
         else if (!self.firmwareRevisionCharateristic &&
