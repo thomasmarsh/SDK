@@ -5,10 +5,10 @@
 //  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
 //
 
-#import "FiftyThreeSdk/FTPen+Private.h"
-#import "FiftyThreeSdk/FTPenManager.h"
-#import "FiftyThreeSdk/FTPenManager+Private.h"
 #import "FiftyThreeSdk/FTFirmwareUpdateProgressView.h"
+#import "FiftyThreeSdk/FTPen+Private.h"
+#import "FiftyThreeSdk/FTPenManager+Private.h"
+#import "FiftyThreeSdk/FTPenManager.h"
 #import "RscMgr.h"
 #import "ViewController.h"
 
@@ -195,6 +195,8 @@
 
         self.tipStateButton.highlighted = NO;
         self.eraserStateButton.highlighted = NO;
+
+        self.deviceInfoLabel.text = @"";
     }
 
     [self.pcConnectedButton setHighlighted:self.pcConnected];
