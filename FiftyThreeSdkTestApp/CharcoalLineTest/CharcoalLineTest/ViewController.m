@@ -92,6 +92,18 @@
         penManager.pen.privateDelegate = self;
     }
 
+    if (self.firmwareUpdateProgressView)
+    {
+        [self.firmwareUpdateProgressView dismiss];
+        self.firmwareUpdateProgressView = nil;
+
+        [[[UIAlertView alloc] initWithTitle:@"Update Failed"
+                                    message:@"Firmware update failed. Please retry."
+                                   delegate:nil
+                          cancelButtonTitle:@"OK"
+                          otherButtonTitles:nil] show];
+    }
+
     [self updateDisplay];
 }
 

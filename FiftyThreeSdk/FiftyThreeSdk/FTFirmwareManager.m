@@ -58,7 +58,7 @@ NSString *applicationDocumentsDirectory()
             else
             {
                 // TODO: This error should be reported to caller, not shown in an alert view.
-                [[[UIAlertView alloc] initWithTitle:@"Multiple images found"
+                [[[UIAlertView alloc] initWithTitle:@"Multiple Images Found"
                                             message:@"Only one firmware image may be present in the iTunes Documents directory." delegate:nil
                                   cancelButtonTitle:@"OK"
                                   otherButtonTitles:nil, nil] show];
@@ -72,7 +72,7 @@ NSString *applicationDocumentsDirectory()
     {
         // TODO: This error should be reported to caller, not shown in an alert view.
 
-        [[[UIAlertView alloc] initWithTitle:@"No image found"
+        [[[UIAlertView alloc] initWithTitle:@"No Image Found"
                                     message:@"No firmware image was found in the iTunes Documents directory."
                                    delegate:nil
                           cancelButtonTitle:@"OK"
