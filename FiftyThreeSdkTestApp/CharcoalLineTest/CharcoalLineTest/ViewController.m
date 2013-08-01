@@ -16,6 +16,7 @@
 
 @property (nonatomic) RscMgr *rscManager;
 @property (nonatomic) FTPenManager *penManager;
+@property (nonatomic) UIAlertView *firmwareUpdateConfirmAlertView;
 @property (nonatomic) FTFirmwareUpdateProgressView *firmwareUpdateProgressView;
 @property (nonatomic) BOOL pairing;
 @property (nonatomic) BOOL pcConnected;
@@ -53,7 +54,20 @@
 
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
 {
-    if (alertView == self.firmwareUpdateProgressView)
+    if (alertView == self.firmwareUpdateConfirmAlertView)
+    {
+        if (buttonIndex == 1)
+        {
+            if ([self.penManager updateFirmwareForPen:self.penManager.pen])
+            {
+                self.firmwareUpdateProgressView = [FTFirmwareUpdateProgressView start];
+                self.firmwareUpdateProgressView.delegate = self;
+            }
+        }
+
+        self.firmwareUpdateConfirmAlertView = nil;
+    }
+    else if (alertView == self.firmwareUpdateProgressView)
     {
         [self.penManager disconnect];
         self.firmwareUpdateProgressView = nil;
@@ -223,10 +237,15 @@
 
 - (IBAction)updateFirmwareButtonTouchUpInside:(id)sender
 {
-    if ([self.penManager updateFirmwareForPen:self.penManager.pen])
+    if (!self.firmwareUpdateConfirmAlertView &&
+        !self.firmwareUpdateProgressView)
     {
-        self.firmwareUpdateProgressView = [FTFirmwareUpdateProgressView start];
-        self.firmwareUpdateProgressView.delegate = self;
+        self.firmwareUpdateConfirmAlertView = [[UIAlertView alloc] initWithTitle:@"Update Firmware"
+                                                                         message:@"Update firmware?"
+                                                                        delegate:self
+                                                               cancelButtonTitle:@"No"
+                                                               otherButtonTitles:@"Yes", nil];
+        [self.firmwareUpdateConfirmAlertView show];
     }
 }
 
