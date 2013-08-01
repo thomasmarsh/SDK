@@ -39,21 +39,23 @@ NSString *applicationDocumentsDirectory()
 
 + (NSString *)filePathForModel:(NSString *)model imageType:(FTFirmwareImageType)imageType
 {
-    model = [model lowercaseString];
-
-    // map model to image name
-    NSDictionary* modelMap = @{
-                               @"es1" : @"charcoal",
+//    model = [model lowercaseString];
+//
+//    // map model to image name
+//    NSDictionary* modelMap = @{
+//                               @"es1" : @"charcoal",
 //                               @"es2" : @"charcoal",
-                               @"es3" : @"charcoal",
+//                               @"es3" : @"charcoal",
 //                               @"charcoal" : @"charcoal"
-                               };
+//                               };
+//
+//    NSString *imagePrefix = [modelMap valueForKey:model];
+//    if (!imagePrefix)
+//    {
+//        return nil;
+//    }
 
-    NSString *imagePrefix = [modelMap valueForKey:model];
-    if (!imagePrefix)
-    {
-        return nil;
-    }
+    NSString *imagePrefix = @"charcoal";
 
     if (imageType == Factory)
     {
