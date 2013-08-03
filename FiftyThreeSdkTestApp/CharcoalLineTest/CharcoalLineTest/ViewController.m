@@ -164,6 +164,17 @@
 - (void)didUpdateDeviceInfo
 {
     FTPen *pen = self.penManager.pen;
+    int   onTimeSec, onTimeHourField, onTimeMinField, onTimeSecField;
+    uint  lastErrorID;
+    int   lastErrorValue;
+    
+    onTimeSec  = 0; // pen.totalOnTimeSec;
+    onTimeHourField = onTimeSec / 60 / 60;
+    onTimeMinField  = (onTimeSec - (onTimeHourField * 60 * 60)) / 60;
+    onTimeSecField  = onTimeSec - (onTimeHourField * 60 * 60) - (onTimeMinField *60);
+    
+    lastErrorID    = 0; // pen.lastErrorCode[0];
+    lastErrorValue = 0; // pen.lastErrorCode[1];
 
     NSMutableString *deviceInfo = [NSMutableString string];
     [deviceInfo appendFormat:@"Manufacturer: %@\n", pen.manufacturerName];
@@ -172,7 +183,14 @@
     [deviceInfo appendFormat:@"Hardware Rev: %@\n", pen.hardwareRevision];
     [deviceInfo appendFormat:@"Factory Firmware Rev: %@\n", pen.firmwareRevision];
     [deviceInfo appendFormat:@"Upgrade Firmware Rev: %@\n", pen.softwareRevision];
-    [deviceInfo appendFormat:@"* currently running\n"];
+    [deviceInfo appendFormat:@"    * currently running\n\n"];
+    [deviceInfo appendFormat:@"Tip Presses: %d\n", 0]; // pen.numTipPresses];
+    [deviceInfo appendFormat:@"Eraser Presses: %d\n", 0]; // pen.numEraserPresses];
+    [deviceInfo appendFormat:@"Failed Connections: %d\n", 0]; // pen.numFailedConnections];
+    [deviceInfo appendFormat:@"Successful Connections: %d\n", 0]; // pen.numSuccessfulConnections];
+    [deviceInfo appendFormat:@"Total On Time: %d:%02d:%02d\n\n", onTimeHourField, onTimeMinField,  onTimeSecField];
+    [deviceInfo appendFormat:@"Last Error ID: %03u\n", lastErrorID];
+    [deviceInfo appendFormat:@"Last Error Value: %d\n", lastErrorValue];
 
     self.deviceInfoLabel.text = deviceInfo;
 }
