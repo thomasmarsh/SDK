@@ -71,6 +71,8 @@
         if (data.length == sizeof(FTPenLastErrorCode))
         {
             memccpy(&lastErrorCode, data.bytes, 0, sizeof(lastErrorCode));
+            lastErrorCode.lastErrorID = CFSwapInt32LittleToHost(lastErrorCode.lastErrorID);
+            lastErrorCode.lastErrorValue = CFSwapInt32LittleToHost(lastErrorCode.lastErrorValue);
         }
     }
 
