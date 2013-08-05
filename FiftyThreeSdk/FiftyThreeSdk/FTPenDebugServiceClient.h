@@ -7,6 +7,7 @@
 
 #pragma once
 
+#import "FTPen+Private.h"
 #import "FTServiceClient.h"
 
 @protocol FTPenDebugServiceClientDelegate <NSObject>
@@ -14,12 +15,16 @@
 - (void)didWriteManufacturingID;
 - (void)didFailToWriteManufacturingID;
 - (void)didReadManufacturingID:(NSString *)manufacturingID;
+- (void)didUpdateDebugProperties;
 
 @end
 
 @interface FTPenDebugServiceClient : FTServiceClient
 
 @property (nonatomic, weak) id<FTPenDebugServiceClientDelegate> delegate;
+
+// Debug Properties
+@property (nonatomic) FTPenLastErrorCode lastErrorCode;
 
 - (id)initWithPeripheral:(CBPeripheral *)peripheral;
 

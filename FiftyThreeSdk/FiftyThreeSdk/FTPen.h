@@ -30,6 +30,7 @@ extern NSString * const kFTPenIsEraserPressedDidChangeNotificationName;
 
 @property (nonatomic, readonly) BOOL isReady;
 
+// Device Info
 @property (nonatomic, readonly) NSString *name;
 @property (nonatomic, readonly) NSString *manufacturerName;
 @property (nonatomic, readonly) NSString *modelNumber;

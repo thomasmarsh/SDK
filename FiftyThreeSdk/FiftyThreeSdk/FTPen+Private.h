@@ -9,6 +9,12 @@
 
 #import "FTPen.h"
 
+typedef struct FTPenLastErrorCode
+{
+    int lastErrorID;
+    int lastErrorValue;
+} FTPenLastErrorCode;
+
 @class CBCentralManager;
 @class CBPeripheral;
 
@@ -18,6 +24,7 @@
 - (void)didFailToWriteManufacturingID;
 - (void)didReadManufacturingID:(NSString *)manufacturingID;
 - (void)didUpdateDeviceInfo;
+- (void)didUpdateDebugProperties;
 
 @end
 
@@ -27,6 +34,9 @@
 @property (nonatomic, readonly) CBPeripheral *peripheral;
 @property (nonatomic, readonly) BOOL isPoweringOff;
 @property (nonatomic) BOOL requiresTipBePressedToBecomeReady;
+
+// Debug Properties
+@property (nonatomic) FTPenLastErrorCode lastErrorCode;
 
 - (id)initWithCentralManager:(CBCentralManager *)centralManager
                   peripheral:(CBPeripheral *)peripheral;

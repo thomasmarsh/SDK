@@ -59,6 +59,35 @@
     }
 }
 
+- (FTPenLastErrorCode)lastErrorCode
+{
+    FTPenLastErrorCode lastErrorCode;
+    lastErrorCode.lastErrorID = 0;
+    lastErrorCode.lastErrorValue = 0;
+
+    if (self.lastErrorCodeCharacteristic)
+    {
+        NSData *data = self.lastErrorCodeCharacteristic.value;
+        if (data.length == sizeof(FTPenLastErrorCode))
+        {
+            memccpy(&lastErrorCode, data.bytes, 0, sizeof(lastErrorCode));
+        }
+    }
+
+    return lastErrorCode;
+}
+
+- (void)setLastErrorCode:(FTPenLastErrorCode)lastErrorCode
+{
+    if (self.lastErrorCodeCharacteristic)
+    {
+        NSData *data = [NSData dataWithBytes:&lastErrorCode length:sizeof(lastErrorCode)];
+        [self.peripheral writeValue:data
+                  forCharacteristic:self.lastErrorCodeCharacteristic
+                               type:CBCharacteristicWriteWithResponse];
+    }
+}
+
 #pragma mark - FTServiceClient
 
 - (NSArray *)peripheral:(CBPeripheral *)peripheral isConnectedDidChange:(BOOL)isConnected
@@ -164,6 +193,7 @@
                  [characteristic.UUID isEqual:[FTPenDebugServiceUUIDs lastErrorCode]])
         {
             self.lastErrorCodeCharacteristic = characteristic;
+            [peripheral readValueForCharacteristic:characteristic];
         }
     }
 }
@@ -187,6 +217,10 @@
     {
         NSString *manufacturingID = [[NSString alloc] initWithData:characteristic.value encoding:NSASCIIStringEncoding];
         [self.delegate didReadManufacturingID:manufacturingID];
+    }
+    else if ([characteristic.UUID isEqual:[FTPenDebugServiceUUIDs lastErrorCode]])
+    {
+        [self.delegate didUpdateDebugProperties];
     }
 }
 

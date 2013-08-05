@@ -77,6 +77,16 @@ NSString * const kFTPenIsEraserPressedDidChangeNotificationName = @"com.fiftythr
 
 #pragma mark - Properties
 
+- (FTPenLastErrorCode)lastErrorCode
+{
+    return self.penDebugServiceClient.lastErrorCode;
+}
+
+- (void)setLastErrorCode:(FTPenLastErrorCode)lastErrorCode
+{
+    self.penDebugServiceClient.lastErrorCode = lastErrorCode;
+}
+
 - (BOOL)isReady
 {
     return self.penServiceClient.isReady;
@@ -213,6 +223,11 @@ NSString * const kFTPenIsEraserPressedDidChangeNotificationName = @"com.fiftythr
 - (void)didReadManufacturingID:(NSString *)manufacturingID
 {
     [self.privateDelegate didReadManufacturingID:manufacturingID];
+}
+
+- (void)didUpdateDebugProperties
+{
+    [self.privateDelegate didUpdateDebugProperties];
 }
 
 #pragma mark - FTDeviceInfoServiceClientDelegate

@@ -163,16 +163,26 @@
 
 - (void)didUpdateDeviceInfo
 {
+    [self updateDeviceInfoLabel];
+}
+
+- (void)didUpdateDebugProperties
+{
+    [self updateDeviceInfoLabel];
+}
+
+- (void)updateDeviceInfoLabel
+{
     FTPen *pen = self.penManager.pen;
     int   onTimeSec, onTimeHourField, onTimeMinField, onTimeSecField;
     uint  lastErrorID;
     int   lastErrorValue;
-    
+
     onTimeSec  = 0; // pen.totalOnTimeSec;
     onTimeHourField = onTimeSec / 60 / 60;
     onTimeMinField  = (onTimeSec - (onTimeHourField * 60 * 60)) / 60;
     onTimeSecField  = onTimeSec - (onTimeHourField * 60 * 60) - (onTimeMinField *60);
-    
+
     lastErrorID    = 0; // pen.lastErrorCode[0];
     lastErrorValue = 0; // pen.lastErrorCode[1];
 
