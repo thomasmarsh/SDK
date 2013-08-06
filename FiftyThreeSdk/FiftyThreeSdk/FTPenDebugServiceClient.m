@@ -70,23 +70,25 @@
         NSData *data = self.lastErrorCodeCharacteristic.value;
         if (data.length == sizeof(FTPenLastErrorCode))
         {
-            memccpy(&lastErrorCode, data.bytes, 0, sizeof(lastErrorCode));
-            lastErrorCode.lastErrorID = CFSwapInt32LittleToHost(lastErrorCode.lastErrorID);
-            lastErrorCode.lastErrorValue = CFSwapInt32LittleToHost(lastErrorCode.lastErrorValue);
+            lastErrorCode.lastErrorID = CFSwapInt32LittleToHost(*((uint32_t *)&data.bytes[0]));
+            lastErrorCode.lastErrorValue = CFSwapInt32LittleToHost(*((uint32_t *)&data.bytes[4]));
         }
     }
 
     return lastErrorCode;
 }
 
-- (void)setLastErrorCode:(FTPenLastErrorCode)lastErrorCode
+- (void)clearLastErrorCode
 {
     if (self.lastErrorCodeCharacteristic)
     {
-        NSData *data = [NSData dataWithBytes:&lastErrorCode length:sizeof(lastErrorCode)];
+        uint32_t value[2] = { 0, 0 };
+        NSData *data = [NSData dataWithBytes:&value length:sizeof(value)];
         [self.peripheral writeValue:data
                   forCharacteristic:self.lastErrorCodeCharacteristic
                                type:CBCharacteristicWriteWithResponse];
+
+        [self.peripheral readValueForCharacteristic:self.lastErrorCodeCharacteristic];
     }
 }
 

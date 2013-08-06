@@ -24,11 +24,13 @@
 @property (nonatomic, weak) id<FTPenDebugServiceClientDelegate> delegate;
 
 // Debug Properties
-@property (nonatomic) FTPenLastErrorCode lastErrorCode;
+@property (nonatomic, readonly) FTPenLastErrorCode lastErrorCode;
 
 - (id)initWithPeripheral:(CBPeripheral *)peripheral;
 
 - (void)getManufacturingID;
 - (void)setManufacturingID:(NSString *)manufacturingID;
+
+- (void)clearLastErrorCode;
 
 @end

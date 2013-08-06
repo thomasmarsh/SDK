@@ -36,7 +36,7 @@ typedef struct FTPenLastErrorCode
 @property (nonatomic) BOOL requiresTipBePressedToBecomeReady;
 
 // Debug Properties
-@property (nonatomic) FTPenLastErrorCode lastErrorCode;
+@property (nonatomic, readonly) FTPenLastErrorCode lastErrorCode;
 
 - (id)initWithCentralManager:(CBCentralManager *)centralManager
                   peripheral:(CBPeripheral *)peripheral;
@@ -53,5 +53,7 @@ typedef struct FTPenLastErrorCode
 // Sets the Manufacturing ID, which is the combination of the SKU and SN. This is to be used only in the
 // manufacturing process, and may only be called once.
 - (void)setManufacturingID:(NSString *)manufacturingID;
+
+- (void)clearLastErrorCode;
 
 @end

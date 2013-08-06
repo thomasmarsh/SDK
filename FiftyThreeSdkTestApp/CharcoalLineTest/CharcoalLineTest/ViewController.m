@@ -175,16 +175,11 @@
 {
     FTPen *pen = self.penManager.pen;
     int   onTimeSec, onTimeHourField, onTimeMinField, onTimeSecField;
-    uint  lastErrorID;
-    int   lastErrorValue;
 
     onTimeSec  = 0; // pen.totalOnTimeSec;
     onTimeHourField = onTimeSec / 60 / 60;
     onTimeMinField  = (onTimeSec - (onTimeHourField * 60 * 60)) / 60;
     onTimeSecField  = onTimeSec - (onTimeHourField * 60 * 60) - (onTimeMinField *60);
-
-    lastErrorID    = 0; // pen.lastErrorCode[0];
-    lastErrorValue = 0; // pen.lastErrorCode[1];
 
     NSMutableString *deviceInfo = [NSMutableString string];
     [deviceInfo appendFormat:@"Manufacturer: %@\n", pen.manufacturerName];
@@ -199,8 +194,17 @@
     [deviceInfo appendFormat:@"Failed Connections: %d\n", 0]; // pen.numFailedConnections];
     [deviceInfo appendFormat:@"Successful Connections: %d\n", 0]; // pen.numSuccessfulConnections];
     [deviceInfo appendFormat:@"Total On Time: %d:%02d:%02d\n\n", onTimeHourField, onTimeMinField,  onTimeSecField];
-    [deviceInfo appendFormat:@"Last Error ID: %03u\n", lastErrorID];
-    [deviceInfo appendFormat:@"Last Error Value: %d\n", lastErrorValue];
+    [deviceInfo appendFormat:@"Last Error ID: %d\n", pen.lastErrorCode.lastErrorID];
+    [deviceInfo appendFormat:@"Last Error Value: %d\n", pen.lastErrorCode.lastErrorValue];
+
+    if (self.penManager.pen.lastErrorCode.lastErrorID != 0)
+    {
+        self.clearLastErrorButton.hidden = NO;
+    }
+    else
+    {
+        self.clearLastErrorButton.hidden = YES;
+    }
 
     self.deviceInfoLabel.text = deviceInfo;
 }
@@ -254,6 +258,7 @@
         self.penConnectedButton.highlighted = NO;
         self.connectButton.hidden = YES;
         self.updateFirmwareButton.hidden = YES;
+        self.clearLastErrorButton.hidden = YES;
 
         self.tipStateButton.highlighted = NO;
         self.eraserStateButton.highlighted = NO;
@@ -306,6 +311,11 @@
             [self.firmwareUpdateConfirmAlertView show];
         }
     }
+}
+
+- (IBAction)clearLastErrorButtonTouchUpInside:(id)sender
+{
+    [self.penManager.pen clearLastErrorCode];
 }
 
 - (IBAction)pairButtonTouchUpInside:(id)sender

@@ -34,4 +34,7 @@
 @property (nonatomic, readonly) NSData *IEEECertificationData;
 @property (nonatomic, readonly) PnPID PnPID;
 
+- (id)initWithPeripheral:(CBPeripheral *)peripheral;
+- (void)refreshModelNumberAndSerialNumber;
+
 @end

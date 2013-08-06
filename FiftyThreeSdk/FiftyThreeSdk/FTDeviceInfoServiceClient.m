@@ -32,6 +32,16 @@
 
 @implementation FTDeviceInfoServiceClient
 
+- (id)initWithPeripheral:(CBPeripheral *)peripheral
+{
+    self = [super init];
+    if (self)
+    {
+        _peripheral = peripheral;
+    }
+    return self;
+}
+
 #pragma mark - Properties
 
 - (void)setManufacturerName:(NSString *)manufacturerName
@@ -136,14 +146,12 @@
                  [characteristic.UUID isEqual:[FTDeviceInfoServiceUUIDs modelNumber]])
         {
             self.modelNumberCharateristic = characteristic;
-            [self.peripheral setNotifyValue:YES forCharacteristic:characteristic];
             [peripheral readValueForCharacteristic:characteristic];
         }
         else if (!self.serialNumberCharateristic &&
                  [characteristic.UUID isEqual:[FTDeviceInfoServiceUUIDs serialNumber]])
         {
             self.serialNumberCharateristic = characteristic;
-            [self.peripheral setNotifyValue:YES forCharacteristic:characteristic];
             [peripheral readValueForCharacteristic:characteristic];
         }
         else if (!self.firmwareRevisionCharateristic &&
@@ -254,6 +262,21 @@
     if (updatedCharacteristic)
     {
         [self.delegate deviceInfoServiceClientDidUpdateDeviceInfo:self];
+    }
+}
+
+#pragma mark -
+
+- (void)refreshModelNumberAndSerialNumber
+{
+    if (self.modelNumberCharateristic)
+    {
+        [self.peripheral readValueForCharacteristic:self.modelNumberCharateristic];
+    }
+
+    if (self.serialNumberCharateristic)
+    {
+        [self.peripheral readValueForCharacteristic:self.serialNumberCharateristic];
     }
 }
 

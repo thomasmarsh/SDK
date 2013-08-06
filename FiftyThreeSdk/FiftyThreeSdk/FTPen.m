@@ -67,7 +67,7 @@ NSString * const kFTPenIsEraserPressedDidChangeNotificationName = @"com.fiftythr
 #endif
 
         // Device Info Service client
-        _deviceInfoServiceClient = [[FTDeviceInfoServiceClient alloc] init];
+        _deviceInfoServiceClient = [[FTDeviceInfoServiceClient alloc] initWithPeripheral:_peripheral];
         _deviceInfoServiceClient.delegate = self;
         [_peripheralDelegate addServiceClient:_deviceInfoServiceClient];
     }
@@ -82,9 +82,9 @@ NSString * const kFTPenIsEraserPressedDidChangeNotificationName = @"com.fiftythr
     return self.penDebugServiceClient.lastErrorCode;
 }
 
-- (void)setLastErrorCode:(FTPenLastErrorCode)lastErrorCode
+- (void)clearLastErrorCode
 {
-    self.penDebugServiceClient.lastErrorCode = lastErrorCode;
+    [self.penDebugServiceClient clearLastErrorCode];
 }
 
 - (BOOL)isReady
@@ -140,6 +140,11 @@ NSString * const kFTPenIsEraserPressedDidChangeNotificationName = @"com.fiftythr
 - (void)setManufacturingID:(NSString *)manufacturingID
 {
     [self.penDebugServiceClient setManufacturingID:manufacturingID];
+
+    // The model number and serial number charateristics of the device info
+    // service change as a result of setting the manufacturing ID, so refresh
+    // them now.
+    [self.deviceInfoServiceClient refreshModelNumberAndSerialNumber];
 }
 
 #pragma mark -

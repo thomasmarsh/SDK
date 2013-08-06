@@ -21,6 +21,7 @@
 @property (weak, nonatomic) IBOutlet UIButton *updateFirmwareButton;
 @property (weak, nonatomic) IBOutlet UIButton *touchButton;
 @property (weak, nonatomic) IBOutlet UILabel *deviceInfoLabel;
+@property (weak, nonatomic) IBOutlet UIButton *clearLastErrorButton;
 
 - (IBAction)pairButtonTouchUpInside:(id)sender;
 - (IBAction)pairButtonTouchUpOutside:(id)sender;
@@ -28,5 +29,6 @@
 - (IBAction)infoButtonPressed:(id)sender;
 - (IBAction)connectButtonPressed:(id)sender;
 - (IBAction)updateFirmwareButtonTouchUpInside:(id)sender;
+- (IBAction)clearLastErrorButtonTouchUpInside:(id)sender;
 
 @end
