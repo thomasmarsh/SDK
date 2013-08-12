@@ -18,14 +18,14 @@
 // 4FB6FE50-39D9-4B12-A523-8DC8857542E6
 #define FT_PEN_SERVICE_IS_ERASER_PRESSED_UUID CFUUIDGetConstantUUIDWithBytes(kCFAllocatorSystemDefault, 0x4F, 0xB6, 0xFE, 0x50, 0x39, 0xD9, 0x4B, 0x12, 0xA5, 0x23, 0x8D, 0xC8, 0x85, 0x75, 0x42, 0xE6)
 
+// 1A59BBBD-8205-4699-9B07-F477A0510C67
+#define FT_PEN_SERVICE_BATTERY_LEVEL_UUID CFUUIDGetConstantUUIDWithBytes(kCFAllocatorSystemDefault, 0x1A, 0x59, 0xBB, 0xBD, 0x82, 0x05, 0x46, 0x99, 0x9B, 0x07, 0xF4, 0x77, 0xA0, 0x51, 0x0C, 0x67)
+
 // 9B772BAB-97A0-4C1F-9644-1B4F9530AA35
 #define FT_PEN_SERVICE_SHOULD_SWING_UUID CFUUIDGetConstantUUIDWithBytes(kCFAllocatorSystemDefault, 0x9B, 0x77, 0x2B, 0xAB, 0x97, 0xA0, 0x4C, 0x1F, 0x96, 0x44, 0x1B, 0x4F, 0x95, 0x30, 0xAA, 0x35)
 
 // FC2FE4B4-BB68-4A9E-A999-373BAA29C809
 #define FT_PEN_SERVICE_SHOULD_POWER_OFF_UUID CFUUIDGetConstantUUIDWithBytes(kCFAllocatorSystemDefault, 0xFC, 0x2F, 0xE4, 0xB4, 0xBB, 0x68, 0x4A, 0x9E, 0xA9, 0x99, 0x37, 0x3B, 0xAA, 0x29, 0xC8, 0x09)
-
-// 34B8CD0F-D0A8-4589-8602-FB3EE4F5030C
-#define FT_PEN_SERVICE_BATTERY_VOLTAGE_UUID CFUUIDGetConstantUUIDWithBytes(kCFAllocatorSystemDefault, 0x34, 0xB8, 0xCD, 0x0F, 0xD0, 0xA8, 0x45, 0x89, 0x86, 0x02, 0xFB, 0x3E, 0xE4, 0xF5, 0x03, 0x0C)
 
 // 80F47BEF-58EF-4C75-9F08-7453BA896DA5
 #define FT_PEN_SERVICE_INACTIVITY_TIME_UUID CFUUIDGetConstantUUIDWithBytes(kCFAllocatorSystemDefault, 0x80, 0xF4, 0x7B, 0xEF, 0x58, 0xEF, 0x4C, 0x75, 0x9F, 0x08, 0x74, 0x53, 0xBA, 0x89, 0x6D, 0xA5)
@@ -50,6 +50,11 @@
 //    return [CBUUID UUIDWithString:@"FFF1"];
 }
 
++ (CBUUID *)batteryLevel
+{
+    return [CBUUID UUIDWithCFUUID:FT_PEN_SERVICE_BATTERY_LEVEL_UUID];
+}
+
 + (CBUUID *)shouldSwing
 {
     return [CBUUID UUIDWithCFUUID:FT_PEN_SERVICE_SHOULD_SWING_UUID];
@@ -58,11 +63,6 @@
 + (CBUUID *)shouldPowerOff
 {
     return [CBUUID UUIDWithCFUUID:FT_PEN_SERVICE_SHOULD_POWER_OFF_UUID];
-}
-
-+ (CBUUID *)batteryVoltage
-{
-    return [CBUUID UUIDWithCFUUID:FT_PEN_SERVICE_BATTERY_VOLTAGE_UUID];
 }
 
 + (CBUUID *)inactivityTime
@@ -75,9 +75,9 @@
     NSDictionary *UUIDs = @{ [FTPenServiceUUIDs penService] : @"PenService",
                              [FTPenServiceUUIDs isTipPressed] : @"IsTipPressed",
                              [FTPenServiceUUIDs isEraserPressed] : @"IsEraserPressed",
+                             [FTPenServiceUUIDs batteryLevel] : @"BatteryLevel",
                              [FTPenServiceUUIDs shouldSwing] : @"ShouldSwing",
                              [FTPenServiceUUIDs shouldPowerOff] : @"ShouldPowerOff",
-                             [FTPenServiceUUIDs batteryVoltage] : @"BatteryVoltage",
                              [FTPenServiceUUIDs inactivityTime] : @"InactivityTime"
                              };
     return [UUIDs objectForKey:UUID];

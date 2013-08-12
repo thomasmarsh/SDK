@@ -144,6 +144,11 @@
     [self sendCharacter:isEraserPressed ? 'B' : 'b'];
 }
 
+- (void)pen:(FTPen *)pen batteryLevelDidChange:(NSInteger)batteryLevel
+{
+    [self updateDeviceInfoLabel];
+}
+
 #pragma mark - FTPenPrivateDelegate
 
 - (void)didWriteManufacturingID
@@ -189,6 +194,7 @@
     [deviceInfo appendFormat:@"Factory Firmware Rev: %@\n", pen.firmwareRevision];
     [deviceInfo appendFormat:@"Upgrade Firmware Rev: %@\n", pen.softwareRevision];
     [deviceInfo appendFormat:@"    * currently running\n\n"];
+    [deviceInfo appendFormat:@"Battery Level: %d%%\n", pen.batteryLevel];
     [deviceInfo appendFormat:@"Tip Presses: %d\n", 0]; // pen.numTipPresses];
     [deviceInfo appendFormat:@"Eraser Presses: %d\n", 0]; // pen.numEraserPresses];
     [deviceInfo appendFormat:@"Failed Connections: %d\n", 0]; // pen.numFailedConnections];
@@ -435,7 +441,7 @@
     [self parseCommandBuffer];
 }
 
-#pragma mark -
+#pragma mark - Serial Connection Commands
 
 - (void)parseCommandBuffer
 {
@@ -474,6 +480,7 @@
     {
         NSString * const kSetIdCommandPrefix = @"set id ";
         NSString * const kGetIdCommand = @"get id";
+        NSString * const kGetBatteryLevelCommand = @"get battery";
         static const int kIdLength = 15;
 
         if ([command hasPrefix:kSetIdCommandPrefix])
@@ -504,6 +511,12 @@
             {
                 [self.penManager.pen getManufacturingID];
             }
+        }
+        else if ([command isEqualToString:kGetBatteryLevelCommand])
+        {
+            NSString *result = [NSString stringWithFormat:@"Battery level: %d%%",
+                                self.penManager.pen.batteryLevel];
+            [self sendString:result];
         }
         else
         {

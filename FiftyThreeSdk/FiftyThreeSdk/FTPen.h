@@ -45,6 +45,7 @@ extern NSString * const kFTPenIsEraserPressedDidChangeNotificationName;
 @property (nonatomic, readonly) BOOL isTipPressed;
 @property (nonatomic, readonly) BOOL isEraserPressed;
 @property (nonatomic, readonly) NSDate *lastTipReleaseTime;
+@property (nonatomic, readonly) NSInteger batteryLevel;
 
 @end
 
@@ -53,5 +54,6 @@ extern NSString * const kFTPenIsEraserPressedDidChangeNotificationName;
 - (void)pen:(FTPen *)pen isReadyDidChange:(BOOL)isReady;
 - (void)pen:(FTPen *)pen isTipPressedDidChange:(BOOL)isTipPressed;
 - (void)pen:(FTPen *)pen isEraserPressedDidChange:(BOOL)isEraserPressed;
+- (void)pen:(FTPen *)pen batteryLevelDidChange:(NSInteger)batteryLevel;
 
 @end

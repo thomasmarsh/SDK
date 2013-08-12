@@ -14,9 +14,9 @@
 + (CBUUID *)penService;
 + (CBUUID *)isTipPressed;
 + (CBUUID *)isEraserPressed;
++ (CBUUID *)batteryLevel;
 + (CBUUID *)shouldSwing;
 + (CBUUID *)shouldPowerOff;
-+ (CBUUID *)batteryVoltage;
 + (CBUUID *)inactivityTime;
 
 + (NSString *)nameForUUID:(CBUUID *)UUID;

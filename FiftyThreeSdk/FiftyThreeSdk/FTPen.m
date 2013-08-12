@@ -19,6 +19,7 @@ NSString * const kFTPenDidEncounterErrorNotificationName = @"com.fiftythree.pen.
 NSString * const kFTPenIsReadyDidChangeNotificationName = @"com.fiftythree.pen.isReadyDidChange";
 NSString * const kFTPenIsTipPressedDidChangeNotificationName = @"com.fiftythree.pen.isTipPressedDidChange";
 NSString * const kFTPenIsEraserPressedDidChangeNotificationName = @"com.fiftythree.pen.isEraserPressedDidChange";
+NSString * const kFTPenBatteryLevelDidChangeNotificationName = @"com.fiftythree.pen.batteryLevelDidChange";
 
 @interface FTPen () <FTPenServiceClientDelegate, FTPenDebugServiceClientDelegate, FTDeviceInfoServiceClientDelegate>
 
@@ -100,6 +101,11 @@ NSString * const kFTPenIsEraserPressedDidChangeNotificationName = @"com.fiftythr
 - (BOOL)isEraserPressed
 {
     return self.penServiceClient.isEraserPressed;
+}
+
+- (NSInteger)batteryLevel
+{
+    return self.penServiceClient.batteryLevel;
 }
 
 - (BOOL)isPoweringOff
@@ -210,6 +216,17 @@ NSString * const kFTPenIsEraserPressedDidChangeNotificationName = @"com.fiftythr
     if ([self.delegate respondsToSelector:@selector(pen:isEraserPressedDidChange:)])
     {
         [self.delegate pen:self isEraserPressedDidChange:isEraserPressed];
+    }
+}
+
+- (void)penServiceClient:(FTPenServiceClient *)penServiceClient batteryLevelDidChange:(NSInteger)batteryLevel
+{
+    [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenBatteryLevelDidChangeNotificationName
+                                                        object:self];
+
+    if ([self.delegate respondsToSelector:@selector(pen:batteryLevelDidChange:)])
+    {
+        [self.delegate pen:self batteryLevelDidChange:batteryLevel];
     }
 }
 
