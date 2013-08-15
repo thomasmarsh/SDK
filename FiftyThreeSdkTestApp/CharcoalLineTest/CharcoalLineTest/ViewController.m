@@ -483,6 +483,12 @@
         NSString * const kGetBatteryLevelCommand = @"get battery";
         static const int kIdLength = 15;
 
+        if (self.penManager.state != FTPenManagerStateConnected)
+        {
+            [self reportError:@"Pen must be connected to execute a command."];
+            return;
+        }
+
         if ([command hasPrefix:kSetIdCommandPrefix])
         {
             if (command.length == kSetIdCommandPrefix.length + kIdLength)
@@ -490,15 +496,9 @@
                 NSString *manufacturingID = [command substringWithRange:NSMakeRange(command.length - kIdLength,
                                                                                     kIdLength)];
 
-                if (self.penManager.state == FTPenManagerStateConnected)
-                {
-                    [self.penManager.pen setManufacturingID:manufacturingID];
-                    [self sendString:[NSString stringWithFormat:@"Set Manufacturing ID: \"%@\"", manufacturingID]];
-                }
-                else
-                {
-                    [self reportError:@"Pen must be connected to set Manufacturing ID."];
-                }
+                [self.penManager.pen setManufacturingID:manufacturingID];
+                [self sendString:[NSString stringWithFormat:@"Set Manufacturing ID: \"%@\"",
+                                  manufacturingID]];
             }
             else
             {
@@ -520,7 +520,8 @@
         }
         else
         {
-            [self reportError:@"Unknown command."];
+            [self reportError:[NSString stringWithFormat:@"Unknown command: \"%@\".",
+                               command]];
         }
     }
     else
