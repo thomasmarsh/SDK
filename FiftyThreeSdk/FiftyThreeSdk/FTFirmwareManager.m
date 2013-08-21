@@ -5,14 +5,23 @@
 //  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
 //
 
+#import <UIKit/UIKit.h>
+
 #import "FTFirmwareManager.h"
+
+NSString *applicationDocumentsDirectory()
+{
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *basePath = ([paths count] > 0) ? [paths objectAtIndex:0] : nil;
+    return basePath;
+}
 
 @implementation FTFirmwareManager
 
 + (NSInteger)versionForModel:(NSString *)model imageType:(FTFirmwareImageType)imageType
 {
     uint16_t version = 0;
-    NSString *filePath = [self filePathForModel:model imageType:imageType];
+    NSString *filePath = [self filePathForImageType:imageType];
     if (filePath)
     {
         NSFileHandle* fileHandle = [NSFileHandle fileHandleForReadingAtPath:filePath];
@@ -30,34 +39,47 @@
     return version;
 }
 
-+ (NSString *)filePathForModel:(NSString *)model imageType:(FTFirmwareImageType)imageType
++ (NSString *)filePathForImageType:(FTFirmwareImageType)imageType
 {
-    model = [model lowercaseString];
-    
-    // map model to image name
-    NSDictionary* modelMap = @{
-                          @"es1" : @"charcoal",
-                          @"es2" : @"charcoal",
-                          @"charcoal" : @"charcoal"
-                          };
+    NSString *documentsDir = applicationDocumentsDirectory();
+    NSArray *directoryContent = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:documentsDir
+                                                                                    error:NULL];
 
-    NSString *imagePrefix = [modelMap valueForKey:model];
-    if (!imagePrefix)
+    NSString *firmwareImageFilePath;
+
+    for (NSString *fileName in directoryContent)
     {
-        return nil;
+        if ([[fileName pathExtension] isEqualToString:@"bin"])
+        {
+            if (!firmwareImageFilePath)
+            {
+                firmwareImageFilePath = [documentsDir stringByAppendingPathComponent:fileName];
+            }
+            else
+            {
+                // TODO: This error should be reported to caller, not shown in an alert view.
+                [[[UIAlertView alloc] initWithTitle:@"Multiple Images Found"
+                                            message:@"Only one firmware image may be present in the iTunes Documents directory." delegate:nil
+                                  cancelButtonTitle:@"OK"
+                                  otherButtonTitles:nil, nil] show];
+
+                return nil;
+            }
+        }
     }
 
-    NSString *imageFileName;
-    if (imageType == Factory)
+    if (!firmwareImageFilePath)
     {
-        imageFileName = [imagePrefix stringByAppendingString:@"-factory"];
+        // TODO: This error should be reported to caller, not shown in an alert view.
+
+        [[[UIAlertView alloc] initWithTitle:@"No Image Found"
+                                    message:@"No firmware image was found in the iTunes Documents directory."
+                                   delegate:nil
+                          cancelButtonTitle:@"OK"
+                          otherButtonTitles:nil, nil] show];
     }
-    else
-    {
-        imageFileName = [imagePrefix stringByAppendingString:@"-upgrade"];
-    }
-    
-    return [[NSBundle mainBundle] pathForResource:imageFileName ofType:@"bin"];
+
+    return firmwareImageFilePath;
 }
 
 @end

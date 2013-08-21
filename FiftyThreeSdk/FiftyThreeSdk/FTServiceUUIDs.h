@@ -14,9 +14,9 @@
 + (CBUUID *)penService;
 + (CBUUID *)isTipPressed;
 + (CBUUID *)isEraserPressed;
++ (CBUUID *)batteryLevel;
 + (CBUUID *)shouldSwing;
 + (CBUUID *)shouldPowerOff;
-+ (CBUUID *)batteryVoltage;
 + (CBUUID *)inactivityTime;
 
 + (NSString *)nameForUUID:(CBUUID *)UUID;
@@ -28,9 +28,12 @@
 + (CBUUID *)penDebugService;
 + (CBUUID *)deviceState;
 + (CBUUID *)tipPressure;
-+ (CBUUID *)erasurePressure;
++ (CBUUID *)eraserPressure;
 + (CBUUID *)longPressTime;
 + (CBUUID *)connectionTime;
++ (CBUUID *)numFailedConnections;
++ (CBUUID *)manufacturingID;
++ (CBUUID *)lastErrorCode;
 
 + (NSString *)nameForUUID:(CBUUID *)UUID;
 

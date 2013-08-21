@@ -19,8 +19,9 @@ NSString * const kFTPenDidEncounterErrorNotificationName = @"com.fiftythree.pen.
 NSString * const kFTPenIsReadyDidChangeNotificationName = @"com.fiftythree.pen.isReadyDidChange";
 NSString * const kFTPenIsTipPressedDidChangeNotificationName = @"com.fiftythree.pen.isTipPressedDidChange";
 NSString * const kFTPenIsEraserPressedDidChangeNotificationName = @"com.fiftythree.pen.isEraserPressedDidChange";
+NSString * const kFTPenBatteryLevelDidChangeNotificationName = @"com.fiftythree.pen.batteryLevelDidChange";
 
-@interface FTPen () <FTPenServiceClientDelegate, FTPenDebugServiceClientDelegate>
+@interface FTPen () <FTPenServiceClientDelegate, FTPenDebugServiceClientDelegate, FTDeviceInfoServiceClientDelegate>
 
 @property (nonatomic) CBCentralManager *centralManager;
 @property (nonatomic) FTPeripheralDelegate *peripheralDelegate;
@@ -59,14 +60,16 @@ NSString * const kFTPenIsEraserPressedDidChangeNotificationName = @"com.fiftythr
         _penServiceClient.delegate = self;
         [_peripheralDelegate addServiceClient:_penServiceClient];
 
-//        // Pen Debug Service client
-//#ifdef DEBUG
-//        _penDebugServiceClient = [[FTPenDebugServiceClient alloc] init];
-//        _penDebugServiceClient.delegate = self;
-//        [_peripheralDelegate addServiceClient:_penDebugServiceClient];
-//#endif
-//
-        _deviceInfoServiceClient = [[FTDeviceInfoServiceClient alloc] init];
+#ifdef DEBUG
+        // Pen Debug Service client
+        _penDebugServiceClient = [[FTPenDebugServiceClient alloc] initWithPeripheral:_peripheral];
+        _penDebugServiceClient.delegate = self;
+        [_peripheralDelegate addServiceClient:_penDebugServiceClient];
+#endif
+
+        // Device Info Service client
+        _deviceInfoServiceClient = [[FTDeviceInfoServiceClient alloc] initWithPeripheral:_peripheral];
+        _deviceInfoServiceClient.delegate = self;
         [_peripheralDelegate addServiceClient:_deviceInfoServiceClient];
     }
 
@@ -74,6 +77,16 @@ NSString * const kFTPenIsEraserPressedDidChangeNotificationName = @"com.fiftythr
 }
 
 #pragma mark - Properties
+
+- (FTPenLastErrorCode)lastErrorCode
+{
+    return self.penDebugServiceClient.lastErrorCode;
+}
+
+- (void)clearLastErrorCode
+{
+    [self.penDebugServiceClient clearLastErrorCode];
+}
 
 - (BOOL)isReady
 {
@@ -88,6 +101,16 @@ NSString * const kFTPenIsEraserPressedDidChangeNotificationName = @"com.fiftythr
 - (BOOL)isEraserPressed
 {
     return self.penServiceClient.isEraserPressed;
+}
+
+- (NSInteger)batteryLevel
+{
+    return self.penServiceClient.batteryLevel;
+}
+
+- (BOOL)isPoweringOff
+{
+    return self.penServiceClient.isPoweringOff;
 }
 
 - (NSDate *)lastTipReleaseTime
@@ -105,24 +128,29 @@ NSString * const kFTPenIsEraserPressedDidChangeNotificationName = @"com.fiftythr
     self.penServiceClient.requiresTipBePressedToBecomeReady = requiresTipBePressedToBecomeReady;
 }
 
-- (BOOL)shouldSwing
+- (void)startSwinging
 {
-    return self.penServiceClient.shouldSwing;
+    [self.penServiceClient startSwinging];
 }
 
-- (void)setShouldSwing:(BOOL)shouldSwing
+- (void)powerOff
 {
-    self.penServiceClient.shouldSwing = shouldSwing;
+    [self.penServiceClient powerOff];
 }
 
-- (BOOL)shouldPowerOff
+- (void)getManufacturingID
 {
-    return self.penServiceClient.shouldPowerOff;
+    [self.penDebugServiceClient getManufacturingID];
 }
 
-- (void)setShouldPowerOff:(BOOL)shouldPowerOff
+- (void)setManufacturingID:(NSString *)manufacturingID
 {
-    self.penServiceClient.shouldPowerOff = shouldPowerOff;
+    [self.penDebugServiceClient setManufacturingID:manufacturingID];
+
+    // The model number and serial number charateristics of the device info
+    // service change as a result of setting the manufacturing ID, so refresh
+    // them now.
+    [self.deviceInfoServiceClient refreshModelNumberAndSerialNumber];
 }
 
 #pragma mark -
@@ -191,15 +219,47 @@ NSString * const kFTPenIsEraserPressedDidChangeNotificationName = @"com.fiftythr
     }
 }
 
+- (void)penServiceClient:(FTPenServiceClient *)penServiceClient batteryLevelDidChange:(NSInteger)batteryLevel
+{
+    [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenBatteryLevelDidChangeNotificationName
+                                                        object:self];
+
+    if ([self.delegate respondsToSelector:@selector(pen:batteryLevelDidChange:)])
+    {
+        [self.delegate pen:self batteryLevelDidChange:batteryLevel];
+    }
+}
+
 #pragma mark - FTPenDebugServiceClientDelegate
 
-#pragma mark -
-
-- (void)updateData:(NSDictionary *)data
+- (void)didWriteManufacturingID
 {
-    _name = [data objectForKey:CBAdvertisementDataLocalNameKey];
-    _manufacturer = [data objectForKey:CBAdvertisementDataManufacturerDataKey];
+    [self.privateDelegate didWriteManufacturingID];
 }
+
+- (void)didFailToWriteManufacturingID
+{
+    [self.privateDelegate didFailToWriteManufacturingID];
+}
+
+- (void)didReadManufacturingID:(NSString *)manufacturingID
+{
+    [self.privateDelegate didReadManufacturingID:manufacturingID];
+}
+
+- (void)didUpdateDebugProperties
+{
+    [self.privateDelegate didUpdateDebugProperties];
+}
+
+#pragma mark - FTDeviceInfoServiceClientDelegate
+
+- (void)deviceInfoServiceClientDidUpdateDeviceInfo:(FTDeviceInfoServiceClient *)deviceInfoServiceClient
+{
+    [self.privateDelegate didUpdateDeviceInfo];
+}
+
+#pragma mark -
 
 - (NSString *)name
 {

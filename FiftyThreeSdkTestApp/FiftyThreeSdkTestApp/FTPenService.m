@@ -6,8 +6,9 @@
 //
 
 #import <CoreBluetooth/CoreBluetooth.h>
-#import "FTPenService.h"
+
 #import "FiftyThreeSdk/FTServiceUUIDs.h"
+#import "FTPenService.h"
 
 @interface FTPenService () <CBPeripheralManagerDelegate>
 @property (nonatomic) CBPeripheralManager *peripheralManager;
@@ -40,7 +41,7 @@
 
     NSLog(@"CBPeripheralManager powered on.");
 
-    [self registerService:_secure];
+    [self registerService:NO];
 }
 
 - (void)registerService:(BOOL)secure

@@ -5,12 +5,12 @@
 //  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
 //
 
-#import "FTConnectLatencyTester.h"
-#import "FiftyThreeSdk/FTPenManager.h"
+#import <inttypes.h>
+#import <mach/mach_time.h>
+#import <sys/time.h>
 
-#include <mach/mach_time.h>
-#include <inttypes.h>
-#include <sys/time.h>
+#import "FiftyThreeSdk/FTPenManager.h"
+#import "FTConnectLatencyTester.h"
 
 #define CONNECT_REPS 100
 
@@ -46,7 +46,7 @@
     return millis;
 }
 
-- (void)penManagerDidUpdateState:(FTPenManager *)penManager;
+-(void)penManager:(FTPenManager *)penManager didUpdateState:(FTPenManagerState)state
 {
 }
 

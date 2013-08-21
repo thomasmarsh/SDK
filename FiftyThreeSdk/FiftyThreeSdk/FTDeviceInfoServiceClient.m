@@ -5,9 +5,10 @@
 //  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
 //
 
+#import <CoreBluetooth/CoreBluetooth.h>
+
 #import "FTDeviceInfoServiceClient.h"
 #import "FTServiceUUIDs.h"
-#import <CoreBluetooth/CoreBluetooth.h>
 
 @interface FTDeviceInfoServiceClient ()
 
@@ -30,6 +31,16 @@
 @end
 
 @implementation FTDeviceInfoServiceClient
+
+- (id)initWithPeripheral:(CBPeripheral *)peripheral
+{
+    self = [super init];
+    if (self)
+    {
+        _peripheral = peripheral;
+    }
+    return self;
+}
 
 #pragma mark - Properties
 
@@ -185,39 +196,49 @@
 - (void)peripheral:(CBPeripheral *)peripheral didUpdateValueForCharacteristic:(CBCharacteristic *)characteristic
              error:(NSError *)error
 {
+    BOOL updatedCharacteristic = NO;
+
     if ([characteristic isEqual:self.manufacturerNameCharacteristic])
     {
         self.manufacturerName = [NSString stringWithUTF8String:characteristic.value.bytes];
+        updatedCharacteristic = YES;
     }
     else if ([characteristic isEqual:self.modelNumberCharateristic])
     {
         self.modelNumber = [NSString stringWithUTF8String:characteristic.value.bytes];
+        updatedCharacteristic = YES;
     }
     else if ([characteristic isEqual:self.serialNumberCharateristic])
     {
         self.serialNumber = [NSString stringWithUTF8String:characteristic.value.bytes];
+        updatedCharacteristic = YES;
     }
     else if ([characteristic isEqual:self.firmwareRevisionCharateristic])
     {
         self.firmwareRevision = [NSString stringWithUTF8String:characteristic.value.bytes];
+        updatedCharacteristic = YES;
     }
     else if ([characteristic isEqual:self.hardwareRevisionCharateristic])
     {
         self.hardwareRevisionCharateristic = characteristic;
         self.hardwareRevision = [NSString stringWithUTF8String:characteristic.value.bytes];
+        updatedCharacteristic = YES;
     }
     else if ([characteristic isEqual:self.softwareRevisionCharateristic])
     {
         self.softwareRevisionCharateristic = characteristic;
         self.softwareRevision = [NSString stringWithUTF8String:characteristic.value.bytes];
+        updatedCharacteristic = YES;
     }
     else if ([characteristic isEqual:self.systemIDCharateristic])
     {
         self.systemID = [NSString stringWithUTF8String:characteristic.value.bytes];
+        updatedCharacteristic = YES;
     }
     else if ([characteristic isEqual:self.IEEECertificationDataCharateristic])
     {
         self.IEEECertificationData = characteristic.value;
+        updatedCharacteristic = YES;
     }
     else if ([characteristic isEqual:self.IEEECertificationDataCharateristic])
     {
@@ -234,6 +255,28 @@
         pnpID.productVersion = bytes[5] | (bytes[6] << 8);
 
         self.PnpID = pnpID;
+
+        updatedCharacteristic = YES;
+    }
+
+    if (updatedCharacteristic)
+    {
+        [self.delegate deviceInfoServiceClientDidUpdateDeviceInfo:self];
+    }
+}
+
+#pragma mark -
+
+- (void)refreshModelNumberAndSerialNumber
+{
+    if (self.modelNumberCharateristic)
+    {
+        [self.peripheral readValueForCharacteristic:self.modelNumberCharateristic];
+    }
+
+    if (self.serialNumberCharateristic)
+    {
+        [self.peripheral readValueForCharacteristic:self.serialNumberCharateristic];
     }
 }
 

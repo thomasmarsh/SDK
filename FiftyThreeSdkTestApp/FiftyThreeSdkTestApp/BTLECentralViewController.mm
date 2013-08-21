@@ -21,6 +21,8 @@
 #import <MessageUI/MessageUI.h>
 
 #import "BTLECentralViewController.h"
+#import "FiftyThreeSdk/FTFirmwareManager.h"
+#import "FiftyThreeSdk/FTFirmwareUpdateProgressView.h"
 #import "FiftyThreeSdk/FTPenManager+Private.h"
 #import "FiftyThreeSdk/FTPenManager.h"
 #import "FTConnectLatencyTester.h"
@@ -33,8 +35,6 @@ using boost::dynamic_pointer_cast;
 using boost::shared_ptr;
 using boost::make_shared;
 using std::stringstream;
-
-NSString * const kUpdateProgressViewMessage = @"%.1f%% Complete\nTime Remaining: %02d:%02d";
 
 class TouchObserver;
 
@@ -55,7 +55,7 @@ class TouchObserver;
 
 @property (nonatomic) FTPenManager *penManager;
 @property (nonatomic) id currentTest;
-@property (nonatomic) UIAlertView *updateProgressView;
+@property (nonatomic) FTFirmwareUpdateProgressView *firmwareUpdateProgressView;
 @property (nonatomic) UIAlertView *updateStartView;
 @property (nonatomic) UIAlertView *clearAlertView;
 @property (nonatomic) NSDate *updateStart;
@@ -181,7 +181,7 @@ public:
 
 - (void)penManager:(FTPenManager *)penManager didUpdateState:(FTPenManagerState)state
 {
-    if (penManager.state == FTPenManagerStateNeverConnected)
+    if (penManager.state == FTPenManagerStateUnpaired)
     {
         _PenAndTouchManager->SetPalmRejectionEnabled(false);
     }
@@ -189,7 +189,8 @@ public:
     {
         _PenAndTouchManager->SetPalmRejectionEnabled(false);
     }
-    else if (penManager.state == FTPenManagerStateConnecting)
+    else if (penManager.state == FTPenManagerStateConnecting ||
+             penManager.state == FTPenManagerStateReconnecting)
     {
         NSAssert(penManager.pen, @"Pen is non-nil");
 
@@ -226,24 +227,13 @@ public:
 
 - (void)penManager:(FTPenManager *)manager didFinishUpdate:(NSError *)error
 {
-    NSLog(@"didFinishUpdate");
-
-    [self.updateProgressView dismissWithClickedButtonIndex:0 animated:NO];
-    self.updateProgressView = nil;
+    [self.firmwareUpdateProgressView dismiss];
+    self.firmwareUpdateProgressView = nil;
 }
 
 - (void)penManager:(FTPenManager *)manager didUpdatePercentComplete:(float)percent
 {
-    NSLog(@"didUpdatePercentComplete %f", percent);
-
-    NSTimeInterval elapsed = -[self.updateStart timeIntervalSinceNow];
-    float totalTime = elapsed / (percent / 100.0);
-    float remainingTime = totalTime - (totalTime * percent / 100.0);
-    int minutes = (int)remainingTime / 60;
-    int seconds = (int)remainingTime % 60;
-
-    self.updateProgressView.message = [NSString stringWithFormat:kUpdateProgressViewMessage, percent, minutes, seconds];
-    [self.updateProgressView show];
+    self.firmwareUpdateProgressView.percentComplete = percent;
 }
 
 #pragma mark - FTPenDelegate
@@ -263,7 +253,7 @@ public:
     }
     self.lastTipDate = [NSDate date];
 
-    [self.tip1State setHighlighted:isTipPressed];
+    [self.tipStateButton setHighlighted:isTipPressed];
 
     PenEvent::Ptr event = PenEvent::New([NSProcessInfo processInfo].systemUptime,
                                         isTipPressed ? PenEventType::PenDown : PenEventType::PenUp,
@@ -282,12 +272,17 @@ public:
     }
     self.lastTipDate = [NSDate date];
 
-    [self.tip2State setHighlighted:isEraserPressed];
+    [self.eraserStateButton setHighlighted:isEraserPressed];
 
     PenEvent::Ptr event = PenEvent::New([NSProcessInfo processInfo].systemUptime,
                                         isEraserPressed ? PenEventType::PenDown : PenEventType::PenUp,
                                         PenTip::Tip2);
     _PenAndTouchManager->HandlePenEvent(event);
+}
+
+- (void)pen:(FTPen *)pen batteryLevelDidChange:(NSInteger)batteryLevel
+{
+
 }
 
 #pragma mark -
@@ -312,7 +307,7 @@ public:
 - (void)updateDisplay
 {
     if (self.penManager.state == FTPenManagerStateDisconnected ||
-        self.penManager.state == FTPenManagerStateNeverConnected)
+        self.penManager.state == FTPenManagerStateUnpaired)
     {
         [self.pairingStatusLabel setText:@"Disconnected"];
     }
@@ -340,8 +335,8 @@ public:
         self.updateFirmwareButton.hidden = YES;
         self.trialSeparationButton.hidden = YES;
 
-        self.tip1State.highlighted = NO;
-        self.tip2State.highlighted = NO;
+        self.tipStateButton.highlighted = NO;
+        self.eraserStateButton.highlighted = NO;
     }
 
     if (self.annotationMode)
@@ -457,26 +452,32 @@ public:
 
 - (void)updateFirmware
 {
-    self.updateStart = [NSDate date];
+    NSString *firmwareImagePath = [FTFirmwareManager filePathForImageType:Upgrade];
 
-    self.updateProgressView = [[UIAlertView alloc] initWithTitle:@"Firmware Update" message:[NSString stringWithFormat:kUpdateProgressViewMessage, 0., 0, 0] delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:nil, nil];
-    [self.updateProgressView show];
-
-    [self.penManager updateFirmwareForPen:self.penManager.pen];
+    if (firmwareImagePath)
+    {
+        [self.penManager updateFirmwareForPen:firmwareImagePath];
+        self.firmwareUpdateProgressView = [FTFirmwareUpdateProgressView start];
+        self.firmwareUpdateProgressView.delegate = self;
+    }
 }
 
 - (void)didDetectMultitaskingGesturesEnabled
 {
-    UIAlertView* alertView = [[UIAlertView alloc] initWithTitle:@"Warning" message:@"Multitasking Gestures detected. For the best experience, turn them Off in the Settings app under General" delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
+    UIAlertView* alertView = [[UIAlertView alloc] initWithTitle:@"Warning"
+                                                        message:@"Multitasking Gestures detected. For the best experience, turn them Off in the Settings app under General"
+                                                       delegate:nil
+                                              cancelButtonTitle:@"Ok"
+                                              otherButtonTitles:nil];
     [alertView show];
 }
 
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
 {
-    if (alertView == self.updateProgressView)
+    if (alertView == self.firmwareUpdateProgressView)
     {
         [self.penManager disconnect];
-        self.updateProgressView = nil;
+        self.firmwareUpdateProgressView = nil;
     }
     else if (alertView == self.updateStartView)
     {
@@ -610,6 +611,7 @@ public:
 }
 
 #pragma mark - UIKIt Touches
+
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
 {
     if (self.annotationMode)
@@ -722,6 +724,8 @@ public:
         }
     }
 }
+
+#pragma mark -
 
 - (void)startTrialSeparation
 {

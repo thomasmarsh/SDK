@@ -5,7 +5,10 @@
 //  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
 //
 
+#pragma once
+
 #import <Foundation/Foundation.h>
+
 #import "FTPenManager.h"
 
 typedef NS_ENUM(NSInteger, FTFirmwareImageType) {
@@ -16,7 +19,9 @@ typedef NS_ENUM(NSInteger, FTFirmwareImageType) {
 @interface FTPenManager ()
 
 - (BOOL)isUpdateAvailableForPen:(FTPen *)pen;
-- (void)updateFirmwareForPen:(FTPen *)pen;
+
+- (void)updateFirmwareForPen:(NSString *)firmwareImagePath;
+
 - (void)startTrialSeparation;
 
 @end

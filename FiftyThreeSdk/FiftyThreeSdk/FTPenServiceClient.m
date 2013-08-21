@@ -5,9 +5,9 @@
 //  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
 //
 
+#import "FTError.h"
 #import "FTPenServiceClient.h"
 #import "FTServiceUUIDs.h"
-#import "FTError.h"
 
 @interface FTPenServiceClient ()
 
@@ -16,12 +16,14 @@
 @property (nonatomic) CBService *penService;
 @property (nonatomic) CBCharacteristic *isTipPressedCharacteristic;
 @property (nonatomic) CBCharacteristic *isEraserPressedCharacteristic;
+@property (nonatomic) CBCharacteristic *batteryLevelCharacteristic;
 @property (nonatomic) CBCharacteristic *shouldSwingCharacteristic;
 @property (nonatomic) CBCharacteristic *shouldPowerOffCharacteristic;
 
 @property (nonatomic, readwrite) NSDate *lastTipReleaseTime;
 
 @property (nonatomic) BOOL isReady;
+@property (nonatomic) BOOL shouldPowerOff;
 
 @end
 
@@ -58,6 +60,16 @@
     return NO;
 }
 
+- (NSInteger)batteryLevel
+{
+    if (self.batteryLevelCharacteristic)
+    {
+        return ((const char *)self.batteryLevelCharacteristic.value.bytes)[0];
+    }
+
+    return -1;
+}
+
 - (void)setIsReady:(BOOL)isReady
 {
     _isReady = isReady;
@@ -65,45 +77,35 @@
     [self.delegate penServiceClient:self isReadyDidChange:isReady];
 }
 
-- (BOOL)shouldSwing
-{
-    if (self.shouldSwing)
-    {
-        return ((const char *)self.shouldSwingCharacteristic.value.bytes)[0] != 0;
-    }
-
-    return NO;
-}
-
-- (void)setShouldSwing:(BOOL)shouldSwing
+- (void)startSwinging
 {
     if (self.shouldSwingCharacteristic)
     {
-        NSData *data = [NSData dataWithBytes:shouldSwing ? "1" : "0" length:1];
+        NSData *data = [NSData dataWithBytes:"1" length:1];
         [self.peripheral writeValue:data
                   forCharacteristic:self.shouldSwingCharacteristic
                                type:CBCharacteristicWriteWithResponse];
     }
-}
-
-- (BOOL)shouldPowerOff
-{
-    if (self.shouldPowerOffCharacteristic)
+    else
     {
-        return ((const char *)self.shouldPowerOffCharacteristic.value.bytes)[0] != 0;
+        NSLog(@"ShouldSwing characteristic not initialized.");
     }
-
-    return NO;
 }
 
-- (void)setShouldPowerOff:(BOOL)shouldPowerOff
+- (void)powerOff
 {
+    _isPoweringOff = YES;
+
     if (self.shouldPowerOffCharacteristic)
     {
-        NSData *data = [NSData dataWithBytes:shouldPowerOff ? "1" : "0" length:1];
+        NSData *data = [NSData dataWithBytes:"1" length:1];
         [self.peripheral writeValue:data
                   forCharacteristic:self.shouldPowerOffCharacteristic
                                type:CBCharacteristicWriteWithResponse];
+    }
+    else
+    {
+        NSLog(@"ShouldPowerOff characteristic not initialized.");
     }
 }
 
@@ -120,6 +122,7 @@
         self.penService = nil;
         self.isTipPressedCharacteristic = nil;
         self.isEraserPressedCharacteristic = nil;
+        self.batteryLevelCharacteristic = nil;
         self.shouldSwingCharacteristic = nil;
         self.shouldPowerOffCharacteristic = nil;
 
@@ -140,6 +143,7 @@
         {
             NSArray *characteristics = @[[FTPenServiceUUIDs isTipPressed],
                                          [FTPenServiceUUIDs isEraserPressed],
+                                         [FTPenServiceUUIDs batteryLevel],
                                          [FTPenServiceUUIDs shouldSwing],
                                          [FTPenServiceUUIDs shouldPowerOff]
                                          ];
@@ -181,6 +185,15 @@
             [characteristic.UUID isEqual:[FTPenServiceUUIDs isEraserPressed]])
         {
             self.isEraserPressedCharacteristic = characteristic;
+            [peripheral setNotifyValue:YES forCharacteristic:characteristic];
+        }
+
+        // BatteryLevel
+        if (!self.batteryLevelCharacteristic &&
+            [characteristic.UUID isEqual:[FTPenServiceUUIDs batteryLevel]])
+        {
+            self.batteryLevelCharacteristic = characteristic;
+            [peripheral readValueForCharacteristic:characteristic];
             [peripheral setNotifyValue:YES forCharacteristic:characteristic];
         }
 
@@ -259,6 +272,13 @@
         [self.delegate penServiceClient:self isEraserPressedDidChange:isEraserPressed];
 
         NSLog(@"IsEraserPressed did update value: %d.", isEraserPressed);
+    }
+    else if ([characteristic isEqual:self.batteryLevelCharacteristic])
+    {
+        NSInteger batteryLevel = self.batteryLevel;
+        [self.delegate penServiceClient:self batteryLevelDidChange:batteryLevel];
+
+        NSLog(@"BatteryLevel did update value: %d.", batteryLevel);
     }
 }
 

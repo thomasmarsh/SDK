@@ -15,6 +15,7 @@
 		3CC31DF417933C5F002CD4FB /* TKEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = 3CC31DEE17933C5F002CD4FB /* TKEvent.m */; };
 		3CC31DF517933C5F002CD4FB /* TKState.m in Sources */ = {isa = PBXBuildFile; fileRef = 3CC31DF017933C5F002CD4FB /* TKState.m */; };
 		3CC31DF617933C5F002CD4FB /* TKStateMachine.m in Sources */ = {isa = PBXBuildFile; fileRef = 3CC31DF217933C5F002CD4FB /* TKStateMachine.m */; };
+		3CF1369417A9F4440006AB2E /* FTFirmwareUpdateProgressView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3CF1369317A9F4430006AB2E /* FTFirmwareUpdateProgressView.m */; };
 		3CF2306F177E13910049A9EF /* FTServiceUUIDs.m in Sources */ = {isa = PBXBuildFile; fileRef = 3CF2306E177E13910049A9EF /* FTServiceUUIDs.m */; };
 		663AFED616FA511300681A90 /* TouchClassifierManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 663AFED416FA511300681A90 /* TouchClassifierManager.cpp */; };
 		663AFED916FA6BD800681A90 /* PenEvent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 663AFED716FA6BD800681A90 /* PenEvent.cpp */; };
@@ -72,6 +73,8 @@
 		3CC31DF117933C5F002CD4FB /* TKStateMachine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TKStateMachine.h; path = ../../ThirdParty/TransitionKit/Code/TKStateMachine.h; sourceTree = "<group>"; };
 		3CC31DF217933C5F002CD4FB /* TKStateMachine.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TKStateMachine.m; path = ../../ThirdParty/TransitionKit/Code/TKStateMachine.m; sourceTree = "<group>"; };
 		3CC31DF317933C5F002CD4FB /* TransitionKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TransitionKit.h; path = ../../ThirdParty/TransitionKit/Code/TransitionKit.h; sourceTree = "<group>"; };
+		3CF1369217A9F4430006AB2E /* FTFirmwareUpdateProgressView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FTFirmwareUpdateProgressView.h; path = FiftyThreeSdk/FTFirmwareUpdateProgressView.h; sourceTree = "<group>"; };
+		3CF1369317A9F4430006AB2E /* FTFirmwareUpdateProgressView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FTFirmwareUpdateProgressView.m; path = FiftyThreeSdk/FTFirmwareUpdateProgressView.m; sourceTree = "<group>"; };
 		3CF2306E177E13910049A9EF /* FTServiceUUIDs.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FTServiceUUIDs.m; path = FiftyThreeSdk/FTServiceUUIDs.m; sourceTree = SOURCE_ROOT; };
 		661993D516EF973900B2BEE9 /* FTError.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FTError.h; path = FiftyThreeSdk/FTError.h; sourceTree = SOURCE_ROOT; };
 		663AFED416FA511300681A90 /* TouchClassifierManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TouchClassifierManager.cpp; path = FiftyThreeSdk/TouchClassifierManager.cpp; sourceTree = SOURCE_ROOT; };
@@ -171,6 +174,8 @@
 				66D779B816E57461001C4F55 /* TIUpdateManager.mm */,
 				66BEC2841703B397009207F9 /* FTFirmwareManager.h */,
 				66BEC2851703B397009207F9 /* FTFirmwareManager.m */,
+				3CF1369217A9F4430006AB2E /* FTFirmwareUpdateProgressView.h */,
+				3CF1369317A9F4430006AB2E /* FTFirmwareUpdateProgressView.m */,
 			);
 			name = PenManager;
 			sourceTree = "<group>";
@@ -356,6 +361,7 @@
 				3CC31DF417933C5F002CD4FB /* TKEvent.m in Sources */,
 				3CC31DF517933C5F002CD4FB /* TKState.m in Sources */,
 				3CC31DF617933C5F002CD4FB /* TKStateMachine.m in Sources */,
+				3CF1369417A9F4440006AB2E /* FTFirmwareUpdateProgressView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

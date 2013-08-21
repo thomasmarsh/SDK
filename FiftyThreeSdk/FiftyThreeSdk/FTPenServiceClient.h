@@ -5,7 +5,10 @@
 //  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
 //
 
+#pragma once
+
 #import <Foundation/Foundation.h>
+
 #import "FTServiceClient.h"
 
 @protocol FTPenServiceClientDelegate;
@@ -19,12 +22,15 @@
 @property (nonatomic, readonly) BOOL isReady;
 @property (nonatomic, readonly) BOOL isTipPressed;
 @property (nonatomic, readonly) BOOL isEraserPressed;
+@property (nonatomic, readonly) NSInteger batteryLevel;
+@property (nonatomic, readonly) BOOL isPoweringOff;
 @property (nonatomic, readonly) NSDate *lastTipReleaseTime;
 
 // Defaults to YES
 @property (nonatomic) BOOL requiresTipBePressedToBecomeReady;
-@property (nonatomic) BOOL shouldSwing;
-@property (nonatomic) BOOL shouldPowerOff;
+
+- (void)startSwinging;
+- (void)powerOff;
 
 @end
 
@@ -34,5 +40,6 @@
 - (void)penServiceClient:(FTPenServiceClient *)penServiceClient isReadyDidChange:(BOOL)isReady;
 - (void)penServiceClient:(FTPenServiceClient *)penServiceClient isTipPressedDidChange:(BOOL)isTipPressed;
 - (void)penServiceClient:(FTPenServiceClient *)penServiceClient isEraserPressedDidChange:(BOOL)isEraserPressed;
+- (void)penServiceClient:(FTPenServiceClient *)penServiceClient batteryLevelDidChange:(NSInteger)batteryLevel;
 
 @end
