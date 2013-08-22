@@ -193,6 +193,15 @@
     }
 }
 
+- (NSString *)NSStringFromCharacteristic:(CBCharacteristic *)characteristic
+{
+    if (characteristic.value.length > 0)
+    {
+        return [NSString stringWithUTF8String:characteristic.value.bytes];
+    }
+    return nil;
+}
+
 - (void)peripheral:(CBPeripheral *)peripheral didUpdateValueForCharacteristic:(CBCharacteristic *)characteristic
              error:(NSError *)error
 {
@@ -200,39 +209,39 @@
 
     if ([characteristic isEqual:self.manufacturerNameCharacteristic])
     {
-        self.manufacturerName = [NSString stringWithUTF8String:characteristic.value.bytes];
+        self.manufacturerName = [self NSStringFromCharacteristic:characteristic];
         updatedCharacteristic = YES;
     }
     else if ([characteristic isEqual:self.modelNumberCharateristic])
     {
-        self.modelNumber = [NSString stringWithUTF8String:characteristic.value.bytes];
+        self.modelNumber = [self NSStringFromCharacteristic:characteristic];
         updatedCharacteristic = YES;
     }
     else if ([characteristic isEqual:self.serialNumberCharateristic])
     {
-        self.serialNumber = [NSString stringWithUTF8String:characteristic.value.bytes];
+        self.serialNumber = [self NSStringFromCharacteristic:characteristic];
         updatedCharacteristic = YES;
     }
     else if ([characteristic isEqual:self.firmwareRevisionCharateristic])
     {
-        self.firmwareRevision = [NSString stringWithUTF8String:characteristic.value.bytes];
+        self.firmwareRevision = [self NSStringFromCharacteristic:characteristic];
         updatedCharacteristic = YES;
     }
     else if ([characteristic isEqual:self.hardwareRevisionCharateristic])
     {
         self.hardwareRevisionCharateristic = characteristic;
-        self.hardwareRevision = [NSString stringWithUTF8String:characteristic.value.bytes];
+        self.hardwareRevision = [self NSStringFromCharacteristic:characteristic];
         updatedCharacteristic = YES;
     }
     else if ([characteristic isEqual:self.softwareRevisionCharateristic])
     {
         self.softwareRevisionCharateristic = characteristic;
-        self.softwareRevision = [NSString stringWithUTF8String:characteristic.value.bytes];
+        self.softwareRevision = [self NSStringFromCharacteristic:characteristic];
         updatedCharacteristic = YES;
     }
     else if ([characteristic isEqual:self.systemIDCharateristic])
     {
-        self.systemID = [NSString stringWithUTF8String:characteristic.value.bytes];
+        self.systemID = [self NSStringFromCharacteristic:characteristic];
         updatedCharacteristic = YES;
     }
     else if ([characteristic isEqual:self.IEEECertificationDataCharateristic])
