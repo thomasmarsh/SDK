@@ -36,6 +36,16 @@
     [_rscManager setDelegate:self];
 
     _penManager = [[FTPenManager alloc] initWithDelegate:self];
+
+    NSDictionary *infoDictionary = [[NSBundle mainBundle] infoDictionary];
+//    NSString *appDisplayName = [infoDictionary objectForKey:@"CFBundleDisplayName"];
+//    NSString *majorVersion = [infoDictionary objectForKey:@"CFBundleShortVersionString"];
+//    NSString *minorVersion = [infoDictionary objectForKey:@"CFBundleVersion"];
+    self.appTitleNavItem.title = [NSString stringWithFormat:@"%@ %@ (%@)",
+                                  infoDictionary[@"CFBundleDisplayName"],
+                                  infoDictionary[@"CFBundleVersion"],
+                                  infoDictionary[@"CFBundleShortVersionString"]];
+
 }
 
 - (void)viewWillAppear:(BOOL)animated

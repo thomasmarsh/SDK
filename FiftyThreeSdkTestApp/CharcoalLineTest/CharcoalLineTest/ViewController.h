@@ -22,6 +22,7 @@
 @property (weak, nonatomic) IBOutlet UIButton *touchButton;
 @property (weak, nonatomic) IBOutlet UILabel *deviceInfoLabel;
 @property (weak, nonatomic) IBOutlet UIButton *clearLastErrorButton;
+@property (weak, nonatomic) IBOutlet UINavigationItem *appTitleNavItem;
 
 - (IBAction)pairButtonTouchUpInside:(id)sender;
 - (IBAction)pairButtonTouchUpOutside:(id)sender;
