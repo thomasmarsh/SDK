@@ -104,6 +104,30 @@
                           otherButtonTitles:nil] show];
     }
 
+    char stateChar;
+    switch (state)
+    {
+        case FTPenManagerStateUnpaired:
+            stateChar = 'u';
+            break;
+        case FTPenManagerStateConnecting:
+            stateChar = 'c';
+            break;
+        case FTPenManagerStateReconnecting:
+            stateChar = 'r';
+            break;
+        case FTPenManagerStateConnected:
+            stateChar = 'C';
+            break;
+        case FTPenManagerStateDisconnected:
+            stateChar = 'd';
+            break;
+        default:
+            NSAssert(NO, @"Unexpected state.");
+            break;
+    }
+    [self sendCharacter:stateChar];
+
     [self updateDisplay];
 }
 
