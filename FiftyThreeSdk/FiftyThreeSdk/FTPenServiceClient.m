@@ -42,7 +42,7 @@
 
 - (BOOL)isTipPressed
 {
-    if (self.isTipPressedCharacteristic)
+    if (self.isTipPressedCharacteristic.value.length > 0)
     {
         return ((const char *)self.isTipPressedCharacteristic.value.bytes)[0] != 0;
     }
@@ -52,7 +52,7 @@
 
 - (BOOL)isEraserPressed
 {
-    if (self.isEraserPressedCharacteristic)
+    if (self.isEraserPressedCharacteristic.value.length > 0)
     {
         return ((const char *)self.isEraserPressedCharacteristic.value.bytes)[0] != 0;
     }
@@ -62,7 +62,7 @@
 
 - (NSInteger)batteryLevel
 {
-    if (self.batteryLevelCharacteristic)
+    if (self.batteryLevelCharacteristic.value.length > 0)
     {
         return ((const char *)self.batteryLevelCharacteristic.value.bytes)[0];
     }
