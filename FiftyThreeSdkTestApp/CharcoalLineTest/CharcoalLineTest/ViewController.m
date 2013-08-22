@@ -485,7 +485,7 @@
 
         if (self.penManager.state != FTPenManagerStateConnected)
         {
-            [self reportError:@"Pen must be connected to execute a command."];
+            [self reportError:@"Pen not connected."];
             return;
         }
 
