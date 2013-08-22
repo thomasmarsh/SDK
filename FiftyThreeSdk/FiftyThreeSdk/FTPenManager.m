@@ -251,6 +251,8 @@ typedef enum
     TKState *singleState = [TKState stateWithName:kSingleStateName];
     [singleState setDidEnterStateBlock:^(TKState *state, TKStateMachine *stateMachine)
     {
+        NSAssert(!self.pen, @"Pen is nil");
+
         weakSelf.state = FTPenManagerStateUnpaired;
 
         // If we enter the single state and discover that the pairing spot is currently pressed, then
@@ -293,21 +295,24 @@ typedef enum
     // Engaged - Waiting for Tip Release
     TKState *engagedWaitingForTipReleaseState = [TKState stateWithName:kEngagedWaitingForTipReleaseStateName
                                                     andTimeoutDuration:kEngagedStateTimeout];
+    [engagedWaitingForTipReleaseState setDidEnterStateBlock:^(TKState *state, TKStateMachine *stateMachine) {
+        weakSelf.state = FTPenManagerStateConnected;
+    }];
     [engagedWaitingForTipReleaseState setTimeoutExpiredBlock:^(TKState *state, TKStateMachine *stateMachine)
     {
-        weakSelf.state = FTPenManagerStateConnected;
-
         [weakSelf fireStateMachineEvent:kDisconnectAndBecomeSingleEventName];
     }];
 
     // Engaged - Waiting for Pairing Spot Release
     TKState *engagedWaitingForPairingSpotReleaseState = [TKState stateWithName:kEngagedWaitingForPairingSpotReleaseStateName
                                                             andTimeoutDuration:kEngagedStateTimeout];
+    [engagedWaitingForPairingSpotReleaseState setDidEnterStateBlock:^(TKState *state, TKStateMachine *stateMachine)
+    {
+        weakSelf.state = FTPenManagerStateConnected;
+    }];
     [engagedWaitingForPairingSpotReleaseState setTimeoutExpiredBlock:^(TKState *state,
                                                                        TKStateMachine *stateMachine)
     {
-        weakSelf.state = FTPenManagerStateConnected;
-
         [weakSelf fireStateMachineEvent:kDisconnectAndBecomeSingleEventName];
     }];
 
@@ -412,7 +417,7 @@ typedef enum
     {
         weakSelf.state = FTPenManagerStateUnpaired;
 
-        if (weakSelf.pen.peripheral.isConnected)
+        if (weakSelf.pen)
         {
             if (!weakSelf.pen.isPoweringOff)
             {
@@ -740,11 +745,10 @@ typedef enum
 
 - (void)centralManager:(CBCentralManager *)central didConnectPeripheral:(CBPeripheral *)peripheral
 {
-    NSAssert([self currentStateHasName:kDatingAttemptingConnectiongStateName] ||
-             [self currentStateHasName:kSwingingAttemptingConnectionStateName] ||
-             [self currentStateHasName:kSeparatedAttemptingConnectionStateName], @"");
-
-    if (self.pen.peripheral == peripheral)
+    if (self.pen.peripheral == peripheral &&
+        ([self currentStateHasName:kDatingAttemptingConnectiongStateName] ||
+         [self currentStateHasName:kSwingingAttemptingConnectionStateName] ||
+         [self currentStateHasName:kSeparatedAttemptingConnectionStateName]))
     {
         [self.pen peripheralConnectionStatusDidChange];
     }
