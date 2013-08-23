@@ -85,6 +85,8 @@
 		349CF241174ECF9900F9DCA9 /* Paper_Icon-72.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Paper_Icon-72.png"; sourceTree = "<group>"; };
 		349CF242174ECF9900F9DCA9 /* Paper_Icon-72@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Paper_Icon-72@2x.png"; sourceTree = "<group>"; };
 		3C23828117B3174000161277 /* Crashlytics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Crashlytics.framework; path = ../../../ThirdParty/Crashlytics/Crashlytics.framework; sourceTree = "<group>"; };
+		3CF4D86817C7E224002CD082 /* Entitlements.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Entitlements.plist; sourceTree = "<group>"; };
+		3CF4D86B17C7E526002CD082 /* Application.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Application.xcconfig; sourceTree = "<group>"; };
 		6669CFF8173C008C00BB15C3 /* CharcoalLineTest.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CharcoalLineTest.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6669CFFB173C008C00BB15C3 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		6669CFFD173C008C00BB15C3 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -163,14 +165,32 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		3CF4D86717C7E1DA002CD082 /* Supporting files */ = {
+			isa = PBXGroup;
+			children = (
+				3CF4D86817C7E224002CD082 /* Entitlements.plist */,
+			);
+			name = "Supporting files";
+			sourceTree = "<group>";
+		};
+		3CF4D86A17C7E4FD002CD082 /* BuildConfigurations */ = {
+			isa = PBXGroup;
+			children = (
+				3CF4D86B17C7E526002CD082 /* Application.xcconfig */,
+			);
+			name = BuildConfigurations;
+			sourceTree = "<group>";
+		};
 		6669CFEF173C008C00BB15C3 = {
 			isa = PBXGroup;
 			children = (
+				3CF4D86A17C7E4FD002CD082 /* BuildConfigurations */,
 				6669D036173C00FC00BB15C3 /* Redpark SDK */,
 				6669D001173C008C00BB15C3 /* CharcoalLineTest */,
 				6669D025173C008D00BB15C3 /* CharcoalLineTestTests */,
 				6669CFFA173C008C00BB15C3 /* Frameworks */,
 				6669CFF9173C008C00BB15C3 /* Products */,
+				3CF4D86717C7E1DA002CD082 /* Supporting files */,
 			);
 			sourceTree = "<group>";
 		};
@@ -502,7 +522,6 @@
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -534,7 +553,6 @@
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
@@ -551,6 +569,7 @@
 		};
 		6669D031173C008D00BB15C3 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 3CF4D86B17C7E526002CD082 /* Application.xcconfig */;
 			buildSettings = {
 				ARCHS = armv7;
 				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
@@ -580,6 +599,7 @@
 		};
 		6669D032173C008D00BB15C3 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 3CF4D86B17C7E526002CD082 /* Application.xcconfig */;
 			buildSettings = {
 				ARCHS = armv7;
 				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";

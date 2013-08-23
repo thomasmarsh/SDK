@@ -62,8 +62,8 @@ FTPenPrivateDelegate>
     NSDictionary *infoDictionary = [[NSBundle mainBundle] infoDictionary];
     self.appTitleNavItem.title = [NSString stringWithFormat:@"%@ %@ (%@)",
                                   infoDictionary[@"CFBundleDisplayName"],
-                                  infoDictionary[@"CFBundleVersion"],
-                                  infoDictionary[@"CFBundleShortVersionString"]];
+                                  infoDictionary[@"CFBundleShortVersionString"],
+                                  infoDictionary[@"CFBundleVersion"]];
 
 }
 
