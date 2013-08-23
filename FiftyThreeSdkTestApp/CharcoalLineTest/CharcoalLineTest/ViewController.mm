@@ -1,10 +1,11 @@
 //
-//  ViewController.m
+//  ViewController.mm
 //  CharcoalLineTest
 //
 //  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
 //
 
+#import "Common/Timer.h"
 #import "FiftyThreeSdk/FTFirmwareManager.h"
 #import "FiftyThreeSdk/FTFirmwareUpdateProgressView.h"
 #import "FiftyThreeSdk/FTPen+Private.h"
@@ -13,7 +14,12 @@
 #import "RscMgr.h"
 #import "ViewController.h"
 
-@interface ViewController () <UIAlertViewDelegate, RscMgrDelegate, FTPenManagerDelegate, FTPenManagerDelegatePrivate, FTPenDelegate, FTPenPrivateDelegate>
+@interface ViewController () <UIAlertViewDelegate,
+RscMgrDelegate,
+FTPenManagerDelegate,
+FTPenManagerDelegatePrivate,
+FTPenDelegate,
+FTPenPrivateDelegate>
 
 @property (nonatomic) RscMgr *rscManager;
 @property (nonatomic) FTPenManager *penManager;
@@ -23,9 +29,25 @@
 @property (nonatomic) BOOL pcConnected;
 @property (nonatomic) NSMutableString *commandBuffer;
 
+@property (nonatomic) Timer::Ptr uptimeTimer;
+@property (nonatomic) double lastTouchBeganTimestamp;
+@property (nonatomic) double lastTouchEndedTimestamp;
+@property (nonatomic) double lastTipOrEraserPressedTimestamp;
+@property (nonatomic) double lastTipOrEraserReleasedTimestamp;
+
 @end
 
 @implementation ViewController
+
+- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
+{
+    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
+    if (self)
+    {
+        _uptimeTimer = Timer::New();
+    }
+    return self;
+}
 
 - (void)viewDidLoad
 {
@@ -38,9 +60,6 @@
     _penManager = [[FTPenManager alloc] initWithDelegate:self];
 
     NSDictionary *infoDictionary = [[NSBundle mainBundle] infoDictionary];
-//    NSString *appDisplayName = [infoDictionary objectForKey:@"CFBundleDisplayName"];
-//    NSString *majorVersion = [infoDictionary objectForKey:@"CFBundleShortVersionString"];
-//    NSString *minorVersion = [infoDictionary objectForKey:@"CFBundleVersion"];
     self.appTitleNavItem.title = [NSString stringWithFormat:@"%@ %@ (%@)",
                                   infoDictionary[@"CFBundleDisplayName"],
                                   infoDictionary[@"CFBundleVersion"],
@@ -114,7 +133,7 @@
                           otherButtonTitles:nil] show];
     }
 
-    char stateChar;
+    char stateChar = '\0';
     switch (state)
     {
         case FTPenManagerStateUnpaired:
@@ -136,7 +155,10 @@
             NSAssert(NO, @"Unexpected state.");
             break;
     }
-    [self sendCharacter:stateChar];
+    if (stateChar != '\0')
+    {
+        [self sendCharacter:stateChar];
+    }
 
     [self updateDisplay];
 }
@@ -168,12 +190,32 @@
 
 - (void)pen:(FTPen *)pen isTipPressedDidChange:(BOOL)isTipPressed
 {
+    if (isTipPressed)
+    {
+        self.lastTipOrEraserPressedTimestamp = self.uptimeTimer->ElapsedTimeSeconds();
+    }
+    else
+    {
+        self.lastTipOrEraserReleasedTimestamp = self.uptimeTimer->ElapsedTimeSeconds();
+    }
+    [self updateDeviceInfoLabel];
+
     self.tipStateButton.highlighted = isTipPressed;
     [self sendCharacter:isTipPressed ? 'A' : 'a'];
 }
 
 - (void)pen:(FTPen *)pen isEraserPressedDidChange:(BOOL)isEraserPressed
 {
+    if (isEraserPressed)
+    {
+        self.lastTipOrEraserPressedTimestamp = self.uptimeTimer->ElapsedTimeSeconds();
+    }
+    else
+    {
+        self.lastTipOrEraserReleasedTimestamp = self.uptimeTimer->ElapsedTimeSeconds();
+    }
+    [self updateDeviceInfoLabel];
+
     self.eraserStateButton.highlighted = isEraserPressed;
     [self sendCharacter:isEraserPressed ? 'B' : 'b'];
 }
@@ -235,7 +277,12 @@
     [deviceInfo appendFormat:@"Successful Connections: %d\n", 0]; // pen.numSuccessfulConnections];
     [deviceInfo appendFormat:@"Total On Time: %d:%02d:%02d\n\n", onTimeHourField, onTimeMinField,  onTimeSecField];
     [deviceInfo appendFormat:@"Last Error ID: %d\n", pen.lastErrorCode.lastErrorID];
-    [deviceInfo appendFormat:@"Last Error Value: %d\n", pen.lastErrorCode.lastErrorValue];
+    [deviceInfo appendFormat:@"Last Error Value: %d\n\n", pen.lastErrorCode.lastErrorValue];
+
+    [deviceInfo appendFormat:@"Press Latency (ms): %f\n",
+     1000.0 * (self.lastTipOrEraserPressedTimestamp - self.lastTouchBeganTimestamp)];
+    [deviceInfo appendFormat:@"Release Latency (ms): %f\n",
+     1000.0 * (self.lastTipOrEraserReleasedTimestamp - self.lastTouchEndedTimestamp)];
 
     if (self.penManager.pen.lastErrorCode.lastErrorID != 0)
     {
@@ -407,6 +454,9 @@
 
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
 {
+    self.lastTouchBeganTimestamp = self.uptimeTimer->ElapsedTimeSeconds();
+    [self updateDeviceInfoLabel];
+
     [self sendCharacter:'T'];
     [self.touchButton setHighlighted:YES];
 }
@@ -418,6 +468,9 @@
 
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
 {
+    self.lastTouchEndedTimestamp = self.uptimeTimer->ElapsedTimeSeconds();
+    [self updateDeviceInfoLabel];
+
     [self sendCharacter:'t'];
     [self.touchButton setHighlighted:NO];
 }

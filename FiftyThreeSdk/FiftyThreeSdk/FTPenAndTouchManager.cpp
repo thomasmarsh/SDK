@@ -92,7 +92,10 @@ public:
             _Touches[touch] = TouchType::Unknown;
         }
 
-        if (_Logger) _Logger->TouchesBegan(touches);
+        if (_Logger)
+        {
+            _Logger->TouchesBegan(touches);
+        }
 
         if (_PalmRejectionEnabled)
         {
@@ -102,7 +105,10 @@ public:
 
     void TouchesMoved(const TouchesSetEvent & sender, const TouchesSet & touches)
     {
-        if (_Logger) _Logger->TouchesMoved(touches);
+        if (_Logger)
+        {
+            _Logger->TouchesMoved(touches);
+        }
 
         if (_PalmRejectionEnabled)
         {
@@ -176,6 +182,7 @@ public:
     virtual void Clear()
     {
         _Touches.clear();
+
         if (_Logger)
         {
             _Logger->Clear();

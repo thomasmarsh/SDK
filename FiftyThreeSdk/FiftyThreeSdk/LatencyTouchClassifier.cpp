@@ -5,14 +5,13 @@
 //  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
 //
 
-#include "LatencyTouchClassifier.h"
-
+#include <boost/foreach.hpp>
 #include <ios>
 #include <map>
 #include <vector>
-#include <boost/foreach.hpp>
 
 #include "Common/Touch/TouchManager.h"
+#include "LatencyTouchClassifier.h"
 
 using namespace fiftythree::sdk;
 using namespace fiftythree::common;
@@ -22,6 +21,7 @@ const double MAX_DELAY_SEC = 0.300;
 class LatencyTouchClassifierImpl : public LatencyTouchClassifier
 {
 private:
+
     PenEvent::cPtr _PenDownEvent;
     PenEvent::cPtr _PenUpEvent;
 
@@ -33,12 +33,14 @@ private:
     Event<const Touch::cPtr &> _TouchTypeChangedEvent;
 
 private:
+
     bool IsPenDown()
     {
         return _PenDownEvent->Sample.TimestampSeconds() > _PenUpEvent->Sample.TimestampSeconds();
     }
 
 public:
+
     LatencyTouchClassifierImpl()
     :
     _TouchCount(0)
@@ -48,7 +50,7 @@ public:
         _PenUpEvent = PenEvent::New(0, PenEventType::PenUp, PenTip::Tip1);
     };
 
-    virtual bool HandlesPenInput()
+    bool HandlesPenInput()
     {
         return true;
     }
@@ -103,7 +105,7 @@ public:
         }
     }
 
-    virtual void TouchesBegan(const fiftythree::common::TouchesSet & touches)
+    void TouchesBegan(const fiftythree::common::TouchesSet & touches)
     {
         DebugAssert(CountTouches() == _TouchCount);
 
@@ -122,7 +124,7 @@ public:
         DebugAssert(CountTouches() == _TouchCount);
     }
 
-    virtual void TouchesMoved(const fiftythree::common::TouchesSet & touches)
+    void TouchesMoved(const fiftythree::common::TouchesSet & touches)
     {
         DebugAssert(CountTouches() == _TouchCount);
 
@@ -148,7 +150,7 @@ public:
         DebugAssert(CountTouches() == _TouchCount);
     }
 
-    virtual void TouchesEnded(const fiftythree::common::TouchesSet & touches)
+    void TouchesEnded(const fiftythree::common::TouchesSet & touches)
     {
         DebugAssert(CountTouches() == _TouchCount);
 
@@ -197,12 +199,12 @@ public:
         DebugAssert(CountTouches() == _TouchCount);
     }
 
-    virtual void TouchesCancelled(const fiftythree::common::TouchesSet & touches)
+    void TouchesCancelled(const fiftythree::common::TouchesSet & touches)
     {
         TouchesEnded(touches);
     }
 
-    virtual void ProcessPenEvent(const PenEvent::Ptr & event)
+    void ProcessPenEvent(const PenEvent::Ptr & event)
     {
         DebugAssert(CountTouches() == _TouchCount);
 
@@ -226,7 +228,7 @@ public:
         DebugAssert(CountTouches() == _TouchCount);
     }
 
-    virtual TouchType GetTouchType(const fiftythree::common::Touch::cPtr & touch)
+    TouchType GetTouchType(const fiftythree::common::Touch::cPtr & touch)
     {
         if (_PenTouch == touch)
         {
