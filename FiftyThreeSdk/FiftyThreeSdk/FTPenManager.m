@@ -762,7 +762,6 @@ typedef enum
                  error:(NSError *)error
 {
     NSAssert(self.pen.peripheral == peripheral, @"Peripheral matches pen peripheral.");
-    NSAssert(self.pen.peripheral.UUID, @"Peripheral UUID non-null.");
 
     if (self.pen.peripheral == peripheral)
     {
