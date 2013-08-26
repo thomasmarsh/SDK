@@ -348,6 +348,10 @@ FTPenPrivateDelegate>
     {
         [self.statusLabel setText:[NSString stringWithFormat:@"Connecting to %@", self.penManager.pen.name]];
     }
+    else if (self.penManager.state == FTPenManagerStateReconnecting)
+    {
+        [self.statusLabel setText:[NSString stringWithFormat:@"Reconnecting to %@", self.penManager.pen.name]];
+    }
     else if (self.penManager.state == FTPenManagerStateConnected)
     {
         [self.statusLabel setText:[NSString stringWithFormat:@"Connected to %@", self.penManager.pen.name]];
