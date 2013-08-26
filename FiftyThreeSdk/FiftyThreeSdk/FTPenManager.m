@@ -20,7 +20,7 @@ NSString * const kFTPenManagerDidUpdateStateNotificationName = @"com.fiftythree.
 
 static const int kInterruptedUpdateDelayMax = 30;
 
-static const NSTimeInterval kEngagedStateTimeout = 0.5;
+static const NSTimeInterval kEngagedStateTimeout = 0.1;
 static const NSTimeInterval kIsScanningForPeripheralsToggleTimerInterval = 0.1;
 static const NSTimeInterval kSwingingStateTimeout = 4.0;
 static const NSTimeInterval kSeparatedStateTimeout = 10.0 * 60.0;
