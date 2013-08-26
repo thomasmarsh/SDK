@@ -29,7 +29,8 @@ static const NSTimeInterval kMarriedWaitingForLongPressToDisconnectTimeout = 1.5
 static const NSTimeInterval kAttemptingConnectionStateTimeout = 5.0;
 
 static NSString *const kSingleStateName = @"Single";
-static NSString *const kDatingStateName = @"Dating";
+static NSString *const kDatingRetrievingConnectedPeripheralsStateName = @"DatingRetrievingConnectedPeripherals";
+static NSString *const kDatingScanningStateName = @"DatingScanning";
 static NSString *const kDatingAttemptingConnectiongStateName = @"DatingAttemptingConnection";
 static NSString *const kEngagedStateName = @"Engaged";
 static NSString *const kEngagedWaitingForTipReleaseStateName = @"EngagedWaitingForTipRelease";
@@ -47,7 +48,8 @@ static NSString *const kSeparatedStateName = @"Separated";
 static NSString *const kSeparatedRetrievingPairedPeripheral = @"SeparatedRetrievingPairedPeripheral";
 static NSString *const kSeparatedAttemptingConnectionStateName = @"SeparatedAttemptingConnection";
 
-static NSString *const kBeginDatingEventName = @"BeginDating";
+static NSString *const kBeginDatingAndRetrieveConnectedPeripheralsEventName = @"BeginDatingAndRetrieveConnectedPeripherals";
+static NSString *const kBeginDatingScanningEventName = @"BeginDatingScanning";
 static NSString *const kBecomeSingleEventName = @"BecomeSingleEventName";
 static NSString *const kAttemptConnectionFromDatingEventName = @"AttemptConnectionFromDating";
 static NSString *const kBecomeEngagedEventName = @"BecomeEngaged";
@@ -314,15 +316,23 @@ typedef enum
 //        }
     }];
 
-    // Dating
-    TKState *datingState = [TKState stateWithName:kDatingStateName];
-    [datingState setDidEnterStateBlock:^(TKState *state, TKStateMachine *stateMachine)
+    // DatingRetrievingConnectedPeripherals
+    TKState *datingRetrievingConnectedPeripheralsState = [TKState stateWithName:kDatingRetrievingConnectedPeripheralsStateName];
+    [datingRetrievingConnectedPeripheralsState setDidEnterStateBlock:^(TKState *state,
+                                                                       TKStateMachine *stateMachine)
+    {
+        [weakSelf.centralManager retrieveConnectedPeripherals];
+    }];
+
+    // DatingScanning
+    TKState *datingScanningState = [TKState stateWithName:kDatingScanningStateName];
+    [datingScanningState setDidEnterStateBlock:^(TKState *state, TKStateMachine *stateMachine)
     {
         weakSelf.state = FTPenManagerStateUnpaired;
 
         weakSelf.scanningState = ScanningStateEnabled;
     }];
-    [datingState setDidExitStateBlock:^(TKState *state, TKStateMachine *stateMachine)
+    [datingScanningState setDidExitStateBlock:^(TKState *state, TKStateMachine *stateMachine)
     {
         weakSelf.scanningState = ScanningStateDisabled;
     }];
@@ -536,7 +546,8 @@ typedef enum
 
     [self.stateMachine addStates:@[
      singleState,
-     datingState,
+     datingRetrievingConnectedPeripheralsState,
+     datingScanningState,
      datingAttemptingConnectionState,
      engagedState,
      engagedWaitingForTipReleaseState,
@@ -556,19 +567,24 @@ typedef enum
     // Events
     //
 
-    TKEvent *beginDatingEvent = [TKEvent eventWithName:kBeginDatingEventName
-                               transitioningFromStates:@[singleState,
-                                 separatedState,
-                                 marriedState,
-                                 datingAttemptingConnectionState]
-                                               toState:datingState];
+    TKEvent *beginDatingRetrievingConnectedPeripheralsEvent = [TKEvent eventWithName:kBeginDatingAndRetrieveConnectedPeripheralsEventName
+                                                             transitioningFromStates:@[singleState,
+                                                               separatedState,
+                                                               marriedState,
+                                                               datingAttemptingConnectionState]
+                                                                             toState:datingRetrievingConnectedPeripheralsState];
+    TKEvent *beginDatingScanningEvent = [TKEvent eventWithName:kBeginDatingScanningEventName
+                                       transitioningFromStates:@[datingRetrievingConnectedPeripheralsState]
+                                                       toState:datingScanningState];
     TKEvent *becomeSingleEvent = [TKEvent eventWithName:kBecomeSingleEventName
-                                transitioningFromStates:@[ datingState,
+                                transitioningFromStates:@[ datingScanningState,
+                                  datingRetrievingConnectedPeripheralsState,
                                   separatedState,
                                   swingingState]
                                                 toState:singleState];
     TKEvent *attemptConnectionFromDatingEvent = [TKEvent eventWithName:kAttemptConnectionFromDatingEventName
-                                               transitioningFromStates:@[datingState]
+                                               transitioningFromStates:@[datingScanningState,
+                                                 datingRetrievingConnectedPeripheralsState]
                                                                toState:datingAttemptingConnectionState];
     TKEvent *becomeEngagedEvent = [TKEvent eventWithName:kBecomeEngagedEventName
                                  transitioningFromStates:@[datingAttemptingConnectionState]
@@ -630,7 +646,8 @@ typedef enum
                                                                   toState:separatedAttemptingConnectionState];
 
     [self.stateMachine addEvents:@[
-     beginDatingEvent,
+     beginDatingRetrievingConnectedPeripheralsEvent,
+     beginDatingScanningEvent,
      becomeSingleEvent,
      attemptConnectionFromDatingEvent,
      becomeEngagedEvent,
@@ -704,11 +721,11 @@ typedef enum
 
     if ([self currentStateHasName:kSingleStateName])
     {
-        [self fireStateMachineEvent:kBeginDatingEventName];
+        [self fireStateMachineEvent:kBeginDatingAndRetrieveConnectedPeripheralsEventName];
     }
     else if ([self currentStateHasName:kSeparatedStateName])
     {
-        [self fireStateMachineEvent:kBeginDatingEventName];
+        [self fireStateMachineEvent:kBeginDatingAndRetrieveConnectedPeripheralsEventName];
     }
     else if ([self currentStateHasName:kMarriedStateName])
     {
@@ -724,7 +741,8 @@ typedef enum
 
     self.lastPairingSpotReleaseTime = [NSDate date];
 
-    if ([self currentStateHasName:kDatingStateName])
+    if ([self currentStateHasName:kDatingRetrievingConnectedPeripheralsStateName] ||
+        [self currentStateHasName:kDatingScanningStateName])
     {
         [self fireStateMachineEvent:kBecomeSingleEventName];
     }
@@ -839,7 +857,7 @@ typedef enum
 
     BOOL isPeripheralReconciling = [self isPeripheralReconciling:advertisementData];
 
-    if ([self currentStateHasName:kDatingStateName])
+    if ([self currentStateHasName:kDatingScanningStateName])
     {
         NSAssert(!self.pen, @"pen is nil");
 
@@ -970,7 +988,22 @@ typedef enum
 
 - (void)centralManager:(CBCentralManager *)central didRetrieveConnectedPeripherals:(NSArray *)peripherals
 {
+    if ([self currentStateHasName:kDatingRetrievingConnectedPeripheralsStateName])
+    {
+        for (CBPeripheral *peripheral in peripherals)
+        {
+            if ([peripheral.name isEqualToString:@"Charcoal by 53"])
+            {
+                NSAssert(!self.pen, @"pen is nil");
+                self.pen = [[FTPen alloc] initWithCentralManager:self.centralManager
+                                                      peripheral:peripheral];
+                [self fireStateMachineEvent:kAttemptConnectionFromDatingEventName];
+                return;
+            }
+        }
 
+        [self fireStateMachineEvent:kBeginDatingScanningEventName];
+    }
 }
 
 #pragma mark - Firmware
