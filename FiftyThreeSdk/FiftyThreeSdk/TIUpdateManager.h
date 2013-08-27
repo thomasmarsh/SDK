@@ -5,6 +5,8 @@
 //  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
 //
 
+#pragma once
+
 #import <Foundation/Foundation.h>
 
 @class CBPeripheral;
@@ -14,11 +16,12 @@
 @interface TIUpdateManager : NSObject
 
 @property (nonatomic) BOOL waitingForReboot;
-@property (nonatomic, readonly) NSDate* updateStartTime;
+@property (nonatomic, readonly) NSDate *updateStartTime;
 
-- (id) init __unavailable;
+- (id)init __unavailable;
 - (id)initWithPeripheral:(CBPeripheral *)peripheral delegate:(id<TIUpdateManagerDelegate>)delegate;
 - (void)updateImage:(NSString *)filePath;
+
 @end
 
 @protocol TIUpdateManagerDelegate <NSObject>

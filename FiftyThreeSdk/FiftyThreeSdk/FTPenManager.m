@@ -765,6 +765,11 @@ typedef enum
 
     if (self.pen.peripheral == peripheral)
     {
+        if (error)
+        {
+            NSLog(@"Disconnected peripheral with error: %@", error.localizedDescription);
+        }
+        
         FTPen *pen = self.pen;
         self.pen = nil;
 

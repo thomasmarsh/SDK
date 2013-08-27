@@ -111,8 +111,6 @@ FTPenPrivateDelegate>
 
 - (void)penManager:(FTPenManager *)penManager didUpdateState:(FTPenManagerState)state
 {
-    NSLog(@"penManager didUpdateState: %d", state);
-
     if (state == FTPenManagerStateConnecting ||
         state == FTPenManagerStateReconnecting)
     {
