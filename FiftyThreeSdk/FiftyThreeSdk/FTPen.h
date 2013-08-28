@@ -42,6 +42,7 @@ extern NSString * const kFTPenIsEraserPressedDidChangeNotificationName;
 @property (nonatomic, readonly) NSString *IEEECertificationData;
 @property (nonatomic, readonly) PnPID PnPID;
 
+// Pen Client
 @property (nonatomic, readonly) BOOL isTipPressed;
 @property (nonatomic, readonly) BOOL isEraserPressed;
 @property (nonatomic, readonly) NSDate *lastTipReleaseTime;

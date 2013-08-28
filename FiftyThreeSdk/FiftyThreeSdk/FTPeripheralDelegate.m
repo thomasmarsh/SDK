@@ -159,11 +159,11 @@
 {
     if (characteristic.isNotifying)
     {
-        NSLog(@"Peripheral notification began on charateristic: %@.", FTNameForServiceUUID(characteristic.UUID));
+        NSLog(@"Peripheral notification began on charateristic: %@", FTNameForServiceUUID(characteristic.UUID));
     }
     else
     {
-        NSLog(@"Peripheral notification stopped on characteristic: %@.", FTNameForServiceUUID(characteristic.UUID));
+        NSLog(@"Peripheral notification stopped on characteristic: %@", FTNameForServiceUUID(characteristic.UUID));
     }
 
     for (FTServiceClient *serviceClient in self.serviceClients)
@@ -175,7 +175,7 @@
 - (void)peripheral:(CBPeripheral *)peripheral didDiscoverDescriptorsForCharacteristic:(CBCharacteristic *)characteristic
              error:(NSError *)error
 {
-    NSLog(@"Peripheral did discover descriptors for characteristic: %@.", FTNameForServiceUUID(characteristic.UUID));
+    NSLog(@"Peripheral did discover descriptors for characteristic: %@", FTNameForServiceUUID(characteristic.UUID));
 
     for (FTServiceClient *serviceClient in self.serviceClients)
     {
@@ -186,7 +186,7 @@
 - (void)peripheral:(CBPeripheral *)peripheral didUpdateValueForDescriptor:(CBDescriptor *)descriptor
              error:(NSError *)error
 {
-    NSLog(@"Peripheral did update value for descriptor.");
+    NSLog(@"Peripheral did update value for descriptor");
 
     for (FTServiceClient *serviceClient in self.serviceClients)
     {

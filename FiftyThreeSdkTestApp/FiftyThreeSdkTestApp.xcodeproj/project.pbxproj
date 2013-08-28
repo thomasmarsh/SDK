@@ -817,6 +817,10 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
 				ONLY_ACTIVE_ARCH = YES;
+				OTHER_LDFLAGS = (
+					"-ObjC",
+					"-all_load",
+				);
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = 2;
 			};
@@ -844,6 +848,10 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
+				OTHER_LDFLAGS = (
+					"-ObjC",
+					"-all_load",
+				);
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = 2;
 				VALIDATE_PRODUCT = YES;
@@ -876,7 +884,6 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/../../ThirdParty/PogoConnect\"",
 				);
-				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = FiftyThreeSdkTestApp;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				USER_HEADER_SEARCH_PATHS = "";
@@ -911,7 +918,6 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/../../ThirdParty/PogoConnect\"",
 				);
-				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = FiftyThreeSdkTestApp;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				USER_HEADER_SEARCH_PATHS = "";

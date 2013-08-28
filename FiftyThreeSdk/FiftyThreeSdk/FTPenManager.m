@@ -626,7 +626,7 @@ typedef enum
     NSDate *t0 = self.lastPairingSpotReleaseTime;
     NSDate *t1 = self.pen.lastTipReleaseTime;
     NSTimeInterval tipAndPairingSpoteReleaseTimeDifference = fabs([t0 timeIntervalSinceDate:t1]);
-    NSLog(@"Difference in pairing spot and tip press release times (ms): %f.",
+    NSLog(@"Difference in pairing spot and tip press release times (ms): %f",
           tipAndPairingSpoteReleaseTimeDifference * 1000.0);
 
     if (tipAndPairingSpoteReleaseTimeDifference < kEngagedStateTimeout)
@@ -769,7 +769,7 @@ typedef enum
         {
             NSLog(@"Disconnected peripheral with error: %@", error.localizedDescription);
         }
-        
+
         FTPen *pen = self.pen;
         self.pen = nil;
 

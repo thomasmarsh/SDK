@@ -5,6 +5,8 @@
 //  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
 //
 
+#import "CBCharacteristic+Helpers.h"
+#import "CBPeripheral+Helpers.h"
 #import "FTError.h"
 #import "FTPenServiceClient.h"
 #import "FTServiceUUIDs.h"
@@ -42,22 +44,12 @@
 
 - (BOOL)isTipPressed
 {
-    if (self.isTipPressedCharacteristic.value.length > 0)
-    {
-        return ((const char *)self.isTipPressedCharacteristic.value.bytes)[0] != 0;
-    }
-
-    return NO;
+    return [self.isTipPressedCharacteristic valueAsBOOL];
 }
 
 - (BOOL)isEraserPressed
 {
-    if (self.isEraserPressedCharacteristic.value.length > 0)
-    {
-        return ((const char *)self.isEraserPressedCharacteristic.value.bytes)[0] != 0;
-    }
-
-    return NO;
+    return [self.isEraserPressedCharacteristic valueAsBOOL];
 }
 
 - (NSInteger)batteryLevel
@@ -79,34 +71,18 @@
 
 - (void)startSwinging
 {
-    if (self.shouldSwingCharacteristic)
-    {
-        NSData *data = [NSData dataWithBytes:"1" length:1];
-        [self.peripheral writeValue:data
-                  forCharacteristic:self.shouldSwingCharacteristic
-                               type:CBCharacteristicWriteWithResponse];
-    }
-    else
-    {
-        NSLog(@"ShouldSwing characteristic not initialized.");
-    }
+    [self.peripheral writeBOOL:YES
+             forCharacteristic:self.shouldSwingCharacteristic
+                          type:CBCharacteristicWriteWithResponse];
 }
 
 - (void)powerOff
 {
     _isPoweringOff = YES;
 
-    if (self.shouldPowerOffCharacteristic)
-    {
-        NSData *data = [NSData dataWithBytes:"1" length:1];
-        [self.peripheral writeValue:data
-                  forCharacteristic:self.shouldPowerOffCharacteristic
-                               type:CBCharacteristicWriteWithResponse];
-    }
-    else
-    {
-        NSLog(@"ShouldPowerOff characteristic not initialized.");
-    }
+    [self.peripheral writeBOOL:YES
+             forCharacteristic:self.shouldPowerOffCharacteristic
+                          type:CBCharacteristicWriteWithResponse];
 }
 
 #pragma mark - FTServiceClient
@@ -224,7 +200,7 @@
                  @"The IsTipPressed characteristic must be notifying before we first read its value.");
 
         BOOL isTipPressed = self.isTipPressed;
-        NSLog(@"IsTipPressed did update value: %d.", isTipPressed);
+        NSLog(@"IsTipPressed did update value: %d", isTipPressed);
 
         if (self.isReady)
         {
@@ -264,14 +240,14 @@
         BOOL isEraserPressed = self.isEraserPressed;
         [self.delegate penServiceClient:self isEraserPressedDidChange:isEraserPressed];
 
-        NSLog(@"IsEraserPressed did update value: %d.", isEraserPressed);
+        NSLog(@"IsEraserPressed did update value: %d", isEraserPressed);
     }
     else if ([characteristic isEqual:self.batteryLevelCharacteristic])
     {
         NSInteger batteryLevel = self.batteryLevel;
         [self.delegate penServiceClient:self batteryLevelDidChange:batteryLevel];
 
-        NSLog(@"BatteryLevel did update value: %d.", batteryLevel);
+        NSLog(@"BatteryLevel did update value: %d", batteryLevel);
     }
 }
 
@@ -280,7 +256,7 @@
 {
     if (error)
     {
-        NSLog(@"Error changing notification state: %@.", error.localizedDescription);
+        NSLog(@"Error changing notification state: %@", error.localizedDescription);
         // TODO: Report failed state
         return;
     }

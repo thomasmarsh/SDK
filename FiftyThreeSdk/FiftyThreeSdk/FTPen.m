@@ -138,19 +138,71 @@ NSString * const kFTPenBatteryLevelDidChangeNotificationName = @"com.fiftythree.
     [self.penServiceClient powerOff];
 }
 
-- (void)getManufacturingID
+#pragma mark - Debug properties
+
+- (NSUInteger)numTipPresses
 {
-    [self.penDebugServiceClient getManufacturingID];
+    return self.penDebugServiceClient.numTipPresses;
+}
+
+- (NSUInteger)numEraserPresses
+{
+    return self.penDebugServiceClient.numEraserPresses;
+}
+
+- (NSUInteger)numFailedConnections
+{
+    return self.penDebugServiceClient.numFailedConnections;
+}
+
+- (NSUInteger)numSuccessfulConnections
+{
+    return self.penDebugServiceClient.numSuccessfulConnections;
+}
+
+- (NSUInteger)totalOnTimeSeconds
+{
+    return self.penDebugServiceClient.totalOnTimeSeconds;
+}
+
+- (NSString *)manufacturingID
+{
+    return self.penDebugServiceClient.manufacturingID;
 }
 
 - (void)setManufacturingID:(NSString *)manufacturingID
 {
-    [self.penDebugServiceClient setManufacturingID:manufacturingID];
+    self.penDebugServiceClient.manufacturingID = manufacturingID;
 
     // The model number and serial number charateristics of the device info
     // service change as a result of setting the manufacturing ID, so refresh
     // them now.
     [self.deviceInfoServiceClient refreshModelNumberAndSerialNumber];
+}
+
+- (NSUInteger)longPressTimeMilliseconds
+{
+    return self.penDebugServiceClient.longPressTimeMilliseconds;
+}
+
+- (void)setLongPressTimeMilliseconds:(NSUInteger)longPressTimeMilliseconds
+{
+    self.penDebugServiceClient.longPressTimeMilliseconds = longPressTimeMilliseconds;
+}
+
+- (NSUInteger)connectionTimeSeconds
+{
+    return self.penDebugServiceClient.connectionTimeSeconds;
+}
+
+- (void)setConnectionTimeSeconds:(NSUInteger)connectionTimeSeconds
+{
+    self.penDebugServiceClient.connectionTimeSeconds = connectionTimeSeconds;
+}
+
+- (void)readDebugProperties
+{
+    [self.penDebugServiceClient readDebugProperties];
 }
 
 #pragma mark -
@@ -179,7 +231,7 @@ NSString * const kFTPenBatteryLevelDidChangeNotificationName = @"com.fiftythree.
 
 - (void)penServiceClient:(FTPenServiceClient *)penServiceClient didEncounterError:(NSError *)error
 {
-    NSLog(@"Pen did encounter error: \"%@\".", error.localizedDescription);
+    NSLog(@"Pen did encounter error: \"%@\"", error.localizedDescription);
 
     [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenDidEncounterErrorNotificationName
                                                         object:self];

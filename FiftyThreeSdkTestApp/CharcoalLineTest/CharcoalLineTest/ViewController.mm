@@ -184,6 +184,8 @@ FTPenPrivateDelegate>
 - (void)pen:(FTPen *)pen isReadyDidChange:(BOOL)isReady
 {
     [self updateDisplay];
+
+    [pen readDebugProperties];
 }
 
 - (void)pen:(FTPen *)pen isTipPressedDidChange:(BOOL)isTipPressed
@@ -253,9 +255,9 @@ FTPenPrivateDelegate>
 - (void)updateDeviceInfoLabel
 {
     FTPen *pen = self.penManager.pen;
-    int   onTimeSec, onTimeHourField, onTimeMinField, onTimeSecField;
+    int onTimeSec, onTimeHourField, onTimeMinField, onTimeSecField;
 
-    onTimeSec  = 0; // pen.totalOnTimeSec;
+    onTimeSec  = pen.totalOnTimeSeconds;
     onTimeHourField = onTimeSec / 60 / 60;
     onTimeMinField  = (onTimeSec - (onTimeHourField * 60 * 60)) / 60;
     onTimeSecField  = onTimeSec - (onTimeHourField * 60 * 60) - (onTimeMinField *60);
@@ -269,10 +271,10 @@ FTPenPrivateDelegate>
     [deviceInfo appendFormat:@"Upgrade Firmware Rev: %@\n", pen.softwareRevision];
     [deviceInfo appendFormat:@"    * currently running\n\n"];
     [deviceInfo appendFormat:@"Battery Level: %d%%\n", pen.batteryLevel];
-    [deviceInfo appendFormat:@"Tip Presses: %d\n", 0]; // pen.numTipPresses];
-    [deviceInfo appendFormat:@"Eraser Presses: %d\n", 0]; // pen.numEraserPresses];
-    [deviceInfo appendFormat:@"Failed Connections: %d\n", 0]; // pen.numFailedConnections];
-    [deviceInfo appendFormat:@"Successful Connections: %d\n", 0]; // pen.numSuccessfulConnections];
+    [deviceInfo appendFormat:@"Tip Presses: %d\n", pen.numTipPresses];
+    [deviceInfo appendFormat:@"Eraser Presses: %d\n", pen.numEraserPresses];
+    [deviceInfo appendFormat:@"Failed Connections: %d\n", pen.numFailedConnections];
+    [deviceInfo appendFormat:@"Successful Connections: %d\n", pen.numSuccessfulConnections];
     [deviceInfo appendFormat:@"Total On Time: %d:%02d:%02d\n\n", onTimeHourField, onTimeMinField,  onTimeSecField];
     [deviceInfo appendFormat:@"Last Error ID: %d\n", pen.lastErrorCode.lastErrorID];
     [deviceInfo appendFormat:@"Last Error Value: %d\n\n", pen.lastErrorCode.lastErrorValue];
@@ -337,12 +339,14 @@ FTPenPrivateDelegate>
         self.penConnectedButton.highlighted = YES;
         self.connectButton.hidden = NO;
         self.updateFirmwareButton.hidden = NO;
+        self.updateStatsButton.hidden = NO;
     }
     else
     {
         self.penConnectedButton.highlighted = NO;
         self.connectButton.hidden = YES;
         self.updateFirmwareButton.hidden = YES;
+        self.updateStatsButton.hidden = YES;
         self.clearLastErrorButton.hidden = YES;
 
         self.tipStateButton.highlighted = NO;
@@ -403,6 +407,11 @@ FTPenPrivateDelegate>
     [self.penManager.pen clearLastErrorCode];
 }
 
+- (IBAction)updateStatsTouchUpInside:(id)sender
+{
+    [self.penManager.pen readDebugProperties];
+}
+
 - (IBAction)pairButtonTouchUpInside:(id)sender
 {
     return [self pairButtonReleased:sender];
@@ -419,35 +428,6 @@ FTPenPrivateDelegate>
     {
         [self.penManager disconnect];
     }
-}
-
-- (IBAction)infoButtonPressed:(id)sender
-{
-    NSDateFormatter *format = [[NSDateFormatter alloc] init];
-    [format setDateFormat:@"MMM dd, yyyy HH:mm:ss"];
-
-    FTPen* pen = self.penManager.pen;
-    NSString *info = [NSString stringWithFormat:@"\
-                      Manufacturer = %@\n \
-                      Model Number = %@\n \
-                      Serial Number = %@\n \
-                      Firmware Revision = %@\n \
-                      Hardware Revision = %@\n \
-                      Software Revision = %@\n \
-                      System ID = %@\n \
-                      Battery Level = %lu\n \
-                      \n",
-                      pen.manufacturerName,
-                      pen.modelNumber,
-                      pen.serialNumber,
-                      pen.firmwareRevision,
-                      pen.hardwareRevision,
-                      pen.softwareRevision,
-                      pen.systemID,
-                      0UL];
-
-    UIAlertView* alertView = [[UIAlertView alloc] initWithTitle:@"Device Information" message:info delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
-    [alertView show];
 }
 
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
@@ -581,7 +561,7 @@ FTPenPrivateDelegate>
                 NSString *manufacturingID = [command substringWithRange:NSMakeRange(command.length - kIdLength,
                                                                                     kIdLength)];
 
-                [self.penManager.pen setManufacturingID:manufacturingID];
+                self.penManager.pen.manufacturingID = manufacturingID;
                 [self sendString:[NSString stringWithFormat:@"Set Manufacturing ID: \"%@\"",
                                   manufacturingID]];
             }
@@ -594,7 +574,7 @@ FTPenPrivateDelegate>
         {
             if (self.penManager.state == FTPenManagerStateConnected)
             {
-                [self.penManager.pen getManufacturingID];
+                [self.penManager.pen readDebugProperties];
             }
         }
         else if ([command isEqualToString:kGetBatteryLevelCommand])

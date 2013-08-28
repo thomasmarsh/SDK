@@ -7,6 +7,7 @@
 
 #import <CoreBluetooth/CoreBluetooth.h>
 
+#import "CBCharacteristic+Helpers.h"
 #import "FTDeviceInfoServiceClient.h"
 #import "FTServiceUUIDs.h"
 
@@ -193,15 +194,6 @@
     }
 }
 
-- (NSString *)NSStringFromCharacteristic:(CBCharacteristic *)characteristic
-{
-    if (characteristic.value.length > 0)
-    {
-        return [NSString stringWithUTF8String:characteristic.value.bytes];
-    }
-    return nil;
-}
-
 - (void)peripheral:(CBPeripheral *)peripheral didUpdateValueForCharacteristic:(CBCharacteristic *)characteristic
              error:(NSError *)error
 {
@@ -209,39 +201,39 @@
 
     if ([characteristic isEqual:self.manufacturerNameCharacteristic])
     {
-        self.manufacturerName = [self NSStringFromCharacteristic:characteristic];
+        self.manufacturerName = [characteristic valueAsNSString];
         updatedCharacteristic = YES;
     }
     else if ([characteristic isEqual:self.modelNumberCharateristic])
     {
-        self.modelNumber = [self NSStringFromCharacteristic:characteristic];
+        self.modelNumber = [characteristic valueAsNSString];
         updatedCharacteristic = YES;
     }
     else if ([characteristic isEqual:self.serialNumberCharateristic])
     {
-        self.serialNumber = [self NSStringFromCharacteristic:characteristic];
+        self.serialNumber = [characteristic valueAsNSString];
         updatedCharacteristic = YES;
     }
     else if ([characteristic isEqual:self.firmwareRevisionCharateristic])
     {
-        self.firmwareRevision = [self NSStringFromCharacteristic:characteristic];
+        self.firmwareRevision = [characteristic valueAsNSString];
         updatedCharacteristic = YES;
     }
     else if ([characteristic isEqual:self.hardwareRevisionCharateristic])
     {
         self.hardwareRevisionCharateristic = characteristic;
-        self.hardwareRevision = [self NSStringFromCharacteristic:characteristic];
+        self.hardwareRevision = [characteristic valueAsNSString];
         updatedCharacteristic = YES;
     }
     else if ([characteristic isEqual:self.softwareRevisionCharateristic])
     {
         self.softwareRevisionCharateristic = characteristic;
-        self.softwareRevision = [self NSStringFromCharacteristic:characteristic];
+        self.softwareRevision = [characteristic valueAsNSString];
         updatedCharacteristic = YES;
     }
     else if ([characteristic isEqual:self.systemIDCharateristic])
     {
-        self.systemID = [self NSStringFromCharacteristic:characteristic];
+        self.systemID = [characteristic valueAsNSString];
         updatedCharacteristic = YES;
     }
     else if ([characteristic isEqual:self.IEEECertificationDataCharateristic])

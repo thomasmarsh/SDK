@@ -15,6 +15,8 @@
 		3CC31DF417933C5F002CD4FB /* TKEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = 3CC31DEE17933C5F002CD4FB /* TKEvent.m */; };
 		3CC31DF517933C5F002CD4FB /* TKState.m in Sources */ = {isa = PBXBuildFile; fileRef = 3CC31DF017933C5F002CD4FB /* TKState.m */; };
 		3CC31DF617933C5F002CD4FB /* TKStateMachine.m in Sources */ = {isa = PBXBuildFile; fileRef = 3CC31DF217933C5F002CD4FB /* TKStateMachine.m */; };
+		3CE80BD117CE6DC900AA73A0 /* CBPeripheral+Helpers.m in Sources */ = {isa = PBXBuildFile; fileRef = 3CE80BD017CE6DC900AA73A0 /* CBPeripheral+Helpers.m */; };
+		3CE80BD417CE6DE700AA73A0 /* CBCharacteristic+Helpers.m in Sources */ = {isa = PBXBuildFile; fileRef = 3CE80BD317CE6DE600AA73A0 /* CBCharacteristic+Helpers.m */; };
 		3CF1369417A9F4440006AB2E /* FTFirmwareUpdateProgressView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3CF1369317A9F4430006AB2E /* FTFirmwareUpdateProgressView.m */; };
 		3CF2306F177E13910049A9EF /* FTServiceUUIDs.m in Sources */ = {isa = PBXBuildFile; fileRef = 3CF2306E177E13910049A9EF /* FTServiceUUIDs.m */; };
 		663AFED616FA511300681A90 /* TouchClassifierManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 663AFED416FA511300681A90 /* TouchClassifierManager.cpp */; };
@@ -73,6 +75,10 @@
 		3CC31DF117933C5F002CD4FB /* TKStateMachine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TKStateMachine.h; path = ../../ThirdParty/TransitionKit/Code/TKStateMachine.h; sourceTree = "<group>"; };
 		3CC31DF217933C5F002CD4FB /* TKStateMachine.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TKStateMachine.m; path = ../../ThirdParty/TransitionKit/Code/TKStateMachine.m; sourceTree = "<group>"; };
 		3CC31DF317933C5F002CD4FB /* TransitionKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TransitionKit.h; path = ../../ThirdParty/TransitionKit/Code/TransitionKit.h; sourceTree = "<group>"; };
+		3CE80BCF17CE6DC900AA73A0 /* CBPeripheral+Helpers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "CBPeripheral+Helpers.h"; path = "FiftyThreeSdk/CBPeripheral+Helpers.h"; sourceTree = "<group>"; };
+		3CE80BD017CE6DC900AA73A0 /* CBPeripheral+Helpers.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "CBPeripheral+Helpers.m"; path = "FiftyThreeSdk/CBPeripheral+Helpers.m"; sourceTree = "<group>"; };
+		3CE80BD217CE6DE600AA73A0 /* CBCharacteristic+Helpers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "CBCharacteristic+Helpers.h"; path = "FiftyThreeSdk/CBCharacteristic+Helpers.h"; sourceTree = "<group>"; };
+		3CE80BD317CE6DE600AA73A0 /* CBCharacteristic+Helpers.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "CBCharacteristic+Helpers.m"; path = "FiftyThreeSdk/CBCharacteristic+Helpers.m"; sourceTree = "<group>"; };
 		3CF1369217A9F4430006AB2E /* FTFirmwareUpdateProgressView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FTFirmwareUpdateProgressView.h; path = FiftyThreeSdk/FTFirmwareUpdateProgressView.h; sourceTree = "<group>"; };
 		3CF1369317A9F4430006AB2E /* FTFirmwareUpdateProgressView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FTFirmwareUpdateProgressView.m; path = FiftyThreeSdk/FTFirmwareUpdateProgressView.m; sourceTree = "<group>"; };
 		3CF2306E177E13910049A9EF /* FTServiceUUIDs.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FTServiceUUIDs.m; path = FiftyThreeSdk/FTServiceUUIDs.m; sourceTree = SOURCE_ROOT; };
@@ -133,6 +139,10 @@
 		3C2F9C3E17807FCF00A5FFBC /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				3CE80BD217CE6DE600AA73A0 /* CBCharacteristic+Helpers.h */,
+				3CE80BD317CE6DE600AA73A0 /* CBCharacteristic+Helpers.m */,
+				3CE80BCF17CE6DC900AA73A0 /* CBPeripheral+Helpers.h */,
+				3CE80BD017CE6DC900AA73A0 /* CBPeripheral+Helpers.m */,
 				3C2F9C421780A7BA00A5FFBC /* FTPenDebugServiceClient.h */,
 				3C2F9C431780A7BA00A5FFBC /* FTPenDebugServiceClient.m */,
 				3C2F9C3B1780786F00A5FFBC /* FTPenServiceClient.h */,
@@ -362,6 +372,8 @@
 				3CC31DF517933C5F002CD4FB /* TKState.m in Sources */,
 				3CC31DF617933C5F002CD4FB /* TKStateMachine.m in Sources */,
 				3CF1369417A9F4440006AB2E /* FTFirmwareUpdateProgressView.m in Sources */,
+				3CE80BD117CE6DC900AA73A0 /* CBPeripheral+Helpers.m in Sources */,
+				3CE80BD417CE6DE700AA73A0 /* CBCharacteristic+Helpers.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

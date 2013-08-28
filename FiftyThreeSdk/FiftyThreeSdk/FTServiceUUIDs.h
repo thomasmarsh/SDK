@@ -26,13 +26,18 @@
 @interface FTPenDebugServiceUUIDs : NSObject
 
 + (CBUUID *)penDebugService;
-+ (CBUUID *)tipPressure;
-+ (CBUUID *)eraserPressure;
-+ (CBUUID *)longPressTime;
-+ (CBUUID *)connectionTime;
+
+//+ (CBUUID *)tipPressure;
+//+ (CBUUID *)eraserPressure;
++ (CBUUID *)numTipPresses;
++ (CBUUID *)numEraserPresses;
 + (CBUUID *)numFailedConnections;
++ (CBUUID *)numSuccessfulConnections;
++ (CBUUID *)totalOnTime;
 + (CBUUID *)manufacturingID;
 + (CBUUID *)lastErrorCode;
++ (CBUUID *)longPressTime;
++ (CBUUID *)connectionTime;
 
 + (NSString *)nameForUUID:(CBUUID *)UUID;
 
