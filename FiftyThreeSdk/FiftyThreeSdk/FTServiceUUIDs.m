@@ -94,9 +94,6 @@
 // 55518435-9BAB-4612-BDCE-F5B0C8C127AC
 #define FT_PEN_DEBUG_SERVICE_UUID CFUUIDGetConstantUUIDWithBytes(kCFAllocatorSystemDefault, 0x55, 0x51, 0x84, 0x35, 0x9B, 0xAB, 0x46, 0x12, 0xBD, 0xCE, 0xF5, 0xB0, 0xC8, 0xC1, 0x27, 0xAC)
 
-// B0825032-5897-4BC9-8DF5-4DFC59705197
-#define FT_PEN_DEBUG_SERVICE_DEVICE_STATE_UUID CFUUIDGetConstantUUIDWithBytes(kCFAllocatorSystemDefault, 0xB0, 0x82, 0x50, 0x32, 0x58, 0x97, 0x4B, 0xC9, 0x8D, 0xF5, 0x4D, 0xFC, 0x59, 0x70, 0x51, 0x97)
-
 // EB1B235C-84D8-4595-AD89-9A58187AF718
 #define FT_PEN_DEBUG_SERVICE_TIP_PRESSURE_UUID CFUUIDGetConstantUUIDWithBytes(kCFAllocatorSystemDefault, 0xEB, 0x1B, 0x23, 0x5C, 0x84, 0xD8, 0x45, 0x95, 0xAD, 0x89, 0x9A, 0x58, 0x18, 0x7A, 0xF7, 0x18)
 
@@ -123,11 +120,6 @@
 + (CBUUID *)penDebugService
 {
     return [CBUUID UUIDWithCFUUID:FT_PEN_DEBUG_SERVICE_UUID];
-}
-
-+ (CBUUID *)deviceState
-{
-    return [CBUUID UUIDWithCFUUID:FT_PEN_DEBUG_SERVICE_DEVICE_STATE_UUID];
 }
 
 + (CBUUID *)tipPressure
@@ -168,7 +160,6 @@
 + (NSString *)nameForUUID:(CBUUID *)UUID
 {
     NSDictionary *UUIDs = @{ [FTPenDebugServiceUUIDs penDebugService] : @"PenDebugService",
-                             [FTPenDebugServiceUUIDs deviceState] : @"DeviceState",
                              [FTPenDebugServiceUUIDs tipPressure] : @"TipPressure",
                              [FTPenDebugServiceUUIDs eraserPressure] : @"EraserPressure",
                              [FTPenDebugServiceUUIDs longPressTime] : @"LongPressTime",

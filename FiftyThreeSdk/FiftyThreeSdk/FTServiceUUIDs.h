@@ -26,7 +26,6 @@
 @interface FTPenDebugServiceUUIDs : NSObject
 
 + (CBUUID *)penDebugService;
-+ (CBUUID *)deviceState;
 + (CBUUID *)tipPressure;
 + (CBUUID *)eraserPressure;
 + (CBUUID *)longPressTime;

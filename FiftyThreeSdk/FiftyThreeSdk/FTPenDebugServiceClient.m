@@ -14,7 +14,6 @@
 
 @property (nonatomic) CBService *penDebugService;
 
-@property (nonatomic) CBCharacteristic *deviceStateCharacteristic;
 @property (nonatomic) CBCharacteristic *tipPressureCharacteristic;
 @property (nonatomic) CBCharacteristic *eraserPressureCharacteristic;
 @property (nonatomic) CBCharacteristic *longPressTimeCharacteristic;
@@ -103,7 +102,6 @@
     else
     {
         self.penDebugService = nil;
-        self.deviceStateCharacteristic = nil;
 
         return nil;
     }
@@ -127,8 +125,7 @@
 
         if (self.penDebugService)
         {
-            NSArray *characteristics = @[[FTPenDebugServiceUUIDs deviceState],
-                                         [FTPenDebugServiceUUIDs tipPressure],
+            NSArray *characteristics = @[[FTPenDebugServiceUUIDs tipPressure],
                                          [FTPenDebugServiceUUIDs eraserPressure],
                                          [FTPenDebugServiceUUIDs longPressTime],
                                          [FTPenDebugServiceUUIDs connectionTime],
@@ -154,24 +151,17 @@
 
     for (CBCharacteristic *characteristic in service.characteristics)
     {
-        // DeviceState
-        if (!self.deviceStateCharacteristic &&
-            [characteristic.UUID isEqual:[FTPenDebugServiceUUIDs deviceState]])
-        {
-            self.deviceStateCharacteristic = characteristic;
-            [peripheral setNotifyValue:YES forCharacteristic:characteristic];
-        }
-        else if (!self.tipPressureCharacteristic &&
+        if (!self.tipPressureCharacteristic &&
                  [characteristic.UUID isEqual:[FTPenDebugServiceUUIDs tipPressure]])
         {
             self.tipPressureCharacteristic = characteristic;
-//            [peripheral setNotifyValue:YES forCharacteristic:characteristic];
+            // [peripheral setNotifyValue:YES forCharacteristic:characteristic];
         }
         else if (!self.eraserPressureCharacteristic &&
                  [characteristic.UUID isEqual:[FTPenDebugServiceUUIDs eraserPressure]])
         {
             self.eraserPressureCharacteristic = characteristic;
-//            [peripheral setNotifyValue:YES forCharacteristic:characteristic];
+            // [peripheral setNotifyValue:YES forCharacteristic:characteristic];
         }
         else if (!self.longPressTimeCharacteristic &&
                  [characteristic.UUID isEqual:[FTPenDebugServiceUUIDs longPressTime]])
@@ -212,12 +202,7 @@
         return;
     }
 
-    if ([characteristic.UUID isEqual:[FTPenDebugServiceUUIDs deviceState]])
-    {
-        const int state = ((const char *)characteristic.value.bytes)[0];
-        NSLog(@"DeviceState changed: %d.", state);
-    }
-    else if ([characteristic.UUID isEqual:[FTPenDebugServiceUUIDs manufacturingID]])
+    if ([characteristic.UUID isEqual:[FTPenDebugServiceUUIDs manufacturingID]])
     {
         NSString *manufacturingID = [[NSString alloc] initWithData:characteristic.value encoding:NSASCIIStringEncoding];
         [self.delegate didReadManufacturingID:manufacturingID];
