@@ -11,11 +11,11 @@
 		34986FDF174FAF8800A3088E /* libCommon.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 34986FDA174FAF7C00A3088E /* libCommon.a */; };
 		349CF247174ECF9900F9DCA9 /* Paper_Icon-72.png in Resources */ = {isa = PBXBuildFile; fileRef = 349CF241174ECF9900F9DCA9 /* Paper_Icon-72.png */; };
 		349CF248174ECF9900F9DCA9 /* Paper_Icon-72@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 349CF242174ECF9900F9DCA9 /* Paper_Icon-72@2x.png */; };
+		3C093CD417CF8E3D003B4A0D /* libCanvas.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3C093CCE17CF8E19003B4A0D /* libCanvas.a */; };
+		3C093CE517CF90F2003B4A0D /* libAFNetworking.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3C093CDA17CF90CC003B4A0D /* libAFNetworking.a */; };
+		3C093CE617CF90F2003B4A0D /* libGlobalSettings.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3C093CE017CF90DE003B4A0D /* libGlobalSettings.a */; };
 		3C23828217B3174000161277 /* Crashlytics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3C23828117B3174000161277 /* Crashlytics.framework */; };
 		3CE80BE817CE798500AA73A0 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6669CFFF173C008C00BB15C3 /* CoreGraphics.framework */; };
-		3CE80BEC17CE798600AA73A0 /* libAFNetworking.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3CE80BE917CE798500AA73A0 /* libAFNetworking.a */; };
-		3CE80BED17CE798600AA73A0 /* libCanvas.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3CE80BEA17CE798600AA73A0 /* libCanvas.a */; };
-		3CE80BEE17CE798600AA73A0 /* libGlobalSettings.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3CE80BEB17CE798600AA73A0 /* libGlobalSettings.a */; };
 		3CE80BF117CE79BD00AA73A0 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3CE80BEF17CE79BD00AA73A0 /* CFNetwork.framework */; };
 		3CE80BF217CE79BD00AA73A0 /* GLKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3CE80BF017CE79BD00AA73A0 /* GLKit.framework */; };
 		3CE80BF417CE79D900AA73A0 /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3CE80BF317CE79D900AA73A0 /* CoreVideo.framework */; };
@@ -88,6 +88,55 @@
 			remoteGlobalIDString = B96AD1D113949F8F0036028E;
 			remoteInfo = Common;
 		};
+		3C093CCD17CF8E19003B4A0D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3C093CC817CF8E18003B4A0D /* Canvas.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = B9F296FB14DB374D00D204D9;
+			remoteInfo = Canvas;
+		};
+		3C093CCF17CF8E19003B4A0D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3C093CC817CF8E18003B4A0D /* Canvas.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = B9F2970B14DB374D00D204D9;
+			remoteInfo = CanvasTests;
+		};
+		3C093CD217CF8E2F003B4A0D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3C093CC817CF8E18003B4A0D /* Canvas.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = B9F296FA14DB374D00D204D9;
+			remoteInfo = Canvas;
+		};
+		3C093CD917CF90CC003B4A0D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3C093CD517CF90CC003B4A0D /* AFNetworking.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 3CE2FE69164AE1AF008DD18E;
+			remoteInfo = AFNetworking;
+		};
+		3C093CDF17CF90DE003B4A0D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3C093CDB17CF90DE003B4A0D /* GlobalSettings.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 34576CFB1608CBB800825F06;
+			remoteInfo = GlobalSettings;
+		};
+		3C093CE117CF90EE003B4A0D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3C093CD517CF90CC003B4A0D /* AFNetworking.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 3CE2FE68164AE1AF008DD18E;
+			remoteInfo = AFNetworking;
+		};
+		3C093CE317CF90EE003B4A0D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3C093CDB17CF90DE003B4A0D /* GlobalSettings.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 34576CFA1608CBB800825F06;
+			remoteInfo = GlobalSettings;
+		};
 		6669D023173C008D00BB15C3 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 6669CFF0173C008C00BB15C3 /* Project object */;
@@ -102,10 +151,10 @@
 		34986FD4174FAF7B00A3088E /* Common.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Common.xcodeproj; path = ../../../Common/Common.xcodeproj; sourceTree = "<group>"; };
 		349CF241174ECF9900F9DCA9 /* Paper_Icon-72.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Paper_Icon-72.png"; sourceTree = "<group>"; };
 		349CF242174ECF9900F9DCA9 /* Paper_Icon-72@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Paper_Icon-72@2x.png"; sourceTree = "<group>"; };
+		3C093CC817CF8E18003B4A0D /* Canvas.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Canvas.xcodeproj; path = ../../../Canvas/Canvas.xcodeproj; sourceTree = "<group>"; };
+		3C093CD517CF90CC003B4A0D /* AFNetworking.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = AFNetworking.xcodeproj; path = ../../../AFNetworking/AFNetworking.xcodeproj; sourceTree = "<group>"; };
+		3C093CDB17CF90DE003B4A0D /* GlobalSettings.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = GlobalSettings.xcodeproj; path = ../../../GlobalSettings/GlobalSettings.xcodeproj; sourceTree = "<group>"; };
 		3C23828117B3174000161277 /* Crashlytics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Crashlytics.framework; path = ../../../ThirdParty/Crashlytics/Crashlytics.framework; sourceTree = "<group>"; };
-		3CE80BE917CE798500AA73A0 /* libAFNetworking.a */ = {isa = PBXFileReference; lastKnownFileType = file; name = libAFNetworking.a; path = "../../../AFNetworking/build/Release-iphoneos/libAFNetworking.a"; sourceTree = "<group>"; };
-		3CE80BEA17CE798600AA73A0 /* libCanvas.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libCanvas.a; path = "../../../../../../Library/Developer/Xcode/DerivedData/FiftyThreeSdkTestApp-adaxpvhcpwsovncxkrtzaqqgqkbo/Build/Products/Debug-iphoneos/libCanvas.a"; sourceTree = "<group>"; };
-		3CE80BEB17CE798600AA73A0 /* libGlobalSettings.a */ = {isa = PBXFileReference; lastKnownFileType = file; name = libGlobalSettings.a; path = "../../../GlobalSettings/build/Release-iphoneos/libGlobalSettings.a"; sourceTree = "<group>"; };
 		3CE80BEF17CE79BD00AA73A0 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
 		3CE80BF017CE79BD00AA73A0 /* GLKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLKit.framework; path = System/Library/Frameworks/GLKit.framework; sourceTree = SDKROOT; };
 		3CE80BF317CE79D900AA73A0 /* CoreVideo.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreVideo.framework; path = System/Library/Frameworks/CoreVideo.framework; sourceTree = SDKROOT; };
@@ -158,6 +207,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3C093CE517CF90F2003B4A0D /* libAFNetworking.a in Frameworks */,
+				3C093CE617CF90F2003B4A0D /* libGlobalSettings.a in Frameworks */,
+				3C093CD417CF8E3D003B4A0D /* libCanvas.a in Frameworks */,
 				3CE80C0C17CE7CBB00AA73A0 /* AVFoundation.framework in Frameworks */,
 				3CE80C0817CE7BE900AA73A0 /* MobileCoreServices.framework in Frameworks */,
 				3CE80C0617CE7BCA00AA73A0 /* Twitter.framework in Frameworks */,
@@ -175,9 +227,6 @@
 				3CE80BF117CE79BD00AA73A0 /* CFNetwork.framework in Frameworks */,
 				3CE80BF217CE79BD00AA73A0 /* GLKit.framework in Frameworks */,
 				6669D060173C0D3900BB15C3 /* CoreBluetooth.framework in Frameworks */,
-				3CE80BEC17CE798600AA73A0 /* libAFNetworking.a in Frameworks */,
-				3CE80BED17CE798600AA73A0 /* libCanvas.a in Frameworks */,
-				3CE80BEE17CE798600AA73A0 /* libGlobalSettings.a in Frameworks */,
 				34986FDF174FAF8800A3088E /* libCommon.a in Frameworks */,
 				34986FD0174FAC8300A3088E /* libFiftyThreeSdk.a in Frameworks */,
 				6669D064173C0D6E00BB15C3 /* boost.framework in Frameworks */,
@@ -215,6 +264,31 @@
 			children = (
 				34986FDA174FAF7C00A3088E /* libCommon.a */,
 				34986FDC174FAF7C00A3088E /* CommonTests.octest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		3C093CC917CF8E18003B4A0D /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				3C093CCE17CF8E19003B4A0D /* libCanvas.a */,
+				3C093CD017CF8E19003B4A0D /* CanvasTests.octest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		3C093CD617CF90CC003B4A0D /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				3C093CDA17CF90CC003B4A0D /* libAFNetworking.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		3C093CDC17CF90DE003B4A0D /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				3C093CE017CF90DE003B4A0D /* libGlobalSettings.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -260,11 +334,11 @@
 		6669CFFA173C008C00BB15C3 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				3C093CD517CF90CC003B4A0D /* AFNetworking.xcodeproj */,
 				34986FD4174FAF7B00A3088E /* Common.xcodeproj */,
+				3C093CC817CF8E18003B4A0D /* Canvas.xcodeproj */,
 				34986FC8174FAC6300A3088E /* FiftyThreeSdk.xcodeproj */,
-				3CE80BE917CE798500AA73A0 /* libAFNetworking.a */,
-				3CE80BEA17CE798600AA73A0 /* libCanvas.a */,
-				3CE80BEB17CE798600AA73A0 /* libGlobalSettings.a */,
+				3C093CDB17CF90DE003B4A0D /* GlobalSettings.xcodeproj */,
 				3CE80C0917CE7CA000AA73A0 /* libT1PogoManager.a */,
 				3CE80C0117CE7B5B00AA73A0 /* libz.dylib */,
 				3CE80C0B17CE7CBB00AA73A0 /* AVFoundation.framework */,
@@ -381,6 +455,9 @@
 			buildRules = (
 			);
 			dependencies = (
+				3C093CE217CF90EE003B4A0D /* PBXTargetDependency */,
+				3C093CE417CF90EE003B4A0D /* PBXTargetDependency */,
+				3C093CD317CF8E2F003B4A0D /* PBXTargetDependency */,
 				34986FDE174FAF8300A3088E /* PBXTargetDependency */,
 				34986FCF174FAC7E00A3088E /* PBXTargetDependency */,
 			);
@@ -429,12 +506,24 @@
 			projectDirPath = "";
 			projectReferences = (
 				{
+					ProductGroup = 3C093CD617CF90CC003B4A0D /* Products */;
+					ProjectRef = 3C093CD517CF90CC003B4A0D /* AFNetworking.xcodeproj */;
+				},
+				{
+					ProductGroup = 3C093CC917CF8E18003B4A0D /* Products */;
+					ProjectRef = 3C093CC817CF8E18003B4A0D /* Canvas.xcodeproj */;
+				},
+				{
 					ProductGroup = 34986FD5174FAF7B00A3088E /* Products */;
 					ProjectRef = 34986FD4174FAF7B00A3088E /* Common.xcodeproj */;
 				},
 				{
 					ProductGroup = 34986FC9174FAC6300A3088E /* Products */;
 					ProjectRef = 34986FC8174FAC6300A3088E /* FiftyThreeSdk.xcodeproj */;
+				},
+				{
+					ProductGroup = 3C093CDC17CF90DE003B4A0D /* Products */;
+					ProjectRef = 3C093CDB17CF90DE003B4A0D /* GlobalSettings.xcodeproj */;
 				},
 			);
 			projectRoot = "";
@@ -465,6 +554,34 @@
 			fileType = wrapper.cfbundle;
 			path = CommonTests.octest;
 			remoteRef = 34986FDB174FAF7C00A3088E /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		3C093CCE17CF8E19003B4A0D /* libCanvas.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libCanvas.a;
+			remoteRef = 3C093CCD17CF8E19003B4A0D /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		3C093CD017CF8E19003B4A0D /* CanvasTests.octest */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = CanvasTests.octest;
+			remoteRef = 3C093CCF17CF8E19003B4A0D /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		3C093CDA17CF90CC003B4A0D /* libAFNetworking.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libAFNetworking.a;
+			remoteRef = 3C093CD917CF90CC003B4A0D /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		3C093CE017CF90DE003B4A0D /* libGlobalSettings.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libGlobalSettings.a;
+			remoteRef = 3C093CDF17CF90DE003B4A0D /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */
@@ -554,6 +671,21 @@
 			isa = PBXTargetDependency;
 			name = Common;
 			targetProxy = 34986FDD174FAF8300A3088E /* PBXContainerItemProxy */;
+		};
+		3C093CD317CF8E2F003B4A0D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = Canvas;
+			targetProxy = 3C093CD217CF8E2F003B4A0D /* PBXContainerItemProxy */;
+		};
+		3C093CE217CF90EE003B4A0D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = AFNetworking;
+			targetProxy = 3C093CE117CF90EE003B4A0D /* PBXContainerItemProxy */;
+		};
+		3C093CE417CF90EE003B4A0D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = GlobalSettings;
+			targetProxy = 3C093CE317CF90EE003B4A0D /* PBXContainerItemProxy */;
 		};
 		6669D024173C008D00BB15C3 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;

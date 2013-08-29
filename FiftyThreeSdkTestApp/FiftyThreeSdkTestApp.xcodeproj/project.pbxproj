@@ -375,10 +375,10 @@
 			isa = PBXGroup;
 			children = (
 				34986FFB174FB1CB00A3088E /* AFNetworking.xcodeproj */,
-				34986FF5174FB1BF00A3088E /* GlobalSettings.xcodeproj */,
-				34986FEC174FB1B400A3088E /* Canvas.xcodeproj */,
 				34986FE3174FB1A600A3088E /* Common.xcodeproj */,
+				34986FEC174FB1B400A3088E /* Canvas.xcodeproj */,
 				34986FC2174FAC4F00A3088E /* FiftyThreeSdk.xcodeproj */,
+				34986FF5174FB1BF00A3088E /* GlobalSettings.xcodeproj */,
 				665C61DA1714974D00E70FB4 /* MessageUI.framework */,
 				6632313F16F8B9F2008AD3DC /* libT1PogoManager.a */,
 				6644318116F7FF260049E570 /* libsqlite3.dylib */,
