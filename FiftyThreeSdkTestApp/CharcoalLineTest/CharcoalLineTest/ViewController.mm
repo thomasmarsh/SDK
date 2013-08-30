@@ -279,10 +279,30 @@ FTPenPrivateDelegate>
     [deviceInfo appendFormat:@"Last Error ID: %d\n", pen.lastErrorCode.lastErrorID];
     [deviceInfo appendFormat:@"Last Error Value: %d\n\n", pen.lastErrorCode.lastErrorValue];
 
-    [deviceInfo appendFormat:@"Press Latency (ms): %f\n",
-     1000.0 * (self.lastTipOrEraserPressedTimestamp - self.lastTouchBeganTimestamp)];
-    [deviceInfo appendFormat:@"Release Latency (ms): %f\n",
-     1000.0 * (self.lastTipOrEraserReleasedTimestamp - self.lastTouchEndedTimestamp)];
+    const int kNoTouchCutoffMs = 1000;
+    const int kNoPressCutoffMs = -1000;
+    const int pressLatency = (int)round(1000.0 * (self.lastTipOrEraserPressedTimestamp -
+                                                  self.lastTouchBeganTimestamp));
+    NSString *pressLatencyStr = (pressLatency > kNoTouchCutoffMs ?
+                                 @"No Touch" :
+                                 (pressLatency < kNoPressCutoffMs ?
+                                  @"No Tip/Eraser" :
+                                  [NSString stringWithFormat:@"%d", pressLatency]));
+    [deviceInfo appendFormat:@"Press Latency (ms): %@\n", pressLatencyStr];
+
+    const int releaseLatency = (int)round(1000.0 * (self.lastTipOrEraserReleasedTimestamp -
+                                                    self.lastTouchEndedTimestamp));
+    NSString *releaseLatencyStr = (releaseLatency > kNoTouchCutoffMs ?
+                                   @"No Touch" :
+                                   (releaseLatency < kNoPressCutoffMs ?
+                                    @"No Tip/Eraser" :
+                                    [NSString stringWithFormat:@"%d", releaseLatency]));
+    if (self.penManager.pen.isTipPressed ||
+        self.penManager.pen.isEraserPressed)
+    {
+        releaseLatencyStr = @"";
+    }
+    [deviceInfo appendFormat:@"Release Latency (ms): %@\n", releaseLatencyStr];
 
     if (self.penManager.pen.lastErrorCode.lastErrorID != 0)
     {
