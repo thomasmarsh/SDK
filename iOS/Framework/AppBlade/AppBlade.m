@@ -1380,12 +1380,23 @@ static BOOL is_encrypted () {
 
 - (UIImage*)getContentBelowView
 {
+    // WARNING: UIGetScreenImage will capture OpenGLES content correctly, but unfortunately is
+    // a private API. By no means should a version using this function be submitted to the
+    // AppStore for review.
+#define USE_UIGETSCREENIMAGE 1
+#if USE_UIGETSCREENIMAGE
+    CGImageRef UIGetScreenImage(void);
+    CGImageRef screenImage = UIGetScreenImage();
+    UIImage* image = [UIImage imageWithCGImage:screenImage];
+    CGImageRelease(screenImage);
+#else
     UIWindow* keyWindow = [[UIApplication sharedApplication] keyWindow];
     UIGraphicsBeginImageContext(keyWindow.bounds.size);
     [keyWindow.layer renderInContext:UIGraphicsGetCurrentContext()];
     
     UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
     UIGraphicsEndImageContext();
+#endif
     
     UIImage* returnImage = nil;
     UIInterfaceOrientation interfaceOrientation = [[UIApplication sharedApplication] statusBarOrientation];
