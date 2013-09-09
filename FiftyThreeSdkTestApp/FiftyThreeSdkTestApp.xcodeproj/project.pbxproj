@@ -12,8 +12,8 @@
 		3498700A174FB20700A3088E /* libCanvas.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 34986FF2174FB1B500A3088E /* libCanvas.a */; };
 		3498700B174FB20700A3088E /* libCommon.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 34986FE9174FB1A700A3088E /* libCommon.a */; };
 		3498700C174FB20700A3088E /* libGlobalSettings.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 34986FFA174FB1BF00A3088E /* libGlobalSettings.a */; };
-		349A6448174FD8EC0071D899 /* Paper_Icon-72.png in Resources */ = {isa = PBXBuildFile; fileRef = 349A6442174FD8EC0071D899 /* Paper_Icon-72.png */; };
-		349A6449174FD8EC0071D899 /* Paper_Icon-72@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 349A6443174FD8EC0071D899 /* Paper_Icon-72@2x.png */; };
+		3CD6FA3617DE1D1E001E5F82 /* icon72.png in Resources */ = {isa = PBXBuildFile; fileRef = 3CD6FA3417DE1D1E001E5F82 /* icon72.png */; };
+		3CD6FA3717DE1D1E001E5F82 /* icon144.png in Resources */ = {isa = PBXBuildFile; fileRef = 3CD6FA3517DE1D1E001E5F82 /* icon144.png */; };
 		6632313C16F8B1CA008AD3DC /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6632313B16F8B1CA008AD3DC /* MobileCoreServices.framework */; };
 		6632313E16F8B213008AD3DC /* boost.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6644317416F7FC680049E570 /* boost.framework */; };
 		6632314016F8B9F2008AD3DC /* libT1PogoManager.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6632313F16F8B9F2008AD3DC /* libT1PogoManager.a */; };
@@ -154,8 +154,8 @@
 		34986FEC174FB1B400A3088E /* Canvas.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Canvas.xcodeproj; path = ../../Canvas/Canvas.xcodeproj; sourceTree = "<group>"; };
 		34986FF5174FB1BF00A3088E /* GlobalSettings.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = GlobalSettings.xcodeproj; path = ../../GlobalSettings/GlobalSettings.xcodeproj; sourceTree = "<group>"; };
 		34986FFB174FB1CB00A3088E /* AFNetworking.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = AFNetworking.xcodeproj; path = ../../AFNetworking/AFNetworking.xcodeproj; sourceTree = "<group>"; };
-		349A6442174FD8EC0071D899 /* Paper_Icon-72.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Paper_Icon-72.png"; path = "FiftyThreeSdkTestApp/Paper_Icon-72.png"; sourceTree = SOURCE_ROOT; };
-		349A6443174FD8EC0071D899 /* Paper_Icon-72@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Paper_Icon-72@2x.png"; path = "FiftyThreeSdkTestApp/Paper_Icon-72@2x.png"; sourceTree = SOURCE_ROOT; };
+		3CD6FA3417DE1D1E001E5F82 /* icon72.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = icon72.png; path = FiftyThreeSdkTestApp/icon72.png; sourceTree = "<group>"; };
+		3CD6FA3517DE1D1E001E5F82 /* icon144.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = icon144.png; path = FiftyThreeSdkTestApp/icon144.png; sourceTree = "<group>"; };
 		6632313B16F8B1CA008AD3DC /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
 		6632313F16F8B9F2008AD3DC /* libT1PogoManager.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libT1PogoManager.a; path = ../../ThirdParty/PogoConnect/libT1PogoManager.a; sourceTree = "<group>"; };
 		6644311216F3C8390049E570 /* FiftyThreeSdkTests.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FiftyThreeSdkTests.octest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -345,6 +345,8 @@
 		668F6DEC1703737A002C548B /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				3CD6FA3417DE1D1E001E5F82 /* icon72.png */,
+				3CD6FA3517DE1D1E001E5F82 /* icon144.png */,
 				668F6DEA17037376002C548B /* Shaders */,
 				668F6DE817037361002C548B /* Textures */,
 			);
@@ -425,8 +427,6 @@
 		66A47BFA16D835C90016B31C /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				349A6442174FD8EC0071D899 /* Paper_Icon-72.png */,
-				349A6443174FD8EC0071D899 /* Paper_Icon-72@2x.png */,
 				66BEC2871703B458009207F9 /* Firmware */,
 				6644316716F3D24B0049E570 /* InfoPlist.strings */,
 				6644314616F3D1640049E570 /* FiftyThreeSdkTestApp-Info.plist */,
@@ -628,8 +628,8 @@
 				6644316916F3D24B0049E570 /* InfoPlist.strings in Resources */,
 				669CA621171F034A006596F0 /* charcoal-upgrade.bin in Resources */,
 				66FC1EE21725DC7500B9B9E7 /* charcoal-factory.bin in Resources */,
-				349A6448174FD8EC0071D899 /* Paper_Icon-72.png in Resources */,
-				349A6449174FD8EC0071D899 /* Paper_Icon-72@2x.png in Resources */,
+				3CD6FA3617DE1D1E001E5F82 /* icon72.png in Resources */,
+				3CD6FA3717DE1D1E001E5F82 /* icon144.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -885,7 +885,7 @@
 					"\"$(SRCROOT)/../../ThirdParty/PogoConnect\"",
 				);
 				PRODUCT_NAME = FiftyThreeSdkTestApp;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 2;
 				USER_HEADER_SEARCH_PATHS = "";
 				VALID_ARCHS = "armv7 armv7s";
 				WRAPPER_EXTENSION = app;
@@ -919,7 +919,7 @@
 					"\"$(SRCROOT)/../../ThirdParty/PogoConnect\"",
 				);
 				PRODUCT_NAME = FiftyThreeSdkTestApp;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 2;
 				USER_HEADER_SEARCH_PATHS = "";
 				VALID_ARCHS = "armv7 armv7s";
 				WRAPPER_EXTENSION = app;

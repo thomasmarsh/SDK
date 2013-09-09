@@ -12,7 +12,8 @@
 	<string></string>
 	<key>CFBundleIconFiles</key>
 	<array>
-		<string>Paper_Icon-72</string>
+		<string>icon72.png</string>
+		<string>icon144.png</string>
 	</array>
 	<key>CFBundleIdentifier</key>
 	<string>com.fiftythree.${PRODUCT_NAME:rfc1034identifier}</string>

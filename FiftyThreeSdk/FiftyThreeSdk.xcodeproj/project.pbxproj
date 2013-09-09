@@ -228,11 +228,11 @@
 		66A8387616E52D840048FFE4 /* FiftyThreeSdk */ = {
 			isa = PBXGroup;
 			children = (
-				3CC31DCB17933ABB002CD4FB /* TransitionKit */,
-				3C2F9C3E17807FCF00A5FFBC /* Services */,
-				6665F819170F8AC90027BAD1 /* PenManager */,
 				666DC55B170CF31E00D6B3C2 /* AppSupport */,
+				6665F819170F8AC90027BAD1 /* PenManager */,
+				3C2F9C3E17807FCF00A5FFBC /* Services */,
 				66B6E3E316F9237800251B6A /* TouchClassifiers */,
+				3CC31DCB17933ABB002CD4FB /* TransitionKit */,
 				66C83D7A170600BB00789776 /* FTPenAndTouchManager.h */,
 				66C83D7B170600BB00789776 /* FTPenAndTouchManager.cpp */,
 				6665F81A170F8B6F0027BAD1 /* FTTouchEventLogger.h */,
