@@ -9,12 +9,19 @@
 
 #import "AppDelegate.h"
 #import "ViewController.h"
+#import "AppBlade/AppBlade.h"
 
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     [Crashlytics startWithAPIKey:@"ebfbab33d8cb9d1cd8a2c9537d83b7b321647060"];
+
+    AppBlade *blade = [AppBlade sharedManager];
+    [blade registerWithAppBladePlist];
+    [blade allowFeedbackReporting];
+    [blade catchAndReportCrashes];
+    [blade checkForUpdates];
 
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     // Override point for customization after application launch.
@@ -44,7 +51,8 @@
 
 - (void)applicationDidBecomeActive:(UIApplication *)application
 {
-    // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
+    AppBlade *blade = [AppBlade sharedManager];
+    [blade checkApproval];
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application

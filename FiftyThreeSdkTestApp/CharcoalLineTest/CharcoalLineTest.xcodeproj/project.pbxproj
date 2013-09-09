@@ -15,6 +15,9 @@
 		3C23828217B3174000161277 /* Crashlytics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3C23828117B3174000161277 /* Crashlytics.framework */; };
 		3CD6FA3A17DE1D6B001E5F82 /* icon72.png in Resources */ = {isa = PBXBuildFile; fileRef = 3CD6FA3817DE1D6B001E5F82 /* icon72.png */; };
 		3CD6FA3B17DE1D6B001E5F82 /* icon144.png in Resources */ = {isa = PBXBuildFile; fileRef = 3CD6FA3917DE1D6B001E5F82 /* icon144.png */; };
+		3CD6FA4717DE3063001E5F82 /* libAppBlade.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3CD6FA4417DE3056001E5F82 /* libAppBlade.a */; };
+		3CD6FA4C17DE314D001E5F82 /* AppBladeKeys.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3CD6FA4A17DE314D001E5F82 /* AppBladeKeys.plist */; };
+		3CD6FA4D17DE314D001E5F82 /* ResourceRules.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3CD6FA4B17DE314D001E5F82 /* ResourceRules.plist */; };
 		3CE80BE817CE798500AA73A0 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6669CFFF173C008C00BB15C3 /* CoreGraphics.framework */; };
 		3CE80BF117CE79BD00AA73A0 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3CE80BEF17CE79BD00AA73A0 /* CFNetwork.framework */; };
 		3CE80BF217CE79BD00AA73A0 /* GLKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3CE80BF017CE79BD00AA73A0 /* GLKit.framework */; };
@@ -137,6 +140,27 @@
 			remoteGlobalIDString = 34576CFA1608CBB800825F06;
 			remoteInfo = GlobalSettings;
 		};
+		3CD6FA4317DE3056001E5F82 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3CD6FA3E17DE3055001E5F82 /* AppBlade.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = CBF479F813969C2B00949297;
+			remoteInfo = AppBlade;
+		};
+		3CD6FA4517DE3056001E5F82 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3CD6FA3E17DE3055001E5F82 /* AppBlade.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = CB51D2FC1429274C00A43CB5;
+			remoteInfo = AppBladeUniversal;
+		};
+		3CD6FA4817DE3068001E5F82 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3CD6FA3E17DE3055001E5F82 /* AppBlade.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = CBF479F713969C2B00949297;
+			remoteInfo = AppBlade;
+		};
 		6669D023173C008D00BB15C3 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 6669CFF0173C008C00BB15C3 /* Project object */;
@@ -155,6 +179,9 @@
 		3C23828117B3174000161277 /* Crashlytics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Crashlytics.framework; path = ../../../ThirdParty/Crashlytics/Crashlytics.framework; sourceTree = "<group>"; };
 		3CD6FA3817DE1D6B001E5F82 /* icon72.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = icon72.png; path = ../FiftyThreeSdkTestApp/icon72.png; sourceTree = "<group>"; };
 		3CD6FA3917DE1D6B001E5F82 /* icon144.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = icon144.png; path = ../FiftyThreeSdkTestApp/icon144.png; sourceTree = "<group>"; };
+		3CD6FA3E17DE3055001E5F82 /* AppBlade.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = AppBlade.xcodeproj; path = ../../../ThirdParty/AppBlade/iOS/Framework/AppBlade.xcodeproj; sourceTree = "<group>"; };
+		3CD6FA4A17DE314D001E5F82 /* AppBladeKeys.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = AppBladeKeys.plist; path = CharcoalLineTest/Resources/AppBladeKeys.plist; sourceTree = "<group>"; };
+		3CD6FA4B17DE314D001E5F82 /* ResourceRules.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = ResourceRules.plist; path = CharcoalLineTest/Resources/ResourceRules.plist; sourceTree = "<group>"; };
 		3CE80BEF17CE79BD00AA73A0 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
 		3CE80BF017CE79BD00AA73A0 /* GLKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLKit.framework; path = System/Library/Frameworks/GLKit.framework; sourceTree = SDKROOT; };
 		3CE80BF317CE79D900AA73A0 /* CoreVideo.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreVideo.framework; path = System/Library/Frameworks/CoreVideo.framework; sourceTree = SDKROOT; };
@@ -207,6 +234,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3CD6FA4717DE3063001E5F82 /* libAppBlade.a in Frameworks */,
 				3C093CE517CF90F2003B4A0D /* libAFNetworking.a in Frameworks */,
 				3C093CE617CF90F2003B4A0D /* libGlobalSettings.a in Frameworks */,
 				3C093CD417CF8E3D003B4A0D /* libCanvas.a in Frameworks */,
@@ -296,10 +324,21 @@
 		3CD6FA1D17DE1AF0001E5F82 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				3CD6FA4A17DE314D001E5F82 /* AppBladeKeys.plist */,
 				3CD6FA3817DE1D6B001E5F82 /* icon72.png */,
 				3CD6FA3917DE1D6B001E5F82 /* icon144.png */,
+				3CD6FA4B17DE314D001E5F82 /* ResourceRules.plist */,
 			);
 			name = Resources;
+			sourceTree = "<group>";
+		};
+		3CD6FA3F17DE3055001E5F82 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				3CD6FA4417DE3056001E5F82 /* libAppBlade.a */,
+				3CD6FA4617DE3056001E5F82 /* libAppBladeUniversal.a */,
+			);
+			name = Products;
 			sourceTree = "<group>";
 		};
 		3CF4D86717C7E1DA002CD082 /* Supporting files */ = {
@@ -345,6 +384,7 @@
 			isa = PBXGroup;
 			children = (
 				3C093CD517CF90CC003B4A0D /* AFNetworking.xcodeproj */,
+				3CD6FA3E17DE3055001E5F82 /* AppBlade.xcodeproj */,
 				34986FD4174FAF7B00A3088E /* Common.xcodeproj */,
 				3C093CC817CF8E18003B4A0D /* Canvas.xcodeproj */,
 				34986FC8174FAC6300A3088E /* FiftyThreeSdk.xcodeproj */,
@@ -463,6 +503,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				3CD6FA4917DE3068001E5F82 /* PBXTargetDependency */,
 				3C093CE217CF90EE003B4A0D /* PBXTargetDependency */,
 				3C093CE417CF90EE003B4A0D /* PBXTargetDependency */,
 				3C093CD317CF8E2F003B4A0D /* PBXTargetDependency */,
@@ -516,6 +557,10 @@
 				{
 					ProductGroup = 3C093CD617CF90CC003B4A0D /* Products */;
 					ProjectRef = 3C093CD517CF90CC003B4A0D /* AFNetworking.xcodeproj */;
+				},
+				{
+					ProductGroup = 3CD6FA3F17DE3055001E5F82 /* Products */;
+					ProjectRef = 3CD6FA3E17DE3055001E5F82 /* AppBlade.xcodeproj */;
 				},
 				{
 					ProductGroup = 3C093CC917CF8E18003B4A0D /* Products */;
@@ -592,6 +637,20 @@
 			remoteRef = 3C093CDF17CF90DE003B4A0D /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
+		3CD6FA4417DE3056001E5F82 /* libAppBlade.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libAppBlade.a;
+			remoteRef = 3CD6FA4317DE3056001E5F82 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		3CD6FA4617DE3056001E5F82 /* libAppBladeUniversal.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libAppBladeUniversal.a;
+			remoteRef = 3CD6FA4517DE3056001E5F82 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 /* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
@@ -606,6 +665,8 @@
 				6669D05C173C066800BB15C3 /* ViewController.xib in Resources */,
 				3CD6FA3A17DE1D6B001E5F82 /* icon72.png in Resources */,
 				3CD6FA3B17DE1D6B001E5F82 /* icon144.png in Resources */,
+				3CD6FA4C17DE314D001E5F82 /* AppBladeKeys.plist in Resources */,
+				3CD6FA4D17DE314D001E5F82 /* ResourceRules.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -694,6 +755,11 @@
 			isa = PBXTargetDependency;
 			name = GlobalSettings;
 			targetProxy = 3C093CE317CF90EE003B4A0D /* PBXContainerItemProxy */;
+		};
+		3CD6FA4917DE3068001E5F82 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = AppBlade;
+			targetProxy = 3CD6FA4817DE3068001E5F82 /* PBXContainerItemProxy */;
 		};
 		6669D024173C008D00BB15C3 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -804,6 +870,7 @@
 				HEADER_SEARCH_PATHS = (
 					"$(SRCROOT)/../../FiftyThreeSdk",
 					"$(SRCROOT)/../../../Common",
+					"$(SRCROOT)/../../../ThirdParty/AppBlade/iOS/Framework",
 				);
 				INFOPLIST_FILE = "CharcoalLineTest/CharcoalLineTest-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
@@ -836,6 +903,7 @@
 				HEADER_SEARCH_PATHS = (
 					"$(SRCROOT)/../../FiftyThreeSdk",
 					"$(SRCROOT)/../../../Common",
+					"$(SRCROOT)/../../../ThirdParty/AppBlade/iOS/Framework",
 				);
 				INFOPLIST_FILE = "CharcoalLineTest/CharcoalLineTest-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 6.0;

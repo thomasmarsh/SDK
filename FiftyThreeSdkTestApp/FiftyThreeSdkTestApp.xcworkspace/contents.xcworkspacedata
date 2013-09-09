@@ -22,4 +22,7 @@
    <FileRef
       location = "group:../../AFNetworking/AFNetworking.xcodeproj">
    </FileRef>
+   <FileRef
+      location = "group:../../ThirdParty/AppBlade/iOS/Framework/AppBlade.xcodeproj">
+   </FileRef>
 </Workspace>
