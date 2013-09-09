@@ -38,7 +38,6 @@ static NSString *const kEngagedWaitingForPairingSpotReleaseStateName = @"Engaged
 static NSString *const kMarriedStateName = @"Married";
 static NSString *const kMarriedWaitingForLongPressToDisconnectStateName = @"MarriedWaitingForLongPressToDisconnect";
 static NSString *const kDisconnectingAndBecomingSingleStateName = @"DisconnectingAndBecomingSingle";
-static NSString *const kDisconnectingAndBecomingSeparatedStateName = @"DisconnectingAndBecomingSeparated";
 
 static NSString *const kPreparingToSwingStateName = @"PreparingToSwing";
 static NSString *const kSwingingStateName = @"Swinging";
@@ -60,8 +59,6 @@ static NSString *const kWaitForLongPressToDisconnect = @"WaitForLongPressToDisco
 static NSString *const kReturnToMarriedEventName = @"ReturnToMarried";
 static NSString *const kDisconnectAndBecomeSingleEventName = @"DisconnectAndBecomeSingle";
 static NSString *const kCompleteDisconnectionAndBecomeSingleEventName = @"CompleteDisconnectAndBecomeSingle";
-static NSString *const kDisconnectAndBecomeSeparatedEventName = @"DisconnectAndBecomeSeparated";
-static NSString *const kCompleteDisconnectAndBecomeSeparatedEventName = @"CompleteDisconnectAndBecomeSeparated";
 static NSString *const kPrepareToSwingEventName = @"PrepareToSwing";
 
 static NSString *const kSwingEventName = @"Swing";
@@ -505,7 +502,7 @@ typedef enum
     }];
     [separatedAttemptingConnectionState setTimeoutExpiredBlock:^(TKState *state, TKStateMachine *stateMachine)
     {
-        [self fireStateMachineEvent:kDisconnectAndBecomeSeparatedEventName];
+        [self fireStateMachineEvent:kDisconnectAndBecomeSingleEventName];
     }];
 
     // Disconnecting and Becoming Single
@@ -527,23 +524,6 @@ typedef enum
         }
     }];
 
-    // Disconnecting and Becoming Separated
-    TKState *disconnectingAndBecomingSeparatedState = [TKState stateWithName:kDisconnectingAndBecomingSeparatedStateName];
-    [disconnectingAndBecomingSeparatedState setDidEnterStateBlock:^(TKState *state,
-                                                                    TKStateMachine *stateMachine)
-     {
-         weakSelf.state = FTPenManagerStateDisconnected;
-
-         if (weakSelf.pen)
-         {
-             [weakSelf.centralManager cancelPeripheralConnection:weakSelf.pen.peripheral];
-         }
-         else
-         {
-             [weakSelf fireStateMachineEvent:kCompleteDisconnectAndBecomeSeparatedEventName];
-         }
-     }];
-
     [self.stateMachine addStates:@[
      singleState,
      datingRetrievingConnectedPeripheralsState,
@@ -560,8 +540,7 @@ typedef enum
      separatedState,
      separatedRetrievingPairedPeripheralState,
      separatedAttemptingConnectionState,
-     disconnectingAndBecomingSingleState,
-     disconnectingAndBecomingSeparatedState]];
+     disconnectingAndBecomingSingleState]];
 
     //
     // Events
@@ -611,6 +590,7 @@ typedef enum
     TKEvent *disconnectAndBecomeSingleEvent = [TKEvent eventWithName:kDisconnectAndBecomeSingleEventName
                                              transitioningFromStates:@[
                                                datingAttemptingConnectionState,
+                                               separatedAttemptingConnectionState,
                                                engagedWaitingForPairingSpotReleaseState,
                                                engagedWaitingForTipReleaseState,
                                                marriedState,
@@ -620,12 +600,6 @@ typedef enum
     TKEvent *completeDisconnectAndBecomeSingleEvent = [TKEvent eventWithName:kCompleteDisconnectionAndBecomeSingleEventName
                                                      transitioningFromStates:@[disconnectingAndBecomingSingleState]
                                                                      toState:singleState];
-    TKEvent *disconnectAndBecomeSepartedEvent = [TKEvent eventWithName:kDisconnectAndBecomeSeparatedEventName
-                                               transitioningFromStates:@[separatedAttemptingConnectionState]
-                                                               toState:disconnectingAndBecomingSeparatedState];
-    TKEvent *completeDisconnectAndBecomeSeparatedEvent = [TKEvent eventWithName:kCompleteDisconnectAndBecomeSeparatedEventName
-                                                        transitioningFromStates:@[disconnectingAndBecomingSeparatedState]
-                                                                        toState:separatedState];
     TKEvent *prepareToSwingEvent = [TKEvent eventWithName:kPrepareToSwingEventName
                                   transitioningFromStates:@[marriedState]
                                                   toState:preparingToSwingState];
@@ -662,9 +636,7 @@ typedef enum
      swingEvent,
      attemptConnectionFromSwingingEvent,
      becomeSeparatedEvent,
-     attemptConnectionFromSeparatedEvent,
-     disconnectAndBecomeSepartedEvent,
-     completeDisconnectAndBecomeSeparatedEvent
+     attemptConnectionFromSeparatedEvent
      ]];
 
     // If we're already paired with a peripheral, then start in the separted state so that we
@@ -948,10 +920,6 @@ typedef enum
         if ([self currentStateHasName:kDisconnectingAndBecomingSingleStateName])
         {
             [self fireStateMachineEvent:kCompleteDisconnectionAndBecomeSingleEventName];
-        }
-        else if ([self currentStateHasName:kDisconnectingAndBecomingSeparatedStateName])
-        {
-            [self fireStateMachineEvent:kCompleteDisconnectAndBecomeSeparatedEventName];
         }
         else if ([self currentStateHasName:kPreparingToSwingStateName])
         {
