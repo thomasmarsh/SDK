@@ -161,11 +161,6 @@ FTPenPrivateDelegate>
     [self updateDisplay];
 }
 
-- (void)penManager:(FTPenManager *)penManager didUpdateDeviceInfo:(FTPen *)pen
-{
-    [self displayPenInfo:pen];
-}
-
 #pragma mark - FTPenManagerDelegatePrivate
 
 - (void)penManager:(FTPenManager *)manager didFinishUpdate:(NSError *)error
@@ -180,6 +175,11 @@ FTPenPrivateDelegate>
 }
 
 #pragma mark - FTPenDelegate
+
+- (void)penDidUpdateDeviceInfo:(FTPen *)pen
+{
+    [self displayPenInfo:pen];
+}
 
 - (void)pen:(FTPen *)pen isReadyDidChange:(BOOL)isReady
 {

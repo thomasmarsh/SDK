@@ -308,7 +308,10 @@ NSString * const kFTPenBatteryLevelDidChangeNotificationName = @"com.fiftythree.
 
 - (void)deviceInfoServiceClientDidUpdateDeviceInfo:(FTDeviceInfoServiceClient *)deviceInfoServiceClient
 {
-    [self.privateDelegate didUpdateDeviceInfo];
+    if ([self.delegate respondsToSelector:@selector(penDidUpdateDeviceInfo:)])
+    {
+        [self.delegate penDidUpdateDeviceInfo:self];
+    }
 }
 
 #pragma mark -

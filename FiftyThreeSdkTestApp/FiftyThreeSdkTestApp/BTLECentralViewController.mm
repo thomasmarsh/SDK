@@ -218,11 +218,6 @@ public:
     [self updateDisplay];
 }
 
-- (void)penManager:(FTPenManager *)penManager didUpdateDeviceInfo:(FTPen *)pen
-{
-    [self updateDisplay];
-}
-
 #pragma mark - FTPenManagerDelegatePrivate
 
 - (void)penManager:(FTPenManager *)manager didFinishUpdate:(NSError *)error
@@ -237,6 +232,11 @@ public:
 }
 
 #pragma mark - FTPenDelegate
+
+- (void)penDidUpdateDeviceInfo:(FTPen *)pen
+{
+    [self updateDisplay];
+}
 
 - (void)pen:(FTPen *)pen isReadyDidChange:(BOOL)isReady
 {

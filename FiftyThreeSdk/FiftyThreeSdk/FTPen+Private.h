@@ -23,7 +23,6 @@ typedef struct FTPenLastErrorCode
 - (void)didWriteManufacturingID;
 - (void)didFailToWriteManufacturingID;
 - (void)didReadManufacturingID:(NSString *)manufacturingID;
-- (void)didUpdateDeviceInfo;
 - (void)didUpdateDebugProperties;
 
 @end

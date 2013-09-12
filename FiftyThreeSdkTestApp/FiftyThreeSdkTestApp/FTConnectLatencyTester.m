@@ -20,7 +20,7 @@
     void (^_complete)(NSError *error);
 }
 
-@property (nonatomic) FTPenManager* penManager;
+@property (nonatomic) FTPenManager *penManager;
 @property int connectCount;
 @property uint64_t startTime;
 
@@ -87,16 +87,6 @@
 {
     self.connectCount++;
     [self doConnect];
-}
-
-- (void)penManager:(FTPenManager *)penManager didUpdateDeviceInfo:(FTPen *)pen
-{
-
-}
-
-- (void)penManager:(FTPenManager *)penManager didUpdateDeviceBatteryLevel:(FTPen *)pen
-{
-
 }
 
 - (void)startTest:(void(^)(NSError *error))complete;

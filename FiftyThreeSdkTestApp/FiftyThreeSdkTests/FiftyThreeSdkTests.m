@@ -5,8 +5,8 @@
 //  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
 //
 
-#import "FiftyThreeSdkTests.h"
 #import "FiftyThreeSdk/FTPenManager.h"
+#import "FiftyThreeSdkTests.h"
 
 @interface FiftyThreeSdkTests () <FTPenManagerDelegate>
 @property int actualConnects;
@@ -132,16 +132,6 @@
     STAssertFalse(pen.isConnected, nil);
 
     [self notify:SenAsyncTestCaseStatusSucceeded];
-}
-
-- (void)penManager:(FTPenManager *)penManager didUpdateDeviceInfo:(FTPen *)pen
-{
-
-}
-
-- (void)penManager:(FTPenManager *)penManager didUpdateDeviceBatteryLevel:(FTPen *)pen
-{
-
 }
 
 @end

@@ -52,6 +52,8 @@ extern NSString * const kFTPenIsEraserPressedDidChangeNotificationName;
 
 @protocol FTPenDelegate <NSObject>
 
+@optional
+- (void)penDidUpdateDeviceInfo:(FTPen *)pen;
 - (void)pen:(FTPen *)pen isReadyDidChange:(BOOL)isReady;
 - (void)pen:(FTPen *)pen isTipPressedDidChange:(BOOL)isTipPressed;
 - (void)pen:(FTPen *)pen isEraserPressedDidChange:(BOOL)isEraserPressed;
