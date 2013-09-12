@@ -42,7 +42,7 @@ extern NSString * const kFTPenManagerDidUpdateStateNotificationName;
 @protocol FTPenManagerDelegate <NSObject>
 
 @optional
-- (void)penManagerdidFailToDiscoverPen:(FTPenManager *)penManager;
+- (void)penManagerDidFailToDiscoverPen:(FTPenManager *)penManager;
 - (void)penManager:(FTPenManager *)penManager didUpdateState:(FTPenManagerState)state;
 
 @end

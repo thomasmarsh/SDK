@@ -22,6 +22,7 @@ static NSString * const kPairedPeripheralUUIDUserDefaultsKey = @"com.fiftythree.
 
 static const int kInterruptedUpdateDelayMax = 30;
 
+static const NSTimeInterval kDatingScanningTimeout = 2.5;
 static const NSTimeInterval kEngagedStateTimeout = 0.1;
 static const NSTimeInterval kIsScanningForPeripheralsToggleTimerInterval = 0.1;
 static const NSTimeInterval kSwingingStateTimeout = 4.0;
@@ -316,11 +317,11 @@ typedef enum
     TKState *singleState = [TKState stateWithName:kSingleStateName];
     [singleState setDidEnterStateBlock:^(TKState *state, TKStateMachine *stateMachine)
     {
-        NSAssert(!self.pen, @"Pen is nil");
+        NSAssert(!weakSelf.pen, @"Pen is nil");
 
         weakSelf.state = FTPenManagerStateUnpaired;
 
-        self.pairedPeripheralUUID = NULL;
+        weakSelf.pairedPeripheralUUID = NULL;
 
         // If we enter the single state and discover that the pairing spot is currently
         // pressed, then proceed directly to the dating state.
@@ -341,7 +342,8 @@ typedef enum
     }];
 
     // DatingScanning
-    TKState *datingScanningState = [TKState stateWithName:kDatingScanningStateName];
+    TKState *datingScanningState = [TKState stateWithName:kDatingScanningStateName
+                                       andTimeoutDuration:kDatingScanningTimeout];
     [datingScanningState setDidEnterStateBlock:^(TKState *state, TKStateMachine *stateMachine)
     {
         weakSelf.state = FTPenManagerStateUnpaired;
@@ -351,6 +353,16 @@ typedef enum
     [datingScanningState setDidExitStateBlock:^(TKState *state, TKStateMachine *stateMachine)
     {
         weakSelf.scanningState = ScanningStateDisabled;
+    }];
+    [datingScanningState setTimeoutExpiredBlock:^(TKState *state,
+                                                  TKStateMachine *stateMachine)
+    {
+        if ([weakSelf.delegate respondsToSelector:@selector(penManagerDidFailToDiscoverPen:)])
+        {
+            [weakSelf.delegate penManagerDidFailToDiscoverPen:weakSelf];
+        }
+
+        [weakSelf fireStateMachineEvent:kBecomeSingleEventName];
     }];
 
     // Dating - Attempting Connection
@@ -436,7 +448,7 @@ typedef enum
     [preparingToSwingState setDidEnterStateBlock:^(TKState *state,
                                                    TKStateMachine *stateMachine)
     {
-        NSAssert(self.pairedPeripheralUUID != NULL, @"paired peripheral UUID is non-nil");
+        NSAssert(weakSelf.pairedPeripheralUUID != NULL, @"paired peripheral UUID is non-nil");
 
         weakSelf.state = FTPenManagerStateDisconnected;
 
@@ -521,7 +533,7 @@ typedef enum
     }];
     [separatedAttemptingConnectionState setTimeoutExpiredBlock:^(TKState *state, TKStateMachine *stateMachine)
     {
-        [self fireStateMachineEvent:kDisconnectAndBecomeSeparatedEventName];
+        [weakSelf fireStateMachineEvent:kDisconnectAndBecomeSeparatedEventName];
     }];
 
     // Disconnecting and Becoming Single
