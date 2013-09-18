@@ -111,11 +111,7 @@ FTPenPrivateDelegate>
 
 - (void)penManagerDidFailToDiscoverPen:(FTPenManager *)penManager
 {
-    [[[UIAlertView alloc] initWithTitle:@"Pencil Not Found"
-                                message:@"Ensure the battery is fully charged and try again."
-                               delegate:nil
-                      cancelButtonTitle:@"OK"
-                      otherButtonTitles:nil, nil] show];
+    [self.statusLabel setText:@"Pencil not found. Ensure the battery is fully charged and try again."];
 }
 
 - (void)penManager:(FTPenManager *)penManager didUpdateState:(FTPenManagerState)state
