@@ -259,6 +259,12 @@ FTPenPrivateDelegate>
 
 - (void)updateDeviceInfoLabel
 {
+    if (self.penManager.state != FTPenManagerStateConnected)
+    {
+        self.deviceInfoLabel.text = @"";
+        return;
+    }
+
     FTPen *pen = self.penManager.pen;
     int onTimeSec, onTimeHourField, onTimeMinField, onTimeSecField;
 
@@ -380,9 +386,9 @@ FTPenPrivateDelegate>
 
         self.tipStateButton.highlighted = NO;
         self.eraserStateButton.highlighted = NO;
-
-        self.deviceInfoLabel.text = @"";
     }
+
+    [self updateDeviceInfoLabel];
 
     [self.pcConnectedButton setHighlighted:self.pcConnected];
 }
