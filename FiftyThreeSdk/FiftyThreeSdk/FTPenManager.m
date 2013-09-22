@@ -22,7 +22,7 @@ static NSString * const kPairedPeripheralUUIDUserDefaultsKey = @"com.fiftythree.
 
 static const int kInterruptedUpdateDelayMax = 30;
 
-static const NSTimeInterval kDatingScanningTimeout = 2.5;
+static const NSTimeInterval kDatingScanningTimeout = 4.f;
 static const NSTimeInterval kEngagedStateTimeout = 0.1;
 static const NSTimeInterval kIsScanningForPeripheralsToggleTimerInterval = 0.1;
 static const NSTimeInterval kSwingingStateTimeout = 4.0;
