@@ -336,7 +336,7 @@ typedef enum
     [datingRetrievingConnectedPeripheralsState setDidEnterStateBlock:^(TKState *state,
                                                                        TKStateMachine *stateMachine)
     {
-        weakSelf.state = FTPenManagerStateUnpaired;
+        weakSelf.state = FTPenManagerStateSeeking;
 
         [weakSelf.centralManager retrieveConnectedPeripherals];
     }];
@@ -346,7 +346,7 @@ typedef enum
                                        andTimeoutDuration:kDatingScanningTimeout];
     [datingScanningState setDidEnterStateBlock:^(TKState *state, TKStateMachine *stateMachine)
     {
-        weakSelf.state = FTPenManagerStateUnpaired;
+        weakSelf.state = FTPenManagerStateSeeking;
 
         weakSelf.scanningState = ScanningStateEnabled;
     }];
