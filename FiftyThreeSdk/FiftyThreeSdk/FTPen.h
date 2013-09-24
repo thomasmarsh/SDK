@@ -21,6 +21,7 @@ extern NSString * const kFTPenDidEncounterErrorNotificationName;
 extern NSString * const kFTPenIsReadyDidChangeNotificationName;
 extern NSString * const kFTPenIsTipPressedDidChangeNotificationName;
 extern NSString * const kFTPenIsEraserPressedDidChangeNotificationName;
+extern NSString * const kFTPenBatteryLevelDidChangeNotificationName;
 
 @protocol FTPenDelegate;
 
