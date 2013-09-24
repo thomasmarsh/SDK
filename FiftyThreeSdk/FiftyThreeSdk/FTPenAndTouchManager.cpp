@@ -12,7 +12,6 @@
 #include "Common/DispatchTimer.h"
 #include "Common/Mathiness.h"
 #include "Common/NoCopy.h"
-#include "Common/Touch/PenManager.h"
 #include "Common/Touch/TouchTracker.h"
 #include "FTPenAndTouchManager.h"
 #include "FTTouchEventLogger.h"

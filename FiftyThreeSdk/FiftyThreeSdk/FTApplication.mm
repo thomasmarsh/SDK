@@ -98,7 +98,6 @@ using namespace boost;
         }
     }
 
-    NSLog(@"SendEvent");
     [super sendEvent:event];
 }
 
