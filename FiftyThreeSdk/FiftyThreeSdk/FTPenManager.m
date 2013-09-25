@@ -609,6 +609,10 @@ typedef enum
     TKEvent *becomeSingleEvent = [TKEvent eventWithName:kBecomeSingleEventName
                                 transitioningFromStates:@[ datingScanningState,
                                   datingRetrievingConnectedPeripheralsState,
+                                  datingAttemptingConnectionState,
+                                  engagedState,
+                                  engagedWaitingForPairingSpotReleaseState,
+                                  engagedWaitingForTipReleaseState,
                                   separatedState,
                                   swingingState]
                                                 toState:singleState];
@@ -1001,8 +1005,6 @@ typedef enum
 
         [pen peripheralConnectionStatusDidChange];
 
-        self.state = FTPenManagerStateDisconnected;
-
         if ([self currentStateHasName:kDisconnectingAndBecomingSingleStateName])
         {
             [self fireStateMachineEvent:kCompleteDisconnectionAndBecomeSingleEventName];
@@ -1017,9 +1019,22 @@ typedef enum
         }
         else if ([self currentStateHasName:kMarriedStateName] ||
                  [self currentStateHasName:kMarriedWaitingForLongPressToDisconnectStateName] ||
-                 [self currentStateHasName:kSeparatedAttemptingConnectionStateName])
+                 [self currentStateHasName:kSeparatedAttemptingConnectionStateName] ||
+                 [self currentStateHasName:kSwingingAttemptingConnectionStateName])
         {
             [self fireStateMachineEvent:kBecomeSeparatedEventName];
+        }
+        else if ([self currentStateHasName:kDatingAttemptingConnectiongStateName] ||
+                 [self currentStateHasName:kEngagedStateName] ||
+                 [self currentStateHasName:kEngagedWaitingForPairingSpotReleaseStateName] ||
+                 [self currentStateHasName:kEngagedWaitingForTipReleaseStateName])
+        {
+            [self fireStateMachineEvent:kBecomeSingleEventName];
+        }
+        else
+        {
+            NSAssert(NO, @"Disconnect from unexpected state: %@",
+                     self.stateMachine.currentState.name);
         }
     }
 }

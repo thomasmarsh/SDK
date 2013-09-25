@@ -154,6 +154,9 @@ FTPenPrivateDelegate>
         case FTPenManagerStateDisconnected:
             stateChar = 'd';
             break;
+        case FTPenManagerStateUninitialized:
+        case FTPenManagerStateSeeking:
+            break;
         default:
             NSAssert(NO, @"Unexpected state.");
             break;
