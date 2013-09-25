@@ -7,13 +7,20 @@
 
 #pragma once
 
+@class FTPen;
+
 #import <Foundation/Foundation.h>
 
-#import "FTPenManager+Private.h"
+typedef NS_ENUM(NSInteger, FTFirmwareImageType) {
+    FTFirmwareImageTypeFactory,
+    FTFirmwareImageTypeUpgrade
+};
 
 @interface FTFirmwareManager : NSObject
 
-+ (NSInteger)versionForModel:(NSString *)model imageType:(FTFirmwareImageType)imageType;
-+ (NSString *)filePathForImageType:(FTFirmwareImageType)imageType;
++ (NSString *)imagePath;
+
++ (BOOL)isVersionAtPath:(NSString *)imagePath newerThanVersionOnPen:(FTPen *)pen;
++ (FTFirmwareImageType)imageTypeRunningOnPen:(FTPen *)pen;
 
 @end

@@ -15,6 +15,8 @@ typedef struct FTPenLastErrorCode
     int lastErrorValue;
 } FTPenLastErrorCode;
 
+extern NSString * const kFTPenDidUpdateDebugPropertyNotificationName;
+
 @class CBCentralManager;
 @class CBPeripheral;
 
@@ -23,7 +25,7 @@ typedef struct FTPenLastErrorCode
 - (void)didWriteManufacturingID;
 - (void)didFailToWriteManufacturingID;
 - (void)didReadManufacturingID:(NSString *)manufacturingID;
-- (void)didUpdateDebugProperties;
+- (void)didUpdateDebugProperty;
 
 @end
 
@@ -57,5 +59,9 @@ typedef struct FTPenLastErrorCode
 - (void)clearLastErrorCode;
 
 - (void)readDebugProperties;
+
+// Clears the current firmwareRevision and softwareRevision values and requests a read of them
+// from the peripheral.
+- (void)refreshFirmwareVersionProperties;
 
 @end

@@ -200,7 +200,7 @@
                  @"The IsTipPressed characteristic must be notifying before we first read its value.");
 
         BOOL isTipPressed = self.isTipPressed;
-        NSLog(@"IsTipPressed did update value: %d", isTipPressed);
+//        NSLog(@"IsTipPressed did update value: %d", isTipPressed);
 
         if (self.isReady)
         {
@@ -240,14 +240,14 @@
         BOOL isEraserPressed = self.isEraserPressed;
         [self.delegate penServiceClient:self isEraserPressedDidChange:isEraserPressed];
 
-        NSLog(@"IsEraserPressed did update value: %d", isEraserPressed);
+//        NSLog(@"IsEraserPressed did update value: %d", isEraserPressed);
     }
     else if ([characteristic isEqual:self.batteryLevelCharacteristic])
     {
         NSInteger batteryLevel = self.batteryLevel;
         [self.delegate penServiceClient:self batteryLevelDidChange:batteryLevel];
 
-        NSLog(@"BatteryLevel did update value: %d", batteryLevel);
+//        NSLog(@"BatteryLevel did update value: %d", batteryLevel);
     }
 }
 

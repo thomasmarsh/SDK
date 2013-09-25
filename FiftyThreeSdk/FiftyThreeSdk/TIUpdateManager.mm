@@ -25,15 +25,13 @@ static NSString *const kImageBlockTransferUUID = @"F000FFC2-0451-4000-B000-00000
 @property (nonatomic) CBCharacteristic *imageIdentifyCharacteristic;
 @property (nonatomic) CBCharacteristic *imageBlockTransferCharacteristic;
 
-@property (nonatomic) NSString *imagePath;
+@property (nonatomic, copy) NSString *imagePath;
 @property (nonatomic) NSFileHandle *imageHandle;
 @property (nonatomic) unsigned long long imageSize;
 
 @property (nonatomic) NSTimer *imageBlockWriteTimer;
 @property (nonatomic) NSInteger currentBlock;
 @property (nonatomic) unsigned long long imageSizeRemaining;
-
-@property (nonatomic, readwrite) NSDate *updateStartTime;
 @property (nonatomic) float lastPercent;
 
 @end
@@ -45,25 +43,59 @@ static NSString *const kImageBlockTransferUUID = @"F000FFC2-0451-4000-B000-00000
     self = [super init];
     if (self)
     {
+        _state = TIUpdateManagerStateNotStarted;
+        _shouldRestorePeripheralDelegate = YES;
+
         _peripheral = peripheral;
         _delegate = delegate;
     }
     return self;
 }
 
-- (void)updateImage:(NSString *)filePath
+- (void)dealloc
 {
-    self.waitingForReboot = NO;
+    _shouldRestorePeripheralDelegate = NO;
+    [self cleanup];
+}
+
+- (void)cleanup
+{
+    _imageIdentifyCharacteristic = nil;
+    _imageBlockTransferCharacteristic = nil;
+    [self stopImageBlockWrite];
+    _currentBlock = 0;
+    _imageSizeRemaining = 0;
+
+    _imagePath = nil;
+    [self.imageHandle closeFile];
+    _imageHandle = nil;
+    _imageSize = 0;
+
+    _lastPercent = 0;
+
+    if (_shouldRestorePeripheralDelegate)
+    {
+        // Restore the original peripheral delegate.
+        _peripheral.delegate = _oldPeripheralDelegate;
+    }
+}
+
+- (void)updateWithImagePath:(NSString *)imagePath
+{
+    NSAssert(self.state == TIUpdateManagerStateNotStarted,
+             @"Firmware may only be updated once using a single update manager.");
+
+    self.state = TIUpdateManagerStateInProgress;
 
     self.oldPeripheralDelegate = self.peripheral.delegate;
     self.peripheral.delegate = self;
 
-    self.imagePath = [filePath copy];
-    self.imageHandle = [NSFileHandle fileHandleForReadingAtPath:filePath];
+    self.imagePath = imagePath;
+    self.imageHandle = [NSFileHandle fileHandleForReadingAtPath:self.imagePath];
     if (!self.imageHandle)
     {
-        NSLog(@"invalid file path");
-        [self done:nil];
+        NSLog(@"Firmware: invalid file path: %@", self.imagePath);
+        [self doneWithError:[self errorAborted]];
     }
 
     NSDictionary *attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:self.imagePath
@@ -75,35 +107,40 @@ static NSString *const kImageBlockTransferUUID = @"F000FFC2-0451-4000-B000-00000
     [self.peripheral discoverServices:@[[CBUUID UUIDWithString:kOADServiceUUID]]];
 }
 
-- (void)done:(NSError *)error
+- (void)cancelUpdate
 {
-    if (error)
+    if (self.state == TIUpdateManagerStateInProgress)
     {
-        NSLog(@"Done, with error: %@", error.localizedDescription);
+        NSLog(@"Firmware: update cancelled");
+        self.state = TIUpdateManagerStateCancelled;
+        [self cleanup];
     }
-    else
+}
+
+- (void)doneWithError:(NSError *)error
+{
+    if (!error)
     {
-        NSLog(@"Done.");
+        error = [self errorAborted];
     }
+    NSLog(@"Firmware: update done with error: %@", error.localizedDescription);
 
-    self.imageIdentifyCharacteristic = nil;
-    self.imageBlockTransferCharacteristic = nil;
-    [self stopImageBlockWrite];
-    self.currentBlock = 0;
-    self.imageSizeRemaining = 0;
-
-    self.imagePath = nil;
-    [self.imageHandle closeFile];
-    self.imageHandle = nil;
-    self.imageSize = 0;
-
-    self.updateStartTime = nil;
-    self.lastPercent = 0;
-
-    self.peripheral.delegate = self.oldPeripheralDelegate;
-    self.oldPeripheralDelegate = nil;
+    self.state = TIUpdateManagerStateFailed;
 
     [self.delegate updateManager:self didFinishUpdate:error];
+
+    [self cleanup];
+}
+
+- (void)done
+{
+    NSLog(@"Firmware: update done");
+
+    self.state = TIUpdateManagerStateSucceeded;
+
+    [self.delegate updateManager:self didFinishUpdate:nil];
+
+    [self cleanup];
 }
 
 #pragma mark - CBPeripheralDelegate
@@ -112,8 +149,8 @@ static NSString *const kImageBlockTransferUUID = @"F000FFC2-0451-4000-B000-00000
 {
     if (error || !peripheral.services || peripheral.services.count == 0)
     {
-        NSLog(@"Error discovering device info service: %@", error.localizedDescription);
-        [self done:error];
+        NSLog(@"Firmware: error discovering device info service: %@", error.localizedDescription);
+        [self doneWithError:error];
         return;
     }
 
@@ -132,9 +169,9 @@ static NSString *const kImageBlockTransferUUID = @"F000FFC2-0451-4000-B000-00000
 {
     if (error)
     {
-        NSLog(@"Error discovering device info characteristics: %@",
+        NSLog(@"Firmware: error discovering device info characteristics: %@",
               error.localizedDescription);
-        [self done:error];
+        [self doneWithError:error];
         return;
     }
 
@@ -143,7 +180,6 @@ static NSString *const kImageBlockTransferUUID = @"F000FFC2-0451-4000-B000-00000
         if ([characteristic.UUID isEqual:[CBUUID UUIDWithString:kImageIdentifyUUID]])
         {
             self.imageIdentifyCharacteristic = characteristic;
-            [peripheral setNotifyValue:YES forCharacteristic:characteristic];
         }
         else if ([characteristic.UUID isEqual:[CBUUID UUIDWithString:kImageBlockTransferUUID]])
         {
@@ -154,53 +190,14 @@ static NSString *const kImageBlockTransferUUID = @"F000FFC2-0451-4000-B000-00000
     [self maybeStartImageBlockWrite];
 }
 
-- (void)peripheral:(CBPeripheral *)peripheral didUpdateNotificationStateForCharacteristic:(CBCharacteristic *)characteristic
-             error:(NSError *)error
-{
-    if (error)
-    {
-        NSLog(@"Error updating notification state for characteristic: %@",
-              error.localizedDescription);
-        [self done:error];
-        return;
-    }
-
-    [self maybeStartImageBlockWrite];
-}
-
 - (void)peripheral:(CBPeripheral *)peripheral didUpdateValueForCharacteristic:(CBCharacteristic *)characteristic
              error:(NSError *)error
 {
     if (error)
     {
-        NSLog(@"Error updating value for descriptor: %@", error.localizedDescription);
-        [self done:error];
+        NSLog(@"Firmware: error updating value for descriptor: %@", error.localizedDescription);
+        [self doneWithError:error];
         return;
-    }
-
-    if ([characteristic.UUID isEqual:[CBUUID UUIDWithString:kImageIdentifyUUID]])
-    {
-        uint16_t version = ((uint16_t *)characteristic.value.bytes)[0];
-        if (version == 0)
-        {
-            NSLog(@"Device is rebooting, reconnect and attempt again");
-            self.waitingForReboot = YES;
-            [self done:[[NSError alloc] initWithDomain:@"TiUpdateManager"
-                                                  code:FTErrorAborted
-                                              userInfo:nil]];
-        }
-        else
-        {
-            NSLog(@"Update rejected, existing version = %d", version);
-            [self done:[[NSError alloc] initWithDomain:@"TiUpdateManager"
-                                                  code:FTErrorAborted
-                                              userInfo:nil]];
-        }
-    }
-    else if ([characteristic.UUID isEqual:[CBUUID UUIDWithString:kImageBlockTransferUUID]])
-    {
-        uint16_t index = ((uint16_t *)characteristic.value.bytes)[0];
-        NSLog(@"Block index = %d", index);
     }
 }
 
@@ -209,9 +206,9 @@ static NSString *const kImageBlockTransferUUID = @"F000FFC2-0451-4000-B000-00000
 {
     if (error)
     {
-        NSLog(@"Error writing value for characteristic: %@",
+        NSLog(@"Firmware: error writing value for characteristic: %@",
               error.localizedDescription);
-        [self done:error];
+        [self doneWithError:error];
         return;
     }
 }
@@ -221,9 +218,9 @@ static NSString *const kImageBlockTransferUUID = @"F000FFC2-0451-4000-B000-00000
 {
     if (error)
     {
-        NSLog(@"Error writing value for descriptor: %@",
+        NSLog(@"Firmware: error writing value for descriptor: %@",
               error.localizedDescription);
-        [self done:error];
+        [self doneWithError:error];
         return;
     }
 }
@@ -233,9 +230,9 @@ static NSString *const kImageBlockTransferUUID = @"F000FFC2-0451-4000-B000-00000
 {
     if (error)
     {
-        NSLog(@"Error updating value for descriptor: %@",
+        NSLog(@"Firmware: error updating value for descriptor: %@",
               error.localizedDescription);
-        [self done:error];
+        [self doneWithError:error];
         return;
     }
 }
@@ -244,7 +241,7 @@ static NSString *const kImageBlockTransferUUID = @"F000FFC2-0451-4000-B000-00000
 
 - (void)maybeStartImageBlockWrite
 {
-    if (self.imageIdentifyCharacteristic.isNotifying &&
+    if (self.imageIdentifyCharacteristic &&
         self.imageBlockTransferCharacteristic)
     {
         [self startImageBlockWrite];
@@ -253,9 +250,7 @@ static NSString *const kImageBlockTransferUUID = @"F000FFC2-0451-4000-B000-00000
 
 - (void)startImageBlockWrite
 {
-    self.updateStartTime = [NSDate date];
-
-    NSLog(@"Sending image header");
+    NSLog(@"Firmware: sending image header");
 
     [self.imageHandle seekToFileOffset:4]; // skip CRC + shadow CRC
 
@@ -278,7 +273,7 @@ static NSString *const kImageBlockTransferUUID = @"F000FFC2-0451-4000-B000-00000
 - (void)scheduleWriteTimer
 {
     NSAssert(!self.imageBlockWriteTimer, @"write timer nil");
-    self.imageBlockWriteTimer = [NSTimer scheduledTimerWithTimeInterval:0.20
+    self.imageBlockWriteTimer = [NSTimer scheduledTimerWithTimeInterval:0.25
                                                                  target:self
                                                                selector:@selector(imageBlockWriteTimerFired:)
                                                                userInfo:nil
@@ -289,9 +284,7 @@ static NSString *const kImageBlockTransferUUID = @"F000FFC2-0451-4000-B000-00000
 {
     if (!self.peripheral.isConnected)
     {
-        [self done:[[NSError alloc] initWithDomain:@"TiUpdateManager"
-                                              code:FTErrorAborted
-                                          userInfo:nil]];
+        [self doneWithError:[self errorAborted]];
         return;
     }
 
@@ -323,7 +316,7 @@ static NSString *const kImageBlockTransferUUID = @"F000FFC2-0451-4000-B000-00000
 
         if (self.imageSizeRemaining == 0)
         {
-            [self done:nil];
+            [self done];
             break;
         }
         else
@@ -335,6 +328,13 @@ static NSString *const kImageBlockTransferUUID = @"F000FFC2-0451-4000-B000-00000
             }
         }
     }
+}
+
+- (NSError *)errorAborted
+{
+    return [[NSError alloc] initWithDomain:@"TiUpdateManager"
+                                      code:FTErrorAborted
+                                  userInfo:nil];
 }
 
 @end

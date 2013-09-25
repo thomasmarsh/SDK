@@ -281,4 +281,20 @@
     }
 }
 
+- (void)refreshFirmwareRevisions
+{
+    self.firmwareRevision = nil;
+    self.softwareRevision = nil;
+
+    if (self.firmwareRevisionCharateristic)
+    {
+        [self.peripheral readValueForCharacteristic:self.firmwareRevisionCharateristic];
+    }
+
+    if (self.softwareRevisionCharateristic)
+    {
+        [self.peripheral readValueForCharacteristic:self.softwareRevisionCharateristic];
+    }
+}
+
 @end

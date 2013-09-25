@@ -11,16 +11,11 @@
 
 #import "FTPenManager.h"
 
-typedef NS_ENUM(NSInteger, FTFirmwareImageType) {
-    Factory,
-    Upgrade
-};
-
 @interface FTPenManager ()
 
-- (BOOL)isUpdateAvailableForPen:(FTPen *)pen;
-
-- (void)updateFirmwareForPen:(NSString *)firmwareImagePath;
+- (BOOL)isFirmwareUpdateAvailable;
+- (void)updateFirmware:(NSString *)firmwareImagePath;
+- (void)cancelFirmwareUpdate;
 
 - (void)startTrialSeparation;
 
@@ -30,7 +25,8 @@ typedef NS_ENUM(NSInteger, FTFirmwareImageType) {
 
 @optional
 
-- (void)penManager:(FTPenManager *)manager didFinishUpdate:(NSError *)error;
-- (void)penManager:(FTPenManager *)manager didUpdatePercentComplete:(float)percent;
+- (void)penManagerDidStartFirmwareUpdate:(FTPenManager *)manager;
+- (void)penManager:(FTPenManager *)manager didUpdateFirmwareUpdatePercentComplete:(float)percentComplete;
+- (void)penManager:(FTPenManager *)manager didFinishFirmwareUpdate:(NSError *)error;
 
 @end

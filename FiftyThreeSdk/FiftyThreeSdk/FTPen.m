@@ -20,6 +20,8 @@ NSString * const kFTPenIsReadyDidChangeNotificationName = @"com.fiftythree.pen.i
 NSString * const kFTPenIsTipPressedDidChangeNotificationName = @"com.fiftythree.pen.isTipPressedDidChange";
 NSString * const kFTPenIsEraserPressedDidChangeNotificationName = @"com.fiftythree.pen.isEraserPressedDidChange";
 NSString * const kFTPenBatteryLevelDidChangeNotificationName = @"com.fiftythree.pen.batteryLevelDidChange";
+NSString * const kFTPenDidUpdateDeviceInfoPropertyNotificationName = @"com.fiftythree.pen.didUpdateDeviceInfoProperty";
+NSString * const kFTPenDidUpdateDebugPropertyNotificationName = @"com.fiftythree.pen.didUpdateDebugProperty";
 
 @interface FTPen () <FTPenServiceClientDelegate, FTPenDebugServiceClientDelegate, FTDeviceInfoServiceClientDelegate>
 
@@ -205,6 +207,11 @@ NSString * const kFTPenBatteryLevelDidChangeNotificationName = @"com.fiftythree.
     [self.penDebugServiceClient readDebugProperties];
 }
 
+- (void)refreshFirmwareVersionProperties
+{
+    [self.deviceInfoServiceClient refreshFirmwareRevisions];
+}
+
 #pragma mark -
 
 - (void)peripheralConnectionStatusDidChange
@@ -214,6 +221,9 @@ NSString * const kFTPenBatteryLevelDidChangeNotificationName = @"com.fiftythree.
 
     if (self.peripheral.isConnected)
     {
+        NSAssert(self.peripheral.delegate == self.peripheralDelegate,
+                 @"peripheral delegate is installed");
+
         NSLog(@"Peripheral is connected.");
 
         [self.peripheral discoverServices:servicesToBeDiscovered];
@@ -299,18 +309,24 @@ NSString * const kFTPenBatteryLevelDidChangeNotificationName = @"com.fiftythree.
     [self.privateDelegate didReadManufacturingID:manufacturingID];
 }
 
-- (void)didUpdateDebugProperties
+- (void)didUpdateDebugProperty
 {
-    [self.privateDelegate didUpdateDebugProperties];
+    [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenDidUpdateDebugPropertyNotificationName
+                                                        object:self];
+
+    [self.privateDelegate didUpdateDebugProperty];
 }
 
 #pragma mark - FTDeviceInfoServiceClientDelegate
 
 - (void)deviceInfoServiceClientDidUpdateDeviceInfo:(FTDeviceInfoServiceClient *)deviceInfoServiceClient
 {
-    if ([self.delegate respondsToSelector:@selector(penDidUpdateDeviceInfo:)])
+    [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenDidUpdateDeviceInfoPropertyNotificationName
+                                                        object:self];
+
+    if ([self.delegate respondsToSelector:@selector(penDidUpdateDeviceInfoProperty:)])
     {
-        [self.delegate penDidUpdateDeviceInfo:self];
+        [self.delegate penDidUpdateDeviceInfoProperty:self];
     }
 }
 

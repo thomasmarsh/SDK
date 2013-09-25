@@ -88,13 +88,11 @@ FTPenPrivateDelegate>
     {
         if (buttonIndex == 1)
         {
-            NSString *firmwareImagePath = [self firmwareImagePath];
+            NSString *firmwareImagePath = [FTFirmwareManager imagePath];
 
             if (firmwareImagePath)
             {
-                [self.penManager updateFirmwareForPen:firmwareImagePath];
-                self.firmwareUpdateProgressView = [FTFirmwareUpdateProgressView start];
-                self.firmwareUpdateProgressView.delegate = self;
+                [self.penManager updateFirmware:firmwareImagePath];
             }
         }
 
@@ -103,7 +101,7 @@ FTPenPrivateDelegate>
     else if (alertView == self.firmwareUpdateProgressView)
     {
         self.firmwareUpdateProgressView = nil;
-        [self.penManager disconnect];
+        [self.penManager cancelFirmwareUpdate];
     }
 }
 
@@ -156,6 +154,7 @@ FTPenPrivateDelegate>
             break;
         case FTPenManagerStateUninitialized:
         case FTPenManagerStateSeeking:
+        case FTPenManagerStateUpdatingFirmware:
             break;
         default:
             NSAssert(NO, @"Unexpected state.");
@@ -171,22 +170,29 @@ FTPenPrivateDelegate>
 
 #pragma mark - FTPenManagerDelegatePrivate
 
-- (void)penManager:(FTPenManager *)manager didFinishUpdate:(NSError *)error
+- (void)penManagerDidStartFirmwareUpdate:(FTPenManager *)manager
+{
+    [self.firmwareUpdateProgressView dismiss];
+    self.firmwareUpdateProgressView = [FTFirmwareUpdateProgressView start];
+    self.firmwareUpdateProgressView.delegate = self;
+}
+
+- (void)penManager:(FTPenManager *)manager didFinishFirmwareUpdate:(NSError *)error
 {
     [self.firmwareUpdateProgressView dismiss];
     self.firmwareUpdateProgressView = nil;
 }
 
-- (void)penManager:(FTPenManager *)manager didUpdatePercentComplete:(float)percent
+- (void)penManager:(FTPenManager *)penManager didUpdateFirmwareUpdatePercentComplete:(float)percentComplete
 {
-    self.firmwareUpdateProgressView.percentComplete = percent;
+    self.firmwareUpdateProgressView.percentComplete = percentComplete;
 }
 
 #pragma mark - FTPenDelegate
 
-- (void)penDidUpdateDeviceInfo:(FTPen *)pen
+- (void)penDidUpdateDeviceInfoProperty:(FTPen *)pen
 {
-    [self displayPenInfo:pen];
+    [self updateDeviceInfoLabel];
 }
 
 - (void)pen:(FTPen *)pen isReadyDidChange:(BOOL)isReady
@@ -255,14 +261,15 @@ FTPenPrivateDelegate>
     [self updateDeviceInfoLabel];
 }
 
-- (void)didUpdateDebugProperties
+- (void)didUpdateDebugProperty
 {
     [self updateDeviceInfoLabel];
 }
 
 - (void)updateDeviceInfoLabel
 {
-    if (self.penManager.state != FTPenManagerStateConnected)
+    if (self.penManager.state != FTPenManagerStateConnected &&
+        self.penManager.state != FTPenManagerStateUpdatingFirmware)
     {
         self.deviceInfoLabel.text = @"";
         return;
@@ -360,18 +367,27 @@ FTPenPrivateDelegate>
     }
     else if (self.penManager.state == FTPenManagerStateConnecting)
     {
-        [self.statusLabel setText:[NSString stringWithFormat:@"Connecting to %@", self.penManager.pen.name]];
+        [self.statusLabel setText:[NSString stringWithFormat:@"Connecting to %@",
+                                   self.penManager.pen.name]];
     }
     else if (self.penManager.state == FTPenManagerStateReconnecting)
     {
-        [self.statusLabel setText:[NSString stringWithFormat:@"Reconnecting to %@", self.penManager.pen.name]];
+        [self.statusLabel setText:[NSString stringWithFormat:@"Reconnecting to %@",
+                                   self.penManager.pen.name]];
     }
     else if (self.penManager.state == FTPenManagerStateConnected)
     {
-        [self.statusLabel setText:[NSString stringWithFormat:@"Connected to %@", self.penManager.pen.name]];
+        [self.statusLabel setText:[NSString stringWithFormat:@"Connected to %@",
+                                   self.penManager.pen.name]];
+    }
+    else if (self.penManager.state == FTPenManagerStateUpdatingFirmware)
+    {
+        [self.statusLabel setText:[NSString stringWithFormat:@"Updating firmware on %@",
+                                   self.penManager.pen.name]];
     }
 
-    if (self.penManager.state == FTPenManagerStateConnected)
+    if (self.penManager.state == FTPenManagerStateConnected ||
+        self.penManager.state == FTPenManagerStateUpdatingFirmware)
     {
         [self.connectButton setTitle:@"Disconnect" forState:UIControlStateNormal];
         self.penConnectedButton.highlighted = YES;
@@ -415,27 +431,34 @@ FTPenPrivateDelegate>
     return [self pairButtonPressed:sender];
 }
 
-- (NSString *)firmwareImagePath
-{
-    return [FTFirmwareManager filePathForImageType:Upgrade];
-}
-
 - (IBAction)updateFirmwareButtonTouchUpInside:(id)sender
 {
     if (!self.firmwareUpdateConfirmAlertView &&
         !self.firmwareUpdateProgressView)
     {
-        NSString *firmwareUpdateImage = [self firmwareImagePath];
-        if (firmwareUpdateImage)
+        if (YES)
+//        if ([self.penManager isFirmwareUpdateAvailable])
         {
-            NSString *message = [NSString stringWithFormat:@"Update with the following image?\n\n%@",
-                                 [firmwareUpdateImage lastPathComponent]];
-            self.firmwareUpdateConfirmAlertView = [[UIAlertView alloc] initWithTitle:@"Update Firmware"
-                                                                             message:message
-                                                                            delegate:self
-                                                                   cancelButtonTitle:@"No"
-                                                                   otherButtonTitles:@"Yes", nil];
-            [self.firmwareUpdateConfirmAlertView show];
+            NSString *firmwareUpdateImage = [FTFirmwareManager imagePath];
+            if (firmwareUpdateImage)
+            {
+                NSString *message = [NSString stringWithFormat:@"Update with the following image?\n\n%@",
+                                     [firmwareUpdateImage lastPathComponent]];
+                self.firmwareUpdateConfirmAlertView = [[UIAlertView alloc] initWithTitle:@"Update Firmware"
+                                                                                 message:message
+                                                                                delegate:self
+                                                                       cancelButtonTitle:@"No"
+                                                                       otherButtonTitles:@"Yes", nil];
+                [self.firmwareUpdateConfirmAlertView show];
+            }
+        }
+        else
+        {
+            [[[UIAlertView alloc] initWithTitle:@"Firmware Is Up to Date"
+                                       message:nil
+                                      delegate:nil
+                             cancelButtonTitle:@"OK"
+                              otherButtonTitles:nil, nil] show];
         }
     }
 }

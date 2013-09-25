@@ -35,6 +35,12 @@
 @property (nonatomic, readonly) PnPID PnPID;
 
 - (id)initWithPeripheral:(CBPeripheral *)peripheral;
+
+// Requests a read of the model number and serial number characteristics from the peripheral.
 - (void)refreshModelNumberAndSerialNumber;
+
+// Clears the current firmwareRevision and softwareRevision values and requests a read of them
+// from the peripheral.
+- (void)refreshFirmwareRevisions;
 
 @end

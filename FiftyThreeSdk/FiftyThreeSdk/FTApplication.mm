@@ -146,6 +146,7 @@ using namespace boost;
         switch (manager.state)
         {
             case FTPenManagerStateUninitialized:
+            case FTPenManagerStateUpdatingFirmware:
             case FTPenManagerStateUnpaired:
             case FTPenManagerStateConnecting:
             case FTPenManagerStateReconnecting:

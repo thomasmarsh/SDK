@@ -50,6 +50,9 @@ static NSString *const kSeparatedStateName = @"Separated";
 static NSString *const kSeparatedRetrievingConnectedPeripheralsStatename = @"SeparatedRetrievingConnectedPeripherals";
 static NSString *const kSeparatedAttemptingConnectionStateName = @"SeparatedAttemptingConnection";
 
+static NSString *const kUpdatingFirmwareStateName = @"UpdatingFirmware";
+static NSString *const kUpdatingFirmwareAttemptingConnectionStateName = @"UpdatingFirmwareAttemptingConnection";
+
 static NSString *const kBeginDatingAndRetrieveConnectedPeripheralsEventName = @"BeginDatingAndRetrieveConnectedPeripherals";
 static NSString *const kRetrieveConnectedPeripheralsFromSeparatedEventName = @"RetrieveConnectedPeripheralsFromSeparated";
 static NSString *const kBeginDatingScanningEventName = @"BeginDatingScanning";
@@ -73,6 +76,9 @@ static NSString *const kAttemptConnectionFromSwingingEventName = @"AttemptConnec
 static NSString *const kBecomeSeparatedEventName = @"BecomeSeparated";
 static NSString *const kAttemptConnectionFromSeparatedEventName = @"AttemptConnectionFromSeparated";
 
+static NSString *const kUpdateFirmwareEventName = @"UpdateFirmware";
+static NSString *const kAttemptConnectionFromUpdatingFirmwareEventName = @"AttemptConnectionFromUpdatingFirmware";
+
 typedef enum
 {
     ScanningStateDisabled,
@@ -85,6 +91,8 @@ typedef enum
 }
 
 @property (nonatomic) CBCentralManager *centralManager;
+
+@property (nonatomic, copy) NSString *firmwareImagePath;
 @property (nonatomic) TIUpdateManager *updateManager;
 
 @property (nonatomic) TKStateMachine *stateMachine;
@@ -173,6 +181,7 @@ typedef enum
     [[NSNotificationCenter defaultCenter] removeObserver:kFTPenDidEncounterErrorNotificationName];
     [[NSNotificationCenter defaultCenter] removeObserver:kFTPenIsReadyDidChangeNotificationName];
     [[NSNotificationCenter defaultCenter] removeObserver:kFTPenIsTipPressedDidChangeNotificationName];
+    [[NSNotificationCenter defaultCenter] removeObserver:kFTPenDidUpdateDeviceInfoPropertyNotificationName];
 
     if (_pen)
     {
@@ -189,6 +198,10 @@ typedef enum
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(penIsTipPressedDidChange:)
                                                      name:kFTPenIsTipPressedDidChangeNotificationName
+                                                   object:_pen];
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(penDidUpdateDeviceInfoProperty:)
+                                                     name:kFTPenDidUpdateDeviceInfoPropertyNotificationName
                                                    object:_pen];
     }
 }
@@ -241,17 +254,20 @@ typedef enum
 {
     NSLog(@"Pen did encounter error. Disconnecting.");
 
-    if ([self.stateMachine canFireEvent:kBecomeSingleEventName])
-    {
-        [self fireStateMachineEvent:kBecomeSingleEventName];
-    }
-    else if ([self.stateMachine canFireEvent:kDisconnectAndBecomeSingleEventName])
+    // Make sure that we favor transitions that go through disconnect over going straight
+    // to single. Some states may support both, but if we're connected we need to disconnect
+    // first.
+    if ([self.stateMachine canFireEvent:kDisconnectAndBecomeSingleEventName])
     {
         [self fireStateMachineEvent:kDisconnectAndBecomeSingleEventName];
     }
     else if ([self.stateMachine canFireEvent:kDisconnectAndBecomeSeparatedEventName])
     {
         [self fireStateMachineEvent:kDisconnectAndBecomeSeparatedEventName];
+    }
+    else if ([self.stateMachine canFireEvent:kBecomeSingleEventName])
+    {
+        [self fireStateMachineEvent:kBecomeSingleEventName];
     }
 }
 
@@ -292,6 +308,38 @@ typedef enum
     }
 }
 
+- (void)penDidUpdateDeviceInfoProperty:(NSNotification *)notification
+{
+    // Firmware update can't proceed until we've refreshed the factory and upgrade firmware
+    // versions. (The reason for this is that after the upgrade -> factory reset we need the
+    // check that we're running the factory version to be accurate.)
+    if ([self currentStateHasName:kUpdatingFirmwareStateName])
+    {
+        NSAssert(self.pen, @"pen is non-nil");
+        if (self.pen.firmwareRevision && self.pen.softwareRevision)
+        {
+            NSLog(@"Factory firmware version: %@", self.pen.firmwareRevision);
+            NSLog(@"Upgrade firmware version: %@", self.pen.softwareRevision);
+
+            self.updateManager = [[TIUpdateManager alloc] initWithPeripheral:self.pen.peripheral
+                                                                    delegate:self];
+            [self.updateManager updateWithImagePath:self.firmwareImagePath];
+
+            // If the pen is currently running the upgrade firmware, it needs to reset. We
+            // don't want to indicate that the update has started until we initate another
+            // update *after* the reset has happened.
+            if ([FTFirmwareManager imageTypeRunningOnPen:self.pen] == FTFirmwareImageTypeFactory)
+            {
+                if ([self.delegate conformsToProtocol:@protocol(FTPenManagerDelegatePrivate)])
+                {
+                    id<FTPenManagerDelegatePrivate> d = (id<FTPenManagerDelegatePrivate>)self.delegate;
+                    [d penManagerDidStartFirmwareUpdate:self];
+                }
+            }
+        }
+    }
+}
+
 #pragma mark - State machine
 
 - (void)initializeStateMachine
@@ -308,7 +356,7 @@ typedef enum
 
     void (^attemptingConnectionCommon)() = ^()
     {
-        NSAssert(weakSelf.pen, @"pen is non-null");
+        NSAssert(weakSelf.pen, @"pen is non-nil");
 
         [weakSelf.centralManager connectPeripheral:weakSelf.pen.peripheral options:nil];
     };
@@ -574,6 +622,51 @@ typedef enum
          }
      }];
 
+    // Updating Firmware
+    TKState *updatingFirmwareState = [TKState stateWithName:kUpdatingFirmwareStateName];
+    [updatingFirmwareState setDidEnterStateBlock:^(TKState *state, TKStateMachine *stateMachine)
+    {
+        NSAssert(weakSelf.pen, @"Pen must be non-nil");
+        NSAssert(weakSelf.firmwareImagePath, @"firmwareImagePath must be non-nil");
+        NSAssert(!weakSelf.updateManager, @"Update manager must be nil");
+
+        weakSelf.state = FTPenManagerStateUpdatingFirmware;
+
+        // Firmware update can't proceed until we've refreshed the factory and upgrade firmware
+        // versions. (The reason for this is that after the upgrade -> factory reset we need
+        // the check that we're running the factory version to be accurate.)
+        [self.pen refreshFirmwareVersionProperties];
+    }];
+    [updatingFirmwareState setDidExitStateBlock:^(TKState *state,
+                                                  TKStateMachine *stateMachine)
+    {
+        [weakSelf.updateManager cancelUpdate];
+        weakSelf.updateManager = nil;
+    }];
+
+    // Updating Firmware - Attempting Connection
+    TKState *updatingFirmwareAttemptingConnectionState = [TKState stateWithName:kUpdatingFirmwareAttemptingConnectionStateName
+                                                             andTimeoutDuration:kAttemptingConnectionStateTimeout];
+    [updatingFirmwareAttemptingConnectionState setDidEnterStateBlock:^(TKState *state,
+                                                                       TKStateMachine *stateMachine)
+    {
+        NSAssert(weakSelf.pen, @"Pen must be non-nil");
+        NSAssert(weakSelf.pen.peripheral, @"Pen peripheral is non-nil");
+        NSAssert(!weakSelf.pen.peripheral.isConnected, @"Pen peripheral is not connected");
+        NSAssert(!weakSelf.updateManager, @"Update manager must be nil");
+
+        weakSelf.state = FTPenManagerStateUpdatingFirmware;
+
+        attemptingConnectionCommon();
+    }];
+    [updatingFirmwareAttemptingConnectionState setTimeoutExpiredBlock:^(TKState *state,
+                                                                        TKStateMachine *stateMachine)
+    {
+        NSAssert(weakSelf.pen, @"Pen must be non-nil");
+
+        [self fireStateMachineEvent:kDisconnectAndBecomeSingleEventName];
+    }];
+
     [self.stateMachine addStates:@[
      singleState,
      datingRetrievingConnectedPeripheralsState,
@@ -591,7 +684,9 @@ typedef enum
      separatedRetrievingConnectedPeripheralsState,
      separatedAttemptingConnectionState,
      disconnectingAndBecomingSingleState,
-     disconnectingAndBecomingSeparatedState]];
+     disconnectingAndBecomingSeparatedState,
+     updatingFirmwareState,
+     updatingFirmwareAttemptingConnectionState]];
 
     //
     // Events
@@ -609,10 +704,6 @@ typedef enum
     TKEvent *becomeSingleEvent = [TKEvent eventWithName:kBecomeSingleEventName
                                 transitioningFromStates:@[ datingScanningState,
                                   datingRetrievingConnectedPeripheralsState,
-                                  datingAttemptingConnectionState,
-                                  engagedState,
-                                  engagedWaitingForPairingSpotReleaseState,
-                                  engagedWaitingForTipReleaseState,
                                   separatedState,
                                   swingingState]
                                                 toState:singleState];
@@ -634,7 +725,8 @@ typedef enum
                                    engagedWaitingForPairingSpotReleaseState,
                                    engagedWaitingForTipReleaseState,
                                    swingingAttemptingConnectionState,
-                                   separatedAttemptingConnectionState]
+                                   separatedAttemptingConnectionState,
+                                   updatingFirmwareState]
                                                  toState:marriedState];
     TKEvent *waitForLongPressToDisconnectEvent = [TKEvent eventWithName:kWaitForLongPressToDisconnect
                                                 transitioningFromStates:@[marriedState]
@@ -650,7 +742,8 @@ typedef enum
                                                engagedWaitingForTipReleaseState,
                                                marriedState,
                                                marriedWaitingForLongPressToDisconnectState,
-                                               swingingAttemptingConnectionState]
+                                               swingingAttemptingConnectionState,
+                                               updatingFirmwareAttemptingConnectionState]
                                                              toState:disconnectingAndBecomingSingleState];
     TKEvent *disconnectAndBecomeSeparatedEvent = [TKEvent eventWithName:kDisconnectAndBecomeSeparatedEventName
                                                 transitioningFromStates:@[separatedAttemptingConnectionState]
@@ -674,7 +767,8 @@ typedef enum
                                    transitioningFromStates:@[
                                      marriedState,
                                      separatedRetrievingConnectedPeripheralsState,
-                                     separatedAttemptingConnectionState]
+                                     separatedAttemptingConnectionState,
+                                     updatingFirmwareState]
                                                    toState:separatedState];
     TKEvent *retrieveConnectedPeripheralsFromSeparatedEvent = [TKEvent eventWithName:kRetrieveConnectedPeripheralsFromSeparatedEventName
                                                              transitioningFromStates:@[separatedState]
@@ -684,6 +778,14 @@ typedef enum
                                                     separatedState,
                                                     separatedRetrievingConnectedPeripheralsState]
                                                                   toState:separatedAttemptingConnectionState];
+
+    TKEvent *updateFirmwareEvent = [TKEvent eventWithName:kUpdateFirmwareEventName
+                                  transitioningFromStates:@[ marriedState,
+                                    updatingFirmwareAttemptingConnectionState]
+                                                  toState:updatingFirmwareState];
+    TKEvent *attemptConnectionFromUpdatingFirmwareEvent = [TKEvent eventWithName:kAttemptConnectionFromUpdatingFirmwareEventName
+                                                         transitioningFromStates:@[updatingFirmwareState]
+                                                                         toState:updatingFirmwareAttemptingConnectionState];
 
     [self.stateMachine addEvents:@[
      beginDatingRetrievingConnectedPeripheralsEvent,
@@ -705,7 +807,9 @@ typedef enum
      attemptConnectionFromSwingingEvent,
      becomeSeparatedEvent,
      attemptConnectionFromSeparatedEvent,
-     retrieveConnectedPeripheralsFromSeparatedEvent
+     retrieveConnectedPeripheralsFromSeparatedEvent,
+     updateFirmwareEvent,
+     attemptConnectionFromUpdatingFirmwareEvent,
      ]];
 
     // If we're already paired with a peripheral, then start in the separted state so that we
@@ -982,6 +1086,11 @@ typedef enum
     {
         [self.pen peripheralConnectionStatusDidChange];
     }
+    else if ([self currentStateHasName:kUpdatingFirmwareAttemptingConnectionStateName])
+    {
+        [self.pen peripheralConnectionStatusDidChange];
+        [self fireStateMachineEvent:kUpdateFirmwareEventName];
+    }
     else
     {
         [self.centralManager cancelPeripheralConnection:peripheral];
@@ -1000,41 +1109,73 @@ typedef enum
             NSLog(@"Disconnected peripheral with error: %@", error.localizedDescription);
         }
 
-        FTPen *pen = self.pen;
-        self.pen = nil;
+        if ([self currentStateHasName:kUpdatingFirmwareStateName])
+        {
+            if (self.updateManager.state == TIUpdateManagerStateSucceeded ||
+                self.updateManager.state == TIUpdateManagerStateCancelled)
+            {
+                FTPen *pen = self.pen;
+                self.pen = nil;
+                [pen peripheralConnectionStatusDidChange];
 
-        [pen peripheralConnectionStatusDidChange];
+                [self fireStateMachineEvent:kBecomeSeparatedEventName];
+            }
+            else
+            {
+                NSLog(@"Peripheral did disconnect while updating firmware. Reconnecting.");
 
-        if ([self currentStateHasName:kDisconnectingAndBecomingSingleStateName])
-        {
-            [self fireStateMachineEvent:kCompleteDisconnectionAndBecomeSingleEventName];
+                // Normally when we transition from the UpdatingFirmware state we cancel
+                // the firmware update, which restores the peripheral delegate. In this case
+                // since we've created a new FTPen, we *don't* want the old delegate.
+                self.updateManager.shouldRestorePeripheralDelegate = NO;
+                self.pen = [[FTPen alloc] initWithCentralManager:self.centralManager
+                                                      peripheral:self.pen.peripheral];
+                [self fireStateMachineEvent:kAttemptConnectionFromUpdatingFirmwareEventName];
+            }
         }
-        else if ([self currentStateHasName:kDisconnectingAndBecomingSeparatedStateName])
+        else if ([self currentStateHasName:kUpdatingFirmwareAttemptingConnectionStateName])
         {
-            [self fireStateMachineEvent:kCompleteDisconnectionAndBecomeSeparatedEventName];
-        }
-        else if ([self currentStateHasName:kPreparingToSwingStateName])
-        {
-            [self fireStateMachineEvent:kSwingEventName];
-        }
-        else if ([self currentStateHasName:kMarriedStateName] ||
-                 [self currentStateHasName:kMarriedWaitingForLongPressToDisconnectStateName] ||
-                 [self currentStateHasName:kSeparatedAttemptingConnectionStateName] ||
-                 [self currentStateHasName:kSwingingAttemptingConnectionStateName])
-        {
-            [self fireStateMachineEvent:kBecomeSeparatedEventName];
-        }
-        else if ([self currentStateHasName:kDatingAttemptingConnectiongStateName] ||
-                 [self currentStateHasName:kEngagedStateName] ||
-                 [self currentStateHasName:kEngagedWaitingForPairingSpotReleaseStateName] ||
-                 [self currentStateHasName:kEngagedWaitingForTipReleaseStateName])
-        {
-            [self fireStateMachineEvent:kBecomeSingleEventName];
+            // Try again. Eventually the state will timeout.
+            [self.centralManager connectPeripheral:self.pen.peripheral options:nil];
         }
         else
         {
-            NSAssert(NO, @"Disconnect from unexpected state: %@",
-                     self.stateMachine.currentState.name);
+            FTPen *pen = self.pen;
+            self.pen = nil;
+
+            [pen peripheralConnectionStatusDidChange];
+
+            if ([self currentStateHasName:kDisconnectingAndBecomingSingleStateName])
+            {
+                [self fireStateMachineEvent:kCompleteDisconnectionAndBecomeSingleEventName];
+            }
+            else if ([self currentStateHasName:kDisconnectingAndBecomingSeparatedStateName])
+            {
+                [self fireStateMachineEvent:kCompleteDisconnectionAndBecomeSeparatedEventName];
+            }
+            else if ([self currentStateHasName:kPreparingToSwingStateName])
+            {
+                [self fireStateMachineEvent:kSwingEventName];
+            }
+            else if ([self currentStateHasName:kMarriedStateName] ||
+                     [self currentStateHasName:kMarriedWaitingForLongPressToDisconnectStateName] ||
+                     [self currentStateHasName:kSeparatedAttemptingConnectionStateName] ||
+                     [self currentStateHasName:kSwingingAttemptingConnectionStateName])
+            {
+                [self fireStateMachineEvent:kBecomeSeparatedEventName];
+            }
+            else if ([self currentStateHasName:kDatingAttemptingConnectiongStateName] ||
+                     [self currentStateHasName:kEngagedStateName] ||
+                     [self currentStateHasName:kEngagedWaitingForPairingSpotReleaseStateName] ||
+                     [self currentStateHasName:kEngagedWaitingForTipReleaseStateName])
+            {
+                [self fireStateMachineEvent:kDisconnectAndBecomeSingleEventName];
+            }
+            else
+            {
+                NSAssert(NO, @"Disconnect from unexpected state: %@",
+                         self.stateMachine.currentState.name);
+            }
         }
     }
 }
@@ -1080,73 +1221,57 @@ typedef enum
 
 #pragma mark - Firmware
 
-- (BOOL)isUpdateAvailableForPen:(FTPen *)pen
+- (BOOL)isFirmwareUpdateAvailable
 {
-    NSAssert(pen, nil);
-
-    return ([self isUpdateAvailableForPen:pen imageType:Factory] ||
-            [self isUpdateAvailableForPen:pen imageType:Upgrade]);
+    return [FTFirmwareManager isVersionAtPath:[FTFirmwareManager imagePath]
+                        newerThanVersionOnPen:self.pen];
 }
 
-- (BOOL)isUpdateAvailableForPen:(FTPen *)pen imageType:(FTFirmwareImageType)imageType
-{
-    NSAssert(pen, nil);
-
-    NSNumberFormatter *f = [[NSNumberFormatter alloc] init];
-    [f setNumberStyle:NSNumberFormatterDecimalStyle];
-
-    NSInteger availableVersion = [FTFirmwareManager versionForModel:pen.modelNumber imageType:imageType];
-    NSInteger existingVersion;
-    if (imageType == Factory)
-    {
-        existingVersion = [f numberFromString:[pen.firmwareRevision componentsSeparatedByString:@" "][0]].integerValue;
-
-        NSLog(@"Factory version: Available = %d, Existing = %d", availableVersion, existingVersion);
-    }
-    else
-    {
-        existingVersion = [f numberFromString:[pen.softwareRevision componentsSeparatedByString:@" "][0]].integerValue;
-
-        NSLog(@"Upgrade version: Available = %d, Existing = %d", availableVersion, existingVersion);
-    }
-
-    return availableVersion > existingVersion;
-}
-
-- (void)updateFirmwareForPen:(NSString *)firmwareImagePath;
+- (void)updateFirmware:(NSString *)firmwareImagePath;
 {
     NSAssert(firmwareImagePath, @"firmwareImagePath must be non-nil");
-    NSAssert(self.pen, @"pen must be non-nill");
 
-    self.updateManager = [[TIUpdateManager alloc] initWithPeripheral:self.pen.peripheral
-                                                            delegate:self]; // BUGBUG - ugly cast
+    if ([self.stateMachine canFireEvent:kUpdateFirmwareEventName])
+    {
+        self.firmwareImagePath = firmwareImagePath;
+        [self fireStateMachineEvent:kUpdateFirmwareEventName];
+    }
+}
 
-    [self.updateManager updateImage:firmwareImagePath];
+- (void)cancelFirmwareUpdate
+{
+    if ([self currentStateHasName:kUpdatingFirmwareStateName])
+    {
+        [self fireStateMachineEvent:kBecomeMarriedEventName];
+    }
+    else if ([self currentStateHasName:kUpdatingFirmwareAttemptingConnectionStateName])
+    {
+        [self fireStateMachineEvent:kDisconnectAndBecomeSeparatedEventName];
+    }
 }
 
 #pragma mark - TIUpdateManagerDelegate
 
 - (void)updateManager:(TIUpdateManager *)manager didFinishUpdate:(NSError *)error
 {
+    NSAssert(self.updateManager, @"update manager non-nil");
     NSAssert(manager, nil);
-
-    self.updateManager = nil;
 
     if ([self.delegate conformsToProtocol:@protocol(FTPenManagerDelegatePrivate)])
     {
         id<FTPenManagerDelegatePrivate> d = (id<FTPenManagerDelegatePrivate>)self.delegate;
-        [d penManager:self didFinishUpdate:error];
+        [d penManager:self didFinishFirmwareUpdate:error];
     }
 }
 
-- (void)updateManager:(TIUpdateManager *)manager didUpdatePercentComplete:(float)percent
+- (void)updateManager:(TIUpdateManager *)manager didUpdatePercentComplete:(float)percentComplete
 {
     NSAssert(manager, nil);
 
     if ([self.delegate conformsToProtocol:@protocol(FTPenManagerDelegatePrivate)])
     {
         id<FTPenManagerDelegatePrivate> d = (id<FTPenManagerDelegatePrivate>)self.delegate;
-        [d penManager:self didUpdatePercentComplete:percent];
+        [d penManager:self didUpdateFirmwareUpdatePercentComplete:percentComplete];
     }
 }
 

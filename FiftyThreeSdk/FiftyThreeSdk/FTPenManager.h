@@ -14,6 +14,7 @@
 typedef NS_ENUM(NSInteger, FTPenManagerState)
 {
     FTPenManagerStateUninitialized,
+    FTPenManagerStateUpdatingFirmware,
     FTPenManagerStateUnpaired,
     FTPenManagerStateSeeking,
     FTPenManagerStateConnecting,

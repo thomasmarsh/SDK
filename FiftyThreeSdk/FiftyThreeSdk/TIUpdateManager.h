@@ -9,24 +9,38 @@
 
 #import <Foundation/Foundation.h>
 
+typedef NS_ENUM(NSInteger, TIUpdateManagerState)
+{
+    TIUpdateManagerStateNotStarted,
+    TIUpdateManagerStateInProgress,
+    TIUpdateManagerStateFailed,
+    TIUpdateManagerStateCancelled,
+    TIUpdateManagerStateSucceeded
+};
+
 @class CBPeripheral;
 
 @protocol TIUpdateManagerDelegate;
 
 @interface TIUpdateManager : NSObject
 
-@property (nonatomic) BOOL waitingForReboot;
-@property (nonatomic, readonly) NSDate *updateStartTime;
+@property (nonatomic) TIUpdateManagerState state;
+@property (nonatomic) BOOL shouldRestorePeripheralDelegate;
 
 - (id)init __unavailable;
-- (id)initWithPeripheral:(CBPeripheral *)peripheral delegate:(id<TIUpdateManagerDelegate>)delegate;
-- (void)updateImage:(NSString *)filePath;
+
+- (id)initWithPeripheral:(CBPeripheral *)peripheral
+                delegate:(id<TIUpdateManagerDelegate>)delegate;
+
+- (void)updateWithImagePath:(NSString *)imagePath;
+
+- (void)cancelUpdate;
 
 @end
 
 @protocol TIUpdateManagerDelegate <NSObject>
 
-- (void)updateManager:(TIUpdateManager *)manager didFinishUpdate:(NSError *)error;
 - (void)updateManager:(TIUpdateManager *)manager didUpdatePercentComplete:(float)percent;
+- (void)updateManager:(TIUpdateManager *)manager didFinishUpdate:(NSError *)error;
 
 @end

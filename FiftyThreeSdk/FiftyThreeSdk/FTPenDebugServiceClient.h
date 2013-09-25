@@ -16,7 +16,7 @@
 - (void)didWriteManufacturingID;
 - (void)didFailToWriteManufacturingID;
 
-- (void)didUpdateDebugProperties;
+- (void)didUpdateDebugProperty;
 
 @end
 

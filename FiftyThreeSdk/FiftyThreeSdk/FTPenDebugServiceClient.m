@@ -263,51 +263,58 @@
         return;
     }
 
+    BOOL didUpdate = NO;
+
     if ([characteristic.UUID isEqual:[FTPenDebugServiceUUIDs numTipPresses]])
     {
         _numTipPresses = [characteristic valueAsNSUInteger];
-        [self.delegate didUpdateDebugProperties];
+        didUpdate = YES;
     }
     else if ([characteristic.UUID isEqual:[FTPenDebugServiceUUIDs numEraserPresses]])
     {
         _numEraserPresses = [characteristic valueAsNSUInteger];
-        [self.delegate didUpdateDebugProperties];
+        didUpdate = YES;
     }
     else if ([characteristic.UUID isEqual:[FTPenDebugServiceUUIDs numFailedConnections]])
     {
         _numFailedConnections = [characteristic valueAsNSUInteger];
-        [self.delegate didUpdateDebugProperties];
+        didUpdate = YES;
     }
     else if ([characteristic.UUID isEqual:[FTPenDebugServiceUUIDs numSuccessfulConnections]])
     {
         _numSuccessfulConnections = [characteristic valueAsNSUInteger];
-        [self.delegate didUpdateDebugProperties];
+        didUpdate = YES;
     }
     else if ([characteristic.UUID isEqual:[FTPenDebugServiceUUIDs totalOnTime]])
     {
         _totalOnTimeSeconds = [characteristic valueAsNSUInteger];
-        [self.delegate didUpdateDebugProperties];
+        didUpdate = YES;
     }
     else if ([characteristic.UUID isEqual:[FTPenDebugServiceUUIDs manufacturingID]])
     {
         _manufacturingID = [characteristic valueAsNSString];
 
         [self.delegate didReadManufacturingID:self.manufacturingID];
-        [self.delegate didUpdateDebugProperties];
+        didUpdate = YES;
     }
     else if ([characteristic.UUID isEqual:[FTPenDebugServiceUUIDs lastErrorCode]])
     {
-        [self.delegate didUpdateDebugProperties];
+        didUpdate = YES;
     }
     else if ([characteristic.UUID isEqual:[FTPenDebugServiceUUIDs longPressTime]])
     {
         _longPressTimeMilliseconds = [characteristic valueAsNSUInteger];
-        [self.delegate didUpdateDebugProperties];
+        didUpdate = YES;
     }
     else if ([characteristic.UUID isEqual:[FTPenDebugServiceUUIDs connectionTime]])
     {
         _connectionTimeSeconds = [characteristic valueAsNSUInteger];
-        [self.delegate didUpdateDebugProperties];
+        didUpdate = YES;
+    }
+
+    if (didUpdate)
+    {
+        [self.delegate didUpdateDebugProperty];
     }
 }
 

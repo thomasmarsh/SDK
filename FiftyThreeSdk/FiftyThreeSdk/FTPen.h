@@ -22,6 +22,7 @@ extern NSString * const kFTPenIsReadyDidChangeNotificationName;
 extern NSString * const kFTPenIsTipPressedDidChangeNotificationName;
 extern NSString * const kFTPenIsEraserPressedDidChangeNotificationName;
 extern NSString * const kFTPenBatteryLevelDidChangeNotificationName;
+extern NSString * const kFTPenDidUpdateDeviceInfoPropertyNotificationName;
 
 @protocol FTPenDelegate;
 
@@ -54,7 +55,7 @@ extern NSString * const kFTPenBatteryLevelDidChangeNotificationName;
 @protocol FTPenDelegate <NSObject>
 
 @optional
-- (void)penDidUpdateDeviceInfo:(FTPen *)pen;
+- (void)penDidUpdateDeviceInfoProperty:(FTPen *)pen;
 - (void)pen:(FTPen *)pen isReadyDidChange:(BOOL)isReady;
 - (void)pen:(FTPen *)pen isTipPressedDidChange:(BOOL)isTipPressed;
 - (void)pen:(FTPen *)pen isEraserPressedDidChange:(BOOL)isEraserPressed;
