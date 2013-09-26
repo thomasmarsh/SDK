@@ -9,6 +9,8 @@
 
 #import <UIKit/UIKit.h>
 
+#ifdef __cplusplus
+
 #import "Common/Touch/TouchClassifier.h"
 
 @interface FTApplication : UIApplication
@@ -17,3 +19,4 @@
 - (fiftythree::common::TouchClassifier::Ptr)createClassifier;
 
 @end
+#endif

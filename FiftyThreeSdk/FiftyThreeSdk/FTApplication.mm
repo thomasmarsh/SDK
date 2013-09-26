@@ -53,6 +53,10 @@ using namespace boost;
 
 - (void)onTimer:(id)token
 {
+    // TODO:
+    //    Right now the classifier APIs need to be notified every frame, since
+    //    Paper pauses the display link, we just use a timer.
+    //    The correct fix is update Classifier API to work correctly when *only* called in event processing.
     if (self.classifier && *self.classifier)
     {
         double timestamp = [[NSProcessInfo processInfo] systemUptime];
