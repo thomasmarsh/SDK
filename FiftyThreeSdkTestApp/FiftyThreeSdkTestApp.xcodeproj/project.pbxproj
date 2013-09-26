@@ -31,7 +31,7 @@
 		6644315816F3D1640049E570 /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 6644314216F3D1640049E570 /* Default@2x.png */; };
 		6644315B16F3D1640049E570 /* FTConnectLatencyTester.m in Sources */ = {isa = PBXBuildFile; fileRef = 6644314916F3D1640049E570 /* FTConnectLatencyTester.m */; };
 		6644315C16F3D1640049E570 /* FTPenService.m in Sources */ = {isa = PBXBuildFile; fileRef = 6644314B16F3D1640049E570 /* FTPenService.m */; };
-		6644315D16F3D1640049E570 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 6644314D16F3D1640049E570 /* main.m */; };
+		6644315D16F3D1640049E570 /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = 6644314D16F3D1640049E570 /* main.mm */; };
 		6644315E16F3D1640049E570 /* MainStoryboard_iPad.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6644314E16F3D1640049E570 /* MainStoryboard_iPad.storyboard */; };
 		6644315F16F3D1640049E570 /* MainStoryboard_iPhone.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6644314F16F3D1640049E570 /* MainStoryboard_iPhone.storyboard */; };
 		6644316016F3D1640049E570 /* TiUpdateService.m in Sources */ = {isa = PBXBuildFile; fileRef = 6644315116F3D1640049E570 /* TiUpdateService.m */; };
@@ -182,7 +182,7 @@
 		6644314916F3D1640049E570 /* FTConnectLatencyTester.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FTConnectLatencyTester.m; path = FiftyThreeSdkTestApp/FTConnectLatencyTester.m; sourceTree = SOURCE_ROOT; };
 		6644314A16F3D1640049E570 /* FTPenService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FTPenService.h; path = FiftyThreeSdkTestApp/FTPenService.h; sourceTree = SOURCE_ROOT; };
 		6644314B16F3D1640049E570 /* FTPenService.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FTPenService.m; path = FiftyThreeSdkTestApp/FTPenService.m; sourceTree = SOURCE_ROOT; };
-		6644314D16F3D1640049E570 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = FiftyThreeSdkTestApp/main.m; sourceTree = SOURCE_ROOT; };
+		6644314D16F3D1640049E570 /* main.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = main.mm; path = FiftyThreeSdkTestApp/main.mm; sourceTree = SOURCE_ROOT; };
 		6644314E16F3D1640049E570 /* MainStoryboard_iPad.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = MainStoryboard_iPad.storyboard; path = FiftyThreeSdkTestApp/MainStoryboard_iPad.storyboard; sourceTree = SOURCE_ROOT; };
 		6644314F16F3D1640049E570 /* MainStoryboard_iPhone.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = MainStoryboard_iPhone.storyboard; path = FiftyThreeSdkTestApp/MainStoryboard_iPhone.storyboard; sourceTree = SOURCE_ROOT; };
 		6644315016F3D1640049E570 /* TiUpdateService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TiUpdateService.h; path = FiftyThreeSdkTestApp/TiUpdateService.h; sourceTree = SOURCE_ROOT; };
@@ -431,7 +431,7 @@
 				6644316716F3D24B0049E570 /* InfoPlist.strings */,
 				6644314616F3D1640049E570 /* FiftyThreeSdkTestApp-Info.plist */,
 				6644314716F3D1640049E570 /* FiftyThreeSdkTestApp-Prefix.pch */,
-				6644314D16F3D1640049E570 /* main.m */,
+				6644314D16F3D1640049E570 /* main.mm */,
 				6644314016F3D1640049E570 /* Default-568h@2x.png */,
 				6644314116F3D1640049E570 /* Default.png */,
 				6644314216F3D1640049E570 /* Default@2x.png */,
@@ -672,7 +672,7 @@
 				6644315416F3D1640049E570 /* BTLEPeripheralViewController.mm in Sources */,
 				6644315B16F3D1640049E570 /* FTConnectLatencyTester.m in Sources */,
 				6644315C16F3D1640049E570 /* FTPenService.m in Sources */,
-				6644315D16F3D1640049E570 /* main.m in Sources */,
+				6644315D16F3D1640049E570 /* main.mm in Sources */,
 				6644316016F3D1640049E570 /* TiUpdateService.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
