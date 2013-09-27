@@ -632,6 +632,9 @@ typedef enum
 
         weakSelf.state = FTPenManagerStateUpdatingFirmware;
 
+        // Discourage the device from going to sleep while the firmware is updating.
+        [UIApplication sharedApplication].idleTimerDisabled = YES;
+
         // Firmware update can't proceed until we've refreshed the factory and upgrade firmware
         // versions. (The reason for this is that after the upgrade -> factory reset we need
         // the check that we're running the factory version to be accurate.)
@@ -642,6 +645,9 @@ typedef enum
     {
         [weakSelf.updateManager cancelUpdate];
         weakSelf.updateManager = nil;
+
+        // Restore the idle timer disable flag to its original state.
+        [UIApplication sharedApplication].idleTimerDisabled = NO;
     }];
 
     // Updating Firmware - Attempting Connection
