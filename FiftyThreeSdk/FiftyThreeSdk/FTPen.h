@@ -22,15 +22,29 @@ extern NSString * const kFTPenIsReadyDidChangeNotificationName;
 extern NSString * const kFTPenIsTipPressedDidChangeNotificationName;
 extern NSString * const kFTPenIsEraserPressedDidChangeNotificationName;
 extern NSString * const kFTPenBatteryLevelDidChangeNotificationName;
-extern NSString * const kFTPenDidUpdateDeviceInfoPropertyNotificationName;
+extern NSString * const kFTPenDidUpdateDeviceInfoPropertiesNotificationName;
+extern NSString * const kFTPenNotificationPropertiesKey;
+
+extern NSString * const kFTPenNamePropertyName;
+extern NSString * const kFTPenManufacturerNamePropertyName;
+extern NSString * const kFTPenModelNumberPropertyName;
+extern NSString * const kFTPenSerialNumberPropertyName;
+extern NSString * const kFTPenFirmwareRevisionPropertyName;
+extern NSString * const kFTPenHardwareRevisionPropertyName;
+extern NSString * const kFTPenSoftwareRevisionPropertyName;
+extern NSString * const kFTPenSystemIDPropertyName;
+extern NSString * const kFTPenIEEECertificationDataPropertyName;
+extern NSString * const kFTPenPnPIDCertificationDataPropertyName;
+
+extern NSString * const kFTPenIsTipPressPropertyName;
+extern NSString * const kFTPenIsEraserPressedPropertyName;
+extern NSString * const kFTPenBatteryLevelPropertyName;
 
 @protocol FTPenDelegate;
 
 @interface FTPen : NSObject
 
 @property (nonatomic, weak) id<FTPenDelegate> delegate;
-
-@property (nonatomic, readonly) BOOL isReady;
 
 // Device Info
 @property (nonatomic, readonly) NSString *name;
@@ -56,7 +70,6 @@ extern NSString * const kFTPenDidUpdateDeviceInfoPropertyNotificationName;
 
 @optional
 - (void)penDidUpdateDeviceInfoProperty:(FTPen *)pen;
-- (void)pen:(FTPen *)pen isReadyDidChange:(BOOL)isReady;
 - (void)pen:(FTPen *)pen isTipPressedDidChange:(BOOL)isTipPressed;
 - (void)pen:(FTPen *)pen isEraserPressedDidChange:(BOOL)isEraserPressed;
 - (void)pen:(FTPen *)pen batteryLevelDidChange:(NSInteger)batteryLevel;

@@ -20,8 +20,34 @@ NSString * const kFTPenIsReadyDidChangeNotificationName = @"com.fiftythree.pen.i
 NSString * const kFTPenIsTipPressedDidChangeNotificationName = @"com.fiftythree.pen.isTipPressedDidChange";
 NSString * const kFTPenIsEraserPressedDidChangeNotificationName = @"com.fiftythree.pen.isEraserPressedDidChange";
 NSString * const kFTPenBatteryLevelDidChangeNotificationName = @"com.fiftythree.pen.batteryLevelDidChange";
-NSString * const kFTPenDidUpdateDeviceInfoPropertyNotificationName = @"com.fiftythree.pen.didUpdateDeviceInfoProperty";
+NSString * const kFTPenDidUpdateDeviceInfoPropertiesNotificationName = @"com.fiftythree.pen.didUpdateDeviceInfoProperties";
 NSString * const kFTPenDidUpdateUsagePropertiesNotificationName = @"com.fiftythree.pen.didUpdateUsageProperties";
+NSString * const kFTPenNotificationPropertiesKey = @"kFTPenNotificationPropertiesKey";
+
+NSString * const kFTPenNamePropertyName = @"name";
+NSString * const kFTPenManufacturerNamePropertyName = @"manufacturerName";
+NSString * const kFTPenModelNumberPropertyName = @"modelNumber";
+NSString * const kFTPenSerialNumberPropertyName = @"serialNumber";
+NSString * const kFTPenFirmwareRevisionPropertyName = @"firmwareRevision";
+NSString * const kFTPenHardwareRevisionPropertyName = @"hardwareRevision";
+NSString * const kFTPenSoftwareRevisionPropertyName = @"softwareRevision";
+NSString * const kFTPenSystemIDPropertyName = @"systemID";
+NSString * const kFTPenIEEECertificationDataPropertyName = @"IEEECertificationData";
+NSString * const kFTPenPnPIDCertificationDataPropertyName = @"PnpIDCertificationData";
+
+NSString * const kFTPenIsTipPressPropertyName = @"isTipPressed";
+NSString * const kFTPenIsEraserPressedPropertyName = @"isEraserPressed";
+NSString * const kFTPenBatteryLevelPropertyName = @"batteryLevel";
+
+NSString * const kFTPenNumTipPressesPropertyName = @"numTipPresses";
+NSString * const kFTPenNumEraserPressesPropertyName = @"numEraserPresses";
+NSString * const kFTPenNumFailedConnectionsPropertyName = @"numFailedConnections";
+NSString * const kFTPenNumSuccessfulConnectionsPropertyName = @"numSuccessfulConnections";
+NSString * const kFTPenTotalOnTimeSecondsPropertyName = @"totalOnTimeSeconds";
+NSString * const kFTPenManufacturingIDPropertyName = @"manufacturingID";
+NSString * const kFTPenLastErrorCodePropertyName = @"lastErrorCode";
+NSString * const kFTPenLongPressTimeMillisecondsPropertyName = @"longPressTimeMilliseconds";
+NSString * const kFTPenConnectionTimeSecondsPropertyName = @"connectionTimeSeconds";
 
 @interface FTPen () <FTPenServiceClientDelegate, FTPenUsageServiceClientDelegate, FTDeviceInfoServiceClientDelegate>
 
@@ -253,9 +279,9 @@ NSString * const kFTPenDidUpdateUsagePropertiesNotificationName = @"com.fiftythr
     [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenIsReadyDidChangeNotificationName
                                                         object:self];
 
-    if ([self.delegate respondsToSelector:@selector(pen:isReadyDidChange:)])
+    if ([self.privateDelegate respondsToSelector:@selector(pen:isReadyDidChange:)])
     {
-        [self.delegate pen:self isReadyDidChange:isReady];
+        [self.privateDelegate pen:self isReadyDidChange:isReady];
     }
 }
 
@@ -309,21 +335,22 @@ NSString * const kFTPenDidUpdateUsagePropertiesNotificationName = @"com.fiftythr
     [self.privateDelegate didReadManufacturingID:manufacturingID];
 }
 
-- (void)didUpdateUsageProperty
+- (void)didUpdateUsageProperties:(NSSet *)updatedProperties
 {
     [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenDidUpdateUsagePropertiesNotificationName
-                                                        object:self];
-
-    [self.privateDelegate didUpdateUsageProperty];
+                                                        object:self
+                                                      userInfo:@{ kFTPenNotificationPropertiesKey:updatedProperties }];
+    [self.privateDelegate didUpdateUsageProperties:updatedProperties];
 }
 
 #pragma mark - FTDeviceInfoServiceClientDelegate
 
 - (void)deviceInfoServiceClientDidUpdateDeviceInfo:(FTDeviceInfoServiceClient *)deviceInfoServiceClient
+                                 updatedProperties:(NSSet *)updatedProperties
 {
-    [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenDidUpdateDeviceInfoPropertyNotificationName
-                                                        object:self];
-
+    [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenDidUpdateDeviceInfoPropertiesNotificationName
+                                                        object:self
+                                                      userInfo:@{ kFTPenNotificationPropertiesKey:updatedProperties }];
     if ([self.delegate respondsToSelector:@selector(penDidUpdateDeviceInfoProperty:)])
     {
         [self.delegate penDidUpdateDeviceInfoProperty:self];

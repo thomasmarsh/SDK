@@ -16,7 +16,8 @@
 
 @protocol FTDeviceInfoServiceClientDelegate <NSObject>
 
-- (void)deviceInfoServiceClientDidUpdateDeviceInfo:(FTDeviceInfoServiceClient *)deviceInfoServiceClient;
+- (void)deviceInfoServiceClientDidUpdateDeviceInfo:(FTDeviceInfoServiceClient *)deviceInfoServiceClient
+                                 updatedProperties:(NSSet *)updatedProperties;
 
 @end
 

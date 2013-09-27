@@ -264,31 +264,37 @@
     }
 
     BOOL didUpdate = NO;
+    NSMutableSet *updatedProperties = [NSMutableSet set];
 
     if ([characteristic.UUID isEqual:[FTPenUsageServiceUUIDs numTipPresses]])
     {
         _numTipPresses = [characteristic valueAsNSUInteger];
         didUpdate = YES;
+        [updatedProperties addObject:kFTPenNumTipPressesPropertyName];
     }
     else if ([characteristic.UUID isEqual:[FTPenUsageServiceUUIDs numEraserPresses]])
     {
         _numEraserPresses = [characteristic valueAsNSUInteger];
         didUpdate = YES;
+        [updatedProperties addObject:kFTPenNumEraserPressesPropertyName];
     }
     else if ([characteristic.UUID isEqual:[FTPenUsageServiceUUIDs numFailedConnections]])
     {
         _numFailedConnections = [characteristic valueAsNSUInteger];
         didUpdate = YES;
+        [updatedProperties addObject:kFTPenNumFailedConnectionsPropertyName];
     }
     else if ([characteristic.UUID isEqual:[FTPenUsageServiceUUIDs numSuccessfulConnections]])
     {
         _numSuccessfulConnections = [characteristic valueAsNSUInteger];
         didUpdate = YES;
+        [updatedProperties addObject:kFTPenNumSuccessfulConnectionsPropertyName];
     }
     else if ([characteristic.UUID isEqual:[FTPenUsageServiceUUIDs totalOnTime]])
     {
         _totalOnTimeSeconds = [characteristic valueAsNSUInteger];
         didUpdate = YES;
+        [updatedProperties addObject:kFTPenTotalOnTimeSecondsPropertyName];
     }
     else if ([characteristic.UUID isEqual:[FTPenUsageServiceUUIDs manufacturingID]])
     {
@@ -296,25 +302,29 @@
 
         [self.delegate didReadManufacturingID:self.manufacturingID];
         didUpdate = YES;
+        [updatedProperties addObject:kFTPenManufacturingIDPropertyName];
     }
     else if ([characteristic.UUID isEqual:[FTPenUsageServiceUUIDs lastErrorCode]])
     {
         didUpdate = YES;
+        [updatedProperties addObject:kFTPenLastErrorCodePropertyName];
     }
     else if ([characteristic.UUID isEqual:[FTPenUsageServiceUUIDs longPressTime]])
     {
         _longPressTimeMilliseconds = [characteristic valueAsNSUInteger];
         didUpdate = YES;
+        [updatedProperties addObject:kFTPenLongPressTimeMillisecondsPropertyName];
     }
     else if ([characteristic.UUID isEqual:[FTPenUsageServiceUUIDs connectionTime]])
     {
         _connectionTimeSeconds = [characteristic valueAsNSUInteger];
         didUpdate = YES;
+        [updatedProperties addObject:kFTPenConnectionTimeSecondsPropertyName];
     }
 
     if (didUpdate)
     {
-        [self.delegate didUpdateUsageProperty];
+        [self.delegate didUpdateUsageProperties:updatedProperties];
     }
 }
 

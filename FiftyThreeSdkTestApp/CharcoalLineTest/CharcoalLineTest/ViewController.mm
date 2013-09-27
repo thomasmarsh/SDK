@@ -121,6 +121,11 @@ FTPenPrivateDelegate>
         penManager.pen.delegate = self;
         penManager.pen.privateDelegate = self;
     }
+    
+    if (state == FTPenManagerStateConnected)
+    {
+        [self.penManager.pen readUsageProperties];
+    }
 
     if (self.firmwareUpdateProgressView)
     {
@@ -195,13 +200,6 @@ FTPenPrivateDelegate>
     [self updateDeviceInfoLabel];
 }
 
-- (void)pen:(FTPen *)pen isReadyDidChange:(BOOL)isReady
-{
-    [self updateDisplay];
-
-    [pen readUsageProperties];
-}
-
 - (void)pen:(FTPen *)pen isTipPressedDidChange:(BOOL)isTipPressed
 {
     if (isTipPressed)
@@ -261,7 +259,7 @@ FTPenPrivateDelegate>
     [self updateDeviceInfoLabel];
 }
 
-- (void)didUpdateUsageProperty
+- (void)didUpdateUsageProperties:(NSSet *)updatedProperties
 {
     [self updateDeviceInfoLabel];
 }

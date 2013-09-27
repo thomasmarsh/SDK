@@ -17,15 +17,27 @@ typedef struct FTPenLastErrorCode
 
 extern NSString * const kFTPenDidUpdateUsagePropertiesNotificationName;
 
+extern NSString * const kFTPenNumTipPressesPropertyName;
+extern NSString * const kFTPenNumEraserPressesPropertyName;
+extern NSString * const kFTPenNumFailedConnectionsPropertyName;
+extern NSString * const kFTPenNumSuccessfulConnectionsPropertyName;
+extern NSString * const kFTPenTotalOnTimeSecondsPropertyName;
+extern NSString * const kFTPenManufacturingIDPropertyName;
+extern NSString * const kFTPenLastErrorCodePropertyName;
+extern NSString * const kFTPenLongPressTimeMillisecondsPropertyName;
+extern NSString * const kFTPenConnectionTimeSecondsPropertyName;
+
 @class CBCentralManager;
 @class CBPeripheral;
 
 @protocol FTPenPrivateDelegate <NSObject>
 
+@optional
+- (void)pen:(FTPen *)pen isReadyDidChange:(BOOL)isReady;
 - (void)didWriteManufacturingID;
 - (void)didFailToWriteManufacturingID;
 - (void)didReadManufacturingID:(NSString *)manufacturingID;
-- (void)didUpdateUsageProperty;
+- (void)didUpdateUsageProperties:(NSSet *)updatedProperties;
 
 @end
 
@@ -33,6 +45,8 @@ extern NSString * const kFTPenDidUpdateUsagePropertiesNotificationName;
 
 @property (nonatomic, weak) id<FTPenPrivateDelegate> privateDelegate;
 @property (nonatomic, readonly) CBPeripheral *peripheral;
+
+@property (nonatomic, readonly) BOOL isReady;
 @property (nonatomic, readonly) BOOL isPoweringOff;
 @property (nonatomic) BOOL requiresTipBePressedToBecomeReady;
 

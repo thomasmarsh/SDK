@@ -181,7 +181,7 @@ typedef enum
     [[NSNotificationCenter defaultCenter] removeObserver:kFTPenDidEncounterErrorNotificationName];
     [[NSNotificationCenter defaultCenter] removeObserver:kFTPenIsReadyDidChangeNotificationName];
     [[NSNotificationCenter defaultCenter] removeObserver:kFTPenIsTipPressedDidChangeNotificationName];
-    [[NSNotificationCenter defaultCenter] removeObserver:kFTPenDidUpdateDeviceInfoPropertyNotificationName];
+    [[NSNotificationCenter defaultCenter] removeObserver:kFTPenDidUpdateDeviceInfoPropertiesNotificationName];
 
     if (_pen)
     {
@@ -201,7 +201,7 @@ typedef enum
                                                    object:_pen];
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(penDidUpdateDeviceInfoProperty:)
-                                                     name:kFTPenDidUpdateDeviceInfoPropertyNotificationName
+                                                     name:kFTPenDidUpdateDeviceInfoPropertiesNotificationName
                                                    object:_pen];
     }
 }

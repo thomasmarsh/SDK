@@ -198,48 +198,57 @@
              error:(NSError *)error
 {
     BOOL updatedCharacteristic = NO;
+    NSMutableSet *updatedProperties = [NSMutableSet set];
 
     if ([characteristic isEqual:self.manufacturerNameCharacteristic])
     {
         self.manufacturerName = [characteristic valueAsNSString];
         updatedCharacteristic = YES;
+        [updatedProperties addObject:kFTPenManufacturerNamePropertyName];
     }
     else if ([characteristic isEqual:self.modelNumberCharateristic])
     {
         self.modelNumber = [characteristic valueAsNSString];
         updatedCharacteristic = YES;
+        [updatedProperties addObject:kFTPenModelNumberPropertyName];
     }
     else if ([characteristic isEqual:self.serialNumberCharateristic])
     {
         self.serialNumber = [characteristic valueAsNSString];
         updatedCharacteristic = YES;
+        [updatedProperties addObject:kFTPenSerialNumberPropertyName];
     }
     else if ([characteristic isEqual:self.firmwareRevisionCharateristic])
     {
         self.firmwareRevision = [characteristic valueAsNSString];
         updatedCharacteristic = YES;
+        [updatedProperties addObject:kFTPenFirmwareRevisionPropertyName];
     }
     else if ([characteristic isEqual:self.hardwareRevisionCharateristic])
     {
         self.hardwareRevisionCharateristic = characteristic;
         self.hardwareRevision = [characteristic valueAsNSString];
         updatedCharacteristic = YES;
+        [updatedProperties addObject:kFTPenHardwareRevisionPropertyName];
     }
     else if ([characteristic isEqual:self.softwareRevisionCharateristic])
     {
         self.softwareRevisionCharateristic = characteristic;
         self.softwareRevision = [characteristic valueAsNSString];
         updatedCharacteristic = YES;
+        [updatedProperties addObject:kFTPenSoftwareRevisionPropertyName];
     }
     else if ([characteristic isEqual:self.systemIDCharateristic])
     {
         self.systemID = [characteristic valueAsNSString];
         updatedCharacteristic = YES;
+        [updatedProperties addObject:kFTPenSystemIDPropertyName];
     }
     else if ([characteristic isEqual:self.IEEECertificationDataCharateristic])
     {
         self.IEEECertificationData = characteristic.value;
         updatedCharacteristic = YES;
+        [updatedProperties addObject:kFTPenIEEECertificationDataPropertyName];
     }
     else if ([characteristic isEqual:self.IEEECertificationDataCharateristic])
     {
@@ -254,15 +263,16 @@
         pnpID.vendorId = bytes[1] | (bytes[2] << 8);
         pnpID.productId = bytes[3] | (bytes[4] << 8);
         pnpID.productVersion = bytes[5] | (bytes[6] << 8);
-
         self.PnpID = pnpID;
 
         updatedCharacteristic = YES;
+        [updatedProperties addObject:kFTPenPnPIDCertificationDataPropertyName];
     }
 
     if (updatedCharacteristic)
     {
-        [self.delegate deviceInfoServiceClientDidUpdateDeviceInfo:self];
+        [self.delegate deviceInfoServiceClientDidUpdateDeviceInfo:self
+                                                updatedProperties:updatedProperties];
     }
 }
 
