@@ -21,45 +21,32 @@ NSString *applicationDocumentsDirectory()
 
 + (NSString *)imagePath
 {
+    return [[NSBundle mainBundle] pathForResource:@"PencilFirmware" ofType:@"bin"];
+}
+
++ (NSString *)imagePathIncludingDocumentsDir
+{
+    NSString *bestImagePath = [FTFirmwareManager imagePath];
+    NSInteger bestVersion = [FTFirmwareManager versionOfImageAtPath:bestImagePath];
+
     NSString *documentsDir = applicationDocumentsDirectory();
     NSArray *directoryContent = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:documentsDir
                                                                                     error:NULL];
-
-    NSString *firmwareImageFilePath;
-
     for (NSString *fileName in directoryContent)
     {
         if ([[fileName pathExtension] isEqualToString:@"bin"])
         {
-            if (!firmwareImageFilePath)
+            NSString *imagePath = [documentsDir stringByAppendingPathComponent:fileName];
+            NSInteger version = [FTFirmwareManager versionOfImageAtPath:imagePath];
+            if (version > bestVersion)
             {
-                firmwareImageFilePath = [documentsDir stringByAppendingPathComponent:fileName];
-            }
-            else
-            {
-                // TODO: This error should be reported to caller, not shown in an alert view.
-                [[[UIAlertView alloc] initWithTitle:@"Multiple Images Found"
-                                            message:@"Only one firmware image may be present in the iTunes Documents directory." delegate:nil
-                                  cancelButtonTitle:@"OK"
-                                  otherButtonTitles:nil, nil] show];
-
-                return nil;
+                bestVersion = version;
+                bestImagePath = imagePath;
             }
         }
     }
 
-    if (!firmwareImageFilePath)
-    {
-        // TODO: This error should be reported to caller, not shown in an alert view.
-
-        [[[UIAlertView alloc] initWithTitle:@"No Image Found"
-                                    message:@"No firmware image was found in the iTunes Documents directory."
-                                   delegate:nil
-                          cancelButtonTitle:@"OK"
-                          otherButtonTitles:nil, nil] show];
-    }
-
-    return firmwareImageFilePath;
+    return bestImagePath;
 }
 
 + (NSInteger)versionOfImageAtPath:(NSString *)imagePath

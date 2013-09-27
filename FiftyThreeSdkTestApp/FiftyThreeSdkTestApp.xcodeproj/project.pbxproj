@@ -12,6 +12,7 @@
 		3498700A174FB20700A3088E /* libCanvas.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 34986FF2174FB1B500A3088E /* libCanvas.a */; };
 		3498700B174FB20700A3088E /* libCommon.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 34986FE9174FB1A700A3088E /* libCommon.a */; };
 		3498700C174FB20700A3088E /* libGlobalSettings.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 34986FFA174FB1BF00A3088E /* libGlobalSettings.a */; };
+		3C94A5B717F609D600BCDB43 /* PencilFirmware.bin in Resources */ = {isa = PBXBuildFile; fileRef = 3C94A5B617F609D600BCDB43 /* PencilFirmware.bin */; };
 		3CD6FA3617DE1D1E001E5F82 /* icon72.png in Resources */ = {isa = PBXBuildFile; fileRef = 3CD6FA3417DE1D1E001E5F82 /* icon72.png */; };
 		3CD6FA3717DE1D1E001E5F82 /* icon144.png in Resources */ = {isa = PBXBuildFile; fileRef = 3CD6FA3517DE1D1E001E5F82 /* icon144.png */; };
 		6632313C16F8B1CA008AD3DC /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6632313B16F8B1CA008AD3DC /* MobileCoreServices.framework */; };
@@ -154,6 +155,7 @@
 		34986FEC174FB1B400A3088E /* Canvas.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Canvas.xcodeproj; path = ../../Canvas/Canvas.xcodeproj; sourceTree = "<group>"; };
 		34986FF5174FB1BF00A3088E /* GlobalSettings.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = GlobalSettings.xcodeproj; path = ../../GlobalSettings/GlobalSettings.xcodeproj; sourceTree = "<group>"; };
 		34986FFB174FB1CB00A3088E /* AFNetworking.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = AFNetworking.xcodeproj; path = ../../AFNetworking/AFNetworking.xcodeproj; sourceTree = "<group>"; };
+		3C94A5B617F609D600BCDB43 /* PencilFirmware.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; name = PencilFirmware.bin; path = ../FiftyThreeSdk/FiftyThreeSdk/PencilFirmware.bin; sourceTree = "<group>"; };
 		3CD6FA3417DE1D1E001E5F82 /* icon72.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = icon72.png; path = FiftyThreeSdkTestApp/icon72.png; sourceTree = "<group>"; };
 		3CD6FA3517DE1D1E001E5F82 /* icon144.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = icon144.png; path = FiftyThreeSdkTestApp/icon144.png; sourceTree = "<group>"; };
 		6632313B16F8B1CA008AD3DC /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
@@ -347,6 +349,7 @@
 			children = (
 				3CD6FA3417DE1D1E001E5F82 /* icon72.png */,
 				3CD6FA3517DE1D1E001E5F82 /* icon144.png */,
+				3C94A5B617F609D600BCDB43 /* PencilFirmware.bin */,
 				668F6DEA17037376002C548B /* Shaders */,
 				668F6DE817037361002C548B /* Textures */,
 			);
@@ -630,6 +633,7 @@
 				66FC1EE21725DC7500B9B9E7 /* charcoal-factory.bin in Resources */,
 				3CD6FA3617DE1D1E001E5F82 /* icon72.png in Resources */,
 				3CD6FA3717DE1D1E001E5F82 /* icon144.png in Resources */,
+				3C94A5B717F609D600BCDB43 /* PencilFirmware.bin in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

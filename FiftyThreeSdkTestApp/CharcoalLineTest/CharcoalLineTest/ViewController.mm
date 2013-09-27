@@ -439,12 +439,12 @@ FTPenPrivateDelegate>
         if (YES)
 //        if ([self.penManager isFirmwareUpdateAvailable])
         {
-            NSString *firmwareUpdateImage = [FTFirmwareManager imagePath];
+            NSString *firmwareUpdateImage = [FTFirmwareManager imagePathIncludingDocumentsDir];
             if (firmwareUpdateImage)
             {
-                NSString *message = [NSString stringWithFormat:@"Update with the following image?\n\n%@",
-                                     [firmwareUpdateImage lastPathComponent]];
-                self.firmwareUpdateConfirmAlertView = [[UIAlertView alloc] initWithTitle:@"Update Firmware"
+                NSString *message = [NSString stringWithFormat:@"Update firmware to version %d?",
+                                     [FTFirmwareManager versionOfImageAtPath:firmwareUpdateImage]];
+                self.firmwareUpdateConfirmAlertView = [[UIAlertView alloc] initWithTitle:@"Firmware Update"
                                                                                  message:message
                                                                                 delegate:self
                                                                        cancelButtonTitle:@"No"
