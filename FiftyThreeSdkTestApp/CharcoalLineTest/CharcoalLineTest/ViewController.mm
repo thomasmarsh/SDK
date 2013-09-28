@@ -327,12 +327,12 @@ FTPenPrivateDelegate>
     }
 
     FTPen *pen = self.penManager.pen;
-    int onTimeSec, onTimeHourField, onTimeMinField, onTimeSecField;
 
-    onTimeSec  = pen.totalOnTimeSeconds;
-    onTimeHourField = onTimeSec / 60 / 60;
-    onTimeMinField  = (onTimeSec - (onTimeHourField * 60 * 60)) / 60;
-    onTimeSecField  = onTimeSec - (onTimeHourField * 60 * 60) - (onTimeMinField *60);
+    const int onTimeSec = pen.totalOnTimeSeconds;
+    const int onTimeDayField =  onTimeSec / 60 / 60 / 24;
+    const int onTimeHourField = (onTimeSec - (onTimeDayField * 60 * 60 * 24)) / 60 / 60;
+    const int onTimeMinField = (onTimeSec - (onTimeDayField * 60 * 60 * 24) - (onTimeHourField * 60 * 60)) / 60;
+    const int onTimeSecField =  onTimeSec - (onTimeDayField * 60 * 60 * 24) - (onTimeHourField * 60 * 60) - (onTimeMinField * 60);
 
     NSMutableString *deviceInfo = [NSMutableString string];
     [deviceInfo appendFormat:@"Manufacturer: %@\n", pen.manufacturerName];
@@ -347,7 +347,8 @@ FTPenPrivateDelegate>
     [deviceInfo appendFormat:@"Eraser Presses: %d\n", pen.numEraserPresses];
     [deviceInfo appendFormat:@"Failed Connections: %d\n", pen.numFailedConnections];
     [deviceInfo appendFormat:@"Successful Connections: %d\n", pen.numSuccessfulConnections];
-    [deviceInfo appendFormat:@"Total On Time: %d:%02d:%02d\n\n", onTimeHourField, onTimeMinField,  onTimeSecField];
+    [deviceInfo appendFormat:@"Total Connected Time: %dd %02d:%02d:%02d\n\n",
+     onTimeDayField, onTimeHourField, onTimeMinField,  onTimeSecField];
     [deviceInfo appendFormat:@"Last Error ID: %d\n", pen.lastErrorCode.lastErrorID];
     [deviceInfo appendFormat:@"Last Error Value: %d\n\n", pen.lastErrorCode.lastErrorValue];
 
