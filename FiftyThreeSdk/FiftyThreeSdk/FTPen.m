@@ -10,8 +10,8 @@
 #import "FTDeviceInfoServiceClient.h"
 #import "FTPen+Private.h"
 #import "FTPen.h"
-#import "FTPenDebugServiceClient.h"
 #import "FTPenServiceClient.h"
+#import "FTPenUsageServiceClient.h"
 #import "FTPeripheralDelegate.h"
 #import "FTServiceUUIDs.h"
 
@@ -21,15 +21,15 @@ NSString * const kFTPenIsTipPressedDidChangeNotificationName = @"com.fiftythree.
 NSString * const kFTPenIsEraserPressedDidChangeNotificationName = @"com.fiftythree.pen.isEraserPressedDidChange";
 NSString * const kFTPenBatteryLevelDidChangeNotificationName = @"com.fiftythree.pen.batteryLevelDidChange";
 NSString * const kFTPenDidUpdateDeviceInfoPropertyNotificationName = @"com.fiftythree.pen.didUpdateDeviceInfoProperty";
-NSString * const kFTPenDidUpdateDebugPropertyNotificationName = @"com.fiftythree.pen.didUpdateDebugProperty";
+NSString * const kFTPenDidUpdateUsagePropertiesNotificationName = @"com.fiftythree.pen.didUpdateUsageProperties";
 
-@interface FTPen () <FTPenServiceClientDelegate, FTPenDebugServiceClientDelegate, FTDeviceInfoServiceClientDelegate>
+@interface FTPen () <FTPenServiceClientDelegate, FTPenUsageServiceClientDelegate, FTDeviceInfoServiceClientDelegate>
 
 @property (nonatomic) CBCentralManager *centralManager;
 @property (nonatomic) FTPeripheralDelegate *peripheralDelegate;
 
 @property (nonatomic) FTPenServiceClient *penServiceClient;
-@property (nonatomic) FTPenDebugServiceClient *penDebugServiceClient;
+@property (nonatomic) FTPenUsageServiceClient *penUsageServiceClient;
 @property (nonatomic) FTDeviceInfoServiceClient *deviceInfoServiceClient;
 
 @property (nonatomic, readwrite) NSString *name;
@@ -63,10 +63,10 @@ NSString * const kFTPenDidUpdateDebugPropertyNotificationName = @"com.fiftythree
         [_peripheralDelegate addServiceClient:_penServiceClient];
 
 #ifdef DEBUG
-        // Pen Debug Service client
-        _penDebugServiceClient = [[FTPenDebugServiceClient alloc] initWithPeripheral:_peripheral];
-        _penDebugServiceClient.delegate = self;
-        [_peripheralDelegate addServiceClient:_penDebugServiceClient];
+        // Pen Usage Service client
+        _penUsageServiceClient = [[FTPenUsageServiceClient alloc] initWithPeripheral:_peripheral];
+        _penUsageServiceClient.delegate = self;
+        [_peripheralDelegate addServiceClient:_penUsageServiceClient];
 #endif
 
         // Device Info Service client
@@ -82,12 +82,12 @@ NSString * const kFTPenDidUpdateDebugPropertyNotificationName = @"com.fiftythree
 
 - (FTPenLastErrorCode)lastErrorCode
 {
-    return self.penDebugServiceClient.lastErrorCode;
+    return self.penUsageServiceClient.lastErrorCode;
 }
 
 - (void)clearLastErrorCode
 {
-    [self.penDebugServiceClient clearLastErrorCode];
+    [self.penUsageServiceClient clearLastErrorCode];
 }
 
 - (BOOL)isReady
@@ -144,37 +144,37 @@ NSString * const kFTPenDidUpdateDebugPropertyNotificationName = @"com.fiftythree
 
 - (NSUInteger)numTipPresses
 {
-    return self.penDebugServiceClient.numTipPresses;
+    return self.penUsageServiceClient.numTipPresses;
 }
 
 - (NSUInteger)numEraserPresses
 {
-    return self.penDebugServiceClient.numEraserPresses;
+    return self.penUsageServiceClient.numEraserPresses;
 }
 
 - (NSUInteger)numFailedConnections
 {
-    return self.penDebugServiceClient.numFailedConnections;
+    return self.penUsageServiceClient.numFailedConnections;
 }
 
 - (NSUInteger)numSuccessfulConnections
 {
-    return self.penDebugServiceClient.numSuccessfulConnections;
+    return self.penUsageServiceClient.numSuccessfulConnections;
 }
 
 - (NSUInteger)totalOnTimeSeconds
 {
-    return self.penDebugServiceClient.totalOnTimeSeconds;
+    return self.penUsageServiceClient.totalOnTimeSeconds;
 }
 
 - (NSString *)manufacturingID
 {
-    return self.penDebugServiceClient.manufacturingID;
+    return self.penUsageServiceClient.manufacturingID;
 }
 
 - (void)setManufacturingID:(NSString *)manufacturingID
 {
-    self.penDebugServiceClient.manufacturingID = manufacturingID;
+    self.penUsageServiceClient.manufacturingID = manufacturingID;
 
     // The model number and serial number charateristics of the device info
     // service change as a result of setting the manufacturing ID, so refresh
@@ -184,27 +184,27 @@ NSString * const kFTPenDidUpdateDebugPropertyNotificationName = @"com.fiftythree
 
 - (NSUInteger)longPressTimeMilliseconds
 {
-    return self.penDebugServiceClient.longPressTimeMilliseconds;
+    return self.penUsageServiceClient.longPressTimeMilliseconds;
 }
 
 - (void)setLongPressTimeMilliseconds:(NSUInteger)longPressTimeMilliseconds
 {
-    self.penDebugServiceClient.longPressTimeMilliseconds = longPressTimeMilliseconds;
+    self.penUsageServiceClient.longPressTimeMilliseconds = longPressTimeMilliseconds;
 }
 
 - (NSUInteger)connectionTimeSeconds
 {
-    return self.penDebugServiceClient.connectionTimeSeconds;
+    return self.penUsageServiceClient.connectionTimeSeconds;
 }
 
 - (void)setConnectionTimeSeconds:(NSUInteger)connectionTimeSeconds
 {
-    self.penDebugServiceClient.connectionTimeSeconds = connectionTimeSeconds;
+    self.penUsageServiceClient.connectionTimeSeconds = connectionTimeSeconds;
 }
 
-- (void)readDebugProperties
+- (void)readUsageProperties
 {
-    [self.penDebugServiceClient readDebugProperties];
+    [self.penUsageServiceClient readUsageProperties];
 }
 
 - (void)refreshFirmwareVersionProperties
@@ -292,7 +292,7 @@ NSString * const kFTPenDidUpdateDebugPropertyNotificationName = @"com.fiftythree
     }
 }
 
-#pragma mark - FTPenDebugServiceClientDelegate
+#pragma mark - FTPenUsageServiceClientDelegate
 
 - (void)didWriteManufacturingID
 {
@@ -309,12 +309,12 @@ NSString * const kFTPenDidUpdateDebugPropertyNotificationName = @"com.fiftythree
     [self.privateDelegate didReadManufacturingID:manufacturingID];
 }
 
-- (void)didUpdateDebugProperty
+- (void)didUpdateUsageProperty
 {
-    [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenDidUpdateDebugPropertyNotificationName
+    [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenDidUpdateUsagePropertiesNotificationName
                                                         object:self];
 
-    [self.privateDelegate didUpdateDebugProperty];
+    [self.privateDelegate didUpdateUsageProperty];
 }
 
 #pragma mark - FTDeviceInfoServiceClientDelegate

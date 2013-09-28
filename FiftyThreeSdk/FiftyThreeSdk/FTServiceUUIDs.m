@@ -7,7 +7,7 @@
 
 #import "FTServiceUUIDs.h"
 
-#pragma mark - PenService
+#pragma mark - Pen Service
 
 // 1DEF5645-3C5D-4667-973D-8965706A2961
 #define FT_PEN_SERVICE_UUID CFUUIDGetConstantUUIDWithBytes(kCFAllocatorSystemDefault, 0x1D, 0xEF, 0x56, 0x45, 0x3C, 0x5D, 0x46, 0x67, 0x97, 0x3D, 0x89, 0x65, 0x70, 0x6A, 0x29, 0x61)
@@ -85,11 +85,7 @@
 
 @end
 
-#pragma mark - Pen Debug Service
-
-//
-// Pen Debug Service
-//
+#pragma mark - Pen Usage Service
 
 // 55518435-9BAB-4612-BDCE-F5B0C8C127AC
 #define FT_PEN_DEBUG_SERVICE_UUID CFUUIDGetConstantUUIDWithBytes(kCFAllocatorSystemDefault, 0x55, 0x51, 0x84, 0x35, 0x9B, 0xAB, 0x46, 0x12, 0xBD, 0xCE, 0xF5, 0xB0, 0xC8, 0xC1, 0x27, 0xAC)
@@ -127,9 +123,9 @@
 // 31F51EB8-050D-4E4D-A549-397459259B77
 #define FT_PEN_DEBUG_SERVICE_CONNECTION_TIME_UUID CFUUIDGetConstantUUIDWithBytes(kCFAllocatorSystemDefault, 0x31, 0xF5, 0x1E, 0xB8, 0x05, 0x0D, 0x4E, 0x4D, 0xA5, 0x49, 0x39, 0x74, 0x59, 0x25, 0x9B, 0x77)
 
-@implementation FTPenDebugServiceUUIDs
+@implementation FTPenUsageServiceUUIDs
 
-+ (CBUUID *)penDebugService
++ (CBUUID *)penUsageService
 {
     return [CBUUID UUIDWithCFUUID:FT_PEN_DEBUG_SERVICE_UUID];
 }
@@ -191,24 +187,26 @@
 
 + (NSString *)nameForUUID:(CBUUID *)UUID
 {
-    NSDictionary *UUIDs = @{ [FTPenDebugServiceUUIDs penDebugService] : @"PenDebugService",
-                             //[FTPenDebugServiceUUIDs tipPressure] : @"TipPressure",
-                             //[FTPenDebugServiceUUIDs eraserPressure] : @"EraserPressure",
-                             [FTPenDebugServiceUUIDs numTipPresses] : @"NumTipPresses",
-                             [FTPenDebugServiceUUIDs numEraserPresses] : @"NumEraserPresses",
-                             [FTPenDebugServiceUUIDs numFailedConnections] : @"NumFailedConnections",
-                             [FTPenDebugServiceUUIDs numSuccessfulConnections] : @"NumSuccesfulConnections",
-                             [FTPenDebugServiceUUIDs totalOnTime] : @"TotalOnTime",
-                             [FTPenDebugServiceUUIDs manufacturingID] : @"ManufacturingID",
-                             [FTPenDebugServiceUUIDs lastErrorCode] : @"LastErrorCode",
-                             [FTPenDebugServiceUUIDs longPressTime] : @"LongPressTime",
-                             [FTPenDebugServiceUUIDs connectionTime] : @"ConnectionTime"
+    NSDictionary *UUIDs = @{ [FTPenUsageServiceUUIDs penUsageService] : @"PenUsageService",
+                             //[FTPenUsageServiceUUIDs tipPressure] : @"TipPressure",
+                             //[FTPenUsageServiceUUIDs eraserPressure] : @"EraserPressure",
+                             [FTPenUsageServiceUUIDs numTipPresses] : @"NumTipPresses",
+                             [FTPenUsageServiceUUIDs numEraserPresses] : @"NumEraserPresses",
+                             [FTPenUsageServiceUUIDs numFailedConnections] : @"NumFailedConnections",
+                             [FTPenUsageServiceUUIDs numSuccessfulConnections] : @"NumSuccesfulConnections",
+                             [FTPenUsageServiceUUIDs totalOnTime] : @"TotalOnTime",
+                             [FTPenUsageServiceUUIDs manufacturingID] : @"ManufacturingID",
+                             [FTPenUsageServiceUUIDs lastErrorCode] : @"LastErrorCode",
+                             [FTPenUsageServiceUUIDs longPressTime] : @"LongPressTime",
+                             [FTPenUsageServiceUUIDs connectionTime] : @"ConnectionTime"
                              };
 
     return [UUIDs objectForKey:UUID];
 }
 
 @end
+
+#pragma mark - Device Info Service
 
 @implementation FTDeviceInfoServiceUUIDs
 
@@ -280,12 +278,14 @@
 
 @end
 
+#pragma mark -
+
 NSString *FTNameForServiceUUID(CBUUID *UUID)
 {
     NSString *name = [FTPenServiceUUIDs nameForUUID:UUID];
     if (!name)
     {
-        name = [FTPenDebugServiceUUIDs nameForUUID:UUID];
+        name = [FTPenUsageServiceUUIDs nameForUUID:UUID];
     }
     if (!name)
     {

@@ -15,7 +15,7 @@ typedef struct FTPenLastErrorCode
     int lastErrorValue;
 } FTPenLastErrorCode;
 
-extern NSString * const kFTPenDidUpdateDebugPropertyNotificationName;
+extern NSString * const kFTPenDidUpdateUsagePropertiesNotificationName;
 
 @class CBCentralManager;
 @class CBPeripheral;
@@ -25,7 +25,7 @@ extern NSString * const kFTPenDidUpdateDebugPropertyNotificationName;
 - (void)didWriteManufacturingID;
 - (void)didFailToWriteManufacturingID;
 - (void)didReadManufacturingID:(NSString *)manufacturingID;
-- (void)didUpdateDebugProperty;
+- (void)didUpdateUsageProperty;
 
 @end
 
@@ -36,7 +36,7 @@ extern NSString * const kFTPenDidUpdateDebugPropertyNotificationName;
 @property (nonatomic, readonly) BOOL isPoweringOff;
 @property (nonatomic) BOOL requiresTipBePressedToBecomeReady;
 
-// Debug Properties
+// Usage Properties
 @property (nonatomic, readonly) NSUInteger numTipPresses;
 @property (nonatomic, readonly) NSUInteger numEraserPresses;
 @property (nonatomic, readonly) NSUInteger numFailedConnections;
@@ -58,7 +58,7 @@ extern NSString * const kFTPenDidUpdateDebugPropertyNotificationName;
 
 - (void)clearLastErrorCode;
 
-- (void)readDebugProperties;
+- (void)readUsageProperties;
 
 // Clears the current firmwareRevision and softwareRevision values and requests a read of them
 // from the peripheral.

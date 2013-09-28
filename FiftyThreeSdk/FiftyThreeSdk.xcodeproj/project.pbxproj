@@ -10,7 +10,7 @@
 		3C2F9C3A1780758300A5FFBC /* FTPeripheralDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 3C2F9C391780758300A5FFBC /* FTPeripheralDelegate.m */; };
 		3C2F9C3D1780786F00A5FFBC /* FTPenServiceClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 3C2F9C3C1780786F00A5FFBC /* FTPenServiceClient.m */; };
 		3C2F9C411780802600A5FFBC /* FTServiceClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 3C2F9C401780802600A5FFBC /* FTServiceClient.m */; };
-		3C2F9C441780A7BA00A5FFBC /* FTPenDebugServiceClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 3C2F9C431780A7BA00A5FFBC /* FTPenDebugServiceClient.m */; };
+		3C2F9C441780A7BA00A5FFBC /* FTPenUsageServiceClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 3C2F9C431780A7BA00A5FFBC /* FTPenUsageServiceClient.m */; };
 		3C404F7B1784C5A200EB7B9A /* FTError.m in Sources */ = {isa = PBXBuildFile; fileRef = 3C404F7A1784C5A200EB7B9A /* FTError.m */; };
 		3CC31DF417933C5F002CD4FB /* TKEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = 3CC31DEE17933C5F002CD4FB /* TKEvent.m */; };
 		3CC31DF517933C5F002CD4FB /* TKState.m in Sources */ = {isa = PBXBuildFile; fileRef = 3CC31DF017933C5F002CD4FB /* TKState.m */; };
@@ -65,8 +65,8 @@
 		3C2F9C3C1780786F00A5FFBC /* FTPenServiceClient.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FTPenServiceClient.m; path = FiftyThreeSdk/FTPenServiceClient.m; sourceTree = SOURCE_ROOT; };
 		3C2F9C3F1780802600A5FFBC /* FTServiceClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FTServiceClient.h; path = FiftyThreeSdk/FTServiceClient.h; sourceTree = SOURCE_ROOT; };
 		3C2F9C401780802600A5FFBC /* FTServiceClient.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FTServiceClient.m; path = FiftyThreeSdk/FTServiceClient.m; sourceTree = SOURCE_ROOT; };
-		3C2F9C421780A7BA00A5FFBC /* FTPenDebugServiceClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FTPenDebugServiceClient.h; path = FiftyThreeSdk/FTPenDebugServiceClient.h; sourceTree = SOURCE_ROOT; };
-		3C2F9C431780A7BA00A5FFBC /* FTPenDebugServiceClient.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FTPenDebugServiceClient.m; path = FiftyThreeSdk/FTPenDebugServiceClient.m; sourceTree = SOURCE_ROOT; };
+		3C2F9C421780A7BA00A5FFBC /* FTPenUsageServiceClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FTPenUsageServiceClient.h; path = FiftyThreeSdk/FTPenUsageServiceClient.h; sourceTree = SOURCE_ROOT; };
+		3C2F9C431780A7BA00A5FFBC /* FTPenUsageServiceClient.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FTPenUsageServiceClient.m; path = FiftyThreeSdk/FTPenUsageServiceClient.m; sourceTree = SOURCE_ROOT; };
 		3C404F7A1784C5A200EB7B9A /* FTError.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FTError.m; path = FiftyThreeSdk/FTError.m; sourceTree = SOURCE_ROOT; };
 		3CC31DED17933C5F002CD4FB /* TKEvent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TKEvent.h; path = ../../ThirdParty/TransitionKit/Code/TKEvent.h; sourceTree = "<group>"; };
 		3CC31DEE17933C5F002CD4FB /* TKEvent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TKEvent.m; path = ../../ThirdParty/TransitionKit/Code/TKEvent.m; sourceTree = "<group>"; };
@@ -143,8 +143,8 @@
 				3CE80BD317CE6DE600AA73A0 /* CBCharacteristic+Helpers.m */,
 				3CE80BCF17CE6DC900AA73A0 /* CBPeripheral+Helpers.h */,
 				3CE80BD017CE6DC900AA73A0 /* CBPeripheral+Helpers.m */,
-				3C2F9C421780A7BA00A5FFBC /* FTPenDebugServiceClient.h */,
-				3C2F9C431780A7BA00A5FFBC /* FTPenDebugServiceClient.m */,
+				3C2F9C421780A7BA00A5FFBC /* FTPenUsageServiceClient.h */,
+				3C2F9C431780A7BA00A5FFBC /* FTPenUsageServiceClient.m */,
 				3C2F9C3B1780786F00A5FFBC /* FTPenServiceClient.h */,
 				3C2F9C3C1780786F00A5FFBC /* FTPenServiceClient.m */,
 				66D779AF16E57461001C4F55 /* FTDeviceInfoServiceClient.h */,
@@ -366,7 +366,7 @@
 				3C2F9C3A1780758300A5FFBC /* FTPeripheralDelegate.m in Sources */,
 				3C2F9C3D1780786F00A5FFBC /* FTPenServiceClient.m in Sources */,
 				3C2F9C411780802600A5FFBC /* FTServiceClient.m in Sources */,
-				3C2F9C441780A7BA00A5FFBC /* FTPenDebugServiceClient.m in Sources */,
+				3C2F9C441780A7BA00A5FFBC /* FTPenUsageServiceClient.m in Sources */,
 				3C404F7B1784C5A200EB7B9A /* FTError.m in Sources */,
 				3CC31DF417933C5F002CD4FB /* TKEvent.m in Sources */,
 				3CC31DF517933C5F002CD4FB /* TKState.m in Sources */,

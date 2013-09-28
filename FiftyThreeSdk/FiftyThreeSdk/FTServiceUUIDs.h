@@ -23,9 +23,9 @@
 
 @end
 
-@interface FTPenDebugServiceUUIDs : NSObject
+@interface FTPenUsageServiceUUIDs : NSObject
 
-+ (CBUUID *)penDebugService;
++ (CBUUID *)penUsageService;
 
 //+ (CBUUID *)tipPressure;
 //+ (CBUUID *)eraserPressure;

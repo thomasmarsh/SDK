@@ -1,5 +1,5 @@
 //
-//  FTPenDebugServiceClient.m
+//  FTPenUsageServiceClient.m
 //  FiftyThreeSdk
 //
 //  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
@@ -7,14 +7,14 @@
 
 #import "CBCharacteristic+Helpers.h"
 #import "CBPeripheral+Helpers.h"
-#import "FTPenDebugServiceClient.h"
+#import "FTPenUsageServiceClient.h"
 #import "FTServiceUUIDs.h"
 
-@interface FTPenDebugServiceClient ()
+@interface FTPenUsageServiceClient ()
 
 @property (nonatomic) CBPeripheral *peripheral;
 
-@property (nonatomic) CBService *penDebugService;
+@property (nonatomic) CBService *penUsageService;
 
 //@property (nonatomic) CBCharacteristic *tipPressureCharacteristic;
 //@property (nonatomic) CBCharacteristic *eraserPressureCharacteristic;
@@ -30,7 +30,7 @@
 
 @end
 
-@implementation FTPenDebugServiceClient
+@implementation FTPenUsageServiceClient
 
 - (id)initWithPeripheral:(CBPeripheral *)peripheral
 {
@@ -98,7 +98,7 @@
     }
 }
 
-- (void)readDebugProperties
+- (void)readUsageProperties
 {
     //[self readValueForCharacteristic:self.tipPressureCharacteristic];
     //[self readValueForCharacteristic:self.eraserPressureCharacteristic];
@@ -127,11 +127,11 @@
 {
     if (isConnected)
     {
-        return @[[FTPenDebugServiceUUIDs penDebugService]];
+        return @[[FTPenUsageServiceUUIDs penUsageService]];
     }
     else
     {
-        self.penDebugService = nil;
+        self.penUsageService = nil;
         //self.tipPressureCharacteristic = nil;
         //self.eraserPressureCharacteristic = nil;
         self.numTipPressesCharacteristic = nil;
@@ -158,25 +158,25 @@
         return;
     }
 
-    if (!self.penDebugService)
+    if (!self.penUsageService)
     {
-        self.penDebugService = [FTServiceClient findServiceWithPeripheral:peripheral
-                                                                  andUUID:[FTPenDebugServiceUUIDs penDebugService]];
+        self.penUsageService = [FTServiceClient findServiceWithPeripheral:peripheral
+                                                                  andUUID:[FTPenUsageServiceUUIDs penUsageService]];
 
-        NSArray *characteristics = @[//[FTPenDebugServiceUUIDs tipPressure],
-                                     //[FTPenDebugServiceUUIDs eraserPressure],
-                                     [FTPenDebugServiceUUIDs numTipPresses],
-                                     [FTPenDebugServiceUUIDs numEraserPresses],
-                                     [FTPenDebugServiceUUIDs numFailedConnections],
-                                     [FTPenDebugServiceUUIDs numSuccessfulConnections],
-                                     [FTPenDebugServiceUUIDs totalOnTime],
-                                     [FTPenDebugServiceUUIDs manufacturingID],
-                                     [FTPenDebugServiceUUIDs lastErrorCode],
-                                     [FTPenDebugServiceUUIDs longPressTime],
-                                     [FTPenDebugServiceUUIDs connectionTime]
+        NSArray *characteristics = @[//[FTPenUsageServiceUUIDs tipPressure],
+                                     //[FTPenUsageServiceUUIDs eraserPressure],
+                                     [FTPenUsageServiceUUIDs numTipPresses],
+                                     [FTPenUsageServiceUUIDs numEraserPresses],
+                                     [FTPenUsageServiceUUIDs numFailedConnections],
+                                     [FTPenUsageServiceUUIDs numSuccessfulConnections],
+                                     [FTPenUsageServiceUUIDs totalOnTime],
+                                     [FTPenUsageServiceUUIDs manufacturingID],
+                                     [FTPenUsageServiceUUIDs lastErrorCode],
+                                     [FTPenUsageServiceUUIDs longPressTime],
+                                     [FTPenUsageServiceUUIDs connectionTime]
                                      ];
 
-        [peripheral discoverCharacteristics:characteristics forService:self.penDebugService];
+        [peripheral discoverCharacteristics:characteristics forService:self.penUsageService];
     }
 }
 
@@ -193,60 +193,60 @@
     for (CBCharacteristic *characteristic in service.characteristics)
     {
 //        if (!self.tipPressureCharacteristic &&
-//                 [characteristic.UUID isEqual:[FTPenDebugServiceUUIDs tipPressure]])
+//                 [characteristic.UUID isEqual:[FTPenUsageServiceUUIDs tipPressure]])
 //        {
 //            self.tipPressureCharacteristic = characteristic;
 //            // [peripheral setNotifyValue:YES forCharacteristic:characteristic];
 //        }
 //        else if (!self.eraserPressureCharacteristic &&
-//                 [characteristic.UUID isEqual:[FTPenDebugServiceUUIDs eraserPressure]])
+//                 [characteristic.UUID isEqual:[FTPenUsageServiceUUIDs eraserPressure]])
 //        {
 //            self.eraserPressureCharacteristic = characteristic;
 //            // [peripheral setNotifyValue:YES forCharacteristic:characteristic];
 //        }
         if (!self.numTipPressesCharacteristic &&
-            [characteristic.UUID isEqual:[FTPenDebugServiceUUIDs numTipPresses]])
+            [characteristic.UUID isEqual:[FTPenUsageServiceUUIDs numTipPresses]])
         {
             self.numTipPressesCharacteristic = characteristic;
         }
         else if (!self.numEraserPressesCharacteristic &&
-                 [characteristic.UUID isEqual:[FTPenDebugServiceUUIDs numEraserPresses]])
+                 [characteristic.UUID isEqual:[FTPenUsageServiceUUIDs numEraserPresses]])
         {
             self.numEraserPressesCharacteristic = characteristic;
         }
         else if (!self.numFailedConnectionsCharacteristic &&
-                 [characteristic.UUID isEqual:[FTPenDebugServiceUUIDs numFailedConnections]])
+                 [characteristic.UUID isEqual:[FTPenUsageServiceUUIDs numFailedConnections]])
         {
             self.numFailedConnectionsCharacteristic = characteristic;
         }
         else if (!self.numSuccessfulConnectionsCharacteristic &&
-                 [characteristic.UUID isEqual:[FTPenDebugServiceUUIDs numSuccessfulConnections]])
+                 [characteristic.UUID isEqual:[FTPenUsageServiceUUIDs numSuccessfulConnections]])
         {
             self.numSuccessfulConnectionsCharacteristic = characteristic;
         }
         else if (!self.totalOnTimeCharacteristic &&
-                 [characteristic.UUID isEqual:[FTPenDebugServiceUUIDs totalOnTime]])
+                 [characteristic.UUID isEqual:[FTPenUsageServiceUUIDs totalOnTime]])
         {
             self.totalOnTimeCharacteristic = characteristic;
         }
         else if (!self.manufacturingIDCharacteristic &&
-                 [characteristic.UUID isEqual:[FTPenDebugServiceUUIDs manufacturingID]])
+                 [characteristic.UUID isEqual:[FTPenUsageServiceUUIDs manufacturingID]])
         {
             self.manufacturingIDCharacteristic = characteristic;
         }
         else if (!self.lastErrorCodeCharacteristic &&
-                 [characteristic.UUID isEqual:[FTPenDebugServiceUUIDs lastErrorCode]])
+                 [characteristic.UUID isEqual:[FTPenUsageServiceUUIDs lastErrorCode]])
         {
             self.lastErrorCodeCharacteristic = characteristic;
             [peripheral readValueForCharacteristic:characteristic];
         }
         else if (!self.longPressTimeCharacteristic &&
-                 [characteristic.UUID isEqual:[FTPenDebugServiceUUIDs longPressTime]])
+                 [characteristic.UUID isEqual:[FTPenUsageServiceUUIDs longPressTime]])
         {
             self.longPressTimeCharacteristic = characteristic;
         }
         else if (!self.connectionTimeCharacteristic &&
-                 [characteristic.UUID isEqual:[FTPenDebugServiceUUIDs connectionTime]])
+                 [characteristic.UUID isEqual:[FTPenUsageServiceUUIDs connectionTime]])
         {
             self.connectionTimeCharacteristic = characteristic;
         }
@@ -265,48 +265,48 @@
 
     BOOL didUpdate = NO;
 
-    if ([characteristic.UUID isEqual:[FTPenDebugServiceUUIDs numTipPresses]])
+    if ([characteristic.UUID isEqual:[FTPenUsageServiceUUIDs numTipPresses]])
     {
         _numTipPresses = [characteristic valueAsNSUInteger];
         didUpdate = YES;
     }
-    else if ([characteristic.UUID isEqual:[FTPenDebugServiceUUIDs numEraserPresses]])
+    else if ([characteristic.UUID isEqual:[FTPenUsageServiceUUIDs numEraserPresses]])
     {
         _numEraserPresses = [characteristic valueAsNSUInteger];
         didUpdate = YES;
     }
-    else if ([characteristic.UUID isEqual:[FTPenDebugServiceUUIDs numFailedConnections]])
+    else if ([characteristic.UUID isEqual:[FTPenUsageServiceUUIDs numFailedConnections]])
     {
         _numFailedConnections = [characteristic valueAsNSUInteger];
         didUpdate = YES;
     }
-    else if ([characteristic.UUID isEqual:[FTPenDebugServiceUUIDs numSuccessfulConnections]])
+    else if ([characteristic.UUID isEqual:[FTPenUsageServiceUUIDs numSuccessfulConnections]])
     {
         _numSuccessfulConnections = [characteristic valueAsNSUInteger];
         didUpdate = YES;
     }
-    else if ([characteristic.UUID isEqual:[FTPenDebugServiceUUIDs totalOnTime]])
+    else if ([characteristic.UUID isEqual:[FTPenUsageServiceUUIDs totalOnTime]])
     {
         _totalOnTimeSeconds = [characteristic valueAsNSUInteger];
         didUpdate = YES;
     }
-    else if ([characteristic.UUID isEqual:[FTPenDebugServiceUUIDs manufacturingID]])
+    else if ([characteristic.UUID isEqual:[FTPenUsageServiceUUIDs manufacturingID]])
     {
         _manufacturingID = [characteristic valueAsNSString];
 
         [self.delegate didReadManufacturingID:self.manufacturingID];
         didUpdate = YES;
     }
-    else if ([characteristic.UUID isEqual:[FTPenDebugServiceUUIDs lastErrorCode]])
+    else if ([characteristic.UUID isEqual:[FTPenUsageServiceUUIDs lastErrorCode]])
     {
         didUpdate = YES;
     }
-    else if ([characteristic.UUID isEqual:[FTPenDebugServiceUUIDs longPressTime]])
+    else if ([characteristic.UUID isEqual:[FTPenUsageServiceUUIDs longPressTime]])
     {
         _longPressTimeMilliseconds = [characteristic valueAsNSUInteger];
         didUpdate = YES;
     }
-    else if ([characteristic.UUID isEqual:[FTPenDebugServiceUUIDs connectionTime]])
+    else if ([characteristic.UUID isEqual:[FTPenUsageServiceUUIDs connectionTime]])
     {
         _connectionTimeSeconds = [characteristic valueAsNSUInteger];
         didUpdate = YES;
@@ -314,7 +314,7 @@
 
     if (didUpdate)
     {
-        [self.delegate didUpdateDebugProperty];
+        [self.delegate didUpdateUsageProperty];
     }
 }
 

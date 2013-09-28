@@ -199,7 +199,7 @@ FTPenPrivateDelegate>
 {
     [self updateDisplay];
 
-    [pen readDebugProperties];
+    [pen readUsageProperties];
 }
 
 - (void)pen:(FTPen *)pen isTipPressedDidChange:(BOOL)isTipPressed
@@ -261,7 +261,7 @@ FTPenPrivateDelegate>
     [self updateDeviceInfoLabel];
 }
 
-- (void)didUpdateDebugProperty
+- (void)didUpdateUsageProperty
 {
     [self updateDeviceInfoLabel];
 }
@@ -470,7 +470,7 @@ FTPenPrivateDelegate>
 
 - (IBAction)updateStatsTouchUpInside:(id)sender
 {
-    [self.penManager.pen readDebugProperties];
+    [self.penManager.pen readUsageProperties];
 }
 
 - (IBAction)pairButtonTouchUpInside:(id)sender
@@ -635,7 +635,7 @@ FTPenPrivateDelegate>
         {
             if (self.penManager.state == FTPenManagerStateConnected)
             {
-                [self.penManager.pen readDebugProperties];
+                [self.penManager.pen readUsageProperties];
             }
         }
         else if ([command isEqualToString:kGetBatteryLevelCommand])

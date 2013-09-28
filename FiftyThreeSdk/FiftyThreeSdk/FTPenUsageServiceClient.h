@@ -1,5 +1,5 @@
 //
-//  FTPenDebugServiceClient.h
+//  FTPenUsageServiceClient.h
 //  FiftyThreeSdk
 //
 //  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
@@ -10,19 +10,19 @@
 #import "FTPen+Private.h"
 #import "FTServiceClient.h"
 
-@protocol FTPenDebugServiceClientDelegate <NSObject>
+@protocol FTPenUsageServiceClientDelegate <NSObject>
 
 - (void)didReadManufacturingID:(NSString *)manufacturingID;
 - (void)didWriteManufacturingID;
 - (void)didFailToWriteManufacturingID;
 
-- (void)didUpdateDebugProperty;
+- (void)didUpdateUsageProperty;
 
 @end
 
-@interface FTPenDebugServiceClient : FTServiceClient
+@interface FTPenUsageServiceClient : FTServiceClient
 
-@property (nonatomic, weak) id<FTPenDebugServiceClientDelegate> delegate;
+@property (nonatomic, weak) id<FTPenUsageServiceClientDelegate> delegate;
 
 // Debug Properties
 @property (nonatomic, readonly) NSUInteger numTipPresses;
@@ -39,6 +39,6 @@
 
 - (void)clearLastErrorCode;
 
-- (void)readDebugProperties;
+- (void)readUsageProperties;
 
 @end
