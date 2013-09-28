@@ -35,6 +35,10 @@ FTPenPrivateDelegate>
 @property (nonatomic) double lastTipOrEraserPressedTimestamp;
 @property (nonatomic) double lastTipOrEraserReleasedTimestamp;
 
+@property (nonatomic) int numUnexpectedDisconnectsGeneral;
+@property (nonatomic) int numUnexpectedDisconnectsConnecting;
+@property (nonatomic) int numUnexpectedDisconnectsFirmware;
+
 @end
 
 @implementation ViewController
@@ -45,14 +49,31 @@ FTPenPrivateDelegate>
     if (self)
     {
         _uptimeTimer = Timer::New();
+
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(penDidEncounterUnexpectedDisconnect:)
+                                                     name:kFTPenUnexpectedDisconnectNotificationName
+                                                   object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(penDidEncounterUnexpectedDisconnectWhileConnecting:)
+                                                     name:kFTPenUnexpectedDisconnectWhileConnectingNotifcationName
+                                                   object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(penDidEncounterUnexpectedDisconnectWhileUpdatingFirmware:)
+                                                     name:kFTPenUnexpectedDisconnectWhileUpdatingFirmwareNotificationName
+                                                   object:nil];
     }
     return self;
+}
+
+- (void)dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    // Do any additional setup after loading the view, typically from a nib.
 
     _rscManager = [[RscMgr alloc] init];
     [_rscManager setDelegate:self];
@@ -64,7 +85,6 @@ FTPenPrivateDelegate>
                                   infoDictionary[@"CFBundleDisplayName"],
                                   infoDictionary[@"CFBundleShortVersionString"],
                                   infoDictionary[@"CFBundleVersion"]];
-
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -78,6 +98,26 @@ FTPenPrivateDelegate>
 {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+#pragma mark - Notifications
+
+- (void)penDidEncounterUnexpectedDisconnect:(NSNotification *)notification
+{
+    self.numUnexpectedDisconnectsGeneral++;
+    [self updateConnectionHistoryLabel];
+}
+
+- (void)penDidEncounterUnexpectedDisconnectWhileConnecting:(NSNotification *)notification
+{
+    self.numUnexpectedDisconnectsConnecting++;
+    [self updateConnectionHistoryLabel];
+}
+
+- (void)penDidEncounterUnexpectedDisconnectWhileUpdatingFirmware:(NSNotification *)notification
+{
+    self.numUnexpectedDisconnectsFirmware++;
+    [self updateConnectionHistoryLabel];
 }
 
 #pragma mark - UIAlertViewDelegate
@@ -121,7 +161,7 @@ FTPenPrivateDelegate>
         penManager.pen.delegate = self;
         penManager.pen.privateDelegate = self;
     }
-    
+
     if (state == FTPenManagerStateConnected)
     {
         [self.penManager.pen readUsageProperties];
@@ -264,6 +304,19 @@ FTPenPrivateDelegate>
     [self updateDeviceInfoLabel];
 }
 
+#pragma mark -
+
+- (void)updateConnectionHistoryLabel
+{
+    NSMutableString *connectionHistory = [NSMutableString string];
+    [connectionHistory appendFormat:@"Disconnects\n"];
+    [connectionHistory appendFormat:@"    General: %d\n", self.numUnexpectedDisconnectsGeneral];
+    [connectionHistory appendFormat:@"    Connecting: %d\n", self.numUnexpectedDisconnectsConnecting];
+    [connectionHistory appendFormat:@"    Firmware: %d", self.numUnexpectedDisconnectsFirmware];
+
+    self.connectionHistoryLabel.text = connectionHistory;
+}
+
 - (void)updateDeviceInfoLabel
 {
     if (self.penManager.state != FTPenManagerStateConnected &&
@@ -335,8 +388,6 @@ FTPenPrivateDelegate>
     self.deviceInfoLabel.text = deviceInfo;
 }
 
-#pragma mark -
-
 - (void)displayPenInfo:(FTPen *)pen
 {
     NSLog(@"manufacturer = %@", pen.manufacturerName);
@@ -406,6 +457,7 @@ FTPenPrivateDelegate>
     }
 
     [self updateDeviceInfoLabel];
+    [self updateConnectionHistoryLabel];
 
     [self.pcConnectedButton setHighlighted:self.pcConnected];
 }
@@ -468,6 +520,11 @@ FTPenPrivateDelegate>
 
 - (IBAction)updateStatsTouchUpInside:(id)sender
 {
+    self.numUnexpectedDisconnectsGeneral = 0;
+    self.numUnexpectedDisconnectsConnecting = 0;
+    self.numUnexpectedDisconnectsFirmware = 0;
+    [self updateConnectionHistoryLabel];
+
     [self.penManager.pen readUsageProperties];
 }
 

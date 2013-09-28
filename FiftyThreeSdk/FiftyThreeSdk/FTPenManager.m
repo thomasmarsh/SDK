@@ -17,8 +17,12 @@
 #import "TIUpdateManager.h"
 #import "TransitionKit.h"
 
+NSString * const kPairedPeripheralUUIDUserDefaultsKey = @"com.fiftythree.pen.pairedPeripheralUUID";
+
 NSString * const kFTPenManagerDidUpdateStateNotificationName = @"com.fiftythree.penManager.didUpdateState";
-static NSString * const kPairedPeripheralUUIDUserDefaultsKey = @"com.fiftythree.pen.pairedPeripheralUUID";
+NSString * const kFTPenUnexpectedDisconnectNotificationName = @"com.fiftythree.penManager.unexpectedDisconnect";
+NSString * const kFTPenUnexpectedDisconnectWhileConnectingNotifcationName = @"com.fiftythree.penManager.unexpectedDisconnectWhileConnecting";
+NSString * const kFTPenUnexpectedDisconnectWhileUpdatingFirmwareNotificationName = @"com.fiftythre.penManager.unexpectedDisconnectWhileUpdatingFirmware";
 
 static const int kInterruptedUpdateDelayMax = 30;
 
@@ -663,6 +667,8 @@ typedef enum
 
         weakSelf.state = FTPenManagerStateUpdatingFirmware;
 
+        weakSelf.pen.requiresTipBePressedToBecomeReady = NO;
+
         attemptingConnectionCommon();
     }];
     [updatingFirmwareAttemptingConnectionState setTimeoutExpiredBlock:^(TKState *state,
@@ -670,7 +676,7 @@ typedef enum
     {
         NSAssert(weakSelf.pen, @"Pen must be non-nil");
 
-        [self fireStateMachineEvent:kDisconnectAndBecomeSingleEventName];
+        [weakSelf fireStateMachineEvent:kDisconnectAndBecomeSingleEventName];
     }];
 
     [self.stateMachine addStates:@[
@@ -1130,9 +1136,15 @@ typedef enum
             {
                 NSLog(@"Peripheral did disconnect while updating firmware. Reconnecting.");
 
-                // Normally when we transition from the UpdatingFirmware state we cancel
-                // the firmware update, which restores the peripheral delegate. In this case
-                // since we've created a new FTPen, we *don't* want the old delegate.
+                if ([FTFirmwareManager imageTypeRunningOnPen:self.pen] == FTFirmwareImageTypeFactory)
+                {
+                    [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenUnexpectedDisconnectWhileUpdatingFirmwareNotificationName
+                                                                        object:self.pen];
+                }
+
+                // Normally when we transition from the UpdatingFirmware state we cancel the firmware update,
+                // which restores the peripheral delegate. In this case since we've created a new FTPen, we
+                // *don't* want the old delegate.
                 self.updateManager.shouldRestorePeripheralDelegate = NO;
                 self.pen = [[FTPen alloc] initWithCentralManager:self.centralManager
                                                       peripheral:self.pen.peripheral];
@@ -1141,6 +1153,9 @@ typedef enum
         }
         else if ([self currentStateHasName:kUpdatingFirmwareAttemptingConnectionStateName])
         {
+            [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenUnexpectedDisconnectWhileConnectingNotifcationName
+                                                                object:self.pen];
+
             // Try again. Eventually the state will timeout.
             [self.centralManager connectPeripheral:self.pen.peripheral options:nil];
         }
@@ -1163,24 +1178,41 @@ typedef enum
             {
                 [self fireStateMachineEvent:kSwingEventName];
             }
-            else if ([self currentStateHasName:kMarriedStateName] ||
-                     [self currentStateHasName:kMarriedWaitingForLongPressToDisconnectStateName] ||
-                     [self currentStateHasName:kSeparatedAttemptingConnectionStateName] ||
-                     [self currentStateHasName:kSwingingAttemptingConnectionStateName])
-            {
-                [self fireStateMachineEvent:kBecomeSeparatedEventName];
-            }
-            else if ([self currentStateHasName:kDatingAttemptingConnectiongStateName] ||
-                     [self currentStateHasName:kEngagedStateName] ||
-                     [self currentStateHasName:kEngagedWaitingForPairingSpotReleaseStateName] ||
-                     [self currentStateHasName:kEngagedWaitingForTipReleaseStateName])
-            {
-                [self fireStateMachineEvent:kDisconnectAndBecomeSingleEventName];
-            }
             else
             {
-                NSAssert(NO, @"Disconnect from unexpected state: %@",
-                         self.stateMachine.currentState.name);
+                // Fire notifications to report that we've had an unexpected disconnect. Make sure to do this
+                // prior to transitioning states.
+                if ([self currentStateHasName:kMarriedStateName] ||
+                    [self currentStateHasName:kMarriedWaitingForLongPressToDisconnectStateName] ||
+                    [self currentStateHasName:kEngagedStateName] ||
+                    [self currentStateHasName:kEngagedWaitingForPairingSpotReleaseStateName] ||
+                    [self currentStateHasName:kEngagedWaitingForTipReleaseStateName])
+                {
+                    [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenUnexpectedDisconnectNotificationName
+                                                                        object:pen];
+                }
+                else if ([self currentStateHasName:kSeparatedAttemptingConnectionStateName] ||
+                         [self currentStateHasName:kSwingingAttemptingConnectionStateName] ||
+                         [self currentStateHasName:kDatingAttemptingConnectiongStateName])
+                {
+                    [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenUnexpectedDisconnectWhileConnectingNotifcationName
+                                                                        object:pen];
+                }
+
+                if ([self currentStateHasName:kMarriedStateName] ||
+                    [self currentStateHasName:kMarriedWaitingForLongPressToDisconnectStateName] ||
+                    [self currentStateHasName:kSeparatedAttemptingConnectionStateName] ||
+                    [self currentStateHasName:kSwingingAttemptingConnectionStateName])
+                {
+                    [self fireStateMachineEvent:kBecomeSeparatedEventName];
+                }
+                else if ([self currentStateHasName:kDatingAttemptingConnectiongStateName] ||
+                         [self currentStateHasName:kEngagedStateName] ||
+                         [self currentStateHasName:kEngagedWaitingForPairingSpotReleaseStateName] ||
+                         [self currentStateHasName:kEngagedWaitingForTipReleaseStateName])
+                {
+                    [self fireStateMachineEvent:kDisconnectAndBecomeSingleEventName];
+                }
             }
         }
     }

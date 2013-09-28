@@ -11,6 +11,10 @@
 
 #import "FTPenManager.h"
 
+extern NSString * const kFTPenUnexpectedDisconnectNotificationName;
+extern NSString * const kFTPenUnexpectedDisconnectWhileConnectingNotifcationName;
+extern NSString * const kFTPenUnexpectedDisconnectWhileUpdatingFirmwareNotificationName;
+
 @interface FTPenManager ()
 
 - (BOOL)isFirmwareUpdateAvailable;

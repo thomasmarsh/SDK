@@ -22,6 +22,7 @@
 @property (weak, nonatomic) IBOutlet UIButton *updateStatsButton;
 @property (weak, nonatomic) IBOutlet UIButton *touchButton;
 @property (weak, nonatomic) IBOutlet UILabel *deviceInfoLabel;
+@property (weak, nonatomic) IBOutlet UILabel *connectionHistoryLabel;
 @property (weak, nonatomic) IBOutlet UIButton *clearLastErrorButton;
 @property (weak, nonatomic) IBOutlet UINavigationItem *appTitleNavItem;
 
