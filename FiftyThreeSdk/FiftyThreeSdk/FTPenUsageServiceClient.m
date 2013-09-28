@@ -123,11 +123,13 @@
 
 #pragma mark - FTServiceClient
 
-- (NSArray *)peripheral:(CBPeripheral *)peripheral isConnectedDidChange:(BOOL)isConnected
+- (NSArray *)ensureServicesForConnectionState:(BOOL)isConnected;
 {
     if (isConnected)
     {
-        return @[[FTPenUsageServiceUUIDs penUsageService]];
+        return (self.penUsageService ?
+                nil :
+                @[[FTPenUsageServiceUUIDs penUsageService]]);
     }
     else
     {
@@ -190,6 +192,11 @@
         return;
     }
 
+    if (service != self.penUsageService)
+    {
+        return;
+    }
+
     for (CBCharacteristic *characteristic in service.characteristics)
     {
 //        if (!self.tipPressureCharacteristic &&
@@ -208,47 +215,56 @@
             [characteristic.UUID isEqual:[FTPenUsageServiceUUIDs numTipPresses]])
         {
             self.numTipPressesCharacteristic = characteristic;
+            [self.peripheral readValueForCharacteristic:characteristic];
         }
         else if (!self.numEraserPressesCharacteristic &&
                  [characteristic.UUID isEqual:[FTPenUsageServiceUUIDs numEraserPresses]])
         {
             self.numEraserPressesCharacteristic = characteristic;
+            [self.peripheral readValueForCharacteristic:characteristic];
         }
         else if (!self.numFailedConnectionsCharacteristic &&
                  [characteristic.UUID isEqual:[FTPenUsageServiceUUIDs numFailedConnections]])
         {
             self.numFailedConnectionsCharacteristic = characteristic;
+            [self.peripheral readValueForCharacteristic:characteristic];
         }
         else if (!self.numSuccessfulConnectionsCharacteristic &&
                  [characteristic.UUID isEqual:[FTPenUsageServiceUUIDs numSuccessfulConnections]])
         {
             self.numSuccessfulConnectionsCharacteristic = characteristic;
+            [self.peripheral readValueForCharacteristic:characteristic];
         }
         else if (!self.totalOnTimeCharacteristic &&
                  [characteristic.UUID isEqual:[FTPenUsageServiceUUIDs totalOnTime]])
         {
             self.totalOnTimeCharacteristic = characteristic;
+            [self.peripheral readValueForCharacteristic:characteristic];
         }
         else if (!self.manufacturingIDCharacteristic &&
                  [characteristic.UUID isEqual:[FTPenUsageServiceUUIDs manufacturingID]])
         {
             self.manufacturingIDCharacteristic = characteristic;
+            [self.peripheral readValueForCharacteristic:characteristic];
         }
         else if (!self.lastErrorCodeCharacteristic &&
                  [characteristic.UUID isEqual:[FTPenUsageServiceUUIDs lastErrorCode]])
         {
             self.lastErrorCodeCharacteristic = characteristic;
+            [self.peripheral readValueForCharacteristic:characteristic];
             [peripheral readValueForCharacteristic:characteristic];
         }
         else if (!self.longPressTimeCharacteristic &&
                  [characteristic.UUID isEqual:[FTPenUsageServiceUUIDs longPressTime]])
         {
             self.longPressTimeCharacteristic = characteristic;
+            [self.peripheral readValueForCharacteristic:characteristic];
         }
         else if (!self.connectionTimeCharacteristic &&
                  [characteristic.UUID isEqual:[FTPenUsageServiceUUIDs connectionTime]])
         {
             self.connectionTimeCharacteristic = characteristic;
+            [self.peripheral readValueForCharacteristic:characteristic];
         }
     }
 }

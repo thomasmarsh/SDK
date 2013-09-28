@@ -31,14 +31,13 @@
     [_serviceClients addObject:serviceClient];
 }
 
-- (NSArray *)peripheral:(CBPeripheral *)peripheral isConnectedDidChange:(BOOL)isConnected;
+- (NSArray *)ensureServicesForConnectionState:(BOOL)isConnected
 {
     NSMutableArray *servicesToBeDiscovered = [NSMutableArray array];
 
     for (FTServiceClient *serviceClient in self.serviceClients)
     {
-        NSArray *servicesToBeDiscoveredForClient = [serviceClient peripheral:peripheral
-                                                        isConnectedDidChange:isConnected];
+        NSArray *servicesToBeDiscoveredForClient = [serviceClient ensureServicesForConnectionState:isConnected];
 
         if (servicesToBeDiscoveredForClient)
         {

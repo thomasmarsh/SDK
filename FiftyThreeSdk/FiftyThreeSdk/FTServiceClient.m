@@ -9,7 +9,7 @@
 
 @implementation FTServiceClient
 
-- (NSArray *)peripheral:(CBPeripheral *)peripheral isConnectedDidChange:(BOOL)isConnected
+- (NSArray *)ensureServicesForConnectionState:(BOOL)isConnected;
 {
     return nil;
 }

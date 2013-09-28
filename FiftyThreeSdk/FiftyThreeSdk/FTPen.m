@@ -87,18 +87,6 @@ NSString * const kFTPenConnectionTimeSecondsPropertyName = @"connectionTimeSecon
         _penServiceClient = [[FTPenServiceClient alloc] initWithPeripheral:_peripheral];
         _penServiceClient.delegate = self;
         [_peripheralDelegate addServiceClient:_penServiceClient];
-
-#ifdef DEBUG
-        // Pen Usage Service client
-        _penUsageServiceClient = [[FTPenUsageServiceClient alloc] initWithPeripheral:_peripheral];
-        _penUsageServiceClient.delegate = self;
-        [_peripheralDelegate addServiceClient:_penUsageServiceClient];
-#endif
-
-        // Device Info Service client
-        _deviceInfoServiceClient = [[FTDeviceInfoServiceClient alloc] initWithPeripheral:_peripheral];
-        _deviceInfoServiceClient.delegate = self;
-        [_peripheralDelegate addServiceClient:_deviceInfoServiceClient];
     }
 
     return self;
@@ -231,6 +219,15 @@ NSString * const kFTPenConnectionTimeSecondsPropertyName = @"connectionTimeSecon
 - (void)readUsageProperties
 {
     [self.penUsageServiceClient readUsageProperties];
+
+    if (!self.penUsageServiceClient)
+    {
+        self.penUsageServiceClient = [[FTPenUsageServiceClient alloc] initWithPeripheral:_peripheral];
+        self.penUsageServiceClient.delegate = self;
+        [self.peripheralDelegate addServiceClient:_penUsageServiceClient];
+
+        [self ensureServicesDiscovered];
+    }
 }
 
 - (void)refreshFirmwareVersionProperties
@@ -242,22 +239,34 @@ NSString * const kFTPenConnectionTimeSecondsPropertyName = @"connectionTimeSecon
 
 - (void)peripheralConnectionStatusDidChange
 {
-    NSArray *servicesToBeDiscovered = [self.peripheralDelegate peripheral:self.peripheral
-                                                     isConnectedDidChange:self.peripheral.isConnected];
-
     if (self.peripheral.isConnected)
     {
         NSAssert(self.peripheral.delegate == self.peripheralDelegate,
                  @"peripheral delegate is installed");
 
         NSLog(@"Peripheral is connected.");
+    }
+    else
+    {
+        NSLog(@"Peripheral was disconnected.");
+    }
+
+    [self ensureServicesDiscovered];
+}
+
+- (void)ensureServicesDiscovered
+{
+    NSArray *servicesToBeDiscovered = [self.peripheralDelegate ensureServicesForConnectionState:self.peripheral.isConnected];
+
+    if (self.peripheral.isConnected)
+    {
+        NSAssert(self.peripheral.delegate == self.peripheralDelegate,
+                 @"peripheral delegate is installed");
 
         [self.peripheral discoverServices:servicesToBeDiscovered];
     }
     else
     {
-        NSLog(@"Peripheral was disconnected.");
-
         NSAssert(servicesToBeDiscovered.count == 0,
                  @"Should not attempt to discover services if not connected");
     }
@@ -282,6 +291,14 @@ NSString * const kFTPenConnectionTimeSecondsPropertyName = @"connectionTimeSecon
     if ([self.privateDelegate respondsToSelector:@selector(pen:isReadyDidChange:)])
     {
         [self.privateDelegate pen:self isReadyDidChange:isReady];
+    }
+
+    if (!self.deviceInfoServiceClient)
+    {
+        self.deviceInfoServiceClient = [[FTDeviceInfoServiceClient alloc] initWithPeripheral:_peripheral];
+        self.deviceInfoServiceClient.delegate = self;
+        [self.peripheralDelegate addServiceClient:_deviceInfoServiceClient];
+        [self ensureServicesDiscovered];
     }
 }
 

@@ -5,13 +5,15 @@
 //  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
+#pragma once
+
 #import <CoreBluetooth/CoreBluetooth.h>
+#import <Foundation/Foundation.h>
 
 @interface FTServiceClient : NSObject <CBPeripheralDelegate>
 
 // Returns the list of services that should be discoverred as a result of the connection being established.
-- (NSArray *)peripheral:(CBPeripheral *)peripheral isConnectedDidChange:(BOOL)isConnected;
+- (NSArray *)ensureServicesForConnectionState:(BOOL)isConnected;
 
 + (CBService *)findServiceWithPeripheral:(CBPeripheral *)peripheral andUUID:(CBUUID *)UUID;
 

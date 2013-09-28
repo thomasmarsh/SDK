@@ -92,11 +92,13 @@
 
 #pragma mark - FTServiceClient
 
-- (NSArray *)peripheral:(CBPeripheral *)peripheral isConnectedDidChange:(BOOL)isConnected
+- (NSArray *)ensureServicesForConnectionState:(BOOL)isConnected;
 {
     if (isConnected)
     {
-        return @[[FTDeviceInfoServiceUUIDs deviceInfoService]];
+        return (self.deviceInfoService ?
+                nil :
+                @[[FTDeviceInfoServiceUUIDs deviceInfoService]]);
     }
     else
     {
@@ -135,6 +137,11 @@
 - (void)peripheral:(CBPeripheral *)peripheral didDiscoverCharacteristicsForService:(CBService *)service
              error:(NSError *)error
 {
+    if (service != self.deviceInfoService)
+    {
+        return;
+    }
+
     for (CBCharacteristic *characteristic in service.characteristics)
     {
         if (!self.manufacturerNameCharacteristic &&

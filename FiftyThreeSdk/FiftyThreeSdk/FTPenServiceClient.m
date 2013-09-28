@@ -87,11 +87,13 @@
 
 #pragma mark - FTServiceClient
 
-- (NSArray *)peripheral:(CBPeripheral *)peripheral isConnectedDidChange:(BOOL)isConnected
+- (NSArray *)ensureServicesForConnectionState:(BOOL)isConnected;
 {
     if (isConnected)
     {
-        return @[[FTPenServiceUUIDs penService]];
+        return (self.penService ?
+                nil :
+                @[[FTPenServiceUUIDs penService]]);
     }
     else
     {
@@ -139,6 +141,11 @@
         return;
     }
 
+    if (service != self.penService)
+    {
+        return;
+    }
+
     for (CBCharacteristic *characteristic in service.characteristics)
     {
         // IsTipPressed
@@ -146,7 +153,6 @@
             [characteristic.UUID isEqual:[FTPenServiceUUIDs isTipPressed]])
         {
             self.isTipPressedCharacteristic = characteristic;
-            [peripheral setNotifyValue:YES forCharacteristic:characteristic];
         }
 
         // IsEraserPressed
@@ -154,7 +160,6 @@
             [characteristic.UUID isEqual:[FTPenServiceUUIDs isEraserPressed]])
         {
             self.isEraserPressedCharacteristic = characteristic;
-            [peripheral setNotifyValue:YES forCharacteristic:characteristic];
         }
 
         // BatteryLevel
@@ -162,8 +167,6 @@
             [characteristic.UUID isEqual:[FTPenServiceUUIDs batteryLevel]])
         {
             self.batteryLevelCharacteristic = characteristic;
-            [peripheral readValueForCharacteristic:characteristic];
-            [peripheral setNotifyValue:YES forCharacteristic:characteristic];
         }
 
         // ShouldSwing
@@ -180,6 +183,8 @@
             self.shouldPowerOffCharacteristic = characteristic;
         }
     }
+
+    [self ensureNotifications];
 }
 
 - (void)peripheral:(CBPeripheral *)peripheral didUpdateValueForCharacteristic:(CBCharacteristic *)characteristic
@@ -266,21 +271,42 @@
         // Once we start listening for changes in the characteristic it's safe to read its value. (We avoid
         // the opposite order since that might lead to a race condidtion where we miss a change in the
         // characteristic.)
-        if ([characteristic isEqual:self.isTipPressedCharacteristic] ||
-            [characteristic isEqual:self.isEraserPressedCharacteristic])
-        {
-            [peripheral readValueForCharacteristic:characteristic];
-        }
+        [peripheral readValueForCharacteristic:characteristic];
     }
-    else
-    {
-        // TODO: Is this an error case that needs to be handled.
-    }
+
+    [self ensureNotifications];
 }
 
 - (void)peripheral:(CBPeripheral *)peripheral didWriteValueForCharacteristic:(CBCharacteristic *)characteristic
              error:(NSError *)error
 {
+}
+
+#pragma mark -
+
+- (void)ensureNotifications
+{
+    const BOOL isTipPressedNotifying = (self.isTipPressedCharacteristic &&
+                                        self.isTipPressedCharacteristic.isNotifying);
+    if (!isTipPressedNotifying)
+    {
+        [self.peripheral setNotifyValue:YES forCharacteristic:self.isTipPressedCharacteristic];
+    }
+
+    if (isTipPressedNotifying)
+    {
+        if (self.isEraserPressedCharacteristic && !self.isEraserPressedCharacteristic.isNotifying)
+        {
+            [self.peripheral setNotifyValue:YES
+                          forCharacteristic:self.isEraserPressedCharacteristic];
+        }
+
+        if (self.batteryLevelCharacteristic && !self.batteryLevelCharacteristic.isNotifying)
+        {
+            [self.peripheral setNotifyValue:YES
+                          forCharacteristic:self.batteryLevelCharacteristic];
+        }
+    }
 }
 
 @end
