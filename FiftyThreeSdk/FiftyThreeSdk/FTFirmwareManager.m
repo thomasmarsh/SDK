@@ -26,8 +26,8 @@ NSString *applicationDocumentsDirectory()
 
 + (NSString *)imagePathIncludingDocumentsDir
 {
-    NSString *bestImagePath = [FTFirmwareManager imagePath];
-    NSInteger bestVersion = [FTFirmwareManager versionOfImageAtPath:bestImagePath];
+    NSString *bestImagePath;
+    NSInteger bestVersion;
 
     NSString *documentsDir = applicationDocumentsDirectory();
     NSArray *directoryContent = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:documentsDir
@@ -38,7 +38,7 @@ NSString *applicationDocumentsDirectory()
         {
             NSString *imagePath = [documentsDir stringByAppendingPathComponent:fileName];
             NSInteger version = [FTFirmwareManager versionOfImageAtPath:imagePath];
-            if (version > bestVersion)
+            if (!bestImagePath || version > bestVersion)
             {
                 bestVersion = version;
                 bestImagePath = imagePath;
@@ -46,7 +46,9 @@ NSString *applicationDocumentsDirectory()
         }
     }
 
-    return bestImagePath;
+    // Always favor the documents dir, even if the image contained therein is an older version. We need a way
+    // to downgrade.
+    return bestImagePath ? bestImagePath : [self imagePath];
 }
 
 + (NSInteger)versionOfImageAtPath:(NSString *)imagePath
