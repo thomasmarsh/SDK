@@ -18,6 +18,8 @@
 @property (nonatomic) CBService *penService;
 @property (nonatomic) CBCharacteristic *isTipPressedCharacteristic;
 @property (nonatomic) CBCharacteristic *isEraserPressedCharacteristic;
+@property (nonatomic) CBCharacteristic *tipPressureCharacteristic;
+@property (nonatomic) CBCharacteristic *eraserPressureCharacteristic;
 @property (nonatomic) CBCharacteristic *batteryLevelCharacteristic;
 @property (nonatomic) CBCharacteristic *shouldSwingCharacteristic;
 @property (nonatomic) CBCharacteristic *shouldPowerOffCharacteristic;
@@ -100,6 +102,8 @@
         self.penService = nil;
         self.isTipPressedCharacteristic = nil;
         self.isEraserPressedCharacteristic = nil;
+        self.tipPressureCharacteristic = nil;
+        self.eraserPressureCharacteristic = nil;
         self.batteryLevelCharacteristic = nil;
         self.shouldSwingCharacteristic = nil;
         self.shouldPowerOffCharacteristic = nil;
@@ -120,7 +124,9 @@
         if (self.penService)
         {
             NSArray *characteristics = @[[FTPenServiceUUIDs isTipPressed],
+                                         [FTPenServiceUUIDs tipPressure],
                                          [FTPenServiceUUIDs isEraserPressed],
+                                         [FTPenServiceUUIDs eraserPressure],
                                          [FTPenServiceUUIDs batteryLevel],
                                          [FTPenServiceUUIDs shouldSwing],
                                          [FTPenServiceUUIDs shouldPowerOff]
@@ -160,6 +166,20 @@
             [characteristic.UUID isEqual:[FTPenServiceUUIDs isEraserPressed]])
         {
             self.isEraserPressedCharacteristic = characteristic;
+        }
+
+        // TipPressure
+        if (!self.tipPressureCharacteristic &&
+            [characteristic.UUID isEqual:[FTPenServiceUUIDs tipPressure]])
+        {
+            self.tipPressureCharacteristic = characteristic;
+        }
+
+        // EraserPressure
+        if (!self.eraserPressureCharacteristic &&
+            [characteristic.UUID isEqual:[FTPenServiceUUIDs eraserPressure]])
+        {
+            self.eraserPressureCharacteristic = characteristic;
         }
 
         // BatteryLevel
@@ -247,6 +267,16 @@
 
 //        NSLog(@"IsEraserPressed did update value: %d", isEraserPressed);
     }
+    if ([characteristic.UUID isEqual:[FTPenServiceUUIDs tipPressure]])
+    {
+        _tipPressure = (32767 - [characteristic valueAsNSUInteger]) / 32767.f;
+        [self.delegate penServiceClient:self didUpdateTipPressure:_tipPressure];
+    }
+    else if ([characteristic.UUID isEqual:[FTPenServiceUUIDs eraserPressure]])
+    {
+        _eraserPressure = (32767 - [characteristic valueAsNSUInteger]) / 32767.f;
+        [self.delegate penServiceClient:self didUpdateEraserPressure:_eraserPressure];
+    }
     else if ([characteristic isEqual:self.batteryLevelCharacteristic])
     {
         NSInteger batteryLevel = self.batteryLevel;
@@ -299,6 +329,20 @@
         {
             [self.peripheral setNotifyValue:YES
                           forCharacteristic:self.isEraserPressedCharacteristic];
+        }
+
+        if (self.tipPressureCharacteristic && !self.tipPressureCharacteristic.isNotifying)
+        {
+            // TODO: Enable notifications on tip pressure
+//            [self.peripheral setNotifyValue:YES
+//                          forCharacteristic:self.tipPressureCharacteristic];
+        }
+
+        if (self.eraserPressureCharacteristic && !self.eraserPressureCharacteristic.isNotifying)
+        {
+            // TODO: Enable notifications on eraser pressure
+//            [self.peripheral setNotifyValue:YES
+//                          forCharacteristic:self.eraserPressureCharacteristic];
         }
 
         if (self.batteryLevelCharacteristic && !self.batteryLevelCharacteristic.isNotifying)

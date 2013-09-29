@@ -319,6 +319,16 @@ FTPenPrivateDelegate>
     [self sendCharacter:isEraserPressed ? 'B' : 'b'];
 }
 
+- (void)pen:(FTPen *)pen tipPressureDidChange:(float)tipPressure
+{
+//    NSLog(@"tip pressure: %f", tipPressure);
+}
+
+- (void)pen:(FTPen *)pen eraserPressureDidChange:(float)eraserPressure
+{
+//    NSLog(@"eraser pressure: %f", eraserPressure);
+}
+
 - (void)pen:(FTPen *)pen batteryLevelDidChange:(NSInteger)batteryLevel
 {
     [self updateDeviceInfoLabel];

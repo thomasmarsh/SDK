@@ -14,6 +14,8 @@
 + (CBUUID *)penService;
 + (CBUUID *)isTipPressed;
 + (CBUUID *)isEraserPressed;
++ (CBUUID *)tipPressure;
++ (CBUUID *)eraserPressure;
 + (CBUUID *)batteryLevel;
 + (CBUUID *)shouldSwing;
 + (CBUUID *)shouldPowerOff;
@@ -27,8 +29,6 @@
 
 + (CBUUID *)penUsageService;
 
-//+ (CBUUID *)tipPressure;
-//+ (CBUUID *)eraserPressure;
 + (CBUUID *)numTipPresses;
 + (CBUUID *)numEraserPresses;
 + (CBUUID *)numFailedConnections;

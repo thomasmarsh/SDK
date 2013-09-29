@@ -29,6 +29,14 @@
     {
         return CFSwapInt32LittleToHost(*((uint32_t *)self.value.bytes));
     }
+    else if (self.value.length == sizeof(uint16_t))
+    {
+        return CFSwapInt16LittleToHost(*((uint16_t *)self.value.bytes));
+    }
+    else if (self.value.length == sizeof(uint8_t))
+    {
+        return (*(uint8_t *)self.value.bytes);
+    }
     else
     {
         return NSUIntegerMax;

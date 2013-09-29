@@ -61,6 +61,8 @@ extern NSString * const kFTPenBatteryLevelPropertyName;
 // Pen Client
 @property (nonatomic, readonly) BOOL isTipPressed;
 @property (nonatomic, readonly) BOOL isEraserPressed;
+@property (nonatomic, readonly) float tipPressure;
+@property (nonatomic, readonly) float eraserPressure;
 @property (nonatomic, readonly) NSDate *lastTipReleaseTime;
 @property (nonatomic, readonly) NSInteger batteryLevel;
 
@@ -72,6 +74,8 @@ extern NSString * const kFTPenBatteryLevelPropertyName;
 - (void)penDidUpdateDeviceInfoProperty:(FTPen *)pen;
 - (void)pen:(FTPen *)pen isTipPressedDidChange:(BOOL)isTipPressed;
 - (void)pen:(FTPen *)pen isEraserPressedDidChange:(BOOL)isEraserPressed;
+- (void)pen:(FTPen *)pen tipPressureDidChange:(float)tipPressure;
+- (void)pen:(FTPen *)pen eraserPressureDidChange:(float)eraserPressure;
 - (void)pen:(FTPen *)pen batteryLevelDidChange:(NSInteger)batteryLevel;
 
 @end

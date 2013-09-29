@@ -199,18 +199,6 @@
 
     for (CBCharacteristic *characteristic in service.characteristics)
     {
-//        if (!self.tipPressureCharacteristic &&
-//                 [characteristic.UUID isEqual:[FTPenUsageServiceUUIDs tipPressure]])
-//        {
-//            self.tipPressureCharacteristic = characteristic;
-//            // [peripheral setNotifyValue:YES forCharacteristic:characteristic];
-//        }
-//        else if (!self.eraserPressureCharacteristic &&
-//                 [characteristic.UUID isEqual:[FTPenUsageServiceUUIDs eraserPressure]])
-//        {
-//            self.eraserPressureCharacteristic = characteristic;
-//            // [peripheral setNotifyValue:YES forCharacteristic:characteristic];
-//        }
         if (!self.numTipPressesCharacteristic &&
             [characteristic.UUID isEqual:[FTPenUsageServiceUUIDs numTipPresses]])
         {

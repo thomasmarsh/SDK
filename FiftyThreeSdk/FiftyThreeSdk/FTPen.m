@@ -119,6 +119,16 @@ NSString * const kFTPenConnectionTimeSecondsPropertyName = @"connectionTimeSecon
     return self.penServiceClient.isEraserPressed;
 }
 
+- (float)tipPressure
+{
+    return self.penServiceClient.tipPressure;
+}
+
+- (float)eraserPressure
+{
+    return self.penServiceClient.eraserPressure;
+}
+
 - (NSInteger)batteryLevel
 {
     return self.penServiceClient.batteryLevel;
@@ -321,6 +331,22 @@ NSString * const kFTPenConnectionTimeSecondsPropertyName = @"connectionTimeSecon
     if ([self.delegate respondsToSelector:@selector(pen:isEraserPressedDidChange:)])
     {
         [self.delegate pen:self isEraserPressedDidChange:isEraserPressed];
+    }
+}
+
+- (void)penServiceClient:(FTPenServiceClient *)penServiceClient didUpdateTipPressure:(float)tipPressure
+{
+    if ([self.delegate respondsToSelector:@selector(pen:tipPressureDidChange:)])
+    {
+        [self.delegate pen:self tipPressureDidChange:tipPressure];
+    }
+}
+
+- (void)penServiceClient:(FTPenServiceClient *)penServiceClient didUpdateEraserPressure:(float)eraserPressure
+{
+    if ([self.delegate respondsToSelector:@selector(pen:eraserPressureDidChange:)])
+    {
+        [self.delegate pen:self eraserPressureDidChange:eraserPressure];
     }
 }
 

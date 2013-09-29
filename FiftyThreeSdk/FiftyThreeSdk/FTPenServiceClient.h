@@ -22,6 +22,8 @@
 @property (nonatomic, readonly) BOOL isReady;
 @property (nonatomic, readonly) BOOL isTipPressed;
 @property (nonatomic, readonly) BOOL isEraserPressed;
+@property (nonatomic, readonly) float eraserPressure;
+@property (nonatomic, readonly) float tipPressure;
 @property (nonatomic, readonly) NSInteger batteryLevel;
 @property (nonatomic, readonly) BOOL isPoweringOff;
 @property (nonatomic, readonly) NSDate *lastTipReleaseTime;
@@ -39,6 +41,8 @@
 - (void)penServiceClient:(FTPenServiceClient *)penServiceClient didEncounterError:(NSError *)error;
 - (void)penServiceClient:(FTPenServiceClient *)penServiceClient isReadyDidChange:(BOOL)isReady;
 - (void)penServiceClient:(FTPenServiceClient *)penServiceClient isTipPressedDidChange:(BOOL)isTipPressed;
+- (void)penServiceClient:(FTPenServiceClient *)penServiceClient didUpdateTipPressure:(float)tipPressure;
+- (void)penServiceClient:(FTPenServiceClient *)penServiceClient didUpdateEraserPressure:(float)eraserPressure;
 - (void)penServiceClient:(FTPenServiceClient *)penServiceClient isEraserPressedDidChange:(BOOL)isEraserPressed;
 - (void)penServiceClient:(FTPenServiceClient *)penServiceClient batteryLevelDidChange:(NSInteger)batteryLevel;
 
