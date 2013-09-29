@@ -748,7 +748,7 @@ FTPenPrivateDelegate>
         {
             if (self.penManager.state == FTPenManagerStateConnected)
             {
-                [self.penManager.pen readUsageProperties];
+                [self.penManager.pen readManufacturingID];
             }
         }
         else if ([command isEqualToString:kGetBatteryLevelCommand])

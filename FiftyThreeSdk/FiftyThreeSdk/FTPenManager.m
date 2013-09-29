@@ -193,7 +193,7 @@ typedef enum
     [[NSNotificationCenter defaultCenter] removeObserver:kFTPenDidEncounterErrorNotificationName];
     [[NSNotificationCenter defaultCenter] removeObserver:kFTPenIsReadyDidChangeNotificationName];
     [[NSNotificationCenter defaultCenter] removeObserver:kFTPenIsTipPressedDidChangeNotificationName];
-    [[NSNotificationCenter defaultCenter] removeObserver:kFTPenDidUpdateDeviceInfoPropertiesNotificationName];
+    [[NSNotificationCenter defaultCenter] removeObserver:kFTPenDidUpdatePropertiesNotificationName];
 
     if (_pen)
     {
@@ -212,8 +212,8 @@ typedef enum
                                                      name:kFTPenIsTipPressedDidChangeNotificationName
                                                    object:_pen];
         [[NSNotificationCenter defaultCenter] addObserver:self
-                                                 selector:@selector(penDidUpdateDeviceInfoProperty:)
-                                                     name:kFTPenDidUpdateDeviceInfoPropertiesNotificationName
+                                                 selector:@selector(penDidUpdateProperties:)
+                                                     name:kFTPenDidUpdatePropertiesNotificationName
                                                    object:_pen];
     }
 }
@@ -320,7 +320,7 @@ typedef enum
     }
 }
 
-- (void)penDidUpdateDeviceInfoProperty:(NSNotification *)notification
+- (void)penDidUpdateProperties:(NSNotification *)notification
 {
     // Firmware update can't proceed until we've refreshed the factory and upgrade firmware
     // versions. (The reason for this is that after the upgrade -> factory reset we need the
@@ -328,7 +328,9 @@ typedef enum
     if ([self currentStateHasName:kUpdatingFirmwareStateName])
     {
         NSAssert(self.pen, @"pen is non-nil");
-        if (self.pen.firmwareRevision && self.pen.softwareRevision)
+        if (self.pen.firmwareRevision &&
+            self.pen.softwareRevision &&
+            !self.updateManager)
         {
             NSLog(@"Factory firmware version: %@", self.pen.firmwareRevision);
             NSLog(@"Upgrade firmware version: %@", self.pen.softwareRevision);

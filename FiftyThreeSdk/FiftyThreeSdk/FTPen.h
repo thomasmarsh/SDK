@@ -22,7 +22,7 @@ extern NSString * const kFTPenIsReadyDidChangeNotificationName;
 extern NSString * const kFTPenIsTipPressedDidChangeNotificationName;
 extern NSString * const kFTPenIsEraserPressedDidChangeNotificationName;
 extern NSString * const kFTPenBatteryLevelDidChangeNotificationName;
-extern NSString * const kFTPenDidUpdateDeviceInfoPropertiesNotificationName;
+extern NSString * const kFTPenDidUpdatePropertiesNotificationName;
 extern NSString * const kFTPenNotificationPropertiesKey;
 
 extern NSString * const kFTPenNamePropertyName;

@@ -20,8 +20,8 @@ NSString * const kFTPenIsReadyDidChangeNotificationName = @"com.fiftythree.pen.i
 NSString * const kFTPenIsTipPressedDidChangeNotificationName = @"com.fiftythree.pen.isTipPressedDidChange";
 NSString * const kFTPenIsEraserPressedDidChangeNotificationName = @"com.fiftythree.pen.isEraserPressedDidChange";
 NSString * const kFTPenBatteryLevelDidChangeNotificationName = @"com.fiftythree.pen.batteryLevelDidChange";
-NSString * const kFTPenDidUpdateDeviceInfoPropertiesNotificationName = @"com.fiftythree.pen.didUpdateDeviceInfoProperties";
-NSString * const kFTPenDidUpdateUsagePropertiesNotificationName = @"com.fiftythree.pen.didUpdateUsageProperties";
+NSString * const kFTPenDidUpdatePropertiesNotificationName = @"com.fiftythree.pen.didUpdateProperties";
+NSString * const kFTPenDidUpdatePrivatePropertiesNotificationName = @"com.fiftythree.pen.didUpdatePrivateProperties";
 NSString * const kFTPenNotificationPropertiesKey = @"kFTPenNotificationPropertiesKey";
 
 NSString * const kFTPenNamePropertyName = @"name";
@@ -48,6 +48,9 @@ NSString * const kFTPenManufacturingIDPropertyName = @"manufacturingID";
 NSString * const kFTPenLastErrorCodePropertyName = @"lastErrorCode";
 NSString * const kFTPenLongPressTimeMillisecondsPropertyName = @"longPressTimeMilliseconds";
 NSString * const kFTPenConnectionTimeSecondsPropertyName = @"connectionTimeSeconds";
+
+@implementation FTPenLastErrorCode
+@end
 
 @interface FTPen () <FTPenServiceClientDelegate, FTPenUsageServiceClientDelegate, FTDeviceInfoServiceClientDelegate>
 
@@ -94,14 +97,19 @@ NSString * const kFTPenConnectionTimeSecondsPropertyName = @"connectionTimeSecon
 
 #pragma mark - Properties
 
-- (FTPenLastErrorCode)lastErrorCode
+- (void)readManufacturingID
 {
-    return self.penUsageServiceClient.lastErrorCode;
+    [self.penServiceClient readManufacturingID];
+}
+
+- (FTPenLastErrorCode *)lastErrorCode
+{
+    return self.penServiceClient.lastErrorCode;
 }
 
 - (void)clearLastErrorCode
 {
-    [self.penUsageServiceClient clearLastErrorCode];
+    [self.penServiceClient clearLastErrorCode];
 }
 
 - (BOOL)isReady
@@ -193,16 +201,15 @@ NSString * const kFTPenConnectionTimeSecondsPropertyName = @"connectionTimeSecon
 
 - (NSString *)manufacturingID
 {
-    return self.penUsageServiceClient.manufacturingID;
+    return self.penServiceClient.manufacturingID;
 }
 
 - (void)setManufacturingID:(NSString *)manufacturingID
 {
-    self.penUsageServiceClient.manufacturingID = manufacturingID;
+    self.penServiceClient.manufacturingID = manufacturingID;
 
-    // The model number and serial number charateristics of the device info
-    // service change as a result of setting the manufacturing ID, so refresh
-    // them now.
+    // The model number and serial number charateristics of the device info service change as a result of
+    // setting the manufacturing ID, so refresh them now.
     [self.deviceInfoServiceClient refreshModelNumberAndSerialNumber];
 }
 
@@ -284,6 +291,12 @@ NSString * const kFTPenConnectionTimeSecondsPropertyName = @"connectionTimeSecon
 
 #pragma mark - FTPenServiceClientDelegate
 
+- (void)penServiceClient:(FTPenServiceClient *)penServiceClient didUpdatePenProperties:(NSSet *)updatedProperties
+{
+    [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenDidUpdatePrivatePropertiesNotificationName
+                                                        object:self];
+}
+
 - (void)penServiceClient:(FTPenServiceClient *)penServiceClient didEncounterError:(NSError *)error
 {
     NSLog(@"Pen did encounter error: \"%@\"", error.localizedDescription);
@@ -361,26 +374,26 @@ NSString * const kFTPenConnectionTimeSecondsPropertyName = @"connectionTimeSecon
     }
 }
 
-#pragma mark - FTPenUsageServiceClientDelegate
-
-- (void)didWriteManufacturingID
+- (void)penServiceClientDidWriteManufacturingID:(FTPenServiceClient *)serviceClient
 {
     [self.privateDelegate didWriteManufacturingID];
 }
 
-- (void)didFailToWriteManufacturingID
+- (void)penServiceClientDidFailToWriteManufacturingID:(FTPenServiceClient *)serviceClient
 {
     [self.privateDelegate didFailToWriteManufacturingID];
 }
 
-- (void)didReadManufacturingID:(NSString *)manufacturingID
+- (void)penServiceClient:(FTPenServiceClient *)serviceClient didReadManufacturingID:(NSString *)manufacturingID
 {
     [self.privateDelegate didReadManufacturingID:manufacturingID];
 }
 
+#pragma mark - FTPenUsageServiceClientDelegate
+
 - (void)didUpdateUsageProperties:(NSSet *)updatedProperties
 {
-    [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenDidUpdateUsagePropertiesNotificationName
+    [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenDidUpdatePrivatePropertiesNotificationName
                                                         object:self
                                                       userInfo:@{ kFTPenNotificationPropertiesKey:updatedProperties }];
     [self.privateDelegate didUpdateUsageProperties:updatedProperties];
@@ -391,9 +404,9 @@ NSString * const kFTPenConnectionTimeSecondsPropertyName = @"connectionTimeSecon
 - (void)deviceInfoServiceClientDidUpdateDeviceInfo:(FTDeviceInfoServiceClient *)deviceInfoServiceClient
                                  updatedProperties:(NSSet *)updatedProperties
 {
-    [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenDidUpdateDeviceInfoPropertiesNotificationName
+    [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenDidUpdatePropertiesNotificationName
                                                         object:self
-                                                      userInfo:@{ kFTPenNotificationPropertiesKey:updatedProperties }];
+                                                      userInfo:@{ kFTPenNotificationPropertiesKey : updatedProperties }];
     if ([self.delegate respondsToSelector:@selector(penDidUpdateDeviceInfoProperty:)])
     {
         [self.delegate penDidUpdateDeviceInfoProperty:self];

@@ -9,13 +9,12 @@
 
 #import "FTPen.h"
 
-typedef struct FTPenLastErrorCode
-{
-    int lastErrorID;
-    int lastErrorValue;
-} FTPenLastErrorCode;
+@interface FTPenLastErrorCode : NSObject
+@property (nonatomic) int lastErrorID;
+@property (nonatomic) int lastErrorValue;
+@end
 
-extern NSString * const kFTPenDidUpdateUsagePropertiesNotificationName;
+extern NSString * const kFTPenDidUpdatePrivatePropertiesNotificationName;
 
 extern NSString * const kFTPenNumTipPressesPropertyName;
 extern NSString * const kFTPenNumEraserPressesPropertyName;
@@ -57,7 +56,7 @@ extern NSString * const kFTPenConnectionTimeSecondsPropertyName;
 @property (nonatomic, readonly) NSUInteger numSuccessfulConnections;
 @property (nonatomic, readonly) NSUInteger totalOnTimeSeconds;
 @property (nonatomic) NSString *manufacturingID;
-@property (nonatomic, readonly) FTPenLastErrorCode lastErrorCode;
+@property (nonatomic, readonly) FTPenLastErrorCode *lastErrorCode;
 @property (nonatomic) NSUInteger longPressTimeMilliseconds;
 @property (nonatomic) NSUInteger connectionTimeSeconds;
 
@@ -69,6 +68,8 @@ extern NSString * const kFTPenConnectionTimeSecondsPropertyName;
 - (void)startSwinging;
 
 - (void)powerOff;
+
+- (void)readManufacturingID;
 
 - (void)clearLastErrorCode;
 

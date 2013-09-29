@@ -17,9 +17,13 @@
 + (CBUUID *)tipPressure;
 + (CBUUID *)eraserPressure;
 + (CBUUID *)batteryLevel;
+//+ (CBUUID *)hasListener; //
 + (CBUUID *)shouldSwing;
 + (CBUUID *)shouldPowerOff;
 + (CBUUID *)inactivityTime;
+//+ (CBUUID *)pressureSetup;
++ (CBUUID *)manufacturingID;
++ (CBUUID *)lastErrorCode;
 
 + (NSString *)nameForUUID:(CBUUID *)UUID;
 
@@ -34,8 +38,6 @@
 + (CBUUID *)numFailedConnections;
 + (CBUUID *)numSuccessfulConnections;
 + (CBUUID *)totalOnTime;
-+ (CBUUID *)manufacturingID;
-+ (CBUUID *)lastErrorCode;
 + (CBUUID *)longPressTime;
 + (CBUUID *)connectionTime;
 

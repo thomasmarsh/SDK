@@ -12,9 +12,6 @@
 
 @protocol FTPenUsageServiceClientDelegate <NSObject>
 
-- (void)didReadManufacturingID:(NSString *)manufacturingID;
-- (void)didWriteManufacturingID;
-- (void)didFailToWriteManufacturingID;
 - (void)didUpdateUsageProperties:(NSSet *)updatedProperties;
 
 @end
@@ -29,14 +26,10 @@
 @property (nonatomic, readonly) NSUInteger numFailedConnections;
 @property (nonatomic, readonly) NSUInteger numSuccessfulConnections;
 @property (nonatomic, readonly) NSUInteger totalOnTimeSeconds;
-@property (nonatomic) NSString *manufacturingID;
-@property (nonatomic, readonly) FTPenLastErrorCode lastErrorCode;
 @property (nonatomic) NSUInteger longPressTimeMilliseconds;
 @property (nonatomic) NSUInteger connectionTimeSeconds;
 
 - (id)initWithPeripheral:(CBPeripheral *)peripheral;
-
-- (void)clearLastErrorCode;
 
 - (void)readUsageProperties;
 

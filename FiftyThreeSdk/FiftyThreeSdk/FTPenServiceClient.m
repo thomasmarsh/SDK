@@ -23,6 +23,8 @@
 @property (nonatomic) CBCharacteristic *batteryLevelCharacteristic;
 @property (nonatomic) CBCharacteristic *shouldSwingCharacteristic;
 @property (nonatomic) CBCharacteristic *shouldPowerOffCharacteristic;
+@property (nonatomic) CBCharacteristic *manufacturingIDCharacteristic;
+@property (nonatomic) CBCharacteristic *lastErrorCodeCharacteristic;
 
 @property (nonatomic, readwrite) NSDate *lastTipReleaseTime;
 
@@ -87,6 +89,56 @@
                           type:CBCharacteristicWriteWithResponse];
 }
 
+- (void)setManufacturingID:(NSString *)manufacturingID
+{
+    NSAssert(manufacturingID.length == 15, @"Manufacturing ID must be 15 characters");
+
+    [self.peripheral writeNSString:manufacturingID
+                 forCharacteristic:self.manufacturingIDCharacteristic
+                              type:CBCharacteristicWriteWithResponse];
+}
+
+- (FTPenLastErrorCode *)lastErrorCode
+{
+    FTPenLastErrorCode *lastErrorCode;
+    lastErrorCode.lastErrorID = 0;
+    lastErrorCode.lastErrorValue = 0;
+
+    if (self.lastErrorCodeCharacteristic)
+    {
+        NSData *data = self.lastErrorCodeCharacteristic.value;
+        if (data.length == 2 * sizeof(uint32_t))
+        {
+            lastErrorCode.lastErrorID = CFSwapInt32LittleToHost(((uint32_t *)data.bytes)[0]);
+            lastErrorCode.lastErrorValue = CFSwapInt32LittleToHost(((uint32_t *)data.bytes)[1]);
+        }
+    }
+
+    return lastErrorCode;
+}
+
+- (void)readManufacturingID
+{
+    if (self.manufacturingIDCharacteristic)
+    {
+        [self.peripheral readValueForCharacteristic:self.manufacturingIDCharacteristic];
+    }
+}
+
+- (void)clearLastErrorCode
+{
+    if (self.lastErrorCodeCharacteristic)
+    {
+        uint32_t value[2] = { 0, 0 };
+        NSData *data = [NSData dataWithBytes:&value length:sizeof(value)];
+        [self.peripheral writeValue:data
+                  forCharacteristic:self.lastErrorCodeCharacteristic
+                               type:CBCharacteristicWriteWithResponse];
+
+        [self.peripheral readValueForCharacteristic:self.lastErrorCodeCharacteristic];
+    }
+}
+
 #pragma mark - FTServiceClient
 
 - (NSArray *)ensureServicesForConnectionState:(BOOL)isConnected;
@@ -107,6 +159,8 @@
         self.batteryLevelCharacteristic = nil;
         self.shouldSwingCharacteristic = nil;
         self.shouldPowerOffCharacteristic = nil;
+        self.manufacturingIDCharacteristic = nil;
+        self.lastErrorCodeCharacteristic = nil;
 
         return nil;
     }
@@ -202,9 +256,23 @@
         {
             self.shouldPowerOffCharacteristic = characteristic;
         }
+
+        // Manufacturing ID
+        if (!self.manufacturingIDCharacteristic &&
+            [characteristic.UUID isEqual:[FTPenServiceUUIDs manufacturingID]])
+        {
+            self.manufacturingIDCharacteristic = characteristic;
+        }
+
+        // Last Error Code
+        if (!self.lastErrorCodeCharacteristic &&
+            [characteristic.UUID isEqual:[FTPenServiceUUIDs lastErrorCode]])
+        {
+            self.lastErrorCodeCharacteristic = characteristic;
+        }
     }
 
-    [self ensureNotifications];
+    [self ensureCharacteristicNotificationsAndInitialization];
 }
 
 - (void)peripheral:(CBPeripheral *)peripheral didUpdateValueForCharacteristic:(CBCharacteristic *)characteristic
@@ -216,6 +284,8 @@
         // TODO: Report failed state
         return;
     }
+
+    NSMutableSet *updatedProperties = [NSMutableSet set];
 
     if ([characteristic isEqual:self.isTipPressedCharacteristic])
     {
@@ -284,6 +354,22 @@
 
 //        NSLog(@"BatteryLevel did update value: %d", batteryLevel);
     }
+    else if ([characteristic.UUID isEqual:[FTPenServiceUUIDs manufacturingID]])
+    {
+        _manufacturingID = [characteristic valueAsNSString];
+
+        [self.delegate penServiceClient:self didReadManufacturingID:self.manufacturingID];
+        [updatedProperties addObject:kFTPenManufacturingIDPropertyName];
+    }
+    else if ([characteristic.UUID isEqual:[FTPenServiceUUIDs lastErrorCode]])
+    {
+        [updatedProperties addObject:kFTPenLastErrorCodePropertyName];
+    }
+
+    if (updatedProperties.count > 0)
+    {
+        [self.delegate penServiceClient:self didUpdatePenProperties:updatedProperties];
+    }
 }
 
 - (void)peripheral:(CBPeripheral *)peripheral didUpdateNotificationStateForCharacteristic:(CBCharacteristic *)characteristic
@@ -304,17 +390,29 @@
         [peripheral readValueForCharacteristic:characteristic];
     }
 
-    [self ensureNotifications];
+    [self ensureCharacteristicNotificationsAndInitialization];
 }
 
 - (void)peripheral:(CBPeripheral *)peripheral didWriteValueForCharacteristic:(CBCharacteristic *)characteristic
              error:(NSError *)error
 {
+    if (characteristic == self.manufacturingIDCharacteristic)
+    {
+        if (error)
+        {
+            [self.delegate penServiceClientDidFailToWriteManufacturingID:self];
+        }
+        else
+        {
+            [self.delegate penServiceClientDidWriteManufacturingID:self];
+        }
+
+    }
 }
 
 #pragma mark -
 
-- (void)ensureNotifications
+- (void)ensureCharacteristicNotificationsAndInitialization
 {
     const BOOL isTipPressedNotifying = (self.isTipPressedCharacteristic &&
                                         self.isTipPressedCharacteristic.isNotifying);
@@ -349,6 +447,16 @@
         {
             [self.peripheral setNotifyValue:YES
                           forCharacteristic:self.batteryLevelCharacteristic];
+        }
+
+        if (self.manufacturingIDCharacteristic && !self.manufacturingID)
+        {
+            [self.peripheral readValueForCharacteristic:self.manufacturingIDCharacteristic];
+        }
+
+        if (self.lastErrorCodeCharacteristic && !self.lastErrorCode)
+        {
+            [self.peripheral readValueForCharacteristic:self.lastErrorCodeCharacteristic];
         }
     }
 }
