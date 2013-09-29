@@ -55,6 +55,7 @@ class TouchObserver;
 
 @property (nonatomic) FTPenManager *penManager;
 @property (nonatomic) id currentTest;
+@property (nonatomic) NSString *firmwareImagePath;
 @property (nonatomic) UIAlertView *firmwareUpdateConfirmAlertView;
 @property (nonatomic) FTFirmwareUpdateProgressView *firmwareUpdateProgressView;
 @property (nonatomic) UIAlertView *clearAlertView;
@@ -428,12 +429,12 @@ public:
         if (YES)
             //        if ([self.penManager isFirmwareUpdateAvailable])
         {
-            NSString *firmwareUpdateImage = [FTFirmwareManager imagePath];
-            if (firmwareUpdateImage)
+            self.firmwareImagePath = [FTFirmwareManager imagePathIncludingDocumentsDir];
+            if (self.firmwareImagePath)
             {
-                NSString *message = [NSString stringWithFormat:@"Update with the following image?\n\n%@",
-                                     [firmwareUpdateImage lastPathComponent]];
-                self.firmwareUpdateConfirmAlertView = [[UIAlertView alloc] initWithTitle:@"Update Firmware"
+                NSString *message = [NSString stringWithFormat:@"Update firmware to version %d?",
+                                     [FTFirmwareManager versionOfImageAtPath:self.firmwareImagePath]];
+                self.firmwareUpdateConfirmAlertView = [[UIAlertView alloc] initWithTitle:@"Firmware Update"
                                                                                  message:message
                                                                                 delegate:self
                                                                        cancelButtonTitle:@"No"
@@ -473,11 +474,9 @@ public:
     {
         if (buttonIndex == 1)
         {
-            NSString *firmwareImagePath = [FTFirmwareManager imagePath];
-
-            if (firmwareImagePath)
+            if (self.firmwareImagePath)
             {
-                [self.penManager updateFirmware:firmwareImagePath];
+                [self.penManager updateFirmware:self.firmwareImagePath];
             }
         }
 

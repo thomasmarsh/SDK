@@ -29,6 +29,7 @@ FTPenPrivateDelegate>
 @property (nonatomic) BOOL pcConnected;
 @property (nonatomic) NSMutableString *commandBuffer;
 
+@property (nonatomic) NSString *firmwareImagePath;
 @property (nonatomic) Timer::Ptr uptimeTimer;
 @property (nonatomic) double lastTouchBeganTimestamp;
 @property (nonatomic) double lastTouchEndedTimestamp;
@@ -128,11 +129,9 @@ FTPenPrivateDelegate>
     {
         if (buttonIndex == 1)
         {
-            NSString *firmwareImagePath = [FTFirmwareManager imagePath];
-
-            if (firmwareImagePath)
+            if (self.firmwareImagePath)
             {
-                [self.penManager updateFirmware:firmwareImagePath];
+                [self.penManager updateFirmware:self.firmwareImagePath];
             }
         }
 
@@ -490,11 +489,11 @@ FTPenPrivateDelegate>
         if (YES)
 //        if ([self.penManager isFirmwareUpdateAvailable])
         {
-            NSString *firmwareUpdateImage = [FTFirmwareManager imagePathIncludingDocumentsDir];
-            if (firmwareUpdateImage)
+            self.firmwareImagePath = [FTFirmwareManager imagePathIncludingDocumentsDir];
+            if (self.firmwareImagePath)
             {
                 NSString *message = [NSString stringWithFormat:@"Update firmware to version %d?",
-                                     [FTFirmwareManager versionOfImageAtPath:firmwareUpdateImage]];
+                                     [FTFirmwareManager versionOfImageAtPath:self.firmwareImagePath]];
                 self.firmwareUpdateConfirmAlertView = [[UIAlertView alloc] initWithTitle:@"Firmware Update"
                                                                                  message:message
                                                                                 delegate:self
