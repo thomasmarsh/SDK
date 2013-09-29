@@ -21,7 +21,12 @@ typedef NS_ENUM(NSInteger, FTFirmwareImageType) {
 + (NSString *)imagePath;
 + (NSString *)imagePathIncludingDocumentsDir;
 + (NSInteger)versionOfImageAtPath:(NSString *)imagePath;
-+ (BOOL)isVersionAtPath:(NSString *)imagePath newerThanVersionOnPen:(FTPen *)pen;
+
++ (BOOL)isVersionAtPath:(NSString *)imagePath
+  newerThanVersionOnPen:(FTPen *)pen
+         currentVersion:(NSInteger *)currentVersion
+          updateVersion:(NSInteger *)updateVersion;
+
 + (FTFirmwareImageType)imageTypeRunningOnPen:(FTPen *)pen;
 
 @end

@@ -17,7 +17,16 @@ extern NSString * const kFTPenUnexpectedDisconnectWhileUpdatingFirmwareNotificat
 
 @interface FTPenManager ()
 
-- (BOOL)isFirmwareUpdateAvailable;
+// Returns true if a firmware update is available for the connected pen. This determination can only be made
+// once the softwareRevision and firmwareRevision properties of the device info service have been initialized.
+//
+// If the current version of the firmware can be determined, currentVersion gets that version; otherwise it
+// gets -1.
+//
+// If the firmware can be updated, updateVersion gets the version that the firmware can be updated to;
+// otherwise it gets - 1.
+- (BOOL)isFirmwareUpdateAvailable:(NSInteger *)currentVersion
+                    updateVersion:(NSInteger *)updateVersion;
 - (void)updateFirmware:(NSString *)firmwareImagePath;
 - (void)cancelFirmwareUpdate;
 

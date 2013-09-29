@@ -1259,10 +1259,13 @@ typedef enum
 
 #pragma mark - Firmware
 
-- (BOOL)isFirmwareUpdateAvailable
+- (BOOL)isFirmwareUpdateAvailable:(NSInteger *)currentVersion
+                    updateVersion:(NSInteger *)updateVersion
 {
     return [FTFirmwareManager isVersionAtPath:[FTFirmwareManager imagePath]
-                        newerThanVersionOnPen:self.pen];
+                        newerThanVersionOnPen:self.pen
+                               currentVersion:currentVersion
+                                updateVersion:updateVersion];
 }
 
 - (void)updateFirmware:(NSString *)firmwareImagePath;

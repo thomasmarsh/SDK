@@ -119,12 +119,13 @@
 
         if (self.deviceInfoService)
         {
-            NSArray* characteristics = @[[FTDeviceInfoServiceUUIDs manufacturerName],
-                                         [FTDeviceInfoServiceUUIDs modelNumber],
-                                         [FTDeviceInfoServiceUUIDs serialNumber],
-                                         [FTDeviceInfoServiceUUIDs firmwareRevision],
-                                         [FTDeviceInfoServiceUUIDs hardwareRevision],
+            NSArray* characteristics = @[
                                          [FTDeviceInfoServiceUUIDs softwareRevision],
+                                         [FTDeviceInfoServiceUUIDs firmwareRevision],
+                                         [FTDeviceInfoServiceUUIDs serialNumber],
+                                         [FTDeviceInfoServiceUUIDs modelNumber],
+                                         [FTDeviceInfoServiceUUIDs manufacturerName],
+                                         [FTDeviceInfoServiceUUIDs hardwareRevision],
                                          [FTDeviceInfoServiceUUIDs systemID],
                                          [FTDeviceInfoServiceUUIDs IEEECertificationData],
                                          [FTDeviceInfoServiceUUIDs PnPID]];

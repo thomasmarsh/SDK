@@ -115,29 +115,45 @@ NSString *applicationDocumentsDirectory()
     return NO;
 }
 
-+ (BOOL)isVersionAtPath:(NSString *)imagePath newerThanVersionOnPen:(FTPen *)pen
++ (BOOL)isVersionAtPath:(NSString *)imagePath
+  newerThanVersionOnPen:(FTPen *)pen
+         currentVersion:(NSInteger *)currentVersion
+          updateVersion:(NSInteger *)updateVersion
 {
-    NSInteger version = [FTFirmwareManager versionOfImageAtPath:imagePath];
-    if (version != -1)
-    {
-        NSInteger factoryVersion, upgradeVersion;
-        BOOL factoryIsCurrentlyRunning, upgradeIsCurrentlyRunning;
+    *currentVersion = -1;
+    *updateVersion = -1;
 
-        if ([FTFirmwareManager firmwareVersionOnPen:pen
-                                       forImageType:FTFirmwareImageTypeFactory
-                                            version:&factoryVersion
-                                 isCurrentlyRunning:&factoryIsCurrentlyRunning] &&
-            [FTFirmwareManager firmwareVersionOnPen:pen
-                                       forImageType:FTFirmwareImageTypeUpgrade
-                                            version:&upgradeVersion
-                                 isCurrentlyRunning:&upgradeIsCurrentlyRunning])
+    NSInteger factoryVersion, upgradeVersion;
+    BOOL factoryIsCurrentlyRunning, upgradeIsCurrentlyRunning;
+    if ([FTFirmwareManager firmwareVersionOnPen:pen
+                                   forImageType:FTFirmwareImageTypeFactory
+                                        version:&factoryVersion
+                             isCurrentlyRunning:&factoryIsCurrentlyRunning])
+    {
+        if (factoryIsCurrentlyRunning)
         {
-            if ((factoryIsCurrentlyRunning && factoryVersion < version) ||
-                (upgradeIsCurrentlyRunning && upgradeVersion < version))
-            {
-                return YES;
-            }
+            *currentVersion = factoryVersion;
         }
+    }
+
+    if ([FTFirmwareManager firmwareVersionOnPen:pen
+                                   forImageType:FTFirmwareImageTypeUpgrade
+                                        version:&upgradeVersion
+                             isCurrentlyRunning:&upgradeIsCurrentlyRunning])
+    {
+        if (upgradeIsCurrentlyRunning)
+        {
+            *currentVersion = upgradeVersion;
+        }
+    }
+
+    NSInteger version = [FTFirmwareManager versionOfImageAtPath:imagePath];
+    if (version != -1 &&
+        *currentVersion != -1 &&
+        *currentVersion < version)
+    {
+        *updateVersion = version;
+        return YES;
     }
 
     return NO;
