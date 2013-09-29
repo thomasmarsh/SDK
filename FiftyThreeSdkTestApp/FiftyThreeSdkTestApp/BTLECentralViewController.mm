@@ -38,7 +38,7 @@ using std::stringstream;
 
 class TouchObserver;
 
-@interface BTLECentralViewController () <FTPenManagerDelegate, FTPenDelegate, FTPenManagerDelegatePrivate, UIAlertViewDelegate, MFMailComposeViewControllerDelegate>
+@interface BTLECentralViewController () <FTPenManagerDelegate, FTPenDelegate, UIAlertViewDelegate, MFMailComposeViewControllerDelegate>
 {
     FTPenAndTouchManager::Ptr _PenAndTouchManager;
     FTTouchEventLogger::Ptr _EventLogger;
@@ -111,6 +111,31 @@ public:
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(applicationWillEnterForeground:)
                                                  name:UIApplicationWillEnterForegroundNotification
+                                               object:nil];
+
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(penManagerFirmwareUpdateDidBegin:)
+                                                 name:kFTPenManagerFirmwareUpdateDidBegin
+                                               object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(penManagerFirmwareUpdateDidBeginSendingUpdate:)
+                                                 name:kFTPenManagerFirmwareUpdateDidBeginSendingUpdate
+                                               object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(penManagerFirmwareUpdateDidUpdatePercentComplete:)
+                                                 name:kFTPenManagerFirmwareUpdateDidUpdatePercentComplete
+                                               object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(penManagerFirmwareUpdateDidFinishSendingUpdate:)
+                                                 name:kFTPenManagerFirmwareUpdateDidFinishSendingUpdate
+                                               object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(penManagerFirmwareUpdateWasCancelled:)
+                                                 name:kFTPenManagerFirmwareUpdateWasCancelled
+                                               object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(penManagerFirmwareUpdateDidCompleteSuccessfully:)
+                                                 name:kFTPenManagerFirmwareUpdateDidCompleteSuccessfully
                                                object:nil];
 
     self.view.multipleTouchEnabled = YES;
@@ -219,24 +244,47 @@ public:
     [self updateDisplay];
 }
 
-#pragma mark - FTPenManagerDelegatePrivate
+#pragma mark - Firmware Update
 
-- (void)penManagerDidStartFirmwareUpdate:(FTPenManager *)manager
+- (void)penManagerFirmwareUpdateDidBegin:(NSNotification *)notification
 {
     [self.firmwareUpdateProgressView dismiss];
     self.firmwareUpdateProgressView = [FTFirmwareUpdateProgressView start];
     self.firmwareUpdateProgressView.delegate = self;
 }
 
-- (void)penManager:(FTPenManager *)manager didFinishFirmwareUpdate:(NSError *)error
+- (void)penManagerFirmwareUpdateDidBeginSendingUpdate:(NSNotification *)notification
+{
+    if (self.firmwareUpdateProgressView.percentComplete != 0.f)
+    {
+        [self.firmwareUpdateProgressView dismiss];
+        self.firmwareUpdateProgressView = [FTFirmwareUpdateProgressView start];
+        self.firmwareUpdateProgressView.delegate = self;
+    }
+}
+
+- (void)penManagerFirmwareUpdateDidUpdatePercentComplete:(NSNotification *)notification
+{
+    const float percentComplete = [notification.userInfo[kFTPenManagerPercentCompleteProperty] floatValue];
+    self.firmwareUpdateProgressView.percentComplete = percentComplete;
+}
+
+- (void)penManagerFirmwareUpdateDidFinishSendingUpdate:(NSNotification *)notification
 {
     [self.firmwareUpdateProgressView dismiss];
     self.firmwareUpdateProgressView = nil;
 }
 
-- (void)penManager:(FTPenManager *)manager didUpdateFirmwareUpdatePercentComplete:(float)percentComplete
+- (void)penManagerFirmwareUpdateWasCancelled:(NSNotification *)notification
 {
-    self.firmwareUpdateProgressView.percentComplete = percentComplete;
+    [self.firmwareUpdateProgressView dismiss];
+    self.firmwareUpdateProgressView = nil;
+}
+
+- (void)penManagerFirmwareUpdateDidCompleteSuccessfully:(NSNotification *)notification
+{
+    [self.firmwareUpdateProgressView dismiss];
+    self.firmwareUpdateProgressView = nil;
 }
 
 #pragma mark - FTPenDelegate

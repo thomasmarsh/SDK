@@ -15,6 +15,14 @@ extern NSString * const kFTPenUnexpectedDisconnectNotificationName;
 extern NSString * const kFTPenUnexpectedDisconnectWhileConnectingNotifcationName;
 extern NSString * const kFTPenUnexpectedDisconnectWhileUpdatingFirmwareNotificationName;
 
+extern NSString * const kFTPenManagerFirmwareUpdateDidBegin;
+extern NSString * const kFTPenManagerFirmwareUpdateDidBeginSendingUpdate;
+extern NSString * const kFTPenManagerFirmwareUpdateDidUpdatePercentComplete;
+extern NSString * const kFTPenManagerPercentCompleteProperty;
+extern NSString * const kFTPenManagerFirmwareUpdateDidFinishSendingUpdate;
+extern NSString * const kFTPenManagerFirmwareUpdateDidCompleteSuccessfully;
+extern NSString * const kFTPenManagerFirmwareUpdateWasCancelled;
+
 @interface FTPenManager ()
 
 // Returns true if a firmware update is available for the connected pen. This determination can only be made
@@ -27,19 +35,10 @@ extern NSString * const kFTPenUnexpectedDisconnectWhileUpdatingFirmwareNotificat
 // otherwise it gets - 1.
 - (BOOL)isFirmwareUpdateAvailable:(NSInteger *)currentVersion
                     updateVersion:(NSInteger *)updateVersion;
-- (void)updateFirmware:(NSString *)firmwareImagePath;
+- (BOOL)updateFirmware;
+- (BOOL)updateFirmware:(NSString *)firmwareImagePath;
 - (void)cancelFirmwareUpdate;
 
 - (void)startTrialSeparation;
-
-@end
-
-@protocol FTPenManagerDelegatePrivate <FTPenManagerDelegate>
-
-@optional
-
-- (void)penManagerDidStartFirmwareUpdate:(FTPenManager *)manager;
-- (void)penManager:(FTPenManager *)manager didUpdateFirmwareUpdatePercentComplete:(float)percentComplete;
-- (void)penManager:(FTPenManager *)manager didFinishFirmwareUpdate:(NSError *)error;
 
 @end

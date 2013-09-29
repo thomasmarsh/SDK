@@ -24,6 +24,14 @@ NSString * const kFTPenUnexpectedDisconnectNotificationName = @"com.fiftythree.p
 NSString * const kFTPenUnexpectedDisconnectWhileConnectingNotifcationName = @"com.fiftythree.penManager.unexpectedDisconnectWhileConnecting";
 NSString * const kFTPenUnexpectedDisconnectWhileUpdatingFirmwareNotificationName = @"com.fiftythre.penManager.unexpectedDisconnectWhileUpdatingFirmware";
 
+NSString * const kFTPenManagerFirmwareUpdateDidBegin = @"com.fiftythree.penManger.firmwareUpdateDidBegin";
+NSString * const kFTPenManagerFirmwareUpdateDidBeginSendingUpdate = @"com.fiftythree.penManger.firmwareUpdateDidBeginSendingUpdate";
+NSString * const kFTPenManagerFirmwareUpdateDidUpdatePercentComplete = @"com.fiftythree.penManger.firmwareUpdateDidUpdatePercentComplete";
+NSString * const kFTPenManagerPercentCompleteProperty = @"com.fiftythree.penManager.percentComplete";
+NSString * const kFTPenManagerFirmwareUpdateDidFinishSendingUpdate = @"com.fiftythree.penManger.firmwareUpdateDidFinishSendingUpdate";
+NSString * const kFTPenManagerFirmwareUpdateDidCompleteSuccessfully = @"com.fiftythree.penManger.firmwareUpdateDidCompleteSuccessfully";
+NSString * const kFTPenManagerFirmwareUpdateWasCancelled = @"com.fiftythree.penManger.firmwareUpdateWasCancelled";
+
 static const int kInterruptedUpdateDelayMax = 30;
 
 static const NSTimeInterval kDatingScanningTimeout = 4.f;
@@ -334,11 +342,8 @@ typedef enum
             // update *after* the reset has happened.
             if ([FTFirmwareManager imageTypeRunningOnPen:self.pen] == FTFirmwareImageTypeFactory)
             {
-                if ([self.delegate conformsToProtocol:@protocol(FTPenManagerDelegatePrivate)])
-                {
-                    id<FTPenManagerDelegatePrivate> d = (id<FTPenManagerDelegatePrivate>)self.delegate;
-                    [d penManagerDidStartFirmwareUpdate:self];
-                }
+                [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenManagerFirmwareUpdateDidBeginSendingUpdate
+                                                                    object:self];
             }
         }
     }
@@ -635,6 +640,9 @@ typedef enum
         NSAssert(!weakSelf.updateManager, @"Update manager must be nil");
 
         weakSelf.state = FTPenManagerStateUpdatingFirmware;
+
+        [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenManagerFirmwareUpdateDidBegin
+                                                            object:self];
 
         // Discourage the device from going to sleep while the firmware is updating.
         [UIApplication sharedApplication].idleTimerDisabled = YES;
@@ -1123,12 +1131,15 @@ typedef enum
 
         if ([self currentStateHasName:kUpdatingFirmwareStateName])
         {
-            if (self.updateManager.state == TIUpdateManagerStateSucceeded ||
-                self.updateManager.state == TIUpdateManagerStateCancelled)
+            if (self.updateManager.state == TIUpdateManagerStateSucceeded)
             {
                 FTPen *pen = self.pen;
                 self.pen = nil;
                 [pen peripheralConnectionStatusDidChange];
+
+                // TODO: Should this wait until reconnect?
+                [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenManagerFirmwareUpdateDidCompleteSuccessfully
+                                                                    object:self];
 
                 [self fireStateMachineEvent:kBecomeSeparatedEventName];
             }
@@ -1268,7 +1279,12 @@ typedef enum
                                 updateVersion:updateVersion];
 }
 
-- (void)updateFirmware:(NSString *)firmwareImagePath;
+- (BOOL)updateFirmware
+{
+    return [self updateFirmware:[FTFirmwareManager imagePath]];
+}
+
+- (BOOL)updateFirmware:(NSString *)firmwareImagePath;
 {
     NSAssert(firmwareImagePath, @"firmwareImagePath must be non-nil");
 
@@ -1276,18 +1292,31 @@ typedef enum
     {
         self.firmwareImagePath = firmwareImagePath;
         [self fireStateMachineEvent:kUpdateFirmwareEventName];
+        return YES;
     }
+
+    return NO;
 }
 
 - (void)cancelFirmwareUpdate
 {
+    BOOL didCancel = NO;
+
     if ([self currentStateHasName:kUpdatingFirmwareStateName])
     {
         [self fireStateMachineEvent:kBecomeMarriedEventName];
+        didCancel = YES;
     }
     else if ([self currentStateHasName:kUpdatingFirmwareAttemptingConnectionStateName])
     {
         [self fireStateMachineEvent:kDisconnectAndBecomeSeparatedEventName];
+        didCancel = YES;
+    }
+
+    if (didCancel)
+    {
+        [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenManagerFirmwareUpdateWasCancelled
+                                                            object:self];
     }
 }
 
@@ -1295,13 +1324,18 @@ typedef enum
 
 - (void)updateManager:(TIUpdateManager *)manager didFinishUpdate:(NSError *)error
 {
+    NSAssert([self currentStateHasName:kUpdatingFirmwareStateName], @"in updating firmware state");
     NSAssert(self.updateManager, @"update manager non-nil");
     NSAssert(manager, nil);
 
-    if ([self.delegate conformsToProtocol:@protocol(FTPenManagerDelegatePrivate)])
+    if (error)
     {
-        id<FTPenManagerDelegatePrivate> d = (id<FTPenManagerDelegatePrivate>)self.delegate;
-        [d penManager:self didFinishFirmwareUpdate:error];
+        // TODO: Should retry...
+    }
+    else
+    {
+        [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenManagerFirmwareUpdateDidFinishSendingUpdate
+                                                            object:self];
     }
 }
 
@@ -1309,10 +1343,11 @@ typedef enum
 {
     NSAssert(manager, nil);
 
-    if ([self.delegate conformsToProtocol:@protocol(FTPenManagerDelegatePrivate)])
+    if ([FTFirmwareManager imageTypeRunningOnPen:self.pen] == FTFirmwareImageTypeFactory)
     {
-        id<FTPenManagerDelegatePrivate> d = (id<FTPenManagerDelegatePrivate>)self.delegate;
-        [d penManager:self didUpdateFirmwareUpdatePercentComplete:percentComplete];
+        [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenManagerFirmwareUpdateDidUpdatePercentComplete
+                                                            object:self
+                                                          userInfo:@{ kFTPenManagerPercentCompleteProperty : @(percentComplete) }];
     }
 }
 
