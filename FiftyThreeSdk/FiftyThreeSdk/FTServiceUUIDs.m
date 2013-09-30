@@ -27,6 +27,9 @@
 // 1A59BBBD-8205-4699-9B07-F477A0510C67
 #define FT_PEN_SERVICE_BATTERY_LEVEL_UUID CFUUIDGetConstantUUIDWithBytes(kCFAllocatorSystemDefault, 0x1A, 0x59, 0xBB, 0xBD, 0x82, 0x05, 0x46, 0x99, 0x9B, 0x07, 0xF4, 0x77, 0xA0, 0x51, 0x0C, 0x67)
 
+// A314488F-266F-4A7B-AFEE-6034B2F59808
+#define FT_PEN_SERVICE_HAS_LISTENER_UUID CFUUIDGetConstantUUIDWithBytes(kCFAllocatorSystemDefault, 0xA3, 0x14, 0x48, 0x8F, 0x26, 0x6F, 0x4A, 0x7B, 0xAF, 0xEE, 0x60, 0x34, 0xB2, 0xF5, 0x98, 0x08)
+
 // 9B772BAB-97A0-4C1F-9644-1B4F9530AA35
 #define FT_PEN_SERVICE_SHOULD_SWING_UUID CFUUIDGetConstantUUIDWithBytes(kCFAllocatorSystemDefault, 0x9B, 0x77, 0x2B, 0xAB, 0x97, 0xA0, 0x4C, 0x1F, 0x96, 0x44, 0x1B, 0x4F, 0x95, 0x30, 0xAA, 0x35)
 
@@ -35,6 +38,9 @@
 
 // 80F47BEF-58EF-4C75-9F08-7453BA896DA5
 #define FT_PEN_SERVICE_INACTIVITY_TIME_UUID CFUUIDGetConstantUUIDWithBytes(kCFAllocatorSystemDefault, 0x80, 0xF4, 0x7B, 0xEF, 0x58, 0xEF, 0x4C, 0x75, 0x9F, 0x08, 0x74, 0x53, 0xBA, 0x89, 0x6D, 0xA5)
+
+// A9FE2C8F-9A5D-429A-A4B2-C5E63AF22FB3
+#define FT_PEN_SERVICE_PRESSURE_SETUP_UUID CFUUIDGetConstantUUIDWithBytes(kCFAllocatorSystemDefault, 0xA9, 0xFE, 0x2C, 0x8F, 0x9A, 0x5D, 0x42, 0x9A, 0xA4, 0xB2, 0xC5, 0xE6, 0x3A, 0xF2, 0x2F, 0xB3)
 
 // 0976668C-001F-4744-8335-0E147B697CAE
 #define FT_PEN_SERVICE_MANUF_ID_STRING_UUID CFUUIDGetConstantUUIDWithBytes(kCFAllocatorSystemDefault, 0x09, 0x76, 0x66, 0x8C, 0x00, 0x1F, 0x47, 0x44, 0x83, 0x35, 0x0E, 0x14, 0x7B, 0x69, 0x7C, 0xAE)
@@ -74,6 +80,11 @@
     return [CBUUID UUIDWithCFUUID:FT_PEN_SERVICE_BATTERY_LEVEL_UUID];
 }
 
++ (CBUUID *)hasListener
+{
+    return [CBUUID UUIDWithCFUUID:FT_PEN_SERVICE_HAS_LISTENER_UUID];
+}
+
 + (CBUUID *)shouldSwing
 {
     return [CBUUID UUIDWithCFUUID:FT_PEN_SERVICE_SHOULD_SWING_UUID];
@@ -87,6 +98,11 @@
 + (CBUUID *)inactivityTime
 {
     return [CBUUID UUIDWithCFUUID:FT_PEN_SERVICE_INACTIVITY_TIME_UUID];
+}
+
++ (CBUUID *)pressureSetup
+{
+    return [CBUUID UUIDWithCFUUID:FT_PEN_SERVICE_PRESSURE_SETUP_UUID];
 }
 
 + (CBUUID *)manufacturingID
@@ -107,9 +123,11 @@
                              [FTPenServiceUUIDs tipPressure] : @"TipPressure",
                              [FTPenServiceUUIDs eraserPressure] : @"EraserPressure",
                              [FTPenServiceUUIDs batteryLevel] : @"BatteryLevel",
+                             [FTPenServiceUUIDs hasListener] : @"HasListener",
                              [FTPenServiceUUIDs shouldSwing] : @"ShouldSwing",
                              [FTPenServiceUUIDs shouldPowerOff] : @"ShouldPowerOff",
                              [FTPenServiceUUIDs inactivityTime] : @"InactivityTime",
+                             [FTPenServiceUUIDs pressureSetup] : @"PressureSetup",
                              [FTPenServiceUUIDs manufacturingID] : @"ManufacturingID",
                              [FTPenServiceUUIDs lastErrorCode] : @"LastErrorCode"
                              };
@@ -135,14 +153,17 @@
 // 3C797361-7DA5-48F2-AAD9-6580BF165526
 #define FT_PEN_USAGE_SERVICE_NUM_SUCCESSFUL_CONN_UUID CFUUIDGetConstantUUIDWithBytes(kCFAllocatorSystemDefault, 0x3C, 0x79, 0x73, 0x61, 0x7D, 0xA5, 0x48, 0xF2, 0xAA, 0xD9, 0x65, 0x80, 0xBF, 0x16, 0x55, 0x26)
 
+// D78385CF-DA8A-41D0-9F6B-6C0013B6C094
+#define FT_PEN_USAGE_SERVICE_NUM_RESETS_UUID CFUUIDGetConstantUUIDWithBytes(kCFAllocatorSystemDefault, 0xD7, 0x83, 0x85, 0xCF, 0xDA, 0x8A, 0x41, 0xD0, 0x9F, 0x6B, 0x6C, 0x00, 0x13, 0xB6, 0xC0, 0x94)
+
+// 703DA5B0-A1E1-45B4-882A-0AE22249D46F
+#define FT_PEN_USAGE_SERVICE_NUM_LINK_TERM_UUID CFUUIDGetConstantUUIDWithBytes(kCFAllocatorSystemDefault, 0x70, 0x3D, 0xA5, 0xB0, 0xA1, 0xE1, 0x45, 0xB4, 0x88, 0x2A, 0x0A, 0xE2, 0x22, 0x49, 0xD4, 0x6F)
+
+// 2724E73A-F4F2-407C-84F6-DF6B9AA6C640
+#define FT_PEN_USAGE_SERVICE_NUM_DROPPED_NOTIF_UUID CFUUIDGetConstantUUIDWithBytes(kCFAllocatorSystemDefault, 0x27, 0x24, 0xE7, 0x3A, 0xF4, 0xF2, 0x40, 0x7C, 0x84, 0xF6, 0xDF, 0x6B, 0x9A, 0xA6, 0xC6, 0x40)
+
 // 442BBE12-C44D-4332-AFDC-138DDAAD3E44
-#define FT_PEN_USAGE_SERVICE_TOTAL_ON_TIME_UUID CFUUIDGetConstantUUIDWithBytes(kCFAllocatorSystemDefault, 0x44, 0x2B, 0xBE, 0x12, 0xC4, 0x4D, 0x43, 0x32, 0xAF, 0xDC, 0x13, 0x8D, 0xDA, 0xAD, 0x3E, 0x44)
-
-// E5407310-84CA-48CA-B3CC-F47AC1271C22
-#define FT_PEN_USAGE_SERVICE_LONG_PRESS_TIME_UUID CFUUIDGetConstantUUIDWithBytes(kCFAllocatorSystemDefault, 0xE5, 0x40, 0x73, 0x10, 0x84, 0xCA, 0x48, 0xCA, 0xB3, 0xCC, 0xF4, 0x7A, 0xC1, 0x27, 0x1C, 0x22)
-
-// 31F51EB8-050D-4E4D-A549-397459259B77
-#define FT_PEN_USAGE_SERVICE_CONNECTION_TIME_UUID CFUUIDGetConstantUUIDWithBytes(kCFAllocatorSystemDefault, 0x31, 0xF5, 0x1E, 0xB8, 0x05, 0x0D, 0x4E, 0x4D, 0xA5, 0x49, 0x39, 0x74, 0x59, 0x25, 0x9B, 0x77)
+#define FT_PEN_USAGE_SERVICE_CONNECTED_SECONDS_UUID CFUUIDGetConstantUUIDWithBytes(kCFAllocatorSystemDefault, 0x44, 0x2B, 0xBE, 0x12, 0xC4, 0x4D, 0x43, 0x32, 0xAF, 0xDC, 0x13, 0x8D, 0xDA, 0xAD, 0x3E, 0x44)
 
 @implementation FTPenUsageServiceUUIDs
 
@@ -171,19 +192,24 @@
     return [CBUUID UUIDWithCFUUID:FT_PEN_USAGE_SERVICE_NUM_SUCCESSFUL_CONN_UUID];
 }
 
-+ (CBUUID *)totalOnTime
++ (CBUUID *)numResets
 {
-    return [CBUUID UUIDWithCFUUID:FT_PEN_USAGE_SERVICE_TOTAL_ON_TIME_UUID];
+    return [CBUUID UUIDWithCFUUID:FT_PEN_USAGE_SERVICE_NUM_RESETS_UUID];
 }
 
-+ (CBUUID *)longPressTime
++ (CBUUID *)numLinkTerminations
 {
-    return [CBUUID UUIDWithCFUUID:FT_PEN_USAGE_SERVICE_LONG_PRESS_TIME_UUID];
+    return [CBUUID UUIDWithCFUUID:FT_PEN_USAGE_SERVICE_NUM_LINK_TERM_UUID];
 }
 
-+ (CBUUID *)connectionTime
++ (CBUUID *)numDroppedNotifications
 {
-    return [CBUUID UUIDWithCFUUID:FT_PEN_USAGE_SERVICE_CONNECTION_TIME_UUID];
+    return [CBUUID UUIDWithCFUUID:FT_PEN_USAGE_SERVICE_NUM_DROPPED_NOTIF_UUID];
+}
+
++ (CBUUID *)connectedSeconds
+{
+    return [CBUUID UUIDWithCFUUID:FT_PEN_USAGE_SERVICE_CONNECTED_SECONDS_UUID];
 }
 
 + (NSString *)nameForUUID:(CBUUID *)UUID
@@ -193,9 +219,10 @@
                              [FTPenUsageServiceUUIDs numEraserPresses] : @"NumEraserPresses",
                              [FTPenUsageServiceUUIDs numFailedConnections] : @"NumFailedConnections",
                              [FTPenUsageServiceUUIDs numSuccessfulConnections] : @"NumSuccesfulConnections",
-                             [FTPenUsageServiceUUIDs totalOnTime] : @"TotalOnTime",
-                             [FTPenUsageServiceUUIDs longPressTime] : @"LongPressTime",
-                             [FTPenUsageServiceUUIDs connectionTime] : @"ConnectionTime"
+                             [FTPenUsageServiceUUIDs numResets] : @"NumResets",
+                             [FTPenUsageServiceUUIDs numLinkTerminations] : @"NumLinkTerminations",
+                             [FTPenUsageServiceUUIDs numDroppedNotifications] : @"NumDroppedNotifications",
+                             [FTPenUsageServiceUUIDs connectedSeconds] : @"ConnectedSeconds",
                              };
 
     return [UUIDs objectForKey:UUID];

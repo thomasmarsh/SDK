@@ -43,11 +43,13 @@ NSString * const kFTPenNumTipPressesPropertyName = @"numTipPresses";
 NSString * const kFTPenNumEraserPressesPropertyName = @"numEraserPresses";
 NSString * const kFTPenNumFailedConnectionsPropertyName = @"numFailedConnections";
 NSString * const kFTPenNumSuccessfulConnectionsPropertyName = @"numSuccessfulConnections";
-NSString * const kFTPenTotalOnTimeSecondsPropertyName = @"totalOnTimeSeconds";
+NSString * const kFTPenNumResetsPropertyName = @"numResets";
+NSString * const kFTPenNumLinkTerminationsPropertyName = @"numLinkTerminations";
+NSString * const kFTPenNumDroppedNotificationsPropertyName = @"numDroppedNotifications";
+NSString * const kFTPenConnectedSecondsPropertyName = @"numDroppedNotifications";
+
 NSString * const kFTPenManufacturingIDPropertyName = @"manufacturingID";
 NSString * const kFTPenLastErrorCodePropertyName = @"lastErrorCode";
-NSString * const kFTPenLongPressTimeMillisecondsPropertyName = @"longPressTimeMilliseconds";
-NSString * const kFTPenConnectionTimeSecondsPropertyName = @"connectionTimeSeconds";
 
 @implementation FTPenLastErrorCode
 @end
@@ -172,7 +174,21 @@ NSString * const kFTPenConnectionTimeSecondsPropertyName = @"connectionTimeSecon
     [self.penServiceClient powerOff];
 }
 
-#pragma mark - Debug properties
+- (NSString *)manufacturingID
+{
+    return self.penServiceClient.manufacturingID;
+}
+
+- (void)setManufacturingID:(NSString *)manufacturingID
+{
+    self.penServiceClient.manufacturingID = manufacturingID;
+
+    // The model number and serial number charateristics of the device info service change as a result of
+    // setting the manufacturing ID, so refresh them now.
+    [self.deviceInfoServiceClient refreshModelNumberAndSerialNumber];
+}
+
+#pragma mark - Usage properties
 
 - (NSUInteger)numTipPresses
 {
@@ -194,43 +210,19 @@ NSString * const kFTPenConnectionTimeSecondsPropertyName = @"connectionTimeSecon
     return self.penUsageServiceClient.numSuccessfulConnections;
 }
 
-- (NSUInteger)totalOnTimeSeconds
+- (NSUInteger)numResets
 {
-    return self.penUsageServiceClient.totalOnTimeSeconds;
+    return self.penUsageServiceClient.numResets;
 }
 
-- (NSString *)manufacturingID
+- (NSUInteger)numDroppedNotifications
 {
-    return self.penServiceClient.manufacturingID;
+    return self.penUsageServiceClient.numDroppedNotifications;
 }
 
-- (void)setManufacturingID:(NSString *)manufacturingID
+- (NSUInteger)connectedSeconds
 {
-    self.penServiceClient.manufacturingID = manufacturingID;
-
-    // The model number and serial number charateristics of the device info service change as a result of
-    // setting the manufacturing ID, so refresh them now.
-    [self.deviceInfoServiceClient refreshModelNumberAndSerialNumber];
-}
-
-- (NSUInteger)longPressTimeMilliseconds
-{
-    return self.penUsageServiceClient.longPressTimeMilliseconds;
-}
-
-- (void)setLongPressTimeMilliseconds:(NSUInteger)longPressTimeMilliseconds
-{
-    self.penUsageServiceClient.longPressTimeMilliseconds = longPressTimeMilliseconds;
-}
-
-- (NSUInteger)connectionTimeSeconds
-{
-    return self.penUsageServiceClient.connectionTimeSeconds;
-}
-
-- (void)setConnectionTimeSeconds:(NSUInteger)connectionTimeSeconds
-{
-    self.penUsageServiceClient.connectionTimeSeconds = connectionTimeSeconds;
+    return self.penUsageServiceClient.connectedSeconds;
 }
 
 - (void)readUsageProperties

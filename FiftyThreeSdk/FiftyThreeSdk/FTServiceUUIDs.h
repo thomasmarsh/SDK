@@ -37,9 +37,10 @@
 + (CBUUID *)numEraserPresses;
 + (CBUUID *)numFailedConnections;
 + (CBUUID *)numSuccessfulConnections;
-+ (CBUUID *)totalOnTime;
-+ (CBUUID *)longPressTime;
-+ (CBUUID *)connectionTime;
++ (CBUUID *)numResets;
++ (CBUUID *)numLinkTerminations;
++ (CBUUID *)numDroppedNotifications;
++ (CBUUID *)connectedSeconds;
 
 + (NSString *)nameForUUID:(CBUUID *)UUID;
 

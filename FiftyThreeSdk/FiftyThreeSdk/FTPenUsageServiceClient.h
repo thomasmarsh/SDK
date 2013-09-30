@@ -25,9 +25,10 @@
 @property (nonatomic, readonly) NSUInteger numEraserPresses;
 @property (nonatomic, readonly) NSUInteger numFailedConnections;
 @property (nonatomic, readonly) NSUInteger numSuccessfulConnections;
-@property (nonatomic, readonly) NSUInteger totalOnTimeSeconds;
-@property (nonatomic) NSUInteger longPressTimeMilliseconds;
-@property (nonatomic) NSUInteger connectionTimeSeconds;
+@property (nonatomic, readonly) NSUInteger numResets;
+@property (nonatomic, readonly) NSUInteger numLinkTerminations;
+@property (nonatomic, readonly) NSUInteger numDroppedNotifications;
+@property (nonatomic, readonly) NSUInteger connectedSeconds;
 
 - (id)initWithPeripheral:(CBPeripheral *)peripheral;
 

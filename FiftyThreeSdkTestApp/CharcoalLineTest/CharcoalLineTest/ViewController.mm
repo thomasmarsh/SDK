@@ -385,7 +385,7 @@ FTPenPrivateDelegate>
 
     FTPen *pen = self.penManager.pen;
 
-    const int onTimeSec = pen.totalOnTimeSeconds;
+    const int onTimeSec = pen.connectedSeconds;
     const int onTimeDayField =  onTimeSec / 60 / 60 / 24;
     const int onTimeHourField = (onTimeSec - (onTimeDayField * 60 * 60 * 24)) / 60 / 60;
     const int onTimeMinField = (onTimeSec - (onTimeDayField * 60 * 60 * 24) - (onTimeHourField * 60 * 60)) / 60;
@@ -404,6 +404,9 @@ FTPenPrivateDelegate>
     [deviceInfo appendFormat:@"Eraser Presses: %d\n", pen.numEraserPresses];
     [deviceInfo appendFormat:@"Failed Connections: %d\n", pen.numFailedConnections];
     [deviceInfo appendFormat:@"Successful Connections: %d\n", pen.numSuccessfulConnections];
+    [deviceInfo appendFormat:@"Num Resets: %d\n", pen.numResets];
+    [deviceInfo appendFormat:@"Num Link Terminations: %d\n", pen.numLinkTerminations];
+    [deviceInfo appendFormat:@"Num Dropped Notifications: %d\n", pen.numDroppedNotifications];
     [deviceInfo appendFormat:@"Total Connected Time: %dd %02d:%02d:%02d\n\n",
      onTimeDayField, onTimeHourField, onTimeMinField,  onTimeSecField];
     [deviceInfo appendFormat:@"Last Error ID: %d\n", pen.lastErrorCode.lastErrorID];

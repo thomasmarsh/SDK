@@ -20,9 +20,10 @@
 @property (nonatomic) CBCharacteristic *numEraserPressesCharacteristic;
 @property (nonatomic) CBCharacteristic *numFailedConnectionsCharacteristic;
 @property (nonatomic) CBCharacteristic *numSuccessfulConnectionsCharacteristic;
-@property (nonatomic) CBCharacteristic *totalOnTimeCharacteristic;
-@property (nonatomic) CBCharacteristic *longPressTimeCharacteristic;
-@property (nonatomic) CBCharacteristic *connectionTimeCharacteristic;
+@property (nonatomic) CBCharacteristic *numResetsCharacteristic;
+@property (nonatomic) CBCharacteristic *numLinkTerminationsCharacteristic;
+@property (nonatomic) CBCharacteristic *numDroppedNotificationsCharacteristic;
+@property (nonatomic) CBCharacteristic *connectedSecondsCharacteristic;
 
 @end
 
@@ -38,29 +39,16 @@
     return self;
 }
 
-- (void)setLongPressTimeMilliseconds:(NSUInteger)longPressTimeMilliseconds
-{
-    [self.peripheral writeNSUInteger:longPressTimeMilliseconds
-                   forCharacteristic:self.longPressTimeCharacteristic
-                                type:CBCharacteristicWriteWithoutResponse];
-}
-
-- (void)setConnectionTimeSeconds:(NSUInteger)connectionTimeSeconds
-{
-    [self.peripheral writeNSUInteger:connectionTimeSeconds
-                   forCharacteristic:self.connectionTimeCharacteristic
-                                type:CBCharacteristicWriteWithoutResponse];
-}
-
 - (void)readUsageProperties
 {
     [self readValueForCharacteristic:self.numTipPressesCharacteristic];
     [self readValueForCharacteristic:self.numEraserPressesCharacteristic];
     [self readValueForCharacteristic:self.numFailedConnectionsCharacteristic];
     [self readValueForCharacteristic:self.numSuccessfulConnectionsCharacteristic];
-    [self readValueForCharacteristic:self.totalOnTimeCharacteristic];
-    [self readValueForCharacteristic:self.longPressTimeCharacteristic];
-    [self readValueForCharacteristic:self.connectionTimeCharacteristic];
+    [self readValueForCharacteristic:self.numResetsCharacteristic];
+    [self readValueForCharacteristic:self.numLinkTerminationsCharacteristic];
+    [self readValueForCharacteristic:self.numDroppedNotificationsCharacteristic];
+    [self readValueForCharacteristic:self.connectedSecondsCharacteristic];
 }
 
 - (void)readValueForCharacteristic:(CBCharacteristic *)characteristic
@@ -87,9 +75,10 @@
         self.numTipPressesCharacteristic = nil;
         self.numFailedConnectionsCharacteristic = nil;
         self.numSuccessfulConnectionsCharacteristic = nil;
-        self.totalOnTimeCharacteristic = nil;
-        self.longPressTimeCharacteristic = nil;
-        self.connectionTimeCharacteristic = nil;
+        self.numResetsCharacteristic = nil;
+        self.numLinkTerminationsCharacteristic = nil;
+        self.numDroppedNotificationsCharacteristic = nil;
+        self.connectedSecondsCharacteristic = nil;
     }
 
     return nil;
@@ -115,9 +104,10 @@
                                      [FTPenUsageServiceUUIDs numEraserPresses],
                                      [FTPenUsageServiceUUIDs numFailedConnections],
                                      [FTPenUsageServiceUUIDs numSuccessfulConnections],
-                                     [FTPenUsageServiceUUIDs totalOnTime],
-                                     [FTPenUsageServiceUUIDs longPressTime],
-                                     [FTPenUsageServiceUUIDs connectionTime]
+                                     [FTPenUsageServiceUUIDs numResets],
+                                     [FTPenUsageServiceUUIDs numLinkTerminations],
+                                     [FTPenUsageServiceUUIDs numDroppedNotifications],
+                                     [FTPenUsageServiceUUIDs connectedSeconds]
                                      ];
 
         [peripheral discoverCharacteristics:characteristics forService:self.penUsageService];
@@ -165,22 +155,28 @@
             self.numSuccessfulConnectionsCharacteristic = characteristic;
             [self.peripheral readValueForCharacteristic:characteristic];
         }
-        else if (!self.totalOnTimeCharacteristic &&
-                 [characteristic.UUID isEqual:[FTPenUsageServiceUUIDs totalOnTime]])
+        else if (!self.numResetsCharacteristic &&
+                 [characteristic.UUID isEqual:[FTPenUsageServiceUUIDs numResets]])
         {
-            self.totalOnTimeCharacteristic = characteristic;
+            self.numResetsCharacteristic = characteristic;
             [self.peripheral readValueForCharacteristic:characteristic];
         }
-        else if (!self.longPressTimeCharacteristic &&
-                 [characteristic.UUID isEqual:[FTPenUsageServiceUUIDs longPressTime]])
+        else if (!self.numLinkTerminationsCharacteristic &&
+                 [characteristic.UUID isEqual:[FTPenUsageServiceUUIDs numLinkTerminations]])
         {
-            self.longPressTimeCharacteristic = characteristic;
+            self.numLinkTerminationsCharacteristic = characteristic;
             [self.peripheral readValueForCharacteristic:characteristic];
         }
-        else if (!self.connectionTimeCharacteristic &&
-                 [characteristic.UUID isEqual:[FTPenUsageServiceUUIDs connectionTime]])
+        else if (!self.numDroppedNotificationsCharacteristic &&
+                 [characteristic.UUID isEqual:[FTPenUsageServiceUUIDs numDroppedNotifications]])
         {
-            self.connectionTimeCharacteristic = characteristic;
+            self.numDroppedNotificationsCharacteristic = characteristic;
+            [self.peripheral readValueForCharacteristic:characteristic];
+        }
+        else if (!self.connectedSecondsCharacteristic &&
+                 [characteristic.UUID isEqual:[FTPenUsageServiceUUIDs connectedSeconds]])
+        {
+            self.connectedSecondsCharacteristic = characteristic;
             [self.peripheral readValueForCharacteristic:characteristic];
         }
     }
@@ -218,20 +214,25 @@
         _numSuccessfulConnections = [characteristic valueAsNSUInteger];
         [updatedProperties addObject:kFTPenNumSuccessfulConnectionsPropertyName];
     }
-    else if ([characteristic.UUID isEqual:[FTPenUsageServiceUUIDs totalOnTime]])
+    else if ([characteristic.UUID isEqual:[FTPenUsageServiceUUIDs numResets]])
     {
-        _totalOnTimeSeconds = [characteristic valueAsNSUInteger];
-        [updatedProperties addObject:kFTPenTotalOnTimeSecondsPropertyName];
+        _numResets = [characteristic valueAsNSUInteger];
+        [updatedProperties addObject:kFTPenNumResetsPropertyName];
     }
-    else if ([characteristic.UUID isEqual:[FTPenUsageServiceUUIDs longPressTime]])
+    else if ([characteristic.UUID isEqual:[FTPenUsageServiceUUIDs numLinkTerminations]])
     {
-        _longPressTimeMilliseconds = [characteristic valueAsNSUInteger];
-        [updatedProperties addObject:kFTPenLongPressTimeMillisecondsPropertyName];
+        _numLinkTerminations = [characteristic valueAsNSUInteger];
+        [updatedProperties addObject:kFTPenNumLinkTerminationsPropertyName];
     }
-    else if ([characteristic.UUID isEqual:[FTPenUsageServiceUUIDs connectionTime]])
+    else if ([characteristic.UUID isEqual:[FTPenUsageServiceUUIDs numDroppedNotifications]])
     {
-        _connectionTimeSeconds = [characteristic valueAsNSUInteger];
-        [updatedProperties addObject:kFTPenConnectionTimeSecondsPropertyName];
+        _numDroppedNotifications = [characteristic valueAsNSUInteger];
+        [updatedProperties addObject:kFTPenNumDroppedNotificationsPropertyName];
+    }
+    else if ([characteristic.UUID isEqual:[FTPenUsageServiceUUIDs connectedSeconds]])
+    {
+        _connectedSeconds = [characteristic valueAsNSUInteger];
+        [updatedProperties addObject:kFTPenConnectedSecondsPropertyName];
     }
 
     if (updatedProperties.count > 0)

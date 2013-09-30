@@ -36,7 +36,7 @@ extern NSString * const kFTPenSystemIDPropertyName;
 extern NSString * const kFTPenIEEECertificationDataPropertyName;
 extern NSString * const kFTPenPnPIDCertificationDataPropertyName;
 
-extern NSString * const kFTPenIsTipPressPropertyName;
+extern NSString * const kFTPenIsTipPressedPropertyName;
 extern NSString * const kFTPenIsEraserPressedPropertyName;
 extern NSString * const kFTPenBatteryLevelPropertyName;
 

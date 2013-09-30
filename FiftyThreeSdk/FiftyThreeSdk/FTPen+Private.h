@@ -20,11 +20,13 @@ extern NSString * const kFTPenNumTipPressesPropertyName;
 extern NSString * const kFTPenNumEraserPressesPropertyName;
 extern NSString * const kFTPenNumFailedConnectionsPropertyName;
 extern NSString * const kFTPenNumSuccessfulConnectionsPropertyName;
-extern NSString * const kFTPenTotalOnTimeSecondsPropertyName;
+extern NSString * const kFTPenNumResetsPropertyName;
+extern NSString * const kFTPenNumLinkTerminationsPropertyName;
+extern NSString * const kFTPenNumDroppedNotificationsPropertyName;
+extern NSString * const kFTPenConnectedSecondsPropertyName;
+
 extern NSString * const kFTPenManufacturingIDPropertyName;
 extern NSString * const kFTPenLastErrorCodePropertyName;
-extern NSString * const kFTPenLongPressTimeMillisecondsPropertyName;
-extern NSString * const kFTPenConnectionTimeSecondsPropertyName;
 
 @class CBCentralManager;
 @class CBPeripheral;
@@ -45,6 +47,9 @@ extern NSString * const kFTPenConnectionTimeSecondsPropertyName;
 @property (nonatomic, weak) id<FTPenPrivateDelegate> privateDelegate;
 @property (nonatomic, readonly) CBPeripheral *peripheral;
 
+@property (nonatomic) NSString *manufacturingID;
+@property (nonatomic, readonly) FTPenLastErrorCode *lastErrorCode;
+
 @property (nonatomic, readonly) BOOL isReady;
 @property (nonatomic, readonly) BOOL isPoweringOff;
 @property (nonatomic) BOOL requiresTipBePressedToBecomeReady;
@@ -54,11 +59,10 @@ extern NSString * const kFTPenConnectionTimeSecondsPropertyName;
 @property (nonatomic, readonly) NSUInteger numEraserPresses;
 @property (nonatomic, readonly) NSUInteger numFailedConnections;
 @property (nonatomic, readonly) NSUInteger numSuccessfulConnections;
-@property (nonatomic, readonly) NSUInteger totalOnTimeSeconds;
-@property (nonatomic) NSString *manufacturingID;
-@property (nonatomic, readonly) FTPenLastErrorCode *lastErrorCode;
-@property (nonatomic) NSUInteger longPressTimeMilliseconds;
-@property (nonatomic) NSUInteger connectionTimeSeconds;
+@property (nonatomic, readonly) NSUInteger numResets;
+@property (nonatomic, readonly) NSUInteger numLinkTerminations;
+@property (nonatomic, readonly) NSUInteger numDroppedNotifications;
+@property (nonatomic, readonly) NSUInteger connectedSeconds;
 
 - (id)initWithCentralManager:(CBCentralManager *)centralManager
                   peripheral:(CBPeripheral *)peripheral;
