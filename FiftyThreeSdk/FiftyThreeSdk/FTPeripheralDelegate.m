@@ -123,7 +123,7 @@
 - (void)peripheral:(CBPeripheral *)peripheral didDiscoverCharacteristicsForService:(CBService *)service
              error:(NSError *)error
 {
-    NSLog(@"Peripheral did discover characterisitics for service: %@", FTNameForServiceUUID(service.UUID));
+//    NSLog(@"Peripheral did discover characterisitics for service: %@", FTNameForServiceUUID(service.UUID));
 
     for (FTServiceClient *serviceClient in self.serviceClients)
     {
@@ -134,7 +134,7 @@
 - (void)peripheral:(CBPeripheral *)peripheral didUpdateValueForCharacteristic:(CBCharacteristic *)characteristic
              error:(NSError *)error
 {
-    NSLog(@"Peripheral did update value for characteristic: %@", FTNameForServiceUUID(characteristic.UUID));
+//    NSLog(@"Peripheral did update value for characteristic: %@", FTNameForServiceUUID(characteristic.UUID));
 
     for (FTServiceClient *serviceClient in self.serviceClients)
     {
