@@ -1286,13 +1286,15 @@ typedef enum
 
 - (void)centralManager:(CBCentralManager *)central didRetrieveConnectedPeripherals:(NSArray *)peripherals
 {
-    static NSString * const kPencilPeripheralName = @"Charcoal by 53";
+    static NSString * const kCharcoalPeripheralName = @"Charcoal by 53";
+    static NSString * const kPencilPeripheralName = @"Pencil";
 
     if ([self currentStateHasName:kDatingRetrievingConnectedPeripheralsStateName])
     {
         for (CBPeripheral *peripheral in peripherals)
         {
-            if ([peripheral.name isEqualToString:kPencilPeripheralName])
+            if ([peripheral.name isEqualToString:kPencilPeripheralName] ||
+                [peripheral.name isEqualToString:kCharcoalPeripheralName])
             {
                 NSAssert(!self.pen, @"pen is nil");
                 self.pen = [[FTPen alloc] initWithCentralManager:self.centralManager
