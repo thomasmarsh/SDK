@@ -20,15 +20,16 @@
 
 @property (nonatomic, weak) id<FTPenServiceClientDelegate> delegate;
 
-@property (nonatomic, readonly) BOOL isReady;
 @property (nonatomic, readonly) BOOL isTipPressed;
 @property (nonatomic, readonly) BOOL isEraserPressed;
 @property (nonatomic, readonly) float eraserPressure;
 @property (nonatomic, readonly) float tipPressure;
 @property (nonatomic, readonly) NSInteger batteryLevel;
+@property (nonatomic) BOOL hasListener;
 @property (nonatomic) NSString *manufacturingID;
 @property (nonatomic, readonly) FTPenLastErrorCode *lastErrorCode;
 
+@property (nonatomic, readonly) BOOL isReady;
 @property (nonatomic, readonly) BOOL isPoweringOff;
 @property (nonatomic, readonly) NSDate *lastTipReleaseTime;
 

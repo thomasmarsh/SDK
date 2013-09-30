@@ -15,6 +15,7 @@
 @end
 
 extern NSString * const kFTPenDidUpdatePrivatePropertiesNotificationName;
+extern NSString * const kFTPenDidWriteHasListenerNotificationName;
 
 extern NSString * const kFTPenNumTipPressesPropertyName;
 extern NSString * const kFTPenNumEraserPressesPropertyName;
@@ -47,6 +48,7 @@ extern NSString * const kFTPenLastErrorCodePropertyName;
 @property (nonatomic, weak) id<FTPenPrivateDelegate> privateDelegate;
 @property (nonatomic, readonly) CBPeripheral *peripheral;
 
+@property (nonatomic) BOOL hasListener;
 @property (nonatomic) NSString *manufacturingID;
 @property (nonatomic, readonly) FTPenLastErrorCode *lastErrorCode;
 

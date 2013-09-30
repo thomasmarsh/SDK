@@ -23,6 +23,7 @@ NSString * const kFTPenBatteryLevelDidChangeNotificationName = @"com.fiftythree.
 NSString * const kFTPenDidUpdatePropertiesNotificationName = @"com.fiftythree.pen.didUpdateProperties";
 NSString * const kFTPenDidUpdatePrivatePropertiesNotificationName = @"com.fiftythree.pen.didUpdatePrivateProperties";
 NSString * const kFTPenNotificationPropertiesKey = @"kFTPenNotificationPropertiesKey";
+NSString * const kFTPenDidWriteHasListenerNotificationName = @"com.fiftythree.pen.didWriteHasListener";
 
 NSString * const kFTPenNamePropertyName = @"name";
 NSString * const kFTPenManufacturerNamePropertyName = @"manufacturerName";
@@ -177,6 +178,16 @@ NSString * const kFTPenLastErrorCodePropertyName = @"lastErrorCode";
 - (NSString *)manufacturingID
 {
     return self.penServiceClient.manufacturingID;
+}
+
+- (BOOL)hasListener
+{
+    return self.penServiceClient.hasListener;
+}
+
+- (void)setHasListener:(BOOL)hasListener
+{
+    self.penServiceClient.hasListener = hasListener;
 }
 
 - (void)setManufacturingID:(NSString *)manufacturingID

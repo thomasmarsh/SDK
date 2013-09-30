@@ -21,6 +21,7 @@
 @property (nonatomic) CBCharacteristic *tipPressureCharacteristic;
 @property (nonatomic) CBCharacteristic *eraserPressureCharacteristic;
 @property (nonatomic) CBCharacteristic *batteryLevelCharacteristic;
+@property (nonatomic) CBCharacteristic *hasListenerCharacteristic;
 @property (nonatomic) CBCharacteristic *shouldSwingCharacteristic;
 @property (nonatomic) CBCharacteristic *shouldPowerOffCharacteristic;
 @property (nonatomic) CBCharacteristic *manufacturingIDCharacteristic;
@@ -60,10 +61,27 @@
 {
     if (self.batteryLevelCharacteristic.value.length > 0)
     {
-        return ((const char *)self.batteryLevelCharacteristic.value.bytes)[0];
+        return [self.batteryLevelCharacteristic valueAsNSUInteger];
     }
 
     return -1;
+}
+
+- (void)setHasListener:(BOOL)hasListener
+{
+    _hasListener = hasListener;
+    [self writeHasListener];
+}
+
+- (void)writeHasListener
+{
+    if (self.hasListenerCharacteristic)
+    {
+        const uint8_t hasListenerByte = (self.hasListener ? 1 : 0);
+        [self.peripheral writeValue:[NSData dataWithBytes:&hasListenerByte length:1]
+                  forCharacteristic:self.hasListenerCharacteristic
+                               type:CBCharacteristicWriteWithResponse];
+    }
 }
 
 - (void)setIsReady:(BOOL)isReady
@@ -157,6 +175,7 @@
         self.tipPressureCharacteristic = nil;
         self.eraserPressureCharacteristic = nil;
         self.batteryLevelCharacteristic = nil;
+        self.hasListenerCharacteristic = nil;
         self.shouldSwingCharacteristic = nil;
         self.shouldPowerOffCharacteristic = nil;
         self.manufacturingIDCharacteristic = nil;
@@ -180,6 +199,7 @@
             NSArray *characteristics = @[[FTPenServiceUUIDs isTipPressed],
                                          [FTPenServiceUUIDs tipPressure],
                                          [FTPenServiceUUIDs isEraserPressed],
+                                         [FTPenServiceUUIDs hasListener],
                                          [FTPenServiceUUIDs eraserPressure],
                                          [FTPenServiceUUIDs batteryLevel],
                                          [FTPenServiceUUIDs shouldSwing],
@@ -241,6 +261,14 @@
             [characteristic.UUID isEqual:[FTPenServiceUUIDs batteryLevel]])
         {
             self.batteryLevelCharacteristic = characteristic;
+        }
+
+        if (!self.hasListenerCharacteristic &&
+            [characteristic.UUID isEqual:[FTPenServiceUUIDs hasListener]])
+        {
+            self.hasListener = YES;
+            [self writeHasListener];
+            self.hasListenerCharacteristic = characteristic;
         }
 
         // ShouldSwing
@@ -406,7 +434,11 @@
         {
             [self.delegate penServiceClientDidWriteManufacturingID:self];
         }
-
+    }
+    else if (characteristic == self.hasListenerCharacteristic)
+    {
+        [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenDidWriteHasListenerNotificationName
+                                                            object:nil];
     }
 }
 
@@ -447,6 +479,7 @@
         {
             [self.peripheral setNotifyValue:YES
                           forCharacteristic:self.batteryLevelCharacteristic];
+            [self.peripheral readValueForCharacteristic:self.batteryLevelCharacteristic];
         }
 
         if (self.manufacturingIDCharacteristic && !self.manufacturingID)

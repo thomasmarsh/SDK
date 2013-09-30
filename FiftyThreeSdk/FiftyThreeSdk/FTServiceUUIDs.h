@@ -17,7 +17,7 @@
 + (CBUUID *)tipPressure;
 + (CBUUID *)eraserPressure;
 + (CBUUID *)batteryLevel;
-//+ (CBUUID *)hasListener; //
++ (CBUUID *)hasListener;
 + (CBUUID *)shouldSwing;
 + (CBUUID *)shouldPowerOff;
 + (CBUUID *)inactivityTime;

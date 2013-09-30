@@ -124,6 +124,8 @@ typedef enum
 
 @property (nonatomic) NSTimer *stateTimeoutTimer;
 
+@property (nonatomic) UIBackgroundTaskIdentifier backgroundTaskId;
+
 @end
 
 @implementation FTPenManager
@@ -141,6 +143,8 @@ typedef enum
 
         _scanningState = ScanningStateDisabled;
 
+        _backgroundTaskId = UIBackgroundTaskInvalid;
+
         [self initializeStateMachine];
 
         [[NSNotificationCenter defaultCenter] addObserver:self
@@ -155,6 +159,15 @@ typedef enum
                                                  selector:@selector(applicationDidBecomeActive:)
                                                      name:UIApplicationDidBecomeActiveNotification
                                                    object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(applicationDidEnterBackground:)
+                                                     name:UIApplicationDidEnterBackgroundNotification
+                                                   object:nil];
+
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(penDidWriteHasListener:)
+                                                     name:kFTPenDidWriteHasListenerNotificationName
+                                                   object:nil];
     }
 
     return self;
@@ -162,6 +175,8 @@ typedef enum
 
 - (void)dealloc
 {
+    [self resetBackgroundTask];
+
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 
     if (_pairedPeripheralUUID)
@@ -178,6 +193,11 @@ typedef enum
     if (_state != state)
     {
         _state = state;
+
+        if ([UIApplication sharedApplication].applicationState == UIApplicationStateActive)
+        {
+            self.pen.hasListener = YES;
+        }
 
         [self.delegate penManager:self didUpdateState:state];
 
@@ -880,6 +900,39 @@ typedef enum
     {
         [self fireStateMachineEvent:kRetrieveConnectedPeripheralsFromSeparatedEventName];
     }
+
+    self.pen.hasListener = YES;
+    [self resetBackgroundTask];
+}
+
+- (void)applicationDidEnterBackground:(NSNotification *)notificaton
+{
+    NSAssert(self.backgroundTaskId == UIBackgroundTaskInvalid, @"No background task present");
+
+    //    NSLog(@"Did enter background");
+
+    __weak __typeof(&*self)weakSelf = self;
+    self.backgroundTaskId = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
+        [weakSelf resetBackgroundTask];
+    }];
+
+    self.pen.hasListener = NO;
+}
+
+- (void)resetBackgroundTask
+{
+    if (self.backgroundTaskId != UIBackgroundTaskInvalid)
+    {
+        [[UIApplication sharedApplication] endBackgroundTask:self.backgroundTaskId];
+        self.backgroundTaskId = UIBackgroundTaskInvalid;
+    }
+}
+
+#pragma mark - Notifications
+
+- (void)penDidWriteHasListener:(NSNotification *)notification
+{
+    [self resetBackgroundTask];
 }
 
 #pragma mark - Pairing Spot
