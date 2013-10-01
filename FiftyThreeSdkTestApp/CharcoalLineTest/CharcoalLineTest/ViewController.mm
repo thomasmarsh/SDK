@@ -470,30 +470,40 @@ FTPenPrivateDelegate>
 
 - (void)updateDisplay
 {
-    if (self.penManager.state == FTPenManagerStateDisconnected ||
-        self.penManager.state == FTPenManagerStateUnpaired)
+
+    switch (self.penManager.state)
     {
-        [self.statusLabel setText:@"Disconnected"];
-    }
-    else if (self.penManager.state == FTPenManagerStateConnecting)
-    {
-        [self.statusLabel setText:[NSString stringWithFormat:@"Connecting to %@",
-                                   self.penManager.pen.name]];
-    }
-    else if (self.penManager.state == FTPenManagerStateReconnecting)
-    {
-        [self.statusLabel setText:[NSString stringWithFormat:@"Reconnecting to %@",
-                                   self.penManager.pen.name]];
-    }
-    else if (self.penManager.state == FTPenManagerStateConnected)
-    {
-        [self.statusLabel setText:[NSString stringWithFormat:@"Connected to %@",
-                                   self.penManager.pen.name]];
-    }
-    else if (self.penManager.state == FTPenManagerStateUpdatingFirmware)
-    {
-        [self.statusLabel setText:[NSString stringWithFormat:@"Updating firmware on %@",
-                                   self.penManager.pen.name]];
+        case FTPenManagerStateUninitialized:
+            [self.statusLabel setText:@"Uninitialized"];
+            break;
+        case FTPenManagerStateUpdatingFirmware:
+            [self.statusLabel setText:[NSString stringWithFormat:@"Updating firmware on %@",
+                                       self.penManager.pen.name]];
+            break;
+        case FTPenManagerStateUnpaired:
+            [self.statusLabel setText:@"Unpaired"];
+            break;
+        case FTPenManagerStateSeeking:
+            [self.statusLabel setText:@"Seeking"];
+            break;
+        case FTPenManagerStateConnecting:
+            [self.statusLabel setText:[NSString stringWithFormat:@"Connecting to %@",
+                                       self.penManager.pen.name]];
+            break;
+        case FTPenManagerStateReconnecting:
+            [self.statusLabel setText:[NSString stringWithFormat:@"Reconnecting to %@",
+                                       self.penManager.pen.name]];
+            break;
+        case FTPenManagerStateConnected:
+            [self.statusLabel setText:[NSString stringWithFormat:@"Connected to %@",
+                                       self.penManager.pen.name]];
+            break;
+        case FTPenManagerStateDisconnected:
+            [self.statusLabel setText:@"Disconnected"];
+            break;
+        default:
+            NSAssert(NO, @"unexpected state");
+            break;
     }
 
     if (self.penManager.state == FTPenManagerStateConnected ||
