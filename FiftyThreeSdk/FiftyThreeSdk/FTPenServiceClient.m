@@ -203,7 +203,9 @@
                                          [FTPenServiceUUIDs eraserPressure],
                                          [FTPenServiceUUIDs batteryLevel],
                                          [FTPenServiceUUIDs shouldSwing],
-                                         [FTPenServiceUUIDs shouldPowerOff]
+                                         [FTPenServiceUUIDs shouldPowerOff],
+                                         [FTPenServiceUUIDs manufacturingID],
+                                         [FTPenServiceUUIDs lastErrorCode]
                                          ];
 
             [peripheral discoverCharacteristics:characteristics forService:self.penService];
