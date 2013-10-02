@@ -53,6 +53,16 @@ NSString * const kFTPenManufacturingIDPropertyName = @"manufacturingID";
 NSString * const kFTPenLastErrorCodePropertyName = @"lastErrorCode";
 
 @implementation FTPenLastErrorCode
+- (id)initWithErrorID:(int)errorID andErrorValue:(int)errorValue
+{
+    self = [super init];
+    if (self)
+    {
+        _lastErrorID = errorID;
+        _lastErrorValue = errorValue;
+    }
+    return self;
+}
 @end
 
 @interface FTPen () <FTPenServiceClientDelegate, FTPenUsageServiceClientDelegate, FTDeviceInfoServiceClientDelegate>

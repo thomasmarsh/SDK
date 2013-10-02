@@ -409,8 +409,10 @@ FTPenPrivateDelegate>
     [deviceInfo appendFormat:@"Num Dropped Notifications: %d\n", pen.numDroppedNotifications];
     [deviceInfo appendFormat:@"Total Connected Time: %dd %02d:%02d:%02d\n\n",
      onTimeDayField, onTimeHourField, onTimeMinField,  onTimeSecField];
-    [deviceInfo appendFormat:@"Last Error ID: %d\n", pen.lastErrorCode.lastErrorID];
-    [deviceInfo appendFormat:@"Last Error Value: %d\n\n", pen.lastErrorCode.lastErrorValue];
+    [deviceInfo appendFormat:@"Last Error ID: %d\n",
+     (pen.lastErrorCode ? pen.lastErrorCode.lastErrorID : - 1)];
+    [deviceInfo appendFormat:@"Last Error Value: %d\n\n",
+     (pen.lastErrorCode ? pen.lastErrorCode.lastErrorValue : -1)];
 
     const int kNoTouchCutoffMs = 1000;
     const int kNoPressCutoffMs = -1000;

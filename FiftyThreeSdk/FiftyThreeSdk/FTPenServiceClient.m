@@ -116,25 +116,6 @@
                               type:CBCharacteristicWriteWithResponse];
 }
 
-- (FTPenLastErrorCode *)lastErrorCode
-{
-    FTPenLastErrorCode *lastErrorCode;
-    lastErrorCode.lastErrorID = 0;
-    lastErrorCode.lastErrorValue = 0;
-
-    if (self.lastErrorCodeCharacteristic)
-    {
-        NSData *data = self.lastErrorCodeCharacteristic.value;
-        if (data.length == 2 * sizeof(uint32_t))
-        {
-            lastErrorCode.lastErrorID = CFSwapInt32LittleToHost(((uint32_t *)data.bytes)[0]);
-            lastErrorCode.lastErrorValue = CFSwapInt32LittleToHost(((uint32_t *)data.bytes)[1]);
-        }
-    }
-
-    return lastErrorCode;
-}
-
 - (void)readManufacturingID
 {
     if (self.manufacturingIDCharacteristic)
@@ -145,6 +126,8 @@
 
 - (void)clearLastErrorCode
 {
+    _lastErrorCode = nil;
+
     if (self.lastErrorCodeCharacteristic)
     {
         uint32_t value[2] = { 0, 0 };
@@ -265,6 +248,7 @@
             self.batteryLevelCharacteristic = characteristic;
         }
 
+        // HasListener
         if (!self.hasListenerCharacteristic &&
             [characteristic.UUID isEqual:[FTPenServiceUUIDs hasListener]])
         {
@@ -287,14 +271,14 @@
             self.shouldPowerOffCharacteristic = characteristic;
         }
 
-        // Manufacturing ID
+        // ManufacturingID
         if (!self.manufacturingIDCharacteristic &&
             [characteristic.UUID isEqual:[FTPenServiceUUIDs manufacturingID]])
         {
             self.manufacturingIDCharacteristic = characteristic;
         }
 
-        // Last Error Code
+        // LastErrorCode
         if (!self.lastErrorCodeCharacteristic &&
             [characteristic.UUID isEqual:[FTPenServiceUUIDs lastErrorCode]])
         {
@@ -393,6 +377,21 @@
     }
     else if ([characteristic.UUID isEqual:[FTPenServiceUUIDs lastErrorCode]])
     {
+        NSAssert(characteristic == self.lastErrorCodeCharacteristic,
+                 @"matches last error code characterisit");
+
+        if (self.lastErrorCodeCharacteristic)
+        {
+            NSData *data = self.lastErrorCodeCharacteristic.value;
+            if (data.length == 2 * sizeof(uint32_t))
+            {
+                int errorId = CFSwapInt32LittleToHost(((uint32_t *)data.bytes)[0]);
+                int errorValue = CFSwapInt32LittleToHost(((uint32_t *)data.bytes)[1]);
+                _lastErrorCode = [[FTPenLastErrorCode alloc] initWithErrorID:errorId
+                                                               andErrorValue:errorValue];
+            }
+        }
+
         [updatedProperties addObject:kFTPenLastErrorCodePropertyName];
     }
 

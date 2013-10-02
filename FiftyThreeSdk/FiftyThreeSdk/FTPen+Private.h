@@ -10,8 +10,10 @@
 #import "FTPen.h"
 
 @interface FTPenLastErrorCode : NSObject
-@property (nonatomic) int lastErrorID;
-@property (nonatomic) int lastErrorValue;
+- (id)init __unavailable;
+- (id)initWithErrorID:(int)errorID andErrorValue:(int)errorValue;
+@property (nonatomic, readonly) int lastErrorID;
+@property (nonatomic, readonly) int lastErrorValue;
 @end
 
 extern NSString * const kFTPenDidUpdatePrivatePropertiesNotificationName;
