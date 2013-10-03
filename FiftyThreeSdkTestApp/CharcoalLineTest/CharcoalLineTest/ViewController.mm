@@ -448,7 +448,14 @@ FTPenPrivateDelegate>
     [deviceInfo appendFormat:@"Last Error Value: %d\n\n",
      (pen.lastErrorCode ? pen.lastErrorCode.lastErrorValue : -1)];
 
-    [deviceInfo appendFormat:@"Inactivity Timeout: %d\n", pen.inactivityTimeout];
+    if (pen.inactivityTimeout == 0)
+    {
+        [deviceInfo appendFormat:@"Inactivity Timeout: Never\n"];
+    }
+    else
+    {
+        [deviceInfo appendFormat:@"Inactivity Timeout: %d\n", pen.inactivityTimeout];
+    }
 
     if (pen.pressureSetup)
     {
