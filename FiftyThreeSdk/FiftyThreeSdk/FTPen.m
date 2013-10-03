@@ -236,6 +236,11 @@ NSString * const kFTPenLastErrorCodePropertyName = @"lastErrorCode";
     return self.penUsageServiceClient.numResets;
 }
 
+- (NSUInteger)numLinkTerminations
+{
+    return self.penUsageServiceClient.numLinkTerminations;
+}
+
 - (NSUInteger)numDroppedNotifications
 {
     return self.penUsageServiceClient.numDroppedNotifications;
