@@ -137,6 +137,9 @@
                                type:CBCharacteristicWriteWithResponse];
 
         [self.peripheral readValueForCharacteristic:self.lastErrorCodeCharacteristic];
+
+        NSSet *updatedProperties = [NSSet setWithArray:@[kFTPenLastErrorCodePropertyName]];
+        [self.delegate penServiceClient:self didUpdatePenProperties:updatedProperties];
     }
 }
 
@@ -389,10 +392,10 @@
                 int errorValue = CFSwapInt32LittleToHost(((uint32_t *)data.bytes)[1]);
                 _lastErrorCode = [[FTPenLastErrorCode alloc] initWithErrorID:errorId
                                                                andErrorValue:errorValue];
+
+                [updatedProperties addObject:kFTPenLastErrorCodePropertyName];
             }
         }
-
-        [updatedProperties addObject:kFTPenLastErrorCodePropertyName];
     }
 
     if (updatedProperties.count > 0)

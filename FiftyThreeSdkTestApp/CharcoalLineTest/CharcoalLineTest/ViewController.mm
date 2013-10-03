@@ -62,6 +62,10 @@ FTPenPrivateDelegate>
                                                  selector:@selector(penDidEncounterUnexpectedDisconnectWhileUpdatingFirmware:)
                                                      name:kFTPenUnexpectedDisconnectWhileUpdatingFirmwareNotificationName
                                                    object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(penDidUpdatePrivateProperties:)
+                                                     name:kFTPenDidUpdatePrivatePropertiesNotificationName
+                                                   object:nil];
 
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(penManagerFirmwareUpdateDidBegin:)
@@ -144,6 +148,11 @@ FTPenPrivateDelegate>
 {
     self.numUnexpectedDisconnectsFirmware++;
     [self updateConnectionHistoryLabel];
+}
+
+- (void)penDidUpdatePrivateProperties:(NSNotification *)notification
+{
+    [self updateDisplay];
 }
 
 #pragma mark - UIAlertViewDelegate
