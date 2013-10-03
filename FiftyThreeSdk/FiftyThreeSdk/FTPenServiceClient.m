@@ -25,6 +25,7 @@
 @property (nonatomic) CBCharacteristic *shouldSwingCharacteristic;
 @property (nonatomic) CBCharacteristic *shouldPowerOffCharacteristic;
 @property (nonatomic) CBCharacteristic *inactivityTimeoutCharacteristic;
+@property (nonatomic) CBCharacteristic *pressureSetupCharacteristic;
 @property (nonatomic) CBCharacteristic *manufacturingIDCharacteristic;
 @property (nonatomic) CBCharacteristic *lastErrorCodeCharacteristic;
 
@@ -121,9 +122,29 @@
         uint8_t inactivityTimeoutByte = inactivityTimeout;
         [self.peripheral writeValue:[NSData dataWithBytes:&inactivityTimeoutByte length:1]
                   forCharacteristic:self.inactivityTimeoutCharacteristic
-                               type:CBCharacteristicWriteWithoutResponse];
+                               type:CBCharacteristicWriteWithResponse];
 
         [self.peripheral readValueForCharacteristic:self.inactivityTimeoutCharacteristic];
+    }
+}
+
+- (void)setPressureSetup:(FTPenPressureSetup *)pressureSetup
+{
+    NSAssert(pressureSetup, @"pressureSetup non-nil");
+
+    _pressureSetup = pressureSetup;
+    if (self.pressureSetupCharacteristic)
+    {
+        static int length = 10;
+        uint8_t bytes[length];
+        NSData *data = [NSData dataWithBytes:bytes length:10];
+        [self.pressureSetup writeToNSData:data];
+
+        [self.peripheral writeValue:data
+                  forCharacteristic:self.pressureSetupCharacteristic
+                               type:CBCharacteristicWriteWithResponse];
+
+        [self.peripheral readValueForCharacteristic:self.pressureSetupCharacteristic];
     }
 }
 
@@ -184,6 +205,8 @@
         self.hasListenerCharacteristic = nil;
         self.shouldSwingCharacteristic = nil;
         self.shouldPowerOffCharacteristic = nil;
+        self.inactivityTimeoutCharacteristic = nil;
+        self.pressureSetupCharacteristic = nil;
         self.manufacturingIDCharacteristic = nil;
         self.lastErrorCodeCharacteristic = nil;
 
@@ -211,7 +234,8 @@
                                          [FTPenServiceUUIDs shouldSwing],
                                          [FTPenServiceUUIDs shouldPowerOff],
                                          [FTPenServiceUUIDs manufacturingID],
-                                         [FTPenServiceUUIDs lastErrorCode]
+                                         [FTPenServiceUUIDs lastErrorCode],
+                                         [FTPenServiceUUIDs pressureSetup]
                                          ];
 
             [peripheral discoverCharacteristics:characteristics forService:self.penService];
@@ -301,6 +325,13 @@
             self.inactivityTimeoutCharacteristic = characteristic;
         }
 
+        // PressureSetup
+        if (!self.pressureSetupCharacteristic &&
+            [characteristic.UUID isEqual:[FTPenServiceUUIDs pressureSetup]])
+        {
+            self.pressureSetupCharacteristic = characteristic;
+        }
+
         // ManufacturingID
         if (!self.manufacturingIDCharacteristic &&
             [characteristic.UUID isEqual:[FTPenServiceUUIDs manufacturingID]])
@@ -383,12 +414,12 @@
     }
     if ([characteristic.UUID isEqual:[FTPenServiceUUIDs tipPressure]])
     {
-        _tipPressure = (32767 - [characteristic valueAsNSUInteger]) / 32767.f;
+        _tipPressure = [characteristic valueAsNSUInteger];
         [self.delegate penServiceClient:self didUpdateTipPressure:_tipPressure];
     }
     else if ([characteristic.UUID isEqual:[FTPenServiceUUIDs eraserPressure]])
     {
-        _eraserPressure = (32767 - [characteristic valueAsNSUInteger]) / 32767.f;
+        _eraserPressure = [characteristic valueAsNSUInteger];
         [self.delegate penServiceClient:self didUpdateEraserPressure:_eraserPressure];
     }
     else if ([characteristic isEqual:self.batteryLevelCharacteristic])
@@ -402,6 +433,14 @@
     {
         _inactivityTimeout = [self.inactivityTimeoutCharacteristic valueAsNSUInteger];
         [updatedProperties addObject:kFTPenInactivityTimeoutPropertyName];
+    }
+    else if ([characteristic isEqual:self.pressureSetupCharacteristic])
+    {
+        if (characteristic.value.length == 10)
+        {
+            _pressureSetup = [[FTPenPressureSetup alloc] initWithNSData:characteristic.value];
+            [updatedProperties addObject:kFTPenPressureSetupPropertyName];
+        }
     }
     else if ([characteristic.UUID isEqual:[FTPenServiceUUIDs manufacturingID]])
     {
@@ -488,8 +527,7 @@
     {
         [self.peripheral setNotifyValue:YES forCharacteristic:self.isTipPressedCharacteristic];
     }
-
-    if (isTipPressedNotifying)
+    else
     {
         if (self.isEraserPressedCharacteristic && !self.isEraserPressedCharacteristic.isNotifying)
         {
@@ -499,16 +537,14 @@
 
         if (self.tipPressureCharacteristic && !self.tipPressureCharacteristic.isNotifying)
         {
-            // TODO: Enable notifications on tip pressure
-//            [self.peripheral setNotifyValue:YES
-//                          forCharacteristic:self.tipPressureCharacteristic];
+            [self.peripheral setNotifyValue:YES
+                          forCharacteristic:self.tipPressureCharacteristic];
         }
 
         if (self.eraserPressureCharacteristic && !self.eraserPressureCharacteristic.isNotifying)
         {
-            // TODO: Enable notifications on eraser pressure
-//            [self.peripheral setNotifyValue:YES
-//                          forCharacteristic:self.eraserPressureCharacteristic];
+            [self.peripheral setNotifyValue:YES
+                          forCharacteristic:self.eraserPressureCharacteristic];
         }
 
         if (self.batteryLevelCharacteristic && !self.batteryLevelCharacteristic.isNotifying)
@@ -521,6 +557,11 @@
         if (self.inactivityTimeoutCharacteristic && self.inactivityTimeout == -1)
         {
             [self.peripheral readValueForCharacteristic:self.inactivityTimeoutCharacteristic];
+        }
+
+        if (self.pressureSetupCharacteristic && !self.pressureSetup)
+        {
+            [self.peripheral readValueForCharacteristic:self.pressureSetupCharacteristic];
         }
 
         if (self.manufacturingIDCharacteristic && !self.manufacturingID)

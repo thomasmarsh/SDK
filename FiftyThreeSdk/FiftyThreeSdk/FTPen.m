@@ -27,6 +27,7 @@ NSString * const kFTPenDidWriteHasListenerNotificationName = @"com.fiftythree.pe
 
 NSString * const kFTPenNamePropertyName = @"name";
 NSString * const kFTPenInactivityTimeoutPropertyName = @"inactivityTimeout";
+NSString * const kFTPenPressureSetupPropertyName = @"pressureSetup";
 NSString * const kFTPenManufacturerNamePropertyName = @"manufacturerName";
 NSString * const kFTPenModelNumberPropertyName = @"modelNumber";
 NSString * const kFTPenSerialNumberPropertyName = @"serialNumber";
@@ -52,6 +53,77 @@ NSString * const kFTPenConnectedSecondsPropertyName = @"numDroppedNotifications"
 
 NSString * const kFTPenManufacturingIDPropertyName = @"manufacturingID";
 NSString * const kFTPenLastErrorCodePropertyName = @"lastErrorCode";
+
+@implementation FTPenPressureSetup
+
+- (id)initWithTipSamplePeriodMilliseconds:(uint8_t)tipSamplePeriodMilliseconds
+         tipNotificatinPeriodMilliseconds:(uint8_t)tipNotificatinPeriodMilliseconds
+                          tipMinThreshold:(uint8_t)tipMinThreshold
+                          tipMaxThreshold:(uint8_t)tipMaxThreshold
+                               isTipGated:(BOOL)isTipGated
+           eraserSamplePeriodMilliseconds:(uint8_t)eraserSamplePeriodMilliseconds
+      eraserNotificatinPeriodMilliseconds:(uint8_t)eraserNotificationPeriodMilliseconds
+                       eraserMinThreshold:(uint8_t)eraserMinThreshold
+                       eraserMaxThreshold:(uint8_t)eraserMaxThreshold
+                            isEraserGated:(BOOL)isEraserGated
+{
+    self = [super init];
+    if (self)
+    {
+        _tipSamplePeriodMilliseconds = tipSamplePeriodMilliseconds;
+        _tipNotificatinPeriodMilliseconds = tipNotificatinPeriodMilliseconds;
+        _tipMinThreshold = tipMinThreshold;
+        _tipMaxThreshold = tipMaxThreshold;
+        _isTipGated = isTipGated;
+        _eraserSamplePeriodMilliseconds = eraserSamplePeriodMilliseconds;
+        _eraserNotificatinPeriodMilliseconds = eraserNotificationPeriodMilliseconds;
+        _eraserMinThreshold = eraserMinThreshold;
+        _eraserMaxThreshold = eraserMaxThreshold;
+        _isEraserGated = isEraserGated;
+    }
+    return self;
+}
+
+- (id)initWithNSData:(NSData *)data
+{
+    NSAssert(data.length == 10, @"PressureSetup data is 10 bytes long");
+
+    self = [super init];
+    if (self)
+    {
+        uint8_t *bytes = (uint8_t *)data.bytes;
+        _tipSamplePeriodMilliseconds = bytes[0];
+        _tipNotificatinPeriodMilliseconds = bytes[1];
+        _tipMinThreshold = bytes[2];
+        _tipMaxThreshold = bytes[3];
+        _isTipGated = bytes[4] ? YES : NO;
+        _eraserSamplePeriodMilliseconds = bytes[5];
+        _eraserNotificatinPeriodMilliseconds = bytes[6];
+        _eraserMinThreshold = bytes[7];
+        _eraserMaxThreshold = bytes[8];
+        _isEraserGated = bytes[9] ? YES : NO;
+    }
+    return self;
+}
+
+- (void)writeToNSData:(NSData *)data
+{
+    NSAssert(data.length == 10, @"PressureSetup data is 10 bytes long");
+
+    uint8_t *bytes = (uint8_t *)data.bytes;
+    bytes[0] = _tipSamplePeriodMilliseconds;
+    bytes[1] = _tipNotificatinPeriodMilliseconds;
+    bytes[2] = _tipMinThreshold;
+    bytes[3] = _tipMaxThreshold;
+    bytes[4] = _isTipGated ? 1 : 0;
+    bytes[5] = _eraserSamplePeriodMilliseconds;
+    bytes[6] = _eraserNotificatinPeriodMilliseconds;
+    bytes[7] = _eraserMinThreshold;
+    bytes[8] = _eraserMaxThreshold;
+    bytes[9] = _isEraserGated ? 1 : 0;
+}
+
+@end
 
 @implementation FTPenLastErrorCode
 - (id)initWithErrorID:(int)errorID andErrorValue:(int)errorValue
@@ -119,6 +191,16 @@ NSString * const kFTPenLastErrorCodePropertyName = @"lastErrorCode";
 - (NSInteger)inactivityTimeout
 {
     return [self.penServiceClient inactivityTimeout];
+}
+
+- (FTPenPressureSetup *)pressureSetup
+{
+    return [self.penServiceClient pressureSetup];
+}
+
+- (void)setPressureSetup:(FTPenPressureSetup *)pressureSetup
+{
+    self.penServiceClient.pressureSetup = pressureSetup;
 }
 
 - (void)setInactivityTimeout:(NSInteger)inactivityTimeout

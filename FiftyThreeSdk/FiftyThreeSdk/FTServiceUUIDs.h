@@ -21,7 +21,7 @@
 + (CBUUID *)shouldSwing;
 + (CBUUID *)shouldPowerOff;
 + (CBUUID *)inactivityTimeout;
-//+ (CBUUID *)pressureSetup;
++ (CBUUID *)pressureSetup;
 + (CBUUID *)manufacturingID;
 + (CBUUID *)lastErrorCode;
 

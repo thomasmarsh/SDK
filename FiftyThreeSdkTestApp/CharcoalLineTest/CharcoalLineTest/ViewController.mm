@@ -449,8 +449,27 @@ FTPenPrivateDelegate>
      (pen.lastErrorCode ? pen.lastErrorCode.lastErrorValue : -1)];
 
     [deviceInfo appendFormat:@"Inactivity Timeout: %d\n", pen.inactivityTimeout];
-    [deviceInfo appendFormat:@"Tip Pressure Setup: \n"];
-    [deviceInfo appendFormat:@"Eraser Pressure Setup: \n"];
+
+    if (pen.pressureSetup)
+    {
+        [deviceInfo appendFormat:@"Tip Pressure Setup: %d %d %d %d %d\n",
+         pen.pressureSetup.tipSamplePeriodMilliseconds,
+         pen.pressureSetup.tipNotificatinPeriodMilliseconds,
+         pen.pressureSetup.tipMinThreshold,
+         pen.pressureSetup.tipMaxThreshold,
+         pen.pressureSetup.isTipGated];
+        [deviceInfo appendFormat:@"Eraser Pressure Setup: %d %d %d %d %d\n",
+         pen.pressureSetup.eraserSamplePeriodMilliseconds,
+         pen.pressureSetup.eraserNotificatinPeriodMilliseconds,
+         pen.pressureSetup.eraserMinThreshold,
+         pen.pressureSetup.eraserMaxThreshold,
+         pen.pressureSetup.isEraserGated];
+    }
+    else
+    {
+        [deviceInfo appendFormat:@"Tip Pressure Setup:\n"];
+        [deviceInfo appendFormat:@"Eraser Pressure Setup:\n"];
+    }
 
     if (self.penManager.pen.lastErrorCode.lastErrorID != 0)
     {

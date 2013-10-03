@@ -27,6 +27,7 @@
 @property (nonatomic, readonly) NSInteger batteryLevel;
 @property (nonatomic) BOOL hasListener;
 @property (nonatomic) NSInteger inactivityTimeout;
+@property (nonatomic) FTPenPressureSetup *pressureSetup;
 @property (nonatomic) NSString *manufacturingID;
 @property (nonatomic, readonly) FTPenLastErrorCode *lastErrorCode;
 
