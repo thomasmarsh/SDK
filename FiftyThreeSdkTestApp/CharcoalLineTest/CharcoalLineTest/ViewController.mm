@@ -297,7 +297,7 @@ FTPenPrivateDelegate>
     {
         self.lastTipOrEraserReleasedTimestamp = self.uptimeTimer->ElapsedTimeSeconds();
     }
-    [self updateDeviceInfoLabel];
+    [self updateConnectionHistoryLabel];
 
     self.tipStateButton.highlighted = isTipPressed;
     [self sendCharacter:isTipPressed ? 'A' : 'a'];
@@ -313,7 +313,7 @@ FTPenPrivateDelegate>
     {
         self.lastTipOrEraserReleasedTimestamp = self.uptimeTimer->ElapsedTimeSeconds();
     }
-    [self updateDeviceInfoLabel];
+    [self updateConnectionHistoryLabel];
 
     self.eraserStateButton.highlighted = isEraserPressed;
     [self sendCharacter:isEraserPressed ? 'B' : 'b'];
@@ -369,7 +369,32 @@ FTPenPrivateDelegate>
     [connectionHistory appendFormat:@"Disconnects\n"];
     [connectionHistory appendFormat:@"    General: %d\n", self.numUnexpectedDisconnectsGeneral];
     [connectionHistory appendFormat:@"    Connecting: %d\n", self.numUnexpectedDisconnectsConnecting];
-    [connectionHistory appendFormat:@"    Firmware: %d", self.numUnexpectedDisconnectsFirmware];
+    [connectionHistory appendFormat:@"    Firmware: %d\n\n", self.numUnexpectedDisconnectsFirmware];
+
+    const int kNoTouchCutoffMs = 1000;
+    const int kNoPressCutoffMs = -1000;
+    const int pressLatency = (int)round(1000.0 * (self.lastTipOrEraserPressedTimestamp -
+                                                  self.lastTouchBeganTimestamp));
+    NSString *pressLatencyStr = (pressLatency > kNoTouchCutoffMs ?
+                                 @"No Touch" :
+                                 (pressLatency < kNoPressCutoffMs ?
+                                  @"No Tip/Eraser" :
+                                  [NSString stringWithFormat:@"%d", pressLatency]));
+    [connectionHistory appendFormat:@"Press Latency (ms): %@\n", pressLatencyStr];
+
+    const int releaseLatency = (int)round(1000.0 * (self.lastTipOrEraserReleasedTimestamp -
+                                                    self.lastTouchEndedTimestamp));
+    NSString *releaseLatencyStr = (releaseLatency > kNoTouchCutoffMs ?
+                                   @"No Touch" :
+                                   (releaseLatency < kNoPressCutoffMs ?
+                                    @"No Tip/Eraser" :
+                                    [NSString stringWithFormat:@"%d", releaseLatency]));
+    if (self.penManager.pen.isTipPressed ||
+        self.penManager.pen.isEraserPressed)
+    {
+        releaseLatencyStr = @"";
+    }
+    [connectionHistory appendFormat:@"Release Latency (ms): %@\n", releaseLatencyStr];
 
     self.connectionHistoryLabel.text = connectionHistory;
 }
@@ -414,30 +439,9 @@ FTPenPrivateDelegate>
     [deviceInfo appendFormat:@"Last Error Value: %d\n\n",
      (pen.lastErrorCode ? pen.lastErrorCode.lastErrorValue : -1)];
 
-    const int kNoTouchCutoffMs = 1000;
-    const int kNoPressCutoffMs = -1000;
-    const int pressLatency = (int)round(1000.0 * (self.lastTipOrEraserPressedTimestamp -
-                                                  self.lastTouchBeganTimestamp));
-    NSString *pressLatencyStr = (pressLatency > kNoTouchCutoffMs ?
-                                 @"No Touch" :
-                                 (pressLatency < kNoPressCutoffMs ?
-                                  @"No Tip/Eraser" :
-                                  [NSString stringWithFormat:@"%d", pressLatency]));
-    [deviceInfo appendFormat:@"Press Latency (ms): %@\n", pressLatencyStr];
-
-    const int releaseLatency = (int)round(1000.0 * (self.lastTipOrEraserReleasedTimestamp -
-                                                    self.lastTouchEndedTimestamp));
-    NSString *releaseLatencyStr = (releaseLatency > kNoTouchCutoffMs ?
-                                   @"No Touch" :
-                                   (releaseLatency < kNoPressCutoffMs ?
-                                    @"No Tip/Eraser" :
-                                    [NSString stringWithFormat:@"%d", releaseLatency]));
-    if (self.penManager.pen.isTipPressed ||
-        self.penManager.pen.isEraserPressed)
-    {
-        releaseLatencyStr = @"";
-    }
-    [deviceInfo appendFormat:@"Release Latency (ms): %@\n", releaseLatencyStr];
+    [deviceInfo appendFormat:@"Inactivity Timeout: \n"];
+    [deviceInfo appendFormat:@"Tip Pressure Setup: \n"];
+    [deviceInfo appendFormat:@"Eraser Pressure Setup: \n"];
 
     if (self.penManager.pen.lastErrorCode.lastErrorID != 0)
     {
@@ -622,7 +626,7 @@ FTPenPrivateDelegate>
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
 {
     self.lastTouchBeganTimestamp = self.uptimeTimer->ElapsedTimeSeconds();
-    [self updateDeviceInfoLabel];
+    [self updateConnectionHistoryLabel];
 
     [self sendCharacter:'T'];
     [self.touchButton setHighlighted:YES];
