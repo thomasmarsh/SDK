@@ -26,6 +26,7 @@ NSString * const kFTPenNotificationPropertiesKey = @"kFTPenNotificationPropertie
 NSString * const kFTPenDidWriteHasListenerNotificationName = @"com.fiftythree.pen.didWriteHasListener";
 
 NSString * const kFTPenNamePropertyName = @"name";
+NSString * const kFTPenInactivityTimeoutPropertyName = @"inactivityTimeout";
 NSString * const kFTPenManufacturerNamePropertyName = @"manufacturerName";
 NSString * const kFTPenModelNumberPropertyName = @"modelNumber";
 NSString * const kFTPenSerialNumberPropertyName = @"serialNumber";
@@ -113,6 +114,16 @@ NSString * const kFTPenLastErrorCodePropertyName = @"lastErrorCode";
 - (void)readManufacturingID
 {
     [self.penServiceClient readManufacturingID];
+}
+
+- (NSInteger)inactivityTimeout
+{
+    return [self.penServiceClient inactivityTimeout];
+}
+
+- (void)setInactivityTimeout:(NSInteger)inactivityTimeout
+{
+    [self.penServiceClient setInactivityTimeout:inactivityTimeout];
 }
 
 - (FTPenLastErrorCode *)lastErrorCode

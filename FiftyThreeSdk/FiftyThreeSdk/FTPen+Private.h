@@ -28,6 +28,7 @@ extern NSString * const kFTPenNumLinkTerminationsPropertyName;
 extern NSString * const kFTPenNumDroppedNotificationsPropertyName;
 extern NSString * const kFTPenConnectedSecondsPropertyName;
 
+extern NSString * const kFTPenInactivityTimeoutPropertyName;
 extern NSString * const kFTPenManufacturingIDPropertyName;
 extern NSString * const kFTPenLastErrorCodePropertyName;
 
@@ -52,6 +53,7 @@ extern NSString * const kFTPenLastErrorCodePropertyName;
 
 @property (nonatomic) BOOL hasListener;
 @property (nonatomic) NSString *manufacturingID;
+@property (nonatomic) NSInteger inactivityTimeout;
 @property (nonatomic, readonly) FTPenLastErrorCode *lastErrorCode;
 
 @property (nonatomic, readonly) BOOL isReady;

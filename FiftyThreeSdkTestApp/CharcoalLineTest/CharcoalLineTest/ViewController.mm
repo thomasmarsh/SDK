@@ -448,7 +448,7 @@ FTPenPrivateDelegate>
     [deviceInfo appendFormat:@"Last Error Value: %d\n\n",
      (pen.lastErrorCode ? pen.lastErrorCode.lastErrorValue : -1)];
 
-    [deviceInfo appendFormat:@"Inactivity Timeout: \n"];
+    [deviceInfo appendFormat:@"Inactivity Timeout: %d\n", pen.inactivityTimeout];
     [deviceInfo appendFormat:@"Tip Pressure Setup: \n"];
     [deviceInfo appendFormat:@"Eraser Pressure Setup: \n"];
 

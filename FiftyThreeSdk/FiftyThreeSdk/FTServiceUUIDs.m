@@ -37,7 +37,7 @@
 #define FT_PEN_SERVICE_SHOULD_POWER_OFF_UUID CFUUIDGetConstantUUIDWithBytes(kCFAllocatorSystemDefault, 0xFC, 0x2F, 0xE4, 0xB4, 0xBB, 0x68, 0x4A, 0x9E, 0xA9, 0x99, 0x37, 0x3B, 0xAA, 0x29, 0xC8, 0x09)
 
 // 80F47BEF-58EF-4C75-9F08-7453BA896DA5
-#define FT_PEN_SERVICE_INACTIVITY_TIME_UUID CFUUIDGetConstantUUIDWithBytes(kCFAllocatorSystemDefault, 0x80, 0xF4, 0x7B, 0xEF, 0x58, 0xEF, 0x4C, 0x75, 0x9F, 0x08, 0x74, 0x53, 0xBA, 0x89, 0x6D, 0xA5)
+#define FT_PEN_SERVICE_INACTIVITY_TIMEOUT_UUID CFUUIDGetConstantUUIDWithBytes(kCFAllocatorSystemDefault, 0x80, 0xF4, 0x7B, 0xEF, 0x58, 0xEF, 0x4C, 0x75, 0x9F, 0x08, 0x74, 0x53, 0xBA, 0x89, 0x6D, 0xA5)
 
 // A9FE2C8F-9A5D-429A-A4B2-C5E63AF22FB3
 #define FT_PEN_SERVICE_PRESSURE_SETUP_UUID CFUUIDGetConstantUUIDWithBytes(kCFAllocatorSystemDefault, 0xA9, 0xFE, 0x2C, 0x8F, 0x9A, 0x5D, 0x42, 0x9A, 0xA4, 0xB2, 0xC5, 0xE6, 0x3A, 0xF2, 0x2F, 0xB3)
@@ -95,9 +95,9 @@
     return [CBUUID UUIDWithCFUUID:FT_PEN_SERVICE_SHOULD_POWER_OFF_UUID];
 }
 
-+ (CBUUID *)inactivityTime
++ (CBUUID *)inactivityTimeout
 {
-    return [CBUUID UUIDWithCFUUID:FT_PEN_SERVICE_INACTIVITY_TIME_UUID];
+    return [CBUUID UUIDWithCFUUID:FT_PEN_SERVICE_INACTIVITY_TIMEOUT_UUID];
 }
 
 + (CBUUID *)pressureSetup
@@ -126,7 +126,7 @@
                              [FTPenServiceUUIDs hasListener] : @"HasListener",
                              [FTPenServiceUUIDs shouldSwing] : @"ShouldSwing",
                              [FTPenServiceUUIDs shouldPowerOff] : @"ShouldPowerOff",
-                             [FTPenServiceUUIDs inactivityTime] : @"InactivityTime",
+                             [FTPenServiceUUIDs inactivityTimeout] : @"InactivityTimeout",
                              [FTPenServiceUUIDs pressureSetup] : @"PressureSetup",
                              [FTPenServiceUUIDs manufacturingID] : @"ManufacturingID",
                              [FTPenServiceUUIDs lastErrorCode] : @"LastErrorCode"

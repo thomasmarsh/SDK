@@ -24,6 +24,7 @@
 @property (nonatomic) CBCharacteristic *hasListenerCharacteristic;
 @property (nonatomic) CBCharacteristic *shouldSwingCharacteristic;
 @property (nonatomic) CBCharacteristic *shouldPowerOffCharacteristic;
+@property (nonatomic) CBCharacteristic *inactivityTimeoutCharacteristic;
 @property (nonatomic) CBCharacteristic *manufacturingIDCharacteristic;
 @property (nonatomic) CBCharacteristic *lastErrorCodeCharacteristic;
 
@@ -43,6 +44,7 @@
     {
         _peripheral = peripheral;
         _requiresTipBePressedToBecomeReady = YES;
+        _inactivityTimeout = -1;
     }
     return self;
 }
@@ -105,6 +107,24 @@
     [self.peripheral writeBOOL:YES
              forCharacteristic:self.shouldPowerOffCharacteristic
                           type:CBCharacteristicWriteWithResponse];
+}
+
+- (void)setInactivityTimeout:(NSInteger)inactivityTimeout
+{
+    NSAssert(inactivityTimeout >= 0 && inactivityTimeout < 256,
+             @"Inactivity timeout in valid range");
+
+    _inactivityTimeout = inactivityTimeout;
+
+    if (self.inactivityTimeoutCharacteristic)
+    {
+        uint8_t inactivityTimeoutByte = inactivityTimeout;
+        [self.peripheral writeValue:[NSData dataWithBytes:&inactivityTimeoutByte length:1]
+                  forCharacteristic:self.inactivityTimeoutCharacteristic
+                               type:CBCharacteristicWriteWithoutResponse];
+
+        [self.peripheral readValueForCharacteristic:self.inactivityTimeoutCharacteristic];
+    }
 }
 
 - (void)setManufacturingID:(NSString *)manufacturingID
@@ -274,6 +294,13 @@
             self.shouldPowerOffCharacteristic = characteristic;
         }
 
+        // InactivityTimeout
+        if (!self.inactivityTimeoutCharacteristic &&
+            [characteristic.UUID isEqual:[FTPenServiceUUIDs inactivityTimeout]])
+        {
+            self.inactivityTimeoutCharacteristic = characteristic;
+        }
+
         // ManufacturingID
         if (!self.manufacturingIDCharacteristic &&
             [characteristic.UUID isEqual:[FTPenServiceUUIDs manufacturingID]])
@@ -370,6 +397,11 @@
         [self.delegate penServiceClient:self batteryLevelDidChange:batteryLevel];
 
 //        NSLog(@"BatteryLevel did update value: %d", batteryLevel);
+    }
+    else if ([characteristic isEqual:self.inactivityTimeoutCharacteristic])
+    {
+        _inactivityTimeout = [self.inactivityTimeoutCharacteristic valueAsNSUInteger];
+        [updatedProperties addObject:kFTPenInactivityTimeoutPropertyName];
     }
     else if ([characteristic.UUID isEqual:[FTPenServiceUUIDs manufacturingID]])
     {
@@ -484,6 +516,11 @@
             [self.peripheral setNotifyValue:YES
                           forCharacteristic:self.batteryLevelCharacteristic];
             [self.peripheral readValueForCharacteristic:self.batteryLevelCharacteristic];
+        }
+
+        if (self.inactivityTimeoutCharacteristic && self.inactivityTimeout == -1)
+        {
+            [self.peripheral readValueForCharacteristic:self.inactivityTimeoutCharacteristic];
         }
 
         if (self.manufacturingIDCharacteristic && !self.manufacturingID)

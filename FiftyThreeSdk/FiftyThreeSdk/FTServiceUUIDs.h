@@ -20,7 +20,7 @@
 + (CBUUID *)hasListener;
 + (CBUUID *)shouldSwing;
 + (CBUUID *)shouldPowerOff;
-+ (CBUUID *)inactivityTime;
++ (CBUUID *)inactivityTimeout;
 //+ (CBUUID *)pressureSetup;
 + (CBUUID *)manufacturingID;
 + (CBUUID *)lastErrorCode;

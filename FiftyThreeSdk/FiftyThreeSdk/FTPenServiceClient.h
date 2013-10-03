@@ -26,6 +26,7 @@
 @property (nonatomic, readonly) float tipPressure;
 @property (nonatomic, readonly) NSInteger batteryLevel;
 @property (nonatomic) BOOL hasListener;
+@property (nonatomic) NSInteger inactivityTimeout;
 @property (nonatomic) NSString *manufacturingID;
 @property (nonatomic, readonly) FTPenLastErrorCode *lastErrorCode;
 
