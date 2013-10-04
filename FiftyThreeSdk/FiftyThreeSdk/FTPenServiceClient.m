@@ -29,6 +29,12 @@
 @property (nonatomic) CBCharacteristic *manufacturingIDCharacteristic;
 @property (nonatomic) CBCharacteristic *lastErrorCodeCharacteristic;
 
+@property (nonatomic) BOOL isTipPressedDidSetNofifyValue;
+@property (nonatomic) BOOL isEraserPressedDidSetNofifyValue;
+@property (nonatomic) BOOL tipPressureDidSetNofifyValue;
+@property (nonatomic) BOOL eraserPressureDidSetNofifyValue;
+@property (nonatomic) BOOL batteryLevelDidSetNofifyValue;
+
 @property (nonatomic, readwrite) NSDate *lastTipReleaseTime;
 
 @property (nonatomic) BOOL isReady;
@@ -209,6 +215,12 @@
         self.pressureSetupCharacteristic = nil;
         self.manufacturingIDCharacteristic = nil;
         self.lastErrorCodeCharacteristic = nil;
+
+        self.isTipPressedDidSetNofifyValue = NO;
+        self.isEraserPressedDidSetNofifyValue = NO;
+        self.tipPressureDidSetNofifyValue = NO;
+        self.eraserPressureDidSetNofifyValue = NO;
+        self.batteryLevelDidSetNofifyValue = NO;
 
         return nil;
     }
@@ -525,32 +537,41 @@
                                         self.isTipPressedCharacteristic.isNotifying);
     if (!isTipPressedNotifying)
     {
-        [self.peripheral setNotifyValue:YES forCharacteristic:self.isTipPressedCharacteristic];
+        if (!self.isTipPressedDidSetNofifyValue)
+        {
+            [self.peripheral setNotifyValue:YES
+                          forCharacteristic:self.isTipPressedCharacteristic];
+            self.isTipPressedDidSetNofifyValue = YES;
+        }
     }
     else
     {
-        if (self.isEraserPressedCharacteristic && !self.isEraserPressedCharacteristic.isNotifying)
+        if (self.isEraserPressedCharacteristic && !self.isEraserPressedDidSetNofifyValue)
         {
             [self.peripheral setNotifyValue:YES
                           forCharacteristic:self.isEraserPressedCharacteristic];
+            self.isEraserPressedDidSetNofifyValue = YES;
         }
 
-        if (self.tipPressureCharacteristic && !self.tipPressureCharacteristic.isNotifying)
+        if (self.tipPressureCharacteristic && !self.tipPressureDidSetNofifyValue)
         {
             [self.peripheral setNotifyValue:YES
                           forCharacteristic:self.tipPressureCharacteristic];
+            self.tipPressureDidSetNofifyValue = YES;
         }
 
-        if (self.eraserPressureCharacteristic && !self.eraserPressureCharacteristic.isNotifying)
+        if (self.eraserPressureCharacteristic && !self.eraserPressureDidSetNofifyValue)
         {
             [self.peripheral setNotifyValue:YES
                           forCharacteristic:self.eraserPressureCharacteristic];
+            self.eraserPressureDidSetNofifyValue = YES;
         }
 
-        if (self.batteryLevelCharacteristic && !self.batteryLevelCharacteristic.isNotifying)
+        if (self.batteryLevelCharacteristic && !self.batteryLevelDidSetNofifyValue)
         {
             [self.peripheral setNotifyValue:YES
                           forCharacteristic:self.batteryLevelCharacteristic];
+            self.batteryLevelDidSetNofifyValue = YES;
             [self.peripheral readValueForCharacteristic:self.batteryLevelCharacteristic];
         }
 
