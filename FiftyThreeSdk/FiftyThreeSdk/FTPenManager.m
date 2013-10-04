@@ -780,6 +780,7 @@ typedef enum
                                              transitioningFromStates:@[
                                                datingAttemptingConnectionState,
                                                separatedAttemptingConnectionState,
+                                               engagedState,
                                                engagedWaitingForPairingSpotReleaseState,
                                                engagedWaitingForTipReleaseState,
                                                marriedState,
