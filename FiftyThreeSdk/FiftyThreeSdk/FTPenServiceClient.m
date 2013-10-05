@@ -245,6 +245,7 @@
                                          [FTPenServiceUUIDs batteryLevel],
                                          [FTPenServiceUUIDs shouldSwing],
                                          [FTPenServiceUUIDs shouldPowerOff],
+                                         [FTPenServiceUUIDs inactivityTimeout],
                                          [FTPenServiceUUIDs manufacturingID],
                                          [FTPenServiceUUIDs lastErrorCode],
                                          [FTPenServiceUUIDs pressureSetup]
