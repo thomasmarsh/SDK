@@ -129,7 +129,14 @@
         [self.peripheral writeValue:[NSData dataWithBytes:&inactivityTimeoutByte length:1]
                   forCharacteristic:self.inactivityTimeoutCharacteristic
                                type:CBCharacteristicWriteWithResponse];
+        [self readInactivityTimeout];
+    }
+}
 
+- (void)readInactivityTimeout
+{
+    if (self.inactivityTimeoutCharacteristic)
+    {
         [self.peripheral readValueForCharacteristic:self.inactivityTimeoutCharacteristic];
     }
 }
@@ -161,6 +168,10 @@
     [self.peripheral writeNSString:manufacturingID
                  forCharacteristic:self.manufacturingIDCharacteristic
                               type:CBCharacteristicWriteWithResponse];
+
+    // Setting the manufacturing ID can update the inactivity timeout, so read it as well
+    // to ensure we report its most up to date value.
+    [self readInactivityTimeout];
 }
 
 - (void)readManufacturingID
