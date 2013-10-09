@@ -19,7 +19,6 @@ using namespace boost;
 {
 }
 @property (nonatomic)boost::optional<TouchClassifier::Ptr> classifier;
-@property (nonatomic) NSTimer *timer;
 @end
 
 @implementation FTApplication
@@ -41,32 +40,12 @@ using namespace boost;
                                                      name:kFTPenManagerDidUpdateStateNotificationName
                                                    object:nil];
 
-        self.timer = [NSTimer scheduledTimerWithTimeInterval: 1.0f/60.0f
-                                                      target: self
-                                                    selector: @selector(onTimer:)
-                                                    userInfo: nil
-                                                     repeats: YES];
-
     }
     return self;
 }
 
-- (void)onTimer:(id)token
-{
-    // TODO:
-    //    Right now the classifier APIs need to be notified every frame, since
-    //    Paper pauses the display link, we just use a timer.
-    //    The correct fix is update Classifier API to work correctly when *only* called in event processing.
-    if (self.classifier && *self.classifier)
-    {
-        double timestamp = [[NSProcessInfo processInfo] systemUptime];
-        (*self.classifier)->ReclassifyIfNeeded(timestamp);
-    }
-}
-
 - (void)dealloc
 {
-    [self.timer invalidate];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
