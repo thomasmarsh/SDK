@@ -5,8 +5,6 @@
 //  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
 //
 
-#import <boost/optional/optional.hpp>
-
 #import "Common/Touch/TouchTracker.h"
 #import "FTApplication.h"
 #import "FTPen.h"
@@ -18,7 +16,7 @@ using namespace boost;
 @interface FTApplication ()
 {
 }
-@property (nonatomic)boost::optional<TouchClassifier::Ptr> classifier;
+@property (nonatomic, readwrite)boost::optional<TouchClassifier::Ptr> classifier;
 @end
 
 @implementation FTApplication
@@ -54,6 +52,16 @@ using namespace boost;
     return TouchClassifier::Ptr();
 }
 
+- (boost::optional<fiftythree::common::TouchClassifier::Ptr>) classifier
+{
+    if (!_classifier)
+    {
+        // Lazily create the classifier.
+        _classifier = [self createClassifier];
+    }
+    return _classifier;
+}
+
 - (void)sendEvent:(UIEvent *)event
 {
     // If this event is a "touches" event, then send it to the TouchTracker for processing. Hooking into touch
@@ -61,11 +69,6 @@ using namespace boost;
     if (event.type == UIEventTypeTouches)
     {
         static_pointer_cast<TouchTrackerObjC>(TouchTracker::Instance())->ProcessTouchesEvent(event);
-        if (!self.classifier)
-        {
-            // Lazily create the classifier.
-            self.classifier  = [self createClassifier];
-        }
 
         if (self.classifier && *self.classifier)
         {
@@ -112,12 +115,6 @@ using namespace boost;
 
 - (void)didUpdateStateNotification:(NSNotification *)notification
 {
-    if (!self.classifier)
-    {
-        // Lazily create the classifier.
-        self.classifier  = [self createClassifier];
-    }
-
     if (self.classifier && *self.classifier)
     {
         FTPenManager *manager = (FTPenManager*)notification.object;
