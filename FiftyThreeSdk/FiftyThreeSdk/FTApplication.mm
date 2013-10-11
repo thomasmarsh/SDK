@@ -80,7 +80,7 @@ using namespace boost;
                 touches.insert(touch);
             }
 
-            (*self.classifier)->Classify(touches);
+            (*self.classifier)->TouchesDidChanged(touches);
         }
     }
 
@@ -96,7 +96,7 @@ using namespace boost;
         PenEventArgs args;
         args.Timestamp = [NSProcessInfo processInfo].systemUptime;
         args.Type = pen.isTipPressed?PenEventType::Tip1Down : PenEventType::Tip1Up;
-        (*self.classifier)->UpdatePenState(args);
+        (*self.classifier)->PenStateDidChanged(args);
     }
 }
 
@@ -109,7 +109,7 @@ using namespace boost;
         PenEventArgs args;
         args.Timestamp = [NSProcessInfo processInfo].systemUptime;
         args.Type = pen.isEraserPressed?PenEventType::Tip2Down : PenEventType::Tip2Up;
-        (*self.classifier)->UpdatePenState(args);
+        (*self.classifier)->PenStateDidChanged(args);
     }
 }
 
