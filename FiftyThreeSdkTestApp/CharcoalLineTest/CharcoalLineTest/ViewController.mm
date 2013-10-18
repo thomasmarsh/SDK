@@ -5,6 +5,10 @@
 //  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
 //
 
+#import <Security/Security.h>
+
+#import "Common/DeviceInfo.h"
+#import "Common/NSData+Crypto.h"
 #import "Common/Timer.h"
 #import "FiftyThreeSdk/FTFirmwareManager.h"
 #import "FiftyThreeSdk/FTFirmwareUpdateProgressView.h"
@@ -12,7 +16,17 @@
 #import "FiftyThreeSdk/FTPenManager+Private.h"
 #import "FiftyThreeSdk/FTPenManager.h"
 #import "RscMgr.h"
+#import "UIALertView-Blocks/UIAlertView+Blocks.h"
 #import "ViewController.h"
+
+NSString *applicationDocumentsDirectory()
+{
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *basePath = ([paths count] > 0) ? [paths objectAtIndex:0] : nil;
+    return basePath;
+}
+
+using namespace fiftythree::common;
 
 @interface ViewController () <UIAlertViewDelegate,
 RscMgrDelegate,
@@ -38,6 +52,9 @@ FTPenPrivateDelegate>
 @property (nonatomic) int numUnexpectedDisconnectsGeneral;
 @property (nonatomic) int numUnexpectedDisconnectsConnecting;
 @property (nonatomic) int numUnexpectedDisconnectsFirmware;
+
+@property (nonatomic) SecIdentityRef authenticationCodeSigningIdentity;
+@property (nonatomic) SecKeyRef authenticationCodeSigningPublicKey;
 
 @end
 
@@ -97,6 +114,7 @@ FTPenPrivateDelegate>
                                                    object:nil];
 
     }
+
     return self;
 }
 
@@ -364,7 +382,24 @@ FTPenPrivateDelegate>
 
 - (void)didReadManufacturingID:(NSString *)manufacturingID
 {
-    [self sendString:[NSString stringWithFormat:@"Retrieved Manufacturing ID: \"%@\"", manufacturingID]];
+    [self sendString:[NSString stringWithFormat:@"Retrieved Manufacturing ID: \"%@\"",
+                      manufacturingID]];
+}
+
+- (void)didWriteAuthenticationCode
+{
+    [self sendString:@"Successfully wrote Authentication Code."];
+}
+
+- (void)didFailToWriteAuthenticationCode
+{
+    [self reportError:@"Failed to write Authentication Code."];
+}
+
+- (void)didReadAuthenticationCode:(NSData *)authenticationCode
+{
+    [self sendString:[NSString stringWithFormat:@"Retrieved Authentication Code: \"%@\"",
+                      authenticationCode]];
 }
 
 - (void)didUpdateDeviceInfo
@@ -851,9 +886,23 @@ FTPenPrivateDelegate>
                 NSString *manufacturingID = [command substringWithRange:NSMakeRange(command.length - kIdLength,
                                                                                     kIdLength)];
 
-                self.penManager.pen.manufacturingID = manufacturingID;
-                [self sendString:[NSString stringWithFormat:@"Set Manufacturing ID: \"%@\"",
-                                  manufacturingID]];
+                [self authenticationCodeForManufacturingID:manufacturingID completion:^(NSData *authenticationCode)
+                {
+                    if (authenticationCode)
+                    {
+                        self.penManager.pen.manufacturingID = manufacturingID;
+                        [self sendString:[NSString stringWithFormat:@"Set Manufacturing ID: \"%@\"",
+                                          manufacturingID]];
+
+                        self.penManager.pen.authenticationCode = authenticationCode;
+                        [self sendString:[NSString stringWithFormat:@"Set Authentication Code: \"%@\"",
+                                          authenticationCode]];
+                    }
+                    else
+                    {
+                        [self reportError:@"Failed to calculate Authentication Code. Manufacturing ID will not be set."];
+                    }
+                }];
             }
             else
             {
@@ -862,9 +911,18 @@ FTPenPrivateDelegate>
         }
         else if ([command isEqualToString:kGetIdCommand])
         {
+            BOOL didIssueRead = NO;
             if (self.penManager.state == FTPenManagerStateConnected)
             {
-                [self.penManager.pen readManufacturingID];
+                if ([self.penManager.pen readManufacturingIDAndAuthCode])
+                {
+                    didIssueRead = YES;
+                }
+            }
+
+            if (!didIssueRead)
+            {
+                [self sendString:@"Not ready to read manufacturing ID"];
             }
         }
         else if ([command isEqualToString:kGetBatteryLevelCommand])
@@ -909,6 +967,127 @@ FTPenPrivateDelegate>
 - (void)reportError:(NSString *)description
 {
     [self sendString:[NSString stringWithFormat:@"ERROR: %@", description]];
+}
+
+#pragma mark - Authentication Code
+
+// Pops an alert that allows the user to enter a password. Returns the result asynchronously.
+- (void)queryForPassword:(void (^)(NSString *password))completion
+{
+    RIButtonItem *buttonItem = [RIButtonItem itemWithLabel:@"OK"];
+    UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Enter Passcode"
+                                                        message:nil
+                                               cancelButtonItem:buttonItem
+                                               otherButtonItems:nil];
+    alertView.alertViewStyle = UIAlertViewStyleSecureTextInput;
+
+    __weak UIAlertView *weakAlertView = alertView;
+    buttonItem.action =
+    ^{
+        if (completion)
+        {
+            completion([weakAlertView textFieldAtIndex:0].text);
+        }
+    };
+
+    [alertView show];
+
+}
+
+- (void)authenticationCodeForManufacturingID:(NSString *)manufacturingID
+                                  completion:(void (^)(NSData *authenticationCode))completion
+{
+    if (manufacturingID.length == 0 ||
+        ![manufacturingID canBeConvertedToEncoding:NSASCIIStringEncoding])
+    {
+        [[[UIAlertView alloc] initWithTitle:@"Invalid Manufacturing ID"
+                                    message:@"The manufacturing ID must be comprised of 20 ASCII characters."
+                                   delegate:nil
+                          cancelButtonTitle:@"OK"
+                          otherButtonTitles:nil] show];
+        if (completion)
+        {
+            completion(nil);
+        }
+        return;
+    }
+
+    NSString *certPath = [applicationDocumentsDirectory() stringByAppendingPathComponent:@"cert.p12"];
+    NSData *PKCS12Data = [NSData dataWithContentsOfFile:certPath];
+    if (!PKCS12Data)
+    {
+        [[[UIAlertView alloc] initWithTitle:@"Signing Identity Not Present"
+                                    message:@"Please install the p12 file in the iTunes Document Directory to continue."
+                                   delegate:nil
+                          cancelButtonTitle:@"OK"
+                          otherButtonTitles:nil] show];
+        if (completion)
+        {
+            completion(nil);
+        }
+        return;
+    }
+
+    void (^calculateAuthenticationCode)() = ^()
+    {
+        NSAssert(self.authenticationCodeSigningIdentity != NULL, @"signing identity non-null");
+        NSAssert(self.authenticationCodeSigningPublicKey != NULL, @"signing public key non-null");
+
+        NSData *dataToSign = [manufacturingID dataUsingEncoding:NSASCIIStringEncoding];
+        NSData *signature = [dataToSign createSignatureWithIdentity:self.authenticationCodeSigningIdentity];
+
+        // To create the authorization code from the digital signature we first take the
+        // SHA512 digest of it, then truncate it to the most significant 20 bytes.
+        NSData *authCode = [signature SHA512Digest];
+        NSData *authCode20Bytes = [authCode subdataWithRange:NSMakeRange(0, 20)];
+
+        // To sanity check, make sure that we can verify the signature.
+        NSAssert([dataToSign verifySignature:signature
+                                andPublicKey:self.authenticationCodeSigningPublicKey],
+                 @"Can verify signature using public key");
+
+        if (completion)
+        {
+            completion(authCode20Bytes);
+        }
+    };
+
+    if (self.authenticationCodeSigningIdentity != NULL &&
+        self.authenticationCodeSigningPublicKey != NULL)
+    {
+        calculateAuthenticationCode();
+    }
+    else
+    {
+        [self queryForPassword:^(NSString *password) {
+
+            SecIdentityRef identity = NULL;
+            SecTrustRef trust = NULL;
+            if (![PKCS12Data PKCS12ExtractIdentity:&identity
+                                          andTrust:&trust
+                                      withPassword:password])
+            {
+                [[[UIAlertView alloc] initWithTitle:@"Could Not Access Signing Identity"
+                                            message:@"Please verify the password and try again."
+                                           delegate:nil
+                                  cancelButtonTitle:@"OK"
+                                  otherButtonTitles:nil] show];
+                if (completion)
+                {
+                    completion(nil);
+                }
+                return;
+            }
+
+            self.authenticationCodeSigningIdentity = identity;
+            self.authenticationCodeSigningPublicKey = SecTrustCopyPublicKey(trust);
+            CFRelease(trust);
+
+            calculateAuthenticationCode();
+        }];
+    }
+
+    return;
 }
 
 @end

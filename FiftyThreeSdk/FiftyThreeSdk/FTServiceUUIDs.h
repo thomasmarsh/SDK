@@ -24,6 +24,7 @@
 + (CBUUID *)pressureSetup;
 + (CBUUID *)manufacturingID;
 + (CBUUID *)lastErrorCode;
++ (CBUUID *)authenticationCode;
 
 + (NSString *)nameForUUID:(CBUUID *)UUID;
 

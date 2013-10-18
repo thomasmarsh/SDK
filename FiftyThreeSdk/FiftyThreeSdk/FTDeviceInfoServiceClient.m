@@ -205,6 +205,18 @@
 - (void)peripheral:(CBPeripheral *)peripheral didUpdateValueForCharacteristic:(CBCharacteristic *)characteristic
              error:(NSError *)error
 {
+    if (error)
+    {
+        if ([FTDeviceInfoServiceUUIDs nameForUUID:characteristic.UUID])
+        {
+            NSLog(@"Error updating value for characteristic: %@ error: %@.",
+                  [FTPenServiceUUIDs nameForUUID:characteristic.UUID],
+                  [error localizedDescription]);
+            // TODO: Report failed state
+        }
+        return;
+    }
+
     BOOL updatedCharacteristic = NO;
     NSMutableSet *updatedProperties = [NSMutableSet set];
 

@@ -30,6 +30,7 @@
 @property (nonatomic) FTPenPressureSetup *pressureSetup;
 @property (nonatomic) NSString *manufacturingID;
 @property (nonatomic, readonly) FTPenLastErrorCode *lastErrorCode;
+@property (nonatomic) NSData *authenticationCode;
 
 @property (nonatomic, readonly) BOOL isReady;
 @property (nonatomic, readonly) BOOL isPoweringOff;
@@ -40,7 +41,7 @@
 
 - (void)startSwinging;
 - (void)powerOff;
-- (void)readManufacturingID;
+- (BOOL)readManufacturingIDAndAuthCode;
 - (void)clearLastErrorCode;
 
 @end
@@ -58,5 +59,8 @@
 - (void)penServiceClient:(FTPenServiceClient *)penServiceClient didReadManufacturingID:(NSString *)manufacturingID;
 - (void)penServiceClientDidWriteManufacturingID:(FTPenServiceClient *)penServiceClient;
 - (void)penServiceClientDidFailToWriteManufacturingID:(FTPenServiceClient *)penServiceClient;
+- (void)penServiceClientDidWriteAuthenticationCode:(FTPenServiceClient *)serviceClient;
+- (void)penServiceClientDidFailToWriteAuthenticationCode:(FTPenServiceClient *)serviceClient;
+- (void)penServiceClient:(FTPenServiceClient *)serviceClient didReadAuthenticationCode:(NSData *)authenticationCode;
 
 @end

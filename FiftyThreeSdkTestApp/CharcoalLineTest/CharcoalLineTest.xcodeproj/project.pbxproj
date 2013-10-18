@@ -15,6 +15,7 @@
 		3C23828217B3174000161277 /* Crashlytics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3C23828117B3174000161277 /* Crashlytics.framework */; };
 		3C2FE9641819EF0C00FE7190 /* CoreTelephony.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3C2FE9631819EF0C00FE7190 /* CoreTelephony.framework */; };
 		3C2FE9691819EF1900FE7190 /* AdSupport.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3C2FE9681819EF1900FE7190 /* AdSupport.framework */; };
+		3C8173971815CAAC000C4FFD /* boost.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6669D063173C0D6E00BB15C3 /* boost.framework */; };
 		3C94A5B217F609BD00BCDB43 /* PencilFirmware.bin in Resources */ = {isa = PBXBuildFile; fileRef = 3C94A5B117F609BD00BCDB43 /* PencilFirmware.bin */; };
 		3CD6FA3A17DE1D6B001E5F82 /* icon72.png in Resources */ = {isa = PBXBuildFile; fileRef = 3CD6FA3817DE1D6B001E5F82 /* icon72.png */; };
 		3CD6FA3B17DE1D6B001E5F82 /* icon144.png in Resources */ = {isa = PBXBuildFile; fileRef = 3CD6FA3917DE1D6B001E5F82 /* icon144.png */; };
@@ -55,7 +56,6 @@
 		6669D05A173C038B00BB15C3 /* ExternalAccessory.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6669D059173C038B00BB15C3 /* ExternalAccessory.framework */; };
 		6669D05C173C066800BB15C3 /* ViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6669D05B173C066800BB15C3 /* ViewController.xib */; };
 		6669D060173C0D3900BB15C3 /* CoreBluetooth.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6669D05F173C0D3900BB15C3 /* CoreBluetooth.framework */; };
-		6669D064173C0D6E00BB15C3 /* boost.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6669D063173C0D6E00BB15C3 /* boost.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -240,6 +240,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3C8173971815CAAC000C4FFD /* boost.framework in Frameworks */,
 				3CD6FA4717DE3063001E5F82 /* libAppBlade.a in Frameworks */,
 				3C093CE517CF90F2003B4A0D /* libAFNetworking.a in Frameworks */,
 				3C093CE617CF90F2003B4A0D /* libGlobalSettings.a in Frameworks */,
@@ -265,7 +266,6 @@
 				6669D060173C0D3900BB15C3 /* CoreBluetooth.framework in Frameworks */,
 				34986FDF174FAF8800A3088E /* libCommon.a in Frameworks */,
 				34986FD0174FAC8300A3088E /* libFiftyThreeSdk.a in Frameworks */,
-				6669D064173C0D6E00BB15C3 /* boost.framework in Frameworks */,
 				6669D05A173C038B00BB15C3 /* ExternalAccessory.framework in Frameworks */,
 				6669CFFE173C008C00BB15C3 /* Foundation.framework in Frameworks */,
 				6669D058173C01B400BB15C3 /* libRscMgrUniv.a in Frameworks */,
@@ -883,6 +883,8 @@
 					"$(SRCROOT)/../../FiftyThreeSdk",
 					"$(SRCROOT)/../../../Common",
 					"$(SRCROOT)/../../../ThirdParty/AppBlade/iOS/Framework",
+					"$(SRCROOT)/../../../ThirdParty",
+					"$(SRCROOT)/../../../../ThirdParty",
 				);
 				INFOPLIST_FILE = "CharcoalLineTest/CharcoalLineTest-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
@@ -916,6 +918,8 @@
 					"$(SRCROOT)/../../FiftyThreeSdk",
 					"$(SRCROOT)/../../../Common",
 					"$(SRCROOT)/../../../ThirdParty/AppBlade/iOS/Framework",
+					"$(SRCROOT)/../../../ThirdParty",
+					"$(SRCROOT)/../../../../ThirdParty",
 				);
 				INFOPLIST_FILE = "CharcoalLineTest/CharcoalLineTest-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 6.0;

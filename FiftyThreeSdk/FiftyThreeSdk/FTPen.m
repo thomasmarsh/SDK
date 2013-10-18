@@ -53,6 +53,7 @@ NSString * const kFTPenConnectedSecondsPropertyName = @"numDroppedNotifications"
 
 NSString * const kFTPenManufacturingIDPropertyName = @"manufacturingID";
 NSString * const kFTPenLastErrorCodePropertyName = @"lastErrorCode";
+NSString * const kFTPenAuthenticationCodePropertyName = @"authenticationCode";
 
 @implementation FTPenPressureSetup
 
@@ -183,9 +184,9 @@ NSString * const kFTPenLastErrorCodePropertyName = @"lastErrorCode";
 
 #pragma mark - Properties
 
-- (void)readManufacturingID
+- (BOOL)readManufacturingIDAndAuthCode
 {
-    [self.penServiceClient readManufacturingID];
+    return [self.penServiceClient readManufacturingIDAndAuthCode];
 }
 
 - (NSInteger)inactivityTimeout
@@ -216,6 +217,16 @@ NSString * const kFTPenLastErrorCodePropertyName = @"lastErrorCode";
 - (void)clearLastErrorCode
 {
     [self.penServiceClient clearLastErrorCode];
+}
+
+- (NSData *)authenticationCode
+{
+    return self.penServiceClient.authenticationCode;
+}
+
+- (void)setAuthenticationCode:(NSData *)authenticationCode
+{
+    self.penServiceClient.authenticationCode = authenticationCode;
 }
 
 - (BOOL)isReady
@@ -498,6 +509,21 @@ NSString * const kFTPenLastErrorCodePropertyName = @"lastErrorCode";
 - (void)penServiceClient:(FTPenServiceClient *)serviceClient didReadManufacturingID:(NSString *)manufacturingID
 {
     [self.privateDelegate didReadManufacturingID:manufacturingID];
+}
+
+- (void)penServiceClientDidWriteAuthenticationCode:(FTPenServiceClient *)serviceClient
+{
+    [self.privateDelegate didWriteAuthenticationCode];
+}
+
+- (void)penServiceClientDidFailToWriteAuthenticationCode:(FTPenServiceClient *)serviceClient
+{
+    [self.privateDelegate didFailToWriteAuthenticationCode];
+}
+
+- (void)penServiceClient:(FTPenServiceClient *)serviceClient didReadAuthenticationCode:(NSData *)authenticationCode
+{
+    [self.privateDelegate didReadAuthenticationCode:authenticationCode];
 }
 
 #pragma mark - FTPenUsageServiceClientDelegate

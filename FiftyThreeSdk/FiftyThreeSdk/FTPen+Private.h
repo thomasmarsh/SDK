@@ -25,6 +25,7 @@ extern NSString * const kFTPenInactivityTimeoutPropertyName;
 extern NSString * const kFTPenPressureSetupPropertyName;
 extern NSString * const kFTPenManufacturingIDPropertyName;
 extern NSString * const kFTPenLastErrorCodePropertyName;
+extern NSString * const kFTPenAuthenticationCodePropertyName;
 
 @class CBCentralManager;
 @class CBPeripheral;
@@ -78,10 +79,17 @@ extern NSString * const kFTPenLastErrorCodePropertyName;
 @protocol FTPenPrivateDelegate <NSObject>
 
 @optional
+
 - (void)pen:(FTPen *)pen isReadyDidChange:(BOOL)isReady;
+
 - (void)didWriteManufacturingID;
 - (void)didFailToWriteManufacturingID;
 - (void)didReadManufacturingID:(NSString *)manufacturingID;
+
+- (void)didWriteAuthenticationCode;
+- (void)didFailToWriteAuthenticationCode;
+- (void)didReadAuthenticationCode:(NSData *)authenticationCode;
+
 - (void)didUpdateUsageProperties:(NSSet *)updatedProperties;
 
 @end
@@ -96,7 +104,11 @@ extern NSString * const kFTPenLastErrorCodePropertyName;
 
 @property (nonatomic) BOOL hasListener;
 @property (nonatomic) FTPenPressureSetup *pressureSetup;
+
 @property (nonatomic) NSString *manufacturingID;
+@property (nonatomic) NSData *authenticationCode;
+@property (nonatomic, readonly) NSString *serialNumber;
+
 @property (nonatomic) NSInteger inactivityTimeout;
 @property (nonatomic, readonly) FTPenLastErrorCode *lastErrorCode;
 
@@ -129,7 +141,9 @@ extern NSString * const kFTPenLastErrorCodePropertyName;
 
 - (void)powerOff;
 
-- (void)readManufacturingID;
+// Returns YES if the read request for the two characterisitcs was issued. It may fail
+// if the characterisitics have not been discovered yet.
+- (BOOL)readManufacturingIDAndAuthCode;
 
 - (void)clearLastErrorCode;
 

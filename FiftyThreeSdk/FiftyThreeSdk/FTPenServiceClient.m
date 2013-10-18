@@ -28,12 +28,18 @@
 @property (nonatomic) CBCharacteristic *pressureSetupCharacteristic;
 @property (nonatomic) CBCharacteristic *manufacturingIDCharacteristic;
 @property (nonatomic) CBCharacteristic *lastErrorCodeCharacteristic;
+@property (nonatomic) CBCharacteristic *authenticationCodeCharacteristic;
 
 @property (nonatomic) BOOL isTipPressedDidSetNofifyValue;
 @property (nonatomic) BOOL isEraserPressedDidSetNofifyValue;
 @property (nonatomic) BOOL tipPressureDidSetNofifyValue;
 @property (nonatomic) BOOL eraserPressureDidSetNofifyValue;
 @property (nonatomic) BOOL batteryLevelDidSetNofifyValue;
+@property (nonatomic) BOOL didInitialReadOfInactivityTimeout;
+@property (nonatomic) BOOL didInitialReadOfPressureSetup;
+@property (nonatomic) BOOL didInitialReadOfManufacturingID;
+@property (nonatomic) BOOL didInitialReadOfLastErrorCode;
+@property (nonatomic) BOOL didInitialReadOfAuthenticationCode;
 
 @property (nonatomic, readwrite) NSDate *lastTipReleaseTime;
 
@@ -165,21 +171,41 @@
 {
     NSAssert(manufacturingID.length == 15, @"Manufacturing ID must be 15 characters");
 
-    [self.peripheral writeNSString:manufacturingID
-                 forCharacteristic:self.manufacturingIDCharacteristic
-                              type:CBCharacteristicWriteWithResponse];
+    if (self.manufacturingIDCharacteristic)
+    {
+        [self.peripheral writeNSString:manufacturingID
+                     forCharacteristic:self.manufacturingIDCharacteristic
+                                  type:CBCharacteristicWriteWithResponse];
+    }
 
     // Setting the manufacturing ID can update the inactivity timeout, so read it as well
     // to ensure we report its most up to date value.
     [self readInactivityTimeout];
 }
 
-- (void)readManufacturingID
+- (void)setAuthenticationCode:(NSData *)authenticationCode
 {
-    if (self.manufacturingIDCharacteristic)
+    NSAssert(authenticationCode.length == 20, @"Authentication Code must be 20 bytes");
+
+    if (self.authenticationCodeCharacteristic)
+    {
+        [self.peripheral writeValue:authenticationCode
+                  forCharacteristic:self.authenticationCodeCharacteristic
+                               type:CBCharacteristicWriteWithResponse];
+    }
+}
+
+- (BOOL)readManufacturingIDAndAuthCode
+{
+    if (self.manufacturingIDCharacteristic && self.authenticationCodeCharacteristic)
     {
         [self.peripheral readValueForCharacteristic:self.manufacturingIDCharacteristic];
+        [self.peripheral readValueForCharacteristic:self.authenticationCodeCharacteristic];
+
+        return YES;
     }
+
+    return NO;
 }
 
 - (void)clearLastErrorCode
@@ -226,12 +252,19 @@
         self.pressureSetupCharacteristic = nil;
         self.manufacturingIDCharacteristic = nil;
         self.lastErrorCodeCharacteristic = nil;
+        self.authenticationCodeCharacteristic = nil;
 
         self.isTipPressedDidSetNofifyValue = NO;
         self.isEraserPressedDidSetNofifyValue = NO;
         self.tipPressureDidSetNofifyValue = NO;
         self.eraserPressureDidSetNofifyValue = NO;
         self.batteryLevelDidSetNofifyValue = NO;
+
+        self.didInitialReadOfInactivityTimeout = NO;
+        self.didInitialReadOfPressureSetup = NO;
+        self.didInitialReadOfManufacturingID = NO;
+        self.didInitialReadOfLastErrorCode = NO;
+        self.didInitialReadOfAuthenticationCode = NO;
 
         return nil;
     }
@@ -249,9 +282,9 @@
         if (self.penService)
         {
             NSArray *characteristics = @[[FTPenServiceUUIDs isTipPressed],
+                                         [FTPenServiceUUIDs hasListener],
                                          [FTPenServiceUUIDs tipPressure],
                                          [FTPenServiceUUIDs isEraserPressed],
-                                         [FTPenServiceUUIDs hasListener],
                                          [FTPenServiceUUIDs eraserPressure],
                                          [FTPenServiceUUIDs batteryLevel],
                                          [FTPenServiceUUIDs shouldSwing],
@@ -290,6 +323,15 @@
         {
             self.isTipPressedCharacteristic = characteristic;
         }
+        
+        // HasListener
+        if (!self.hasListenerCharacteristic &&
+            [characteristic.UUID isEqual:[FTPenServiceUUIDs hasListener]])
+        {
+            self.hasListener = YES;
+            self.hasListenerCharacteristic = characteristic;
+            [self writeHasListener];
+        }
 
         // IsEraserPressed
         if (!self.isEraserPressedCharacteristic &&
@@ -317,15 +359,6 @@
             [characteristic.UUID isEqual:[FTPenServiceUUIDs batteryLevel]])
         {
             self.batteryLevelCharacteristic = characteristic;
-        }
-
-        // HasListener
-        if (!self.hasListenerCharacteristic &&
-            [characteristic.UUID isEqual:[FTPenServiceUUIDs hasListener]])
-        {
-            self.hasListener = YES;
-            [self writeHasListener];
-            self.hasListenerCharacteristic = characteristic;
         }
 
         // ShouldSwing
@@ -369,6 +402,13 @@
         {
             self.lastErrorCodeCharacteristic = characteristic;
         }
+
+        // AuthenticationCode
+        if (!self.authenticationCodeCharacteristic &&
+            [characteristic.UUID isEqual:[FTPenServiceUUIDs authenticationCode]])
+        {
+            self.authenticationCodeCharacteristic = characteristic;
+        }
     }
 
     [self ensureCharacteristicNotificationsAndInitialization];
@@ -379,8 +419,13 @@
 {
     if (error)
     {
-        NSLog(@"Error discovering characteristics: %@.", [error localizedDescription]);
-        // TODO: Report failed state
+        if ([FTPenServiceUUIDs nameForUUID:characteristic.UUID])
+        {
+            NSLog(@"Error updating value for characteristic: %@ error: %@.",
+                  [FTPenServiceUUIDs nameForUUID:characteristic.UUID],
+                  [error localizedDescription]);
+            // TODO: Report failed state
+        }
         return;
     }
 
@@ -475,11 +520,11 @@
     }
     else if ([characteristic.UUID isEqual:[FTPenServiceUUIDs lastErrorCode]])
     {
-        NSAssert(characteristic == self.lastErrorCodeCharacteristic,
-                 @"matches last error code characterisit");
-
         if (self.lastErrorCodeCharacteristic)
         {
+            NSAssert(characteristic == self.lastErrorCodeCharacteristic,
+                     @"matches last error code characterisit");
+
             NSData *data = self.lastErrorCodeCharacteristic.value;
             if (data.length == 2 * sizeof(uint32_t))
             {
@@ -490,6 +535,20 @@
 
                 [updatedProperties addObject:kFTPenLastErrorCodePropertyName];
             }
+        }
+    }
+    else if ([characteristic.UUID isEqual:[FTPenServiceUUIDs authenticationCode]])
+    {
+        if (self.authenticationCodeCharacteristic)
+        {
+            NSAssert(characteristic == self.authenticationCodeCharacteristic,
+                     @"characteristic is authenenticationCode characteristic");
+
+            _authenticationCode = [self.authenticationCodeCharacteristic.value copy];
+
+            [self.delegate penServiceClient:self
+                  didReadAuthenticationCode:self.authenticationCode];
+            [updatedProperties addObject:kFTPenAuthenticationCodePropertyName];
         }
     }
 
@@ -532,6 +591,17 @@
         else
         {
             [self.delegate penServiceClientDidWriteManufacturingID:self];
+        }
+    }
+    else if (characteristic == self.authenticationCodeCharacteristic)
+    {
+        if (error)
+        {
+            [self.delegate penServiceClientDidFailToWriteAuthenticationCode:self];
+        }
+        else
+        {
+            [self.delegate penServiceClientDidWriteAuthenticationCode:self];
         }
     }
     else if (characteristic == self.hasListenerCharacteristic)
@@ -587,24 +657,34 @@
             [self.peripheral readValueForCharacteristic:self.batteryLevelCharacteristic];
         }
 
-        if (self.inactivityTimeoutCharacteristic && self.inactivityTimeout == -1)
+        if (self.inactivityTimeoutCharacteristic && !self.didInitialReadOfInactivityTimeout)
         {
             [self.peripheral readValueForCharacteristic:self.inactivityTimeoutCharacteristic];
+            self.didInitialReadOfInactivityTimeout = YES;
         }
 
-        if (self.pressureSetupCharacteristic && !self.pressureSetup)
+        if (self.pressureSetupCharacteristic && !self.didInitialReadOfPressureSetup)
         {
             [self.peripheral readValueForCharacteristic:self.pressureSetupCharacteristic];
+            self.didInitialReadOfPressureSetup = YES;
         }
 
-        if (self.manufacturingIDCharacteristic && !self.manufacturingID)
+        if (self.manufacturingIDCharacteristic && !self.didInitialReadOfManufacturingID)
         {
             [self.peripheral readValueForCharacteristic:self.manufacturingIDCharacteristic];
+            self.didInitialReadOfManufacturingID = YES;
         }
 
-        if (self.lastErrorCodeCharacteristic && !self.lastErrorCode)
+        if (self.lastErrorCodeCharacteristic && !self.didInitialReadOfLastErrorCode)
         {
             [self.peripheral readValueForCharacteristic:self.lastErrorCodeCharacteristic];
+            self.didInitialReadOfLastErrorCode = YES;
+        }
+
+        if (self.authenticationCodeCharacteristic && !self.didInitialReadOfAuthenticationCode)
+        {
+            [self.peripheral readValueForCharacteristic:self.authenticationCodeCharacteristic];
+            self.didInitialReadOfAuthenticationCode = YES;
         }
     }
 }

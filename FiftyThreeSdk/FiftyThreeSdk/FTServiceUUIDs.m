@@ -48,6 +48,9 @@
 // 5749A836-6E3A-4CA5-B8CA-225A4C635D8E
 #define FT_PEN_SERVICE_LAST_ERROR_CODE_UUID CFUUIDGetConstantUUIDWithBytes(kCFAllocatorSystemDefault, 0x57, 0x49, 0xA8, 0x36, 0x6E, 0x3A, 0x4C, 0xA5, 0xB8, 0xCA, 0x22, 0x5A, 0x4C, 0x63, 0x5D, 0x8E)
 
+// 6041750F-F284-4125-BFB4-E912878614D7
+#define FT_PEN_SERVICE_AUTH_CODE_UUID CFUUIDGetConstantUUIDWithBytes(kCFAllocatorSystemDefault, 0x60, 0x41, 0x75, 0x0F, 0xF2, 0x84, 0x41, 0x25, 0xBF, 0xB4, 0xE9, 0x12, 0x87, 0x86, 0x14, 0xD7)
+
 @implementation FTPenServiceUUIDs
 
 + (CBUUID *)penService
@@ -115,6 +118,11 @@
     return [CBUUID UUIDWithCFUUID:FT_PEN_SERVICE_LAST_ERROR_CODE_UUID];
 }
 
++ (CBUUID *)authenticationCode
+{
+    return [CBUUID UUIDWithCFUUID:FT_PEN_SERVICE_AUTH_CODE_UUID];
+}
+
 + (NSString *)nameForUUID:(CBUUID *)UUID
 {
     NSDictionary *UUIDs = @{ [FTPenServiceUUIDs penService] : @"PenService",
@@ -129,7 +137,8 @@
                              [FTPenServiceUUIDs inactivityTimeout] : @"InactivityTimeout",
                              [FTPenServiceUUIDs pressureSetup] : @"PressureSetup",
                              [FTPenServiceUUIDs manufacturingID] : @"ManufacturingID",
-                             [FTPenServiceUUIDs lastErrorCode] : @"LastErrorCode"
+                             [FTPenServiceUUIDs lastErrorCode] : @"LastErrorCode",
+                             [FTPenServiceUUIDs authenticationCode] : @"AuthenticationCode",
                              };
     return [UUIDs objectForKey:UUID];
 }

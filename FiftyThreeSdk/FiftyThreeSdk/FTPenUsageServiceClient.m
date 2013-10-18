@@ -189,8 +189,13 @@
 {
     if (error)
     {
-        NSLog(@"Error discovering characteristics: %@.", [error localizedDescription]);
-        // TODO: Report failed state
+        if ([FTPenUsageServiceUUIDs nameForUUID:characteristic.UUID])
+        {
+            NSLog(@"Error updating value for characteristic: %@ error: %@.",
+                  [FTPenServiceUUIDs nameForUUID:characteristic.UUID],
+                  [error localizedDescription]);
+            // TODO: Report failed state
+        }
         return;
     }
 

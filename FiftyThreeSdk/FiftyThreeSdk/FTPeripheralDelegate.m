@@ -145,7 +145,9 @@
 - (void)peripheral:(CBPeripheral *)peripheral didWriteValueForCharacteristic:(CBCharacteristic *)characteristic
              error:(NSError *)error
 {
-    NSLog(@"Peripheral did write value for characteristic: %@", FTNameForServiceUUID(characteristic.UUID));
+    NSLog(@"Peripheral did write value: %@ for characteristic: %@",
+          characteristic.value,
+          FTNameForServiceUUID(characteristic.UUID));
 
     for (FTServiceClient *serviceClient in self.serviceClients)
     {
