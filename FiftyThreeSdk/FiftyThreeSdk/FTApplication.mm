@@ -39,6 +39,8 @@ using namespace boost;
                                                    object:nil];
 
     }
+    
+    
     return self;
 }
 
@@ -58,6 +60,7 @@ using namespace boost;
     {
         // Lazily create the classifier.
         _classifier = [self createClassifier];
+        ActiveClassifier::Activate(*_classifier);
     }
     return _classifier;
 }
