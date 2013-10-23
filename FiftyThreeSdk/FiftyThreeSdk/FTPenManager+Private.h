@@ -21,6 +21,7 @@ extern NSString * const kFTPenManagerFirmwareUpdateDidUpdatePercentComplete;
 extern NSString * const kFTPenManagerPercentCompleteProperty;
 extern NSString * const kFTPenManagerFirmwareUpdateDidFinishSendingUpdate;
 extern NSString * const kFTPenManagerFirmwareUpdateDidCompleteSuccessfully;
+extern NSString * const kFTPenManagerFirmwareUpdateDidFail;
 extern NSString * const kFTPenManagerFirmwareUpdateWasCancelled;
 
 @interface FTPenManager ()

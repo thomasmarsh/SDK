@@ -30,6 +30,7 @@ NSString * const kFTPenManagerFirmwareUpdateDidUpdatePercentComplete = @"com.fif
 NSString * const kFTPenManagerPercentCompleteProperty = @"com.fiftythree.penManager.percentComplete";
 NSString * const kFTPenManagerFirmwareUpdateDidFinishSendingUpdate = @"com.fiftythree.penManger.firmwareUpdateDidFinishSendingUpdate";
 NSString * const kFTPenManagerFirmwareUpdateDidCompleteSuccessfully = @"com.fiftythree.penManger.firmwareUpdateDidCompleteSuccessfully";
+NSString * const kFTPenManagerFirmwareUpdateDidFail = @"com.fiftythree.penManger.firmwareUpdateDidFail";
 NSString * const kFTPenManagerFirmwareUpdateWasCancelled = @"com.fiftythree.penManger.firmwareUpdateWasCancelled";
 
 static const int kInterruptedUpdateDelayMax = 30;
@@ -705,6 +706,9 @@ typedef enum
                                                                         TKStateMachine *stateMachine)
     {
         NSAssert(weakSelf.pen, @"Pen must be non-nil");
+
+        [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenManagerFirmwareUpdateDidFail
+                                                            object:self];
 
         [weakSelf fireStateMachineEvent:kDisconnectAndBecomeSingleEventName];
     }];
