@@ -1326,10 +1326,26 @@ typedef enum
     }
 }
 
+#pragma mark - Model
+
+- (NSNumber *)isAluminumPencil
+{
+    if (!self.pen ||
+        self.state != FTPenManagerStateConnected ||
+        !self.pen.modelNumber)
+    {
+        return nil;
+    }
+    // Example modelNumber: 53PA02
+    NSString *modelNumber = self.pen.modelNumber;
+    NSString *metalModelNumberPrefix = @"53PA";
+    return  @([modelNumber hasPrefix:metalModelNumberPrefix]);
+}
+
 #pragma mark - Firmware
 
-- (BOOL)isFirmwareUpdateAvailable:(NSInteger *)currentVersion
-                    updateVersion:(NSInteger *)updateVersion
+- (NSNumber *)isFirmwareUpdateAvailable:(NSInteger *)currentVersion
+                          updateVersion:(NSInteger *)updateVersion
 {
     return [FTFirmwareManager isVersionAtPath:[FTFirmwareManager imagePath]
                         newerThanVersionOnPen:self.pen

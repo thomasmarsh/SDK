@@ -115,10 +115,10 @@ NSString *applicationDocumentsDirectory()
     return NO;
 }
 
-+ (BOOL)isVersionAtPath:(NSString *)imagePath
-  newerThanVersionOnPen:(FTPen *)pen
-         currentVersion:(NSInteger *)currentVersion
-          updateVersion:(NSInteger *)updateVersion
++ (NSNumber *)isVersionAtPath:(NSString *)imagePath
+        newerThanVersionOnPen:(FTPen *)pen
+               currentVersion:(NSInteger *)currentVersion
+                updateVersion:(NSInteger *)updateVersion
 {
     *currentVersion = -1;
     *updateVersion = -1;
@@ -149,14 +149,13 @@ NSString *applicationDocumentsDirectory()
 
     NSInteger version = [FTFirmwareManager versionOfImageAtPath:imagePath];
     if (version != -1 &&
-        *currentVersion != -1 &&
-        *currentVersion < version)
+        *currentVersion != -1)
     {
         *updateVersion = version;
-        return YES;
+        return @(*currentVersion < version);
     }
 
-    return NO;
+    return nil;
 }
 
 + (FTFirmwareImageType)imageTypeRunningOnPen:(FTPen *)pen;
