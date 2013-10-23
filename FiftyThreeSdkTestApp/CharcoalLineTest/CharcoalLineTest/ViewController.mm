@@ -450,24 +450,27 @@ FTPenPrivateDelegate>
 
     if (pen.inactivityTimeout == 0)
     {
-        [deviceInfo appendFormat:@"Inactivity Timeout: Never\n"];
+        [deviceInfo appendFormat:@"Inactivity Timeout: Never\n\n"];
     }
     else
     {
-        [deviceInfo appendFormat:@"Inactivity Timeout: %d\n", pen.inactivityTimeout];
+        [deviceInfo appendFormat:@"Inactivity Timeout: %d\n\n", pen.inactivityTimeout];
     }
 
     if (pen.pressureSetup)
     {
-        [deviceInfo appendFormat:@"Tip Pressure Setup: %d %d %d %d %d\n",
-         pen.pressureSetup.tipSamplePeriodMilliseconds,
-         pen.pressureSetup.tipNotificatinPeriodMilliseconds,
+        [deviceInfo appendFormat:@"Pressure Rate: %d %d\n",
+         pen.pressureSetup.samplePeriodMilliseconds,
+         pen.pressureSetup.notificatinPeriodMilliseconds];
+
+        [deviceInfo appendFormat:@"Tip Mapping: %d %d %d %d\n",
+         pen.pressureSetup.tipFloorThreshold,
          pen.pressureSetup.tipMinThreshold,
          pen.pressureSetup.tipMaxThreshold,
          pen.pressureSetup.isTipGated];
-        [deviceInfo appendFormat:@"Eraser Pressure Setup: %d %d %d %d %d\n",
-         pen.pressureSetup.eraserSamplePeriodMilliseconds,
-         pen.pressureSetup.eraserNotificatinPeriodMilliseconds,
+
+        [deviceInfo appendFormat:@"Eraser Mapping: %d %d %d %d\n",
+         pen.pressureSetup.eraserFloorThreshold,
          pen.pressureSetup.eraserMinThreshold,
          pen.pressureSetup.eraserMaxThreshold,
          pen.pressureSetup.isEraserGated];
@@ -555,6 +558,9 @@ FTPenPrivateDelegate>
         self.connectButton.hidden = NO;
         self.updateFirmwareButton.hidden = NO;
         self.updateStatsButton.hidden = NO;
+        self.incrementInactivityTimeoutButton.hidden = NO;
+        self.decrementInactivityTimeoutButton.hidden = NO;
+        self.togglePressureButton.hidden = NO;
     }
     else
     {
@@ -562,6 +568,9 @@ FTPenPrivateDelegate>
         self.connectButton.hidden = YES;
         self.updateFirmwareButton.hidden = YES;
         self.updateStatsButton.hidden = YES;
+        self.incrementInactivityTimeoutButton.hidden = YES;
+        self.decrementInactivityTimeoutButton.hidden = YES;
+        self.togglePressureButton.hidden = YES;
         self.clearLastErrorButton.hidden = YES;
 
         self.tipStateButton.highlighted = NO;
@@ -638,6 +647,52 @@ FTPenPrivateDelegate>
     [self updateConnectionHistoryLabel];
 
     [self.penManager.pen readUsageProperties];
+}
+
+- (IBAction)incrementInactivityTimeoutButtonTouchUpInside:(id)sender
+{
+    self.penManager.pen.inactivityTimeout++;
+}
+
+- (IBAction)decrementInactivityTimeoutButtonTouchUpInside:(id)sender
+{
+    if (self.penManager.pen.inactivityTimeout > 0)
+    {
+        self.penManager.pen.inactivityTimeout--;
+    }
+}
+
+- (IBAction)togglePressureButtonTouchUpInside:(id)sender
+{
+    if (self.penManager.pen.pressureSetup)
+    {
+        if (self.penManager.pen.pressureSetup.samplePeriodMilliseconds > 0)
+        {
+            self.penManager.pen.pressureSetup = [[FTPenPressureSetup alloc] initWithSamplePeriodMilliseconds:0
+                                                                               notificatinPeriodMilliseconds:0
+                                                                                           tipFloorThreshold:0
+                                                                                             tipMinThreshold:0
+                                                                                             tipMaxThreshold:0
+                                                                                                  isTipGated:NO
+                                                                                        eraserFloorThreshold:0
+                                                                                          eraserMinThreshold:0
+                                                                                          eraserMaxThreshold:0
+                                                                                               isEraserGated:NO];
+        }
+        else
+        {
+            self.penManager.pen.pressureSetup = [[FTPenPressureSetup alloc] initWithSamplePeriodMilliseconds:20
+                                                                               notificatinPeriodMilliseconds:100
+                                                                                           tipFloorThreshold:32
+                                                                                             tipMinThreshold:128
+                                                                                             tipMaxThreshold:255
+                                                                                                  isTipGated:NO
+                                                                                        eraserFloorThreshold:32
+                                                                                          eraserMinThreshold:128
+                                                                                          eraserMaxThreshold:255
+                                                                                               isEraserGated:NO];
+        }
+    }
 }
 
 - (IBAction)pairButtonTouchUpInside:(id)sender

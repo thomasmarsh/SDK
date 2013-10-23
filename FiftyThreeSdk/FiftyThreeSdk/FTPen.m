@@ -56,27 +56,27 @@ NSString * const kFTPenLastErrorCodePropertyName = @"lastErrorCode";
 
 @implementation FTPenPressureSetup
 
-- (id)initWithTipSamplePeriodMilliseconds:(uint8_t)tipSamplePeriodMilliseconds
-         tipNotificatinPeriodMilliseconds:(uint8_t)tipNotificatinPeriodMilliseconds
-                          tipMinThreshold:(uint8_t)tipMinThreshold
-                          tipMaxThreshold:(uint8_t)tipMaxThreshold
-                               isTipGated:(BOOL)isTipGated
-           eraserSamplePeriodMilliseconds:(uint8_t)eraserSamplePeriodMilliseconds
-      eraserNotificatinPeriodMilliseconds:(uint8_t)eraserNotificationPeriodMilliseconds
-                       eraserMinThreshold:(uint8_t)eraserMinThreshold
-                       eraserMaxThreshold:(uint8_t)eraserMaxThreshold
-                            isEraserGated:(BOOL)isEraserGated
+- (id)initWithSamplePeriodMilliseconds:(uint8_t)samplePeriodMilliseconds
+         notificatinPeriodMilliseconds:(uint8_t)notificatinPeriodMilliseconds
+                     tipFloorThreshold:(uint8_t)tipFloorThreshold
+                       tipMinThreshold:(uint8_t)tipMinThreshold
+                       tipMaxThreshold:(uint8_t)tipMaxThreshold
+                            isTipGated:(BOOL)isTipGated
+                  eraserFloorThreshold:(uint8_t)eraserFloorThreshold
+                    eraserMinThreshold:(uint8_t)eraserMinThreshold
+                    eraserMaxThreshold:(uint8_t)eraserMaxThreshold
+                         isEraserGated:(BOOL)isEraserGated
 {
     self = [super init];
     if (self)
     {
-        _tipSamplePeriodMilliseconds = tipSamplePeriodMilliseconds;
-        _tipNotificatinPeriodMilliseconds = tipNotificatinPeriodMilliseconds;
+        _samplePeriodMilliseconds = samplePeriodMilliseconds;
+        _notificatinPeriodMilliseconds = notificatinPeriodMilliseconds;
+        _tipFloorThreshold = tipFloorThreshold;
         _tipMinThreshold = tipMinThreshold;
         _tipMaxThreshold = tipMaxThreshold;
         _isTipGated = isTipGated;
-        _eraserSamplePeriodMilliseconds = eraserSamplePeriodMilliseconds;
-        _eraserNotificatinPeriodMilliseconds = eraserNotificationPeriodMilliseconds;
+        _eraserFloorThreshold = eraserFloorThreshold;
         _eraserMinThreshold = eraserMinThreshold;
         _eraserMaxThreshold = eraserMaxThreshold;
         _isEraserGated = isEraserGated;
@@ -92,13 +92,13 @@ NSString * const kFTPenLastErrorCodePropertyName = @"lastErrorCode";
     if (self)
     {
         uint8_t *bytes = (uint8_t *)data.bytes;
-        _tipSamplePeriodMilliseconds = bytes[0];
-        _tipNotificatinPeriodMilliseconds = bytes[1];
-        _tipMinThreshold = bytes[2];
-        _tipMaxThreshold = bytes[3];
-        _isTipGated = bytes[4] ? YES : NO;
-        _eraserSamplePeriodMilliseconds = bytes[5];
-        _eraserNotificatinPeriodMilliseconds = bytes[6];
+        _samplePeriodMilliseconds = bytes[0];
+        _notificatinPeriodMilliseconds = bytes[1];
+        _tipFloorThreshold = bytes[2];
+        _tipMinThreshold = bytes[3];
+        _tipMaxThreshold = bytes[4];
+        _isTipGated = bytes[5] ? YES : NO;
+        _eraserFloorThreshold = bytes[6];
         _eraserMinThreshold = bytes[7];
         _eraserMaxThreshold = bytes[8];
         _isEraserGated = bytes[9] ? YES : NO;
@@ -111,13 +111,13 @@ NSString * const kFTPenLastErrorCodePropertyName = @"lastErrorCode";
     NSAssert(data.length == 10, @"PressureSetup data is 10 bytes long");
 
     uint8_t *bytes = (uint8_t *)data.bytes;
-    bytes[0] = _tipSamplePeriodMilliseconds;
-    bytes[1] = _tipNotificatinPeriodMilliseconds;
-    bytes[2] = _tipMinThreshold;
-    bytes[3] = _tipMaxThreshold;
-    bytes[4] = _isTipGated ? 1 : 0;
-    bytes[5] = _eraserSamplePeriodMilliseconds;
-    bytes[6] = _eraserNotificatinPeriodMilliseconds;
+    bytes[0] = _samplePeriodMilliseconds;;
+    bytes[1] = _notificatinPeriodMilliseconds;
+    bytes[2] = _tipFloorThreshold;
+    bytes[3] = _tipMinThreshold;
+    bytes[4] = _tipMaxThreshold;
+    bytes[5] = _isTipGated ? 1 : 0;
+    bytes[6] = _eraserFloorThreshold;
     bytes[7] = _eraserMinThreshold;
     bytes[8] = _eraserMaxThreshold;
     bytes[9] = _isEraserGated ? 1 : 0;

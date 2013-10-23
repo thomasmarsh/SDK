@@ -24,6 +24,9 @@
 @property (weak, nonatomic) IBOutlet UILabel *deviceInfoLabel;
 @property (weak, nonatomic) IBOutlet UILabel *connectionHistoryLabel;
 @property (weak, nonatomic) IBOutlet UIButton *clearLastErrorButton;
+@property (weak, nonatomic) IBOutlet UIButton *incrementInactivityTimeoutButton;
+@property (weak, nonatomic) IBOutlet UIButton *decrementInactivityTimeoutButton;
+@property (weak, nonatomic) IBOutlet UIButton *togglePressureButton;
 @property (weak, nonatomic) IBOutlet UINavigationItem *appTitleNavItem;
 
 - (IBAction)pairButtonTouchUpInside:(id)sender;
@@ -33,5 +36,8 @@
 - (IBAction)updateFirmwareButtonTouchUpInside:(id)sender;
 - (IBAction)clearLastErrorButtonTouchUpInside:(id)sender;
 - (IBAction)updateStatsTouchUpInside:(id)sender;
+- (IBAction)incrementInactivityTimeoutButtonTouchUpInside:(id)sender;
+- (IBAction)decrementInactivityTimeoutButtonTouchUpInside:(id)sender;
+- (IBAction)togglePressureButtonTouchUpInside:(id)sender;
 
 @end

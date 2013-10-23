@@ -33,29 +33,30 @@ extern NSString * const kFTPenLastErrorCodePropertyName;
 // FTPenPressureSetup
 //
 @interface FTPenPressureSetup : NSObject
-@property (nonatomic, readonly) uint8_t tipSamplePeriodMilliseconds;
-@property (nonatomic, readonly) uint8_t tipNotificatinPeriodMilliseconds;
+@property (nonatomic, readonly) uint8_t samplePeriodMilliseconds;
+@property (nonatomic, readonly) uint8_t notificatinPeriodMilliseconds;
+
+@property (nonatomic, readonly) uint8_t tipFloorThreshold;
 @property (nonatomic, readonly) uint8_t tipMinThreshold;
 @property (nonatomic, readonly) uint8_t tipMaxThreshold;
 @property (nonatomic, readonly) BOOL isTipGated;
 
-@property (nonatomic, readonly) uint8_t eraserSamplePeriodMilliseconds;
-@property (nonatomic, readonly) uint8_t eraserNotificatinPeriodMilliseconds;
+@property (nonatomic, readonly) uint8_t eraserFloorThreshold;
 @property (nonatomic, readonly) uint8_t eraserMinThreshold;
 @property (nonatomic, readonly) uint8_t eraserMaxThreshold;
 @property (nonatomic, readonly) BOOL isEraserGated;
 
 - (id)init __unavailable;
-- (id)initWithTipSamplePeriodMilliseconds:(uint8_t)tipSamplePeriodMilliseconds
-         tipNotificatinPeriodMilliseconds:(uint8_t)tipNotificatinPeriodMilliseconds
-                          tipMinThreshold:(uint8_t)tipMinThreshold
-                          tipMaxThreshold:(uint8_t)tipMaxThreshold
-                               isTipGated:(BOOL)isTipGated
-           eraserSamplePeriodMilliseconds:(uint8_t)eraserSamplePeriodMilliseconds
-      eraserNotificatinPeriodMilliseconds:(uint8_t)eraserNotificationPeriodMilliseconds
-                       eraserMinThreshold:(uint8_t)eraserMinThreshold
-                       eraserMaxThreshold:(uint8_t)eraserMaxThreshold
-                            isEraserGated:(BOOL)isEraserGated;
+- (id)initWithSamplePeriodMilliseconds:(uint8_t)samplePeriodMilliseconds
+         notificatinPeriodMilliseconds:(uint8_t)notificatinPeriodMilliseconds
+                     tipFloorThreshold:(uint8_t)tipFloorThreshold
+                       tipMinThreshold:(uint8_t)tipMinThreshold
+                       tipMaxThreshold:(uint8_t)tipMaxThreshold
+                            isTipGated:(BOOL)isTipGated
+                  eraserFloorThreshold:(uint8_t)eraserFloorThreshold
+                    eraserMinThreshold:(uint8_t)eraserMinThreshold
+                    eraserMaxThreshold:(uint8_t)eraserMaxThreshold
+                         isEraserGated:(BOOL)isEraserGated;
 - (id)initWithNSData:(NSData *)data;
 - (void)writeToNSData:(NSData *)data;
 
