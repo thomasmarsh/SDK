@@ -39,8 +39,7 @@ using namespace boost;
                                                    object:nil];
 
     }
-    
-    
+
     return self;
 }
 
@@ -75,11 +74,11 @@ using namespace boost;
 
         if (self.classifier && *self.classifier)
         {
-            std::set<Touch::Ptr> touches;
+            std::set<Touch::cPtr> touches;
 
             for (UITouch *t in [event allTouches])
             {
-                Touch::Ptr touch = static_pointer_cast<TouchTrackerObjC>(TouchTracker::Instance())->TouchForUITouch(t);
+                Touch::cPtr touch = static_pointer_cast<TouchTrackerObjC>(TouchTracker::Instance())->TouchForUITouch(t);
                 touches.insert(touch);
             }
 
