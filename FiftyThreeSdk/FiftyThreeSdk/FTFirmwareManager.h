@@ -23,6 +23,10 @@ typedef NS_ENUM(NSInteger, FTFirmwareImageType) {
 + (NSInteger)versionOfImageAtPath:(NSString *)imagePath;
 
 // Returns a boolean value as a NSNumber, or nil if this cannot yet be determined.
+//
+// currentVersion is updated if it is available; otherwise it is set to -1.
+//
+// updateVersion is updated IFF the return value is @(@YES) and should otherwise be ignored.
 + (NSNumber *)isVersionAtPath:(NSString *)imagePath
         newerThanVersionOnPen:(FTPen *)pen
                currentVersion:(NSInteger *)currentVersion

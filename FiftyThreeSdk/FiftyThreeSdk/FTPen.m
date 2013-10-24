@@ -578,4 +578,18 @@ NSString * const kFTPenLastErrorCodePropertyName = @"lastErrorCode";
     return self.deviceInfoServiceClient.PnPID;
 }
 
+#pragma mark - Model
+
+- (NSNumber *)isAluminumPencil
+{
+    if (!self.modelNumber)
+    {
+        return nil;
+    }
+    // Example modelNumber: 53PA02
+    NSString *modelNumber = self.modelNumber;
+    NSString *metalModelNumberPrefix = @"53PA";
+    return  @([modelNumber hasPrefix:metalModelNumberPrefix]);
+}
+
 @end

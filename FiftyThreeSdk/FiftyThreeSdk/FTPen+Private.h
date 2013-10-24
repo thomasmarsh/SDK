@@ -114,6 +114,12 @@ extern NSString * const kFTPenLastErrorCodePropertyName;
 @property (nonatomic, readonly) NSUInteger numDroppedNotifications;
 @property (nonatomic, readonly) NSUInteger connectedSeconds;
 
+// Returns a boolean value as a NSNumber, or nil if this cannot be determined.
+//
+// Returns @(YES) IFF a pencil is connected, its model number is known and it is an aluminum
+// pencil.
+@property (nonatomic, readonly) NSNumber *isAluminumPencil;
+
 - (id)initWithCentralManager:(CBCentralManager *)centralManager
                   peripheral:(CBPeripheral *)peripheral;
 
