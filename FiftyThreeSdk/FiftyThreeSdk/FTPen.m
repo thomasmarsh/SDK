@@ -419,9 +419,6 @@ NSString * const kFTPenLastErrorCodePropertyName = @"lastErrorCode";
 
 - (void)penServiceClient:(FTPenServiceClient *)penServiceClient isReadyDidChange:(BOOL)isReady
 {
-    [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenIsReadyDidChangeNotificationName
-                                                        object:self];
-
     if ([self.privateDelegate respondsToSelector:@selector(pen:isReadyDidChange:)])
     {
         [self.privateDelegate pen:self isReadyDidChange:isReady];
@@ -434,6 +431,9 @@ NSString * const kFTPenLastErrorCodePropertyName = @"lastErrorCode";
         [self.peripheralDelegate addServiceClient:_deviceInfoServiceClient];
         [self ensureServicesDiscovered];
     }
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenIsReadyDidChangeNotificationName
+                                                        object:self];
 }
 
 - (void)penServiceClient:(FTPenServiceClient *)penServiceClient isTipPressedDidChange:(BOOL)isTipPressed

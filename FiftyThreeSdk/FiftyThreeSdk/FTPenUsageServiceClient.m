@@ -99,18 +99,20 @@
     {
         self.penUsageService = [FTServiceClient findServiceWithPeripheral:peripheral
                                                                   andUUID:[FTPenUsageServiceUUIDs penUsageService]];
+        if (self.penUsageService)
+        {
+            NSArray *characteristics = @[[FTPenUsageServiceUUIDs numTipPresses],
+                                         [FTPenUsageServiceUUIDs numEraserPresses],
+                                         [FTPenUsageServiceUUIDs numFailedConnections],
+                                         [FTPenUsageServiceUUIDs numSuccessfulConnections],
+                                         [FTPenUsageServiceUUIDs numResets],
+                                         [FTPenUsageServiceUUIDs numLinkTerminations],
+                                         [FTPenUsageServiceUUIDs numDroppedNotifications],
+                                         [FTPenUsageServiceUUIDs connectedSeconds]
+                                         ];
 
-        NSArray *characteristics = @[[FTPenUsageServiceUUIDs numTipPresses],
-                                     [FTPenUsageServiceUUIDs numEraserPresses],
-                                     [FTPenUsageServiceUUIDs numFailedConnections],
-                                     [FTPenUsageServiceUUIDs numSuccessfulConnections],
-                                     [FTPenUsageServiceUUIDs numResets],
-                                     [FTPenUsageServiceUUIDs numLinkTerminations],
-                                     [FTPenUsageServiceUUIDs numDroppedNotifications],
-                                     [FTPenUsageServiceUUIDs connectedSeconds]
-                                     ];
-
-        [peripheral discoverCharacteristics:characteristics forService:self.penUsageService];
+            [peripheral discoverCharacteristics:characteristics forService:self.penUsageService];
+        }
     }
 }
 

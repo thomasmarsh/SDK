@@ -51,6 +51,10 @@ FTPenPrivateDelegate>
         _uptimeTimer = Timer::New();
 
         [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(penIsReady:)
+                                                     name:kFTPenIsReadyDidChangeNotificationName
+                                                   object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(penDidEncounterUnexpectedDisconnect:)
                                                      name:kFTPenUnexpectedDisconnectNotificationName
                                                    object:nil];
@@ -132,6 +136,14 @@ FTPenPrivateDelegate>
 
 #pragma mark - Notifications
 
+- (void)penIsReady:(NSNotification *)notification
+{
+    if (self.penManager.pen.isReady)
+    {
+        [self.penManager.pen readUsageProperties];
+    }
+}
+
 - (void)penDidEncounterUnexpectedDisconnect:(NSNotification *)notification
 {
     self.numUnexpectedDisconnectsGeneral++;
@@ -193,11 +205,6 @@ FTPenPrivateDelegate>
         NSAssert(penManager.pen, @"pen is non-nil");
         penManager.pen.delegate = self;
         penManager.pen.privateDelegate = self;
-    }
-
-    if (state == FTPenManagerStateConnected)
-    {
-        [self.penManager.pen readUsageProperties];
     }
 
     if (self.firmwareUpdateProgressView)
