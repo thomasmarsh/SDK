@@ -12,6 +12,8 @@
 		3498700A174FB20700A3088E /* libCanvas.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 34986FF2174FB1B500A3088E /* libCanvas.a */; };
 		3498700B174FB20700A3088E /* libCommon.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 34986FE9174FB1A700A3088E /* libCommon.a */; };
 		3498700C174FB20700A3088E /* libGlobalSettings.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 34986FFA174FB1BF00A3088E /* libGlobalSettings.a */; };
+		3C2FE96B1819EF4F00FE7190 /* CoreTelephony.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3C2FE96A1819EF4F00FE7190 /* CoreTelephony.framework */; };
+		3C2FE96F1819EF5800FE7190 /* AdSupport.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3C2FE96E1819EF5800FE7190 /* AdSupport.framework */; };
 		3C94A5B717F609D600BCDB43 /* PencilFirmware.bin in Resources */ = {isa = PBXBuildFile; fileRef = 3C94A5B617F609D600BCDB43 /* PencilFirmware.bin */; };
 		3CD6FA3617DE1D1E001E5F82 /* icon72.png in Resources */ = {isa = PBXBuildFile; fileRef = 3CD6FA3417DE1D1E001E5F82 /* icon72.png */; };
 		3CD6FA3717DE1D1E001E5F82 /* icon144.png in Resources */ = {isa = PBXBuildFile; fileRef = 3CD6FA3517DE1D1E001E5F82 /* icon144.png */; };
@@ -153,6 +155,8 @@
 		34986FEC174FB1B400A3088E /* Canvas.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Canvas.xcodeproj; path = ../../Canvas/Canvas.xcodeproj; sourceTree = "<group>"; };
 		34986FF5174FB1BF00A3088E /* GlobalSettings.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = GlobalSettings.xcodeproj; path = ../../GlobalSettings/GlobalSettings.xcodeproj; sourceTree = "<group>"; };
 		34986FFB174FB1CB00A3088E /* AFNetworking.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = AFNetworking.xcodeproj; path = ../../AFNetworking/AFNetworking.xcodeproj; sourceTree = "<group>"; };
+		3C2FE96A1819EF4F00FE7190 /* CoreTelephony.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreTelephony.framework; path = System/Library/Frameworks/CoreTelephony.framework; sourceTree = SDKROOT; };
+		3C2FE96E1819EF5800FE7190 /* AdSupport.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AdSupport.framework; path = System/Library/Frameworks/AdSupport.framework; sourceTree = SDKROOT; };
 		3C94A5B617F609D600BCDB43 /* PencilFirmware.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; name = PencilFirmware.bin; path = ../FiftyThreeSdk/FiftyThreeSdk/PencilFirmware.bin; sourceTree = "<group>"; };
 		3CD6FA3417DE1D1E001E5F82 /* icon72.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = icon72.png; path = FiftyThreeSdkTestApp/icon72.png; sourceTree = "<group>"; };
 		3CD6FA3517DE1D1E001E5F82 /* icon144.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = icon144.png; path = FiftyThreeSdkTestApp/icon144.png; sourceTree = "<group>"; };
@@ -239,8 +243,10 @@
 				3498700B174FB20700A3088E /* libCommon.a in Frameworks */,
 				3498700C174FB20700A3088E /* libGlobalSettings.a in Frameworks */,
 				34986FD3174FAC8E00A3088E /* libFiftyThreeSdk.a in Frameworks */,
+				3C2FE96F1819EF5800FE7190 /* AdSupport.framework in Frameworks */,
 				665C61DB1714974D00E70FB4 /* MessageUI.framework in Frameworks */,
 				668F6D5A17024021002C548B /* CoreVideo.framework in Frameworks */,
+				3C2FE96B1819EF4F00FE7190 /* CoreTelephony.framework in Frameworks */,
 				6644318016F7FE570049E570 /* OpenGLES.framework in Frameworks */,
 				6632314116F8B9FD008AD3DC /* AVFoundation.framework in Frameworks */,
 				6632314016F8B9F2008AD3DC /* libT1PogoManager.a in Frameworks */,
@@ -377,23 +383,25 @@
 		66A47BF216D835C90016B31C /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				3C2FE96E1819EF5800FE7190 /* AdSupport.framework */,
 				34986FFB174FB1CB00A3088E /* AFNetworking.xcodeproj */,
-				34986FE3174FB1A600A3088E /* Common.xcodeproj */,
-				34986FEC174FB1B400A3088E /* Canvas.xcodeproj */,
-				34986FC2174FAC4F00A3088E /* FiftyThreeSdk.xcodeproj */,
-				34986FF5174FB1BF00A3088E /* GlobalSettings.xcodeproj */,
-				665C61DA1714974D00E70FB4 /* MessageUI.framework */,
-				6632313F16F8B9F2008AD3DC /* libT1PogoManager.a */,
-				6644318116F7FF260049E570 /* libsqlite3.dylib */,
-				6644317716F7FDD30049E570 /* libz.dylib */,
 				6644317B16F7FE2E0049E570 /* AVFoundation.framework */,
 				6644317416F7FC680049E570 /* boost.framework */,
+				34986FEC174FB1B400A3088E /* Canvas.xcodeproj */,
+				34986FE3174FB1A600A3088E /* Common.xcodeproj */,
 				66A47C1A16D843250016B31C /* CoreBluetooth.framework */,
 				6644318916F7FFE30049E570 /* CoreData.framework */,
 				66A47BF716D835C90016B31C /* CoreGraphics.framework */,
+				3C2FE96A1819EF4F00FE7190 /* CoreTelephony.framework */,
 				6644317916F7FE190049E570 /* CoreText.framework */,
 				6644319616F802C80049E570 /* CoreVideo.framework */,
+				34986FC2174FAC4F00A3088E /* FiftyThreeSdk.xcodeproj */,
 				66A47BF516D835C90016B31C /* Foundation.framework */,
+				34986FF5174FB1BF00A3088E /* GlobalSettings.xcodeproj */,
+				6644318116F7FF260049E570 /* libsqlite3.dylib */,
+				6632313F16F8B9F2008AD3DC /* libT1PogoManager.a */,
+				6644317716F7FDD30049E570 /* libz.dylib */,
+				665C61DA1714974D00E70FB4 /* MessageUI.framework */,
 				6632313B16F8B1CA008AD3DC /* MobileCoreServices.framework */,
 				6644317F16F7FE570049E570 /* OpenGLES.framework */,
 				6644319A16F804B20049E570 /* QuartzCore.framework */,
