@@ -265,7 +265,7 @@ public:
             typeName = "FINGER";
         }
 
-        std::cout << "Touch type changed, id = " << touch->Id() << " type = " << typeName << std::endl;
+//        std::cout << "Touch type changed, id = " << touch->Id() << " type = " << typeName << std::endl;
 
         _TouchTypeChangedEvent.Fire(touch);
     }
