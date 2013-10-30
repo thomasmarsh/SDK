@@ -479,7 +479,9 @@ FTPenPrivateDelegate>
     [deviceInfo appendFormat:@"Upgrade Firmware Rev: %@\n", pen.softwareRevision];
     [deviceInfo appendFormat:@"    * currently running\n\n"];
 
-    [deviceInfo appendFormat:@"Battery Level: %d%%\n\n", pen.batteryLevel];
+    NSString *batteryLevelText = [NSString stringWithFormat:@"Battery Level: %d%%\n\n", pen.batteryLevel];
+    int batteryLevelOffset = [deviceInfo length];
+    [deviceInfo appendString:batteryLevelText];
 
     [deviceInfo appendFormat:@"Tip Presses: %d\n", pen.numTipPresses];
     [deviceInfo appendFormat:@"Eraser Presses: %d\n", pen.numEraserPresses];
@@ -538,7 +540,20 @@ FTPenPrivateDelegate>
         self.clearLastErrorButton.hidden = YES;
     }
 
-    self.deviceInfoLabel.text = deviceInfo;
+    UIColor *batteryLevelColor = [UIColor blackColor];
+    if (pen.batteryLevel != -1)
+    {
+        batteryLevelColor = (pen.batteryLevel < 50 ?
+                             [UIColor redColor] :
+                             [UIColor greenColor]);
+    }
+
+    NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:deviceInfo];
+    [attributedString addAttribute:NSForegroundColorAttributeName
+                             value:batteryLevelColor
+                             range:NSMakeRange(batteryLevelOffset, [batteryLevelText length])];
+
+    self.deviceInfoLabel.attributedText = attributedString;
     self.deviceInfoLabel.size = [self.deviceInfoLabel sizeThatFits:CGSizeZero];
     [self.deviceInfoLabel.superview setNeedsLayout];
 }
