@@ -10,6 +10,7 @@
 #import "Common/DeviceInfo.h"
 #import "Common/NSData+Crypto.h"
 #import "Common/Timer.h"
+#import "Common/UIView+Helpers.h"
 #import "FiftyThreeSdk/FTFirmwareManager.h"
 #import "FiftyThreeSdk/FTFirmwareUpdateProgressView.h"
 #import "FiftyThreeSdk/FTPen+Private.h"
@@ -448,6 +449,8 @@ FTPenPrivateDelegate>
     [connectionHistory appendFormat:@"Release Latency (ms): %@\n", releaseLatencyStr];
 
     self.connectionHistoryLabel.text = connectionHistory;
+    self.connectionHistoryLabel.size = [self.connectionHistoryLabel sizeThatFits:CGSizeZero];
+    [self.connectionHistoryLabel.superview setNeedsLayout];
 }
 
 - (void)updateDeviceInfoLabel
@@ -475,57 +478,60 @@ FTPenPrivateDelegate>
     [deviceInfo appendFormat:@"Factory Firmware Rev: %@\n", pen.firmwareRevision];
     [deviceInfo appendFormat:@"Upgrade Firmware Rev: %@\n", pen.softwareRevision];
     [deviceInfo appendFormat:@"    * currently running\n\n"];
-    [deviceInfo appendFormat:@"Battery Level: %d%%\n", pen.batteryLevel];
+
+    [deviceInfo appendFormat:@"Battery Level: %d%%\n\n", pen.batteryLevel];
+
     [deviceInfo appendFormat:@"Tip Presses: %d\n", pen.numTipPresses];
     [deviceInfo appendFormat:@"Eraser Presses: %d\n", pen.numEraserPresses];
     [deviceInfo appendFormat:@"Failed Connections: %d\n", pen.numFailedConnections];
     [deviceInfo appendFormat:@"Successful Connections: %d\n", pen.numSuccessfulConnections];
-    [deviceInfo appendFormat:@"Num Resets: %d\n", pen.numResets];
-    [deviceInfo appendFormat:@"Num Link Terminations: %d\n", pen.numLinkTerminations];
-    [deviceInfo appendFormat:@"Num Dropped Notifications: %d\n", pen.numDroppedNotifications];
+//    [deviceInfo appendFormat:@"Num Resets: %d\n", pen.numResets];
+//    [deviceInfo appendFormat:@"Num Link Terminations: %d\n", pen.numLinkTerminations];
+//    [deviceInfo appendFormat:@"Num Dropped Notifications: %d\n", pen.numDroppedNotifications];
     [deviceInfo appendFormat:@"Total Connected Time: %dd %02d:%02d:%02d\n\n",
      onTimeDayField, onTimeHourField, onTimeMinField,  onTimeSecField];
-    [deviceInfo appendFormat:@"Last Error ID: %d\n",
-     (pen.lastErrorCode ? pen.lastErrorCode.lastErrorID : - 1)];
-    [deviceInfo appendFormat:@"Last Error Value: %d\n\n",
-     (pen.lastErrorCode ? pen.lastErrorCode.lastErrorValue : -1)];
 
-    if (pen.inactivityTimeout == 0)
-    {
-        [deviceInfo appendFormat:@"Inactivity Timeout: Never\n\n"];
-    }
-    else
-    {
-        [deviceInfo appendFormat:@"Inactivity Timeout: %d\n\n", pen.inactivityTimeout];
-    }
-
-    if (pen.pressureSetup)
-    {
-        [deviceInfo appendFormat:@"Pressure Rate: %d %d\n",
-         pen.pressureSetup.samplePeriodMilliseconds,
-         pen.pressureSetup.notificatinPeriodMilliseconds];
-
-        [deviceInfo appendFormat:@"Tip Mapping: %d %d %d %d\n",
-         pen.pressureSetup.tipFloorThreshold,
-         pen.pressureSetup.tipMinThreshold,
-         pen.pressureSetup.tipMaxThreshold,
-         pen.pressureSetup.isTipGated];
-
-        [deviceInfo appendFormat:@"Eraser Mapping: %d %d %d %d\n",
-         pen.pressureSetup.eraserFloorThreshold,
-         pen.pressureSetup.eraserMinThreshold,
-         pen.pressureSetup.eraserMaxThreshold,
-         pen.pressureSetup.isEraserGated];
-    }
-    else
-    {
-        [deviceInfo appendFormat:@"Tip Pressure Setup:\n"];
-        [deviceInfo appendFormat:@"Eraser Pressure Setup:\n"];
-    }
+//    [deviceInfo appendFormat:@"Last Error ID: %d\n",
+//     (pen.lastErrorCode ? pen.lastErrorCode.lastErrorID : - 1)];
+//    [deviceInfo appendFormat:@"Last Error Value: %d\n\n",
+//     (pen.lastErrorCode ? pen.lastErrorCode.lastErrorValue : -1)];
+//
+//    if (pen.inactivityTimeout == 0)
+//    {
+//        [deviceInfo appendFormat:@"Inactivity Timeout: Never\n\n"];
+//    }
+//    else
+//    {
+//        [deviceInfo appendFormat:@"Inactivity Timeout: %d\n\n", pen.inactivityTimeout];
+//    }
+//
+//    if (pen.pressureSetup)
+//    {
+//        [deviceInfo appendFormat:@"Pressure Rate: %d %d\n",
+//         pen.pressureSetup.samplePeriodMilliseconds,
+//         pen.pressureSetup.notificatinPeriodMilliseconds];
+//
+//        [deviceInfo appendFormat:@"Tip Mapping: %d %d %d %d\n",
+//         pen.pressureSetup.tipFloorThreshold,
+//         pen.pressureSetup.tipMinThreshold,
+//         pen.pressureSetup.tipMaxThreshold,
+//         pen.pressureSetup.isTipGated];
+//
+//        [deviceInfo appendFormat:@"Eraser Mapping: %d %d %d %d\n",
+//         pen.pressureSetup.eraserFloorThreshold,
+//         pen.pressureSetup.eraserMinThreshold,
+//         pen.pressureSetup.eraserMaxThreshold,
+//         pen.pressureSetup.isEraserGated];
+//    }
+//    else
+//    {
+//        [deviceInfo appendFormat:@"Tip Pressure Setup:\n"];
+//        [deviceInfo appendFormat:@"Eraser Pressure Setup:\n"];
+//    }
 
     if (self.penManager.pen.lastErrorCode.lastErrorID != 0)
     {
-        self.clearLastErrorButton.hidden = NO;
+//        self.clearLastErrorButton.hidden = NO;
     }
     else
     {
@@ -533,6 +539,8 @@ FTPenPrivateDelegate>
     }
 
     self.deviceInfoLabel.text = deviceInfo;
+    self.deviceInfoLabel.size = [self.deviceInfoLabel sizeThatFits:CGSizeZero];
+    [self.deviceInfoLabel.superview setNeedsLayout];
 }
 
 - (void)displayPenInfo:(FTPen *)pen
@@ -600,9 +608,9 @@ FTPenPrivateDelegate>
         self.connectButton.hidden = NO;
         self.updateFirmwareButton.hidden = NO;
         self.updateStatsButton.hidden = NO;
-        self.incrementInactivityTimeoutButton.hidden = NO;
-        self.decrementInactivityTimeoutButton.hidden = NO;
-        self.togglePressureButton.hidden = NO;
+//        self.incrementInactivityTimeoutButton.hidden = NO;
+//        self.decrementInactivityTimeoutButton.hidden = NO;
+//        self.togglePressureButton.hidden = NO;
     }
     else
     {
@@ -683,11 +691,6 @@ FTPenPrivateDelegate>
 
 - (IBAction)updateStatsTouchUpInside:(id)sender
 {
-    self.numUnexpectedDisconnectsGeneral = 0;
-    self.numUnexpectedDisconnectsConnecting = 0;
-    self.numUnexpectedDisconnectsFirmware = 0;
-    [self updateConnectionHistoryLabel];
-
     [self.penManager.pen readUsageProperties];
 }
 
@@ -735,6 +738,14 @@ FTPenPrivateDelegate>
                                                                                                isEraserGated:NO];
         }
     }
+}
+
+- (IBAction)clearStatusButtonTouchUpInside:(id)sender
+{
+    self.numUnexpectedDisconnectsGeneral = 0;
+    self.numUnexpectedDisconnectsConnecting = 0;
+    self.numUnexpectedDisconnectsFirmware = 0;
+    [self updateConnectionHistoryLabel];
 }
 
 - (IBAction)pairButtonTouchUpInside:(id)sender

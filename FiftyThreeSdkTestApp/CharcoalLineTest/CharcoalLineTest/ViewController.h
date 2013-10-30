@@ -39,5 +39,6 @@
 - (IBAction)incrementInactivityTimeoutButtonTouchUpInside:(id)sender;
 - (IBAction)decrementInactivityTimeoutButtonTouchUpInside:(id)sender;
 - (IBAction)togglePressureButtonTouchUpInside:(id)sender;
+- (IBAction)clearStatusButtonTouchUpInside:(id)sender;
 
 @end
