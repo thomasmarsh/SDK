@@ -291,8 +291,9 @@
                                          [FTPenServiceUUIDs shouldPowerOff],
                                          [FTPenServiceUUIDs inactivityTimeout],
                                          [FTPenServiceUUIDs manufacturingID],
+                                         [FTPenServiceUUIDs authenticationCode],
                                          [FTPenServiceUUIDs lastErrorCode],
-                                         [FTPenServiceUUIDs pressureSetup]
+                                         [FTPenServiceUUIDs pressureSetup],
                                          ];
 
             [peripheral discoverCharacteristics:characteristics forService:self.penService];
