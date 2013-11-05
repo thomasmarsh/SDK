@@ -16,6 +16,7 @@
 #import "FiftyThreeSdk/FTPen+Private.h"
 #import "FiftyThreeSdk/FTPenManager+Private.h"
 #import "FiftyThreeSdk/FTPenManager.h"
+#import "KeychainItemWrapper/KeychainItemWrapper.h"
 #import "RscMgr.h"
 #import "UIALertView-Blocks/UIAlertView+Blocks.h"
 #import "ViewController.h"
@@ -54,6 +55,7 @@ FTPenPrivateDelegate>
 @property (nonatomic) int numUnexpectedDisconnectsConnecting;
 @property (nonatomic) int numUnexpectedDisconnectsFirmware;
 
+@property (nonatomic) KeychainItemWrapper *PKCS12PasswordKeychainItem;
 @property (nonatomic) SecIdentityRef authenticationCodeSigningIdentity;
 @property (nonatomic) SecKeyRef authenticationCodeSigningPublicKey;
 
@@ -67,6 +69,9 @@ FTPenPrivateDelegate>
     if (self)
     {
         _uptimeTimer = Timer::New();
+
+        _PKCS12PasswordKeychainItem = [[KeychainItemWrapper alloc] initWithIdentifier:@"com.fiftythree.pencil.PKCS12Password"
+                                                                          accessGroup:nil];
 
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(penIsReady:)
@@ -1078,6 +1083,40 @@ FTPenPrivateDelegate>
         }
     };
 
+    void (^loadSigningIdentityAndCalculateAuthCode)(NSString *password) = ^(NSString *password)
+    {
+        SecIdentityRef identity = NULL;
+        SecTrustRef trust = NULL;
+        if (![PKCS12Data PKCS12ExtractIdentity:&identity
+                                      andTrust:&trust
+                                  withPassword:password])
+        {
+            [[[UIAlertView alloc] initWithTitle:@"Could Not Access Signing Identity"
+                                        message:@"Please verify the password and try again."
+                                       delegate:nil
+                              cancelButtonTitle:@"OK"
+                              otherButtonTitles:nil] show];
+
+            // If the stored password is no longer valid for this PKCS12 file, then clear it.
+            [self.PKCS12PasswordKeychainItem resetKeychainItem];
+
+            if (completion)
+            {
+                completion(nil);
+            }
+            return;
+        }
+
+        [self.PKCS12PasswordKeychainItem setObject:password
+                                            forKey:(__bridge id)kSecValueData];
+
+        self.authenticationCodeSigningIdentity = identity;
+        self.authenticationCodeSigningPublicKey = SecTrustCopyPublicKey(trust);
+        CFRelease(trust);
+
+        calculateAuthenticationCode();
+    };
+
     if (self.authenticationCodeSigningIdentity != NULL &&
         self.authenticationCodeSigningPublicKey != NULL)
     {
@@ -1085,32 +1124,17 @@ FTPenPrivateDelegate>
     }
     else
     {
-        [self queryForPassword:^(NSString *password) {
-
-            SecIdentityRef identity = NULL;
-            SecTrustRef trust = NULL;
-            if (![PKCS12Data PKCS12ExtractIdentity:&identity
-                                          andTrust:&trust
-                                      withPassword:password])
-            {
-                [[[UIAlertView alloc] initWithTitle:@"Could Not Access Signing Identity"
-                                            message:@"Please verify the password and try again."
-                                           delegate:nil
-                                  cancelButtonTitle:@"OK"
-                                  otherButtonTitles:nil] show];
-                if (completion)
-                {
-                    completion(nil);
-                }
-                return;
-            }
-
-            self.authenticationCodeSigningIdentity = identity;
-            self.authenticationCodeSigningPublicKey = SecTrustCopyPublicKey(trust);
-            CFRelease(trust);
-
-            calculateAuthenticationCode();
-        }];
+        NSString *storedPassword = [self.PKCS12PasswordKeychainItem objectForKey:(__bridge id)kSecValueData];
+        if (storedPassword.length > 0)
+        {
+            loadSigningIdentityAndCalculateAuthCode(storedPassword);
+        }
+        else
+        {
+            [self queryForPassword:^(NSString *password) {
+                loadSigningIdentityAndCalculateAuthCode(password);
+            }];
+        }
     }
 
     return;
