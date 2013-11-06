@@ -1420,11 +1420,21 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
             [self fireStateMachineEvent:kAttemptConnectionFromSeparatedEventName];
         }
     }
-    else if ([self currentStateHasName:kMarriedWaitingForLongPressToDisconnectStateName] ||
-             [self currentStateHasName:kSeparatedWaitingForLongPressToUnpairStateName])
+    else if ([self currentStateHasName:kMarriedWaitingForLongPressToDisconnectStateName])
     {
+        // Reject the paired peripheral. We don't want to reconnect to the peripheral we may be using
+        // to press the pairing spot to sever the pairing right now.
         if (![self isPairedPeripheral:peripheral] &&
             !isPeripheralReconciling)
+        {
+            [self.peripheralsDiscoveredDuringLongPress addObject:peripheral];
+        }
+    }
+    else if ([self currentStateHasName:kSeparatedWaitingForLongPressToUnpairStateName])
+    {
+        // Unlike in kMarriedWaitingForLongPressToDisconnectStateName, we will accept the paired peripheral
+        // when separated. It might just be trying to reconnect!
+        if (!isPeripheralReconciling)
         {
             [self.peripheralsDiscoveredDuringLongPress addObject:peripheral];
         }
@@ -1545,13 +1555,37 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
             }
             else
             {
+                // Estimate whether the peripheral disconnected due to inactivity timeout by comparing
+                // the time since last activity to the inactivity timeout duration.
+                //
+                // TODO: The peripheral should report this to us in a robust fashion, either by setting a
+                // charachteristic or returning an error code in the disconnect.
+                BOOL didDisconnectDueToInactivityTimeout = NO;
+                if ([self currentStateHasName:kMarriedStateName])
+                {
+                    static const NSTimeInterval kInactivityTimeoutMargin = 20.0;
+                    NSTimeInterval timeSinceLastActivity = -[self.pairedPeripheralLastActivityTime timeIntervalSinceNow];
+                    [FTLog logWithFormat:@"Did disconnect, time since last activity: %f", timeSinceLastActivity];
+
+                    const NSTimeInterval inactivityTimeout = (pen.inactivityTimeout == -1 ?
+                                                              kInactivityTimeout :
+                                                              pen.inactivityTimeout * 60.0);
+
+                    if (fabs(timeSinceLastActivity - inactivityTimeout) < kInactivityTimeoutMargin)
+                    {
+                        didDisconnectDueToInactivityTimeout = YES;
+                        [FTLog log:@"Did disconnect due to peripheral inactivity timeout."];
+                    }
+                }
+
                 // Fire notifications to report that we've had an unexpected disconnect. Make sure to do this
                 // prior to transitioning states.
-                if ([self currentStateHasName:kMarriedStateName] ||
-                    [self currentStateHasName:kMarriedWaitingForLongPressToDisconnectStateName] ||
-                    [self currentStateHasName:kEngagedStateName] ||
-                    [self currentStateHasName:kEngagedWaitingForPairingSpotReleaseStateName] ||
-                    [self currentStateHasName:kEngagedWaitingForTipReleaseStateName])
+                if (!didDisconnectDueToInactivityTimeout &&
+                    ([self currentStateHasName:kMarriedStateName] ||
+                     [self currentStateHasName:kMarriedWaitingForLongPressToDisconnectStateName] ||
+                     [self currentStateHasName:kEngagedStateName] ||
+                     [self currentStateHasName:kEngagedWaitingForPairingSpotReleaseStateName] ||
+                     [self currentStateHasName:kEngagedWaitingForTipReleaseStateName]))
                 {
                     [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenUnexpectedDisconnectNotificationName
                                                                         object:pen];
@@ -1560,7 +1594,16 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
                 if ([self currentStateHasName:kMarriedStateName] ||
                     [self currentStateHasName:kMarriedWaitingForLongPressToDisconnectStateName])
                 {
-                    [self fireStateMachineEvent:kBecomeSeparatedEventName];
+                    // If the peripheral disconnected due to inactivity timeout, it won't go to separated,
+                    // and therefore won't be available to reconnect. Therefore, go to single, not separated.
+                    if (didDisconnectDueToInactivityTimeout)
+                    {
+                        [self fireStateMachineEvent:kDisconnectAndBecomeSingleEventName];
+                    }
+                    else
+                    {
+                        [self fireStateMachineEvent:kBecomeSeparatedEventName];
+                    }
                 }
                 else if ([self currentStateHasName:kEngagedStateName] ||
                          [self currentStateHasName:kEngagedWaitingForPairingSpotReleaseStateName] ||
