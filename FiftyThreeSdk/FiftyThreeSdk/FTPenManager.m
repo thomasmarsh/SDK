@@ -1224,7 +1224,10 @@ typedef enum
                 [self fireStateMachineEvent:kAttemptConnectionFromUpdatingFirmwareEventName];
             }
         }
-        else if ([self currentStateHasName:kUpdatingFirmwareAttemptingConnectionStateName])
+        else if ([self currentStateHasName:kUpdatingFirmwareAttemptingConnectionStateName] ||
+                 [self currentStateHasName:kDatingAttemptingConnectiongStateName] ||
+                 [self currentStateHasName:kSeparatedAttemptingConnectionStateName] ||
+                 [self currentStateHasName:kSwingingAttemptingConnectionStateName])
         {
             [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenUnexpectedDisconnectWhileConnectingNotifcationName
                                                                 object:self.pen];
@@ -1264,23 +1267,13 @@ typedef enum
                     [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenUnexpectedDisconnectNotificationName
                                                                         object:pen];
                 }
-                else if ([self currentStateHasName:kSeparatedAttemptingConnectionStateName] ||
-                         [self currentStateHasName:kSwingingAttemptingConnectionStateName] ||
-                         [self currentStateHasName:kDatingAttemptingConnectiongStateName])
-                {
-                    [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenUnexpectedDisconnectWhileConnectingNotifcationName
-                                                                        object:pen];
-                }
 
                 if ([self currentStateHasName:kMarriedStateName] ||
-                    [self currentStateHasName:kMarriedWaitingForLongPressToDisconnectStateName] ||
-                    [self currentStateHasName:kSeparatedAttemptingConnectionStateName] ||
-                    [self currentStateHasName:kSwingingAttemptingConnectionStateName])
+                    [self currentStateHasName:kMarriedWaitingForLongPressToDisconnectStateName])
                 {
                     [self fireStateMachineEvent:kBecomeSeparatedEventName];
                 }
-                else if ([self currentStateHasName:kDatingAttemptingConnectiongStateName] ||
-                         [self currentStateHasName:kEngagedStateName] ||
+                else if ([self currentStateHasName:kEngagedStateName] ||
                          [self currentStateHasName:kEngagedWaitingForPairingSpotReleaseStateName] ||
                          [self currentStateHasName:kEngagedWaitingForTipReleaseStateName])
                 {

@@ -144,7 +144,7 @@ FTPenPrivateDelegate>
     _rscManager = [[RscMgr alloc] init];
     [_rscManager setDelegate:self];
 
-    [FTLog setLogLevel:FTLogLevelEnabledVerbose];
+//    [FTLog setLogLevel:FTLogLevelEnabledVerbose];
     _penManager = [[FTPenManager alloc] init];
 
     NSDictionary *infoDictionary = [[NSBundle mainBundle] infoDictionary];

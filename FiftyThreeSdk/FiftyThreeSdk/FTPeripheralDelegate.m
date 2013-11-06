@@ -102,7 +102,7 @@
             }
         }
 
-        [FTLog logWithFormat:@"Peripheral did discover service(s): %@.", serviceNames];
+        [FTLog logVerboseWithFormat:@"Peripheral did discover service(s): %@.", serviceNames];
     }
 
     for (FTServiceClient *serviceClient in self.serviceClients)
@@ -150,7 +150,7 @@
 - (void)peripheral:(CBPeripheral *)peripheral didWriteValueForCharacteristic:(CBCharacteristic *)characteristic
              error:(NSError *)error
 {
-    [FTLog logWithFormat:@"Peripheral did write value: %@ for characteristic: %@",
+    [FTLog logVerboseWithFormat:@"Peripheral did write value: %@ for characteristic: %@",
      characteristic.value,
      FTNameForServiceUUID(characteristic.UUID)];
 
@@ -165,12 +165,12 @@
 {
     if (characteristic.isNotifying)
     {
-        [FTLog logWithFormat:@"Peripheral notification began on charateristic: %@",
+        [FTLog logVerboseWithFormat:@"Peripheral notification began on charateristic: %@",
          FTNameForServiceUUID(characteristic.UUID)];
     }
     else
     {
-        [FTLog logWithFormat:@"Peripheral notification stopped on characteristic: %@",
+        [FTLog logVerboseWithFormat:@"Peripheral notification stopped on characteristic: %@",
          FTNameForServiceUUID(characteristic.UUID)];
     }
 
