@@ -1300,16 +1300,6 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     }
 }
 
-- (void)retrievePairedPeripheral
-{
-    FTAssert(self.pairedPeripheralUUID, @"paired peripheral UUID non-nil");
-
-    [FTLog log:@"Retrieving paired peripherals"];
-
-    NSArray *peripheralUUIDs = @[self.pairedPeripheralUUID];
-    [self.centralManager retrievePeripherals:peripheralUUIDs];
-}
-
 #pragma mark - CBCentralManagerDelegate
 
 - (void)centralManagerDidUpdateState:(CBCentralManager *)centralManager
