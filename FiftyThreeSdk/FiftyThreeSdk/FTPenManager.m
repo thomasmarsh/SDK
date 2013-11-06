@@ -20,6 +20,9 @@
 #import "TIUpdateManager.h"
 #import "TransitionKit.h"
 
+static NSString * const kCharcoalPeripheralName = @"Charcoal by 53";
+static NSString * const kPencilPeripheralName = @"Pencil";
+
 NSString * const kPairedPeripheralUUIDUserDefaultsKey = @"com.fiftythree.pen.pairedPeripheralUUID";
 NSString * const kPairedPeripheralLastActivityTimeUserDefaultsKey = @"com.fiftythree.pen.pairedPeripheralLastActivityTime";
 
@@ -573,7 +576,21 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     {
         weakSelf.state = FTPenManagerStateSeeking;
 
-        [weakSelf.centralManager retrieveConnectedPeripherals];
+        NSArray *peripherals = [weakSelf.centralManager retrieveConnectedPeripheralsWithServices:@[[FTPenServiceUUIDs penService]]];
+
+        for (CBPeripheral *peripheral in peripherals)
+        {
+            if ([peripheral.name isEqualToString:kPencilPeripheralName] ||
+                [peripheral.name isEqualToString:kCharcoalPeripheralName])
+            {
+                FTAssert(!weakSelf.pen, @"pen is nil");
+                weakSelf.pen = [[FTPen alloc] initWithPeripheral:peripheral];
+                [weakSelf fireStateMachineEvent:kAttemptConnectionFromDatingEventName];
+                return;
+            }
+        }
+
+        [weakSelf fireStateMachineEvent:kBeginDatingScanningEventName];
     }];
 
     // DatingScanning
@@ -763,7 +780,21 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     {
         weakSelf.state = FTPenManagerStateDisconnected;
 
-        [weakSelf.centralManager retrieveConnectedPeripherals];
+        NSArray *peripherals = [weakSelf.centralManager retrieveConnectedPeripheralsWithServices:@[[FTPenServiceUUIDs penService]]];
+
+        for (CBPeripheral *peripheral in peripherals)
+        {
+            if ([peripheral.name isEqualToString:kPencilPeripheralName] &&
+                [weakSelf isPairedPeripheral:peripheral])
+            {
+                FTAssert(!weakSelf.pen, @"pen is nil");
+                weakSelf.pen = [[FTPen alloc] initWithPeripheral:peripheral];
+                [weakSelf fireStateMachineEvent:kAttemptConnectionFromSeparatedEventName];
+                return;
+            }
+        }
+
+        [weakSelf fireStateMachineEvent:kBecomeSeparatedEventName];
     }];
 
     // Separated - Attempting Connection
@@ -1604,45 +1635,6 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
                 }
             }
         }
-    }
-}
-
-- (void)centralManager:(CBCentralManager *)central didRetrieveConnectedPeripherals:(NSArray *)peripherals
-{
-    static NSString * const kCharcoalPeripheralName = @"Charcoal by 53";
-    static NSString * const kPencilPeripheralName = @"Pencil";
-
-    if ([self currentStateHasName:kDatingRetrievingConnectedPeripheralsStateName])
-    {
-        for (CBPeripheral *peripheral in peripherals)
-        {
-            if ([peripheral.name isEqualToString:kPencilPeripheralName] ||
-                [peripheral.name isEqualToString:kCharcoalPeripheralName])
-            {
-                FTAssert(!self.pen, @"pen is nil");
-                self.pen = [[FTPen alloc] initWithPeripheral:peripheral];
-                [self fireStateMachineEvent:kAttemptConnectionFromDatingEventName];
-                return;
-            }
-        }
-
-        [self fireStateMachineEvent:kBeginDatingScanningEventName];
-    }
-    else if ([self currentStateHasName:kSeparatedRetrievingConnectedPeripheralsStateName])
-    {
-        for (CBPeripheral *peripheral in peripherals)
-        {
-            if ([peripheral.name isEqualToString:kPencilPeripheralName] &&
-                [self isPairedPeripheral:peripheral])
-            {
-                FTAssert(!self.pen, @"pen is nil");
-                self.pen = [[FTPen alloc] initWithPeripheral:peripheral];
-                [self fireStateMachineEvent:kAttemptConnectionFromSeparatedEventName];
-                return;
-            }
-        }
-
-        [self fireStateMachineEvent:kBecomeSeparatedEventName];
     }
 }
 
