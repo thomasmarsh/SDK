@@ -160,9 +160,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     }
 }
 
-@interface FTPenManager () <CBCentralManagerDelegate, TIUpdateManagerDelegate> {
-    CFUUIDRef _pairedPeripheralUUID;
-}
+@interface FTPenManager () <CBCentralManagerDelegate, TIUpdateManagerDelegate>
 
 @property (nonatomic) CBCentralManager *centralManager;
 
@@ -183,7 +181,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 @property (nonatomic) NSDate *lastPairingSpotReleaseTime;
 
 // The UUID of the peripheral with which we are currently paired.
-@property (nonatomic) CFUUIDRef pairedPeripheralUUID;
+@property (nonatomic) NSUUID *pairedPeripheralUUID;
 
 // The time at which the last tip/eraser press activity that was observed on the paired peripheral.
 @property (nonatomic) NSDate *pairedPeripheralLastActivityTime;
@@ -266,12 +264,6 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     [self reset];
 
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-
-    if (_pairedPeripheralUUID)
-    {
-        CFRelease(_pairedPeripheralUUID);
-        _pairedPeripheralUUID = NULL;
-    }
 }
 
 - (void)reset
@@ -361,13 +353,9 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     }
 }
 
-- (void)setPairedPeripheralUUID:(CFUUIDRef)pairedPeripheralUUID
+- (void)setPairedPeripheralUUID:(NSUUID *)pairedPeripheralUUID
 {
-    NSString *uuidStr = (pairedPeripheralUUID != NULL ?
-                         CFBridgingRelease(CFUUIDCreateString(kCFAllocatorDefault, pairedPeripheralUUID)) :
-                         nil);
-
-    [[NSUserDefaults standardUserDefaults] setValue:uuidStr
+    [[NSUserDefaults standardUserDefaults] setValue:pairedPeripheralUUID.UUIDString
                                              forKey:kPairedPeripheralUUIDUserDefaultsKey];
 
     // Also update the last activity time. Be sure to do this prior to synchronize, since setting last
@@ -384,25 +372,14 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
-- (CFUUIDRef)pairedPeripheralUUID
+- (NSUUID *)pairedPeripheralUUID
 {
-    if (_pairedPeripheralUUID)
+    id object = [[NSUserDefaults standardUserDefaults] valueForKey:kPairedPeripheralUUIDUserDefaultsKey];
+    if ([object isKindOfClass:NSString.class])
     {
-        CFRelease(_pairedPeripheralUUID);
-        _pairedPeripheralUUID = NULL;
+        return [[NSUUID alloc] initWithUUIDString:object];
     }
-
-    NSString *uuidStr = [[NSUserDefaults standardUserDefaults] valueForKey:kPairedPeripheralUUIDUserDefaultsKey];
-    if (uuidStr)
-    {
-        _pairedPeripheralUUID = CFUUIDCreateFromString(kCFAllocatorDefault, CFBridgingRetain(uuidStr));
-    }
-    else
-    {
-        return NULL;
-    }
-
-    return _pairedPeripheralUUID;
+    return nil;
 }
 
 - (void)setPairedPeripheralLastActivityTime:(NSDate *)pairedPeripheralLastActivityTime
@@ -422,8 +399,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 - (BOOL)isPairedPeripheral:(CBPeripheral *)peripheral
 {
     return (self.pairedPeripheralUUID != NULL &&
-            peripheral.UUID != NULL &&
-            CFEqual(self.pairedPeripheralUUID, peripheral.UUID));
+            [peripheral.identifier isEqual:self.pairedPeripheralUUID]);
 }
 
 - (void)penDidEncounterError:(NSNotification *)notification
@@ -672,9 +648,9 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     [marriedState setDidEnterStateBlock:^(TKState *state, TKStateMachine *stateMachine)
     {
         FTAssert(weakSelf.pen.peripheral.state == CBPeripheralStateConnected, @"pen peripheral is connected");
-        FTAssert(weakSelf.pen.peripheral.UUID != NULL, @"pen peripheral UUID is non-nil");
+        FTAssert(weakSelf.pen.peripheral.identifier != nil, @"pen peripheral UUID is non-nil");
 
-        weakSelf.pairedPeripheralUUID = weakSelf.pen.peripheral.UUID;
+        weakSelf.pairedPeripheralUUID = weakSelf.pen.peripheral.identifier;
         weakSelf.state = FTPenManagerStateConnected;
     }];
 
@@ -1330,7 +1306,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
     [FTLog log:@"Retrieving paired peripherals"];
 
-    NSArray *peripheralUUIDs = @[(__bridge id)self.pairedPeripheralUUID];
+    NSArray *peripheralUUIDs = @[self.pairedPeripheralUUID];
     [self.centralManager retrievePeripherals:peripheralUUIDs];
 }
 
