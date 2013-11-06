@@ -161,7 +161,7 @@ NSString * const kFTPenAuthenticationCodePropertyName = @"authenticationCode";
 - (id)initWithPeripheral:(CBPeripheral *)peripheral
 {
     FTAssert(peripheral, @"peripheral non-nil");
-    FTAssert(!peripheral.isConnected, @"peripheral is not connected");
+    FTAssert(peripheral.state == CBPeripheralStateDisconnected, @"peripheral is disconnected");
 
     self = [super init];
     if (self)
@@ -376,7 +376,7 @@ NSString * const kFTPenAuthenticationCodePropertyName = @"authenticationCode";
 
 - (void)peripheralConnectionStatusDidChange
 {
-    if (self.peripheral.isConnected)
+    if (self.peripheral.state == CBPeripheralStateConnected)
     {
         FTAssert(self.peripheral.delegate == self.peripheralDelegate,
                  @"peripheral delegate is installed");
@@ -393,9 +393,11 @@ NSString * const kFTPenAuthenticationCodePropertyName = @"authenticationCode";
 
 - (void)ensureServicesDiscovered
 {
-    NSArray *servicesToBeDiscovered = [self.peripheralDelegate ensureServicesForConnectionState:self.peripheral.isConnected];
+    BOOL peripheralIsConnected = (self.peripheral.state == CBPeripheralStateConnected);
 
-    if (self.peripheral.isConnected)
+    NSArray *servicesToBeDiscovered = [self.peripheralDelegate ensureServicesForConnectionState:peripheralIsConnected];
+
+    if (peripheralIsConnected)
     {
         FTAssert(self.peripheral.delegate == self.peripheralDelegate,
                  @"peripheral delegate is installed");

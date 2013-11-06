@@ -295,7 +295,7 @@ static NSString *const kImageBlockTransferUUID = @"F000FFC2-0451-4000-B000-00000
 
 - (void)imageBlockWriteTimerFired:(NSTimer *)writeTimer
 {
-    if (!self.peripheral.isConnected)
+    if (self.peripheral.state != CBPeripheralStateConnected)
     {
         [self doneWithError:[self errorAborted]];
         return;

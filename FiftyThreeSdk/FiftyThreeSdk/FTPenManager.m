@@ -671,7 +671,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     TKState *marriedState = [TKState stateWithName:kMarriedStateName];
     [marriedState setDidEnterStateBlock:^(TKState *state, TKStateMachine *stateMachine)
     {
-        FTAssert(weakSelf.pen.peripheral.isConnected, @"pen peripheral is connected");
+        FTAssert(weakSelf.pen.peripheral.state == CBPeripheralStateConnected, @"pen peripheral is connected");
         FTAssert(weakSelf.pen.peripheral.UUID != NULL, @"pen peripheral UUID is non-nil");
 
         weakSelf.pairedPeripheralUUID = weakSelf.pen.peripheral.UUID;
@@ -685,7 +685,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
                                                                      TKStateMachine *stateMachine)
      {
          FTAssert(weakSelf.pen, @"pen is non-nil");
-         FTAssert(weakSelf.pen.peripheral.isConnected, @"pen peripheral is connected");
+         FTAssert(weakSelf.pen.peripheral.state == CBPeripheralStateConnected, @"pen peripheral is connected");
 
          weakSelf.state = FTPenManagerStateConnectedLongPressToUnpair;
 
@@ -702,7 +702,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     [marriedWaitingForLongPressToUnpairState setTimeoutExpiredBlock:^(TKState *state, TKStateMachine *stateMachine)
      {
          FTAssert(weakSelf.pen, @"pen is non-nil");
-         FTAssert(weakSelf.pen.peripheral.isConnected, @"pen peripheral is connected");
+         FTAssert(weakSelf.pen.peripheral.state == CBPeripheralStateConnected, @"pen peripheral is connected");
 
          [weakSelf.pen powerOff];
 
@@ -925,7 +925,8 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     {
         FTAssert(weakSelf.pen, @"Pen must be non-nil");
         FTAssert(weakSelf.pen.peripheral, @"Pen peripheral is non-nil");
-        FTAssert(!weakSelf.pen.peripheral.isConnected, @"Pen peripheral is not connected");
+        FTAssert(weakSelf.pen.peripheral.state == CBPeripheralStateDisconnected,
+                 @"Pen peripheral is disconnected");
         FTAssert(!weakSelf.updateManager, @"Update manager must be nil");
 
         weakSelf.state = FTPenManagerStateUpdatingFirmware;
@@ -1239,7 +1240,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
         }
         else if ([self currentStateHasName:kMarriedStateName])
         {
-            FTAssert(self.pen.peripheral.isConnected, @"Pen peripheral is connected");
+            FTAssert(self.pen.peripheral.state == CBPeripheralStateConnected, @"Pen peripheral is connected");
 
             [self fireStateMachineEvent:kWaitForLongPressToUnpairFromMarriedEventName];
         }
