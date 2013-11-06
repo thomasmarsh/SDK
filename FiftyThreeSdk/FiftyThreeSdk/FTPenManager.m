@@ -89,7 +89,7 @@ static NSString *const kWaitForTipReleaseEventName = @"WaitForTipRelease";
 static NSString *const kWaitForPairingSpotReleaseEventName = @"WaitForPairingSpotRelease";
 static NSString *const kBecomeMarriedEventName = @"BecomeMarried";
 static NSString *const kWaitForLongPressToUnpairFromMarriedEventName = @"WaitForLongPressToUnpairFromMarried";
-static NSString *const KWaitForLongPressToUnpairFromSeparatedEventName = @"WaitForLongPressToUnPairFromSeparated";
+static NSString *const KkWaitForLongPressToUnpairFromSeparatedEventNameEventName = @"kWaitForLongPressToUnpairFromSeparatedEventName";
 static NSString *const kReturnToMarriedEventName = @"ReturnToMarried";
 static NSString *const kDisconnectAndBecomeSingleEventName = @"DisconnectAndBecomeSingle";
 static NSString *const kDisconnectAndBecomeSeparatedEventName = @"DisconnectAndBecomeSeparated";
@@ -674,11 +674,11 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
      {
          NSAssert(weakSelf.pen, @"pen is non-nil");
          NSAssert(weakSelf.pen.peripheral.isConnected, @"pen peripheral is connected");
-         
+
          weakSelf.state = FTPenManagerStateConnectedLongPressToUnpair;
-         
+
          weakSelf.scanningState = ScanningStateEnabledWithPolling;
-         
+
          weakSelf.peripheralsDiscoveredDuringLongPress = [NSMutableSet set];
      }];
     [marriedWaitingForLongPressToUnpairState setDidExitStateBlock:^(TKState *state,
@@ -796,40 +796,40 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     }];
 
     // Separated - Waiting for Pairing Spot to Unpair
-    TKState *separatedWaitingForLongPressToUnpair = [TKState stateWithName:kSeparatedWaitingForLongPressToUnpairStateName
-                                                        andTimeoutDuration:kSeparatedWaitingForLongPressToUnpairTimeout];
-    [separatedWaitingForLongPressToUnpair setDidEnterStateBlock:^(TKState *state,
-                                                                  TKStateMachine *stateMachine)
-    {
-        weakSelf.state = FTPenManagerStateDisconnectedLongPressToUnpair;
+    TKState *separatedWaitingForLongPressToUnpairState = [TKState stateWithName:kSeparatedWaitingForLongPressToUnpairStateName
+                                                             andTimeoutDuration:kSeparatedWaitingForLongPressToUnpairTimeout];
+    [separatedWaitingForLongPressToUnpairState setDidEnterStateBlock:^(TKState *state,
+                                                                       TKStateMachine *stateMachine)
+     {
+         weakSelf.state = FTPenManagerStateDisconnectedLongPressToUnpair;
 
-        weakSelf.peripheralsDiscoveredDuringLongPress = [NSMutableSet set];
+         weakSelf.peripheralsDiscoveredDuringLongPress = [NSMutableSet set];
 
-        weakSelf.scanningState = ScanningStateEnabledWithPolling;
-    }];
-    [separatedWaitingForLongPressToUnpair setDidExitStateBlock:^(TKState *state,
-                                                                 TKStateMachine *stateMachine)
-    {
-        weakSelf.scanningState = ScanningStateDisabled;
+         weakSelf.scanningState = ScanningStateEnabledWithPolling;
+     }];
+    [separatedWaitingForLongPressToUnpairState setDidExitStateBlock:^(TKState *state,
+                                                                      TKStateMachine *stateMachine)
+     {
+         weakSelf.scanningState = ScanningStateDisabled;
 
-        weakSelf.peripheralsDiscoveredDuringLongPress = nil;
-    }];
-    [separatedWaitingForLongPressToUnpair setTimeoutExpiredBlock:^(TKState *state,
-                                                                   TKStateMachine *stateMachine)
-    {
-        if (weakSelf.peripheralsDiscoveredDuringLongPress.count > 0)
-        {
-            NSAssert(!self.pen, @"pen non-nil");
+         weakSelf.peripheralsDiscoveredDuringLongPress = nil;
+     }];
+    [separatedWaitingForLongPressToUnpairState setTimeoutExpiredBlock:^(TKState *state,
+                                                                        TKStateMachine *stateMachine)
+     {
+         if (weakSelf.peripheralsDiscoveredDuringLongPress.count > 0)
+         {
+             NSAssert(!weakSelf.pen, @"pen non-nil");
 
-            weakSelf.pen = [[FTPen alloc] initWithPeripheral:[self.peripheralsDiscoveredDuringLongPress anyObject]];
+             weakSelf.pen = [[FTPen alloc] initWithPeripheral:[weakSelf.peripheralsDiscoveredDuringLongPress anyObject]];
 
-            [weakSelf fireStateMachineEvent:kAttemptConnectionFromDatingEventName];
-        }
-        else
-        {
-            [weakSelf fireStateMachineEvent:kBecomeSingleEventName];
-        }
-    }];
+             [weakSelf fireStateMachineEvent:kAttemptConnectionFromDatingEventName];
+         }
+         else
+         {
+             [weakSelf fireStateMachineEvent:kBecomeSingleEventName];
+         }
+     }];
 
     // Disconnecting and Becoming Single
     TKState *disconnectingAndBecomingSingleState = [TKState stateWithName:kDisconnectingAndBecomingSingleStateName];
@@ -950,7 +950,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
      separatedState,
      separatedRetrievingConnectedPeripheralsState,
      separatedAttemptingConnectionState,
-     separatedWaitingForLongPressToUnpair,
+     separatedWaitingForLongPressToUnpairState,
      disconnectingAndBecomingSingleState,
      disconnectingAndBecomingSeparatedState,
      updatingFirmwareState,
@@ -982,13 +982,13 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
                                   datingScanningState,
                                   datingRetrievingConnectedPeripheralsState,
                                   separatedState,
-                                  separatedWaitingForLongPressToUnpair,
+                                  separatedWaitingForLongPressToUnpairState,
                                   swingingState]
                                                 toState:singleState];
     TKEvent *attemptConnectionFromDatingEvent = [TKEvent eventWithName:kAttemptConnectionFromDatingEventName
                                                transitioningFromStates:@[datingScanningState,
                                                  datingRetrievingConnectedPeripheralsState,
-                                                 separatedWaitingForLongPressToUnpair,
+                                                 separatedWaitingForLongPressToUnpairState,
                                                  disconnectingAndBecomingSingleState]
                                                                toState:datingAttemptingConnectionState];
     TKEvent *becomeEngagedEvent = [TKEvent eventWithName:kBecomeEngagedEventName
@@ -1011,9 +1011,9 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     TKEvent *waitForLongPressToUnpairFromMarriedEvent = [TKEvent eventWithName:kWaitForLongPressToUnpairFromMarriedEventName
                                                            transitioningFromStates:@[marriedState]
                                                                            toState:marriedWaitingForLongPressToUnpairState];
-    TKEvent *waitForLongPressToUnpairFromSeparatedEvent = [TKEvent eventWithName:KWaitForLongPressToUnpairFromSeparatedEventName
+    TKEvent *kWaitForLongPressToUnpairFromSeparatedEventNameEvent = [TKEvent eventWithName:KkWaitForLongPressToUnpairFromSeparatedEventNameEventName
                                                          transitioningFromStates:@[separatedState]
-                                                                         toState:separatedWaitingForLongPressToUnpair];
+                                                                         toState:separatedWaitingForLongPressToUnpairState];
     TKEvent *returnToMarriedEvent = [TKEvent eventWithName:kReturnToMarriedEventName
                                    transitioningFromStates:@[marriedWaitingForLongPressToUnpairState]
                                                    toState:marriedState];
@@ -1052,7 +1052,9 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
                                      marriedState,
                                      separatedRetrievingConnectedPeripheralsState,
                                      separatedAttemptingConnectionState,
-                                     updatingFirmwareState]
+                                     separatedWaitingForLongPressToUnpairState,
+                                     updatingFirmwareState
+                                     ]
                                                    toState:separatedState];
     TKEvent *retrieveConnectedPeripheralsFromSeparatedEvent = [TKEvent eventWithName:kRetrieveConnectedPeripheralsFromSeparatedEventName
                                                              transitioningFromStates:@[
@@ -1084,7 +1086,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
      waitForPairingSpotReleaseEvent,
      becomeMarriedEvent,
      waitForLongPressToUnpairFromMarriedEvent,
-     waitForLongPressToUnpairFromSeparatedEvent,
+     kWaitForLongPressToUnpairFromSeparatedEventNameEvent,
      returnToMarriedEvent,
      disconnectAndBecomeSingleEvent,
      disconnectAndBecomeSeparatedEvent,
@@ -1218,7 +1220,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
         }
         else if ([self currentStateHasName:kSeparatedStateName])
         {
-            [self fireStateMachineEvent:KWaitForLongPressToUnpairFromSeparatedEventName];
+            [self fireStateMachineEvent:KkWaitForLongPressToUnpairFromSeparatedEventNameEventName];
         }
         else if ([self currentStateHasName:kMarriedStateName])
         {
@@ -1261,7 +1263,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     }
     else if ([self currentStateHasName:kSeparatedWaitingForLongPressToUnpairStateName])
     {
-        [self fireStateMachineEvent:KWaitForLongPressToUnpairFromSeparatedEventName];
+        [self fireStateMachineEvent:kBecomeSeparatedEventName];
     }
 }
 
