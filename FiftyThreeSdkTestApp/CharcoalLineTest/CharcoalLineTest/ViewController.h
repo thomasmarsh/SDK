@@ -12,15 +12,10 @@
 @interface ViewController : UIViewController
 
 @property (weak, nonatomic) IBOutlet UILabel *statusLabel;
-@property (weak, nonatomic) IBOutlet UIButton *tipStateButton;
-@property (weak, nonatomic) IBOutlet UIButton *eraserStateButton;
 @property (weak, nonatomic) IBOutlet UIButton *pairButton;
-@property (weak, nonatomic) IBOutlet UIButton *pcConnectedButton;
-@property (weak, nonatomic) IBOutlet UIButton *penConnectedButton;
 @property (weak, nonatomic) IBOutlet UIButton *connectButton;
 @property (weak, nonatomic) IBOutlet UIButton *updateFirmwareButton;
 @property (weak, nonatomic) IBOutlet UIButton *updateStatsButton;
-@property (weak, nonatomic) IBOutlet UIButton *touchButton;
 @property (weak, nonatomic) IBOutlet UILabel *deviceInfoLabel;
 @property (weak, nonatomic) IBOutlet UILabel *connectionHistoryLabel;
 @property (weak, nonatomic) IBOutlet UIButton *clearLastErrorButton;
@@ -28,6 +23,11 @@
 @property (weak, nonatomic) IBOutlet UIButton *decrementInactivityTimeoutButton;
 @property (weak, nonatomic) IBOutlet UIButton *togglePressureButton;
 @property (weak, nonatomic) IBOutlet UINavigationItem *appTitleNavItem;
+@property (weak, nonatomic) IBOutlet UILabel *isTipPressedLabel;
+@property (weak, nonatomic) IBOutlet UILabel *isEraserPressedLabel;
+@property (weak, nonatomic) IBOutlet UILabel *isTouchPressedLabel;
+@property (weak, nonatomic) IBOutlet UILabel *isPCConnectedLabel;
+@property (weak, nonatomic) IBOutlet UILabel *isPenConnectedLabel;
 
 - (IBAction)pairButtonTouchUpInside:(id)sender;
 - (IBAction)pairButtonTouchUpOutside:(id)sender;

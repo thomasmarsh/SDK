@@ -41,11 +41,12 @@ FTPenPrivateDelegate>
 @property (nonatomic) UIAlertView *firmwareUpdateConfirmAlertView;
 @property (nonatomic) FTFirmwareUpdateProgressView *firmwareUpdateProgressView;
 @property (nonatomic) BOOL pairing;
-@property (nonatomic) BOOL pcConnected;
+@property (nonatomic) BOOL isPCConnected;
 @property (nonatomic) NSMutableString *commandBuffer;
 
 @property (nonatomic) NSString *firmwareImagePath;
 @property (nonatomic) Timer::Ptr uptimeTimer;
+@property (nonatomic) __weak UITouch *currentTouch;
 @property (nonatomic) double lastTouchBeganTimestamp;
 @property (nonatomic) double lastTouchEndedTimestamp;
 @property (nonatomic) double lastTipOrEraserPressedTimestamp;
@@ -339,8 +340,9 @@ FTPenPrivateDelegate>
     }
     [self updateConnectionHistoryLabel];
 
-    self.tipStateButton.highlighted = isTipPressed;
     [self sendCharacter:isTipPressed ? 'A' : 'a'];
+
+    [self updateIsPressedLabels];
 }
 
 - (void)pen:(FTPen *)pen isEraserPressedDidChange:(BOOL)isEraserPressed
@@ -355,8 +357,9 @@ FTPenPrivateDelegate>
     }
     [self updateConnectionHistoryLabel];
 
-    self.eraserStateButton.highlighted = isEraserPressed;
     [self sendCharacter:isEraserPressed ? 'B' : 'b'];
+
+    [self updateIsPressedLabels];
 }
 
 - (void)pen:(FTPen *)pen tipPressureDidChange:(float)tipPressure
@@ -419,6 +422,60 @@ FTPenPrivateDelegate>
 }
 
 #pragma mark -
+
+- (void)updateIsPressedLabels
+{
+    // Tip
+    [self setIsPressed:self.penManager.pen.isTipPressed
+     forIsPressedLabel:self.isTipPressedLabel];
+
+    // Eraser
+    [self setIsPressed:self.penManager.pen.isEraserPressed
+     forIsPressedLabel:self.isEraserPressedLabel];
+
+    // Touch
+    [self setIsPressed:(self.currentTouch != nil)
+     forIsPressedLabel:self.isTouchPressedLabel];
+}
+
+- (void)setIsPressed:(BOOL)isPressed forIsPressedLabel:(UILabel *)label
+{
+    if (isPressed)
+    {
+        label.textColor = [UIColor blackColor];
+        [label setBackgroundColor:[UIColor greenColor]];
+    }
+    else
+    {
+        label.textColor = [UIColor whiteColor];
+        label.backgroundColor = [UIColor blackColor];
+    }
+}
+
+- (void)updateIsConnectedLabels
+{
+    // Is PC Connected
+    [self setIsConnected:self.isPCConnected forIsConnectedLabel:self.isPCConnectedLabel];
+
+    // Is pen connected
+    [self setIsConnected:(self.penManager.state == FTPenManagerStateConnected ||
+                          self.penManager.state == FTPenManagerStateUpdatingFirmware)
+     forIsConnectedLabel:self.isPenConnectedLabel];
+}
+
+- (void)setIsConnected:(BOOL)isConnected forIsConnectedLabel:(UILabel *)label
+{
+    if (isConnected)
+    {
+        label.textColor = [UIColor blackColor];
+        [label setBackgroundColor:[UIColor greenColor]];
+    }
+    else
+    {
+        label.textColor = [UIColor whiteColor];
+        label.backgroundColor = [UIColor blackColor];
+    }
+}
 
 - (void)updateConnectionHistoryLabel
 {
@@ -624,7 +681,6 @@ FTPenPrivateDelegate>
         self.penManager.state == FTPenManagerStateUpdatingFirmware)
     {
         [self.connectButton setTitle:@"Disconnect" forState:UIControlStateNormal];
-        self.penConnectedButton.highlighted = YES;
         self.connectButton.hidden = NO;
         self.updateFirmwareButton.hidden = NO;
         self.updateStatsButton.hidden = NO;
@@ -634,7 +690,6 @@ FTPenPrivateDelegate>
     }
     else
     {
-        self.penConnectedButton.highlighted = NO;
         self.connectButton.hidden = YES;
         self.updateFirmwareButton.hidden = YES;
         self.updateStatsButton.hidden = YES;
@@ -642,15 +697,12 @@ FTPenPrivateDelegate>
         self.decrementInactivityTimeoutButton.hidden = YES;
         self.togglePressureButton.hidden = YES;
         self.clearLastErrorButton.hidden = YES;
-
-        self.tipStateButton.highlighted = NO;
-        self.eraserStateButton.highlighted = NO;
     }
 
+    [self updateIsConnectedLabels];
+    [self updateIsPressedLabels];
     [self updateDeviceInfoLabel];
     [self updateConnectionHistoryLabel];
-
-    [self.pcConnectedButton setHighlighted:self.pcConnected];
 }
 
 - (IBAction)pairButtonPressed:(id)sender
@@ -788,30 +840,44 @@ FTPenPrivateDelegate>
 
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
 {
+    NSAssert(touches.count == 1, @"Should be only a single touch.");
+    NSAssert(!self.currentTouch, @"Should only be a single touch at a time.");
+
     self.lastTouchBeganTimestamp = self.uptimeTimer->ElapsedTimeSeconds();
     [self updateConnectionHistoryLabel];
 
     [self sendCharacter:'T'];
-    [self.touchButton setHighlighted:YES];
+
+    self.currentTouch = [touches anyObject];
+    [self updateIsPressedLabels];
 }
 
 - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
 {
-
+    NSAssert(touches.count == 1, @"Should be only a single touch.");
 }
 
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
 {
+    NSAssert(touches.count == 1, @"Should be only a single touch.");
+    NSAssert(self.currentTouch, @"touch non-nil");
+
     self.lastTouchEndedTimestamp = self.uptimeTimer->ElapsedTimeSeconds();
     [self updateDeviceInfoLabel];
 
     [self sendCharacter:'t'];
-    [self.touchButton setHighlighted:NO];
+
+    self.currentTouch = nil;
+    [self updateIsPressedLabels];
 }
 
 - (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event
 {
+    NSAssert(touches.count == 1, @"Should be only a single touch.");
+    NSAssert(self.currentTouch, @"touch non-nil");
 
+    self.currentTouch = nil;
+    [self updateIsPressedLabels];
 }
 
 #pragma mark -
@@ -823,15 +889,15 @@ FTPenPrivateDelegate>
 {
     [self.rscManager open];
 
-    self.pcConnected = YES;
-    [self updateDisplay];
+    self.isPCConnected = YES;
+    [self updateIsConnectedLabels];
 }
 
 // Redpark Serial Cable was disconnected and/or application moved to background
 - (void)cableDisconnected
 {
-    self.pcConnected = NO;
-    [self updateDisplay];
+    self.isPCConnected = NO;
+    [self updateIsConnectedLabels];
 }
 
 // serial port status has changed
@@ -976,7 +1042,7 @@ FTPenPrivateDelegate>
 
 - (void)sendCharacter:(uint8_t)c
 {
-    if (self.pcConnected)
+    if (self.isPCConnected)
     {
         [self.rscManager write:&c length:sizeof(c)];
     }
@@ -986,7 +1052,7 @@ FTPenPrivateDelegate>
 {
     NSAssert([string canBeConvertedToEncoding:NSASCIIStringEncoding], @"String must be ASCII");
 
-    if (self.pcConnected)
+    if (self.isPCConnected)
     {
         NSString *newlineTerminatedString = [string stringByAppendingString:@"\r\n"];
 
