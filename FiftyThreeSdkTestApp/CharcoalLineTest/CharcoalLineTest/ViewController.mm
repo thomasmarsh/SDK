@@ -9,6 +9,7 @@
 
 #import "Common/DeviceInfo.h"
 #import "Common/NSData+Crypto.h"
+#import "Common/NSString+Helpers.h"
 #import "Common/Timer.h"
 #import "Common/UIView+Helpers.h"
 #import "FiftyThreeSdk/FTFirmwareManager.h"
@@ -553,12 +554,6 @@ FTPenPrivateDelegate>
 
     FTPen *pen = self.penManager.pen;
 
-    const int onTimeSec = pen.connectedSeconds;
-    const int onTimeDayField =  onTimeSec / 60 / 60 / 24;
-    const int onTimeHourField = (onTimeSec - (onTimeDayField * 60 * 60 * 24)) / 60 / 60;
-    const int onTimeMinField = (onTimeSec - (onTimeDayField * 60 * 60 * 24) - (onTimeHourField * 60 * 60)) / 60;
-    const int onTimeSecField =  onTimeSec - (onTimeDayField * 60 * 60 * 24) - (onTimeHourField * 60 * 60) - (onTimeMinField * 60);
-
     NSMutableString *deviceInfo = [NSMutableString string];
     [deviceInfo appendFormat:@"Manufacturer: %@\n", pen.manufacturerName];
     [deviceInfo appendFormat:@"SKU: %@\n", pen.modelNumber];
@@ -583,8 +578,8 @@ FTPenPrivateDelegate>
 //    [deviceInfo appendFormat:@"Num Resets: %d\n", pen.numResets];
 //    [deviceInfo appendFormat:@"Num Link Terminations: %d\n", pen.numLinkTerminations];
 //    [deviceInfo appendFormat:@"Num Dropped Notifications: %d\n", pen.numDroppedNotifications];
-    [deviceInfo appendFormat:@"Total Connected Time: %dd %02d:%02d:%02d\n\n",
-     onTimeDayField, onTimeHourField, onTimeMinField,  onTimeSecField];
+    [deviceInfo appendFormat:@"Total Connected Time: %@\n\n",
+     [NSString stringWithTimeInterval:pen.connectedSeconds]];
 
 //    [deviceInfo appendFormat:@"Last Error ID: %d\n",
 //     (pen.lastErrorCode ? pen.lastErrorCode.lastErrorID : - 1)];

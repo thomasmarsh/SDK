@@ -8,6 +8,7 @@
 #import <CoreBluetooth/CoreBluetooth.h>
 #import <UIKit/UIKit.h>
 
+#import "Common/NSString+Helpers.h"
 #import "FTFirmwareManager.h"
 #import "FTLog.h"
 #import "FTPen+Private.h"
@@ -19,6 +20,7 @@
 #import "TransitionKit.h"
 
 NSString * const kPairedPeripheralUUIDUserDefaultsKey = @"com.fiftythree.pen.pairedPeripheralUUID";
+NSString * const kPairedPeripheralLastActivityTimeUserDefaultsKey = @"com.fiftythree.pen.pairedPeripheralLastActivityTime";
 
 NSString * const kFTPenManagerDidUpdateStateNotificationName = @"com.fiftythree.penManager.didUpdateState";
 NSString * const kFTPenManagerDidFailToDiscoverPenNotificationName = @"com.fiftythree.penManager.didFailToDiscoverPen";
@@ -37,11 +39,12 @@ NSString * const kFTPenManagerFirmwareUpdateWasCancelled = @"com.fiftythree.penM
 
 static const int kInterruptedUpdateDelayMax = 30;
 
+static const NSTimeInterval kInactivityTimeout = 10.0 * 60.0;
 static const NSTimeInterval kDatingScanningTimeout = 4.f;
 static const NSTimeInterval kEngagedStateTimeout = 0.1;
 static const NSTimeInterval kIsScanningForPeripheralsToggleTimerInterval = 0.1;
 static const NSTimeInterval kSwingingStateTimeout = 4.0;
-static const NSTimeInterval kSeparatedStateTimeout = 10.0 * 60.0;
+static const NSTimeInterval kSeparatedStateTimeout = kInactivityTimeout;
 static const NSTimeInterval kMarriedWaitingForLongPressToDisconnectTimeout = 1.5;
 static const NSTimeInterval kAttemptingConnectionStateTimeout = 15.0;
 
@@ -125,7 +128,11 @@ typedef enum
 
 @property (nonatomic) NSDate *lastPairingSpotReleaseTime;
 
+// The UUID of the peripheral with which we are currently paired.
 @property (nonatomic) CFUUIDRef pairedPeripheralUUID;
+
+// The time at which the last tip/eraser press activity that was observed on the paired peripheral.
+@property (nonatomic) NSDate *pairedPeripheralLastActivityTime;
 
 @property (nonatomic) UIBackgroundTaskIdentifier backgroundTaskId;
 
@@ -165,6 +172,30 @@ typedef enum
                                                  selector:@selector(penDidWriteHasListener:)
                                                      name:kFTPenDidWriteHasListenerNotificationName
                                                    object:nil];
+
+        // If we're currently paired with a peripheral, verify that the time since we lost saw acitivity
+        // from this peripheral does not exceed the inactivity timeout of the peripheral. This can happen if,
+        // for example, the app was shutdown while paired with the peripheral, then remained closed for
+        // longer than the timeout. We don't want to enter the separated state if there's no prior indication
+        // that the pen will be attempting to reconcile with us.
+        if (self.pairedPeripheralUUID)
+        {
+            NSTimeInterval timeSinceLastActivity = -[self.pairedPeripheralLastActivityTime timeIntervalSinceNow];
+
+            if (self.pairedPeripheralLastActivityTime)
+            {
+                [FTLog logWithFormat:@"Time since last paired peripheral activity: %@",
+                 [NSString stringWithTimeInterval:timeSinceLastActivity]];
+            }
+
+            if (!self.pairedPeripheralLastActivityTime ||
+                timeSinceLastActivity <= 0.0 ||
+                timeSinceLastActivity > kInactivityTimeout)
+            {
+                [FTLog log:@"Last activity time exceeds timeout. Severing pairing."];
+                self.pairedPeripheralUUID = NULL;
+            }
+        }
 
         [self initializeStateMachine];
     }
@@ -262,6 +293,10 @@ typedef enum
                                                      name:kFTPenIsTipPressedDidChangeNotificationName
                                                    object:_pen];
         [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(penIsEraserPressedDidChange:)
+                                                     name:kFTPenIsEraserPressedDidChangeNotificationName
+                                                   object:_pen];
+        [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(penDidUpdateProperties:)
                                                      name:kFTPenDidUpdatePropertiesNotificationName
                                                    object:_pen];
@@ -276,6 +311,18 @@ typedef enum
 
     [[NSUserDefaults standardUserDefaults] setValue:uuidStr
                                              forKey:kPairedPeripheralUUIDUserDefaultsKey];
+
+    // Also update the last activity time. Be sure to do this prior to synchronize, since setting last
+    // activity time does not call synchronize on its own.
+    if (pairedPeripheralUUID != NULL)
+    {
+        self.pairedPeripheralLastActivityTime = [NSDate date];
+    }
+    else
+    {
+        self.pairedPeripheralLastActivityTime = nil;
+    }
+
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
@@ -298,6 +345,20 @@ typedef enum
     }
 
     return _pairedPeripheralUUID;
+}
+
+- (void)setPairedPeripheralLastActivityTime:(NSDate *)pairedPeripheralLastActivityTime
+{
+    [[NSUserDefaults standardUserDefaults] setValue:pairedPeripheralLastActivityTime
+                                             forKey:kPairedPeripheralLastActivityTimeUserDefaultsKey];
+
+    // Don't synchronize here. This property is updated far too frequently to incur the cost and the
+    // consequences of losing a save to this value are minimal.
+}
+
+- (NSDate *)pairedPeripheralLastActivityTime
+{
+    return [[NSUserDefaults standardUserDefaults] valueForKey:kPairedPeripheralLastActivityTimeUserDefaultsKey];
 }
 
 - (BOOL)isPairedPeripheral:(CBPeripheral *)peripheral
@@ -368,6 +429,13 @@ typedef enum
             [self comparePairingSpotAndTipReleaseTimesAndTransitionState];
         }
     }
+
+    self.pairedPeripheralLastActivityTime = [NSDate date];
+}
+
+- (void)penIsEraserPressedDidChange:(NSNotification *)notification
+{
+    self.pairedPeripheralLastActivityTime = [NSDate date];
 }
 
 - (void)penDidUpdateProperties:(NSNotification *)notification
@@ -429,6 +497,9 @@ typedef enum
     {
         [self reset];
 
+        // Generally we wait until the user presses the pairing spot before initializing the CBCentralManager.
+        // However, if we have a paired peripheral, than we need to fire up the CBCentralManager in order to
+        // see if it's trying to reconcile with us.
         if (self.pairedPeripheralUUID)
         {
             [self ensureCentralManager];
