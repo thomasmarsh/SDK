@@ -228,7 +228,7 @@ public:
 
         penManager.pen.delegate = self;
     }
-    else if (penManager.state == FTPenManagerStateConnected)
+    else if (FTPenManagerStateIsConnected(penManager.state))
     {
         // Stats
         self.connectCount++;
@@ -378,7 +378,8 @@ public:
         [self.pairingStatusLabel setText:[NSString stringWithFormat:@"Connecting to %@",
                                           self.penManager.pen.name]];
     }
-    else if (self.penManager.state == FTPenManagerStateConnected)
+    else if (self.penManager.state == FTPenManagerStateConnected ||
+             self.penManager.state == FTPenManagerStateConnectedLongPressToUnpair)
     {
         [self.pairingStatusLabel setText:[NSString stringWithFormat:@"Connected to %@",
                                           self.penManager.pen.name]];
@@ -393,7 +394,7 @@ public:
         [self.pairingStatusLabel setText:@""];
     }
 
-    if (self.penManager.state == FTPenManagerStateConnected)
+    if (FTPenManagerStateIsConnected(self.penManager.state))
     {
         [self.connectButton setTitle:@"Disconnect" forState:UIControlStateNormal];
         self.connectButton.hidden = NO;

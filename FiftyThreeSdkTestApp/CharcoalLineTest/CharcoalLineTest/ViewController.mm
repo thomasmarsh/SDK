@@ -275,6 +275,8 @@ FTPenPrivateDelegate>
         case FTPenManagerStateUninitialized:
         case FTPenManagerStateSeeking:
         case FTPenManagerStateUpdatingFirmware:
+        case FTPenManagerStateConnectedLongPressToUnpair:
+        case FTPenManagerStateDisconnectedLongPressToUnpair:
             break;
         default:
             NSAssert(NO, @"Unexpected state.");
@@ -471,8 +473,7 @@ FTPenPrivateDelegate>
     [self setIsConnected:self.isPCConnected forIsConnectedLabel:self.isPCConnectedLabel];
 
     // Is pen connected
-    [self setIsConnected:(self.penManager.state == FTPenManagerStateConnected ||
-                          self.penManager.state == FTPenManagerStateUpdatingFirmware)
+    [self setIsConnected:FTPenManagerStateIsConnected(self.penManager.state)
      forIsConnectedLabel:self.isPenConnectedLabel];
 }
 
@@ -545,8 +546,7 @@ FTPenPrivateDelegate>
 
 - (void)updateDeviceInfoLabel
 {
-    if (self.penManager.state != FTPenManagerStateConnected &&
-        self.penManager.state != FTPenManagerStateUpdatingFirmware)
+    if (!FTPenManagerStateIsConnected(self.penManager.state))
     {
         self.deviceInfoLabel.text = @"";
         return;
@@ -695,16 +695,22 @@ FTPenPrivateDelegate>
             [self.statusLabel setText:[NSString stringWithFormat:@"Connected to %@",
                                        self.penManager.pen.name]];
             break;
+        case FTPenManagerStateConnectedLongPressToUnpair:
+            [self.statusLabel setText:[NSString stringWithFormat:@"*Connected to %@",
+                                       self.penManager.pen.name]];
+            break;
         case FTPenManagerStateDisconnected:
             [self.statusLabel setText:@"Disconnected"];
+            break;
+        case FTPenManagerStateDisconnectedLongPressToUnpair:
+            [self.statusLabel setText:@"*Disconnected"];
             break;
         default:
             NSAssert(NO, @"unexpected state");
             break;
     }
 
-    if (self.penManager.state == FTPenManagerStateConnected ||
-        self.penManager.state == FTPenManagerStateUpdatingFirmware)
+    if (FTPenManagerStateIsConnected(self.penManager.state))
     {
         [self.connectButton setTitle:@"Disconnect" forState:UIControlStateNormal];
         self.connectButton.hidden = NO;

@@ -146,10 +146,12 @@ using boost::optional;
             case FTPenManagerStateConnecting:
             case FTPenManagerStateReconnecting:
             case FTPenManagerStateDisconnected:
+            case FTPenManagerStateDisconnectedLongPressToUnpair:
             case FTPenManagerStateSeeking:
                 classifier->SetPenConnected(false);
                 break;
             case FTPenManagerStateConnected:
+            case FTPenManagerStateConnectedLongPressToUnpair:
                 classifier->SetPenConnected(true);
                 break;
             default:

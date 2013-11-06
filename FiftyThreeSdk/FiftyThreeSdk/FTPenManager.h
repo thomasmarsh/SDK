@@ -14,19 +14,27 @@
 typedef NS_ENUM(NSInteger, FTPenManagerState)
 {
     FTPenManagerStateUninitialized,
-    FTPenManagerStateUpdatingFirmware,
     FTPenManagerStateUnpaired,
     FTPenManagerStateSeeking,
     FTPenManagerStateConnecting,
-    FTPenManagerStateReconnecting,
     FTPenManagerStateConnected,
-    FTPenManagerStateDisconnected
+    FTPenManagerStateConnectedLongPressToUnpair,
+    FTPenManagerStateDisconnected,
+    FTPenManagerStateDisconnectedLongPressToUnpair,
+    FTPenManagerStateReconnecting,
+    FTPenManagerStateUpdatingFirmware
 };
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
+
+    // Returns true if the given FTPenManagerState is a state in which the pen is connected:
+    //   * FTPenManagerStateConnected
+    //   * FTPenManagerStateConnectedLongPressToUnpair
+    //   * FTPenManagerStateUpdatingFirmware
+    BOOL FTPenManagerStateIsConnected(FTPenManagerState state);
 
     NSString *FTPenManagerStateToString(FTPenManagerState state);
 
