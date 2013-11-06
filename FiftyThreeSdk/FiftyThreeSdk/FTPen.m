@@ -254,7 +254,7 @@ NSString * const kFTPenAuthenticationCodePropertyName = @"authenticationCode";
     return self.penServiceClient.eraserPressure;
 }
 
-- (NSInteger)batteryLevel
+- (NSNumber *)batteryLevel
 {
     return self.penServiceClient.batteryLevel;
 }
@@ -485,7 +485,7 @@ NSString * const kFTPenAuthenticationCodePropertyName = @"authenticationCode";
     }
 }
 
-- (void)penServiceClient:(FTPenServiceClient *)penServiceClient batteryLevelDidChange:(NSInteger)batteryLevel
+- (void)penServiceClient:(FTPenServiceClient *)penServiceClient batteryLevelDidChange:(NSNumber *)batteryLevel
 {
     [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenBatteryLevelDidChangeNotificationName
                                                         object:self];

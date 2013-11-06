@@ -24,7 +24,7 @@
 @property (nonatomic, readonly) BOOL isEraserPressed;
 @property (nonatomic, readonly) float eraserPressure;
 @property (nonatomic, readonly) float tipPressure;
-@property (nonatomic, readonly) NSInteger batteryLevel;
+@property (nonatomic, readonly) NSNumber *batteryLevel;
 @property (nonatomic) BOOL hasListener;
 @property (nonatomic) NSInteger inactivityTimeout;
 @property (nonatomic) FTPenPressureSetup *pressureSetup;
@@ -55,7 +55,7 @@
 - (void)penServiceClient:(FTPenServiceClient *)penServiceClient didUpdateTipPressure:(float)tipPressure;
 - (void)penServiceClient:(FTPenServiceClient *)penServiceClient didUpdateEraserPressure:(float)eraserPressure;
 - (void)penServiceClient:(FTPenServiceClient *)penServiceClient isEraserPressedDidChange:(BOOL)isEraserPressed;
-- (void)penServiceClient:(FTPenServiceClient *)penServiceClient batteryLevelDidChange:(NSInteger)batteryLevel;
+- (void)penServiceClient:(FTPenServiceClient *)penServiceClient batteryLevelDidChange:(NSNumber *)batteryLevel;
 - (void)penServiceClient:(FTPenServiceClient *)penServiceClient didReadManufacturingID:(NSString *)manufacturingID;
 - (void)penServiceClientDidWriteManufacturingID:(FTPenServiceClient *)penServiceClient;
 - (void)penServiceClientDidFailToWriteManufacturingID:(FTPenServiceClient *)penServiceClient;

@@ -63,7 +63,7 @@ extern NSString * const kFTPenBatteryLevelPropertyName;
 @property (nonatomic, readonly) float tipPressure;
 @property (nonatomic, readonly) float eraserPressure;
 @property (nonatomic, readonly) NSDate *lastTipReleaseTime;
-@property (nonatomic, readonly) NSInteger batteryLevel;
+@property (nonatomic, readonly) NSNumber *batteryLevel;
 
 @end
 
@@ -75,6 +75,6 @@ extern NSString * const kFTPenBatteryLevelPropertyName;
 - (void)pen:(FTPen *)pen isEraserPressedDidChange:(BOOL)isEraserPressed;
 - (void)pen:(FTPen *)pen tipPressureDidChange:(float)tipPressure;
 - (void)pen:(FTPen *)pen eraserPressureDidChange:(float)eraserPressure;
-- (void)pen:(FTPen *)pen batteryLevelDidChange:(NSInteger)batteryLevel;
+- (void)pen:(FTPen *)pen batteryLevelDidChange:(NSNumber *)batteryLevel;
 
 @end

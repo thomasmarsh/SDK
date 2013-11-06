@@ -35,6 +35,7 @@
 @property (nonatomic) BOOL tipPressureDidSetNofifyValue;
 @property (nonatomic) BOOL eraserPressureDidSetNofifyValue;
 @property (nonatomic) BOOL batteryLevelDidSetNofifyValue;
+@property (nonatomic) BOOL batteryLevelDidReceiveFirstUpdate;
 @property (nonatomic) BOOL didInitialReadOfInactivityTimeout;
 @property (nonatomic) BOOL didInitialReadOfPressureSetup;
 @property (nonatomic) BOOL didInitialReadOfManufacturingID;
@@ -70,16 +71,6 @@
 - (BOOL)isEraserPressed
 {
     return [self.isEraserPressedCharacteristic valueAsBOOL];
-}
-
-- (NSInteger)batteryLevel
-{
-    if (self.batteryLevelCharacteristic.value.length > 0)
-    {
-        return [self.batteryLevelCharacteristic valueAsNSUInteger];
-    }
-
-    return -1;
 }
 
 - (void)setHasListener:(BOOL)hasListener
@@ -259,6 +250,7 @@
         self.tipPressureDidSetNofifyValue = NO;
         self.eraserPressureDidSetNofifyValue = NO;
         self.batteryLevelDidSetNofifyValue = NO;
+        self.batteryLevelDidReceiveFirstUpdate = NO;
 
         self.didInitialReadOfInactivityTimeout = NO;
         self.didInitialReadOfPressureSetup = NO;
@@ -494,10 +486,20 @@
     }
     else if ([characteristic isEqual:self.batteryLevelCharacteristic])
     {
-        NSInteger batteryLevel = self.batteryLevel;
-        [self.delegate penServiceClient:self batteryLevelDidChange:batteryLevel];
-
-//        NSLog(@"BatteryLevel did update value: %d", batteryLevel);
+        // Ignore the first battery level update that results from setting notification on the
+        // characterisitic. We only want to pay attention to notifications from the peripheral itself.
+        if (self.batteryLevelDidReceiveFirstUpdate)
+        {
+            _batteryLevel = (self.batteryLevelCharacteristic.value.length > 0 ?
+                             @([self.batteryLevelCharacteristic valueAsNSUInteger]) :
+                             nil);
+            [self.delegate penServiceClient:self batteryLevelDidChange:self.batteryLevel];
+//            NSLog(@"BatteryLevel did update value: %@", self.batteryLevel);
+        }
+        else
+        {
+            self.batteryLevelDidReceiveFirstUpdate = YES;
+        }
     }
     else if ([characteristic isEqual:self.inactivityTimeoutCharacteristic])
     {
@@ -655,7 +657,6 @@
             [self.peripheral setNotifyValue:YES
                           forCharacteristic:self.batteryLevelCharacteristic];
             self.batteryLevelDidSetNofifyValue = YES;
-            [self.peripheral readValueForCharacteristic:self.batteryLevelCharacteristic];
         }
 
         if (self.inactivityTimeoutCharacteristic && !self.didInitialReadOfInactivityTimeout)

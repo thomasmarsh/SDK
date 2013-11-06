@@ -372,7 +372,7 @@ FTPenPrivateDelegate>
 //    NSLog(@"eraser pressure: %f", eraserPressure);
 }
 
-- (void)pen:(FTPen *)pen batteryLevelDidChange:(NSInteger)batteryLevel
+- (void)pen:(FTPen *)pen batteryLevelDidChange:(NSNumber *)batteryLevel
 {
     [self updateDeviceInfoLabel];
 }
@@ -559,7 +559,11 @@ FTPenPrivateDelegate>
     [deviceInfo appendFormat:@"Upgrade Firmware Rev: %@\n", pen.softwareRevision];
     [deviceInfo appendFormat:@"    * currently running\n\n"];
 
-    NSString *batteryLevelText = [NSString stringWithFormat:@"Battery Level: %d%%\n\n", pen.batteryLevel];
+    NSString *batteryLevelText = @"Battery Level:\n\n";
+    if (pen.batteryLevel)
+    {
+        batteryLevelText = [NSString stringWithFormat:@"Battery Level: %d%%\n\n", pen.batteryLevel.integerValue];
+    }
     int batteryLevelOffset = [deviceInfo length];
     [deviceInfo appendString:batteryLevelText];
 
@@ -621,9 +625,9 @@ FTPenPrivateDelegate>
     }
 
     UIColor *batteryLevelColor = [UIColor blackColor];
-    if (pen.batteryLevel != -1)
+    if (pen.batteryLevel)
     {
-        batteryLevelColor = (pen.batteryLevel < 50 ?
+        batteryLevelColor = (pen.batteryLevel.integerValue < 50 ?
                              [UIColor redColor] :
                              [UIColor greenColor]);
     }
@@ -1043,7 +1047,9 @@ FTPenPrivateDelegate>
         else if ([command isEqualToString:kGetBatteryLevelCommand])
         {
             NSString *result = [NSString stringWithFormat:@"Battery level: %d%%",
-                                self.penManager.pen.batteryLevel];
+                                (self.penManager.pen.batteryLevel ?
+                                 self.penManager.pen.batteryLevel.integerValue :
+                                 -1)];
             [self sendString:result];
         }
         else

@@ -337,7 +337,7 @@ public:
     _PenAndTouchManager->HandlePenEvent(event);
 }
 
-- (void)pen:(FTPen *)pen batteryLevelDidChange:(NSInteger)batteryLevel
+- (void)pen:(FTPen *)pen batteryLevelDidChange:(NSNumber *)batteryLevel
 {
 
 }
