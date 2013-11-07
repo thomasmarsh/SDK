@@ -16,7 +16,7 @@ using boost::optional;
 
 @interface FTApplication ()
 
-@property (nonatomic) BOOL didSeeFTPenManager;
+@property (nonatomic) BOOL hasSeenFTPenManager;
 @property (nonatomic) optional<TouchClassifier::Ptr> classifier;
 
 @end
@@ -60,7 +60,7 @@ using boost::optional;
     // Don't instantiate the classifier until we've seen an FTPenManager. That way classification doesn't
     // interfere with devices that don't support Pencil, and performance is not degraded if Pencil is not
     // used on devices that do support it but disable it (possibly).
-    if (self.didSeeFTPenManager && !_classifier)
+    if (self.hasSeenFTPenManager && !_classifier)
     {
         // Lazily create the classifier.
         _classifier = [self createClassifier];
@@ -123,7 +123,7 @@ using boost::optional;
 
 - (void)didUpdateStateNotification:(NSNotification *)notification
 {
-    self.didSeeFTPenManager = YES;
+    self.hasSeenFTPenManager = YES;
 
     if (self.classifier && *self.classifier)
     {
