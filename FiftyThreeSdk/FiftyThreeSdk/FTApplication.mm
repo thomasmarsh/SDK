@@ -12,11 +12,13 @@
 
 using namespace fiftythree::common;
 using namespace boost;
+using boost::optional;
 
 @interface FTApplication ()
-{
-}
-@property (nonatomic, readwrite)boost::optional<TouchClassifier::Ptr> classifier;
+
+@property (nonatomic) BOOL didSeeFTPenManager;
+@property (nonatomic) optional<TouchClassifier::Ptr> classifier;
+
 @end
 
 @implementation FTApplication
@@ -53,14 +55,18 @@ using namespace boost;
     return TouchClassifier::Ptr();
 }
 
-- (boost::optional<fiftythree::common::TouchClassifier::Ptr>) classifier
+- (optional<fiftythree::common::TouchClassifier::Ptr>)classifier
 {
-    if (!_classifier)
+    // Don't instantiate the classifier until we've seen an FTPenManager. That way classification doesn't
+    // interfere with devices that don't support Pencil, and performance is not degraded if Pencil is not
+    // used on devices that do support it but disable it (possibly).
+    if (self.didSeeFTPenManager && !_classifier)
     {
         // Lazily create the classifier.
         _classifier = [self createClassifier];
         ActiveClassifier::Activate(*_classifier);
     }
+
     return _classifier;
 }
 
@@ -117,9 +123,11 @@ using namespace boost;
 
 - (void)didUpdateStateNotification:(NSNotification *)notification
 {
+    self.didSeeFTPenManager = YES;
+
     if (self.classifier && *self.classifier)
     {
-        FTPenManager *manager = (FTPenManager*)notification.object;
+        FTPenManager *manager = (FTPenManager *)notification.object;
 
         switch (manager.state)
         {
@@ -137,7 +145,6 @@ using namespace boost;
                 break;
             default:
                 DebugAssert(false);
-
         }
     }
 }
