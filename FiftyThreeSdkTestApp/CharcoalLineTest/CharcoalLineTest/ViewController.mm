@@ -427,23 +427,26 @@ FTPenPrivateDelegate>
 {
     // Tip
     [self setIsPressed:self.penManager.pen.isTipPressed
-     forIsPressedLabel:self.isTipPressedLabel];
+     forIsPressedLabel:self.isTipPressedLabel
+          pressedColor:[UIColor greenColor]];
 
     // Eraser
     [self setIsPressed:self.penManager.pen.isEraserPressed
-     forIsPressedLabel:self.isEraserPressedLabel];
+     forIsPressedLabel:self.isEraserPressedLabel
+          pressedColor:[UIColor blueColor]];
 
     // Touch
     [self setIsPressed:(self.currentTouch != nil)
-     forIsPressedLabel:self.isTouchPressedLabel];
+     forIsPressedLabel:self.isTouchPressedLabel
+          pressedColor:[UIColor cyanColor]];
 }
 
-- (void)setIsPressed:(BOOL)isPressed forIsPressedLabel:(UILabel *)label
+- (void)setIsPressed:(BOOL)isPressed forIsPressedLabel:(UILabel *)label pressedColor:(UIColor *)pressedColor
 {
     if (isPressed)
     {
-        label.textColor = [UIColor blackColor];
-        [label setBackgroundColor:[UIColor greenColor]];
+        label.textColor = [UIColor lightGrayColor];
+        [label setBackgroundColor:pressedColor];
     }
     else
     {
@@ -467,8 +470,8 @@ FTPenPrivateDelegate>
 {
     if (isConnected)
     {
-        label.textColor = [UIColor blackColor];
-        [label setBackgroundColor:[UIColor greenColor]];
+        label.textColor = [UIColor whiteColor];
+        [label setBackgroundColor:[UIColor purpleColor]];
     }
     else
     {
