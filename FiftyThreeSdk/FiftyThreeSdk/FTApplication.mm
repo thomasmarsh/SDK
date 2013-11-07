@@ -92,6 +92,8 @@ using boost::optional;
 
             classifier->TouchesDidChanged(touches);
         }
+        
+        static_pointer_cast<TouchTrackerObjC>(TouchTracker::Instance())->ProcessTouchesEvent(event);
     }
 
     [super sendEvent:event];
