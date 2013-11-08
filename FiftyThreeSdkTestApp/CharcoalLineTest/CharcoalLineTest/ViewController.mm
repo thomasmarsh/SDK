@@ -518,6 +518,21 @@ FTPenPrivateDelegate>
     [self.connectionHistoryLabel.superview setNeedsLayout];
 }
 
+- (NSString *)postProcessHardwareRevision:(NSString *)hardwareRevision
+{
+    // Due to some esoteric intricacies of the HW/FW combo, we don't accurately report hardwareRevision
+    // on some units. This should clear it up.
+    if ([hardwareRevision isEqualToString:@"DV1"])
+    {
+        return @"DV/PV";
+    }
+    else if ([hardwareRevision isEqualToString:@"Unknown"])
+    {
+        return @"MP";
+    }
+    return hardwareRevision;
+}
+
 - (void)updateDeviceInfoLabel
 {
     if (self.penManager.state != FTPenManagerStateConnected &&
@@ -539,7 +554,7 @@ FTPenPrivateDelegate>
     [deviceInfo appendFormat:@"Manufacturer: %@\n", pen.manufacturerName];
     [deviceInfo appendFormat:@"SKU: %@\n", pen.modelNumber];
     [deviceInfo appendFormat:@"Serial Number: %@\n", pen.serialNumber];
-    [deviceInfo appendFormat:@"Hardware Rev: %@\n", pen.hardwareRevision];
+    [deviceInfo appendFormat:@"Hardware Rev: %@\n", [self postProcessHardwareRevision:pen.hardwareRevision]];
     [deviceInfo appendFormat:@"Factory Firmware Rev: %@\n", pen.firmwareRevision];
     [deviceInfo appendFormat:@"Upgrade Firmware Rev: %@\n", pen.softwareRevision];
     [deviceInfo appendFormat:@"    * currently running\n\n"];

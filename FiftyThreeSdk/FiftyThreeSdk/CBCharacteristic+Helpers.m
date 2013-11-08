@@ -9,6 +9,23 @@
 
 @implementation CBCharacteristic (Helpers)
 
+- (NSData *)removeTrailingZeros:(NSData *)data
+{
+    NSData *value = self.value;
+    int length = value.length;
+    for (; length > 0; length--)
+    {
+        if (((uint8_t *)value.bytes)[length - 1] != '\0')
+        {
+            break;
+        }
+    }
+
+    return ((value.length == length) ?
+            value :
+            [value subdataWithRange:NSMakeRange(0, length)]);
+}
+
 - (BOOL)valueAsBOOL
 {
     return (self.value.length > 0 ?
@@ -18,8 +35,10 @@
 
 - (NSString *)valueAsNSString
 {
-    return (self.value.length > 0 ?
-            [[NSString alloc] initWithData:self.value encoding:NSASCIIStringEncoding] :
+    NSData *data = [self removeTrailingZeros:self.value];
+
+    return (data.length > 0 ?
+            [[NSString alloc] initWithData:data encoding:NSASCIIStringEncoding] :
             nil);
 }
 
