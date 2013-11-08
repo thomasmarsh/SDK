@@ -45,6 +45,7 @@ static const NSTimeInterval kSeparatedStateTimeout = 10.0 * 60.0;
 static const NSTimeInterval kMarriedWaitingForLongPressToDisconnectTimeout = 1.5;
 static const NSTimeInterval kAttemptingConnectionStateTimeout = 15.0;
 
+static NSString *const kWaitingForCentralManagerToPowerOnStateName = @"WaitingForCentralManagerToPowerOn";
 static NSString *const kSingleStateName = @"Single";
 static NSString *const kDatingRetrievingConnectedPeripheralsStateName = @"DatingRetrievingConnectedPeripherals";
 static NSString *const kDatingScanningStateName = @"DatingScanning";
@@ -68,6 +69,7 @@ static NSString *const kSeparatedAttemptingConnectionStateName = @"SeparatedAtte
 static NSString *const kUpdatingFirmwareStateName = @"UpdatingFirmware";
 static NSString *const kUpdatingFirmwareAttemptingConnectionStateName = @"UpdatingFirmwareAttemptingConnection";
 
+static NSString *const kWaitForCentralManagerToPowerOn = @"WaitForCentralManagerToPowerOn";
 static NSString *const kBeginDatingAndRetrieveConnectedPeripheralsEventName = @"BeginDatingAndRetrieveConnectedPeripherals";
 static NSString *const kRetrieveConnectedPeripheralsFromSeparatedEventName = @"RetrieveConnectedPeripheralsFromSeparated";
 static NSString *const kBeginDatingScanningEventName = @"BeginDatingScanning";
@@ -125,8 +127,6 @@ typedef enum
 
 @property (nonatomic) CFUUIDRef pairedPeripheralUUID;
 
-@property (nonatomic) NSTimer *stateTimeoutTimer;
-
 @property (nonatomic) UIBackgroundTaskIdentifier backgroundTaskId;
 
 @end
@@ -138,15 +138,11 @@ typedef enum
     self = [super init];
     if (self)
     {
-        _centralManager = [[CBCentralManager alloc] initWithDelegate:self queue:nil];
-
         _state = FTPenManagerStateUninitialized;
 
         _scanningState = ScanningStateDisabled;
 
         _backgroundTaskId = UIBackgroundTaskInvalid;
-
-        [self initializeStateMachine];
 
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(stateMachineDidChangeState:)
@@ -169,6 +165,8 @@ typedef enum
                                                  selector:@selector(penDidWriteHasListener:)
                                                      name:kFTPenDidWriteHasListenerNotificationName
                                                    object:nil];
+
+        [self initializeStateMachine];
     }
 
     return self;
@@ -176,7 +174,7 @@ typedef enum
 
 - (void)dealloc
 {
-    [self resetBackgroundTask];
+    [self reset];
 
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 
@@ -187,7 +185,40 @@ typedef enum
     }
 }
 
+- (void)reset
+{
+    [self resetBackgroundTask];
+
+    self.firmwareImagePath = nil;
+    self.updateManager = nil;
+
+    FTPen *pen = self.pen;
+    self.pen = nil;
+    [pen peripheralConnectionStatusDidChange];
+
+    self.scanningState = ScanningStateDisabled;
+
+    _centralManager.delegate = nil;
+    _centralManager = nil;
+}
+
 #pragma mark - Properties
+
+- (CBCentralManager *)centralManager
+{
+    return [self ensureCentralManager];
+}
+
+- (CBCentralManager *)ensureCentralManager
+{
+    // Lazily initialize the CBCentralManager so that we don't invoke the system Bluetooth alert (if Bluetooth
+    // is disabled) until the user presses the pairing spot.
+    if (!_centralManager)
+    {
+        _centralManager = [[CBCentralManager alloc] initWithDelegate:self queue:nil];
+    }
+    return _centralManager;
+}
 
 - (void)setState:(FTPenManagerState)state
 {
@@ -390,6 +421,27 @@ typedef enum
 
         [weakSelf.centralManager connectPeripheral:weakSelf.pen.peripheral options:nil];
     };
+
+    // WaitingForCentralManagerToPowerOn
+    TKState *waitingForCentralManagerToPowerOnState = [TKState stateWithName:kWaitingForCentralManagerToPowerOnStateName];
+    [waitingForCentralManagerToPowerOnState setDidEnterStateBlock:^(TKState *state,
+                                                                    TKStateMachine *stateMachine)
+    {
+        [self reset];
+
+        if (self.pairedPeripheralUUID)
+        {
+            [self ensureCentralManager];
+        }
+
+        weakSelf.state = FTPenManagerStateUninitialized;
+    }];
+    [waitingForCentralManagerToPowerOnState setDidExitStateBlock:^(TKState *state,
+                                                                     TKStateMachine *stateMachine)
+    {
+        NSAssert(weakSelf.centralManager, @"CentralManager non-nil");
+        NSAssert(weakSelf.centralManager.state == CBCentralManagerStatePoweredOn, @"State is PoweredOn");
+    }];
 
     // Single
     TKState *singleState = [TKState stateWithName:kSingleStateName];
@@ -709,6 +761,7 @@ typedef enum
     }];
 
     [self.stateMachine addStates:@[
+     waitingForCentralManagerToPowerOnState,
      singleState,
      datingRetrievingConnectedPeripheralsState,
      datingScanningState,
@@ -733,17 +786,26 @@ typedef enum
     // Events
     //
 
+    TKEvent *waitForCentralManagerToPowerOn = [TKEvent eventWithName:kWaitForCentralManagerToPowerOn
+                                             transitioningFromStates:[self.stateMachine.states allObjects]
+                                                             toState:waitingForCentralManagerToPowerOnState];
+
     TKEvent *beginDatingRetrievingConnectedPeripheralsEvent = [TKEvent eventWithName:kBeginDatingAndRetrieveConnectedPeripheralsEventName
-                                                             transitioningFromStates:@[singleState,
+                                                             transitioningFromStates:@[
+                                                               waitingForCentralManagerToPowerOnState,
+                                                               singleState,
                                                                separatedState,
                                                                marriedState,
                                                                datingAttemptingConnectionState]
                                                                              toState:datingRetrievingConnectedPeripheralsState];
     TKEvent *beginDatingScanningEvent = [TKEvent eventWithName:kBeginDatingScanningEventName
-                                       transitioningFromStates:@[datingRetrievingConnectedPeripheralsState]
+                                       transitioningFromStates:@[
+                                         datingRetrievingConnectedPeripheralsState]
                                                        toState:datingScanningState];
     TKEvent *becomeSingleEvent = [TKEvent eventWithName:kBecomeSingleEventName
-                                transitioningFromStates:@[ datingScanningState,
+                                transitioningFromStates:@[
+                                  waitingForCentralManagerToPowerOnState,
+                                  datingScanningState,
                                   datingRetrievingConnectedPeripheralsState,
                                   separatedState,
                                   swingingState]
@@ -813,7 +875,9 @@ typedef enum
                                      updatingFirmwareState]
                                                    toState:separatedState];
     TKEvent *retrieveConnectedPeripheralsFromSeparatedEvent = [TKEvent eventWithName:kRetrieveConnectedPeripheralsFromSeparatedEventName
-                                                             transitioningFromStates:@[separatedState]
+                                                             transitioningFromStates:@[
+                                                               waitingForCentralManagerToPowerOnState,
+                                                               separatedState]
                                                                              toState:separatedRetrievingConnectedPeripheralsState];
     TKEvent *attemptConnectionFromSeparatedEvent = [TKEvent eventWithName:kAttemptConnectionFromSeparatedEventName
                                                   transitioningFromStates:@[
@@ -830,6 +894,7 @@ typedef enum
                                                                          toState:updatingFirmwareAttemptingConnectionState];
 
     [self.stateMachine addEvents:@[
+     waitForCentralManagerToPowerOn,
      beginDatingRetrievingConnectedPeripheralsEvent,
      beginDatingScanningEvent,
      becomeSingleEvent,
@@ -854,11 +919,14 @@ typedef enum
      attemptConnectionFromUpdatingFirmwareEvent,
      ]];
 
-    // If we're already paired with a peripheral, then start in the separted state so that we
-    // may reconnect it automatically.
-    self.stateMachine.initialState = (self.pairedPeripheralUUID ?
-                                      separatedRetrievingConnectedPeripheralsState :
-                                      singleState);
+    self.stateMachine.initialState = waitingForCentralManagerToPowerOnState;
+
+    [FTLog logWithFormat:@"Activating state machine with initial state: %@",
+     self.stateMachine.initialState.name];
+    [self.stateMachine activate];
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenManagerDidUpdateStateNotificationName
+                                                        object:self];
 }
 
 - (void)stateMachineDidChangeState:(NSNotification *)notification
@@ -957,24 +1025,26 @@ typedef enum
 {
     [FTLog log:@"Pairing spot was pressed."];
 
-    if (!self.stateMachine.isActive)
-    {
-        return;
-    }
+    // When the user presses the pairing spot is often the first time we'll create the CBCentralManager and
+    // possibly provoke the system Bluetooth alert if Bluetooth is not enabled.
+    [self ensureCentralManager];
 
-    if ([self currentStateHasName:kSingleStateName])
+    if (![self currentStateHasName:kWaitingForCentralManagerToPowerOnStateName])
     {
-        [self fireStateMachineEvent:kBeginDatingAndRetrieveConnectedPeripheralsEventName];
-    }
-    else if ([self currentStateHasName:kSeparatedStateName])
-    {
-        [self fireStateMachineEvent:kBeginDatingAndRetrieveConnectedPeripheralsEventName];
-    }
-    else if ([self currentStateHasName:kMarriedStateName])
-    {
-        NSAssert(self.pen.peripheral.isConnected, @"Pen peripheral is connected");
+        if ([self currentStateHasName:kSingleStateName])
+        {
+            [self fireStateMachineEvent:kBeginDatingAndRetrieveConnectedPeripheralsEventName];
+        }
+        else if ([self currentStateHasName:kSeparatedStateName])
+        {
+            [self fireStateMachineEvent:kBeginDatingAndRetrieveConnectedPeripheralsEventName];
+        }
+        else if ([self currentStateHasName:kMarriedStateName])
+        {
+            NSAssert(self.pen.peripheral.isConnected, @"Pen peripheral is connected");
 
-        [self fireStateMachineEvent:kWaitForLongPressToDisconnect];
+            [self fireStateMachineEvent:kWaitForLongPressToDisconnect];
+        }
     }
 }
 
@@ -1063,17 +1133,45 @@ typedef enum
 
 #pragma mark - CBCentralManagerDelegate
 
-- (void)centralManagerDidUpdateState:(CBCentralManager *)central
+- (void)centralManagerDidUpdateState:(CBCentralManager *)centralManager
 {
-    if (central.state == CBCentralManagerStatePoweredOn)
-    {
-        if (!self.stateMachine.isActive)
-        {
-            [FTLog logWithFormat:@"Activating state machine with initial state: %@",
-             self.stateMachine.initialState.name];
+    NSAssert(self.centralManager == centralManager, @"centralManager matches expected");
 
-            [self.stateMachine activate];
+    if (centralManager.state == CBCentralManagerStatePoweredOn)
+    {
+        if ([self currentStateHasName:kWaitingForCentralManagerToPowerOnStateName])
+        {
+            if (self.pairedPeripheralUUID)
+            {
+                [self fireStateMachineEvent:kRetrieveConnectedPeripheralsFromSeparatedEventName];
+            }
+            else
+            {
+                if (self.isPairingSpotPressed)
+                {
+                    [self fireStateMachineEvent:kBeginDatingAndRetrieveConnectedPeripheralsEventName];
+                }
+                else
+                {
+                    [self fireStateMachineEvent:kBecomeSingleEventName];
+                }
+            }
         }
+    }
+    else
+    {
+        if ([self currentStateHasName:kWaitingForCentralManagerToPowerOnStateName])
+        {
+            [self reset];
+        }
+        else
+        {
+            [self fireStateMachineEvent:kWaitForCentralManagerToPowerOn];
+        }
+
+        // If the state of the CBCentralManager is ever anything than PoweredOn, sever the pairing to the
+        // peripheral.
+        self.pairedPeripheralUUID = NULL;
     }
 }
 
@@ -1109,8 +1207,7 @@ typedef enum
 
         if (!isPeripheralReconciling)
         {
-            self.pen = [[FTPen alloc] initWithCentralManager:self.centralManager
-                                                  peripheral:peripheral];
+            self.pen = [[FTPen alloc] initWithPeripheral:peripheral];
 
             [self fireStateMachineEvent:kAttemptConnectionFromDatingEventName];
         }
@@ -1126,8 +1223,7 @@ typedef enum
             if (isPeripheralReconciling)
             {
                 NSAssert(!self.pen, @"pen is nil");
-                self.pen = [[FTPen alloc] initWithCentralManager:self.centralManager
-                                                      peripheral:peripheral];
+                self.pen = [[FTPen alloc] initWithPeripheral:peripheral];
                 [self fireStateMachineEvent:kAttemptConnectionFromSwingingEventName];
             }
             else
@@ -1142,8 +1238,7 @@ typedef enum
             isPeripheralReconciling)
         {
             NSAssert(!self.pen, @"pen is nil");
-            self.pen = [[FTPen alloc] initWithCentralManager:self.centralManager
-                                                  peripheral:peripheral];
+            self.pen = [[FTPen alloc] initWithPeripheral:peripheral];
             [self fireStateMachineEvent:kAttemptConnectionFromSeparatedEventName];
         }
     }
@@ -1219,8 +1314,7 @@ typedef enum
                 // which restores the peripheral delegate. In this case since we've created a new FTPen, we
                 // *don't* want the old delegate.
                 self.updateManager.shouldRestorePeripheralDelegate = NO;
-                self.pen = [[FTPen alloc] initWithCentralManager:self.centralManager
-                                                      peripheral:self.pen.peripheral];
+                self.pen = [[FTPen alloc] initWithPeripheral:self.pen.peripheral];
                 [self fireStateMachineEvent:kAttemptConnectionFromUpdatingFirmwareEventName];
             }
         }
@@ -1297,8 +1391,7 @@ typedef enum
                 [peripheral.name isEqualToString:kCharcoalPeripheralName])
             {
                 NSAssert(!self.pen, @"pen is nil");
-                self.pen = [[FTPen alloc] initWithCentralManager:self.centralManager
-                                                      peripheral:peripheral];
+                self.pen = [[FTPen alloc] initWithPeripheral:peripheral];
                 [self fireStateMachineEvent:kAttemptConnectionFromDatingEventName];
                 return;
             }
@@ -1314,8 +1407,7 @@ typedef enum
                 [self isPairedPeripheral:peripheral])
             {
                 NSAssert(!self.pen, @"pen is nil");
-                self.pen = [[FTPen alloc] initWithCentralManager:self.centralManager
-                                                      peripheral:peripheral];
+                self.pen = [[FTPen alloc] initWithPeripheral:peripheral];
                 [self fireStateMachineEvent:kAttemptConnectionFromSeparatedEventName];
                 return;
             }

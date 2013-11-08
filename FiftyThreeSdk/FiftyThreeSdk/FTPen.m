@@ -142,7 +142,6 @@ NSString * const kFTPenAuthenticationCodePropertyName = @"authenticationCode";
 
 @interface FTPen () <FTPenServiceClientDelegate, FTPenUsageServiceClientDelegate, FTDeviceInfoServiceClientDelegate>
 
-@property (nonatomic) CBCentralManager *centralManager;
 @property (nonatomic) FTPeripheralDelegate *peripheralDelegate;
 
 @property (nonatomic) FTPenServiceClient *penServiceClient;
@@ -158,17 +157,14 @@ NSString * const kFTPenAuthenticationCodePropertyName = @"authenticationCode";
 
 #pragma mark - Initialization
 
-- (id)initWithCentralManager:(CBCentralManager *)centralManager
-                  peripheral:(CBPeripheral *)peripheral
+- (id)initWithPeripheral:(CBPeripheral *)peripheral
 {
-    NSAssert(centralManager, @"central manager non-nil");
     NSAssert(peripheral, @"peripheral non-nil");
     NSAssert(!peripheral.isConnected, @"peripheral is not connected");
 
     self = [super init];
     if (self)
     {
-        _centralManager = centralManager;
         _peripheral = peripheral;
 
         _peripheralDelegate = [[FTPeripheralDelegate alloc] init];

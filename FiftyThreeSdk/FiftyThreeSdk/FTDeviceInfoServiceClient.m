@@ -28,7 +28,6 @@
 @property (nonatomic) NSInteger resultCount;
 @property (nonatomic) CBPeripheral *parentPeripheral;
 @property (nonatomic) CBPeripheral *peripheral;
-@property (nonatomic) CBCentralManager *manager;
 
 @end
 

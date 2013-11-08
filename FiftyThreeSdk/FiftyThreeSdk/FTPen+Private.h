@@ -132,8 +132,7 @@ extern NSString * const kFTPenAuthenticationCodePropertyName;
 // pencil.
 @property (nonatomic, readonly) NSNumber *isAluminumPencil;
 
-- (id)initWithCentralManager:(CBCentralManager *)centralManager
-                  peripheral:(CBPeripheral *)peripheral;
+- (id)initWithPeripheral:(CBPeripheral *)peripheral;
 
 - (void)peripheralConnectionStatusDidChange;
 
