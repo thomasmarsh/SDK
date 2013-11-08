@@ -14,10 +14,11 @@ using namespace fiftythree::common;
 using namespace boost;
 using boost::optional;
 
-@interface FTApplication ()
+@interface FTApplication () {
+    optional<TouchClassifier::Ptr> _classifier;
+}
 
 @property (nonatomic) BOOL hasSeenFTPenManager;
-@property (nonatomic) optional<TouchClassifier::Ptr> classifier;
 
 @end
 
@@ -55,7 +56,7 @@ using boost::optional;
     return TouchClassifier::Ptr();
 }
 
-- (optional<fiftythree::common::TouchClassifier::Ptr>)classifier
+- (TouchClassifier::Ptr)classifier
 {
     // Don't instantiate the classifier until we've seen an FTPenManager. That way classification doesn't
     // interfere with devices that don't support Pencil, and performance is not degraded if Pencil is not
@@ -67,7 +68,7 @@ using boost::optional;
         ActiveClassifier::Activate(*_classifier);
     }
 
-    return _classifier;
+    return _classifier ? * _classifier : TouchClassifier::Ptr();
 }
 
 - (void)sendEvent:(UIEvent *)event
@@ -78,7 +79,8 @@ using boost::optional;
     {
         static_pointer_cast<TouchTrackerObjC>(TouchTracker::Instance())->ProcessTouchesEvent(event);
 
-        if (self.classifier && *self.classifier)
+        TouchClassifier::Ptr classifier = self.classifier;
+        if (classifier)
         {
             std::set<Touch::cPtr> touches;
 
@@ -88,7 +90,7 @@ using boost::optional;
                 touches.insert(touch);
             }
 
-            (*self.classifier)->TouchesDidChanged(touches);
+            classifier->TouchesDidChanged(touches);
         }
     }
 
@@ -97,27 +99,29 @@ using boost::optional;
 
 - (void)isTipPressedStateChange:(NSNotification *)notification
 {
-    if (self.classifier && *self.classifier)
+    TouchClassifier::Ptr classifier = self.classifier;
+    if (classifier)
     {
         FTPen *pen = (FTPen*)notification.object;
 
         PenEventArgs args;
         args.Timestamp = [NSProcessInfo processInfo].systemUptime;
         args.Type = pen.isTipPressed?PenEventType::Tip1Down : PenEventType::Tip1Up;
-        (*self.classifier)->PenStateDidChanged(args);
+        classifier->PenStateDidChanged(args);
     }
 }
 
 - (void)isEraserPressedStateChange:(NSNotification *)notification
 {
-    if (self.classifier && *self.classifier)
+    TouchClassifier::Ptr classifier = self.classifier;
+    if (classifier)
     {
         FTPen *pen = (FTPen*)notification.object;
 
         PenEventArgs args;
         args.Timestamp = [NSProcessInfo processInfo].systemUptime;
         args.Type = pen.isEraserPressed?PenEventType::Tip2Down : PenEventType::Tip2Up;
-        (*self.classifier)->PenStateDidChanged(args);
+        classifier->PenStateDidChanged(args);
     }
 }
 
@@ -125,7 +129,8 @@ using boost::optional;
 {
     self.hasSeenFTPenManager = YES;
 
-    if (self.classifier && *self.classifier)
+    TouchClassifier::Ptr classifier = self.classifier;
+    if (classifier)
     {
         FTPenManager *manager = (FTPenManager *)notification.object;
 
@@ -138,10 +143,10 @@ using boost::optional;
             case FTPenManagerStateReconnecting:
             case FTPenManagerStateDisconnected:
             case FTPenManagerStateSeeking:
-                (*self.classifier)->SetPenConnected(false);
+                classifier->SetPenConnected(false);
                 break;
             case FTPenManagerStateConnected:
-                (*self.classifier)->SetPenConnected(true);
+                classifier->SetPenConnected(true);
                 break;
             default:
                 DebugAssert(false);

@@ -20,10 +20,10 @@
 
 #ifdef __cplusplus
 
+@property (nonatomic, readonly) fiftythree::common::TouchClassifier::Ptr classifier;
+
 // Optionally, let a subclass inject a classifier into the touch processing pipeline.
 - (fiftythree::common::TouchClassifier::Ptr)createClassifier;
-
-@property (nonatomic, readonly)boost::optional<fiftythree::common::TouchClassifier::Ptr> classifier;
 
 #endif
 
