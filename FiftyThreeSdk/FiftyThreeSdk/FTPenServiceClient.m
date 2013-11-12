@@ -5,6 +5,8 @@
 //  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
 //
 
+#import <UIKit/UIKit.h>
+
 #import "CBCharacteristic+Helpers.h"
 #import "CBPeripheral+Helpers.h"
 #import "FTError.h"
@@ -47,6 +49,8 @@
 @property (nonatomic) BOOL isReady;
 @property (nonatomic) BOOL shouldPowerOff;
 
+@property (nonatomic) NSTimer *batteryLevelReadTimer;
+
 @end
 
 @implementation FTPenServiceClient
@@ -59,8 +63,22 @@
         _peripheral = peripheral;
         _requiresTipBePressedToBecomeReady = YES;
         _inactivityTimeout = -1;
+
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(applicationDidEnterBackground:)
+                                                     name:UIApplicationDidEnterBackgroundNotification
+                                                   object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(applicationWillEnterForeground:)
+                                                     name:UIApplicationWillEnterForegroundNotification
+                                                   object:nil];
     }
     return self;
+}
+
+- (void)dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 - (BOOL)isTipPressed
@@ -316,7 +334,7 @@
         {
             self.isTipPressedCharacteristic = characteristic;
         }
-        
+
         // HasListener
         if (!self.hasListenerCharacteristic &&
             [characteristic.UUID isEqual:[FTPenServiceUUIDs hasListener]])
@@ -494,7 +512,11 @@
                              @([self.batteryLevelCharacteristic valueAsNSUInteger]) :
                              nil);
             [self.delegate penServiceClient:self batteryLevelDidChange:self.batteryLevel];
-//            NSLog(@"BatteryLevel did update value: %@", self.batteryLevel);
+
+            [self.batteryLevelReadTimer invalidate];
+            self.batteryLevelReadTimer = nil;
+
+            //NSLog(@"BatteryLevel did update value: %@", self.batteryLevel);
         }
         else
         {
@@ -659,6 +681,19 @@
             self.batteryLevelDidSetNofifyValue = YES;
         }
 
+        if (self.batteryLevelCharacteristic && !self.batteryLevel && !self.batteryLevelReadTimer)
+        {
+            // If we don't see a battery level within 22s of connecting, then we need to perform a manual
+            // read of the characteristic. The complexity here is that the Pencil's battery level is
+            // unreliable for the first 20s, so we either wait for the first notification in order to get the
+            // level, or in the case that we don't get one, we read manually.
+            self.batteryLevelReadTimer = [NSTimer scheduledTimerWithTimeInterval:22.0
+                                                                          target:self
+                                                                        selector:@selector(batteryLevelReadTimerDidFire:)
+                                                                        userInfo:nil
+                                                                         repeats:NO];
+        }
+
         if (self.inactivityTimeoutCharacteristic && !self.didInitialReadOfInactivityTimeout)
         {
             [self.peripheral readValueForCharacteristic:self.inactivityTimeoutCharacteristic];
@@ -688,6 +723,28 @@
             [self.peripheral readValueForCharacteristic:self.authenticationCodeCharacteristic];
             self.didInitialReadOfAuthenticationCode = YES;
         }
+    }
+}
+
+- (void)applicationDidEnterBackground:(NSNotification *)notification
+{
+    [self.batteryLevelReadTimer invalidate];
+    self.batteryLevelReadTimer = nil;
+}
+
+- (void)applicationWillEnterForeground:(NSNotification *)notification
+{
+    if (self.batteryLevelCharacteristic && !self.batteryLevel)
+    {
+        [self.peripheral readValueForCharacteristic:self.batteryLevelCharacteristic];
+    }
+}
+
+- (void)batteryLevelReadTimerDidFire:(NSTimer *)sender
+{
+    if (self.batteryLevelCharacteristic && !self.batteryLevel)
+    {
+        [self.peripheral readValueForCharacteristic:self.batteryLevelCharacteristic];
     }
 }
 
