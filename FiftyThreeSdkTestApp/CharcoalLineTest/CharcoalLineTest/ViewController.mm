@@ -450,8 +450,8 @@ FTPenPrivateDelegate>
     }
     else
     {
-        label.textColor = [UIColor whiteColor];
-        label.backgroundColor = [UIColor blackColor];
+        label.textColor = [UIColor blackColor];
+        label.backgroundColor = [UIColor whiteColor];
     }
 }
 
@@ -475,8 +475,8 @@ FTPenPrivateDelegate>
     }
     else
     {
-        label.textColor = [UIColor whiteColor];
-        label.backgroundColor = [UIColor blackColor];
+        label.textColor = [UIColor blackColor];
+        label.backgroundColor = [UIColor whiteColor];
     }
 }
 
