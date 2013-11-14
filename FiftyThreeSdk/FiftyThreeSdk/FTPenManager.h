@@ -23,6 +23,17 @@ typedef NS_ENUM(NSInteger, FTPenManagerState)
     FTPenManagerStateDisconnected
 };
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+    NSString *FTPenManagerStateToString(FTPenManagerState state);
+
+#ifdef __cplusplus
+}
+#endif
+
 extern NSString * const kFTPenManagerDidUpdateStateNotificationName;
 extern NSString * const kFTPenManagerDidFailToDiscoverPenNotificationName;
 

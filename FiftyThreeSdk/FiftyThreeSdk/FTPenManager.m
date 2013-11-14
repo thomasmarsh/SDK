@@ -115,6 +115,32 @@ typedef enum
     ScanningStateEnabledWithPolling
 } ScanningState;
 
+NSString *FTPenManagerStateToString(FTPenManagerState state)
+{
+    switch (state)
+    {
+        case FTPenManagerStateUninitialized:
+            return @"FTPenManagerStateUninitialized";
+        case FTPenManagerStateUpdatingFirmware:
+            return @"FTPenManagerStateUpdatingFirmware";
+        case FTPenManagerStateUnpaired:
+            return @"FTPenManagerStateUnpaired";
+        case FTPenManagerStateSeeking:
+            return @"FTPenManagerStateSeeking";
+        case FTPenManagerStateConnecting:
+            return @"FTPenManagerStateConnecting";
+        case FTPenManagerStateReconnecting:
+            return @"FTPenManagerStateReconnecting";
+        case FTPenManagerStateConnected:
+            return @"FTPenManagerStateConnected";
+        case FTPenManagerStateDisconnected:
+            return @"FTPenManagerStateDisconnected";
+        default:
+            assert(0);
+            return @"Unknown FTPenManagerState value.";
+    }
+}
+
 @interface FTPenManager () <CBCentralManagerDelegate, TIUpdateManagerDelegate> {
     CFUUIDRef _pairedPeripheralUUID;
 }
