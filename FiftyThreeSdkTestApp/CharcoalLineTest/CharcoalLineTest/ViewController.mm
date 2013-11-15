@@ -33,7 +33,6 @@ using namespace fiftythree::common;
 
 @interface ViewController () <UIAlertViewDelegate,
 RscMgrDelegate,
-FTPenManagerDelegate,
 FTPenDelegate,
 FTPenPrivateDelegate>
 
@@ -120,7 +119,14 @@ FTPenPrivateDelegate>
                                                  selector:@selector(penManagerFirmwareUpdateDidCompleteSuccessfully:)
                                                      name:kFTPenManagerFirmwareUpdateDidCompleteSuccessfully
                                                    object:nil];
-
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(penManagerDidFailToDiscoverPen:)
+                                                     name:kFTPenManagerDidFailToDiscoverPenNotificationName
+                                                   object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(penManagerDidUpdateState:)
+                                                     name:kFTPenManagerDidUpdateStateNotificationName
+                                                   object:nil];
     }
 
     return self;
@@ -139,7 +145,7 @@ FTPenPrivateDelegate>
     [_rscManager setDelegate:self];
 
     [FTLog setLogLevel:FTLogLevelEnabledVerbose];
-    _penManager = [[FTPenManager alloc] initWithDelegate:self];
+    _penManager = [[FTPenManager alloc] init];
 
     NSDictionary *infoDictionary = [[NSBundle mainBundle] infoDictionary];
     self.appTitleNavItem.title = [NSString stringWithFormat:@"%@ %@ (%@)",
@@ -217,17 +223,18 @@ FTPenPrivateDelegate>
     }
 }
 
-#pragma mark - FTPenManagerDelegate
+#pragma mark - FTPenManager notifications
 
-- (void)penManagerDidFailToDiscoverPen:(FTPenManager *)penManager
+- (void)penManagerDidFailToDiscoverPen:(NSNotification *)notification
 {
     [self.statusLabel setText:@"Pencil not found. Ensure the battery is fully charged and try again."];
 }
 
-- (void)penManager:(FTPenManager *)penManager didUpdateState:(FTPenManagerState)state
+- (void)penManagerDidUpdateState:(NSNotification *)notification
 {
-    if (state == FTPenManagerStateConnecting ||
-        state == FTPenManagerStateReconnecting)
+    FTPenManager *penManager = [notification object];
+    if (penManager.state == FTPenManagerStateConnecting ||
+        penManager.state == FTPenManagerStateReconnecting)
     {
         NSAssert(penManager.pen, @"pen is non-nil");
         penManager.pen.delegate = self;
@@ -247,7 +254,7 @@ FTPenPrivateDelegate>
     }
 
     char stateChar = '\0';
-    switch (state)
+    switch (penManager.state)
     {
         case FTPenManagerStateUnpaired:
             stateChar = 'u';

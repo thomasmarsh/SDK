@@ -24,8 +24,7 @@ typedef NS_ENUM(NSInteger, FTPenManagerState)
 };
 
 extern NSString * const kFTPenManagerDidUpdateStateNotificationName;
-
-@protocol FTPenManagerDelegate;
+extern NSString * const kFTPenManagerDidFailToDiscoverPenNotificationName;
 
 @interface FTPenManager : NSObject
 
@@ -33,19 +32,8 @@ extern NSString * const kFTPenManagerDidUpdateStateNotificationName;
 
 @property (nonatomic, readonly) FTPen *pen;
 
-@property (nonatomic, weak) id<FTPenManagerDelegate> delegate;
 @property (nonatomic) BOOL isPairingSpotPressed;
 
-- (id)initWithDelegate:(id<FTPenManagerDelegate>)delegate;
-
 - (void)disconnect;
-
-@end
-
-@protocol FTPenManagerDelegate <NSObject>
-
-@optional
-- (void)penManagerDidFailToDiscoverPen:(FTPenManager *)penManager;
-- (void)penManager:(FTPenManager *)penManager didUpdateState:(FTPenManagerState)state;
 
 @end

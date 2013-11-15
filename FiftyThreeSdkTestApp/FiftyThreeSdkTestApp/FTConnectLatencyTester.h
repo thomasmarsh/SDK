@@ -8,7 +8,7 @@
 #import <Foundation/Foundation.h>
 #import "FiftyThreeSdk/FTPenManager.h"
 
-@interface FTConnectLatencyTester : NSObject <FTPenManagerDelegate>
+@interface FTConnectLatencyTester : NSObject
 
 - (id)initWithPenManager:(FTPenManager *)penManager;
 - (void)startTest:(void(^)(NSError *error))complete;

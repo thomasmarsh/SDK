@@ -39,7 +39,7 @@ using std::stringstream;
 
 class TouchObserver;
 
-@interface BTLECentralViewController () <FTPenManagerDelegate, FTPenDelegate, UIAlertViewDelegate, MFMailComposeViewControllerDelegate>
+@interface BTLECentralViewController () <FTPenDelegate, UIAlertViewDelegate, MFMailComposeViewControllerDelegate>
 {
     FTPenAndTouchManager::Ptr _PenAndTouchManager;
     FTTouchEventLogger::Ptr _EventLogger;
@@ -138,6 +138,10 @@ public:
                                              selector:@selector(penManagerFirmwareUpdateDidCompleteSuccessfully:)
                                                  name:kFTPenManagerFirmwareUpdateDidCompleteSuccessfully
                                                object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(penManagerDidUpdateState:)
+                                                 name:kFTPenManagerDidUpdateStateNotificationName
+                                               object:nil];
 
     self.view.multipleTouchEnabled = YES;
 
@@ -150,7 +154,7 @@ public:
     _PenAndTouchManager->TouchTypeChanged().AddListener(_TouchObserver, &TouchObserver::TouchTypeChanged);
     _PenAndTouchManager->ShouldStartTrialSeparation().AddListener(_TouchObserver, &TouchObserver::ShouldStartTrialSeparation);
 
-    _penManager = [[FTPenManager alloc] initWithDelegate:self];
+    _penManager = [[FTPenManager alloc] init];
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -204,10 +208,11 @@ public:
 {
 }
 
-#pragma mark - FTPenManagerDelegate
+#pragma mark - FTPenManager notifications
 
-- (void)penManager:(FTPenManager *)penManager didUpdateState:(FTPenManagerState)state
+- (void)penManagerDidUpdateState:(NSNotification *)notification
 {
+    FTPenManager *penManager = [notification object];
     if (penManager.state == FTPenManagerStateUnpaired)
     {
         _PenAndTouchManager->SetPalmRejectionEnabled(false);

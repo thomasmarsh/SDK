@@ -21,6 +21,7 @@
 NSString * const kPairedPeripheralUUIDUserDefaultsKey = @"com.fiftythree.pen.pairedPeripheralUUID";
 
 NSString * const kFTPenManagerDidUpdateStateNotificationName = @"com.fiftythree.penManager.didUpdateState";
+NSString * const kFTPenManagerDidFailToDiscoverPenNotificationName = @"com.fiftythree.penManager.didFailToDiscoverPen";
 NSString * const kFTPenUnexpectedDisconnectNotificationName = @"com.fiftythree.penManager.unexpectedDisconnect";
 NSString * const kFTPenUnexpectedDisconnectWhileConnectingNotifcationName = @"com.fiftythree.penManager.unexpectedDisconnectWhileConnecting";
 NSString * const kFTPenUnexpectedDisconnectWhileUpdatingFirmwareNotificationName = @"com.fiftythre.penManager.unexpectedDisconnectWhileUpdatingFirmware";
@@ -132,13 +133,11 @@ typedef enum
 
 @implementation FTPenManager
 
-- (id)initWithDelegate:(id<FTPenManagerDelegate>)delegate;
+- (id)init
 {
     self = [super init];
     if (self)
     {
-        _delegate = delegate;
-
         _centralManager = [[CBCentralManager alloc] initWithDelegate:self queue:nil];
 
         _state = FTPenManagerStateUninitialized;
@@ -200,8 +199,6 @@ typedef enum
         {
             self.pen.hasListener = YES;
         }
-
-        [self.delegate penManager:self didUpdateState:state];
 
         [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenManagerDidUpdateStateNotificationName
                                                             object:self];
@@ -438,11 +435,8 @@ typedef enum
     [datingScanningState setTimeoutExpiredBlock:^(TKState *state,
                                                   TKStateMachine *stateMachine)
     {
-        if ([weakSelf.delegate respondsToSelector:@selector(penManagerDidFailToDiscoverPen:)])
-        {
-            [weakSelf.delegate penManagerDidFailToDiscoverPen:weakSelf];
-        }
-
+        [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenManagerDidFailToDiscoverPenNotificationName
+                                                            object:self];
         [weakSelf fireStateMachineEvent:kBecomeSingleEventName];
     }];
 

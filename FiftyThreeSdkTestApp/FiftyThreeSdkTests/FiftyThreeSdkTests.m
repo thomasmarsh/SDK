@@ -8,7 +8,7 @@
 #import "FiftyThreeSdk/FTPenManager.h"
 #import "FiftyThreeSdkTests.h"
 
-@interface FiftyThreeSdkTests () <FTPenManagerDelegate>
+@interface FiftyThreeSdkTests ()
 @property int actualConnects;
 @property int actualDisconnects;
 @end
