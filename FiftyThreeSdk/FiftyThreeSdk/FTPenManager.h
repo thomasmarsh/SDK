@@ -29,8 +29,9 @@ extern NSString * const kFTPenManagerDidUpdateStateNotificationName;
 
 @interface FTPenManager : NSObject
 
-@property (nonatomic, readonly) FTPen *pen;
 @property (nonatomic, readonly) FTPenManagerState state;
+
+@property (nonatomic, readonly) FTPen *pen;
 
 @property (nonatomic, weak) id<FTPenManagerDelegate> delegate;
 @property (nonatomic) BOOL isPairingSpotPressed;

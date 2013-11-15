@@ -8,6 +8,7 @@
 #import <CoreBluetooth/CoreBluetooth.h>
 
 #import "FTDeviceInfoServiceClient.h"
+#import "FTLog.h"
 #import "FTPen+Private.h"
 #import "FTPen.h"
 #import "FTPenServiceClient.h"
@@ -383,11 +384,11 @@ NSString * const kFTPenAuthenticationCodePropertyName = @"authenticationCode";
         NSAssert(self.peripheral.delegate == self.peripheralDelegate,
                  @"peripheral delegate is installed");
 
-        NSLog(@"Peripheral is connected.");
+        [FTLog log:@"Peripheral is connected."];
     }
     else
     {
-        NSLog(@"Peripheral was disconnected.");
+        [FTLog log:@"Peripheral was disconnected."];
     }
 
     [self ensureServicesDiscovered];
@@ -421,7 +422,7 @@ NSString * const kFTPenAuthenticationCodePropertyName = @"authenticationCode";
 
 - (void)penServiceClient:(FTPenServiceClient *)penServiceClient didEncounterError:(NSError *)error
 {
-    NSLog(@"Pen did encounter error: \"%@\"", error.localizedDescription);
+    [FTLog logWithFormat:@"Pen did encounter error: \"%@\"", error.localizedDescription];
 
     [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenDidEncounterErrorNotificationName
                                                         object:self];

@@ -10,6 +10,8 @@
 #import "CBCharacteristic+Helpers.h"
 #import "CBPeripheral+Helpers.h"
 #import "FTError.h"
+#import "FTLog.h"
+#import "FTPenManager.h"
 #import "FTPenServiceClient.h"
 #import "FTServiceUUIDs.h"
 
@@ -316,7 +318,8 @@
 {
     if (error || service.characteristics.count == 0)
     {
-        NSLog(@"Error discovering characteristics: %@", [error localizedDescription]);
+        [FTLog logWithFormat:@"Error discovering characteristics: %@", [error localizedDescription]];
+
         // TODO: Report failed state
         return;
     }
@@ -432,9 +435,10 @@
     {
         if ([FTPenServiceUUIDs nameForUUID:characteristic.UUID])
         {
-            NSLog(@"Error updating value for characteristic: %@ error: %@.",
-                  [FTPenServiceUUIDs nameForUUID:characteristic.UUID],
-                  [error localizedDescription]);
+            [FTLog logWithFormat:@"Error updating value for characteristic: %@ error: %@.",
+             [FTPenServiceUUIDs nameForUUID:characteristic.UUID],
+             [error localizedDescription]];
+
             // TODO: Report failed state
         }
         return;
@@ -588,7 +592,8 @@
 {
     if (error)
     {
-        NSLog(@"Error changing notification state: %@", error.localizedDescription);
+        [FTLog logWithFormat:@"Error changing notification state: %@", error.localizedDescription];
+
         // TODO: Report failed state
         return;
     }

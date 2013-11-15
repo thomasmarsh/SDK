@@ -9,6 +9,7 @@
 #import <UIKit/UIKit.h>
 
 #import "FTFirmwareManager.h"
+#import "FTLog.h"
 #import "FTPen+Private.h"
 #import "FTPen.h"
 #import "FTPenManager+Private.h"
@@ -285,7 +286,7 @@ typedef enum
 
 - (void)handleError
 {
-    NSLog(@"Pen did encounter error. Disconnecting.");
+    [FTLog log:@"Pen did encounter error. Disconnecting."];
 
     // Make sure that we favor transitions that go through disconnect over going straight
     // to single. Some states may support both, but if we're connected we need to disconnect
@@ -308,7 +309,7 @@ typedef enum
 {
     if (self.pen.isReady)
     {
-        NSLog(@"Pen is ready");
+        [FTLog log:@"Pen is ready"];
 
         if ([self currentStateHasName:kDatingAttemptingConnectiongStateName])
         {
@@ -353,8 +354,8 @@ typedef enum
             self.pen.softwareRevision &&
             !self.updateManager)
         {
-            NSLog(@"Factory firmware version: %@", self.pen.firmwareRevision);
-            NSLog(@"Upgrade firmware version: %@", self.pen.softwareRevision);
+            [FTLog logWithFormat:@"Factory firmware version: %@", self.pen.firmwareRevision];
+            [FTLog logWithFormat:@"Upgrade firmware version: %@", self.pen.softwareRevision];
 
             self.updateManager = [[TIUpdateManager alloc] initWithPeripheral:self.pen.peripheral
                                                                     delegate:self];
@@ -868,14 +869,14 @@ typedef enum
 
 - (void)stateMachineDidChangeState:(NSNotification *)notification
 {
-    printf("\n");
-    NSLog(@"State changed: %@", self.stateMachine.currentState.name);
+    [FTLog log:@" "];
+    [FTLog logWithFormat:@"State changed: %@", self.stateMachine.currentState.name];
 }
 
 - (void)stateMachineStateTimeoutDidExpire:(NSNotificationCenter *)notification
 {
-    printf("\n");
-    NSLog(@"State timeout expired: %@", self.stateMachine.currentState.name);
+    [FTLog log:@" "];
+    [FTLog logWithFormat:@"State timeout expired: %@", self.stateMachine.currentState.name];
 }
 
 - (void)fireStateMachineEvent:(NSString *)eventName
@@ -883,9 +884,9 @@ typedef enum
     NSError *error = nil;
     if (![self.stateMachine fireEvent:eventName error:&error])
     {
-        NSLog(@"Failed to fire state machine event (%@): %@",
-              eventName,
-              error.localizedDescription);
+        [FTLog logWithFormat:@"Failed to fire state machine event (%@): %@",
+         eventName,
+         error.localizedDescription];
     }
 }
 
@@ -914,7 +915,7 @@ typedef enum
 {
     NSAssert(self.backgroundTaskId == UIBackgroundTaskInvalid, @"No background task present");
 
-    //    NSLog(@"Did enter background");
+    [FTLog log:@"FTPenManager did enter background"];
 
     __weak __typeof(&*self)weakSelf = self;
     self.backgroundTaskId = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
@@ -928,6 +929,8 @@ typedef enum
 {
     if (self.backgroundTaskId != UIBackgroundTaskInvalid)
     {
+        [FTLog log:@"FTPenManger did end background task"];
+
         [[UIApplication sharedApplication] endBackgroundTask:self.backgroundTaskId];
         self.backgroundTaskId = UIBackgroundTaskInvalid;
     }
@@ -958,7 +961,7 @@ typedef enum
 
 - (void)pairingSpotWasPressed
 {
-    NSLog(@"Pairing spot was pressed.");
+    [FTLog log:@"Pairing spot was pressed."];
 
     if (!self.stateMachine.isActive)
     {
@@ -983,7 +986,7 @@ typedef enum
 
 - (void)pairingSpotWasReleased
 {
-    NSLog(@"Pairing spot was released.");
+    [FTLog log:@"Pairing spot was released."];
 
     self.lastPairingSpotReleaseTime = [NSDate date];
 
@@ -1022,8 +1025,9 @@ typedef enum
     NSDate *t0 = self.lastPairingSpotReleaseTime;
     NSDate *t1 = self.pen.lastTipReleaseTime;
     NSTimeInterval tipAndPairingSpoteReleaseTimeDifference = fabs([t0 timeIntervalSinceDate:t1]);
-    NSLog(@"Difference in pairing spot and tip press release times (ms): %f",
-          tipAndPairingSpoteReleaseTimeDifference * 1000.0);
+
+    [FTLog logWithFormat:@"Difference in pairing spot and tip press release times (ms): %f",
+     tipAndPairingSpoteReleaseTimeDifference * 1000.0];
 
     if (tipAndPairingSpoteReleaseTimeDifference < kEngagedStateTimeout)
     {
@@ -1057,7 +1061,8 @@ typedef enum
 {
     NSAssert(self.pairedPeripheralUUID, @"paired peripheral UUID non-nil");
 
-    NSLog(@"Retrieving paired peripherals.");
+    [FTLog log:@"Retrieving paired peripherals"];
+
     NSArray *peripheralUUIDs = @[(__bridge id)self.pairedPeripheralUUID];
     [self.centralManager retrievePeripherals:peripheralUUIDs];
 }
@@ -1070,8 +1075,9 @@ typedef enum
     {
         if (!self.stateMachine.isActive)
         {
-            NSLog(@"Activating state machine with initial state: %@",
-                  self.stateMachine.initialState.name);
+            [FTLog logWithFormat:@"Activating state machine with initial state: %@",
+             self.stateMachine.initialState.name];
+
             [self.stateMachine activate];
         }
     }
@@ -1096,10 +1102,10 @@ typedef enum
      advertisementData:(NSDictionary *)advertisementData
                   RSSI:(NSNumber *)RSSI
 {
-    NSLog(@"Discovered peripheral with name: \"%@\" IsReconciling: %d RSSI: %d.",
-          peripheral.name,
-          [self isPeripheralReconciling:advertisementData],
-          [RSSI integerValue]);
+    [FTLog logWithFormat:@"Discovered peripheral with name: \"%@\" IsReconciling: %d RSSI: %d.",
+     peripheral.name,
+     [self isPeripheralReconciling:advertisementData],
+     [RSSI integerValue]];
 
     BOOL isPeripheralReconciling = [self isPeripheralReconciling:advertisementData];
 
@@ -1152,7 +1158,9 @@ typedef enum
 - (void)centralManager:(CBCentralManager *)central didFailToConnectPeripheral:(CBPeripheral *)peripheral
                  error:(NSError *)error
 {
-    NSLog(@"Failed to connect to peripheral: %@. (%@).", peripheral, [error localizedDescription]);
+    [FTLog logWithFormat:@"Failed to connect to peripheral: %@. (%@).",
+     peripheral,
+     error.localizedDescription];
 
     [self handleError];
 }
@@ -1186,7 +1194,7 @@ typedef enum
     {
         if (error)
         {
-            NSLog(@"Disconnected peripheral with error: %@", error.localizedDescription);
+            [FTLog logWithFormat:@"Disconnected peripheral with error: %@", error.localizedDescription];
         }
 
         if ([self currentStateHasName:kUpdatingFirmwareStateName])
@@ -1205,7 +1213,7 @@ typedef enum
             }
             else
             {
-                NSLog(@"Peripheral did disconnect while updating firmware. Reconnecting.");
+                [FTLog log:@"Peripheral did disconnect while updating firmware. Reconnecting."];
 
                 if ([FTFirmwareManager imageTypeRunningOnPen:self.pen] == FTFirmwareImageTypeFactory)
                 {
@@ -1475,7 +1483,7 @@ typedef enum
 
         if (_isScanningForPeripherals)
         {
-            NSLog(@"Begin scan for peripherals.");
+            [FTLog log:@"Begin scan for peripherals."];
 
             NSDictionary *options = @{ CBCentralManagerScanOptionAllowDuplicatesKey : @NO };
             [self.centralManager scanForPeripheralsWithServices:@[[FTPenServiceUUIDs penService]]
@@ -1483,7 +1491,7 @@ typedef enum
         }
         else
         {
-            NSLog(@"End scan for peripherals.");
+            [FTLog log:@"End scan for peripherals."];
 
             [self.centralManager stopScan];
         }

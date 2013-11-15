@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3C02E084183698E100420B95 /* FTLog.m in Sources */ = {isa = PBXBuildFile; fileRef = 3C02E083183698E100420B95 /* FTLog.m */; };
 		3C2F9C3A1780758300A5FFBC /* FTPeripheralDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 3C2F9C391780758300A5FFBC /* FTPeripheralDelegate.m */; };
 		3C2F9C3D1780786F00A5FFBC /* FTPenServiceClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 3C2F9C3C1780786F00A5FFBC /* FTPenServiceClient.m */; };
 		3C2F9C411780802600A5FFBC /* FTServiceClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 3C2F9C401780802600A5FFBC /* FTServiceClient.m */; };
@@ -59,6 +60,7 @@
 
 /* Begin PBXFileReference section */
 		349A642F174FD5D80071D899 /* Common.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Common.xcodeproj; path = ../../Common/Common.xcodeproj; sourceTree = "<group>"; };
+		3C02E083183698E100420B95 /* FTLog.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FTLog.m; path = FiftyThreeSdk/FTLog.m; sourceTree = "<group>"; };
 		3C2F9C381780758300A5FFBC /* FTPeripheralDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FTPeripheralDelegate.h; path = FiftyThreeSdk/FTPeripheralDelegate.h; sourceTree = SOURCE_ROOT; };
 		3C2F9C391780758300A5FFBC /* FTPeripheralDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FTPeripheralDelegate.m; path = FiftyThreeSdk/FTPeripheralDelegate.m; sourceTree = SOURCE_ROOT; };
 		3C2F9C3B1780786F00A5FFBC /* FTPenServiceClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FTPenServiceClient.h; path = FiftyThreeSdk/FTPenServiceClient.h; sourceTree = SOURCE_ROOT; };
@@ -68,6 +70,7 @@
 		3C2F9C421780A7BA00A5FFBC /* FTPenUsageServiceClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FTPenUsageServiceClient.h; path = FiftyThreeSdk/FTPenUsageServiceClient.h; sourceTree = SOURCE_ROOT; };
 		3C2F9C431780A7BA00A5FFBC /* FTPenUsageServiceClient.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FTPenUsageServiceClient.m; path = FiftyThreeSdk/FTPenUsageServiceClient.m; sourceTree = SOURCE_ROOT; };
 		3C404F7A1784C5A200EB7B9A /* FTError.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FTError.m; path = FiftyThreeSdk/FTError.m; sourceTree = SOURCE_ROOT; };
+		3C4E641818352A4500C0BB10 /* FTLog.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = FTLog.h; path = FiftyThreeSdk/FTLog.h; sourceTree = "<group>"; };
 		3CC31DED17933C5F002CD4FB /* TKEvent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TKEvent.h; path = ../../ThirdParty/TransitionKit/Code/TKEvent.h; sourceTree = "<group>"; };
 		3CC31DEE17933C5F002CD4FB /* TKEvent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TKEvent.m; path = ../../ThirdParty/TransitionKit/Code/TKEvent.m; sourceTree = "<group>"; };
 		3CC31DEF17933C5F002CD4FB /* TKState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TKState.h; path = ../../ThirdParty/TransitionKit/Code/TKState.h; sourceTree = "<group>"; };
@@ -143,12 +146,12 @@
 				3CE80BD317CE6DE600AA73A0 /* CBCharacteristic+Helpers.m */,
 				3CE80BCF17CE6DC900AA73A0 /* CBPeripheral+Helpers.h */,
 				3CE80BD017CE6DC900AA73A0 /* CBPeripheral+Helpers.m */,
-				3C2F9C421780A7BA00A5FFBC /* FTPenUsageServiceClient.h */,
-				3C2F9C431780A7BA00A5FFBC /* FTPenUsageServiceClient.m */,
-				3C2F9C3B1780786F00A5FFBC /* FTPenServiceClient.h */,
-				3C2F9C3C1780786F00A5FFBC /* FTPenServiceClient.m */,
 				66D779AF16E57461001C4F55 /* FTDeviceInfoServiceClient.h */,
 				66D779B016E57461001C4F55 /* FTDeviceInfoServiceClient.m */,
+				3C2F9C3B1780786F00A5FFBC /* FTPenServiceClient.h */,
+				3C2F9C3C1780786F00A5FFBC /* FTPenServiceClient.m */,
+				3C2F9C421780A7BA00A5FFBC /* FTPenUsageServiceClient.h */,
+				3C2F9C431780A7BA00A5FFBC /* FTPenUsageServiceClient.m */,
 				3C2F9C3F1780802600A5FFBC /* FTServiceClient.h */,
 				3C2F9C401780802600A5FFBC /* FTServiceClient.m */,
 				66D779B616E57461001C4F55 /* FTServiceUUIDs.h */,
@@ -176,16 +179,19 @@
 			children = (
 				661993D516EF973900B2BEE9 /* FTError.h */,
 				3C404F7A1784C5A200EB7B9A /* FTError.m */,
+				66BEC2841703B397009207F9 /* FTFirmwareManager.h */,
+				66BEC2851703B397009207F9 /* FTFirmwareManager.m */,
+				3CF1369217A9F4430006AB2E /* FTFirmwareUpdateProgressView.h */,
+				3CF1369317A9F4430006AB2E /* FTFirmwareUpdateProgressView.m */,
+				3C02E083183698E100420B95 /* FTLog.m */,
+				665C1F5E16F0F23100F1BCB7 /* FTPen+Private.h */,
 				66D779B316E57461001C4F55 /* FTPen.m */,
+				66D2B4A116F2A8A900E11FE6 /* FTPenManager+Private.h */,
 				66D779B516E57461001C4F55 /* FTPenManager.m */,
 				3C2F9C381780758300A5FFBC /* FTPeripheralDelegate.h */,
 				3C2F9C391780758300A5FFBC /* FTPeripheralDelegate.m */,
 				66D779B716E57461001C4F55 /* TIUpdateManager.h */,
 				66D779B816E57461001C4F55 /* TIUpdateManager.mm */,
-				66BEC2841703B397009207F9 /* FTFirmwareManager.h */,
-				66BEC2851703B397009207F9 /* FTFirmwareManager.m */,
-				3CF1369217A9F4430006AB2E /* FTFirmwareUpdateProgressView.h */,
-				3CF1369317A9F4430006AB2E /* FTFirmwareUpdateProgressView.m */,
 			);
 			name = PenManager;
 			sourceTree = "<group>";
@@ -229,16 +235,16 @@
 			isa = PBXGroup;
 			children = (
 				666DC55B170CF31E00D6B3C2 /* AppSupport */,
-				6665F819170F8AC90027BAD1 /* PenManager */,
-				3C2F9C3E17807FCF00A5FFBC /* Services */,
-				66B6E3E316F9237800251B6A /* TouchClassifiers */,
-				3CC31DCB17933ABB002CD4FB /* TransitionKit */,
-				66C83D7A170600BB00789776 /* FTPenAndTouchManager.h */,
+				66A8389C16E531E40048FFE4 /* export */,
 				66C83D7B170600BB00789776 /* FTPenAndTouchManager.cpp */,
+				66C83D7A170600BB00789776 /* FTPenAndTouchManager.h */,
 				6665F81A170F8B6F0027BAD1 /* FTTouchEventLogger.h */,
 				6665F81B170F8B6F0027BAD1 /* FTTouchEventLogger.mm */,
-				66A8389C16E531E40048FFE4 /* export */,
+				6665F819170F8AC90027BAD1 /* PenManager */,
+				3C2F9C3E17807FCF00A5FFBC /* Services */,
 				66A8387716E52D840048FFE4 /* Supporting Files */,
+				66B6E3E316F9237800251B6A /* TouchClassifiers */,
+				3CC31DCB17933ABB002CD4FB /* TransitionKit */,
 			);
 			name = FiftyThreeSdk;
 			sourceTree = "<group>";
@@ -255,10 +261,9 @@
 			isa = PBXGroup;
 			children = (
 				666DC55C170CF33C00D6B3C2 /* FTApplication.h */,
-				66D779B416E57461001C4F55 /* FTPenManager.h */,
-				66D2B4A116F2A8A900E11FE6 /* FTPenManager+Private.h */,
+				3C4E641818352A4500C0BB10 /* FTLog.h */,
 				66D779B116E57461001C4F55 /* FTPen.h */,
-				665C1F5E16F0F23100F1BCB7 /* FTPen+Private.h */,
+				66D779B416E57461001C4F55 /* FTPenManager.h */,
 			);
 			name = export;
 			sourceTree = "<group>";
@@ -266,13 +271,13 @@
 		66B6E3E316F9237800251B6A /* TouchClassifiers */ = {
 			isa = PBXGroup;
 			children = (
-				66B6E3EB16F9258900251B6A /* TouchClassifier.h */,
 				66B6E3E816F9255C00251B6A /* LatencyTouchClassifier.cpp */,
 				66B6E3E916F9255C00251B6A /* LatencyTouchClassifier.h */,
-				663AFED416FA511300681A90 /* TouchClassifierManager.cpp */,
-				663AFED516FA511300681A90 /* TouchClassifierManager.h */,
 				663AFED716FA6BD800681A90 /* PenEvent.cpp */,
 				663AFED816FA6BD800681A90 /* PenEvent.h */,
+				66B6E3EB16F9258900251B6A /* TouchClassifier.h */,
+				663AFED416FA511300681A90 /* TouchClassifierManager.cpp */,
+				663AFED516FA511300681A90 /* TouchClassifierManager.h */,
 			);
 			name = TouchClassifiers;
 			sourceTree = "<group>";
@@ -374,6 +379,7 @@
 				3CF1369417A9F4440006AB2E /* FTFirmwareUpdateProgressView.m in Sources */,
 				3CE80BD117CE6DC900AA73A0 /* CBPeripheral+Helpers.m in Sources */,
 				3CE80BD417CE6DE700AA73A0 /* CBCharacteristic+Helpers.m in Sources */,
+				3C02E084183698E100420B95 /* FTLog.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -9,6 +9,7 @@
 
 #import "CBCharacteristic+Helpers.h"
 #import "FTDeviceInfoServiceClient.h"
+#import "FTLog.h"
 #import "FTServiceUUIDs.h"
 
 @interface FTDeviceInfoServiceClient ()
@@ -209,9 +210,9 @@
     {
         if ([FTDeviceInfoServiceUUIDs nameForUUID:characteristic.UUID])
         {
-            NSLog(@"Error updating value for characteristic: %@ error: %@.",
-                  [FTPenServiceUUIDs nameForUUID:characteristic.UUID],
-                  [error localizedDescription]);
+            [FTLog logWithFormat:@"Error updating value for characteristic: %@ error: %@.",
+             [FTPenServiceUUIDs nameForUUID:characteristic.UUID],
+             error.localizedDescription];
             // TODO: Report failed state
         }
         return;

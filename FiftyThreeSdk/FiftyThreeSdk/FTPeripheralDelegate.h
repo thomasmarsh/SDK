@@ -7,8 +7,6 @@
 
 #pragma once
 
-#import <Foundation/Foundation.h>
-
 #import "FTServiceClient.h"
 
 @interface FTPeripheralDelegate : NSObject <CBPeripheralDelegate>

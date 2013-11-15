@@ -13,6 +13,7 @@
 #import "Common/UIView+Helpers.h"
 #import "FiftyThreeSdk/FTFirmwareManager.h"
 #import "FiftyThreeSdk/FTFirmwareUpdateProgressView.h"
+#import "FiftyThreeSdk/FTLog.h"
 #import "FiftyThreeSdk/FTPen+Private.h"
 #import "FiftyThreeSdk/FTPenManager+Private.h"
 #import "FiftyThreeSdk/FTPenManager.h"
@@ -137,6 +138,7 @@ FTPenPrivateDelegate>
     _rscManager = [[RscMgr alloc] init];
     [_rscManager setDelegate:self];
 
+    [FTLog setLogLevel:FTLogLevelEnabledVerbose];
     _penManager = [[FTPenManager alloc] initWithDelegate:self];
 
     NSDictionary *infoDictionary = [[NSBundle mainBundle] infoDictionary];
