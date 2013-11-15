@@ -232,7 +232,7 @@ FTPenPrivateDelegate>
 
 - (void)penManagerDidUpdateState:(NSNotification *)notification
 {
-    FTPenManager *penManager = [notification object];
+    FTPenManager *penManager = notification.object;
     if (penManager.state == FTPenManagerStateConnecting ||
         penManager.state == FTPenManagerStateReconnecting)
     {

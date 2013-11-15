@@ -212,7 +212,7 @@ public:
 
 - (void)penManagerDidUpdateState:(NSNotification *)notification
 {
-    FTPenManager *penManager = [notification object];
+    FTPenManager *penManager = notification.object;
     if (penManager.state == FTPenManagerStateUnpaired)
     {
         _PenAndTouchManager->SetPalmRejectionEnabled(false);
