@@ -46,7 +46,10 @@ static const NSTimeInterval kIsScanningForPeripheralsToggleTimerInterval = 0.1;
 static const NSTimeInterval kSwingingStateTimeout = 4.0;
 static const NSTimeInterval kSeparatedStateTimeout = kInactivityTimeout;
 static const NSTimeInterval kMarriedWaitingForLongPressToDisconnectTimeout = 1.5;
+static const NSTimeInterval kSeparatedWaitingForLongPressToUnpairTimeout = 1.5;
 static const NSTimeInterval kAttemptingConnectionStateTimeout = 15.0;
+
+#pragma mark - State Names
 
 static NSString *const kWaitingForCentralManagerToPowerOnStateName = @"WaitingForCentralManagerToPowerOn";
 static NSString *const kSingleStateName = @"Single";
@@ -66,13 +69,16 @@ static NSString *const kSwingingStateName = @"Swinging";
 static NSString *const kSwingingAttemptingConnectionStateName = @"SwingingAttemptingConnectionStateName";
 
 static NSString *const kSeparatedStateName = @"Separated";
-static NSString *const kSeparatedRetrievingConnectedPeripheralsStatename = @"SeparatedRetrievingConnectedPeripherals";
+static NSString *const kSeparatedRetrievingConnectedPeripheralsStateName = @"SeparatedRetrievingConnectedPeripherals";
 static NSString *const kSeparatedAttemptingConnectionStateName = @"SeparatedAttemptingConnection";
+static NSString *const kSeparatedWaitingForLongPressToUnpairStateName = @"SeparatedWaitingForLongPressToUnpair";
 
 static NSString *const kUpdatingFirmwareStateName = @"UpdatingFirmware";
 static NSString *const kUpdatingFirmwareAttemptingConnectionStateName = @"UpdatingFirmwareAttemptingConnection";
 
-static NSString *const kWaitForCentralManagerToPowerOn = @"WaitForCentralManagerToPowerOn";
+#pragma mark - Event Names
+
+static NSString *const kWaitForCentralManagerToPowerOnEventName = @"WaitForCentralManagerToPowerOn";
 static NSString *const kBeginDatingAndRetrieveConnectedPeripheralsEventName = @"BeginDatingAndRetrieveConnectedPeripherals";
 static NSString *const kRetrieveConnectedPeripheralsFromSeparatedEventName = @"RetrieveConnectedPeripheralsFromSeparated";
 static NSString *const kBeginDatingScanningEventName = @"BeginDatingScanning";
@@ -82,7 +88,8 @@ static NSString *const kBecomeEngagedEventName = @"BecomeEngaged";
 static NSString *const kWaitForTipReleaseEventName = @"WaitForTipRelease";
 static NSString *const kWaitForPairingSpotReleaseEventName = @"WaitForPairingSpotRelease";
 static NSString *const kBecomeMarriedEventName = @"BecomeMarried";
-static NSString *const kWaitForLongPressToDisconnect = @"WaitForLongPressToDisconnect";
+static NSString *const kWaitForLongPressToDisconnectFromMarriedEventName = @"WaitForLongPressToDisconnectFromMarried";
+static NSString *const KWaitForLongPressToUnpairFromSeparatedEventName = @"WaitForLongPressToUnPairFromSeparated";
 static NSString *const kReturnToMarriedEventName = @"ReturnToMarried";
 static NSString *const kDisconnectAndBecomeSingleEventName = @"DisconnectAndBecomeSingle";
 static NSString *const kDisconnectAndBecomeSeparatedEventName = @"DisconnectAndBecomeSeparated";
@@ -98,6 +105,8 @@ static NSString *const kAttemptConnectionFromSeparatedEventName = @"AttemptConne
 
 static NSString *const kUpdateFirmwareEventName = @"UpdateFirmware";
 static NSString *const kAttemptConnectionFromUpdatingFirmwareEventName = @"AttemptConnectionFromUpdatingFirmware";
+
+#pragma mark -
 
 typedef enum
 {
@@ -133,6 +142,10 @@ typedef enum
 
 // The time at which the last tip/eraser press activity that was observed on the paired peripheral.
 @property (nonatomic) NSDate *pairedPeripheralLastActivityTime;
+
+@property (nonatomic) NSMutableSet *peripheralsDiscoveredDuringLongPress;
+
+@property (nonatomic) CBPeripheral *onDeckPeripheral;
 
 @property (nonatomic) UIBackgroundTaskIdentifier backgroundTaskId;
 
@@ -495,14 +508,14 @@ typedef enum
     [waitingForCentralManagerToPowerOnState setDidEnterStateBlock:^(TKState *state,
                                                                     TKStateMachine *stateMachine)
     {
-        [self reset];
+        [weakSelf reset];
 
         // Generally we wait until the user presses the pairing spot before initializing the CBCentralManager.
         // However, if we have a paired peripheral, than we need to fire up the CBCentralManager in order to
         // see if it's trying to reconcile with us.
-        if (self.pairedPeripheralUUID)
+        if (weakSelf.pairedPeripheralUUID)
         {
-            [self ensureCentralManager];
+            [weakSelf ensureCentralManager];
         }
 
         weakSelf.state = FTPenManagerStateUninitialized;
@@ -623,15 +636,6 @@ typedef enum
     // Married - Waiting for Long Press to Disconnect
     TKState *marriedWaitingForLongPressToDisconnectState = [TKState stateWithName:kMarriedWaitingForLongPressToDisconnectStateName
                                                                andTimeoutDuration:kMarriedWaitingForLongPressToDisconnectTimeout];
-    [marriedWaitingForLongPressToDisconnectState setTimeoutExpiredBlock:^(TKState *state, TKStateMachine *stateMachine)
-    {
-        NSAssert(weakSelf.pen, @"pen is non-nil");
-        NSAssert(weakSelf.pen.peripheral.isConnected, @"pen peripheral is connected");
-
-        [weakSelf.pen powerOff];
-
-        [weakSelf fireStateMachineEvent:kDisconnectAndBecomeSingleEventName];
-    }];
     [marriedWaitingForLongPressToDisconnectState setDidEnterStateBlock:^(TKState *state,
                                                                          TKStateMachine *stateMachine)
     {
@@ -639,7 +643,31 @@ typedef enum
         NSAssert(weakSelf.pen.peripheral.isConnected, @"pen peripheral is connected");
 
         weakSelf.state = FTPenManagerStateConnected;
+
+        weakSelf.scanningState = ScanningStateEnabledWithPolling;
+
+        weakSelf.peripheralsDiscoveredDuringLongPress = [NSMutableSet set];
     }];
+    [marriedWaitingForLongPressToDisconnectState setDidExitStateBlock:^(TKState *state,
+                                                                        TKStateMachine *stateMachine)
+    {
+        weakSelf.scanningState = ScanningStateDisabled;
+        weakSelf.peripheralsDiscoveredDuringLongPress = nil;
+    }];
+    [marriedWaitingForLongPressToDisconnectState setTimeoutExpiredBlock:^(TKState *state, TKStateMachine *stateMachine)
+     {
+         NSAssert(weakSelf.pen, @"pen is non-nil");
+         NSAssert(weakSelf.pen.peripheral.isConnected, @"pen peripheral is connected");
+
+         [weakSelf.pen powerOff];
+
+         if (weakSelf.peripheralsDiscoveredDuringLongPress.count > 0)
+         {
+             weakSelf.onDeckPeripheral = [weakSelf.peripheralsDiscoveredDuringLongPress anyObject];
+         }
+
+         [weakSelf fireStateMachineEvent:kDisconnectAndBecomeSingleEventName];
+     }];
 
     // Preparing to Swing
     TKState *preparingToSwingState = [TKState stateWithName:kPreparingToSwingStateName];
@@ -708,7 +736,7 @@ typedef enum
     }];
 
     // Separated - Retrieving Connceted Peripherals
-    TKState *separatedRetrievingConnectedPeripheralsState = [TKState stateWithName:kSeparatedRetrievingConnectedPeripheralsStatename];
+    TKState *separatedRetrievingConnectedPeripheralsState = [TKState stateWithName:kSeparatedRetrievingConnectedPeripheralsStateName];
     [separatedRetrievingConnectedPeripheralsState setDidEnterStateBlock:^(TKState *state,
                                                                           TKStateMachine *stateMachine)
     {
@@ -734,6 +762,42 @@ typedef enum
         [weakSelf fireStateMachineEvent:kDisconnectAndBecomeSeparatedEventName];
     }];
 
+    // Separated - Waiting for Pairing Spot to Unpair
+    TKState *separatedWaitingForLongPressToUnpair = [TKState stateWithName:kSeparatedWaitingForLongPressToUnpairStateName
+                                                        andTimeoutDuration:kSeparatedWaitingForLongPressToUnpairTimeout];
+    [separatedWaitingForLongPressToUnpair setDidEnterStateBlock:^(TKState *state,
+                                                                  TKStateMachine *stateMachine)
+    {
+        weakSelf.state = FTPenManagerStateDisconnected;
+
+        weakSelf.peripheralsDiscoveredDuringLongPress = [NSMutableSet set];
+
+        weakSelf.scanningState = ScanningStateEnabledWithPolling;
+    }];
+    [separatedWaitingForLongPressToUnpair setDidExitStateBlock:^(TKState *state,
+                                                                 TKStateMachine *stateMachine)
+    {
+        weakSelf.scanningState = ScanningStateDisabled;
+
+        weakSelf.peripheralsDiscoveredDuringLongPress = nil;
+    }];
+    [separatedWaitingForLongPressToUnpair setTimeoutExpiredBlock:^(TKState *state,
+                                                                   TKStateMachine *stateMachine)
+    {
+        if (weakSelf.peripheralsDiscoveredDuringLongPress.count > 0)
+        {
+            NSAssert(!self.pen, @"pen non-nil");
+
+            weakSelf.pen = [[FTPen alloc] initWithPeripheral:[self.peripheralsDiscoveredDuringLongPress anyObject]];
+
+            [weakSelf fireStateMachineEvent:kAttemptConnectionFromDatingEventName];
+        }
+        else
+        {
+            [weakSelf fireStateMachineEvent:kBecomeSingleEventName];
+        }
+    }];
+
     // Disconnecting and Becoming Single
     TKState *disconnectingAndBecomingSingleState = [TKState stateWithName:kDisconnectingAndBecomingSingleStateName];
     [disconnectingAndBecomingSingleState setDidEnterStateBlock:^(TKState *state, TKStateMachine *stateMachine)
@@ -751,6 +815,11 @@ typedef enum
         {
             [weakSelf fireStateMachineEvent:kCompleteDisconnectionAndBecomeSingleEventName];
         }
+    }];
+    [disconnectingAndBecomingSingleState setDidExitStateBlock:^(TKState *state,
+                                                                TKStateMachine *stateMachine)
+    {
+        self.onDeckPeripheral = nil;
     }];
 
     // Disconnecting and Becoming Separated
@@ -848,6 +917,7 @@ typedef enum
      separatedState,
      separatedRetrievingConnectedPeripheralsState,
      separatedAttemptingConnectionState,
+     separatedWaitingForLongPressToUnpair,
      disconnectingAndBecomingSingleState,
      disconnectingAndBecomingSeparatedState,
      updatingFirmwareState,
@@ -857,7 +927,7 @@ typedef enum
     // Events
     //
 
-    TKEvent *waitForCentralManagerToPowerOn = [TKEvent eventWithName:kWaitForCentralManagerToPowerOn
+    TKEvent *waitForCentralManagerToPowerOn = [TKEvent eventWithName:kWaitForCentralManagerToPowerOnEventName
                                              transitioningFromStates:[self.stateMachine.states allObjects]
                                                              toState:waitingForCentralManagerToPowerOnState];
 
@@ -879,11 +949,14 @@ typedef enum
                                   datingScanningState,
                                   datingRetrievingConnectedPeripheralsState,
                                   separatedState,
+                                  separatedWaitingForLongPressToUnpair,
                                   swingingState]
                                                 toState:singleState];
     TKEvent *attemptConnectionFromDatingEvent = [TKEvent eventWithName:kAttemptConnectionFromDatingEventName
                                                transitioningFromStates:@[datingScanningState,
-                                                 datingRetrievingConnectedPeripheralsState]
+                                                 datingRetrievingConnectedPeripheralsState,
+                                                 separatedWaitingForLongPressToUnpair,
+                                                 disconnectingAndBecomingSingleState]
                                                                toState:datingAttemptingConnectionState];
     TKEvent *becomeEngagedEvent = [TKEvent eventWithName:kBecomeEngagedEventName
                                  transitioningFromStates:@[datingAttemptingConnectionState]
@@ -902,9 +975,12 @@ typedef enum
                                    separatedAttemptingConnectionState,
                                    updatingFirmwareState]
                                                  toState:marriedState];
-    TKEvent *waitForLongPressToDisconnectEvent = [TKEvent eventWithName:kWaitForLongPressToDisconnect
-                                                transitioningFromStates:@[marriedState]
-                                                                toState:marriedWaitingForLongPressToDisconnectState];
+    TKEvent *waitForLongPressToDisconnectFromMarriedEvent = [TKEvent eventWithName:kWaitForLongPressToDisconnectFromMarriedEventName
+                                                           transitioningFromStates:@[marriedState]
+                                                                           toState:marriedWaitingForLongPressToDisconnectState];
+    TKEvent *waitForLongPressToUnpairFromSeparatedEvent = [TKEvent eventWithName:KWaitForLongPressToUnpairFromSeparatedEventName
+                                                         transitioningFromStates:@[separatedState]
+                                                                         toState:separatedWaitingForLongPressToUnpair];
     TKEvent *returnToMarriedEvent = [TKEvent eventWithName:kReturnToMarriedEventName
                                    transitioningFromStates:@[marriedWaitingForLongPressToDisconnectState]
                                                    toState:marriedState];
@@ -974,7 +1050,8 @@ typedef enum
      waitForTipReleaseEvent,
      waitForPairingSpotReleaseEvent,
      becomeMarriedEvent,
-     waitForLongPressToDisconnectEvent,
+     waitForLongPressToDisconnectFromMarriedEvent,
+     waitForLongPressToUnpairFromSeparatedEvent,
      returnToMarriedEvent,
      disconnectAndBecomeSingleEvent,
      disconnectAndBecomeSeparatedEvent,
@@ -1108,13 +1185,13 @@ typedef enum
         }
         else if ([self currentStateHasName:kSeparatedStateName])
         {
-            [self fireStateMachineEvent:kBeginDatingAndRetrieveConnectedPeripheralsEventName];
+            [self fireStateMachineEvent:KWaitForLongPressToUnpairFromSeparatedEventName];
         }
         else if ([self currentStateHasName:kMarriedStateName])
         {
             NSAssert(self.pen.peripheral.isConnected, @"Pen peripheral is connected");
 
-            [self fireStateMachineEvent:kWaitForLongPressToDisconnect];
+            [self fireStateMachineEvent:kWaitForLongPressToDisconnectFromMarriedEventName];
         }
     }
 }
@@ -1148,6 +1225,10 @@ typedef enum
     else if ([self currentStateHasName:kMarriedWaitingForLongPressToDisconnectStateName])
     {
         [self fireStateMachineEvent:kReturnToMarriedEventName];
+    }
+    else if ([self currentStateHasName:kSeparatedWaitingForLongPressToUnpairStateName])
+    {
+        [self fireStateMachineEvent:KWaitForLongPressToUnpairFromSeparatedEventName];
     }
 }
 
@@ -1237,7 +1318,7 @@ typedef enum
         }
         else
         {
-            [self fireStateMachineEvent:kWaitForCentralManagerToPowerOn];
+            [self fireStateMachineEvent:kWaitForCentralManagerToPowerOnEventName];
         }
 
         // If the state of the CBCentralManager is ever anything than PoweredOn, sever the pairing to the
@@ -1311,6 +1392,15 @@ typedef enum
             NSAssert(!self.pen, @"pen is nil");
             self.pen = [[FTPen alloc] initWithPeripheral:peripheral];
             [self fireStateMachineEvent:kAttemptConnectionFromSeparatedEventName];
+        }
+    }
+    else if ([self currentStateHasName:kMarriedWaitingForLongPressToDisconnectStateName] ||
+             [self currentStateHasName:kSeparatedWaitingForLongPressToUnpairStateName])
+    {
+        if (![self isPairedPeripheral:peripheral] &&
+            !isPeripheralReconciling)
+        {
+            [self.peripheralsDiscoveredDuringLongPress addObject:peripheral];
         }
     }
 }
@@ -1409,7 +1499,15 @@ typedef enum
 
             if ([self currentStateHasName:kDisconnectingAndBecomingSingleStateName])
             {
-                [self fireStateMachineEvent:kCompleteDisconnectionAndBecomeSingleEventName];
+                if (self.onDeckPeripheral)
+                {
+                    self.pen = [[FTPen alloc] initWithPeripheral:self.onDeckPeripheral];
+                    [self fireStateMachineEvent:kAttemptConnectionFromDatingEventName];
+                }
+                else
+                {
+                    [self fireStateMachineEvent:kCompleteDisconnectionAndBecomeSingleEventName];
+                }
             }
             else if ([self currentStateHasName:kDisconnectingAndBecomingSeparatedStateName])
             {
@@ -1470,7 +1568,7 @@ typedef enum
 
         [self fireStateMachineEvent:kBeginDatingScanningEventName];
     }
-    else if ([self currentStateHasName:kSeparatedRetrievingConnectedPeripheralsStatename])
+    else if ([self currentStateHasName:kSeparatedRetrievingConnectedPeripheralsStateName])
     {
         for (CBPeripheral *peripheral in peripherals)
         {
