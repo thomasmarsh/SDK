@@ -450,7 +450,7 @@
     {
         // To avoid race conditions, it's crucial that we start listening for changes in the characteristic
         // before reading its value for the first time.
-        NSAssert(self.isTipPressedCharacteristic.isNotifying,
+        NSAssert(self.isTipPressedDidSetNofifyValue,
                  @"The IsTipPressed characteristic must be notifying before we first read its value.");
 
         BOOL isTipPressed = self.isTipPressed;
@@ -488,7 +488,7 @@
     {
         // To avoid race conditions, it's crucial that we start listening for changes in the characteristic
         // before reading its value for the first time.
-        NSAssert(self.isEraserPressedCharacteristic.isNotifying,
+        NSAssert(self.isEraserPressedDidSetNofifyValue,
                  @"The IsEraserPressed characteristic must be notifying before we first read its value.");
 
         BOOL isEraserPressed = self.isEraserPressed;
@@ -645,8 +645,8 @@
 
 - (void)ensureCharacteristicNotificationsAndInitialization
 {
-    const BOOL isTipPressedNotifying = (self.isTipPressedCharacteristic &&
-                                        self.isTipPressedCharacteristic.isNotifying);
+    const BOOL isTipPressedNotifying = self.isTipPressedCharacteristic.isNotifying;
+
     if (!isTipPressedNotifying)
     {
         if (!self.isTipPressedDidSetNofifyValue)
