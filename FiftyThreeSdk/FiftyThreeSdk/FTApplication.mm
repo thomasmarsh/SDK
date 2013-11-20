@@ -92,6 +92,7 @@ using boost::optional;
             }
 
             classifier->TouchesDidChanged(touches);
+            classifier->UpdateClassifications();
         }
     }
 
@@ -109,6 +110,7 @@ using boost::optional;
         args.Timestamp = [NSProcessInfo processInfo].systemUptime;
         args.Type = pen.isTipPressed?PenEventType::Tip1Down : PenEventType::Tip1Up;
         classifier->PenStateDidChanged(args);
+        classifier->UpdateClassifications();
     }
 }
 
@@ -123,6 +125,7 @@ using boost::optional;
         args.Timestamp = [NSProcessInfo processInfo].systemUptime;
         args.Type = pen.isEraserPressed?PenEventType::Tip2Down : PenEventType::Tip2Up;
         classifier->PenStateDidChanged(args);
+        classifier->UpdateClassifications();
     }
 }
 
