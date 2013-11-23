@@ -413,7 +413,8 @@ NSString * const kFTPenAuthenticationCodePropertyName = @"authenticationCode";
 - (void)penServiceClient:(FTPenServiceClient *)penServiceClient didUpdatePenProperties:(NSSet *)updatedProperties
 {
     [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenDidUpdatePrivatePropertiesNotificationName
-                                                        object:self];
+                                                        object:self
+                                                      userInfo:@{ kFTPenNotificationPropertiesKey : updatedProperties }];
 }
 
 - (void)penServiceClient:(FTPenServiceClient *)penServiceClient didEncounterError:(NSError *)error
