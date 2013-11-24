@@ -128,20 +128,24 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     {
         case FTPenManagerStateUninitialized:
             return @"FTPenManagerStateUninitialized";
-        case FTPenManagerStateUpdatingFirmware:
-            return @"FTPenManagerStateUpdatingFirmware";
         case FTPenManagerStateUnpaired:
             return @"FTPenManagerStateUnpaired";
         case FTPenManagerStateSeeking:
             return @"FTPenManagerStateSeeking";
         case FTPenManagerStateConnecting:
             return @"FTPenManagerStateConnecting";
-        case FTPenManagerStateReconnecting:
-            return @"FTPenManagerStateReconnecting";
         case FTPenManagerStateConnected:
             return @"FTPenManagerStateConnected";
+        case FTPenManagerStateConnectedLongPressToUnpair:
+            return @"FTPenManagerStateConnectedLongPressToUnpair";
         case FTPenManagerStateDisconnected:
             return @"FTPenManagerStateDisconnected";
+        case FTPenManagerStateDisconnectedLongPressToUnpair:
+            return @"FTPenManagerStateDisconnectedLongPressToUnpair";
+        case FTPenManagerStateReconnecting:
+            return @"FTPenManagerStateReconnecting";
+        case FTPenManagerStateUpdatingFirmware:
+            return @"FTPenManagerStateUpdatingFirmware";
         default:
             assert(0);
             return @"Unknown FTPenManagerState value.";
