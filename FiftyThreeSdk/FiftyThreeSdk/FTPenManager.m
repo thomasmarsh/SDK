@@ -1584,7 +1584,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
                                                               kInactivityTimeout :
                                                               pen.inactivityTimeout * 60.0);
 
-                    if (fabs(timeSinceLastActivity - inactivityTimeout) < kInactivityTimeoutMargin)
+                    if (timeSinceLastActivity - inactivityTimeout >= -kInactivityTimeoutMargin)
                     {
                         didDisconnectDueToInactivityTimeout = YES;
                         [FTLog log:@"Did disconnect due to peripheral inactivity timeout."];
