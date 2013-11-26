@@ -15,6 +15,8 @@
 #import "FTPenUsageServiceClient.h"
 #import "FTPeripheralDelegate.h"
 #import "FTServiceUUIDs.h"
+#import "FTAssert.h"
+
 
 NSString * const kFTPenDidEncounterErrorNotificationName = @"com.fiftythree.pen.didEncounterError";
 NSString * const kFTPenIsReadyDidChangeNotificationName = @"com.fiftythree.pen.isReadyDidChange";

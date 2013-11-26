@@ -9,6 +9,8 @@
 
 #import "FTFirmwareManager.h"
 #import "FTPen.h"
+#import "FTAssert.h"
+
 
 NSString *applicationDocumentsDirectory()
 {

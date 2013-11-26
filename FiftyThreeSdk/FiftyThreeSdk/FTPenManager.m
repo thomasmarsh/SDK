@@ -18,6 +18,8 @@
 #import "FTServiceUUIDs.h"
 #import "TIUpdateManager.h"
 #import "TransitionKit.h"
+#import "FTAssert.h"
+
 
 NSString * const kPairedPeripheralUUIDUserDefaultsKey = @"com.fiftythree.pen.pairedPeripheralUUID";
 NSString * const kPairedPeripheralLastActivityTimeUserDefaultsKey = @"com.fiftythree.pen.pairedPeripheralLastActivityTime";

@@ -14,6 +14,8 @@
 #import "FTPenManager.h"
 #import "FTPenServiceClient.h"
 #import "FTServiceUUIDs.h"
+#import "FTAssert.h"
+
 
 @interface FTPenServiceClient ()
 

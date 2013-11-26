@@ -6,6 +6,7 @@
 //
 
 #import "CBPeripheral+Helpers.h"
+#import "FTAssert.h"
 
 @implementation CBPeripheral (Helpers)
 

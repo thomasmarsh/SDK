@@ -12,6 +12,7 @@
 #import "FTError.h"
 #import "FTLog.h"
 #import "TIUpdateManager.h"
+#import "FTAssert.h"
 
 static NSString *const kOADServiceUUID = @"F000FFC0-0451-4000-B000-000000000000";
 static NSString *const kImageIdentifyUUID = @"F000FFC1-0451-4000-B000-000000000000";
