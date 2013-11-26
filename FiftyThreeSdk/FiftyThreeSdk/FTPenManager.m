@@ -1162,10 +1162,13 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
 - (void)applicationDidEnterBackground:(NSNotification *)notificaton
 {
-    NSAssert(self.backgroundTaskId == UIBackgroundTaskInvalid, @"No background task present");
-
     [FTLog log:@"FTPenManager did enter background"];
 
+    // Reset the background task (if it has not yet been ended) prior to starting a new one. One would think
+    // that we wouldn't need to do this if there were a strict pairing of applicationDidBecomeActive and
+    // applicationDidEnterBackground, but in practice that does not appear to be the case.
+    [self resetBackgroundTask];
+    
     __weak __typeof(&*self)weakSelf = self;
     self.backgroundTaskId = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
         [weakSelf resetBackgroundTask];
