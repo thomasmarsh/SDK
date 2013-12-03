@@ -9,10 +9,9 @@
 
 #include <boost/smart_ptr.hpp>
 #include <set>
-#include "Common/Touch/TouchManager.h"
-#include "Common/Touch/PenManager.h"
-#include "FTPenAndTouchManager.h"
 
+#include "Common/Touch/TouchManager.h"
+#include "FTPenAndTouchManager.h"
 #include "PenEvent.h"
 
 namespace fiftythree
@@ -38,7 +37,7 @@ public:
     virtual void TouchesCancelled(const fiftythree::common::TouchesSet & touches) = 0;
 
     virtual void ProcessPenEvent(const PenEvent::Ptr & event) = 0;
-    
+
     virtual TouchType GetTouchType(const fiftythree::common::Touch::cPtr & touch) = 0;
     virtual Event<const common::Touch::cPtr &> & TouchTypeChanged() = 0;
 };

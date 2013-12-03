@@ -5,18 +5,16 @@
 //  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
 //
 
-#include "TouchClassifierManager.h"
-#include "LatencyTouchClassifier.h"
-
 #include <boost/foreach.hpp>
 #include <boost/shared_ptr.hpp>
-#include <vector>
 #include <set>
-#include "Common/Touch/PenManager.h"
-#include "Common/Touch/TouchManager.h"
-#include "Common/Asserts.h"
+#include <vector>
 
+#include "Common/Asserts.h"
+#include "Common/Touch/TouchManager.h"
+#include "LatencyTouchClassifier.h"
 #include "TouchClassifier.h"
+#include "TouchClassifierManager.h"
 
 using namespace fiftythree::sdk;
 using namespace fiftythree::common;
@@ -88,17 +86,17 @@ public:
             }
         }
     }
-    
+
     virtual TouchType GetTouchType(const fiftythree::common::Touch::cPtr & touch)
     {
         return _Classifiers[0]->GetTouchType(touch); // BUGBUG - figure out how to combine
     }
-    
+
     Event<const Touch::cPtr &> & TouchTypeChanged()
     {
         return _TouchTypeChangedEvent;
     }
-    
+
     void HandleTouchTypeChanged(const Event<const Touch::cPtr &> & event, const Touch::cPtr & touch)
     {
         _TouchTypeChangedEvent.Fire(touch);
