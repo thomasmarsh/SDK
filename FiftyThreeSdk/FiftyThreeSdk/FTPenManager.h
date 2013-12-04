@@ -36,6 +36,12 @@ extern "C"
     //   * FTPenManagerStateUpdatingFirmware
     BOOL FTPenManagerStateIsConnected(FTPenManagerState state);
 
+    // Returns true if the given FTPenManagerState is a state in which the pen is disconnected:
+    //   * FTPenManagerStateDisconnected
+    //   * FTPenManagerStateDisconnectedLongPressToUnpair
+    //   * FTPenManagerStateReconnecting
+    BOOL FTPenManagerStateIsDisconnected(FTPenManagerState state);
+    
     NSString *FTPenManagerStateToString(FTPenManagerState state);
 
 #ifdef __cplusplus

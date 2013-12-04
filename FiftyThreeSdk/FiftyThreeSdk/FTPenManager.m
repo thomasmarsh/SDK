@@ -124,6 +124,13 @@ BOOL FTPenManagerStateIsConnected(FTPenManagerState state)
             state == FTPenManagerStateUpdatingFirmware);
 }
 
+BOOL FTPenManagerStateIsDisconnected(FTPenManagerState state)
+{
+    return (state == FTPenManagerStateDisconnected ||
+            state == FTPenManagerStateDisconnectedLongPressToUnpair ||
+            state == FTPenManagerStateReconnecting);
+}
+
 NSString *FTPenManagerStateToString(FTPenManagerState state)
 {
     switch (state)
