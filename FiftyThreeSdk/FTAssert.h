@@ -16,6 +16,7 @@
 #else
     #ifndef USE_FT_ASSERT
         #define USE_FT_ASSERT FALSE
+        #undef NSAssert
         #define NSAssert(X,Y,...)
     #endif
 #endif
