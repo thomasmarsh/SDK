@@ -8,6 +8,7 @@
 #import <CoreBluetooth/CoreBluetooth.h>
 #import <UIKit/UIKit.h>
 
+#import "Common/Asserts.h"
 #import "Common/NSString+Helpers.h"
 #import "FTFirmwareManager.h"
 #import "FTLog.h"
@@ -18,8 +19,6 @@
 #import "FTServiceUUIDs.h"
 #import "TIUpdateManager.h"
 #import "TransitionKit.h"
-#import "FTAssert.h"
-
 
 NSString * const kPairedPeripheralUUIDUserDefaultsKey = @"com.fiftythree.pen.pairedPeripheralUUID";
 NSString * const kPairedPeripheralLastActivityTimeUserDefaultsKey = @"com.fiftythree.pen.pairedPeripheralLastActivityTime";
@@ -504,7 +503,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     // check that we're running the factory version to be accurate.)
     if ([self currentStateHasName:kUpdatingFirmwareStateName])
     {
-        NSAssert(self.pen, @"pen is non-nil");
+        FTAssert(self.pen, @"pen is non-nil");
         if (self.pen.firmwareRevision &&
             self.pen.softwareRevision &&
             !self.updateManager)
@@ -532,7 +531,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
 - (void)initializeStateMachine
 {
-    NSAssert(!self.stateMachine, @"State machine may only be initialized once.");
+    FTAssert(!self.stateMachine, @"State machine may only be initialized once.");
 
     __weak FTPenManager *weakSelf = self;
 
@@ -544,7 +543,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
     void (^attemptingConnectionCommon)() = ^()
     {
-        NSAssert(weakSelf.pen, @"pen is non-nil");
+        FTAssert(weakSelf.pen, @"pen is non-nil");
 
         [weakSelf.centralManager connectPeripheral:weakSelf.pen.peripheral options:nil];
     };
@@ -569,15 +568,15 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     [waitingForCentralManagerToPowerOnState setDidExitStateBlock:^(TKState *state,
                                                                      TKStateMachine *stateMachine)
     {
-        NSAssert(weakSelf.centralManager, @"CentralManager non-nil");
-        NSAssert(weakSelf.centralManager.state == CBCentralManagerStatePoweredOn, @"State is PoweredOn");
+        FTAssert(weakSelf.centralManager, @"CentralManager non-nil");
+        FTAssert(weakSelf.centralManager.state == CBCentralManagerStatePoweredOn, @"State is PoweredOn");
     }];
 
     // Single
     TKState *singleState = [TKState stateWithName:kSingleStateName];
     [singleState setDidEnterStateBlock:^(TKState *state, TKStateMachine *stateMachine)
     {
-        NSAssert(!weakSelf.pen, @"Pen is nil");
+        FTAssert(!weakSelf.pen, @"Pen is nil");
 
         weakSelf.state = FTPenManagerStateUnpaired;
 
@@ -672,8 +671,8 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     TKState *marriedState = [TKState stateWithName:kMarriedStateName];
     [marriedState setDidEnterStateBlock:^(TKState *state, TKStateMachine *stateMachine)
     {
-        NSAssert(weakSelf.pen.peripheral.isConnected, @"pen peripheral is connected");
-        NSAssert(weakSelf.pen.peripheral.UUID != NULL, @"pen peripheral UUID is non-nil");
+        FTAssert(weakSelf.pen.peripheral.isConnected, @"pen peripheral is connected");
+        FTAssert(weakSelf.pen.peripheral.UUID != NULL, @"pen peripheral UUID is non-nil");
 
         weakSelf.pairedPeripheralUUID = weakSelf.pen.peripheral.UUID;
         weakSelf.state = FTPenManagerStateConnected;
@@ -685,8 +684,8 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     [marriedWaitingForLongPressToUnpairState setDidEnterStateBlock:^(TKState *state,
                                                                      TKStateMachine *stateMachine)
      {
-         NSAssert(weakSelf.pen, @"pen is non-nil");
-         NSAssert(weakSelf.pen.peripheral.isConnected, @"pen peripheral is connected");
+         FTAssert(weakSelf.pen, @"pen is non-nil");
+         FTAssert(weakSelf.pen.peripheral.isConnected, @"pen peripheral is connected");
 
          weakSelf.state = FTPenManagerStateConnectedLongPressToUnpair;
 
@@ -702,8 +701,8 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     }];
     [marriedWaitingForLongPressToUnpairState setTimeoutExpiredBlock:^(TKState *state, TKStateMachine *stateMachine)
      {
-         NSAssert(weakSelf.pen, @"pen is non-nil");
-         NSAssert(weakSelf.pen.peripheral.isConnected, @"pen peripheral is connected");
+         FTAssert(weakSelf.pen, @"pen is non-nil");
+         FTAssert(weakSelf.pen.peripheral.isConnected, @"pen peripheral is connected");
 
          [weakSelf.pen powerOff];
 
@@ -720,7 +719,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     [preparingToSwingState setDidEnterStateBlock:^(TKState *state,
                                                    TKStateMachine *stateMachine)
     {
-        NSAssert(weakSelf.pairedPeripheralUUID != NULL, @"paired peripheral UUID is non-nil");
+        FTAssert(weakSelf.pairedPeripheralUUID != NULL, @"paired peripheral UUID is non-nil");
 
         weakSelf.state = FTPenManagerStateDisconnected;
 
@@ -832,7 +831,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
      {
          if (weakSelf.peripheralsDiscoveredDuringLongPress.count > 0)
          {
-             NSAssert(!weakSelf.pen, @"pen non-nil");
+             FTAssert(!weakSelf.pen, @"pen non-nil");
 
              weakSelf.pen = [[FTPen alloc] initWithPeripheral:[weakSelf.peripheralsDiscoveredDuringLongPress anyObject]];
 
@@ -891,9 +890,9 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     TKState *updatingFirmwareState = [TKState stateWithName:kUpdatingFirmwareStateName];
     [updatingFirmwareState setDidEnterStateBlock:^(TKState *state, TKStateMachine *stateMachine)
     {
-        NSAssert(weakSelf.pen, @"Pen must be non-nil");
-        NSAssert(weakSelf.firmwareImagePath, @"firmwareImagePath must be non-nil");
-        NSAssert(!weakSelf.updateManager, @"Update manager must be nil");
+        FTAssert(weakSelf.pen, @"Pen must be non-nil");
+        FTAssert(weakSelf.firmwareImagePath, @"firmwareImagePath must be non-nil");
+        FTAssert(!weakSelf.updateManager, @"Update manager must be nil");
 
         weakSelf.state = FTPenManagerStateUpdatingFirmware;
 
@@ -924,10 +923,10 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     [updatingFirmwareAttemptingConnectionState setDidEnterStateBlock:^(TKState *state,
                                                                        TKStateMachine *stateMachine)
     {
-        NSAssert(weakSelf.pen, @"Pen must be non-nil");
-        NSAssert(weakSelf.pen.peripheral, @"Pen peripheral is non-nil");
-        NSAssert(!weakSelf.pen.peripheral.isConnected, @"Pen peripheral is not connected");
-        NSAssert(!weakSelf.updateManager, @"Update manager must be nil");
+        FTAssert(weakSelf.pen, @"Pen must be non-nil");
+        FTAssert(weakSelf.pen.peripheral, @"Pen peripheral is non-nil");
+        FTAssert(!weakSelf.pen.peripheral.isConnected, @"Pen peripheral is not connected");
+        FTAssert(!weakSelf.updateManager, @"Update manager must be nil");
 
         weakSelf.state = FTPenManagerStateUpdatingFirmware;
 
@@ -938,7 +937,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     [updatingFirmwareAttemptingConnectionState setTimeoutExpiredBlock:^(TKState *state,
                                                                         TKStateMachine *stateMachine)
     {
-        NSAssert(weakSelf.pen, @"Pen must be non-nil");
+        FTAssert(weakSelf.pen, @"Pen must be non-nil");
 
         [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenManagerFirmwareUpdateDidFail
                                                             object:self];
@@ -1177,7 +1176,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     // that we wouldn't need to do this if there were a strict pairing of applicationDidBecomeActive and
     // applicationDidEnterBackground, but in practice that does not appear to be the case.
     [self resetBackgroundTask];
-    
+
     __weak __typeof(&*self)weakSelf = self;
     self.backgroundTaskId = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
         [weakSelf resetBackgroundTask];
@@ -1240,7 +1239,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
         }
         else if ([self currentStateHasName:kMarriedStateName])
         {
-            NSAssert(self.pen.peripheral.isConnected, @"Pen peripheral is connected");
+            FTAssert(self.pen.peripheral.isConnected, @"Pen peripheral is connected");
 
             [self fireStateMachineEvent:kWaitForLongPressToUnpairFromMarriedEventName];
         }
@@ -1285,9 +1284,9 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
 - (void)comparePairingSpotAndTipReleaseTimesAndTransitionState
 {
-    NSAssert([self currentStateHasName:kEngagedWaitingForTipReleaseStateName] ||
+    FTAssert([self currentStateHasName:kEngagedWaitingForTipReleaseStateName] ||
              [self currentStateHasName:kEngagedWaitingForPairingSpotReleaseStateName], @"");
-    NSAssert(self.lastPairingSpotReleaseTime && self.pen.lastTipReleaseTime, @"");
+    FTAssert(self.lastPairingSpotReleaseTime && self.pen.lastTipReleaseTime, @"");
 
     NSDate *t0 = self.lastPairingSpotReleaseTime;
     NSDate *t1 = self.pen.lastTipReleaseTime;
@@ -1326,7 +1325,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
 - (void)retrievePairedPeripheral
 {
-    NSAssert(self.pairedPeripheralUUID, @"paired peripheral UUID non-nil");
+    FTAssert(self.pairedPeripheralUUID, @"paired peripheral UUID non-nil");
 
     [FTLog log:@"Retrieving paired peripherals"];
 
@@ -1338,7 +1337,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
 - (void)centralManagerDidUpdateState:(CBCentralManager *)centralManager
 {
-    NSAssert(self.centralManager == centralManager, @"centralManager matches expected");
+    FTAssert(self.centralManager == centralManager, @"centralManager matches expected");
 
     if (centralManager.state == CBCentralManagerStatePoweredOn)
     {
@@ -1406,7 +1405,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
     if ([self currentStateHasName:kDatingScanningStateName])
     {
-        NSAssert(!self.pen, @"pen is nil");
+        FTAssert(!self.pen, @"pen is nil");
 
         if (!isPeripheralReconciling)
         {
@@ -1425,7 +1424,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
         {
             if (isPeripheralReconciling)
             {
-                NSAssert(!self.pen, @"pen is nil");
+                FTAssert(!self.pen, @"pen is nil");
                 self.pen = [[FTPen alloc] initWithPeripheral:peripheral];
                 [self fireStateMachineEvent:kAttemptConnectionFromSwingingEventName];
             }
@@ -1440,7 +1439,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
         if ([self isPairedPeripheral:peripheral] &&
             isPeripheralReconciling)
         {
-            NSAssert(!self.pen, @"pen is nil");
+            FTAssert(!self.pen, @"pen is nil");
             self.pen = [[FTPen alloc] initWithPeripheral:peripheral];
             [self fireStateMachineEvent:kAttemptConnectionFromSeparatedEventName];
         }
@@ -1499,7 +1498,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 - (void)centralManager:(CBCentralManager *)central didDisconnectPeripheral:(CBPeripheral *)peripheral
                  error:(NSError *)error
 {
-    NSAssert(self.pen.peripheral == peripheral, @"Peripheral matches pen peripheral.");
+    FTAssert(self.pen.peripheral == peripheral, @"Peripheral matches pen peripheral.");
 
     if (self.pen.peripheral == peripheral)
     {
@@ -1653,7 +1652,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
             if ([peripheral.name isEqualToString:kPencilPeripheralName] ||
                 [peripheral.name isEqualToString:kCharcoalPeripheralName])
             {
-                NSAssert(!self.pen, @"pen is nil");
+                FTAssert(!self.pen, @"pen is nil");
                 self.pen = [[FTPen alloc] initWithPeripheral:peripheral];
                 [self fireStateMachineEvent:kAttemptConnectionFromDatingEventName];
                 return;
@@ -1669,7 +1668,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
             if ([peripheral.name isEqualToString:kPencilPeripheralName] &&
                 [self isPairedPeripheral:peripheral])
             {
-                NSAssert(!self.pen, @"pen is nil");
+                FTAssert(!self.pen, @"pen is nil");
                 self.pen = [[FTPen alloc] initWithPeripheral:peripheral];
                 [self fireStateMachineEvent:kAttemptConnectionFromSeparatedEventName];
                 return;
@@ -1698,7 +1697,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
 - (BOOL)updateFirmware:(NSString *)firmwareImagePath;
 {
-    NSAssert(firmwareImagePath, @"firmwareImagePath must be non-nil");
+    FTAssert(firmwareImagePath, @"firmwareImagePath must be non-nil");
 
     if ([self.stateMachine canFireEvent:kUpdateFirmwareEventName])
     {
@@ -1736,9 +1735,9 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
 - (void)updateManager:(TIUpdateManager *)manager didFinishUpdate:(NSError *)error
 {
-    NSAssert([self currentStateHasName:kUpdatingFirmwareStateName], @"in updating firmware state");
-    NSAssert(self.updateManager, @"update manager non-nil");
-    NSAssert(manager, nil);
+    FTAssert([self currentStateHasName:kUpdatingFirmwareStateName], @"in updating firmware state");
+    FTAssert(self.updateManager, @"update manager non-nil");
+    FTAssert(manager, nil);
 
     if (error)
     {
@@ -1753,7 +1752,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
 - (void)updateManager:(TIUpdateManager *)manager didUpdatePercentComplete:(float)percentComplete
 {
-    NSAssert(manager, nil);
+    FTAssert(manager, nil);
 
     if ([FTFirmwareManager imageTypeRunningOnPen:self.pen] == FTFirmwareImageTypeFactory)
     {
@@ -1788,7 +1787,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
         }
         else
         {
-            NSAssert(NO, @"Unexpected scanning state");
+            FTAssert(NO, @"Unexpected scanning state");
         }
     }
 }

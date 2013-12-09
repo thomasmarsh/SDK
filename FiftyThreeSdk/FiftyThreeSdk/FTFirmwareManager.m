@@ -7,10 +7,9 @@
 
 #import <UIKit/UIKit.h>
 
+#import "Common/Asserts.h"
 #import "FTFirmwareManager.h"
 #import "FTPen.h"
-#import "FTAssert.h"
-
 
 NSString *applicationDocumentsDirectory()
 {
@@ -55,13 +54,13 @@ NSString *applicationDocumentsDirectory()
 
 + (NSInteger)versionOfImageAtPath:(NSString *)imagePath
 {
-    NSAssert(imagePath, @"image path non-nil");
+    FTAssert(imagePath, @"image path non-nil");
 
     uint16_t version = 0;
     if (imagePath)
     {
         NSFileHandle *fileHandle = [NSFileHandle fileHandleForReadingAtPath:imagePath];
-        NSAssert(fileHandle, @"firmware file exists at path");
+        FTAssert(fileHandle, @"firmware file exists at path");
 
         [fileHandle seekToFileOffset:4];
         NSData *data = [fileHandle readDataOfLength:sizeof(version)];
@@ -169,7 +168,7 @@ NSString *applicationDocumentsDirectory()
                                    forImageType:FTFirmwareImageTypeFactory
                                         version:&factoryVersion
                          isCurrentlyRunning:&factoryIsCurrentlyRunning];
-    NSAssert(result, @"Must be able to fetch factory version");
+    FTAssert(result, @"Must be able to fetch factory version");
 
     if (factoryIsCurrentlyRunning)
     {

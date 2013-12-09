@@ -9,13 +9,12 @@
 
 #import "CBCharacteristic+Helpers.h"
 #import "CBPeripheral+Helpers.h"
+#import "Common/Asserts.h"
 #import "FTError.h"
 #import "FTLog.h"
 #import "FTPenManager.h"
 #import "FTPenServiceClient.h"
 #import "FTServiceUUIDs.h"
-#import "FTAssert.h"
-
 
 @interface FTPenServiceClient ()
 
@@ -137,7 +136,7 @@
 
 - (void)setInactivityTimeout:(NSInteger)inactivityTimeout
 {
-    NSAssert(inactivityTimeout >= 0 && inactivityTimeout < 256,
+    FTAssert(inactivityTimeout >= 0 && inactivityTimeout < 256,
              @"Inactivity timeout in valid range");
 
     _inactivityTimeout = inactivityTimeout;
@@ -162,7 +161,7 @@
 
 - (void)setPressureSetup:(FTPenPressureSetup *)pressureSetup
 {
-    NSAssert(pressureSetup, @"pressureSetup non-nil");
+    FTAssert(pressureSetup, @"pressureSetup non-nil");
 
     _pressureSetup = pressureSetup;
     if (self.pressureSetupCharacteristic)
@@ -182,7 +181,7 @@
 
 - (void)setManufacturingID:(NSString *)manufacturingID
 {
-    NSAssert(manufacturingID.length == 15, @"Manufacturing ID must be 15 characters");
+    FTAssert(manufacturingID.length == 15, @"Manufacturing ID must be 15 characters");
 
     if (self.manufacturingIDCharacteristic)
     {
@@ -198,7 +197,7 @@
 
 - (void)setAuthenticationCode:(NSData *)authenticationCode
 {
-    NSAssert(authenticationCode.length == 20, @"Authentication Code must be 20 bytes");
+    FTAssert(authenticationCode.length == 20, @"Authentication Code must be 20 bytes");
 
     if (self.authenticationCodeCharacteristic)
     {
@@ -452,7 +451,7 @@
     {
         // To avoid race conditions, it's crucial that we start listening for changes in the characteristic
         // before reading its value for the first time.
-        NSAssert(self.isTipPressedDidSetNofifyValue,
+        FTAssert(self.isTipPressedDidSetNofifyValue,
                  @"The IsTipPressed characteristic must be notifying before we first read its value.");
 
         BOOL isTipPressed = self.isTipPressed;
@@ -490,7 +489,7 @@
     {
         // To avoid race conditions, it's crucial that we start listening for changes in the characteristic
         // before reading its value for the first time.
-        NSAssert(self.isEraserPressedDidSetNofifyValue,
+        FTAssert(self.isEraserPressedDidSetNofifyValue,
                  @"The IsEraserPressed characteristic must be notifying before we first read its value.");
 
         BOOL isEraserPressed = self.isEraserPressed;
@@ -553,7 +552,7 @@
     {
         if (self.lastErrorCodeCharacteristic)
         {
-            NSAssert(characteristic == self.lastErrorCodeCharacteristic,
+            FTAssert(characteristic == self.lastErrorCodeCharacteristic,
                      @"matches last error code characterisit");
 
             NSData *data = self.lastErrorCodeCharacteristic.value;
@@ -572,7 +571,7 @@
     {
         if (self.authenticationCodeCharacteristic)
         {
-            NSAssert(characteristic == self.authenticationCodeCharacteristic,
+            FTAssert(characteristic == self.authenticationCodeCharacteristic,
                      @"characteristic is authenenticationCode characteristic");
 
             _authenticationCode = [self.authenticationCodeCharacteristic.value copy];

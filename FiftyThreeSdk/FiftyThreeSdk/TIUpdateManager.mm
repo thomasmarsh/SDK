@@ -9,10 +9,10 @@
 
 #import <CoreBluetooth/CoreBluetooth.h>
 
+#import "Common/Asserts.h"
 #import "FTError.h"
 #import "FTLog.h"
 #import "TIUpdateManager.h"
-#import "FTAssert.h"
 
 static NSString *const kOADServiceUUID = @"F000FFC0-0451-4000-B000-000000000000";
 static NSString *const kImageIdentifyUUID = @"F000FFC1-0451-4000-B000-000000000000";
@@ -84,7 +84,7 @@ static NSString *const kImageBlockTransferUUID = @"F000FFC2-0451-4000-B000-00000
 
 - (void)updateWithImagePath:(NSString *)imagePath
 {
-    NSAssert(self.state == TIUpdateManagerStateNotStarted,
+    FTAssert(self.state == TIUpdateManagerStateNotStarted,
              @"Firmware may only be updated once using a single update manager.");
 
     self.state = TIUpdateManagerStateInProgress;
@@ -285,7 +285,7 @@ static NSString *const kImageBlockTransferUUID = @"F000FFC2-0451-4000-B000-00000
 
 - (void)scheduleWriteTimer
 {
-    NSAssert(!self.imageBlockWriteTimer, @"write timer nil");
+    FTAssert(!self.imageBlockWriteTimer, @"write timer nil");
     self.imageBlockWriteTimer = [NSTimer scheduledTimerWithTimeInterval:0.25
                                                                  target:self
                                                                selector:@selector(imageBlockWriteTimerFired:)
@@ -308,7 +308,7 @@ static NSString *const kImageBlockTransferUUID = @"F000FFC2-0451-4000-B000-00000
         NSMutableData *data = [NSMutableData dataWithBytes:&indexHeader length:sizeof(indexHeader)];
         NSData *block = [self.imageHandle readDataOfLength:16];
 
-        NSAssert(block.length != 0, nil);
+        FTAssert(block.length != 0, nil);
 
         [data appendData:block];
 

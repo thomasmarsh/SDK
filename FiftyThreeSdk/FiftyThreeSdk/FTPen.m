@@ -7,6 +7,7 @@
 
 #import <CoreBluetooth/CoreBluetooth.h>
 
+#import "Common/Asserts.h"
 #import "FTDeviceInfoServiceClient.h"
 #import "FTLog.h"
 #import "FTPen+Private.h"
@@ -15,8 +16,6 @@
 #import "FTPenUsageServiceClient.h"
 #import "FTPeripheralDelegate.h"
 #import "FTServiceUUIDs.h"
-#import "FTAssert.h"
-
 
 NSString * const kFTPenDidEncounterErrorNotificationName = @"com.fiftythree.pen.didEncounterError";
 NSString * const kFTPenIsReadyDidChangeNotificationName = @"com.fiftythree.pen.isReadyDidChange";
@@ -90,7 +89,7 @@ NSString * const kFTPenAuthenticationCodePropertyName = @"authenticationCode";
 
 - (id)initWithNSData:(NSData *)data
 {
-    NSAssert(data.length == 10, @"PressureSetup data is 10 bytes long");
+    FTAssert(data.length == 10, @"PressureSetup data is 10 bytes long");
 
     self = [super init];
     if (self)
@@ -112,7 +111,7 @@ NSString * const kFTPenAuthenticationCodePropertyName = @"authenticationCode";
 
 - (void)writeToNSData:(NSData *)data
 {
-    NSAssert(data.length == 10, @"PressureSetup data is 10 bytes long");
+    FTAssert(data.length == 10, @"PressureSetup data is 10 bytes long");
 
     uint8_t *bytes = (uint8_t *)data.bytes;
     bytes[0] = _samplePeriodMilliseconds;;
@@ -161,8 +160,8 @@ NSString * const kFTPenAuthenticationCodePropertyName = @"authenticationCode";
 
 - (id)initWithPeripheral:(CBPeripheral *)peripheral
 {
-    NSAssert(peripheral, @"peripheral non-nil");
-    NSAssert(!peripheral.isConnected, @"peripheral is not connected");
+    FTAssert(peripheral, @"peripheral non-nil");
+    FTAssert(!peripheral.isConnected, @"peripheral is not connected");
 
     self = [super init];
     if (self)
@@ -379,7 +378,7 @@ NSString * const kFTPenAuthenticationCodePropertyName = @"authenticationCode";
 {
     if (self.peripheral.isConnected)
     {
-        NSAssert(self.peripheral.delegate == self.peripheralDelegate,
+        FTAssert(self.peripheral.delegate == self.peripheralDelegate,
                  @"peripheral delegate is installed");
 
         [FTLog log:@"Peripheral is connected."];
@@ -398,14 +397,14 @@ NSString * const kFTPenAuthenticationCodePropertyName = @"authenticationCode";
 
     if (self.peripheral.isConnected)
     {
-        NSAssert(self.peripheral.delegate == self.peripheralDelegate,
+        FTAssert(self.peripheral.delegate == self.peripheralDelegate,
                  @"peripheral delegate is installed");
 
         [self.peripheral discoverServices:servicesToBeDiscovered];
     }
     else
     {
-        NSAssert(servicesToBeDiscovered.count == 0,
+        FTAssert(servicesToBeDiscovered.count == 0,
                  @"Should not attempt to discover services if not connected");
     }
 }

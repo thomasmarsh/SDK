@@ -6,7 +6,7 @@
 //
 
 #import "CBPeripheral+Helpers.h"
-#import "FTAssert.h"
+#import "Common/Asserts.h"
 
 @implementation CBPeripheral (Helpers)
 
@@ -45,7 +45,7 @@ forCharacteristic:(CBCharacteristic *)characteristic
     forCharacteristic:(CBCharacteristic *)characteristic
                  type:(CBCharacteristicWriteType)type
 {
-    NSAssert([value canBeConvertedToEncoding:NSASCIIStringEncoding], @"Value must be ASCII");
+    FTAssert([value canBeConvertedToEncoding:NSASCIIStringEncoding], @"Value must be ASCII");
 
     if (characteristic)
     {
