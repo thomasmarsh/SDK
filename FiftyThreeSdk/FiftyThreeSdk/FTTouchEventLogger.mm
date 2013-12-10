@@ -5,10 +5,11 @@
 //  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
 //
 
-#include "FTTouchEventLogger.h"
-
 #include <boost/foreach.hpp>
 #include <sstream>
+
+#include "FTTouchEventLogger.h"
+
 #import <Foundation/Foundation.h>
 
 const std::string TOUCH_PREFIX = "touch=";

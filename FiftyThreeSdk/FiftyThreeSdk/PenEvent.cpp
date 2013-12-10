@@ -5,9 +5,9 @@
 //  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
 //
 
-#include "PenEvent.h"
-
 #include <boost/smart_ptr.hpp>
+
+#include "PenEvent.h"
 
 using namespace fiftythree::sdk;
 using namespace fiftythree::common;

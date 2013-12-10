@@ -8,9 +8,9 @@
 #pragma once
 
 #include <boost/shared_ptr.hpp>
-#include "Common/NoCopy.h"
-#include "Common/Enum.h"
 
+#include "Common/Enum.h"
+#include "Common/NoCopy.h"
 #include "Common/Touch/PenManager.h"
 
 namespace fiftythree

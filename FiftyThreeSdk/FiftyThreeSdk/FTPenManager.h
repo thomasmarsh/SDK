@@ -41,7 +41,7 @@ extern "C"
     //   * FTPenManagerStateDisconnectedLongPressToUnpair
     //   * FTPenManagerStateReconnecting
     BOOL FTPenManagerStateIsDisconnected(FTPenManagerState state);
-    
+
     NSString *FTPenManagerStateToString(FTPenManagerState state);
 
 #ifdef __cplusplus

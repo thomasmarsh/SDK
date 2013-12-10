@@ -7,11 +7,10 @@
 
 #pragma once
 
-#include "TouchClassifier.h"
-
 #include <boost/smart_ptr.hpp>
 
 #include "Common/NoCopy.h"
+#include "TouchClassifier.h"
 
 namespace fiftythree
 {
