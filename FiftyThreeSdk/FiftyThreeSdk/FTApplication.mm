@@ -5,7 +5,6 @@
 //  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
 //
 
-#import "Common/Touch/PenManager.h"
 #import "Common/Touch/TouchTracker.h"
 #import "FTApplication.h"
 #import "FTPen.h"
@@ -19,13 +18,7 @@ using boost::optional;
     optional<TouchClassifier::Ptr> _classifier;
 }
 
-@property (nonatomic) PropertyToObjCAdapter<PenConnectionStatus>::Ptr pogoConnectionStatusAdapter;
-@property (nonatomic) EventToObjCAdapter<Unit>::Ptr didDetectPogoTipDownAdapter;
-@property (nonatomic) EventToObjCAdapter<Unit>::Ptr didDetectPogoTipUpAdapter;
-
 @property (nonatomic) BOOL hasSeenFTPenManager;
-@property (nonatomic) BOOL isPencilConnected;
-@property (nonatomic) BOOL isPogoConnected;
 
 @end
 
@@ -47,16 +40,6 @@ using boost::optional;
                                                  selector:@selector(didUpdateStateNotification:)
                                                      name:kFTPenManagerDidUpdateStateNotificationName
                                                    object:nil];
-
-        _pogoConnectionStatusAdapter = PropertyToObjCAdapter<PenConnectionStatus>::Bind(PenManager::Instance()->ConnectionStatus(),
-                                                                                        self,
-                                                                                        @selector(pogoConnectionStatusDidChange:newValue:));
-        _didDetectPogoTipDownAdapter = EventToObjCAdapter<Unit>::Bind(PenManager::Instance()->DidDetectTipDown(),
-                                                                      self,
-                                                                      @selector(didDetectPogoTipDown));
-        _didDetectPogoTipUpAdapter = EventToObjCAdapter<Unit>::Bind(PenManager::Instance()->DidDetectTipUp(),
-                                                                    self,
-                                                                    @selector(didDetectPogoTipUp));
     }
 
     return self;
@@ -83,25 +66,10 @@ using boost::optional;
     {
         // Lazily create the classifier.
         _classifier = [self createClassifier];
-        if (_classifier)
-        {
-            (*_classifier)->SetPenConnected(true);
-        }
         ActiveClassifier::Activate(*_classifier);
     }
 
     return _classifier ? * _classifier : TouchClassifier::Ptr();
-}
-
-- (void)updateIsPenConnected
-{
-    const bool isPenConnected = (self.isPencilConnected || self.isPogoConnected);
-
-    TouchClassifier::Ptr classifier = self.classifier;
-    if (classifier)
-    {
-        classifier->SetPenConnected(isPenConnected);
-    }
 }
 
 #pragma mark - Event Dispatch
@@ -171,68 +139,30 @@ using boost::optional;
 {
     self.hasSeenFTPenManager = YES;
 
-    FTPenManager *manager = (FTPenManager *)notification.object;
-    switch (manager.state)
-    {
-        case FTPenManagerStateUninitialized:
-        case FTPenManagerStateUpdatingFirmware:
-        case FTPenManagerStateUnpaired:
-        case FTPenManagerStateConnecting:
-        case FTPenManagerStateReconnecting:
-        case FTPenManagerStateDisconnected:
-        case FTPenManagerStateDisconnectedLongPressToUnpair:
-        case FTPenManagerStateSeeking:
-        {
-            self.isPencilConnected = false;
-            break;
-        }
-        case FTPenManagerStateConnected:
-        case FTPenManagerStateConnectedLongPressToUnpair:
-        {
-            self.isPencilConnected = true;
-            break;
-        }
-        default:
-        {
-            self.isPencilConnected = false;
-            DebugAssert(false);
-        }
-    }
-
-    [self updateIsPenConnected];
-}
-
-#pragma mark - Pogo Connect
-
-- (void)pogoConnectionStatusDidChange:(const PenConnectionStatus &)oldValue
-                             newValue:(const PenConnectionStatus &)newValue
-{
-    self.isPogoConnected = (PenManager::Instance()->ConnectionStatus() == PenConnectionStatus::Connected);
-
-    [self updateIsPenConnected];
-}
-
-- (void)didDetectPogoTipDown
-{
     TouchClassifier::Ptr classifier = self.classifier;
     if (classifier)
     {
-        PenEventArgs args;
-        args.Timestamp = [NSProcessInfo processInfo].systemUptime;
-        args.Type = PenEventType::Tip1Down;
-        classifier->PenStateDidChanged(args);
-    }
-}
+        FTPenManager *manager = (FTPenManager *)notification.object;
 
-- (void)didDetectPogoTipUp
-{
-    TouchClassifier::Ptr classifier = self.classifier;
-    if (classifier)
-    {
-        PenEventArgs args;
-        args.Timestamp = [NSProcessInfo processInfo].systemUptime;
-        args.Type = PenEventType::Tip1Up;
-        classifier->PenStateDidChanged(args);
+        switch (manager.state)
+        {
+            case FTPenManagerStateUninitialized:
+            case FTPenManagerStateUpdatingFirmware:
+            case FTPenManagerStateUnpaired:
+            case FTPenManagerStateConnecting:
+            case FTPenManagerStateReconnecting:
+            case FTPenManagerStateDisconnected:
+            case FTPenManagerStateDisconnectedLongPressToUnpair:
+            case FTPenManagerStateSeeking:
+                classifier->SetPenConnected(false);
+                break;
+            case FTPenManagerStateConnected:
+            case FTPenManagerStateConnectedLongPressToUnpair:
+                classifier->SetPenConnected(true);
+                break;
+            default:
+                DebugAssert(false);
+        }
     }
 }
 
