@@ -403,8 +403,14 @@ FTPenPrivateDelegate>
 
 - (void)didReadManufacturingID:(NSString *)manufacturingID
 {
+    // KYE requested that in the case of a null manufacturing ID, report 0s. This can happen occassionally
+    // when processing many Pencils under heavy load conditions.
+    NSString *outputID = (manufacturingID ?
+                          manufacturingID :
+                          @"000000000000000");
+    
     [self sendString:[NSString stringWithFormat:@"Retrieved Manufacturing ID: \"%@\"",
-                      manufacturingID]];
+                      outputID]];
 }
 
 - (void)didWriteAuthenticationCode
