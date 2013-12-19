@@ -6,11 +6,11 @@
 //
 
 #include <boost/foreach.hpp>
-#include <boost/smart_ptr.hpp>
 #include <boost/unordered_map.hpp>
 
 #include "Common/DispatchTimer.h"
 #include "Common/Mathiness.h"
+#include "Common/Memory.h"
 #include "Common/NoCopy.h"
 #include "Common/Touch/TouchTracker.h"
 #include "FTPenAndTouchManager.h"
@@ -26,7 +26,7 @@ using namespace boost;
 
 typedef unordered_map<Touch::cPtr, TouchType> TouchToTypeMap;
 
-class FTPenAndTouchManagerImpl : public FTPenAndTouchManager, public boost::enable_shared_from_this<FTPenAndTouchManagerImpl>
+class FTPenAndTouchManagerImpl : public FTPenAndTouchManager, public fiftythree::common::enable_shared_from_this<FTPenAndTouchManagerImpl>
 {
 private:
     TouchClassifierManager::Ptr _ClassifierManager;
@@ -219,5 +219,5 @@ public:
 
 FTPenAndTouchManager::Ptr FTPenAndTouchManager::New()
 {
-    return boost::make_shared<FTPenAndTouchManagerImpl>();
+    return fiftythree::common::make_shared<FTPenAndTouchManagerImpl>();
 }

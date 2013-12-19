@@ -7,8 +7,7 @@
 
 #pragma once
 
-#include <boost/smart_ptr.hpp>
-
+#include "Common/Memory.h"
 #include "Common/Touch/Touch.h"
 #include "PenEvent.h"
 
@@ -20,8 +19,8 @@ namespace sdk
 class FTTouchEventLogger
 {
 public:
-    typedef boost::shared_ptr<FTTouchEventLogger> Ptr;
-    typedef const boost::shared_ptr<FTTouchEventLogger> cPtr;
+    typedef fiftythree::common::shared_ptr<FTTouchEventLogger> Ptr;
+    typedef const fiftythree::common::shared_ptr<FTTouchEventLogger> cPtr;
 
 protected:
     FTTouchEventLogger() {}

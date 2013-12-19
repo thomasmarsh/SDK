@@ -7,8 +7,7 @@
 
 #pragma once
 
-#include <boost/smart_ptr.hpp>
-
+#include "Common/Memory.h"
 #include "Common/NoCopy.h"
 #include "TouchClassifier.h"
 
@@ -20,8 +19,8 @@ namespace sdk
 class TouchClassifierManager : public TouchClassifier
 {
 public:
-    typedef boost::shared_ptr<TouchClassifierManager> Ptr;
-    typedef const boost::shared_ptr<TouchClassifierManager> cPtr;
+    typedef fiftythree::common::shared_ptr<TouchClassifierManager> Ptr;
+    typedef const fiftythree::common::shared_ptr<TouchClassifierManager> cPtr;
 
 protected:
     ~TouchClassifierManager() {}

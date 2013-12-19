@@ -148,5 +148,5 @@ public:
 
 FTTouchEventLogger::Ptr FTTouchEventLogger::New()
 {
-    return boost::make_shared<FTTouchEventLoggerImpl>();
+    return fiftythree::common::make_shared<FTTouchEventLoggerImpl>();
 }

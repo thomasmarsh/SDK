@@ -6,10 +6,10 @@
 //
 
 #include <boost/foreach.hpp>
-#include <boost/smart_ptr.hpp>
 #include <sstream>
 
 #include "Canvas/GLCanvasController.h"
+#include "Common/Memory.h"
 #include "Common/Timer.h"
 #include "Common/Touch/InputSample.h"
 #include "Common/Touch/TouchManager.h"
@@ -31,10 +31,10 @@
 using namespace fiftythree::common;
 using namespace fiftythree::canvas;
 using namespace fiftythree::sdk;
-using boost::static_pointer_cast;
-using boost::dynamic_pointer_cast;
-using boost::shared_ptr;
-using boost::make_shared;
+using fiftythree::common::static_pointer_cast;
+using fiftythree::common::dynamic_pointer_cast;
+using fiftythree::common::shared_ptr;
+using fiftythree::common::make_shared;
 using std::stringstream;
 
 class TouchObserver;

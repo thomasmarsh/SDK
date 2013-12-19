@@ -6,11 +6,11 @@
 //
 
 #include <boost/foreach.hpp>
-#include <boost/shared_ptr.hpp>
 #include <set>
 #include <vector>
 
 #include "Common/Asserts.h"
+#include "Common/Memory.h"
 #include "Common/Touch/TouchManager.h"
 #include "LatencyTouchClassifier.h"
 #include "TouchClassifier.h"
@@ -19,7 +19,7 @@
 using namespace fiftythree::sdk;
 using namespace fiftythree::common;
 
-class TouchClassifierManagerImpl : public TouchClassifierManager, public boost::enable_shared_from_this<TouchClassifierManagerImpl>
+class TouchClassifierManagerImpl : public TouchClassifierManager, public fiftythree::common::enable_shared_from_this<TouchClassifierManagerImpl>
 {
 private:
     std::vector<TouchClassifier::Ptr> _Classifiers;
@@ -107,5 +107,5 @@ public:
 
 TouchClassifierManager::Ptr TouchClassifierManager::New()
 {
-    return boost::make_shared<TouchClassifierManagerImpl>();
+    return fiftythree::common::make_shared<TouchClassifierManagerImpl>();
 }

@@ -5,8 +5,7 @@
 //  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
 //
 
-#include <boost/smart_ptr.hpp>
-
+#include "Common/Memory.h"
 #include "PenEvent.h"
 
 using namespace fiftythree::sdk;
@@ -56,5 +55,5 @@ public:
 
 PenEvent::Ptr PenEvent::New(double timestamp, PenEventType type, PenTip tip)
 {
-    return boost::make_shared<PenEventImpl>(timestamp, type, tip);
+    return fiftythree::common::make_shared<PenEventImpl>(timestamp, type, tip);
 }

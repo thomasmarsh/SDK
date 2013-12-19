@@ -7,8 +7,7 @@
 
 #pragma once
 
-#include <boost/smart_ptr.hpp>
-
+#include "Common/Memory.h"
 #include "Common/Touch/Touch.h"
 #include "FTTouchEventLogger.h"
 
@@ -26,8 +25,8 @@ DEFINE_ENUM(TouchType,
 class FTPenAndTouchManager
 {
 public:
-    typedef boost::shared_ptr<FTPenAndTouchManager> Ptr;
-    typedef const boost::shared_ptr<FTPenAndTouchManager> cPtr;
+    typedef fiftythree::common::shared_ptr<FTPenAndTouchManager> Ptr;
+    typedef const fiftythree::common::shared_ptr<FTPenAndTouchManager> cPtr;
 
 protected:
     ~FTPenAndTouchManager() {}

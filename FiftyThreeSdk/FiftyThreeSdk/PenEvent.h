@@ -7,9 +7,8 @@
 
 #pragma once
 
-#include <boost/shared_ptr.hpp>
-
 #include "Common/Enum.h"
+#include "Common/Memory.h"
 #include "Common/NoCopy.h"
 #include "Common/Touch/PenManager.h"
 
@@ -29,8 +28,8 @@ DEFINE_ENUM(PenTip,
 class PenEvent
 {
 public:
-    typedef boost::shared_ptr<PenEvent> Ptr;
-    typedef boost::shared_ptr<const PenEvent> cPtr;
+    typedef fiftythree::common::shared_ptr<PenEvent> Ptr;
+    typedef fiftythree::common::shared_ptr<const PenEvent> cPtr;
 
     fiftythree::common::InputSample Sample;
     PenEventType Type;
