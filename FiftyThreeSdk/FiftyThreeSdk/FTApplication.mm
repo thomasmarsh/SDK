@@ -11,7 +11,7 @@
 #import "FTPenManager.h"
 
 using namespace fiftythree::common;
-using namespace boost;
+using namespace fiftythree::common;
 using boost::optional;
 
 @interface FTApplication () {

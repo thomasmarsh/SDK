@@ -15,7 +15,9 @@
 
 using namespace fiftythree::sdk;
 using namespace fiftythree::common;
-using namespace std;
+using std::vector;
+using std::string;
+using std::numeric_limits;
 
 const double MAX_DELAY_SEC = 0.300;
 

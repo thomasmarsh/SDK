@@ -22,7 +22,7 @@ using namespace fiftythree::sdk;
 using namespace fiftythree::common;
 using std::make_pair;
 using std::pair;
-using namespace boost;
+using boost::unordered_map;
 
 typedef unordered_map<Touch::cPtr, TouchType> TouchToTypeMap;
 
