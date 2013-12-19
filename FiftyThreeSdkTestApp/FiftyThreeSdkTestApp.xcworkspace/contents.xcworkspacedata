@@ -1,8 +1,72 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Workspace
    version = "1.0">
+   <Group
+      location = "container:"
+      name = "BuildConfigurations">
+      <FileRef
+         location = "group:../../BuildConfigurations/Application.xcconfig">
+      </FileRef>
+      <FileRef
+         location = "group:../../BuildConfigurations/ApplicationDebug.xcconfig">
+      </FileRef>
+      <FileRef
+         location = "group:../../BuildConfigurations/ApplicationInternal.xcconfig">
+      </FileRef>
+      <FileRef
+         location = "group:../../BuildConfigurations/ApplicationPreview.xcconfig">
+      </FileRef>
+      <FileRef
+         location = "group:../../BuildConfigurations/ApplicationProduction.xcconfig">
+      </FileRef>
+      <FileRef
+         location = "group:../../BuildConfigurations/ApplicationRelease.xcconfig">
+      </FileRef>
+      <FileRef
+         location = "group:../../BuildConfigurations/ApplicationTests.xcconfig">
+      </FileRef>
+      <FileRef
+         location = "group:../../BuildConfigurations/Shared.xcconfig">
+      </FileRef>
+      <FileRef
+         location = "group:../../BuildConfigurations/SharedDebug.xcconfig">
+      </FileRef>
+      <FileRef
+         location = "group:../../BuildConfigurations/SharedRelease.xcconfig">
+      </FileRef>
+      <FileRef
+         location = "group:../../BuildConfigurations/Subproject.xcconfig">
+      </FileRef>
+      <FileRef
+         location = "group:../../BuildConfigurations/SubprojectDebug.xcconfig">
+      </FileRef>
+      <FileRef
+         location = "group:../../BuildConfigurations/SubprojectInternal.xcconfig">
+      </FileRef>
+      <FileRef
+         location = "group:../../BuildConfigurations/SubprojectPreview.xcconfig">
+      </FileRef>
+      <FileRef
+         location = "group:../../BuildConfigurations/SubprojectProduction.xcconfig">
+      </FileRef>
+      <FileRef
+         location = "group:../../BuildConfigurations/SubprojectRelease.xcconfig">
+      </FileRef>
+   </Group>
+   <FileRef
+      location = "group:../../AFNetworking/AFNetworking.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:../../ThirdParty/AppBlade/iOS/Framework/AppBlade.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:../../Canvas/Canvas.xcodeproj">
+   </FileRef>
    <FileRef
       location = "group:CharcoalLineTest/CharcoalLineTest.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:../../Common/Common.xcodeproj">
    </FileRef>
    <FileRef
       location = "container:FiftyThreeSdkTestApp.xcodeproj">
@@ -11,18 +75,6 @@
       location = "group:../FiftyThreeSdk/FiftyThreeSdk.xcodeproj">
    </FileRef>
    <FileRef
-      location = "group:../../Common/Common.xcodeproj">
-   </FileRef>
-   <FileRef
-      location = "group:../../Canvas/Canvas.xcodeproj">
-   </FileRef>
-   <FileRef
       location = "group:../../GlobalSettings/GlobalSettings.xcodeproj">
-   </FileRef>
-   <FileRef
-      location = "group:../../AFNetworking/AFNetworking.xcodeproj">
-   </FileRef>
-   <FileRef
-      location = "group:../../ThirdParty/AppBlade/iOS/Framework/AppBlade.xcodeproj">
    </FileRef>
 </Workspace>

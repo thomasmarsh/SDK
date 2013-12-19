@@ -158,6 +158,8 @@
 		3C2FE96A1819EF4F00FE7190 /* CoreTelephony.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreTelephony.framework; path = System/Library/Frameworks/CoreTelephony.framework; sourceTree = SDKROOT; };
 		3C2FE96E1819EF5800FE7190 /* AdSupport.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AdSupport.framework; path = System/Library/Frameworks/AdSupport.framework; sourceTree = SDKROOT; };
 		3C94A5B617F609D600BCDB43 /* PencilFirmware.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; name = PencilFirmware.bin; path = ../FiftyThreeSdk/FiftyThreeSdk/PencilFirmware.bin; sourceTree = "<group>"; };
+		3CC0E2E518639E8900499ECC /* FiftyThreeSdkTestApp.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = FiftyThreeSdkTestApp.xcconfig; sourceTree = "<group>"; };
+		3CC0E2E618639E9700499ECC /* FiftyThreeSdkTestAppDebug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = FiftyThreeSdkTestAppDebug.xcconfig; sourceTree = "<group>"; };
 		3CD6FA3417DE1D1E001E5F82 /* icon72.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = icon72.png; path = FiftyThreeSdkTestApp/icon72.png; sourceTree = "<group>"; };
 		3CD6FA3517DE1D1E001E5F82 /* icon144.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = icon144.png; path = FiftyThreeSdkTestApp/icon144.png; sourceTree = "<group>"; };
 		6632313B16F8B1CA008AD3DC /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
@@ -211,7 +213,7 @@
 		668F6DE817037361002C548B /* Textures */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Textures; path = ../../Canvas/Canvas/Textures; sourceTree = "<group>"; };
 		668F6DEA17037376002C548B /* Shaders */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Shaders; path = ../../Common/Common/Shaders; sourceTree = "<group>"; };
 		669CA620171F034A006596F0 /* charcoal-upgrade.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; path = "charcoal-upgrade.bin"; sourceTree = SOURCE_ROOT; };
-		66A47BF016D835C90016B31C /* FiftyThreeSdkTestApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FiftyThreeSdkTestApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		66A47BF016D835C90016B31C /* SDKTestApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SDKTestApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		66A47BF316D835C90016B31C /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		66A47BF516D835C90016B31C /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		66A47BF716D835C90016B31C /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -281,7 +283,7 @@
 			isa = PBXGroup;
 			children = (
 				34986FE9174FB1A700A3088E /* libCommon.a */,
-				34986FEB174FB1A700A3088E /* CommonTests.octest */,
+				34986FEB174FB1A700A3088E /* CommonTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -309,6 +311,15 @@
 				34987000174FB1CC00A3088E /* libAFNetworking.a */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		3CC0E2E418639E7500499ECC /* BuildConfigurations */ = {
+			isa = PBXGroup;
+			children = (
+				3CC0E2E518639E8900499ECC /* FiftyThreeSdkTestApp.xcconfig */,
+				3CC0E2E618639E9700499ECC /* FiftyThreeSdkTestAppDebug.xcconfig */,
+			);
+			name = BuildConfigurations;
 			sourceTree = "<group>";
 		};
 		6644311716F3C8390049E570 /* FiftyThreeSdkTests */ = {
@@ -363,18 +374,19 @@
 		66A47BE716D835C90016B31C = {
 			isa = PBXGroup;
 			children = (
-				668F6DEC1703737A002C548B /* Resources */,
+				3CC0E2E418639E7500499ECC /* BuildConfigurations */,
 				66A47BF916D835C90016B31C /* FiftyThreeSdkTestApp */,
 				6644311716F3C8390049E570 /* FiftyThreeSdkTests */,
 				66A47BF216D835C90016B31C /* Frameworks */,
 				66A47BF116D835C90016B31C /* Products */,
+				668F6DEC1703737A002C548B /* Resources */,
 			);
 			sourceTree = "<group>";
 		};
 		66A47BF116D835C90016B31C /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				66A47BF016D835C90016B31C /* FiftyThreeSdkTestApp.app */,
+				66A47BF016D835C90016B31C /* SDKTestApp.app */,
 				6644311216F3C8390049E570 /* FiftyThreeSdkTests.octest */,
 			);
 			name = Products;
@@ -508,7 +520,7 @@
 			);
 			name = FiftyThreeSdkTestApp;
 			productName = "charcoal-prototype";
-			productReference = 66A47BF016D835C90016B31C /* FiftyThreeSdkTestApp.app */;
+			productReference = 66A47BF016D835C90016B31C /* SDKTestApp.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -576,10 +588,10 @@
 			remoteRef = 34986FE8174FB1A700A3088E /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		34986FEB174FB1A700A3088E /* CommonTests.octest */ = {
+		34986FEB174FB1A700A3088E /* CommonTests.xctest */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.cfbundle;
-			path = CommonTests.octest;
+			path = CommonTests.xctest;
 			remoteRef = 34986FEA174FB1A700A3088E /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
@@ -766,167 +778,18 @@
 			};
 			name = Debug;
 		};
-		6644312316F3C8390049E570 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/FiftyThreeSdkTestApp.app/FiftyThreeSdkTestApp";
-				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
-				CLANG_CXX_LIBRARY = "compiler-default";
-				FRAMEWORK_SEARCH_PATHS = (
-					"\"$(SDKROOT)/Developer/Library/Frameworks\"",
-					"\"$(DEVELOPER_LIBRARY_DIR)/Frameworks\"",
-					"\"$(SRCROOT)/../../ThirdParty/boost/framework\"",
-				);
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "FiftyThreeSdkTests/FiftyThreeSdkTests-Prefix.pch";
-				HEADER_SEARCH_PATHS = (
-					"$(SRCROOT)/../FiftyThreeSdk",
-					"$(SRCROOT)/../../Common",
-					"$(SRCROOT)/../../Canvas",
-					"$(SRCROOT)/../../ThirdParty",
-					"$(SRCROOT)/../../../ThirdParty",
-				);
-				INFOPLIST_FILE = "FiftyThreeSdkTests/FiftyThreeSdkTests-Info.plist";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/../../../../../../Library/Developer/Xcode/DerivedData/FiftyThreeSdkTestApp-fqhrggmyvwwfhzgakxbhthwwiptp/Build/Products/Debug-iphoneos\"",
-				);
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				TEST_HOST = "$(BUNDLE_LOADER)";
-				WRAPPER_EXTENSION = octest;
-			};
-			name = Release;
-		};
 		66A47C1116D835C90016B31C /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 3CC0E2E618639E9700499ECC /* FiftyThreeSdkTestAppDebug.xcconfig */;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = armv7;
-				CLANG_CXX_LANGUAGE_STANDARD = "c++98";
-				CLANG_CXX_LIBRARY = "libstdc++";
-				CLANG_ENABLE_OBJC_ARC = YES;
-				CLANG_WARN_CONSTANT_CONVERSION = YES;
-				CLANG_WARN_EMPTY_BODY = YES;
-				CLANG_WARN_ENUM_CONVERSION = YES;
-				CLANG_WARN_INT_CONVERSION = YES;
-				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				COPY_PHASE_STRIP = NO;
-				GCC_C_LANGUAGE_STANDARD = gnu99;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
-				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
-				ONLY_ACTIVE_ARCH = YES;
-				OTHER_LDFLAGS = (
-					"-ObjC",
-					"-all_load",
-				);
-				SDKROOT = iphoneos;
-				TARGETED_DEVICE_FAMILY = 2;
 			};
 			name = Debug;
-		};
-		66A47C1216D835C90016B31C /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = armv7;
-				CLANG_CXX_LANGUAGE_STANDARD = "c++98";
-				CLANG_CXX_LIBRARY = "libstdc++";
-				CLANG_ENABLE_OBJC_ARC = YES;
-				CLANG_WARN_CONSTANT_CONVERSION = YES;
-				CLANG_WARN_EMPTY_BODY = YES;
-				CLANG_WARN_ENUM_CONVERSION = YES;
-				CLANG_WARN_INT_CONVERSION = YES;
-				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				COPY_PHASE_STRIP = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu99;
-				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
-				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
-				OTHER_LDFLAGS = (
-					"-ObjC",
-					"-all_load",
-				);
-				SDKROOT = iphoneos;
-				TARGETED_DEVICE_FAMILY = 2;
-				VALIDATE_PRODUCT = YES;
-			};
-			name = Release;
 		};
 		66A47C1416D835C90016B31C /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = armv7;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/../../ThirdParty/boost/framework\"",
-				);
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "FiftyThreeSdkTestApp/FiftyThreeSdkTestApp-Prefix.pch";
-				HEADER_SEARCH_PATHS = (
-					"$(SRCROOT)/../../ThirdParty",
-					"$(SRCROOT)/../../../ThirdParty",
-					"$(SRCROOT)/../../Canvas",
-					"$(SRCROOT)/../../Common",
-					"$(SRCROOT)/../FiftyThreeSdk",
-				);
-				INFOPLIST_FILE = "FiftyThreeSdkTestApp/FiftyThreeSdkTestApp-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/../../ThirdParty/PogoConnect\"",
-				);
-				PRODUCT_NAME = FiftyThreeSdkTestApp;
-				TARGETED_DEVICE_FAMILY = 2;
-				USER_HEADER_SEARCH_PATHS = "";
-				VALID_ARCHS = "armv7 armv7s";
-				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
-		};
-		66A47C1516D835C90016B31C /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ARCHS = armv7;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/../../ThirdParty/boost/framework\"",
-				);
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "FiftyThreeSdkTestApp/FiftyThreeSdkTestApp-Prefix.pch";
-				HEADER_SEARCH_PATHS = (
-					"$(SRCROOT)/../../ThirdParty",
-					"$(SRCROOT)/../../../ThirdParty",
-					"$(SRCROOT)/../../Canvas",
-					"$(SRCROOT)/../../Common",
-					"$(SRCROOT)/../FiftyThreeSdk",
-				);
-				INFOPLIST_FILE = "FiftyThreeSdkTestApp/FiftyThreeSdkTestApp-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/../../ThirdParty/PogoConnect\"",
-				);
-				PRODUCT_NAME = FiftyThreeSdkTestApp;
-				TARGETED_DEVICE_FAMILY = 2;
-				USER_HEADER_SEARCH_PATHS = "";
-				VALID_ARCHS = "armv7 armv7s";
-				WRAPPER_EXTENSION = app;
-			};
-			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
@@ -935,28 +798,25 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				6644312216F3C8390049E570 /* Debug */,
-				6644312316F3C8390049E570 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = Debug;
 		};
 		66A47BEB16D835C90016B31C /* Build configuration list for PBXProject "FiftyThreeSdkTestApp" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				66A47C1116D835C90016B31C /* Debug */,
-				66A47C1216D835C90016B31C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = Debug;
 		};
 		66A47C1316D835C90016B31C /* Build configuration list for PBXNativeTarget "FiftyThreeSdkTestApp" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				66A47C1416D835C90016B31C /* Debug */,
-				66A47C1516D835C90016B31C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = Debug;
 		};
 /* End XCConfigurationList section */
 	};

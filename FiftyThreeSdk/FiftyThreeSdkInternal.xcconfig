@@ -1,0 +1,9 @@
+//
+//  FiftyThreeSdkInternal.xcconfig
+//  FiftyThreeSdk
+//
+//  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
+//
+
+#include "../../BuildConfigurations/SubprojectInternal.xcconfig"
+#include "FiftyThreeSdk.xcconfig"
