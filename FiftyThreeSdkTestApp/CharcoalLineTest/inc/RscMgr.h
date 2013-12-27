@@ -9,10 +9,12 @@
 
 #include "redparkSerial.h"
 
+// nota bene: this header include must come before the others
+#import <ExternalAccessory/ExternalAccessoryDefines.h>
+
 #import <ExternalAccessory/EAAccessory.h>
 #import <ExternalAccessory/EAAccessoryManager.h>
 #import <ExternalAccessory/EASession.h>
-#import <ExternalAccessory/ExternalAccessoryDefines.h>
 #import <Foundation/Foundation.h>
 
 enum
