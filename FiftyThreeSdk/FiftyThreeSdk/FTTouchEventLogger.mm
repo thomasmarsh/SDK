@@ -2,10 +2,9 @@
 //  FTTouchEventLogger.mm
 //  FiftyThreeSdk
 //
-//  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
+//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
 
-#include <boost/foreach.hpp>
 #include <sstream>
 
 #include "FTTouchEventLogger.h"
@@ -36,7 +35,7 @@ public:
 
     void TouchesBegan(const TouchesSet & touches)
     {
-        BOOST_FOREACH(const Touch::cPtr & touch, touches)
+        for (const Touch::cPtr & touch :  touches)
         {
             _PastTouches.push_back(touch);
 
@@ -53,7 +52,7 @@ public:
 
     void TouchesMoved(const TouchesSet & touches)
     {
-        BOOST_FOREACH(const Touch::cPtr & touch, touches)
+        for (const Touch::cPtr & touch :  touches)
         {
             stringstream ss;
             ss << TOUCH_PREFIX << touch->ToString() << std::endl;
@@ -68,7 +67,7 @@ public:
 
     void TouchesEnded(const TouchesSet & touches)
     {
-        BOOST_FOREACH(const Touch::cPtr & touch, touches)
+        for (const Touch::cPtr & touch :  touches)
         {
             stringstream ss;
             ss << TOUCH_PREFIX << touch->ToString() << std::endl;
@@ -83,7 +82,7 @@ public:
 
     void TouchesCancelled(const TouchesSet & touches)
     {
-        BOOST_FOREACH(const Touch::cPtr & touch, touches)
+        for (const Touch::cPtr & touch :  touches)
         {
             stringstream ss;
             ss << TOUCH_PREFIX << touch->ToString() << std::endl;
@@ -124,11 +123,11 @@ public:
         Touch::cPtr nearestStroke;
         float nearestDistance = std::numeric_limits<float>::max();
 
-        BOOST_FOREACH(const Touch::cPtr & candidate, _PastTouches)
+        for (const Touch::cPtr & candidate :  _PastTouches)
         {
             Eigen::Vector2f touchLocation = touch->CurrentSample().Location();
 
-            BOOST_FOREACH(const InputSample & sample, *candidate->History())
+            for (const InputSample & sample :  *candidate->History())
             {
                 float distance = (touchLocation - sample.Location()).norm();
 

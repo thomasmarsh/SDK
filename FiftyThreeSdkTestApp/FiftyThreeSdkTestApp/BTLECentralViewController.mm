@@ -2,10 +2,9 @@
 //  BTLECentralViewController.mm
 //  FiftyThreeSdkTestApp
 //
-//  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
+//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
 
-#include <boost/foreach.hpp>
 #include <sstream>
 
 #include "Canvas/GLCanvasController.h"
@@ -598,7 +597,7 @@ public:
 
 - (void)drawStrokeFromTouch:(Touch::cPtr)touch
 {
-    BOOST_FOREACH(const InputSample & sample, *touch->History())
+    for (const InputSample & sample :  *touch->History())
     {
         if (&sample == &touch->History()->front())
         {
@@ -872,7 +871,7 @@ Last Connect Date = %@\n \
 
     NSMutableData* data = static_pointer_cast<FTTouchEventLoggerObjc>(_EventLogger)->GetData();
 
-    BOOST_FOREACH(const Touch::cPtr & touch, _HighlightedTouches)
+    for (const Touch::cPtr & touch :  _HighlightedTouches)
     {
         stringstream ss;
         ss << "strokestate=" << touch->Id() << ","

@@ -2,10 +2,9 @@
 //  FTPenAndTouchManager.cpp
 //  FiftyThreeSdk
 //
-//  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
+//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
 
-#include <boost/foreach.hpp>
 #include <boost/unordered_map.hpp>
 
 #include "Common/DispatchTimer.h"
@@ -86,7 +85,7 @@ public:
     {
         StopTimer(_TrialSeparationTimer);
 
-        BOOST_FOREACH(const Touch::cPtr & touch, touches)
+        for (const Touch::cPtr & touch :  touches)
         {
             _Touches[touch] = TouchType::Unknown;
         }
@@ -117,7 +116,7 @@ public:
 
     void TouchesEnded(const TouchesSetEvent & sender, const TouchesSet & touches)
     {
-        BOOST_FOREACH(const Touch::cPtr & touch, touches)
+        for (const Touch::cPtr & touch :  touches)
         {
             _Touches.erase(touch);
         }
@@ -132,7 +131,7 @@ public:
 
     void TouchesCancelled(const TouchesSetEvent & sender, const TouchesSet & touches)
     {
-        BOOST_FOREACH(const Touch::cPtr & touch, touches)
+        for (const Touch::cPtr & touch :  touches)
         {
             _Touches.erase(touch);
         }
