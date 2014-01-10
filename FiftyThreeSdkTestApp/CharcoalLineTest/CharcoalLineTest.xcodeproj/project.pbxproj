@@ -56,6 +56,8 @@
 		6669D05A173C038B00BB15C3 /* ExternalAccessory.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6669D059173C038B00BB15C3 /* ExternalAccessory.framework */; };
 		6669D05C173C066800BB15C3 /* ViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6669D05B173C066800BB15C3 /* ViewController.xib */; };
 		6669D060173C0D3900BB15C3 /* CoreBluetooth.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6669D05F173C0D3900BB15C3 /* CoreBluetooth.framework */; };
+		92FCDD9F188051920028CCC7 /* libInAppSettingsKit.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 92FCDD9E188051760028CCC7 /* libInAppSettingsKit.a */; };
+		92FCDDA3188052350028CCC7 /* MessageUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 92FCDDA2188052350028CCC7 /* MessageUI.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -171,6 +173,20 @@
 			remoteGlobalIDString = 6669CFF7173C008C00BB15C3;
 			remoteInfo = CharcoalLineTest;
 		};
+		92FCDD9D188051760028CCC7 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 92FCDD96188051760028CCC7 /* InAppSettingsKit.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = B9CF307D13A91A3700ED443E;
+			remoteInfo = InAppSettingsKit;
+		};
+		92FCDDA0188051990028CCC7 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 92FCDD96188051760028CCC7 /* InAppSettingsKit.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = B9CF307C13A91A3700ED443E;
+			remoteInfo = InAppSettingsKit;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
@@ -235,6 +251,8 @@
 		6669D05B173C066800BB15C3 /* ViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ViewController.xib; sourceTree = "<group>"; };
 		6669D05F173C0D3900BB15C3 /* CoreBluetooth.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreBluetooth.framework; path = System/Library/Frameworks/CoreBluetooth.framework; sourceTree = SDKROOT; };
 		6669D063173C0D6E00BB15C3 /* boost.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = boost.framework; path = ../../../ThirdParty/boost/framework/boost.framework; sourceTree = "<group>"; };
+		92FCDD96188051760028CCC7 /* InAppSettingsKit.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = InAppSettingsKit.xcodeproj; path = ../../../ThirdParty/InAppSettingsKit/InAppSettingsKit.xcodeproj; sourceTree = "<group>"; };
+		92FCDDA2188052350028CCC7 /* MessageUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MessageUI.framework; path = System/Library/Frameworks/MessageUI.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -242,6 +260,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				92FCDDA3188052350028CCC7 /* MessageUI.framework in Frameworks */,
+				92FCDD9F188051920028CCC7 /* libInAppSettingsKit.a in Frameworks */,
 				3CC736AB1863754A005BD0C7 /* libT1PogoManager.a in Frameworks */,
 				3C8173971815CAAC000C4FFD /* boost.framework in Frameworks */,
 				3CD6FA4717DE3063001E5F82 /* libAppBlade.a in Frameworks */,
@@ -396,6 +416,7 @@
 		6669CFFA173C008C00BB15C3 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				92FCDDA2188052350028CCC7 /* MessageUI.framework */,
 				3C2FE9681819EF1900FE7190 /* AdSupport.framework */,
 				3C093CD517CF90CC003B4A0D /* AFNetworking.xcodeproj */,
 				3CD6FA3E17DE3055001E5F82 /* AppBlade.xcodeproj */,
@@ -417,6 +438,7 @@
 				6669CFFD173C008C00BB15C3 /* Foundation.framework */,
 				3CE80BF017CE79BD00AA73A0 /* GLKit.framework */,
 				3C093CDB17CF90DE003B4A0D /* GlobalSettings.xcodeproj */,
+				92FCDD96188051760028CCC7 /* InAppSettingsKit.xcodeproj */,
 				3CE80C0917CE7CA000AA73A0 /* libT1PogoManager.a */,
 				3CE80C0117CE7B5B00AA73A0 /* libz.dylib */,
 				3CE80C0717CE7BE900AA73A0 /* MobileCoreServices.framework */,
@@ -503,6 +525,14 @@
 			path = lib;
 			sourceTree = "<group>";
 		};
+		92FCDD97188051760028CCC7 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				92FCDD9E188051760028CCC7 /* libInAppSettingsKit.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -518,6 +548,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				92FCDDA1188051990028CCC7 /* PBXTargetDependency */,
 				3CD6FA4917DE3068001E5F82 /* PBXTargetDependency */,
 				3C093CE217CF90EE003B4A0D /* PBXTargetDependency */,
 				3C093CE417CF90EE003B4A0D /* PBXTargetDependency */,
@@ -598,6 +629,10 @@
 					ProductGroup = 3C093CDC17CF90DE003B4A0D /* Products */;
 					ProjectRef = 3C093CDB17CF90DE003B4A0D /* GlobalSettings.xcodeproj */;
 				},
+				{
+					ProductGroup = 92FCDD97188051760028CCC7 /* Products */;
+					ProjectRef = 92FCDD96188051760028CCC7 /* InAppSettingsKit.xcodeproj */;
+				},
 			);
 			projectRoot = "";
 			targets = (
@@ -669,6 +704,13 @@
 			fileType = archive.ar;
 			path = libAppBladeUniversal.a;
 			remoteRef = 3CD6FA4517DE3056001E5F82 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		92FCDD9E188051760028CCC7 /* libInAppSettingsKit.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libInAppSettingsKit.a;
+			remoteRef = 92FCDD9D188051760028CCC7 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */
@@ -786,6 +828,11 @@
 			isa = PBXTargetDependency;
 			target = 6669CFF7173C008C00BB15C3 /* CharcoalLineTest */;
 			targetProxy = 6669D023173C008D00BB15C3 /* PBXContainerItemProxy */;
+		};
+		92FCDDA1188051990028CCC7 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = InAppSettingsKit;
+			targetProxy = 92FCDDA0188051990028CCC7 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 

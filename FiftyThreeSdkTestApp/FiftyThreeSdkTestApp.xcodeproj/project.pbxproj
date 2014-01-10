@@ -60,6 +60,7 @@
 		66C83D701704F9DD00789776 /* FTLatencyTouchClassfierTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 66C83D6F1704F9DD00789776 /* FTLatencyTouchClassfierTests.mm */; };
 		66C83D751704FDB700789776 /* boost.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6644317416F7FC680049E570 /* boost.framework */; };
 		66D2CBD8171C8B01008E1526 /* strokedata-3.prd in Resources */ = {isa = PBXBuildFile; fileRef = 66D2CBD6171C8AB5008E1526 /* strokedata-3.prd */; };
+		92FCDD861880504E0028CCC7 /* libInAppSettingsKit.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 92FCDD8318804FF40028CCC7 /* libInAppSettingsKit.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -147,6 +148,20 @@
 			remoteGlobalIDString = 3CE2FE68164AE1AF008DD18E;
 			remoteInfo = AFNetworking;
 		};
+		92FCDD8218804FF40028CCC7 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 92FCDD7E18804FF40028CCC7 /* InAppSettingsKit.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = B9CF307D13A91A3700ED443E;
+			remoteInfo = InAppSettingsKit;
+		};
+		92FCDD84188050140028CCC7 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 92FCDD7E18804FF40028CCC7 /* InAppSettingsKit.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = B9CF307C13A91A3700ED443E;
+			remoteInfo = InAppSettingsKit;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
@@ -222,6 +237,7 @@
 		66C83D6F1704F9DD00789776 /* FTLatencyTouchClassfierTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = FTLatencyTouchClassfierTests.mm; sourceTree = "<group>"; };
 		66D2CBD6171C8AB5008E1526 /* strokedata-3.prd */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "strokedata-3.prd"; sourceTree = "<group>"; };
 		66FC1EE11725DC7500B9B9E7 /* charcoal-factory.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; path = "charcoal-factory.bin"; sourceTree = SOURCE_ROOT; };
+		92FCDD7E18804FF40028CCC7 /* InAppSettingsKit.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = InAppSettingsKit.xcodeproj; path = ../../ThirdParty/InAppSettingsKit/InAppSettingsKit.xcodeproj; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -240,6 +256,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				92FCDD861880504E0028CCC7 /* libInAppSettingsKit.a in Frameworks */,
 				34987009174FB20700A3088E /* libAFNetworking.a in Frameworks */,
 				3498700A174FB20700A3088E /* libCanvas.a in Frameworks */,
 				3498700B174FB20700A3088E /* libCommon.a in Frameworks */,
@@ -410,6 +427,7 @@
 				34986FC2174FAC4F00A3088E /* FiftyThreeSdk.xcodeproj */,
 				66A47BF516D835C90016B31C /* Foundation.framework */,
 				34986FF5174FB1BF00A3088E /* GlobalSettings.xcodeproj */,
+				92FCDD7E18804FF40028CCC7 /* InAppSettingsKit.xcodeproj */,
 				6644318116F7FF260049E570 /* libsqlite3.dylib */,
 				6632313F16F8B9F2008AD3DC /* libT1PogoManager.a */,
 				6644317716F7FDD30049E570 /* libz.dylib */,
@@ -480,6 +498,14 @@
 			name = Firmware;
 			sourceTree = "<group>";
 		};
+		92FCDD7F18804FF40028CCC7 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				92FCDD8318804FF40028CCC7 /* libInAppSettingsKit.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -512,6 +538,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				92FCDD85188050140028CCC7 /* PBXTargetDependency */,
 				34987002174FB1FF00A3088E /* PBXTargetDependency */,
 				34987004174FB1FF00A3088E /* PBXTargetDependency */,
 				34987006174FB1FF00A3088E /* PBXTargetDependency */,
@@ -563,6 +590,10 @@
 				{
 					ProductGroup = 34986FF6174FB1BF00A3088E /* Products */;
 					ProjectRef = 34986FF5174FB1BF00A3088E /* GlobalSettings.xcodeproj */;
+				},
+				{
+					ProductGroup = 92FCDD7F18804FF40028CCC7 /* Products */;
+					ProjectRef = 92FCDD7E18804FF40028CCC7 /* InAppSettingsKit.xcodeproj */;
 				},
 			);
 			projectRoot = "";
@@ -621,6 +652,13 @@
 			fileType = archive.ar;
 			path = libAFNetworking.a;
 			remoteRef = 34986FFF174FB1CC00A3088E /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		92FCDD8318804FF40028CCC7 /* libInAppSettingsKit.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libInAppSettingsKit.a;
+			remoteRef = 92FCDD8218804FF40028CCC7 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */
@@ -724,6 +762,11 @@
 			isa = PBXTargetDependency;
 			name = AFNetworking;
 			targetProxy = 34987007174FB1FF00A3088E /* PBXContainerItemProxy */;
+		};
+		92FCDD85188050140028CCC7 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = InAppSettingsKit;
+			targetProxy = 92FCDD84188050140028CCC7 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
