@@ -597,7 +597,7 @@ public:
 
 - (void)drawStrokeFromTouch:(Touch::cPtr)touch
 {
-    for (const InputSample & sample :  *touch->History())
+    for (const InputSample & sample : *touch->History())
     {
         if (&sample == &touch->History()->front())
         {
@@ -871,7 +871,7 @@ Last Connect Date = %@\n \
 
     NSMutableData* data = static_pointer_cast<FTTouchEventLoggerObjc>(_EventLogger)->GetData();
 
-    for (const Touch::cPtr & touch :  _HighlightedTouches)
+    for (const Touch::cPtr & touch : _HighlightedTouches)
     {
         stringstream ss;
         ss << "strokestate=" << touch->Id() << ","

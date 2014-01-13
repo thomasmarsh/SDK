@@ -35,7 +35,7 @@ public:
 
     void TouchesBegan(const TouchesSet & touches)
     {
-        for (const Touch::cPtr & touch :  touches)
+        for (const Touch::cPtr & touch : touches)
         {
             _PastTouches.push_back(touch);
 
@@ -52,7 +52,7 @@ public:
 
     void TouchesMoved(const TouchesSet & touches)
     {
-        for (const Touch::cPtr & touch :  touches)
+        for (const Touch::cPtr & touch : touches)
         {
             stringstream ss;
             ss << TOUCH_PREFIX << touch->ToString() << std::endl;
@@ -67,7 +67,7 @@ public:
 
     void TouchesEnded(const TouchesSet & touches)
     {
-        for (const Touch::cPtr & touch :  touches)
+        for (const Touch::cPtr & touch : touches)
         {
             stringstream ss;
             ss << TOUCH_PREFIX << touch->ToString() << std::endl;
@@ -82,7 +82,7 @@ public:
 
     void TouchesCancelled(const TouchesSet & touches)
     {
-        for (const Touch::cPtr & touch :  touches)
+        for (const Touch::cPtr & touch : touches)
         {
             stringstream ss;
             ss << TOUCH_PREFIX << touch->ToString() << std::endl;
@@ -123,11 +123,11 @@ public:
         Touch::cPtr nearestStroke;
         float nearestDistance = std::numeric_limits<float>::max();
 
-        for (const Touch::cPtr & candidate :  _PastTouches)
+        for (const Touch::cPtr & candidate : _PastTouches)
         {
             Eigen::Vector2f touchLocation = touch->CurrentSample().Location();
 
-            for (const InputSample & sample :  *candidate->History())
+            for (const InputSample & sample : *candidate->History())
             {
                 float distance = (touchLocation - sample.Location()).norm();
 

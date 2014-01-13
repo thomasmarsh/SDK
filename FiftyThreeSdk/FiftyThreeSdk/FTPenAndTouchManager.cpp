@@ -85,7 +85,7 @@ public:
     {
         StopTimer(_TrialSeparationTimer);
 
-        for (const Touch::cPtr & touch :  touches)
+        for (const Touch::cPtr & touch : touches)
         {
             _Touches[touch] = TouchType::Unknown;
         }
@@ -116,7 +116,7 @@ public:
 
     void TouchesEnded(const TouchesSetEvent & sender, const TouchesSet & touches)
     {
-        for (const Touch::cPtr & touch :  touches)
+        for (const Touch::cPtr & touch : touches)
         {
             _Touches.erase(touch);
         }
@@ -131,7 +131,7 @@ public:
 
     void TouchesCancelled(const TouchesSetEvent & sender, const TouchesSet & touches)
     {
-        for (const Touch::cPtr & touch :  touches)
+        for (const Touch::cPtr & touch : touches)
         {
             _Touches.erase(touch);
         }

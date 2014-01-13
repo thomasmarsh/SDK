@@ -45,7 +45,7 @@ public:
 
     virtual void TouchesBegan(const fiftythree::common::TouchesSet & touches)
     {
-        for (const TouchClassifier::Ptr & classifier :  _Classifiers)
+        for (const TouchClassifier::Ptr & classifier : _Classifiers)
         {
             classifier->TouchesBegan(touches);
         }
@@ -53,7 +53,7 @@ public:
 
     virtual void TouchesMoved(const fiftythree::common::TouchesSet & touches)
     {
-        for (const TouchClassifier::Ptr & classifier :  _Classifiers)
+        for (const TouchClassifier::Ptr & classifier : _Classifiers)
         {
             classifier->TouchesMoved(touches);
         }
@@ -61,7 +61,7 @@ public:
 
     virtual void TouchesEnded(const fiftythree::common::TouchesSet & touches)
     {
-        for (const TouchClassifier::Ptr & classifier :  _Classifiers)
+        for (const TouchClassifier::Ptr & classifier : _Classifiers)
         {
             classifier->TouchesEnded(touches);
         }
@@ -69,7 +69,7 @@ public:
 
     virtual void TouchesCancelled(const fiftythree::common::TouchesSet & touches)
     {
-        for (const TouchClassifier::Ptr & classifier :  _Classifiers)
+        for (const TouchClassifier::Ptr & classifier : _Classifiers)
         {
             classifier->TouchesCancelled(touches);
         }
@@ -77,7 +77,7 @@ public:
 
     virtual void ProcessPenEvent(const PenEvent::Ptr & event)
     {
-        for (const TouchClassifier::Ptr & classifier :  _Classifiers)
+        for (const TouchClassifier::Ptr & classifier : _Classifiers)
         {
             if (classifier->HandlesPenInput())
             {

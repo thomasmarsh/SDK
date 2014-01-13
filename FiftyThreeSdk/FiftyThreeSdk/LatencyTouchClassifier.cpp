@@ -117,7 +117,7 @@ public:
     {
         DebugAssert(CountTouches() == _TouchCount);
 
-        for (const Touch::cPtr & touch :  touches)
+        for (const Touch::cPtr & touch : touches)
         {
             _UnknownTouches.push_back(touch);
         }
@@ -136,7 +136,7 @@ public:
     {
         DebugAssert(CountTouches() == _TouchCount);
 
-        for (const Touch::cPtr & touch :  touches)
+        for (const Touch::cPtr & touch : touches)
         {
             if (GetTouchType(touch) != TouchType::Unknown) continue;
 
@@ -162,7 +162,7 @@ public:
     {
         DebugAssert(CountTouches() == _TouchCount);
 
-        for (const Touch::cPtr & touch :  touches)
+        for (const Touch::cPtr & touch : touches)
         {
 //            std::cout << "Ended id = " << touch->Id() << std::endl;
 
@@ -223,7 +223,7 @@ public:
             vector<Touch::cPtr> changedTouches;
             ComputeDeltas(_PenDownEvent, changedTouches);
 
-            for (const Touch::cPtr & touch :  changedTouches)
+            for (const Touch::cPtr & touch : changedTouches)
             {
                 FireTouchTypeChangedEvent(touch);
             }
