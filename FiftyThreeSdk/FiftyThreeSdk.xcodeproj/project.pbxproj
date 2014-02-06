@@ -328,7 +328,7 @@
 		66A8386916E52D840048FFE4 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0460;
+				LastUpgradeCheck = 0500;
 				ORGANIZATIONNAME = FiftyThree;
 			};
 			buildConfigurationList = 66A8386C16E52D840048FFE4 /* Build configuration list for PBXProject "FiftyThreeSdk" */;
@@ -457,6 +457,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 3C373F27186353D700830FD7 /* FiftyThreeSdkDebug.xcconfig */;
 			buildSettings = {
+				ONLY_ACTIVE_ARCH = YES;
 			};
 			name = Debug;
 		};
