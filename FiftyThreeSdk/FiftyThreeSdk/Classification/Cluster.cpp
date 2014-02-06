@@ -9,27 +9,20 @@
 #include "FiftyThreeSdk/Classification/Cluster.h"
 #include "FiftyThreeSdk/Classification/ClassificationProxy.h"
 #include "FiftyThreeSdk/Classification/CommonDeclarations.h"
-
-#include "boost/foreach.hpp"
 #include <algorithm>
 #include "FiftyThreeSdk/Classification/EigenLAB.h"
-
 #include "Common/Touch/Touch.h"
 #include "Common/Touch/TouchTracker.h"
-
 #include <boost/tuple/tuple.hpp>
 #include <boost/foreach.hpp>
-#include <boost/make_shared.hpp>
 
 #include "FiftyThreeSdk/Classification/TouchLogger.h"
 
 using namespace Eigen;
 using namespace fiftythree::common;
 
-using namespace fiftythree::common;
-
 namespace fiftythree {
-namespace classification {
+namespace sdk {
 
 float Cluster::Staleness() const
 {
@@ -624,7 +617,7 @@ void ClusterTracker::AddPointToCluster(Vector2f p, double timestamp, Cluster::Pt
     
     // it is safe to use _touchLog here since the touch is active.  in other places
     // it is possible the touchLog will have discarded data so we use the cluster's ptr.
-    curves::Stroke::Ptr const & stroke = _touchLog->Stroke(touchId);
+    Stroke::Ptr const & stroke = _touchLog->Stroke(touchId);
     if(stroke->Size() > 1)
     {
         int lastIndex = stroke->LastValidIndex();
@@ -743,7 +736,7 @@ Eigen::Vector2f Cluster::CenterOfMass() const
     
     BOOST_FOREACH(common::TouchId touchId, _touchIds)
     {
-        curves::Stroke::Ptr const & stroke = _touchData.at(touchId)->Stroke();
+        Stroke::Ptr const & stroke = _touchData.at(touchId)->Stroke();
         float weight = stroke->Size();
         
         Vector2f c = stroke->WeightedCenterOfMass();
@@ -765,7 +758,7 @@ int Cluster::PointCount() const
     
     BOOST_FOREACH(common::TouchId touchId, _touchIds)
     {
-        curves::Stroke::Ptr const & stroke = _commonData->proxy->ClusterTracker()->Stroke(touchId);
+        Stroke::Ptr const & stroke = _commonData->proxy->ClusterTracker()->Stroke(touchId);
         N += stroke->Size();
     }
     return N;
@@ -1192,7 +1185,7 @@ std::vector<common::TouchId> ClusterTracker::TouchesForCurrentClusters(bool acti
     
 }
     
-curves::Stroke::Ptr const &      ClusterTracker::Stroke(common::TouchId id)
+Stroke::Ptr const &      ClusterTracker::Stroke(common::TouchId id)
 {
     return _touchLog->Stroke(id);
 }
@@ -1208,7 +1201,7 @@ Cluster::Ptr ClusterTracker::NewClusterForTouch(TouchId touchId)
         oldCluster->RemoveTouch(touchId);
     }
     
-    curves::Stroke::Ptr stroke = _touchLog->Stroke(touchId);
+    Stroke::Ptr stroke = _touchLog->Stroke(touchId);
     
     Cluster::Ptr newCluster = NewCluster(stroke->LastPoint(), CurrentTime(), _commonData->proxy->TouchTypeForNewCluster());
     
@@ -1361,7 +1354,7 @@ void ClusterTracker::UpdateClusters()
     BOOST_FOREACH(common::TouchId touchId, _touchLog->ActiveIds())
     {
         
-        curves::Stroke::Ptr stroke = _commonData->proxy->ClusterTracker()->Stroke(touchId);
+        Stroke::Ptr stroke = _commonData->proxy->ClusterTracker()->Stroke(touchId);
         
         Cluster::Ptr knownCluster = _touchLog->Cluster(touchId);
         

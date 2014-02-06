@@ -39,7 +39,7 @@ using namespace fiftythree::common;
 
 namespace fiftythree
 {
-namespace classification
+namespace sdk
 {
 
 PlaybackSequence::PlaybackSequence(std::istream & str)

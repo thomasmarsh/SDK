@@ -10,8 +10,8 @@
 #include <Eigen/Geometry>
 #include <iomanip>
 
-#include "boost/tuple/tuple.hpp"
-#include "ClassificationProxy.h"
+#include <boost/tuple/tuple.hpp>
+#include "FiftyThreeSdk/Classification/ClassificationProxy.h"
 #include "Common/Touch/Touch.h"
 #include "Common/Touch/TouchTracker.h"
 #include "FiftyThreeSdk/Classification/Stroke.h"
@@ -25,12 +25,11 @@ using namespace boost::assign;
 using boost::tie;
 
 using namespace fiftythree::common;
-using namespace fiftythree::curves;
 using namespace Eigen;
 
 namespace fiftythree
 {
-namespace classification
+namespace sdk
 {
 
 void TouchClassificationProxy::RemoveTouchFromClassification(common::TouchId touchId)
@@ -1888,7 +1887,7 @@ void TouchClassificationProxy::ClassifyIsolatedStrokes()
 
 std::vector<float> TouchClassificationProxy::SizeDataForTouch(TouchId touchId)
 {
-    curves::Stroke::Ptr stroke = _clusterTracker->Stroke(touchId);
+    Stroke::Ptr stroke = _clusterTracker->Stroke(touchId);
 
     return stroke->TouchRadiusFloat();
 
@@ -2083,7 +2082,7 @@ void TouchClassificationProxy::ClearStaleTouchStatistics()
     
     TouchId touchId;
     
-    for (std::map<common::TouchId, fiftythree::classification::TouchStatistics>::iterator it = _touchStatistics.begin();
+    for (auto it = _touchStatistics.begin();
          it != _touchStatistics.end();)
     {
         touchId = it->first;

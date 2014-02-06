@@ -23,7 +23,7 @@
 #include "FiftyThreeSdk/Classification/Cluster.h"
 
 namespace fiftythree {
-namespace classification {
+namespace sdk {
 
 class PenTracker {
     

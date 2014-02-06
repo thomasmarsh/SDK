@@ -17,7 +17,7 @@
 #include "FiftyThreeSdk/Classification/FiniteDifferences.h"
 
 namespace fiftythree {
-namespace classification {
+namespace sdk {
 
 // local divided difference stencil
 std::vector<int> DividedDifferenceStencil(const int &order) {

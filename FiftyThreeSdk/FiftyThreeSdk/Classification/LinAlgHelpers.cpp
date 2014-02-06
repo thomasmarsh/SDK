@@ -9,7 +9,7 @@
 #include "FiftyThreeSdk/Classification/LinAlgHelpers.h"
 
 namespace fiftythree {
-namespace classification {
+namespace sdk {
 
 }
 }

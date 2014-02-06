@@ -12,7 +12,7 @@ using namespace Eigen;
 
 namespace fiftythree
 {
-namespace curves
+namespace sdk
 {
 Screen & Screen::MainScreen()
 {

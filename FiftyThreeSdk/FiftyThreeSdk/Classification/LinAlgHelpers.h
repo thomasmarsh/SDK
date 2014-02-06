@@ -20,7 +20,7 @@
 using namespace Eigen;
 
 namespace fiftythree {
-namespace classification {
+namespace sdk {
 
 // Solves A x = b, just does it without all the Eigen syntax overhead
 // Effectively, this method evaluates pinv(A)*b.
@@ -80,7 +80,7 @@ Eigen::Matrix<typename DerivedA::Scalar, Dynamic, 1> LinearLeastSquaresSolve(con
     residual = 0; // implicit cast
     if (QR.rank() < bCopy.rows()) {
         residual = std::sqrt( 
-                        curves::SquaredNorm( 
+                        SquaredNorm(
                             bCopy.segment(QR.rank(), bCopy.rows() - QR.rank()) 
                         ) 
                    );

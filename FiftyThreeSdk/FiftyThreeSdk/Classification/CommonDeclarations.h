@@ -17,7 +17,7 @@
 
 namespace fiftythree
 {
-namespace classification
+namespace sdk
 {
 
 typedef std::map<common::TouchId, float> IdFloatMap;
@@ -60,14 +60,6 @@ typedef std::vector<TouchType>::iterator TouchTypeIterator;
 static const int isolatedBatchThresholds[] = {
   4, 8, 12, 16, 20, 28, 36, 44, 52, 60, 70, 80, 90, 100, 150, 200, 250, 300, 350, 400, 500, 600, intInf
 };
-
-}
-}
-
-namespace fiftythree
-{
-namespace curves
-{
 
 template<typename DataType>
 class DataStream;

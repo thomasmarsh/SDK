@@ -11,7 +11,7 @@
 
 namespace fiftythree
 {
-namespace curves
+namespace sdk
 {
 
 class Stroke;

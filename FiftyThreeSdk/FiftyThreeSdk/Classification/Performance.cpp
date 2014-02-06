@@ -52,7 +52,7 @@ int IndexOfString(std::string probe, std::vector<std::string> headers)
 
 
 namespace fiftythree {
-namespace classification {
+namespace sdk {
     
 // CLUSTER_ID, TOUCH_ID, PEN_DOWN_DT, PEN_UP_DT, SWITCH_ON_DURATION, TOUCH_DURATION,
 // HANDEDNESS_PRIOR, ISOLATED_PRIOR, ORTHOGONAL_JERK, CURVATURE_SCORE, LENGTH_PRIOR,

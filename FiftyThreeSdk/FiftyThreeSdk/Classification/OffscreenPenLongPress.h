@@ -18,7 +18,7 @@
 
 
 namespace fiftythree {
-namespace classification {
+namespace sdk {
 
 class OffscreenPenLongPressGestureRecognizer
 {

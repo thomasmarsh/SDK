@@ -17,10 +17,9 @@
 #include "FiftyThreeSdk/Classification/Quadrature.h"
 
 using namespace Eigen;
-using namespace fiftythree::curves;
 
 namespace fiftythree {
-namespace classification {
+namespace sdk {
 
 ScoreCalibration::ScoreCalibration() {
 
@@ -378,7 +377,7 @@ IdTypeMap IsolatedStrokesClassifier::ReclassifyActiveTouches()
     else {
         for (int i=0; i<ids.size(); ++i) {
 
-            curves::Stroke::Ptr stroke = _clusterTracker->Stroke(ids[i]);
+            Stroke::Ptr stroke = _clusterTracker->Stroke(ids[i]);
 
             float score = Score(*stroke);
 
@@ -470,7 +469,7 @@ bool IsolatedStrokesClassifier::IsPalmCluster(Cluster::Ptr const & cluster)
 
 }
 
-float IsolatedStrokesClassifier::Score(curves::Stroke  & stroke)
+float IsolatedStrokesClassifier::Score(Stroke  & stroke)
 {
     int N = (int) stroke.Size();
     if(N < 3) return 1.5f;
@@ -508,14 +507,14 @@ Eigen::VectorXf IsolatedStrokesClassifier::ScoresForId(common::TouchId id) {
     // but my guess is that numbers are garbage
     //DebugAssert(stroke.Size() > 3);
 
-    curves::Stroke::Ptr stroke = _clusterTracker->Stroke(id);
+    Stroke::Ptr stroke = _clusterTracker->Stroke(id);
 
     Eigen::VectorXf baseScores(_scoreData->_statScoreCount);
     Eigen::VectorXf chosenScores(_scoreData->_chosenScoreCount);
     int lastIndex = isolatedBatchThresholds[_touchIdChunkData[id]->_index] - 1;
 
     Eigen::VectorXf s = stroke->ArclengthParameterMap(lastIndex);
-    if ( ( (curves::Diff(s)).array() <= 1e-4f ).any() ) {
+    if ( ( (Diff(s)).array() <= 1e-4f ).any() ) {
         // I've only seen this happen with palms, and it's very rare anyway (~ 1 / 3e4)
         chosenScores.fill(1e6f);
         return chosenScores;
@@ -551,7 +550,7 @@ Eigen::VectorXf IsolatedStrokesClassifier::ScoresForId(common::TouchId id) {
     MaxAndL2Norm(data, weights, baseScores, 2);
 
     // Acceleration orthogonalized against velocity
-    Eigen::MatrixX2f orthTemp = curves::OrthogonalizeXAgainstY(data, velocity);
+    Eigen::MatrixX2f orthTemp = OrthogonalizeXAgainstY(data, velocity);
     MaxAndL2Norm(orthTemp, weights, baseScores, 6);
 
     // Turn data to jerk
@@ -559,7 +558,7 @@ Eigen::VectorXf IsolatedStrokesClassifier::ScoresForId(common::TouchId id) {
     MaxAndL2Norm(data, weights, baseScores, 4);
 
     // Jerk orthogonalized against velocity
-    orthTemp = curves::OrthogonalizeXAgainstY(data, velocity);
+    orthTemp = OrthogonalizeXAgainstY(data, velocity);
 
     MaxAndL2Norm(orthTemp, weights, baseScores, 8);
 
@@ -627,7 +626,7 @@ Eigen::VectorXf IsolatedStrokesClassifier::ScoresForId(common::TouchId id) {
     //s = stroke->UpsampledArclengthParameterMap();
     //DebugAssert(s.size() == t.size());
 
-    baseScores(39) = curves::Variance(curves::Diff(s));
+    baseScores(39) = Variance(Diff(s));
 
     weights = TrapezoidRuleWeights(t);
     //std::vector<Eigen::VectorXf> stderivatives = CumNthDerivative(t, s, 3);
@@ -1037,10 +1036,10 @@ float IsolatedStrokesClassifier::LogMaxCurvature(common::TouchId id) {
 
     // Otherwise, we'll superscede the direct score computation because all
     // we need is the s(XY) map
-    curves::Stroke::Ptr stroke = _clusterTracker->Stroke(id);
+    Stroke::Ptr stroke = _clusterTracker->Stroke(id);
     Eigen::VectorXf s = stroke->ArclengthParameterMap(touchSize-1);
 
-    if ( ( (curves::Diff(s)).array() <= 1e-4f ).any() ) {
+    if ( ( (Diff(s)).array() <= 1e-4f ).any() ) {
         // Um...the max curvature is inf
         return std::log(1e6f);
     }
@@ -1058,7 +1057,7 @@ float IsolatedStrokesClassifier::NormalizedMaxCurvature(common::TouchId id) {
 
     int touchSize = TouchIdIsolatedSize(id);
 
-    curves::Stroke::Ptr stroke = _clusterTracker->Stroke(id);
+    Stroke::Ptr stroke = _clusterTracker->Stroke(id);
 
     float score = LogMaxCurvature(id);
     float L = stroke->ArcLength(touchSize-1);
@@ -1073,7 +1072,7 @@ int IsolatedStrokesClassifier::TouchIdIsolatedSize(common::TouchId id) {
 
     static float tol = 1e-6f;
 
-    curves::Stroke::Ptr const & stroke = _clusterTracker->Stroke(id);
+    Stroke::Ptr const & stroke = _clusterTracker->Stroke(id);
     int N = stroke->Size();
 
     if (N < 2) {
@@ -1109,7 +1108,7 @@ Eigen::VectorXf PolynomialModel::Evaluate(Eigen::VectorXf x) {
     x.array() -= _shift;
     x /= _scale;
 
-    Eigen::MatrixXf V = curves::VandermondeMatrix(x, _coefficients.rows()-1);
+    Eigen::MatrixXf V = VandermondeMatrix(x, _coefficients.rows()-1);
     std::cerr << "\nVandermonde = " << V;
     
     return (V*_coefficients).array();

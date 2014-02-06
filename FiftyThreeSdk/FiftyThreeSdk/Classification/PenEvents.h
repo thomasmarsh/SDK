@@ -18,7 +18,7 @@
 
 
 namespace fiftythree {
-namespace classification {
+namespace sdk {
 
 typedef std::pair<PenEventId, float> IdLikelihoodPair;
 

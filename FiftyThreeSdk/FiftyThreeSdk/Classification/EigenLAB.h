@@ -28,7 +28,7 @@
 
 namespace fiftythree
 {
-namespace curves
+namespace sdk
 {
     
 template<typename T>

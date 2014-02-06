@@ -16,10 +16,9 @@
 #include "FiftyThreeSdk/Classification/LinAlgHelpers.h"
 #include "FiftyThreeSdk/Classification/LineFitting.h"
 
-using namespace fiftythree::classification;
 
 namespace fiftythree {
-namespace classification {
+namespace sdk {
 namespace debug {
 
     Eigen::VectorXd StrokeT(int);

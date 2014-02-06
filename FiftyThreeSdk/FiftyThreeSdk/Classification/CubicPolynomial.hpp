@@ -15,7 +15,7 @@
 
 namespace fiftythree
 {
-namespace curves
+namespace sdk
 {
 /*
  This is a template class -- we care about 2 cases: T = float and T = Eigen::VectorNf where

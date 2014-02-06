@@ -23,14 +23,13 @@
 
 namespace fiftythree
 {
-namespace curves
+namespace sdk
 {
 
 // this is probably more for making the code self-documenting than anything else...
 DEFINE_ENUM(SamplingType,
             UniformInTime,
-            UniformInSpace
-            );
+            UniformInSpace);
 
 template <class DataType>
 class DataStream

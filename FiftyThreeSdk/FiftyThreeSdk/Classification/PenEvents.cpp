@@ -23,7 +23,7 @@
 using namespace Eigen;
 
 namespace fiftythree {
-namespace classification {
+namespace sdk {
 
 IdLikelihoodPair PenEventClassifier::BestPenDownEventForTouch(common::TouchId touchId, PenEventIdSet const &penDownEvents)
 {

@@ -18,7 +18,7 @@
 #include "FiftyThreeSdk/Classification/Cluster.h"
 
 namespace fiftythree {
-namespace classification {
+namespace sdk {
 
 typedef std::pair<TouchType, bool> TypeBoolPair;
     
@@ -171,7 +171,7 @@ protected:
 
     IdFloatMap _scores;
 
-    std::vector<bool> WeakClassifierNullPen(curves::Stroke &stroke);
+    std::vector<bool> WeakClassifierNullPen(Stroke &stroke);
 
     Eigen::VectorXf ArcLengthParameterization(Eigen::VectorXf t, Eigen::MatrixX2f xy);
 
@@ -195,7 +195,7 @@ public:
     IdTypeMap ReclassifyActiveTouches();
 
     float Score(common::TouchId id);
-    float Score(curves::Stroke  & stroke);
+    float Score(Stroke  & stroke);
 
     EdgeThumbState TestEdgeThumb(common::TouchId touchId);
     void           MarkEdgeThumbs();
@@ -285,14 +285,14 @@ public:
 // Actually it's L2 norm squared
 template<typename DerivedA, typename DerivedB, typename DerivedC>
 void MaxAndL2Norm(const Eigen::MatrixBase<DerivedA> &x, const Eigen::MatrixBase<DerivedB> &weights, Eigen::MatrixBase<DerivedC> &results, int startIndex) {
-    results(startIndex) = (typename DerivedC::Scalar) curves::RowwiseMaxNorm(x);
+    results(startIndex) = (typename DerivedC::Scalar) RowwiseMaxNorm(x);
     results(startIndex+1) = (typename DerivedC::Scalar) weights.dot(x.cwiseAbs2().rowwise().sum());
 }
 
 template<typename DerivedA, typename DerivedB>
 std::pair<typename DerivedA::Scalar, typename DerivedA::Scalar> MaxAndL2Norm(const Eigen::MatrixBase<DerivedA> &x, const Eigen::MatrixBase<DerivedB> &weights) {
     return std::pair<typename DerivedA::Scalar, typename DerivedA::Scalar>(
-            curves::RowwiseMaxNorm(x),
+            RowwiseMaxNorm(x),
             weights.dot(x.cwiseAbs2().rowwise().sum())
             );
 }

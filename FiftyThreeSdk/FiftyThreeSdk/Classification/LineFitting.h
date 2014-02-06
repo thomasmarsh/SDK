@@ -18,7 +18,7 @@
 using namespace Eigen;
 
 namespace fiftythree {
-namespace classification {
+namespace sdk {
 
 template<typename T>
 class Geometric2DLine {
@@ -68,7 +68,7 @@ public:
 
         _orientation(0) = a;
         _orientation(1) = b;
-        curves::NormalizeVectorInPlace(_orientation);
+        NormalizeVectorInPlace(_orientation);
 
         SetDirectionFromOrientation();
 
@@ -79,7 +79,7 @@ public:
         _offset(c),
         _direction(direction)
     {
-        curves::NormalizeVectorInPlace(_direction);
+        NormalizeVectorInPlace(_direction);
 
         SetOrientationFromDirection();
     }
@@ -88,7 +88,7 @@ public:
     Geometric2DLine(const Eigen::Matrix<T, 1, 2> &direction, const Eigen::Matrix<T, 1, 2> &point):
         _direction(direction)
     {
-        curves::NormalizeVectorInPlace(_direction);
+        NormalizeVectorInPlace(_direction);
         SetOrientationFromDirection();
 
         SetOffsetFromNewPoint(point);
@@ -101,7 +101,7 @@ public:
 
         _orientation(0) = coeffs(0);
         _orientation(1) = coeffs(1);
-        curves::NormalizeVectorInPlace(_orientation);
+        NormalizeVectorInPlace(_orientation);
 
         SetDirectionFromOrientation();
     }
@@ -122,7 +122,7 @@ public:
     // obvious what this does geometrically. Child classes use this to more sensible effect.
     void SetDirection(const Eigen::Matrix<T, 1, 2> &direction) {
         _direction = direction;
-        curves::NormalizeVectorInPlace(_direction);
+        NormalizeVectorInPlace(_direction);
         SetOrientationFromDirection();
     }
 
@@ -139,11 +139,11 @@ public:
     }
 
     bool IsLineVertical() {
-        return curves::IsFPZero(_direction(0));
+        return IsFPZero(_direction(0));
     }
 
     bool IsLineHorizontal() {
-        return curves::IsFPZero(_direction(1));
+        return IsFPZero(_direction(1));
     }
 
     // Evaluates y = -1/b*(c + a*x);
@@ -434,8 +434,8 @@ Geometric2DLine<typename DerivedA::Scalar> GeometricLeastSquaresLineFit(const Ma
     DataT yMean = XY.block(0,1,N,1).array().mean();
     DataVector X = XY.block(0,0,N,1).array() - xMean;
     DataVector Y = XY.block(0,1,N,1).array() - yMean;
-    A(0,0) = curves::SquaredNorm(X);
-    A(1,1) = curves::SquaredNorm(Y);
+    A(0,0) = SquaredNorm(X);
+    A(1,1) = SquaredNorm(Y);
     A(0,1) = X.dot(Y);
     A(1,0) = A(0,1);
 
@@ -499,8 +499,8 @@ Geometric2DLine<typename DerivedA::Scalar> GeometricLeastSquaresLineFit(const Ma
     Y = Y.cwiseProduct(sqrtWeights);
 
     Eigen::Matrix<DataT, 2, 2> A;
-    A(0,0) = curves::SquaredNorm(X);
-    A(1,1) = curves::SquaredNorm(Y);
+    A(0,0) = SquaredNorm(X);
+    A(1,1) = SquaredNorm(Y);
     A(0,1) = X.dot(Y);
     A(1,0) = A(0,1);
 
@@ -559,7 +559,7 @@ Geometric2DLine<typename DerivedA::Scalar> GeometricLeastSquaresLineFit(const Ma
         return Geometric2DLine<DataT>(coeffs);
     }
 
-    Eigen::Matrix<DataT, 1, 2> XYMean = curves::WeightedMean(XY, weights);
+    Eigen::Matrix<DataT, 1, 2> XYMean = WeightedMean(XY, weights);
 
     Geometric2DLine<DataT> output = GeometricLeastSquaresLineFit(XY, sqrtWeights, XYMean, residualNorm);
 
@@ -658,7 +658,7 @@ LinearlyParameterized2DLine<typename DerivedD::Scalar> LeastSquaresLinearlyParam
 
     DataVector sqrtWeights = ( weights.array().sqrt() ).template cast<DataT>();
 
-    Eigen::Matrix<DataT, 1, 2> XYMean = curves::WeightedMean(XY, weights);
+    Eigen::Matrix<DataT, 1, 2> XYMean = WeightedMean(XY, weights);
 
     // First find line:
     Geometric2DLine<DataT> line = GeometricLeastSquaresLineFit(XY, sqrtWeights, XYMean);
@@ -793,7 +793,7 @@ QuadraticallyParameterized2DLine<typename DerivedD::Scalar> LeastSquaresQuadrati
     int N = XY.rows();
 
     DataVector sqrtWeights = ( weights.array().sqrt() ).template cast<DataT>();
-    Eigen::Matrix<DataT, 1, 2> XYMean = curves::WeightedMean(XY, weights);
+    Eigen::Matrix<DataT, 1, 2> XYMean = WeightedMean(XY, weights);
 
     // First find line:
     Geometric2DLine<DataT> line = GeometricLeastSquaresLineFit(XY, sqrtWeights, XYMean);

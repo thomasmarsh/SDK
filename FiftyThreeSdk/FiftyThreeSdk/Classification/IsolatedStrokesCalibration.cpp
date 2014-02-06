@@ -18,7 +18,7 @@
 using namespace Eigen;
 
 namespace fiftythree {
-namespace classification {
+namespace sdk {
 
 void IsolatedStrokesClassifier::InitializeLikelihoods() {
 

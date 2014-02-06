@@ -19,7 +19,7 @@ using std::vector;
 
 namespace fiftythree
 {
-namespace curves
+namespace sdk
 {
     
 

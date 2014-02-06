@@ -11,9 +11,8 @@
 
 
 
-using namespace fiftythree::classification;
 using namespace fiftythree::common;
-using namespace fiftythree::curves;
+using namespace fiftythree::sdk;
 
 TouchType DumbStylusClassifier::ClusterType(ClusterId clusterId)
 {

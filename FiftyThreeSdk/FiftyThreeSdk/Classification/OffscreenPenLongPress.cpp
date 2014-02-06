@@ -33,7 +33,7 @@ dispatch_source_t CreateDispatchTimer(uint64_t interval,
 
 namespace fiftythree
 {
-namespace classification
+namespace sdk
 {
     
 OffscreenPenLongPressGestureRecognizer::~OffscreenPenLongPressGestureRecognizer()

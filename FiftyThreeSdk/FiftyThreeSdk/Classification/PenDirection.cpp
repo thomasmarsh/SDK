@@ -19,7 +19,7 @@ using namespace Eigen;
 
 namespace fiftythree
 {
-namespace classification
+namespace sdk
 {
 
 void PenTracker::UpdateLocations()
@@ -79,7 +79,7 @@ void PenTracker::UpdateLocations()
         
         VectorXf evalWeight(1);
         evalWeight[0] = wEval;
-        std::vector<Vector2f> weightedMedianPalm = curves::Interp< std::vector<Vector2f> >(wPalm, clusterCenters, evalWeight);
+        std::vector<Vector2f> weightedMedianPalm = Interp< std::vector<Vector2f> >(wPalm, clusterCenters, evalWeight);
 
         medianPalm = weightedMedianPalm[0];
     }
@@ -94,8 +94,8 @@ void PenTracker::UpdateLocations()
             continue;
         }
         
-        curves::Stroke::Ptr stroke           = _clusterTracker->Stroke(cluster._touchIds.back());
-        curves::StrokeStatistics::cPtr stats = stroke->Statistics();
+        Stroke::Ptr stroke           = _clusterTracker->Stroke(cluster._touchIds.back());
+        StrokeStatistics::cPtr stats = stroke->Statistics();
         
         float palmWeight = 0.0f;
         float penWeight  = 0.0f;
@@ -253,8 +253,8 @@ void PenTracker::UpdateLocations()
     // force the pen to stay on screen.
     Vector2f penLocation = PenLocation();
 
-    float screenWidth  = fiftythree::curves::Screen::MainScreen()._widthInPoints;
-    float screenHeight = fiftythree::curves::Screen::MainScreen()._widthInPoints;
+    float screenWidth  = Screen::MainScreen()._widthInPoints;
+    float screenHeight = Screen::MainScreen()._widthInPoints;
     
     _penDisplacement.x() = std::max(0.0f, std::min(screenWidth,  penLocation.x())) - _palmLocation.x();
     _penDisplacement.y() = std::max(0.0f, std::min(screenHeight, penLocation.y())) - _palmLocation.y();
@@ -477,7 +477,7 @@ Eigen::VectorXf PenTracker::UpdateDirectionPrior(std::vector<Cluster::Ptr> const
         }
         
         // an increasing vector starting at zero, providing an arclength coordinate on the curve
-        VectorXf arcLength = curves::CumSum0NormDiff(clusterCenters);
+        VectorXf arcLength = CumSum0NormDiff(clusterCenters);
         
 
         

@@ -48,13 +48,11 @@
 
 namespace fiftythree
 {
-namespace classification
+namespace sdk
 {
 
 static const char *kClassifierUseCancelledTouch = "classifierUseCancelled";
-
-    
-    
+   
 struct TouchStatistics
 {
     float _penDownDeltaT;
@@ -153,7 +151,7 @@ public:
     
     bool IsAnySwitchDown();
     
-    bool IsReclassifiable(common::Touch::Ptr const & touch, curves::Stroke::Ptr const &stroke);
+    bool IsReclassifiable(common::Touch::Ptr const & touch, Stroke::Ptr const &stroke);
 
     void RemoveEdgeThumbs();
     

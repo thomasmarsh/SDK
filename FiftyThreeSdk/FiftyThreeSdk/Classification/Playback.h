@@ -15,7 +15,7 @@
 
 namespace fiftythree
 {
-namespace classification
+namespace sdk
 {
 
 DEFINE_ENUM(PlaybackEntryType,

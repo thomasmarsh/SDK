@@ -22,7 +22,7 @@
 #include <boost/tuple/tuple.hpp>
 
 namespace fiftythree {
-namespace classification {
+namespace sdk {
 
 /*
  Cluster is the basic object we store.  _center is not actually the center of mass.
@@ -475,7 +475,7 @@ public:
     
     //bool                             ContainsTouchWithId(common::TouchId touchId);
     
-    curves::Stroke::Ptr const &      Stroke(common::TouchId id);
+    Stroke::Ptr const &      Stroke(common::TouchId id);
     
     //std::vector<curves::Stroke::Ptr> Stroke(TouchIdVector ids);
     

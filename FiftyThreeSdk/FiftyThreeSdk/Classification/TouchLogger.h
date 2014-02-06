@@ -16,7 +16,7 @@
 #include "FiftyThreeSdk/Classification/Stroke.h"
 
 namespace fiftythree {
-namespace classification {
+namespace sdk {
 
 typedef std::pair<common::TouchId, bool> IdBoolPair;
 typedef std::vector<common::TouchId> TouchIdVector;
@@ -35,7 +35,7 @@ protected:
     common::TouchId     _touchId;
     common::TouchPhase  _phase;
 
-    curves::Stroke::Ptr _stroke;
+    Stroke::Ptr _stroke;
     common::Touch::Ptr  _touch;
 
     ClusterPtr          _cluster;
@@ -61,19 +61,19 @@ protected:
 public:
 
     static TouchData::Ptr New(common::TouchId touchId,
-                              curves::Stroke::Ptr stroke,
+                              Stroke::Ptr stroke,
                               common::TouchPhase phase,
                               double beganTime);
     static TouchData::Ptr New();
 
     TouchData();
     TouchData(common::TouchId id,
-              curves::Stroke::Ptr stroke,
+              Stroke::Ptr stroke,
               common::TouchPhase phase,
               double beganTime);
 
     void SetPhase(common::TouchPhase phase);
-    void SetStroke(curves::Stroke::Ptr stroke);
+    void SetStroke(Stroke::Ptr stroke);
     void SetId(common::TouchId id);
 
     void SetIsolatedIncrementalUpdateIndex(int index) {
@@ -123,7 +123,7 @@ public:
 
     common::TouchPhase  Phase();
     common::TouchPhase  Phase(int idx);
-    curves::Stroke::Ptr const & Stroke();
+    Stroke::Ptr const & Stroke();
     common::TouchId     Id();
 
     common::Touch::Ptr const & Touch()
@@ -327,8 +327,8 @@ public:
     common::Touch::Ptr const &       TouchWithId(common::TouchId touchId);
     bool                             ContainsTouchWithId(common::TouchId touchId);
 
-    curves::Stroke::Ptr const &      Stroke(common::TouchId id);
-    std::vector<curves::Stroke::Ptr> Stroke(TouchIdVector ids);
+    Stroke::Ptr const &      Stroke(common::TouchId id);
+    std::vector<Stroke::Ptr> Stroke(TouchIdVector ids);
     
     ClusterPtr                       Cluster(common::TouchId touchId);
 

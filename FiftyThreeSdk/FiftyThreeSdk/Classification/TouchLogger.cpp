@@ -28,10 +28,9 @@
 
 
 using namespace fiftythree::common;
-using namespace fiftythree::common;
 
 namespace fiftythree {
-namespace classification {
+namespace sdk {
 
 //
 //                  TouchData public methods                      //
@@ -42,7 +41,7 @@ void TouchData::SetPhase(common::TouchPhase phase) {
     _phase = phase;
 }
 
-void TouchData::SetStroke(curves::Stroke::Ptr stroke) {
+void TouchData::SetStroke(Stroke::Ptr stroke) {
     _stroke = stroke;
 }
 
@@ -72,7 +71,7 @@ common::TouchPhase TouchData::Phase(int idx) {
     
 
 
-curves::Stroke::Ptr const & TouchData::Stroke()
+Stroke::Ptr const & TouchData::Stroke()
 {
     return _stroke;
 }
@@ -98,7 +97,7 @@ Eigen::Vector2f TouchData::FirstPoint() {
 }
 
 TouchData::Ptr TouchData::New(common::TouchId touchId,
-                              curves::Stroke::Ptr stroke,
+                              Stroke::Ptr stroke,
                               common::TouchPhase phase,
                               double beganTime)
 {
@@ -112,7 +111,7 @@ TouchData::Ptr TouchData::New() {
     return TouchData::Ptr();
 }
 
-TouchData::TouchData(common::TouchId touchId, curves::Stroke::Ptr stroke,
+TouchData::TouchData(common::TouchId touchId, Stroke::Ptr stroke,
                      common::TouchPhase phase, double beganTime)
 {
     _beganTime   = beganTime;
@@ -130,7 +129,7 @@ TouchData::TouchData(common::TouchId touchId, curves::Stroke::Ptr stroke,
 TouchData::TouchData() {
     _phase = common::TouchPhase::Unknown;
     _touchId =  InvalidTouchId();
-    _stroke = curves::Stroke::Ptr();
+    _stroke = Stroke::Ptr();
 
     _beganTime = -Inf;
 }
@@ -296,7 +295,7 @@ void TouchLogger::TouchesChanged(const std::set<common::Touch::Ptr> & touches) {
                 // something else moves or otherwise changes.
                 if (_touchData.count(touch->Id()) == 0)
                 {
-                    curves::Stroke::Ptr stroke = curves::Stroke::New();
+                    Stroke::Ptr stroke = Stroke::New();
                     double timestamp    = touch->CurrentSample().TimestampSeconds();
                     Eigen::Vector2f xy  = touch->CurrentSample().Location();
 
@@ -386,7 +385,7 @@ void TouchLogger::TouchesChanged(const std::set<common::Touch::Ptr> & touches) {
                             double timestamp    = touch->CurrentSample().TimestampSeconds();
                             Eigen::Vector2f xy  = touch->CurrentSample().Location();
                             
-                            curves::Stroke::Ptr stroke = touchData->Stroke();
+                            Stroke::Ptr stroke = touchData->Stroke();
                             
                             if(timestamp > touchData->LastTimestamp() + .001)
                             {
@@ -454,7 +453,7 @@ void TouchLogger::TouchesChanged(const std::set<common::Touch::Ptr> & touches) {
                     double timestamp    = touch->CurrentSample().TimestampSeconds();
                     Eigen::Vector2f xy  = touch->CurrentSample().Location();
 
-                    curves::Stroke::Ptr stroke = touchData->Stroke();
+                    Stroke::Ptr stroke = touchData->Stroke();
 
                     touchData->SetEndedTime(timestamp);
 
@@ -789,7 +788,7 @@ ClusterPtr       TouchLogger::Cluster(common::TouchId touchId)
 }
 
     
-curves::Stroke::Ptr const & TouchLogger::Stroke(common::TouchId id) {
+Stroke::Ptr const & TouchLogger::Stroke(common::TouchId id) {
 
     if(_touchData.count(id))
     {
@@ -798,15 +797,15 @@ curves::Stroke::Ptr const & TouchLogger::Stroke(common::TouchId id) {
     else
     {
         DebugAssert(false);
-        static curves::Stroke::Ptr errorCase;
+        static Stroke::Ptr errorCase;
         return errorCase;
     }
 
 }
 
-std::vector<curves::Stroke::Ptr> TouchLogger::Stroke(TouchIdVector ids) {
+std::vector<Stroke::Ptr> TouchLogger::Stroke(TouchIdVector ids) {
 
-    std::vector<curves::Stroke::Ptr> strokes;
+    std::vector<Stroke::Ptr> strokes;
     strokes.clear();
 
     for (int i=0; i<ids.size(); ++i)
@@ -1434,7 +1433,7 @@ void TouchLogger::InsertStroke(common::TouchId touchId, Eigen::VectorXd t, Eigen
     Eigen::Vector2f xy;
 
     if (! IsIdLogged(touchId) ) {
-        curves::Stroke::Ptr stroke = curves::Stroke::New();
+        Stroke::Ptr stroke = Stroke::New();
 
         xy(0) = x(startIndex);
         xy(1) = y(startIndex);

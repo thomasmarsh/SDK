@@ -15,7 +15,7 @@
 using fiftythree::common::TouchId;
 
 namespace fiftythree {
-namespace classification {
+namespace sdk {
 namespace debug {
 
 Eigen::VectorXd StrokeT(int strokeId) {
@@ -293,7 +293,7 @@ void WeakScoreTest(TouchLogger* touchLog, IsolatedStrokesClassifier* isolatedStr
 
     touchLog->InsertStroke(touchId, t, x, y);
     //isolatedStrokesClassifier->UpdateIsolatedScores(touchId);
-    curves::Stroke::Ptr stroke = touchLog->Stroke(touchId);
+    Stroke::Ptr stroke = touchLog->Stroke(touchId);
 
     Eigen::VectorXf scores = isolatedStrokesClassifier->ScoresForId(touchId);
 
@@ -313,7 +313,7 @@ void ChosenWeakScoreTest(TouchLogger* touchLog, IsolatedStrokesClassifier* isola
     Eigen::VectorXf y = StrokeY(2);
 
     touchLog->InsertStroke(touchId, t, x, y);
-    curves::Stroke::Ptr stroke = touchLog->Stroke(touchId);
+    Stroke::Ptr stroke = touchLog->Stroke(touchId);
 
     Eigen::VectorXf scores = isolatedStrokesClassifier->ScoresForId(touchId);
 
@@ -494,7 +494,7 @@ void ScoreOutput(TouchLogger* touchLog, IsolatedStrokesClassifier* isolatedStrok
     Eigen::VectorXf y = StrokeY(2);
 
     touchLog->InsertStroke(touchId, t, x, y);
-    curves::Stroke::Ptr stroke = touchLog->Stroke(touchId);
+    Stroke::Ptr stroke = touchLog->Stroke(touchId);
 
     Eigen::MatrixX2f ll = isolatedStrokesClassifier->StrokeLogLikelihoods(touchId);
     Eigen::VectorXf scores = isolatedStrokesClassifier->ScoresForId(touchId);

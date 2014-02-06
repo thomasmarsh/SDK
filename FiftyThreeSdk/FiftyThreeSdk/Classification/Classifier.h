@@ -8,7 +8,6 @@
 #pragma once
 
 #include "Common/Memory.h"
-
 #include "Common/Enum.h"
 #include "Common/Event.hpp"
 #include "Common/Touch/Touch.h"
@@ -16,7 +15,7 @@
 
 namespace fiftythree
 {
-namespace classification
+namespace sdk
 {
 DEFINE_ENUM(TouchType,
             Unknown,

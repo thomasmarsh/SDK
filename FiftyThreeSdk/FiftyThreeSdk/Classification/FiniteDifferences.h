@@ -13,6 +13,7 @@
 // All we need is a floating-point factorial, so just implement in here
 //#include <boost/math/special_functions/factorials.hpp>
 
+#include <Eigen/Geometry>
 #include <typeinfo>
 #include <boost/foreach.hpp>
 
@@ -22,7 +23,7 @@
 using namespace Eigen;
 
 namespace fiftythree {
-namespace classification {
+namespace sdk {
     
 typedef std::pair < int, std::vector < int > > LocationStencilPair;
 typedef std::vector < LocationStencilPair > BoundaryStencil;
@@ -46,8 +47,8 @@ T Factorial(const int &num) {
 // Computes (order-1) piecewise cross-validation error from the order'th 
 // derivative. E.g. for order=2 we get a piecewise-linear deviation.
 template<typename DerivedA, typename DerivedB>
-void NthDerivativeToCrossValidation(const Map<DerivedA> &x, 
-                                    Map<DerivedB> &derivative,
+    void NthDerivativeToCrossValidation(const Eigen::Map<DerivedA> &x,
+                                    Eigen::Map<DerivedB> &derivative,
                                     const int &order) {
 
     DebugAssert(x.cols() == 1);
@@ -114,22 +115,22 @@ void NthDerivativeToCrossValidation(const Map<DerivedA> &x,
 
 }
 
-// Method for MatrixBase's
+// Method for Eigen::MatrixBase's
 template<typename DerivedA, typename DerivedB>
-void NthDerivativeToCrossValidation(const MatrixBase<DerivedA> &x, 
-                                    MatrixBase<DerivedB> &derivative,
+void NthDerivativeToCrossValidation(const Eigen::MatrixBase<DerivedA> &x,
+                                    Eigen::MatrixBase<DerivedB> &derivative,
                                     const int &order) {
 
-    Map<DerivedA> mapX((typename DerivedA::Scalar*) &x(0), x.rows(), x.cols());
-    Map<DerivedB> mapDerivative((typename DerivedB::Scalar*) &derivative(0), derivative.rows(), derivative.cols());
+    Eigen::Map<DerivedA> mapX((typename DerivedA::Scalar*) &x(0), x.rows(), x.cols());
+    Eigen::Map<DerivedB> mapDerivative((typename DerivedB::Scalar*) &derivative(0), derivative.rows(), derivative.cols());
 
     NthDerivativeToCrossValidation<DerivedA, DerivedB>(mapX, mapDerivative, order);
 
 }
 
 template<typename DerivedA, typename DerivedB>
-void NthDerivativeFromCrossValidation(const Map<DerivedA> &x, 
-                                      Map<DerivedB> &derivative,
+void NthDerivativeFromCrossValidation(const Eigen::Map<DerivedA> &x,
+                                      Eigen::Map<DerivedB> &derivative,
                                       const int &order) {
 
     DebugAssert(x.cols() == 1);
@@ -198,14 +199,14 @@ void NthDerivativeFromCrossValidation(const Map<DerivedA> &x,
 
 }
 
-// Method for MatrixBase's
+// Method for Eigen::MatrixBase's
 template<typename DerivedA, typename DerivedB>
-void NthDerivativeFromCrossValidation(const MatrixBase<DerivedA> &x, 
-                                      MatrixBase<DerivedB> &derivative,
+void NthDerivativeFromCrossValidation(const Eigen::MatrixBase<DerivedA> &x, 
+                                      Eigen::MatrixBase<DerivedB> &derivative,
                                       const int &order) {
 
-    Map<DerivedA> mapX((typename DerivedA::Scalar*) &x(0), x.rows(), x.cols());
-    Map<DerivedB> mapDerivative((typename DerivedB::Scalar*) &derivative(0), derivative.rows(), derivative.cols());
+    Eigen::Map<DerivedA> mapX((typename DerivedA::Scalar*) &x(0), x.rows(), x.cols());
+    Eigen::Map<DerivedB> mapDerivative((typename DerivedB::Scalar*) &derivative(0), derivative.rows(), derivative.cols());
 
     NthDerivativeFromCrossValidation<DerivedA, DerivedB>(mapX, mapDerivative, order);
 
@@ -220,8 +221,8 @@ void NthDerivativeFromCrossValidation(const MatrixBase<DerivedA> &x,
 //
 // Divides each column of y by an abscissa quotient
 template<typename DerivedA, typename DerivedB>
-void ColumnWiseDividedDifferenceDivision(const MatrixBase<DerivedA> &x,
-                                         MatrixBase<DerivedB> &y, 
+void ColumnWiseDividedDifferenceDivision(const Eigen::MatrixBase<DerivedA> &x,
+                                         Eigen::MatrixBase<DerivedB> &y, 
                                          const int &startIndex,
                                          const int &nRows,
                                          const int &xLeftOffset,
@@ -237,9 +238,9 @@ for (int i = 0; i < y.cols(); ++i) {
 // Uses the given indices to determine which interior nodes need to be updated, and also
 // divides by certain x-differences dependent on n.
 template<typename DerivedA, typename DerivedB>
-void LeftwardDividedDifference(const MatrixBase<DerivedA> &x, 
-                               MatrixBase<DerivedB> &output, 
-                               MatrixBase<DerivedB> &tempStorage, 
+void LeftwardDividedDifference(const Eigen::MatrixBase<DerivedA> &x, 
+                               Eigen::MatrixBase<DerivedB> &output, 
+                               Eigen::MatrixBase<DerivedB> &tempStorage, 
                                const int &n,
                                const int &xLeftOffset, 
                                const int &xRightOffset, 
@@ -258,9 +259,9 @@ void LeftwardDividedDifference(const MatrixBase<DerivedA> &x,
 // Uses the given indices to determine which interior nodes need to be updated, and also
 // divides by certain x-differences dependent on n.
 template<typename DerivedA, typename DerivedB>
-void RightwardDividedDifference(const MatrixBase<DerivedA> &x, 
-                                MatrixBase<DerivedB> &output, 
-                                MatrixBase<DerivedB> &tempStorage, 
+void RightwardDividedDifference(const Eigen::MatrixBase<DerivedA> &x, 
+                                Eigen::MatrixBase<DerivedB> &output, 
+                                Eigen::MatrixBase<DerivedB> &tempStorage, 
                                 const int &n,
                                 const int &xLeftOffset, 
                                 const int &xRightOffset, 
@@ -277,7 +278,7 @@ void RightwardDividedDifference(const MatrixBase<DerivedA> &x,
 
 // Copies central edge values to all boundary locations
 template<typename Derived>
-void PostDifferencingBoundaryCopying(MatrixBase<Derived> &output, 
+void PostDifferencingBoundaryCopying(Eigen::MatrixBase<Derived> &output, 
                                      const int &xLeftOffset, 
                                      const int &xRightOffset, 
                                      const int &M,
@@ -297,7 +298,7 @@ void PostDifferencingBoundaryCopying(MatrixBase<Derived> &output,
 
 // Performs factorial normalization
 template<typename Derived>
-void PostDifferencingDerivativeNormalization(MatrixBase<Derived> &output, 
+void PostDifferencingDerivativeNormalization(Eigen::MatrixBase<Derived> &output, 
                                              const int &currentN, 
                                              const int &N) {
 
@@ -319,8 +320,8 @@ void PostDifferencingDerivativeNormalization(MatrixBase<Derived> &output,
 // E.g. IncrementalDerivative(x, y, 1, 2) assumes y is a first derivative and 
 // overwrites it with the second derivative.
 template<typename DerivedA, typename DerivedB>
-void IncrementalDerivative(const MatrixBase<DerivedA> &x,
-                           MatrixBase<DerivedB> &y,
+void IncrementalDerivative(const Eigen::MatrixBase<DerivedA> &x,
+                           Eigen::MatrixBase<DerivedB> &y,
                            const int &currentN,
                            const int &N) {
 
@@ -377,9 +378,9 @@ void IncrementalDerivative(const MatrixBase<DerivedA> &x,
 // This sacrifices a lot of flexibility for more general procedures but is quite fast.
 // The powerhouse behind this is divided differences
 template<typename DerivedA, typename DerivedB>
-void Derivative(const MatrixBase<DerivedA> &x,
-                const MatrixBase<DerivedB> &y,
-                MatrixBase<DerivedB> &output,
+void Derivative(const Eigen::MatrixBase<DerivedA> &x,
+                const Eigen::MatrixBase<DerivedB> &y,
+                Eigen::MatrixBase<DerivedB> &output,
                 const int &N) {
 
     output = y;
@@ -392,8 +393,8 @@ void Derivative(const MatrixBase<DerivedA> &x,
 
 // Requires t.rows() == xy.rows()
 template<typename DerivedA, typename DerivedB>
-DerivedB JerkOrthogonalToVelocity(const MatrixBase<DerivedA> &t,
-                                  const MatrixBase<DerivedB> &xy) {
+DerivedB JerkOrthogonalToVelocity(const Eigen::MatrixBase<DerivedA> &t,
+                                  const Eigen::MatrixBase<DerivedB> &xy) {
 
     //DerivedB velocity = NthDerivative(t, xy, 1);
     //DerivedB jerk = NthDerivative(t, xy, 3);
@@ -427,8 +428,8 @@ DerivedB JerkOrthogonalToVelocity(const MatrixBase<DerivedA> &t,
 
     
 template<typename DerivedA, typename DerivedB>
-DerivedB D4OrthogonalToVelocity(const MatrixBase<DerivedA> &t,
-                                const MatrixBase<DerivedB> &xy) {
+DerivedB D4OrthogonalToVelocity(const Eigen::MatrixBase<DerivedA> &t,
+                                const Eigen::MatrixBase<DerivedB> &xy) {
     
     //DerivedB velocity = NthDerivative(t, xy, 1);
     //DerivedB d4 = NthDerivative(t, xy, 4);
@@ -466,8 +467,8 @@ DerivedB D4OrthogonalToVelocity(const MatrixBase<DerivedA> &t,
 }
     
 template<typename DerivedA, typename DerivedB>
-DerivedB D2OrthogonalToVelocity(const MatrixBase<DerivedA> &t,
-                                const MatrixBase<DerivedB> &xy) {
+DerivedB D2OrthogonalToVelocity(const Eigen::MatrixBase<DerivedA> &t,
+                                const Eigen::MatrixBase<DerivedB> &xy) {
     
     //DerivedB velocity = NthDerivative(t, xy, 1);
     //DerivedB d2 = NthDerivative(t, xy, 2);

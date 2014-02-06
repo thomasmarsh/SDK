@@ -13,7 +13,7 @@ using namespace Eigen;
 
 namespace fiftythree
 {
-namespace curves
+namespace sdk
 {
 
 float Stroke::ArcLength() const
@@ -244,11 +244,11 @@ void Stroke::UpdateSummaryStatistics()
         DebugAssert( (t.tail(t.size()-1) - t.head(t.size()-1)).minCoeff() > .0001f );
         
         MatrixX2f velocity;
-        classification::Derivative(t, xy, velocity, 1);
+        Derivative(t, xy, velocity, 1);
 
-        MatrixX2f answer2    = classification::D2OrthogonalToVelocity(t, xy);
-        MatrixX2f answer3    = classification::JerkOrthogonalToVelocity(t, xy);
-        MatrixX2f answer4    = classification::D4OrthogonalToVelocity(t, xy);
+        MatrixX2f answer2    = D2OrthogonalToVelocity(t, xy);
+        MatrixX2f answer3    = JerkOrthogonalToVelocity(t, xy);
+        MatrixX2f answer4    = D4OrthogonalToVelocity(t, xy);
 
         float L = _statistics->_arcLength;
         
@@ -726,7 +726,7 @@ Stride2Map Stroke::YMap(Interval const & I) const
 // extracting a substroke and calling ArcLength is not fast enough for real-time
 // computation of speeds.  the safe accessors are not fast enough either.
 // using vectorized Eigen might be faster, but this is more than adequate.
-float Stroke::SegmentLength(fiftythree::curves::Interval const &I)
+float Stroke::SegmentLength(fiftythree::sdk::Interval const &I)
 {
     if (Size() < 2)
     {

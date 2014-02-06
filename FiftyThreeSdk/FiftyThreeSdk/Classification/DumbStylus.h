@@ -20,7 +20,7 @@
 #include <boost/tuple/tuple.hpp>
 
 namespace fiftythree {
-namespace classification {
+namespace sdk {
 
 class DumbStylusClassifier
 {

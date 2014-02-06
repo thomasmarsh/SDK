@@ -25,7 +25,7 @@
 
 namespace fiftythree
 {
-namespace curves
+namespace sdk
 {
     
 struct StrokeStatistics
@@ -252,7 +252,7 @@ public:
 
     //double             _t0;
 
-    classification::TouchType _touchType;
+    fiftythree::sdk::TouchType _touchType;
     
     SamplingType _samplingType;
     float        _XYSamplesPerSecond;
