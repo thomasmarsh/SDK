@@ -7,10 +7,10 @@
 //
 
 #include <ctime>
-#include "Debug.h"
-#include "FiniteDifferences.h"
-#include "Curves/Stroke.h"
-#include "Curves/EigenLAB.h"
+#include "FiftyThreeSdk/Classification/Debug.h"
+#include "FiftyThreeSdk/Classification/FiniteDifferences.h"
+#include "FiftyThreeSdk/Classification//Stroke.h"
+#include "FiftyThreeSdk/Classification//EigenLAB.h"
 
 using fiftythree::common::TouchId;
 

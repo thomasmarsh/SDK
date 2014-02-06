@@ -12,9 +12,9 @@
 #pragma once
 
 #include <iostream>
-#include "IsolatedStrokes.h"
-#include "LinAlgHelpers.h"
-#include "LineFitting.h"
+#include "FiftyThreeSdk/Classification/IsolatedStrokes.h"
+#include "FiftyThreeSdk/Classification/LinAlgHelpers.h"
+#include "FiftyThreeSdk/Classification/LineFitting.h"
 
 using namespace fiftythree::classification;
 

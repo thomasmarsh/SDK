@@ -7,6 +7,27 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0416CABA18A42B51004EAC00 /* ClassificationProxy.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0416CA8B18A42B51004EAC00 /* ClassificationProxy.cpp */; };
+		0416CABB18A42B51004EAC00 /* Cluster.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0416CA8E18A42B51004EAC00 /* Cluster.cpp */; };
+		0416CABC18A42B51004EAC00 /* Debug.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0416CA9418A42B51004EAC00 /* Debug.cpp */; };
+		0416CABD18A42B51004EAC00 /* DumbStylus.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0416CA9618A42B51004EAC00 /* DumbStylus.cpp */; };
+		0416CABE18A42B51004EAC00 /* EigenLAB.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0416CA9818A42B51004EAC00 /* EigenLAB.cpp */; };
+		0416CABF18A42B51004EAC00 /* FiniteDifferences.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0416CA9A18A42B51004EAC00 /* FiniteDifferences.cpp */; };
+		0416CAC018A42B51004EAC00 /* Helpers.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0416CA9D18A42B51004EAC00 /* Helpers.mm */; };
+		0416CAC118A42B51004EAC00 /* IsolatedStrokes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0416CA9F18A42B51004EAC00 /* IsolatedStrokes.cpp */; };
+		0416CAC218A42B51004EAC00 /* IsolatedStrokesCalibration.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0416CAA118A42B51004EAC00 /* IsolatedStrokesCalibration.cpp */; };
+		0416CAC318A42B51004EAC00 /* LinAlgHelpers.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0416CAA218A42B51004EAC00 /* LinAlgHelpers.cpp */; };
+		0416CAC418A42B51004EAC00 /* LineFitting.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0416CAA418A42B51004EAC00 /* LineFitting.cpp */; };
+		0416CAC518A42B51004EAC00 /* OffscreenPenLongPress.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0416CAA618A42B51004EAC00 /* OffscreenPenLongPress.cpp */; };
+		0416CAC618A42B51004EAC00 /* PenDirection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0416CAA818A42B51004EAC00 /* PenDirection.cpp */; };
+		0416CAC718A42B51004EAC00 /* PenEvents.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0416CAAA18A42B51004EAC00 /* PenEvents.cpp */; };
+		0416CAC818A42B51004EAC00 /* Performance.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0416CAAC18A42B51004EAC00 /* Performance.cpp */; };
+		0416CAC918A42B51004EAC00 /* Playback.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0416CAAE18A42B51004EAC00 /* Playback.cpp */; };
+		0416CACA18A42B51004EAC00 /* Quadrature.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0416CAB018A42B51004EAC00 /* Quadrature.cpp */; };
+		0416CACB18A42B51004EAC00 /* Screen.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0416CAB218A42B51004EAC00 /* Screen.cpp */; };
+		0416CACC18A42B51004EAC00 /* Stroke.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0416CAB418A42B51004EAC00 /* Stroke.cpp */; };
+		0416CACD18A42B51004EAC00 /* TouchLogger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0416CAB618A42B51004EAC00 /* TouchLogger.cpp */; };
+		0416CACE18A42B51004EAC00 /* UIDeviceHardware.m in Sources */ = {isa = PBXBuildFile; fileRef = 0416CAB918A42B51004EAC00 /* UIDeviceHardware.m */; };
 		3C02E084183698E100420B95 /* FTLog.m in Sources */ = {isa = PBXBuildFile; fileRef = 3C02E083183698E100420B95 /* FTLog.m */; };
 		3C2F9C3A1780758300A5FFBC /* FTPeripheralDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 3C2F9C391780758300A5FFBC /* FTPeripheralDelegate.m */; };
 		3C2F9C3D1780786F00A5FFBC /* FTPenServiceClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 3C2F9C3C1780786F00A5FFBC /* FTPenServiceClient.m */; };
@@ -59,6 +80,53 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		0416CA8B18A42B51004EAC00 /* ClassificationProxy.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ClassificationProxy.cpp; sourceTree = "<group>"; };
+		0416CA8C18A42B51004EAC00 /* ClassificationProxy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ClassificationProxy.h; sourceTree = "<group>"; };
+		0416CA8D18A42B51004EAC00 /* Classifier.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Classifier.h; sourceTree = "<group>"; };
+		0416CA8E18A42B51004EAC00 /* Cluster.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Cluster.cpp; sourceTree = "<group>"; };
+		0416CA8F18A42B51004EAC00 /* Cluster.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Cluster.h; sourceTree = "<group>"; };
+		0416CA9018A42B51004EAC00 /* CommonDeclarations.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CommonDeclarations.h; sourceTree = "<group>"; };
+		0416CA9118A42B51004EAC00 /* CommonDeclarationsCurves.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CommonDeclarationsCurves.h; sourceTree = "<group>"; };
+		0416CA9218A42B51004EAC00 /* CubicPolynomial.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = CubicPolynomial.hpp; sourceTree = "<group>"; };
+		0416CA9318A42B51004EAC00 /* DataStream.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = DataStream.hpp; sourceTree = "<group>"; };
+		0416CA9418A42B51004EAC00 /* Debug.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Debug.cpp; sourceTree = "<group>"; };
+		0416CA9518A42B51004EAC00 /* Debug.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Debug.h; sourceTree = "<group>"; };
+		0416CA9618A42B51004EAC00 /* DumbStylus.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DumbStylus.cpp; sourceTree = "<group>"; };
+		0416CA9718A42B51004EAC00 /* DumbStylus.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DumbStylus.h; sourceTree = "<group>"; };
+		0416CA9818A42B51004EAC00 /* EigenLAB.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EigenLAB.cpp; sourceTree = "<group>"; };
+		0416CA9918A42B51004EAC00 /* EigenLAB.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EigenLAB.h; sourceTree = "<group>"; };
+		0416CA9A18A42B51004EAC00 /* FiniteDifferences.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FiniteDifferences.cpp; sourceTree = "<group>"; };
+		0416CA9B18A42B51004EAC00 /* FiniteDifferences.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FiniteDifferences.h; sourceTree = "<group>"; };
+		0416CA9C18A42B51004EAC00 /* Helpers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Helpers.h; sourceTree = "<group>"; };
+		0416CA9D18A42B51004EAC00 /* Helpers.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = Helpers.mm; sourceTree = "<group>"; };
+		0416CA9E18A42B51004EAC00 /* HelpersObjC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HelpersObjC.h; sourceTree = "<group>"; };
+		0416CA9F18A42B51004EAC00 /* IsolatedStrokes.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = IsolatedStrokes.cpp; sourceTree = "<group>"; };
+		0416CAA018A42B51004EAC00 /* IsolatedStrokes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IsolatedStrokes.h; sourceTree = "<group>"; };
+		0416CAA118A42B51004EAC00 /* IsolatedStrokesCalibration.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = IsolatedStrokesCalibration.cpp; sourceTree = "<group>"; };
+		0416CAA218A42B51004EAC00 /* LinAlgHelpers.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LinAlgHelpers.cpp; sourceTree = "<group>"; };
+		0416CAA318A42B51004EAC00 /* LinAlgHelpers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LinAlgHelpers.h; sourceTree = "<group>"; };
+		0416CAA418A42B51004EAC00 /* LineFitting.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LineFitting.cpp; sourceTree = "<group>"; };
+		0416CAA518A42B51004EAC00 /* LineFitting.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LineFitting.h; sourceTree = "<group>"; };
+		0416CAA618A42B51004EAC00 /* OffscreenPenLongPress.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = OffscreenPenLongPress.cpp; sourceTree = "<group>"; };
+		0416CAA718A42B51004EAC00 /* OffscreenPenLongPress.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OffscreenPenLongPress.h; sourceTree = "<group>"; };
+		0416CAA818A42B51004EAC00 /* PenDirection.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PenDirection.cpp; sourceTree = "<group>"; };
+		0416CAA918A42B51004EAC00 /* PenDirection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PenDirection.h; sourceTree = "<group>"; };
+		0416CAAA18A42B51004EAC00 /* PenEvents.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PenEvents.cpp; sourceTree = "<group>"; };
+		0416CAAB18A42B51004EAC00 /* PenEvents.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PenEvents.h; sourceTree = "<group>"; };
+		0416CAAC18A42B51004EAC00 /* Performance.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Performance.cpp; sourceTree = "<group>"; };
+		0416CAAD18A42B51004EAC00 /* Performance.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Performance.h; sourceTree = "<group>"; };
+		0416CAAE18A42B51004EAC00 /* Playback.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Playback.cpp; sourceTree = "<group>"; };
+		0416CAAF18A42B51004EAC00 /* Playback.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Playback.h; sourceTree = "<group>"; };
+		0416CAB018A42B51004EAC00 /* Quadrature.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Quadrature.cpp; sourceTree = "<group>"; };
+		0416CAB118A42B51004EAC00 /* Quadrature.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Quadrature.h; sourceTree = "<group>"; };
+		0416CAB218A42B51004EAC00 /* Screen.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Screen.cpp; sourceTree = "<group>"; };
+		0416CAB318A42B51004EAC00 /* Screen.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Screen.h; sourceTree = "<group>"; };
+		0416CAB418A42B51004EAC00 /* Stroke.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Stroke.cpp; sourceTree = "<group>"; };
+		0416CAB518A42B51004EAC00 /* Stroke.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Stroke.h; sourceTree = "<group>"; };
+		0416CAB618A42B51004EAC00 /* TouchLogger.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TouchLogger.cpp; sourceTree = "<group>"; };
+		0416CAB718A42B51004EAC00 /* TouchLogger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TouchLogger.h; sourceTree = "<group>"; };
+		0416CAB818A42B51004EAC00 /* UIDeviceHardware.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UIDeviceHardware.h; sourceTree = "<group>"; };
+		0416CAB918A42B51004EAC00 /* UIDeviceHardware.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UIDeviceHardware.m; sourceTree = "<group>"; };
 		349A642F174FD5D80071D899 /* Common.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Common.xcodeproj; path = ../../Common/Common.xcodeproj; sourceTree = "<group>"; };
 		3C02E083183698E100420B95 /* FTLog.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FTLog.m; path = FiftyThreeSdk/FTLog.m; sourceTree = "<group>"; };
 		3C2F9C381780758300A5FFBC /* FTPeripheralDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FTPeripheralDelegate.h; path = FiftyThreeSdk/FTPeripheralDelegate.h; sourceTree = SOURCE_ROOT; };
@@ -136,6 +204,61 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0416CA8918A42B51004EAC00 /* Classification */ = {
+			isa = PBXGroup;
+			children = (
+				0416CA8B18A42B51004EAC00 /* ClassificationProxy.cpp */,
+				0416CA8C18A42B51004EAC00 /* ClassificationProxy.h */,
+				0416CA8D18A42B51004EAC00 /* Classifier.h */,
+				0416CA8E18A42B51004EAC00 /* Cluster.cpp */,
+				0416CA8F18A42B51004EAC00 /* Cluster.h */,
+				0416CA9018A42B51004EAC00 /* CommonDeclarations.h */,
+				0416CA9118A42B51004EAC00 /* CommonDeclarationsCurves.h */,
+				0416CA9218A42B51004EAC00 /* CubicPolynomial.hpp */,
+				0416CA9318A42B51004EAC00 /* DataStream.hpp */,
+				0416CA9418A42B51004EAC00 /* Debug.cpp */,
+				0416CA9518A42B51004EAC00 /* Debug.h */,
+				0416CA9618A42B51004EAC00 /* DumbStylus.cpp */,
+				0416CA9718A42B51004EAC00 /* DumbStylus.h */,
+				0416CA9818A42B51004EAC00 /* EigenLAB.cpp */,
+				0416CA9918A42B51004EAC00 /* EigenLAB.h */,
+				0416CA9A18A42B51004EAC00 /* FiniteDifferences.cpp */,
+				0416CA9B18A42B51004EAC00 /* FiniteDifferences.h */,
+				0416CA9C18A42B51004EAC00 /* Helpers.h */,
+				0416CA9D18A42B51004EAC00 /* Helpers.mm */,
+				0416CA9E18A42B51004EAC00 /* HelpersObjC.h */,
+				0416CA9F18A42B51004EAC00 /* IsolatedStrokes.cpp */,
+				0416CAA018A42B51004EAC00 /* IsolatedStrokes.h */,
+				0416CAA118A42B51004EAC00 /* IsolatedStrokesCalibration.cpp */,
+				0416CAA218A42B51004EAC00 /* LinAlgHelpers.cpp */,
+				0416CAA318A42B51004EAC00 /* LinAlgHelpers.h */,
+				0416CAA418A42B51004EAC00 /* LineFitting.cpp */,
+				0416CAA518A42B51004EAC00 /* LineFitting.h */,
+				0416CAA618A42B51004EAC00 /* OffscreenPenLongPress.cpp */,
+				0416CAA718A42B51004EAC00 /* OffscreenPenLongPress.h */,
+				0416CAA818A42B51004EAC00 /* PenDirection.cpp */,
+				0416CAA918A42B51004EAC00 /* PenDirection.h */,
+				0416CAAA18A42B51004EAC00 /* PenEvents.cpp */,
+				0416CAAB18A42B51004EAC00 /* PenEvents.h */,
+				0416CAAC18A42B51004EAC00 /* Performance.cpp */,
+				0416CAAD18A42B51004EAC00 /* Performance.h */,
+				0416CAAE18A42B51004EAC00 /* Playback.cpp */,
+				0416CAAF18A42B51004EAC00 /* Playback.h */,
+				0416CAB018A42B51004EAC00 /* Quadrature.cpp */,
+				0416CAB118A42B51004EAC00 /* Quadrature.h */,
+				0416CAB218A42B51004EAC00 /* Screen.cpp */,
+				0416CAB318A42B51004EAC00 /* Screen.h */,
+				0416CAB418A42B51004EAC00 /* Stroke.cpp */,
+				0416CAB518A42B51004EAC00 /* Stroke.h */,
+				0416CAB618A42B51004EAC00 /* TouchLogger.cpp */,
+				0416CAB718A42B51004EAC00 /* TouchLogger.h */,
+				0416CAB818A42B51004EAC00 /* UIDeviceHardware.h */,
+				0416CAB918A42B51004EAC00 /* UIDeviceHardware.m */,
+			);
+			name = Classification;
+			path = FiftyThreeSdk/Classification;
+			sourceTree = "<group>";
+		};
 		349A6430174FD5D80071D899 /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -254,6 +377,7 @@
 		66A8387616E52D840048FFE4 /* FiftyThreeSdk */ = {
 			isa = PBXGroup;
 			children = (
+				0416CA8918A42B51004EAC00 /* Classification */,
 				666DC55B170CF31E00D6B3C2 /* AppSupport */,
 				66A8389C16E531E40048FFE4 /* export */,
 				66C83D7B170600BB00789776 /* FTPenAndTouchManager.cpp */,
@@ -378,28 +502,49 @@
 			files = (
 				66D779B916E57461001C4F55 /* FTDeviceInfoServiceClient.m in Sources */,
 				66D779BA16E57461001C4F55 /* FTPen.m in Sources */,
+				0416CABB18A42B51004EAC00 /* Cluster.cpp in Sources */,
 				66D779BB16E57461001C4F55 /* FTPenManager.m in Sources */,
+				0416CAC918A42B51004EAC00 /* Playback.cpp in Sources */,
+				0416CAC118A42B51004EAC00 /* IsolatedStrokes.cpp in Sources */,
+				0416CABE18A42B51004EAC00 /* EigenLAB.cpp in Sources */,
+				0416CAC318A42B51004EAC00 /* LinAlgHelpers.cpp in Sources */,
 				66D779BC16E57461001C4F55 /* TIUpdateManager.mm in Sources */,
+				0416CABC18A42B51004EAC00 /* Debug.cpp in Sources */,
 				66B6E3EA16F9255C00251B6A /* LatencyTouchClassifier.cpp in Sources */,
 				663AFED616FA511300681A90 /* TouchClassifierManager.cpp in Sources */,
 				663AFED916FA6BD800681A90 /* PenEvent.cpp in Sources */,
 				66BEC2861703B397009207F9 /* FTFirmwareManager.m in Sources */,
 				66C83D7C170600BB00789776 /* FTPenAndTouchManager.cpp in Sources */,
+				0416CAC818A42B51004EAC00 /* Performance.cpp in Sources */,
 				666DC55E170CF33C00D6B3C2 /* FTApplication.mm in Sources */,
+				0416CACC18A42B51004EAC00 /* Stroke.cpp in Sources */,
 				6665F81C170F8B6F0027BAD1 /* FTTouchEventLogger.mm in Sources */,
+				0416CACD18A42B51004EAC00 /* TouchLogger.cpp in Sources */,
+				0416CAC618A42B51004EAC00 /* PenDirection.cpp in Sources */,
+				0416CACE18A42B51004EAC00 /* UIDeviceHardware.m in Sources */,
 				3CF2306F177E13910049A9EF /* FTServiceUUIDs.m in Sources */,
 				3C2F9C3A1780758300A5FFBC /* FTPeripheralDelegate.m in Sources */,
+				0416CAC018A42B51004EAC00 /* Helpers.mm in Sources */,
+				0416CAC718A42B51004EAC00 /* PenEvents.cpp in Sources */,
 				3C2F9C3D1780786F00A5FFBC /* FTPenServiceClient.m in Sources */,
 				3C2F9C411780802600A5FFBC /* FTServiceClient.m in Sources */,
 				3C2F9C441780A7BA00A5FFBC /* FTPenUsageServiceClient.m in Sources */,
+				0416CABF18A42B51004EAC00 /* FiniteDifferences.cpp in Sources */,
+				0416CACA18A42B51004EAC00 /* Quadrature.cpp in Sources */,
 				3C404F7B1784C5A200EB7B9A /* FTError.m in Sources */,
 				3CC31DF417933C5F002CD4FB /* TKEvent.m in Sources */,
 				3CC31DF517933C5F002CD4FB /* TKState.m in Sources */,
 				3CC31DF617933C5F002CD4FB /* TKStateMachine.m in Sources */,
+				0416CAC418A42B51004EAC00 /* LineFitting.cpp in Sources */,
+				0416CAC218A42B51004EAC00 /* IsolatedStrokesCalibration.cpp in Sources */,
+				0416CAC518A42B51004EAC00 /* OffscreenPenLongPress.cpp in Sources */,
+				0416CACB18A42B51004EAC00 /* Screen.cpp in Sources */,
 				3CF1369417A9F4440006AB2E /* FTFirmwareUpdateProgressView.m in Sources */,
 				3CE80BD117CE6DC900AA73A0 /* CBPeripheral+Helpers.m in Sources */,
+				0416CABA18A42B51004EAC00 /* ClassificationProxy.cpp in Sources */,
 				3CE80BD417CE6DE700AA73A0 /* CBCharacteristic+Helpers.m in Sources */,
 				3C02E084183698E100420B95 /* FTLog.m in Sources */,
+				0416CABD18A42B51004EAC00 /* DumbStylus.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
