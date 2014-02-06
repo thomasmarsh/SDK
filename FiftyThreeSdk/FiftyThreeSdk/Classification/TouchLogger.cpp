@@ -17,6 +17,16 @@
 #include "FiftyThreeSdk/Classification/Stroke.h"
 #include "FiftyThreeSdk/Classification/TouchLogger.h"
 
+
+// TODO: For some reason these asserts in these files cause
+//       clang to crash. Only in Internal and Previe builds which are built rarely.
+//       For now we disable asserts in this file.
+#undef USE_DEBUG_ASSERT
+#undef DebugAssert
+#define USE_DEBUG_ASSERT FALSE
+#define DebugAssert(X)
+
+
 using namespace fiftythree::common;
 using namespace fiftythree::common;
 
