@@ -2,7 +2,7 @@
 //  FTFirmwareManager.m
 //  FiftyThreeSdk
 //
-//  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
+//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>
@@ -168,7 +168,10 @@ NSString *applicationDocumentsDirectory()
                                    forImageType:FTFirmwareImageTypeFactory
                                         version:&factoryVersion
                          isCurrentlyRunning:&factoryIsCurrentlyRunning];
-    FTAssert(result, @"Must be able to fetch factory version");
+    if (!result)
+    {
+        FTAssert(result, @"Must be able to fetch factory version");
+    }
 
     if (factoryIsCurrentlyRunning)
     {

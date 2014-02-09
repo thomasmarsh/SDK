@@ -46,7 +46,7 @@ public:
             std::cout << ss.str();
 #endif
 
-            [data appendBytes:ss.str().c_str() length:ss.tellp()];
+            [data appendBytes:ss.str().c_str() length:(NSUInteger)ss.tellp()];
         }
     }
 
@@ -61,7 +61,7 @@ public:
             std::cout << ss.str();
 #endif
 
-            [data appendBytes:ss.str().c_str() length:ss.tellp()];
+            [data appendBytes:ss.str().c_str() length:(NSUInteger)ss.tellp()];
         }
     }
 
@@ -76,7 +76,7 @@ public:
             std::cout << ss.str();
 #endif
 
-            [data appendBytes:ss.str().c_str() length:ss.tellp()];
+            [data appendBytes:ss.str().c_str() length:(NSUInteger)ss.tellp()];
         }
     }
 
@@ -91,7 +91,7 @@ public:
             std::cout << ss.str();
 #endif
 
-            [data appendBytes:ss.str().c_str() length:ss.tellp()];
+            [data appendBytes:ss.str().c_str() length:(NSUInteger)ss.tellp()];
         }
     }
 
@@ -104,7 +104,7 @@ public:
         std::cout << ss.str();
 #endif
 
-        [data appendBytes:ss.str().c_str() length:ss.tellp()];
+        [data appendBytes:ss.str().c_str() length:(NSUInteger)ss.tellp()];
     }
 
     virtual void Clear()
