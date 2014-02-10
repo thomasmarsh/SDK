@@ -457,7 +457,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 3C373F27186353D700830FD7 /* FiftyThreeSdkDebug.xcconfig */;
 			buildSettings = {
-				ONLY_ACTIVE_ARCH = YES;
 			};
 			name = Debug;
 		};
