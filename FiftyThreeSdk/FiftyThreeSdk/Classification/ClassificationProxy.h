@@ -385,8 +385,8 @@ public:
     _offscreenPenLongPressGR(_clusterTracker, &_commonData, 3.0f),
     _rtFlag(false),
     _testingIsolated(false),
-    _clearStaleStatistics(true)
-    
+    _clearStaleStatistics(true),
+    _activeStylusConnected(false)
     {
         
         ClearEndedTouchesReclassified();

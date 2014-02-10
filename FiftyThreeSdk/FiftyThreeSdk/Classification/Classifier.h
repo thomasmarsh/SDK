@@ -45,6 +45,8 @@ struct PenEvent
     PenEventType _type;
     double       _timestamp;
 
+    PenEvent() : _type(PenEventType::Tip1Up), _timestamp(0.0) {}
+    
     bool UpEvent() const
     {
         return _type == PenEventType::Tip1Up || _type == PenEventType::Tip2Up;
