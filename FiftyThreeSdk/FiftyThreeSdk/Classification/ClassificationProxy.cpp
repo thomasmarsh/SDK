@@ -758,7 +758,7 @@ TouchType TouchClassificationProxy::CurrentClass(common::TouchId touchId)
 {
     if (! _activeStylusConnected)
     {
-        return TouchType::Finger;
+        return TouchType::UnknownDisconnected;
     }
     
     if (_currentTypes.count(touchId))
