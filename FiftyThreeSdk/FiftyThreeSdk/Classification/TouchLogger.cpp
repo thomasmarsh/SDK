@@ -1,8 +1,8 @@
 //
 //  TouchLogger.cpp
-//  Classification
+//  FiftyThreeSdk
 //
-//  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
+//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
 
 #include <boost/any.hpp>
@@ -10,13 +10,12 @@
 #include <boost/foreach.hpp>
 #include <boost/tuple/tuple.hpp>
 
-#include "FiftyThreeSdk/Classification/ClassificationProxy.h"
 #include "Common/Touch/Touch.h"
 #include "Common/Touch/TouchTracker.h"
+#include "FiftyThreeSdk/Classification/ClassificationProxy.h"
 #include "FiftyThreeSdk/Classification/CommonDeclarations.h"
 #include "FiftyThreeSdk/Classification/Stroke.h"
 #include "FiftyThreeSdk/Classification/TouchLogger.h"
-
 
 // TODO: For some reason these asserts in these files cause
 //       clang to crash. Only in Internal and Previe builds which are built rarely.
@@ -26,6 +25,10 @@
 #define USE_DEBUG_ASSERT FALSE
 #define DebugAssert(X)
 
+namespace
+{
+    static const char *kClassifierUseCancelledTouch = "classifierUseCancelled";
+}
 
 using namespace fiftythree::common;
 
@@ -68,8 +71,6 @@ common::TouchPhase TouchData::Phase(int idx) {
         return _phaseHistory[idx];
     }
 }
-    
-
 
 Stroke::Ptr const & TouchData::Stroke()
 {
@@ -225,10 +226,10 @@ common::TouchId TouchLogger::TouchPrecedingTouch(common::TouchId probeId)
         }
         previousId = touchId;
     }
-    
+
     return InvalidTouchId();
 }
-    
+
 common::TouchId     TouchLogger::MostRecentTouch()
 {
     if(_touchData.empty())
@@ -241,7 +242,7 @@ common::TouchId     TouchLogger::MostRecentTouch()
         return (*_touchData.rbegin()).first;
     }
 }
-    
+
 // This uses the fact that flat_map is an ordered vector internally
 // to extract the first reclassifiable touchId
 common::TouchId TouchLogger::OldestReclassifiableTouch()
@@ -281,7 +282,7 @@ void TouchLogger::TouchesChanged(const std::set<common::Touch::Ptr> & touches) {
         {
             UpdateTime(touch->CurrentSample().TimestampSeconds());
         }
-        
+
         if(_removedTouches.count(touch->Id()))
         {
             continue;
@@ -357,7 +358,7 @@ void TouchLogger::TouchesChanged(const std::set<common::Touch::Ptr> & touches) {
                             touchData->Stroke()->AddTouchRadius(r);
                         }
                     }
-                    
+
                 }
 
                 break;
@@ -377,26 +378,26 @@ void TouchLogger::TouchesChanged(const std::set<common::Touch::Ptr> & touches) {
                 {
                     touchData = it->second;
                     DebugAssert(touchData);
-                    
+
                     if (touchData)
                     {
                         if (touchData->Phase() != common::TouchPhase::Cancelled)
                         {
                             double timestamp    = touch->CurrentSample().TimestampSeconds();
                             Eigen::Vector2f xy  = touch->CurrentSample().Location();
-                            
+
                             Stroke::Ptr stroke = touchData->Stroke();
-                            
+
                             if(timestamp > touchData->LastTimestamp() + .001)
                             {
                                 touchData->Stroke()->AddPoint(xy, timestamp);
                             }
-                            
+
                             touchData->SetEndedTime(timestamp);
                             touchData->TouchEnded();
-                            
+
                             touchData->SetPhase(common::TouchPhase::Cancelled);
-                            
+
                             if(_allCancelledFlag)
                             {
                                 touch->DynamicProperties()[kClassifierUseCancelledTouch] = boost::any(false);
@@ -405,11 +406,11 @@ void TouchLogger::TouchesChanged(const std::set<common::Touch::Ptr> & touches) {
                             {
                                 touch->DynamicProperties()[kClassifierUseCancelledTouch] = boost::any(true);
                             }
-                            
+
                             LogEndedTouch(touch->Id());
-                            
+
                             _endedTouchesStaged.push_back(touch->Id());
-                            
+
                             if(_commonData->proxy->UsePrivateAPI())
                             {
                                 if (touch->CurrentSample().TouchRadius())
@@ -432,7 +433,7 @@ void TouchLogger::TouchesChanged(const std::set<common::Touch::Ptr> & touches) {
 
             case common::TouchPhase::Ended:
             {
-                
+
                 // iOS will cancel large palm touches under unclear circumstances.
                 // from our point of view, this is still valuable information and should be treated
                 // as an ended touch.
@@ -463,7 +464,6 @@ void TouchLogger::TouchesChanged(const std::set<common::Touch::Ptr> & touches) {
                     LogEndedTouch(touch->Id());
                     _endedTouchesStaged.push_back(touch->Id());
 
-                    
                     if(_commonData->proxy->UsePrivateAPI())
                     {
                         if (touch->CurrentSample().TouchRadius())
@@ -472,7 +472,7 @@ void TouchLogger::TouchesChanged(const std::set<common::Touch::Ptr> & touches) {
                             touchData->Stroke()->AddTouchRadius(r);
                         }
                     }
-                    
+
                 }
 
                 break;
@@ -537,7 +537,6 @@ common::TouchId   TouchLogger::MostRecentEndedPen()
     return InvalidTouchId();
 }
 
-    
 PenEventId TouchLogger::MostRecentPenEvent()
 {
     if(_penEventData.empty())
@@ -558,17 +557,17 @@ void       TouchLogger::RemoveMostRecentPenEvent()
         _penEventOrder.pop_back();
     }
 }
-    
+
 void TouchLogger::ClearAllData()
 {
     _penEventData.clear();
     _penEventOrder.clear();
-    
+
     _touchData.clear();
-    
+
     _activeTouches.clear();
     _cancelledTouches.clear();
-    
+
     _endedTouches.clear();
     _endedTouchesStaged.clear();
 
@@ -585,10 +584,9 @@ void TouchLogger::ClearAllData()
             ++it;
         }
     }
-    
+
     _concurrentTouchesCache.clear();
 }
-
 
 void TouchLogger::ClearUnclusteredEndedTouches() {
 
@@ -610,20 +608,20 @@ void TouchLogger::ClearUnclusteredEndedTouches() {
             }
 
             Cluster::Ptr cluster  = data->Cluster();
-            
+
             // the cluster tracker makes the decision to evict old touches from clusters.  if it is in
             // a cluster, it is relevant to classification, and if it is not in a cluster, it isn't relevant.
             bool clusterExists   = cluster && _commonData->proxy->ClusterTracker()->ContainsClusterForKey(cluster->_id);
-            
+
             bool reclassifiable  = _commonData->proxy->IsReclassifiable(data->Touch(), data->Stroke());
-            
+
             // this should never happen.
             // a reclassifiable touch should always be in a cluster
             if(reclassifiable && (! clusterExists))
             {
                 DebugAssert(false);
             }
-            
+
             if (clusterExists || reclassifiable)
             {
                 break;
@@ -642,7 +640,7 @@ void TouchLogger::ClearUnclusteredEndedTouches() {
         }
 
     }
-    
+
     // now clear removed touches if they are ended
     std::set<common::TouchId>::iterator it = _removedTouches.begin();
     for(;it != _removedTouches.end();)
@@ -746,7 +744,6 @@ bool TouchLogger::ContainsTouchWithId(common::TouchId touchId)
 
 TouchData::Ptr const & TouchLogger::Data(common::TouchId id) {
 
-    
     if(_touchData.count(id))
     {
         return _touchData.at(id);
@@ -787,7 +784,6 @@ ClusterPtr       TouchLogger::Cluster(common::TouchId touchId)
     }
 }
 
-    
 Stroke::Ptr const & TouchLogger::Stroke(common::TouchId id) {
 
     if(_touchData.count(id))
@@ -837,7 +833,6 @@ std::vector<common::TouchPhase> TouchLogger::Phase(TouchIdVector ids) {
     return phases;
 
 }
-
 
 PenEventIdVector TouchLogger::PenEventsInTimeInterval(double t0, double t1, bool includeEndpoints)
 {
@@ -1103,7 +1098,6 @@ void TouchLogger::AssertPenEvents(PenEventIdVector ids) {
     }
 }
 
-
 int TouchLogger::NumberOfTouches() {
     return _touchData.size();
 }
@@ -1157,13 +1151,13 @@ TouchIdSet   TouchLogger::TouchIdSetEndedInTimeInterval(double interval_start,
 void TouchLogger::RemoveTouch(common::TouchId touchId)
 {
     _removedTouches.insert(touchId);
-    
+
     _activeTouches.erase(touchId);
     _touchData.erase(touchId);
-    
+
     // in case he was in here, remove him.
     _concurrentTouchesCache.clear();
-    
+
     std::deque<TouchId>::iterator it2 = std::find(_endedTouches.begin(), _endedTouches.end(), touchId);
     if(it2 != _endedTouches.end())
     {
@@ -1176,23 +1170,20 @@ void TouchLogger::RemoveTouch(common::TouchId touchId)
         _cancelledTouches.erase(it3);
     }
 
-    
     std::vector<TouchId>::iterator it4 = std::find(_endedTouchesStaged.begin(), _endedTouchesStaged.end(), touchId);
     if(it4 != _endedTouchesStaged.end())
     {
         _endedTouchesStaged.erase(it4);
     }
 
-    
-    
 }
-    
+
 TouchIdVector TouchLogger::TouchIdsBeganInTimeInterval(double interval_start, double interval_end) {
     TouchIdVector ids;
 
     BOOST_FOREACH(TouchDataPair  const & pair, _touchData) {
         double touchStart = pair.second->FirstTimestamp();
-        
+
         if (( touchStart <= interval_end )   &&
             ( touchStart >= interval_start )
             )
@@ -1353,7 +1344,6 @@ PenEventId TouchLogger::MostRecentPenDownEvent() {
     return id;
 }
 
-
 TouchIdVector TouchLogger::LiveTouches() {
     TouchIdVector ids;
     BOOST_FOREACH(common::TouchId touchId, _activeTouches) {
@@ -1362,7 +1352,6 @@ TouchIdVector TouchLogger::LiveTouches() {
 
     return ids;
 }
-
 
 TouchIdVector TouchLogger::LiveTouchesInPhase(common::TouchPhase phase) {
 
@@ -1466,7 +1455,6 @@ void TouchLogger::InsertStroke(common::TouchId touchId, Eigen::VectorXd t, Eigen
 void TouchLogger::DeleteTouchId(common::TouchId id) {
     _touchData.erase(id);
 }
-
 
 common::TouchId InvalidTouchId()
 {

@@ -1,8 +1,8 @@
 //
 //  IsolatedStrokes.cpp
-//  Classification
+//  FiftyThreeSdk
 //
-//  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
+//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
 
 #include <Eigen/Geometry>
@@ -11,10 +11,10 @@
 
 #include "FiftyThreeSdk/Classification/ClassificationProxy.h"
 #include "FiftyThreeSdk/Classification/EigenLAB.h"
-#include "FiftyThreeSdk/Classification/Screen.h"
 #include "FiftyThreeSdk/Classification/FiniteDifferences.h"
 #include "FiftyThreeSdk/Classification/IsolatedStrokes.h"
 #include "FiftyThreeSdk/Classification/Quadrature.h"
+#include "FiftyThreeSdk/Classification/Screen.h"
 
 using namespace Eigen;
 
@@ -157,13 +157,6 @@ std::pair<TouchType, bool> IsolatedStrokesClassifier::ClassifyForPinchOrPanGestu
         pFinger = normalKScore;
     }
 
-    bool okLength        = L > 10.0f;
-
-    // clusters are not very helpful for "pinch out" since the cluster will have two touches
-    bool okCluster = (! cluster->_wasInterior) && (cluster->_touchIds.size() <= 2);
-
-    float dtMax = stats->_maxDeltaT;
-
     if(! _clusterTracker->TouchWithId(touchId)->IsPhaseEndedOrCancelled())
     {
         std::max(stats->_maxDeltaT, float(_clusterTracker->CurrentTime() - stroke->LastAbsoluteTimestamp()));
@@ -171,9 +164,6 @@ std::pair<TouchType, bool> IsolatedStrokesClassifier::ClassifyForPinchOrPanGestu
     float dt    = stroke->LastAbsoluteTimestamp() - stroke->FirstAbsoluteTimestamp();
     float vMean = L / (.0001f + dt);
 
-    float T = stats->_maxTravel;
-
-    
     float lifespan   = _clusterTracker->CurrentTime() - stroke->FirstAbsoluteTimestamp();
 
     bool okZeroLength = true;
@@ -219,8 +209,6 @@ std::pair<TouchType, bool> IsolatedStrokesClassifier::ClassifyForPinchOrPanGestu
     }
     else
     {
-
-        
 
         if(npVoteScore < .01f)
         {
@@ -1110,7 +1098,7 @@ Eigen::VectorXf PolynomialModel::Evaluate(Eigen::VectorXf x) {
 
     Eigen::MatrixXf V = VandermondeMatrix(x, _coefficients.rows()-1);
     std::cerr << "\nVandermonde = " << V;
-    
+
     return (V*_coefficients).array();
 }
 
@@ -1119,10 +1107,10 @@ float PolynomialModel::Evaluate(float x) {
     //Eigen::VectorXf xvec(1);
     //xvec << x;
     //float sanity = Evaluate(xvec)(0);
-    
+
     x -= _shift;
     x /= _scale;
-    
+
     float xPow = 1;
     float sum  = 0.0f;
     for (int j=0; j<_coefficients.size(); j++)
@@ -1130,10 +1118,9 @@ float PolynomialModel::Evaluate(float x) {
         sum  += xPow * _coefficients(j);
         xPow *= x;
     }
-    
+
     return sum;
-    
-    
+
 }
 
 void IsolatedStrokesClassifier::TouchIdNoLongerLogged(common::TouchId touchId) {

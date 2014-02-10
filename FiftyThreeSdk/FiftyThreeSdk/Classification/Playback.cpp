@@ -1,8 +1,8 @@
 //
 //  Playback.cpp
-//  Classification
+//  FiftyThreeSdk
 //
-//  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
+//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
 
 #include <boost/algorithm/string.hpp>
@@ -86,12 +86,17 @@ PlaybackSequence::PlaybackSequence(std::istream & str)
 
             float      x     = lexical_cast<float>(row[5]);
             float      y     = lexical_cast<float>(row[6]);
-            float      r     = lexical_cast<float>(row[7]);
 
             Eigen::Vector2f z(x,y);
             common::InputSample sample(z, z, timestamp);
 
             Touch::Ptr touch = Touch::New(touchId, phase, sample);
+
+            if (row.size() >= 8)
+            {
+                float r = lexical_cast<float>(row[7]);
+                sample.SetTouchRadius(r);
+            }
 
             // optional...
             if (row.size() >= 9)

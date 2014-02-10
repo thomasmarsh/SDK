@@ -1,9 +1,9 @@
 //
 //  LineFitting.h
-//  Classification
+//  FiftyThreeSdk
 //
-//  Created by Akil Narayan on 2013/12/12.
-//  Copyright (c) 2013 Peter Sibley. All rights reserved.
+//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
+//
 
 #pragma once
 
@@ -11,6 +11,7 @@
 #include<boost/type_traits/is_floating_point.hpp>
 
 #include <Eigen/Dense>
+
 #include "FiftyThreeSdk/Classification/CommonDeclarations.h" // This is only for DebugAssert...where was it defined?
 #include "FiftyThreeSdk/Classification/EigenLAB.h"
 #include "FiftyThreeSdk/Classification/LinAlgHelpers.h"
@@ -27,11 +28,11 @@ class Geometric2DLine {
 
 protected:
     // This is a unit-vector line direction
-    // Has limited meaning in this context since the "positive" direction of the line is 
+    // Has limited meaning in this context since the "positive" direction of the line is
     // undefined. Child classes make use of this
     Eigen::Matrix<T, 1, 2> _direction;
 
-    // This is *NOT* the direction of the line. It is coefficients a, b in 
+    // This is *NOT* the direction of the line. It is coefficients a, b in
     //      a x + b y = c
     Eigen::Matrix<T, 1, 2> _orientation;
     T _offset;
@@ -58,7 +59,7 @@ protected:
 
 public:
 
-    Geometric2DLine(): _offset( (T) 0.0f) 
+    Geometric2DLine(): _offset( (T) 0.0f)
     {
         _orientation.setZero(1,2);
         _direction.setZero(1,2);
@@ -75,7 +76,7 @@ public:
     }
 
     // Set with direction, offset pair
-    Geometric2DLine(const Eigen::Matrix<T, 1, 2> &direction, const T &c): 
+    Geometric2DLine(const Eigen::Matrix<T, 1, 2> &direction, const T &c):
         _offset(c),
         _direction(direction)
     {
@@ -96,8 +97,6 @@ public:
 
     // Set with a vector (a,b,c)
     Geometric2DLine(const Eigen::Matrix<T, 3, 1> &coeffs): _offset(coeffs(2)) {
-
-        T abNorm = coeffs(0)*coeffs(0) + coeffs(1)*coeffs(1);
 
         _orientation(0) = coeffs(0);
         _orientation(1) = coeffs(1);
@@ -147,7 +146,7 @@ public:
     }
 
     // Evaluates y = -1/b*(c + a*x);
-    // NOTE: if line is vertical then this function is not sensible. 
+    // NOTE: if line is vertical then this function is not sensible.
     // Test first with IsLineVertical()
     // In this case, the function simply returns 0 for all values of y.
     Eigen::Matrix<T, Dynamic, 1> EvaluateAtX(const Eigen::Matrix<T, Dynamic, 1> &x) {
@@ -173,7 +172,7 @@ public:
     }
 
     // Evaluates x = -1/a*(c + b*y);
-    // NOTE: if line is horizontal then this function is not sensible. 
+    // NOTE: if line is horizontal then this function is not sensible.
     // Test first with IsLineHorizontal()
     // In this case, the function simply returns 0 for all values of x.
     Eigen::Matrix<T, Dynamic, 1> EvaluateAtY(const Eigen::Matrix<T, Dynamic, 1> &y) {
@@ -209,25 +208,25 @@ class LinearlyParameterized2DLine: public Geometric2DLine<T> {
 private:
     typedef Geometric2DLine<T> parent;
 
-protected: 
+protected:
 
     T _speed; // non-negative
     Eigen::Matrix<T, 1, 2> _anchorPoint; // location at parameter = 0
 
-    // With parameter t, and 2D point (x,y), the equation of the line is 
+    // With parameter t, and 2D point (x,y), the equation of the line is
     //   (x,y) = _anchorPoint + t*_speed*_direction
 
 public:
-    
-    LinearlyParameterized2DLine(): _speed((T) 0.0f) 
+
+    LinearlyParameterized2DLine(): _speed((T) 0.0f)
     {
         _anchorPoint.setZero(1,2);
 
     }
 
     LinearlyParameterized2DLine(const T &speed,
-                                const Eigen::Matrix<T, 1, 2> &direction, 
-                                const Eigen::Matrix<T, 1, 2> &anchorPoint): 
+                                const Eigen::Matrix<T, 1, 2> &direction,
+                                const Eigen::Matrix<T, 1, 2> &anchorPoint):
                                 _anchorPoint(anchorPoint),
                                 _speed(speed),
                                 parent(direction, anchorPoint)
@@ -240,8 +239,8 @@ public:
 
     // In case user uses other dimension permutation
     LinearlyParameterized2DLine(const T &speed,
-                                const Eigen::Matrix<T, 2, 1> &direction, 
-                                const Eigen::Matrix<T, 2, 1> &anchorPoint): 
+                                const Eigen::Matrix<T, 2, 1> &direction,
+                                const Eigen::Matrix<T, 2, 1> &anchorPoint):
                                 _speed(speed),
                                 parent(direction.transpose(), anchorPoint.transpose())
     {
@@ -274,9 +273,9 @@ public:
 
     // "p" for parameter instead of t (here, T = type is confusing)
     // Returns a matrix of size p.rows() x 2
-    Eigen::Matrix<T, Dynamic, 2> Evaluate(const Eigen::Matrix<T, Dynamic, 1> &p) 
+    Eigen::Matrix<T, Dynamic, 2> Evaluate(const Eigen::Matrix<T, Dynamic, 1> &p)
     {
-        
+
         Eigen::Matrix<T, Dynamic, 2> output;
         output.resize(p.rows(), 2);
 
@@ -312,12 +311,12 @@ protected:
     T _velocity0; // Signed velocity at parameter = 0
     Eigen::Matrix<T, 1, 2> _anchorPoint; // location at parameter = 0
 
-    // With parameter t, and 2D point (x,y), the equation of the line is 
+    // With parameter t, and 2D point (x,y), the equation of the line is
     //   (x,y) = _anchorPoint + ( t * _velocity0 + t^2 * _acceleration ) * _direction
 
-public: 
+public:
 
-    QuadraticallyParameterized2DLine(): _velocity0((T) 0.0f), 
+    QuadraticallyParameterized2DLine(): _velocity0((T) 0.0f),
                                         _acceleration((T) 0.0f)
     {
         _anchorPoint.setZero(1,2);
@@ -325,8 +324,8 @@ public:
 
     QuadraticallyParameterized2DLine(const T &acceleration,
                                      const T &velocity0,
-                                     const Eigen::Matrix<T, 1, 2> &direction, 
-                                     const Eigen::Matrix<T, 1, 2> &anchorPoint): 
+                                     const Eigen::Matrix<T, 1, 2> &direction,
+                                     const Eigen::Matrix<T, 1, 2> &anchorPoint):
                                      _anchorPoint(anchorPoint),
                                      _velocity0(velocity0),
                                      _acceleration(acceleration),
@@ -342,8 +341,8 @@ public:
     // In case user uses other dimension permutation
     QuadraticallyParameterized2DLine(const T &acceleration,
                                      const T &velocity0,
-                                     const Eigen::Matrix<T, 2, 1> &direction, 
-                                     const Eigen::Matrix<T, 2, 1> &anchorPoint): 
+                                     const Eigen::Matrix<T, 2, 1> &direction,
+                                     const Eigen::Matrix<T, 2, 1> &anchorPoint):
                                      _velocity0(velocity0),
                                      _acceleration(acceleration),
                                      parent(direction.transpose(), anchorPoint.transpose())
@@ -382,9 +381,9 @@ public:
 
     // "p" for parameter instead of t (here, T = type is confusing)
     // Returns a matrix of size p.rows() x 2
-    Eigen::Matrix<T, Dynamic, 2> Evaluate(const Eigen::Matrix<T, Dynamic, 1> &p) 
+    Eigen::Matrix<T, Dynamic, 2> Evaluate(const Eigen::Matrix<T, Dynamic, 1> &p)
     {
-        
+
         Eigen::Matrix<T, Dynamic, 2> output;
         output.resize(p.rows(), 2);
 
@@ -406,7 +405,7 @@ public:
 };
 
 template<typename DerivedA>
-Geometric2DLine<typename DerivedA::Scalar> GeometricLeastSquaresLineFit(const MatrixBase<DerivedA> &XY, 
+Geometric2DLine<typename DerivedA::Scalar> GeometricLeastSquaresLineFit(const MatrixBase<DerivedA> &XY,
                                                                         typename DerivedA::Scalar &residualNorm) {
 
     DebugAssert(XY.cols() == 2);
@@ -419,7 +418,7 @@ Geometric2DLine<typename DerivedA::Scalar> GeometricLeastSquaresLineFit(const Ma
 
     if (XY.rows() == 1) {
         // No good way to fit a line to one point...just return a horizontal line
-        
+
         coeffs(0) = (DataT) 0;
         coeffs(1) = (DataT) 1;
         coeffs(2) = (DataT) -XY(0,1);
@@ -442,7 +441,7 @@ Geometric2DLine<typename DerivedA::Scalar> GeometricLeastSquaresLineFit(const Ma
     SelfAdjointEigenSolver< Matrix<DataT, 2, 2> > eig(A);
     int minInd = 0;
 
-    if (eig.eigenvalues()(0) > eig.eigenvalues()(1)) 
+    if (eig.eigenvalues()(0) > eig.eigenvalues()(1))
     {
         minInd = 1;
     }
@@ -464,12 +463,11 @@ Geometric2DLine<typename DerivedA::Scalar> GeometricLeastSquaresLineFit(const Ma
     return GeometricLeastSquaresLineFit(XY, residualNorm);
 }
 
-
 template<typename DerivedA, typename DerivedB>
-Geometric2DLine<typename DerivedA::Scalar> GeometricLeastSquaresLineFit(const MatrixBase<DerivedA> &XY, 
-                                                                        const MatrixBase<DerivedB> &sqrtWeights, 
+Geometric2DLine<typename DerivedA::Scalar> GeometricLeastSquaresLineFit(const MatrixBase<DerivedA> &XY,
+                                                                        const MatrixBase<DerivedB> &sqrtWeights,
                                                                         const Eigen::Matrix<typename DerivedA::Scalar, 1, 2> XYMean,
-                                                                        typename DerivedA::Scalar &residualNorm) 
+                                                                        typename DerivedA::Scalar &residualNorm)
 {
 
     DebugAssert( (XY.cols() == 2) && (sqrtWeights.rows() == XY.rows()) );
@@ -478,12 +476,11 @@ Geometric2DLine<typename DerivedA::Scalar> GeometricLeastSquaresLineFit(const Ma
     typedef Eigen::Matrix<DataT, Dynamic, 1> DataVector;
     int N = XY.rows();
 
-
     Eigen::Matrix<DataT, 3, 1> coeffs;
 
     if (XY.rows() == 1) {
         // No good way to fit a line to one point...just return a horizontal line
-        
+
         coeffs(0) = (DataT) 0;
         coeffs(1) = (DataT) 1;
         coeffs(2) = (DataT) -XY(0,1);
@@ -507,7 +504,7 @@ Geometric2DLine<typename DerivedA::Scalar> GeometricLeastSquaresLineFit(const Ma
     SelfAdjointEigenSolver<Matrix<DataT, 2, 2> > eig(A);
     int minInd = 0;
 
-    if (eig.eigenvalues()(0) > eig.eigenvalues()(1)) 
+    if (eig.eigenvalues()(0) > eig.eigenvalues()(1))
     {
         minInd = 1;
     }
@@ -525,17 +522,17 @@ Geometric2DLine<typename DerivedA::Scalar> GeometricLeastSquaresLineFit(const Ma
 
 // Throw away residual
 template<typename DerivedA, typename DerivedB>
-Geometric2DLine<typename DerivedA::Scalar> GeometricLeastSquaresLineFit(const MatrixBase<DerivedA> &XY, 
-                                                                        const MatrixBase<DerivedB> &sqrtWeights, 
-                                                                        const Eigen::Matrix<typename DerivedA::Scalar, 1, 2> XYMean) 
+Geometric2DLine<typename DerivedA::Scalar> GeometricLeastSquaresLineFit(const MatrixBase<DerivedA> &XY,
+                                                                        const MatrixBase<DerivedB> &sqrtWeights,
+                                                                        const Eigen::Matrix<typename DerivedA::Scalar, 1, 2> XYMean)
 {
     typename DerivedA::Scalar residualNorm = 0;
     return GeometricLeastSquaresLineFit(XY, sqrtWeights, XYMean, residualNorm);
 }
 
 template<typename DerivedA, typename DerivedB>
-Geometric2DLine<typename DerivedA::Scalar> GeometricLeastSquaresLineFit(const MatrixBase<DerivedA> &XY, 
-                                                                        const MatrixBase<DerivedB> &weights, 
+Geometric2DLine<typename DerivedA::Scalar> GeometricLeastSquaresLineFit(const MatrixBase<DerivedA> &XY,
+                                                                        const MatrixBase<DerivedB> &weights,
                                                                         typename DerivedA::Scalar &residualNorm) {
 
     DebugAssert( (XY.cols() == 2) && (weights.rows() == XY.rows()) );
@@ -549,7 +546,7 @@ Geometric2DLine<typename DerivedA::Scalar> GeometricLeastSquaresLineFit(const Ma
 
     if (XY.rows() == 1) {
         // No good way to fit a line to one point...just return a horizontal line
-        
+
         coeffs(0) = (DataT) 0;
         coeffs(1) = (DataT) 1;
         coeffs(2) = (DataT) -XY(0,1);
@@ -566,10 +563,9 @@ Geometric2DLine<typename DerivedA::Scalar> GeometricLeastSquaresLineFit(const Ma
     return output;
 }
 
-
 // Throw away residual
 template<typename DerivedA, typename DerivedB>
-Geometric2DLine<typename DerivedA::Scalar> GeometricLeastSquaresLineFit(const MatrixBase<DerivedA> &XY, 
+Geometric2DLine<typename DerivedA::Scalar> GeometricLeastSquaresLineFit(const MatrixBase<DerivedA> &XY,
                                                                         const MatrixBase<DerivedB> &weights) {
     typename DerivedA::Scalar residualNorm = 0;
     return GeometricLeastSquaresLineFit(XY, residualNorm);
@@ -579,9 +575,9 @@ Geometric2DLine<typename DerivedA::Scalar> GeometricLeastSquaresLineFit(const Ma
 // (1) Find the line that minimizes the least-squares distance to the given points XY
 // (2) Use the parameters P to find the least-squares parameterization of the line from (1)
 template<typename DerivedT, typename DerivedD>
-LinearlyParameterized2DLine<typename DerivedD::Scalar> LeastSquaresLinearlyParameterizedLine(const Eigen::MatrixBase<DerivedT> &P, 
-                                                                                             const Eigen::MatrixBase<DerivedD> &XY, 
-                                                                                             typename DerivedD::Scalar &residual) 
+LinearlyParameterized2DLine<typename DerivedD::Scalar> LeastSquaresLinearlyParameterizedLine(const Eigen::MatrixBase<DerivedT> &P,
+                                                                                             const Eigen::MatrixBase<DerivedD> &XY,
+                                                                                             typename DerivedD::Scalar &residual)
 {
 
     DebugAssert( P.cols() == 1 );
@@ -598,7 +594,7 @@ LinearlyParameterized2DLine<typename DerivedD::Scalar> LeastSquaresLinearlyParam
 
     // Find initial anchor point (for numerical stability)
 
-    // AnchorPoint must be the mean 
+    // AnchorPoint must be the mean
     Eigen::Matrix<DataT, 1, 2> anchorPoint;
     anchorPoint(0) = XY.block(0, 0, N, 1).array().mean();
     anchorPoint(1) = XY.block(0, 1, N, 1).array().mean();
@@ -631,8 +627,8 @@ LinearlyParameterized2DLine<typename DerivedD::Scalar> LeastSquaresLinearlyParam
 
 // Throws away residual
 template<typename DerivedT, typename DerivedD>
-LinearlyParameterized2DLine<typename DerivedD::Scalar> LeastSquaresLinearlyParameterizedLine(const Eigen::MatrixBase<DerivedT> &P, 
-                                                                                             const Eigen::MatrixBase<DerivedD> &XY) 
+LinearlyParameterized2DLine<typename DerivedD::Scalar> LeastSquaresLinearlyParameterizedLine(const Eigen::MatrixBase<DerivedT> &P,
+                                                                                             const Eigen::MatrixBase<DerivedD> &XY)
 {
     typename DerivedD::Scalar residual = 0;
     return LeastSquaresLinearlyParameterizedLine(P, XY, residual);
@@ -640,9 +636,9 @@ LinearlyParameterized2DLine<typename DerivedD::Scalar> LeastSquaresLinearlyParam
 
 // Weighted version of above
 template<typename DerivedT, typename DerivedD, typename DerivedW>
-LinearlyParameterized2DLine<typename DerivedD::Scalar> LeastSquaresLinearlyParameterizedLine(const Eigen::MatrixBase<DerivedT> &P, 
-                                                                                             const Eigen::MatrixBase<DerivedD> &XY, 
-                                                                                             const Eigen::MatrixBase<DerivedW> &weights, 
+LinearlyParameterized2DLine<typename DerivedD::Scalar> LeastSquaresLinearlyParameterizedLine(const Eigen::MatrixBase<DerivedT> &P,
+                                                                                             const Eigen::MatrixBase<DerivedD> &XY,
+                                                                                             const Eigen::MatrixBase<DerivedW> &weights,
                                                                                              typename DerivedD::Scalar &residual) {
 
     DebugAssert( P.cols() == 1 );
@@ -664,7 +660,7 @@ LinearlyParameterized2DLine<typename DerivedD::Scalar> LeastSquaresLinearlyParam
     Geometric2DLine<DataT> line = GeometricLeastSquaresLineFit(XY, sqrtWeights, XYMean);
 
     // Find initial anchor point (for numerical stability)
-    // AnchorPoint must be the mean 
+    // AnchorPoint must be the mean
 
     // Now find least-squares parametrization of line
     Eigen::Matrix<DataT, Dynamic, 1> tau = P.template cast<DataT>();
@@ -699,8 +695,8 @@ LinearlyParameterized2DLine<typename DerivedD::Scalar> LeastSquaresLinearlyParam
 
 // Throws away residual
 template<typename DerivedT, typename DerivedD, typename DerivedW>
-LinearlyParameterized2DLine<typename DerivedD::Scalar> LeastSquaresLinearlyParameterizedLine(const Eigen::MatrixBase<DerivedT> &P, 
-                                                                                             const Eigen::MatrixBase<DerivedD> &XY, 
+LinearlyParameterized2DLine<typename DerivedD::Scalar> LeastSquaresLinearlyParameterizedLine(const Eigen::MatrixBase<DerivedT> &P,
+                                                                                             const Eigen::MatrixBase<DerivedD> &XY,
                                                                                              const Eigen::MatrixBase<DerivedW> weights)
 {
     typename DerivedD::Scalar residual = 0;
@@ -711,8 +707,8 @@ LinearlyParameterized2DLine<typename DerivedD::Scalar> LeastSquaresLinearlyParam
 // (1) Find the line that minimizes the least-squares distance to the given points XY
 // (2) Use the parameters P to find the least-squares parameterization of the line from (1)
 template<typename DerivedT, typename DerivedD>
-QuadraticallyParameterized2DLine<typename DerivedD::Scalar> LeastSquaresQuadraticallyParameterizedLine(const Eigen::MatrixBase<DerivedT> &P, 
-                                                                                                       const Eigen::MatrixBase<DerivedD> &XY, 
+QuadraticallyParameterized2DLine<typename DerivedD::Scalar> LeastSquaresQuadraticallyParameterizedLine(const Eigen::MatrixBase<DerivedT> &P,
+                                                                                                       const Eigen::MatrixBase<DerivedD> &XY,
                                                                                                        typename DerivedD::Scalar &residual) {
 
     DebugAssert( ( P.cols() == 1 ) &&
@@ -765,8 +761,8 @@ QuadraticallyParameterized2DLine<typename DerivedD::Scalar> LeastSquaresQuadrati
 
 // Throws away residual
 template<typename DerivedT, typename DerivedD>
-QuadraticallyParameterized2DLine<typename DerivedD::Scalar> LeastSquaresQuadraticallyParameterizedLine(const Eigen::MatrixBase<DerivedT> &P, 
-                                                                                                       const Eigen::MatrixBase<DerivedD> &XY) 
+QuadraticallyParameterized2DLine<typename DerivedD::Scalar> LeastSquaresQuadraticallyParameterizedLine(const Eigen::MatrixBase<DerivedT> &P,
+                                                                                                       const Eigen::MatrixBase<DerivedD> &XY)
 {
     typename DerivedD::Scalar residual = 0;
     return LeastSquaresQuadraticallyParameterizedLine(P, XY, residual);
@@ -774,10 +770,10 @@ QuadraticallyParameterized2DLine<typename DerivedD::Scalar> LeastSquaresQuadrati
 
 // Weighted version of above:
 template<typename DerivedT, typename DerivedD, typename DerivedW>
-QuadraticallyParameterized2DLine<typename DerivedD::Scalar> LeastSquaresQuadraticallyParameterizedLine(const Eigen::MatrixBase<DerivedT> &P, 
-                                                                                                       const Eigen::MatrixBase<DerivedD> &XY, 
-                                                                                                       const Eigen::MatrixBase<DerivedW> &weights, 
-                                                                                                       typename DerivedD::Scalar &residual) 
+QuadraticallyParameterized2DLine<typename DerivedD::Scalar> LeastSquaresQuadraticallyParameterizedLine(const Eigen::MatrixBase<DerivedT> &P,
+                                                                                                       const Eigen::MatrixBase<DerivedD> &XY,
+                                                                                                       const Eigen::MatrixBase<DerivedW> &weights,
+                                                                                                       typename DerivedD::Scalar &residual)
 {
 
     DebugAssert( ( P.cols() == 1 ) &&
@@ -838,9 +834,9 @@ QuadraticallyParameterized2DLine<typename DerivedD::Scalar> LeastSquaresQuadrati
 
 // Throws away residual
 template<typename DerivedT, typename DerivedD, typename DerivedW>
-QuadraticallyParameterized2DLine<typename DerivedD::Scalar> LeastSquaresQuadraticallyParameterizedLine(const Eigen::MatrixBase<DerivedT> &P, 
-                                                                                                       const Eigen::MatrixBase<DerivedD> &XY, 
-                                                                                                       const Eigen::MatrixBase<DerivedW> &weights) 
+QuadraticallyParameterized2DLine<typename DerivedD::Scalar> LeastSquaresQuadraticallyParameterizedLine(const Eigen::MatrixBase<DerivedT> &P,
+                                                                                                       const Eigen::MatrixBase<DerivedD> &XY,
+                                                                                                       const Eigen::MatrixBase<DerivedW> &weights)
 {
     typename DerivedD::Scalar residual = 0;
     return LeastSquaresQuadraticallyParameterizedLine(P, XY, weights, residual);

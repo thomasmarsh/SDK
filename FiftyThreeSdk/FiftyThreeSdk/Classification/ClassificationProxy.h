@@ -1,8 +1,8 @@
 //
 //  ClassificationProxy.h
-//  Classification
+//  FiftyThreeSdk
 //
-//  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
+//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
 
 #pragma once
@@ -11,17 +11,17 @@
 
 #include "FiftyThreeSdk/Classification/Cluster.h"
 #include "FiftyThreeSdk/Classification/CommonDeclarations.h"
-#include "FiftyThreeSdk/Classification/EigenLAB.h"
 #include "FiftyThreeSdk/Classification/Debug.h"
+#include "FiftyThreeSdk/Classification/DumbStylus.h"
+#include "FiftyThreeSdk/Classification/EigenLAB.h"
 #include "FiftyThreeSdk/Classification/FiniteDifferences.h"
 #include "FiftyThreeSdk/Classification/IsolatedStrokes.h"
-#include "math.h"
 #include "FiftyThreeSdk/Classification/OffscreenPenLongPress.h"
 #include "FiftyThreeSdk/Classification/PenDirection.h"
 #include "FiftyThreeSdk/Classification/PenEvents.h"
 #include "FiftyThreeSdk/Classification/Quadrature.h"
 #include "FiftyThreeSdk/Classification/TouchLogger.h"
-#include "FiftyThreeSdk/Classification/DumbStylus.h"
+#include "math.h"
 
 // It's expected that the application routes touch and pen events
 // to the classifier.
@@ -51,8 +51,6 @@ namespace fiftythree
 namespace sdk
 {
 
-static const char *kClassifierUseCancelledTouch = "classifierUseCancelled";
-   
 struct TouchStatistics
 {
     float _penDownDeltaT;
@@ -75,10 +73,10 @@ struct TouchStatistics
     float _dominationScore;
     float _preIsolation;
     float _postIsolation;
-    
+
     double _tBegan;
     double _tEnded;
-    
+
     int   _clusterId;
 
     // using 100.0f since max() is really annoying when you open the spreadsheet.
@@ -140,30 +138,28 @@ public:
     void ClearTouchesReclassified();
 
     TouchType ClassifyPair(common::TouchId touch0, common::TouchId touch1, const TwoTouchPairType & type);
-    
+
     TouchType ClassifyForGesture(common::TouchId touch0, const SingleTouchGesture & type);
-    
+
     Eigen::VectorXf GeometricStatistics(common::TouchId  touch0);
 
     bool AreAnyTouchesCurrentlyPenOrEraser();
 
     bool HasPenActivityOccurredRecently();
-    
+
     bool IsAnySwitchDown();
-    
+
     bool IsReclassifiable(common::Touch::Ptr const & touch, Stroke::Ptr const &stroke);
 
     void RemoveEdgeThumbs();
-    
+
     void ClearSessionStatistics();
     fiftythree::common::SessionStatistics::Ptr SessionStatistics();
-    
-    
+
 protected:
 
     fiftythree::common::SessionStatistics::Ptr _sessionStatistics;
-    
-    
+
     // not really clear if these need to be exposed as tuning parameters.
     // they are used to decide when a touch can no longer be reclassified and
     // associated resources can be released.
@@ -173,13 +169,13 @@ protected:
 
     Event<Unit> _LongPressWithPencilTip;
     std::map<common::TouchId, TouchType> _currentTypes;
-    
+
     std::map<common::TouchId, bool>      _touchLocked;
 
     std::map<common::TouchId, TouchStatistics> _touchStatistics;
 
     ClusterTracker::Ptr                  _clusterTracker;
-    
+
     IsolatedStrokesClassifier            _isolatedStrokesClassifier;
     PenEventClassifier                   _penEventClassifier;
     PenTracker                           _penTracker;
@@ -187,7 +183,7 @@ protected:
     OffscreenPenLongPressGestureRecognizer _offscreenPenLongPressGR;
 
     std::deque<PenEvent>                 _debounceQueue;
-    
+
     // True if everything not associated with a penEvent is rejected.
     bool                                 _penEventsRequired;
     // True if stylus is connected and can deliver PenEvents
@@ -196,7 +192,7 @@ protected:
     bool                                 _ignorePenEvents;
 
     void UpdateIsolationStatistics();
-    
+
     const CommonData _commonData;
 
     std::vector<common::TouchId> _endedTouchesReclassified;
@@ -204,19 +200,18 @@ protected:
 
     Eigen::Vector2f    _penDirection;
 
-
     bool _usePrivateTouchSizeAPI;
 
 protected:
-    
+
     void UpdateSessionStatistics();
-    
+
     void SaveCurrentPenTipTouch(common::TouchId touchId);
 
     void ClassifyIsolatedStrokes();
 
     void ReclassifyClusters();
-    
+
     void FingerTapIsolationRule(IdTypeMap& newTypes);
 
     void SetClusterType(Cluster::Ptr const & cluster, TouchType newType, IdTypeMap &changedTypes);
@@ -228,9 +223,9 @@ protected:
     std::vector<int> SortedIndices(std::vector<float>);
 
     void ClearStaleTouchStatistics();
-    
+
     void ProcessDebounceQueue();
-    
+
     // Akil:
     bool _isolatedStrokesForClusterClassification;
 
@@ -239,7 +234,7 @@ public:
     bool _clearStaleStatistics;
     bool _showDebugLogMessages;
     bool _testingIsolated;
-    
+
     // at the moment, this is used in one place -- there is some bookkeeping which
     // frees up old stroke data, and part of the calculation involves clock time.
     // this is not going to work when running RTs, and should not affect anything.
@@ -259,7 +254,7 @@ public:
     // this feels like it should be in PenDirection, but it shouldn't.  The decision crosses multiple
     // components.
     bool      HandednessLocked();
-    
+
     void      InitializeTouchTypes();
 
     void      LockTypeForTouch(common::TouchId touchId);
@@ -321,7 +316,6 @@ public:
         return _clusterTracker;
     }
 
-
     PenTracker* PenTracker()
     {
         return &_penTracker;
@@ -331,7 +325,7 @@ public:
     {
         return _usePrivateTouchSizeAPI;
     }
-    
+
     void SetUsePrivateTouchSizeAPI(bool useIt)
     {
         _usePrivateTouchSizeAPI = useIt;
@@ -344,8 +338,6 @@ public:
     void SetOldUnknownTouchesToType(TouchType newType);
 
     void SetCurrentTime(double timestamp);
-
-    
 
     std::vector<float> SizeDataForTouch(common::TouchId touchId);
 
@@ -363,16 +355,12 @@ public:
 
     // callback from clustertracker when an event ends
     void            OnClusterEventEnded();
-    
+
     void            RecomputeClusterPriors();
 
-    
-    
     Eigen::VectorXf PenPriorForTouches(TouchIdVector const &touchIds);
     Eigen::VectorXf PenPriorForClusters(std::vector<Cluster::Ptr> const &clusters);
 
-    
-    
     inline TouchClassificationProxy():
     _commonData(&_currentTypes, &_touchLocked, this),
     _clusterTracker(ClusterTracker::Ptr::make_shared(&_commonData)),
@@ -388,10 +376,10 @@ public:
     _clearStaleStatistics(true),
     _activeStylusConnected(false)
     {
-        
+
         ClearEndedTouchesReclassified();
         ClearActiveTouchesReclassified();
-        
+
         ClearSessionStatistics();
     }
 
@@ -399,21 +387,3 @@ public:
 
 }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
