@@ -1474,20 +1474,20 @@ static BOOL is_encrypted () {
     // WARNING: UIGetScreenImage will capture OpenGLES content correctly, but unfortunately is
     // a private API. By no means should a version using this function be submitted to the
     // AppStore for review.
-#define USE_UIGETSCREENIMAGE 1
-#if USE_UIGETSCREENIMAGE
-    CGImageRef UIGetScreenImage(void);
-    CGImageRef screenImage = UIGetScreenImage();
-    UIImage* image = [UIImage imageWithCGImage:screenImage];
-    CGImageRelease(screenImage);
-#else
+//#define USE_UIGETSCREENIMAGE 0
+//#if USE_UIGETSCREENIMAGE
+//    CGImageRef UIGetScreenImage(void);
+//    CGImageRef screenImage = UIGetScreenImage();
+//    UIImage* image = [UIImage imageWithCGImage:screenImage];
+//    CGImageRelease(screenImage);
+//#else
     UIWindow* keyWindow = [[UIApplication sharedApplication] keyWindow];
     UIGraphicsBeginImageContext(keyWindow.bounds.size);
-    [keyWindow.layer renderInContext:UIGraphicsGetCurrentContext()];
+    [keyWindow drawViewHierarchyInRect:keyWindow.bounds afterScreenUpdates:YES];
     
     UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
     UIGraphicsEndImageContext();
-#endif
+//#endif
     
     UIImage* returnImage = nil;
     UIInterfaceOrientation interfaceOrientation = [[UIApplication sharedApplication] statusBarOrientation];
