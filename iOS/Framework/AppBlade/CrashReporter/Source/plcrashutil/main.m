@@ -26,6 +26,8 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
+#ifndef TARGET_OS_IPHONE
+
 #import <Foundation/Foundation.h>
 #import <CrashReporter.h>
 
@@ -136,3 +138,5 @@ int main (int argc, char *argv[]) {
     [pool release];
     exit(ret);
 }
+
+#endif
