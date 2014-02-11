@@ -48,8 +48,8 @@ public:
     _TouchCount(0)
     {
         // Dummy so we don't need to check for null
-        _PenDownEvent = PenEvent::New(0, PenEventType::PenDown, PenTip::Tip1);
-        _PenUpEvent = PenEvent::New(0, PenEventType::PenUp, PenTip::Tip1);
+        _PenDownEvent = PenEvent::New(0, FTPenEventType::PenDown, FTPenTip::Tip1);
+        _PenUpEvent = PenEvent::New(0, FTPenEventType::PenUp, FTPenTip::Tip1);
     };
 
     bool HandlesPenInput()
@@ -216,7 +216,7 @@ public:
     {
         DebugAssert(CountTouches() == _TouchCount);
 
-        if (event->Type == PenEventType::PenDown)
+        if (event->Type == FTPenEventType::PenDown)
         {
             _PenDownEvent = event;
 

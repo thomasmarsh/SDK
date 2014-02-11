@@ -2,7 +2,7 @@
 //  PenEvent.h
 //  FiftyThreeSdk
 //
-//  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
+//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
 
 #pragma once
@@ -17,11 +17,11 @@ namespace fiftythree
 namespace sdk
 {
 
-DEFINE_ENUM(PenEventType,
+DEFINE_ENUM(FTPenEventType,
             PenUp,
             PenDown);
 
-DEFINE_ENUM(PenTip,
+DEFINE_ENUM(FTPenTip,
             Tip1,
             Tip2);
 
@@ -32,18 +32,15 @@ public:
     typedef fiftythree::common::shared_ptr<const PenEvent> cPtr;
 
     fiftythree::common::InputSample Sample;
-    PenEventType Type;
-    PenTip Tip;
-
-    std::string ToString() const;
-    static PenEvent::Ptr FromString(const std::string & s);
+    FTPenEventType Type;
+    FTPenTip Tip;
 
 protected:
     ~PenEvent() {}
     PenEvent() {}
 
 public:
-    static PenEvent::Ptr New(double timestamp, PenEventType type, PenTip tip);
+    static PenEvent::Ptr New(double timestamp, FTPenEventType type, FTPenTip tip);
 
     FT_NO_COPY(PenEvent)
 };

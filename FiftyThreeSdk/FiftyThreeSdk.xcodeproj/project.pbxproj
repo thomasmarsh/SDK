@@ -43,7 +43,6 @@
 		3CF2306F177E13910049A9EF /* FTServiceUUIDs.m in Sources */ = {isa = PBXBuildFile; fileRef = 3CF2306E177E13910049A9EF /* FTServiceUUIDs.m */; };
 		663AFED616FA511300681A90 /* TouchClassifierManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 663AFED416FA511300681A90 /* TouchClassifierManager.cpp */; };
 		663AFED916FA6BD800681A90 /* PenEvent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 663AFED716FA6BD800681A90 /* PenEvent.cpp */; };
-		6665F81C170F8B6F0027BAD1 /* FTTouchEventLogger.mm in Sources */ = {isa = PBXBuildFile; fileRef = 6665F81B170F8B6F0027BAD1 /* FTTouchEventLogger.mm */; };
 		666DC55E170CF33C00D6B3C2 /* FTApplication.mm in Sources */ = {isa = PBXBuildFile; fileRef = 666DC55D170CF33C00D6B3C2 /* FTApplication.mm */; };
 		66A8387516E52D840048FFE4 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 66A8387416E52D840048FFE4 /* Foundation.framework */; };
 		66B6E3EA16F9255C00251B6A /* LatencyTouchClassifier.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 66B6E3E816F9255C00251B6A /* LatencyTouchClassifier.cpp */; };
@@ -166,8 +165,6 @@
 		663AFED816FA6BD800681A90 /* PenEvent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PenEvent.h; path = FiftyThreeSdk/PenEvent.h; sourceTree = SOURCE_ROOT; };
 		6644317216F7FB920049E570 /* boost.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = boost.framework; path = ../../ThirdParty/boost/framework/boost.framework; sourceTree = "<group>"; };
 		665C1F5E16F0F23100F1BCB7 /* FTPen+Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "FTPen+Private.h"; path = "FiftyThreeSdk/FTPen+Private.h"; sourceTree = SOURCE_ROOT; };
-		6665F81A170F8B6F0027BAD1 /* FTTouchEventLogger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FTTouchEventLogger.h; path = FiftyThreeSdk/FTTouchEventLogger.h; sourceTree = SOURCE_ROOT; };
-		6665F81B170F8B6F0027BAD1 /* FTTouchEventLogger.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = FTTouchEventLogger.mm; path = FiftyThreeSdk/FTTouchEventLogger.mm; sourceTree = SOURCE_ROOT; };
 		666DC55C170CF33C00D6B3C2 /* FTApplication.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FTApplication.h; path = FiftyThreeSdk/FTApplication.h; sourceTree = SOURCE_ROOT; };
 		666DC55D170CF33C00D6B3C2 /* FTApplication.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = FTApplication.mm; path = FiftyThreeSdk/FTApplication.mm; sourceTree = SOURCE_ROOT; };
 		66A8387116E52D840048FFE4 /* libFiftyThreeSdk.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libFiftyThreeSdk.a; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -382,8 +379,6 @@
 				66A8389C16E531E40048FFE4 /* export */,
 				66C83D7B170600BB00789776 /* FTPenAndTouchManager.cpp */,
 				66C83D7A170600BB00789776 /* FTPenAndTouchManager.h */,
-				6665F81A170F8B6F0027BAD1 /* FTTouchEventLogger.h */,
-				6665F81B170F8B6F0027BAD1 /* FTTouchEventLogger.mm */,
 				6665F819170F8AC90027BAD1 /* PenManager */,
 				3C2F9C3E17807FCF00A5FFBC /* Services */,
 				66A8387716E52D840048FFE4 /* Supporting Files */,
@@ -518,7 +513,6 @@
 				0416CAC818A42B51004EAC00 /* Performance.cpp in Sources */,
 				666DC55E170CF33C00D6B3C2 /* FTApplication.mm in Sources */,
 				0416CACC18A42B51004EAC00 /* Stroke.cpp in Sources */,
-				6665F81C170F8B6F0027BAD1 /* FTTouchEventLogger.mm in Sources */,
 				0416CACD18A42B51004EAC00 /* TouchLogger.cpp in Sources */,
 				0416CAC618A42B51004EAC00 /* PenDirection.cpp in Sources */,
 				0416CACE18A42B51004EAC00 /* UIDeviceHardware.m in Sources */,

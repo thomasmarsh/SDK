@@ -9,7 +9,7 @@
 
 #include "Common/Memory.h"
 #include "Common/Touch/Touch.h"
-#include "FTTouchEventLogger.h"
+#include "FiftyThreeSdk/PenEvent.h"
 
 namespace fiftythree
 {
@@ -35,7 +35,6 @@ protected:
     ~FTPenAndTouchManager() {}
 
 public:
-    virtual void SetLogger(FTTouchEventLogger::Ptr logger) = 0;
     virtual void SetPalmRejectionEnabled(bool enabled) = 0;
 
     virtual void RegisterForEvents() = 0;

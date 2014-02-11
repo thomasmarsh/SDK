@@ -2,45 +2,19 @@
 //  PenEvent.cpp
 //  FiftyThreeSdk
 //
-//  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
+//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
 
 #include "Common/Memory.h"
 #include "PenEvent.h"
 
-using namespace fiftythree::sdk;
 using namespace fiftythree::common;
-
-std::string PenEvent::ToString() const
-{
-    std::stringstream ss ;
-    ss.precision(20);
-    ss << (int)this->Type << ","
-    << this->Tip << ","
-    << this->Sample.ToString();
-    return ss.str();
-}
-
-PenEvent::Ptr PenEvent::FromString(const std::string & s)
-{
-    std::vector<std::string> parts;
-    boost::algorithm::split(parts, s, boost::is_any_of("=,"));
-
-    std::vector<std::string> remainder(parts.begin() + 2, parts.end());
-
-    InputSample sample = InputSample::FromString(boost::algorithm::join(remainder, ","));
-    PenEvent::Ptr event = PenEvent::New(
-                                        sample.TimestampSeconds(),
-                                        PenEventType((PenEventType::PenEventTypeEnum)boost::lexical_cast<int>(parts[0])),
-                                        PenTip((PenTip::PenTipEnum)boost::lexical_cast<int>(parts[1])));
-
-    return event;
-}
+using namespace fiftythree::sdk;
 
 class PenEventImpl : public PenEvent
 {
 public:
-    PenEventImpl(double timestamp, PenEventType type, PenTip tip)
+    PenEventImpl(double timestamp, FTPenEventType type, FTPenTip tip)
     {
         InputSample sample(Eigen::Vector2f::Zero(),
                            Eigen::Vector2f::Zero(),
@@ -53,7 +27,7 @@ public:
     ~PenEventImpl() {}
 };
 
-PenEvent::Ptr PenEvent::New(double timestamp, PenEventType type, PenTip tip)
+PenEvent::Ptr PenEvent::New(double timestamp, FTPenEventType type, FTPenTip tip)
 {
     return fiftythree::common::make_shared<PenEventImpl>(timestamp, type, tip);
 }

@@ -13,7 +13,6 @@
 #include "Common/NoCopy.h"
 #include "Common/Touch/TouchTracker.h"
 #include "FTPenAndTouchManager.h"
-#include "FTTouchEventLogger.h"
 #include "LatencyTouchClassifier.h"
 #include "TouchClassifierManager.h"
 
@@ -29,7 +28,6 @@ class FTPenAndTouchManagerImpl : public FTPenAndTouchManager, public fiftythree:
 {
 private:
     TouchClassifierManager::Ptr _ClassifierManager;
-    FTTouchEventLogger::Ptr _Logger;
     TouchToTypeMap _Touches;
     Event<const Touch::cPtr &> _TouchTypeChangedEvent;
     Event<Unit> _ShouldStartTrialSeparation;
@@ -76,11 +74,6 @@ public:
         TouchTracker::Instance()->TouchesCancelled().RemoveListener(shared_from_this());
     }
 
-    void SetLogger(FTTouchEventLogger::Ptr logger)
-    {
-        _Logger = logger;
-    }
-
     void TouchesBegan(const TouchesSetEvent & sender, const TouchesSet & touches)
     {
         StopTimer(_TrialSeparationTimer);
@@ -88,11 +81,6 @@ public:
         for (const Touch::cPtr & touch : touches)
         {
             _Touches[touch] = FTTouchType::Unknown;
-        }
-
-        if (_Logger)
-        {
-            _Logger->TouchesBegan(touches);
         }
 
         if (_PalmRejectionEnabled)
@@ -103,10 +91,6 @@ public:
 
     void TouchesMoved(const TouchesSetEvent & sender, const TouchesSet & touches)
     {
-        if (_Logger)
-        {
-            _Logger->TouchesMoved(touches);
-        }
 
         if (_PalmRejectionEnabled)
         {
@@ -121,8 +105,6 @@ public:
             _Touches.erase(touch);
         }
 
-        if (_Logger) _Logger->TouchesEnded(touches);
-
         if (_PalmRejectionEnabled)
         {
             _ClassifierManager->TouchesEnded(touches);
@@ -136,8 +118,6 @@ public:
             _Touches.erase(touch);
         }
 
-        if (_Logger) _Logger->TouchesCancelled(touches);
-
         if (_PalmRejectionEnabled)
         {
             _ClassifierManager->TouchesCancelled(touches);
@@ -147,21 +127,19 @@ public:
     virtual void HandlePenEvent(const PenEvent::Ptr & event)
     {
         // Consider trial separation
-        if (event->Tip == PenTip::Tip1)
+        if (event->Tip == FTPenTip::Tip1)
         {
             if (_Touches.size() == 0
-                && event->Type == PenEventType::PenDown)
+                && event->Type == FTPenEventType::PenDown)
             {
                 StopTimer(_TrialSeparationTimer);
                 _TrialSeparationTimer->Start(1.0);
             }
-            else if (event->Type == PenEventType::PenUp)
+            else if (event->Type == FTPenEventType::PenUp)
             {
                 StopTimer(_TrialSeparationTimer);
             }
         }
-
-        if (_Logger) _Logger->HandlePenEvent(event);
 
         if (_PalmRejectionEnabled)
         {
@@ -180,11 +158,6 @@ public:
     virtual void Clear()
     {
         _Touches.clear();
-
-        if (_Logger)
-        {
-            _Logger->Clear();
-        }
     }
 
     virtual FTTouchType GetTouchType(const Touch::cPtr & touch)
