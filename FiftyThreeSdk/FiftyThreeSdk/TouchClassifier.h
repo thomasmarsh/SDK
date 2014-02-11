@@ -2,7 +2,7 @@
 //  TouchClassifier.h
 //  FiftyThreeSdk
 //
-//  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
+//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
 
 #pragma once
@@ -38,7 +38,7 @@ public:
 
     virtual void ProcessPenEvent(const PenEvent::Ptr & event) = 0;
 
-    virtual TouchType GetTouchType(const fiftythree::common::Touch::cPtr & touch) = 0;
+    virtual FTTouchType GetTouchType(const fiftythree::common::Touch::cPtr & touch) = 0;
     virtual Event<const common::Touch::cPtr &> & TouchTypeChanged() = 0;
 };
 

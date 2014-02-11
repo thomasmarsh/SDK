@@ -15,8 +15,8 @@
 #include "TouchClassifier.h"
 #include "TouchClassifierManager.h"
 
-using namespace fiftythree::sdk;
 using namespace fiftythree::common;
+using namespace fiftythree::sdk;
 
 class TouchClassifierManagerImpl : public TouchClassifierManager, public fiftythree::common::enable_shared_from_this<TouchClassifierManagerImpl>
 {
@@ -86,7 +86,7 @@ public:
         }
     }
 
-    virtual TouchType GetTouchType(const fiftythree::common::Touch::cPtr & touch)
+    virtual FTTouchType GetTouchType(const fiftythree::common::Touch::cPtr & touch)
     {
         return _Classifiers[0]->GetTouchType(touch); // BUGBUG - figure out how to combine
     }

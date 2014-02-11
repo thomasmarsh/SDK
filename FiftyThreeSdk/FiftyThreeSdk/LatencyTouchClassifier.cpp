@@ -12,11 +12,11 @@
 #include "Common/Touch/TouchManager.h"
 #include "LatencyTouchClassifier.h"
 
-using namespace fiftythree::sdk;
 using namespace fiftythree::common;
-using std::vector;
-using std::string;
+using namespace fiftythree::sdk;
 using std::numeric_limits;
+using std::string;
+using std::vector;
 
 const double MAX_DELAY_SEC = 0.300;
 
@@ -138,7 +138,7 @@ public:
 
         for (const Touch::cPtr & touch : touches)
         {
-            if (GetTouchType(touch) != TouchType::Unknown) continue;
+            if (GetTouchType(touch) != FTTouchType::Unknown) continue;
 
             double delta = abs(touch->CurrentSample().TimestampSeconds() - touch->FirstSample().TimestampSeconds());
 //            std::cout << "Moved id = " << touch->Id() << " delta = " << delta << std::endl;
@@ -168,8 +168,8 @@ public:
 
             _TouchCount--;
 
-            TouchType type = GetTouchType(touch);
-            if (type == TouchType::Pen)
+            FTTouchType type = GetTouchType(touch);
+            if (type == FTTouchType::Pen)
             {
                 _PenTouch.reset();
 
@@ -181,12 +181,12 @@ public:
                     _FingerTouches.erase(remove(_FingerTouches.begin(), _FingerTouches.end(), touch), _FingerTouches.end());
                 }
             }
-            else if (type == TouchType::Finger)
+            else if (type == FTTouchType::Finger)
             {
                 // Finger touches are removed right away
                 _FingerTouches.erase(remove(_FingerTouches.begin(), _FingerTouches.end(), touch), _FingerTouches.end());
             }
-            else if (type == TouchType::Unknown)
+            else if (type == FTTouchType::Unknown)
             {
                 _UnknownTouches.erase(remove(_UnknownTouches.begin(), _UnknownTouches.end(), touch), _UnknownTouches.end());
 
@@ -236,39 +236,39 @@ public:
         DebugAssert(CountTouches() == _TouchCount);
     }
 
-    TouchType GetTouchType(const fiftythree::common::Touch::cPtr & touch)
+    FTTouchType GetTouchType(const fiftythree::common::Touch::cPtr & touch)
     {
         if (_PenTouch == touch)
         {
-            return TouchType::Pen;
+            return FTTouchType::Pen;
         }
         else if (find(_FingerTouches.begin(), _FingerTouches.end(), touch) != _FingerTouches.end())
         {
-            return TouchType::Finger;
+            return FTTouchType::Finger;
         }
         else if (find(_UnknownTouches.begin(), _UnknownTouches.end(), touch) != _UnknownTouches.end())
         {
-            return TouchType::Unknown;
+            return FTTouchType::Unknown;
         }
         else
         {
-            return TouchType::NotFound;
+            return FTTouchType::NotFound;
         }
     }
 
     void FireTouchTypeChangedEvent(const Touch::cPtr & touch)
     {
-        TouchType type = GetTouchType(touch);
+        FTTouchType type = GetTouchType(touch);
         string typeName;
-        if (type == TouchType::Unknown)
+        if (type == FTTouchType::Unknown)
         {
             typeName = "UNKNOWN";
         }
-        else if (type == TouchType::Pen)
+        else if (type == FTTouchType::Pen)
         {
             typeName = "PEN";
         }
-        else if (type == TouchType::Finger)
+        else if (type == FTTouchType::Finger)
         {
             typeName = "FINGER";
         }

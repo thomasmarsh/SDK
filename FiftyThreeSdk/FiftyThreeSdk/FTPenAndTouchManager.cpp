@@ -17,13 +17,13 @@
 #include "LatencyTouchClassifier.h"
 #include "TouchClassifierManager.h"
 
-using namespace fiftythree::sdk;
 using namespace fiftythree::common;
+using namespace fiftythree::sdk;
+using boost::unordered_map;
 using std::make_pair;
 using std::pair;
-using boost::unordered_map;
 
-typedef unordered_map<Touch::cPtr, TouchType> TouchToTypeMap;
+typedef unordered_map<Touch::cPtr, FTTouchType> TouchToTypeMap;
 
 class FTPenAndTouchManagerImpl : public FTPenAndTouchManager, public fiftythree::common::enable_shared_from_this<FTPenAndTouchManagerImpl>
 {
@@ -87,7 +87,7 @@ public:
 
         for (const Touch::cPtr & touch : touches)
         {
-            _Touches[touch] = TouchType::Unknown;
+            _Touches[touch] = FTTouchType::Unknown;
         }
 
         if (_Logger)
@@ -187,7 +187,7 @@ public:
         }
     }
 
-    virtual TouchType GetTouchType(const Touch::cPtr & touch)
+    virtual FTTouchType GetTouchType(const Touch::cPtr & touch)
     {
         return _ClassifierManager->GetTouchType(touch);
     }

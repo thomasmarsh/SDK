@@ -2,7 +2,7 @@
 //  FTPenAndTouchManager.h
 //  FiftyThreeSdk
 //
-//  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
+//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
 
 #pragma once
@@ -16,7 +16,10 @@ namespace fiftythree
 namespace sdk
 {
 
-DEFINE_ENUM(TouchType,
+// TODO:
+//      This class is barely used. We should axe it and the event logger.
+
+DEFINE_ENUM(FTTouchType,
             Finger,
             Pen,
             Unknown,
@@ -40,7 +43,7 @@ public:
     virtual void Clear() = 0;
     virtual void HandlePenEvent(const PenEvent::Ptr & event) = 0; // TODO - should register for pen events as with touch events, for now pass them in
 
-    virtual TouchType GetTouchType(const common::Touch::cPtr & touch) = 0;
+    virtual FTTouchType GetTouchType(const common::Touch::cPtr & touch) = 0;
     virtual Event<const common::Touch::cPtr &> & TouchTypeChanged() = 0;
     virtual Event<Unit> & ShouldStartTrialSeparation() = 0;
 
