@@ -14,7 +14,6 @@
 #include "Common/Touch/TouchManager.h"
 #include "Common/Touch/TouchTracker.h"
 #include "FiftyThreeSdk/FTPenAndTouchManager.h"
-#include "FiftyThreeSdk/FTTouchEventLogger.h"
 
 #import <CoreBluetooth/CoreBluetooth.h>
 #import <MessageUI/MessageUI.h>
@@ -41,7 +40,6 @@ class TouchObserver;
 @interface BTLECentralViewController () <FTPenDelegate, UIAlertViewDelegate, MFMailComposeViewControllerDelegate>
 {
     FTPenAndTouchManager::Ptr _PenAndTouchManager;
-    FTTouchEventLogger::Ptr _EventLogger;
     Touch::cPtr _SelectedTouch;
     BOOL _SelectedTouchHighlighted; // the state the stroke was in before touched
     std::vector<Touch::cPtr> _HighlightedTouches;
@@ -146,9 +144,7 @@ public:
 
     _PenAndTouchManager = FTPenAndTouchManager::New();
     _PenAndTouchManager->RegisterForEvents();
-    _EventLogger = FTTouchEventLogger::New();
-    _PenAndTouchManager->SetLogger(_EventLogger);
-
+  
     _TouchObserver = make_shared<TouchObserver>(self);
     _PenAndTouchManager->TouchTypeChanged().AddListener(_TouchObserver, &TouchObserver::TouchTypeChanged);
     _PenAndTouchManager->ShouldStartTrialSeparation().AddListener(_TouchObserver, &TouchObserver::ShouldStartTrialSeparation);
@@ -317,8 +313,8 @@ public:
     [self.tipStateButton setHighlighted:isTipPressed];
 
     PenEvent::Ptr event = PenEvent::New([NSProcessInfo processInfo].systemUptime,
-                                        isTipPressed ? PenEventType::PenDown : PenEventType::PenUp,
-                                        PenTip::Tip1);
+                                        isTipPressed ? FTPenEventType::PenDown : FTPenEventType::PenUp,
+                                        FTPenTip::Tip1);
 
     _PenAndTouchManager->HandlePenEvent(event);
 }
@@ -336,8 +332,8 @@ public:
     [self.eraserStateButton setHighlighted:isEraserPressed];
 
     PenEvent::Ptr event = PenEvent::New([NSProcessInfo processInfo].systemUptime,
-                                        isEraserPressed ? PenEventType::PenDown : PenEventType::PenUp,
-                                        PenTip::Tip2);
+                                        isEraserPressed ? FTPenEventType::PenDown : FTPenEventType::PenUp,
+                                        FTPenTip::Tip2);
     _PenAndTouchManager->HandlePenEvent(event);
 }
 
@@ -580,9 +576,7 @@ public:
 - (Touch::cPtr)findStroke:(UITouch *)uiTouch
 {
     Touch::cPtr touch = static_pointer_cast<TouchTrackerObjC>(TouchTracker::Instance())->TouchForUITouch(uiTouch);
-    Touch::cPtr nearest = static_pointer_cast<FTTouchEventLoggerObjc>(_EventLogger)->NearestStrokeForTouch(touch);
-
-    return nearest;
+    return touch;
 }
 
 - (void)setInkColorRed
@@ -654,9 +648,9 @@ public:
 {
     if (self.penManager.pen)
     {
-        TouchType type = _PenAndTouchManager->GetTouchType(touch);
+        FTTouchType type = _PenAndTouchManager->GetTouchType(touch);
 
-        return type != TouchType::Finger;
+        return type != FTTouchType::Finger;
     }
     else
     {
@@ -860,27 +854,6 @@ Last Connect Date = %@\n \
 
 -(void)displayComposerSheet
 {
-    MFMailComposeViewController *picker = [[MFMailComposeViewController alloc] init];
-    picker.mailComposeDelegate = self;
-
-    [picker setSubject:@"Pen and Touch Event Data"];
-
-    NSArray *toRecipients = [NSArray arrayWithObjects:@"adam@fiftythree.com",
-                             nil];
-    [picker setToRecipients:toRecipients];
-
-    NSMutableData* data = static_pointer_cast<FTTouchEventLoggerObjc>(_EventLogger)->GetData();
-
-    for (const Touch::cPtr & touch : _HighlightedTouches)
-    {
-        stringstream ss;
-        ss << "strokestate=" << touch->Id() << ","
-            << 1 << std::endl;
-        [data appendBytes:ss.str().c_str() length:ss.tellp()];
-    }
-    [picker addAttachmentData:data mimeType:@"application/prd" fileName:@"strokedata.ptd"]; // todo - add counter to filename?
-
-    [self presentViewController:picker animated:YES completion:nil];
 }
 
 // The mail compose view controller delegate method
@@ -893,15 +866,7 @@ Last Connect Date = %@\n \
 
 - (IBAction)shareButtonPressed:(id)sender
 {
-    if (![MFMailComposeViewController canSendMail])
-    {
-        UIAlertView* alertView = [[UIAlertView alloc] initWithTitle:@"Share" message:@"Email must be configured to share" delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
-        [alertView show];
-    }
-    else
-    {
-        [self displayComposerSheet];
-    }
+ 
 }
 
 @end
