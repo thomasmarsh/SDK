@@ -40,6 +40,11 @@ using boost::optional;
                                                      name:kFTPenManagerDidUpdateStateNotificationName
                                                    object:nil];
     }
+    
+    
+    // Initialize the classifier here, as early as possible, since other components may try to consume it
+    // in their initialization.
+    [self classifier];
 
     return self;
 }
