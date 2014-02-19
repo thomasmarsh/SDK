@@ -7,8 +7,7 @@
 
 #pragma once
 
-#include<boost/static_assert.hpp>
-#include<boost/type_traits/is_floating_point.hpp>
+#include<type_traits>
 
 #include <Eigen/Dense>
 
@@ -24,7 +23,7 @@ namespace sdk {
 template<typename T>
 class Geometric2DLine {
 
-    BOOST_STATIC_ASSERT(boost::is_floating_point<T>::value);
+    static_assert(std::is_floating_point<T>::value, "Expecting a floating point type");
 
 protected:
     // This is a unit-vector line direction
@@ -203,7 +202,7 @@ public:
 template<typename T>
 class LinearlyParameterized2DLine: public Geometric2DLine<T> {
 
-    BOOST_STATIC_ASSERT(boost::is_floating_point<T>::value);
+    static_assert(std::is_floating_point<T>::value, "Expecting a floating point type");
 
 private:
     typedef Geometric2DLine<T> parent;
@@ -300,7 +299,7 @@ public:
 template<typename T>
 class QuadraticallyParameterized2DLine: public Geometric2DLine<T> {
 
-    BOOST_STATIC_ASSERT(boost::is_floating_point<T>::value);
+    static_assert(std::is_floating_point<T>::value, "Expecting a floating point type");
 
 private:
     typedef Geometric2DLine<T> parent;

@@ -1,17 +1,16 @@
 //
 //  CubicPolynomial.hpp
-//  Curves
+//  FiftyThreeSdk
 //
-//  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
+//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
 
 #pragma once
 
-#include <boost/static_assert.hpp>
-#include <boost/type_traits/is_floating_point.hpp>
+#include <type_traits>
 
-#include "FiftyThreeSdk/Classification/CommonDeclarations.h"
 #include "Common/Asserts.h"
+#include "FiftyThreeSdk/Classification/CommonDeclarations.h"
 
 namespace fiftythree
 {
@@ -31,8 +30,9 @@ template <class T>
 class CubicPolynomial
 {
 
-    BOOST_STATIC_ASSERT((T::ColsAtCompileTime == 1 && //Ensures it's an Eigen fixed sized column vector.
-                         T::IsVectorAtCompileTime));
+    static_assert((T::ColsAtCompileTime == 1 &&
+                         T::IsVectorAtCompileTime),
+                  "Ensures it's an Eigen fixed sized column vector.");
 
 protected:
     float _globalIntervalLeft;
@@ -299,7 +299,7 @@ public:
         P._t1 = t1;
         P._t2 = t2;
         P._t3 = t3;
-        
+
 //        _globalIntervalLeft = std::min(t0, t1, t2, t3);
 //        std::min(&t0, &t1);
 //        _globalIntervalRight = std::max(t0, t1, t2, t3);
@@ -311,10 +311,10 @@ public:
         return P;
 
     }
-    
+
     // Returns coefficients for L_0, L_1, L_2, and L_3, the normalized Legendre polynomials
     std::vector<T> NormalizedLegendreCoefficients() {
-        
+
     }
 
     // a first-order finite difference approximation to arc length
@@ -349,19 +349,19 @@ public:
     {
         return CubicPolynomial<T>::LineFromTo(this->ValueAt(1), value);
     }
-    
+
 protected:
-    
+
     // Just an affine map to the standard interval
     std::vector<float> MapToStandardInterval(std::vector<float> t) {
-        
+
         // If this is not defined with samples, abort
         if (_definingValueCount < 4) {
             return std::vector<float>();
         }
-        
+
         std::vector<float> vals = t;
-        
+
         vals -= _globalIntervalLeft;
         vals /= (_globalIntervalRight - _globalIntervalLeft);
         vals *= (_standardIntervalRight - _standardIntervalLeft);
