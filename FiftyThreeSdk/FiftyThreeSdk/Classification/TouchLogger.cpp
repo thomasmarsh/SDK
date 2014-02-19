@@ -8,7 +8,6 @@
 #include <boost/any.hpp>
 #include <boost/bind.hpp>
 #include <boost/foreach.hpp>
-#include <boost/tuple/tuple.hpp>
 
 #include "Common/Touch/Touch.h"
 #include "Common/Touch/TouchTracker.h"

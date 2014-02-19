@@ -7,9 +7,9 @@
 
 #include <boost/assign.hpp>
 #include <boost/foreach.hpp>
-#include <boost/tuple/tuple.hpp>
 #include <Eigen/Geometry>
 #include <iomanip>
+#include <tuple>
 
 #include "Common/Touch/Touch.h"
 #include "Common/Touch/TouchTracker.h"
@@ -21,7 +21,7 @@
 
 using namespace boost::assign;
 using Eigen::Vector2f;
-using boost::tie;
+using std::tie;
 using std::vector;
 
 using namespace Eigen;
