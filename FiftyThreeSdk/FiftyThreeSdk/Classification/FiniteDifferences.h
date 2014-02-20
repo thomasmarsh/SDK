@@ -1,11 +1,9 @@
 //
 //  FiniteDifferences.h
-//  Curves
+//  FiftyThreeSdk
 //
-//  Created by Akil Narayan on 2013/08/10.
-//  Copyright (c) 2013 Peter Sibley. All rights reserved.
+//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
-//  Finite difference stuff.
 
 #pragma once
 
@@ -13,10 +11,10 @@
 // All we need is a floating-point factorial, so just implement in here
 //#include <boost/math/special_functions/factorials.hpp>
 
-#include <Eigen/Geometry>
-#include <typeinfo>
 #include <boost/foreach.hpp>
+#include <typeinfo>
 
+#include "Common/Eigen.h"
 #include "FiftyThreeSdk/Classification/CommonDeclarations.h"
 #include "FiftyThreeSdk/Classification/EigenLAB.h"
 
@@ -24,7 +22,7 @@ using namespace Eigen;
 
 namespace fiftythree {
 namespace sdk {
-    
+
 typedef std::pair < int, std::vector < int > > LocationStencilPair;
 typedef std::vector < LocationStencilPair > BoundaryStencil;
 typedef std::map < int, std::vector< int > > BoundaryStencilMap;
@@ -42,9 +40,9 @@ T Factorial(const int &num) {
     return result;
 }
 
-//////////////////////////////// Derivative normalizations /////////////
+// Derivative normalizations /////////////
 
-// Computes (order-1) piecewise cross-validation error from the order'th 
+// Computes (order-1) piecewise cross-validation error from the order'th
 // derivative. E.g. for order=2 we get a piecewise-linear deviation.
 template<typename DerivedA, typename DerivedB>
     void NthDerivativeToCrossValidation(const Eigen::Map<DerivedA> &x,
@@ -72,7 +70,7 @@ template<typename DerivedA, typename DerivedB>
         case 2:
             // Hierarchical surplus from linear interpolation
             derivative /= 2.0f;
-            
+
             // Scaling with stencil +1
             scaling.segment(0,N-1) = scaling.segment(0, N-1).cwiseProduct(x.segment(0, N-1) - x.segment(1, N-1));
             scaling(N-1) *= x(N-1) - x(N-3);
@@ -152,7 +150,7 @@ void NthDerivativeFromCrossValidation(const Eigen::Map<DerivedA> &x,
             break;
 
         case 2:
-            
+
             // Scaling with stencil +1
             scaling.segment(0,N-1) = scaling.segment(0, N-1).cwiseProduct(x.segment(0, N-1) - x.segment(1, N-1));
             scaling(N-1) *= x(N-1) - x(N-3);
@@ -201,7 +199,7 @@ void NthDerivativeFromCrossValidation(const Eigen::Map<DerivedA> &x,
 
 // Method for Eigen::MatrixBase's
 template<typename DerivedA, typename DerivedB>
-void NthDerivativeFromCrossValidation(const Eigen::MatrixBase<DerivedA> &x, 
+void NthDerivativeFromCrossValidation(const Eigen::MatrixBase<DerivedA> &x,
                                       Eigen::MatrixBase<DerivedB> &derivative,
                                       const int &order) {
 
@@ -212,17 +210,17 @@ void NthDerivativeFromCrossValidation(const Eigen::MatrixBase<DerivedA> &x,
 
 }
 
-/////////////////////////////////////////////////////////////////////////////////
+//
 //                Begin utility methods for Finite Differences                 //
-/////////////////////////////////////////////////////////////////////////////////
+//
 
-// Most of these methods are in-place computational tools for modularity of various 
+// Most of these methods are in-place computational tools for modularity of various
 // common operations. None of them perform any kind of input checking.
 //
 // Divides each column of y by an abscissa quotient
 template<typename DerivedA, typename DerivedB>
 void ColumnWiseDividedDifferenceDivision(const Eigen::MatrixBase<DerivedA> &x,
-                                         Eigen::MatrixBase<DerivedB> &y, 
+                                         Eigen::MatrixBase<DerivedB> &y,
                                          const int &startIndex,
                                          const int &nRows,
                                          const int &xLeftOffset,
@@ -234,17 +232,17 @@ for (int i = 0; i < y.cols(); ++i) {
 
 }
 
-// Performs a single left-biased difference. 
+// Performs a single left-biased difference.
 // Uses the given indices to determine which interior nodes need to be updated, and also
 // divides by certain x-differences dependent on n.
 template<typename DerivedA, typename DerivedB>
-void LeftwardDividedDifference(const Eigen::MatrixBase<DerivedA> &x, 
-                               Eigen::MatrixBase<DerivedB> &output, 
-                               Eigen::MatrixBase<DerivedB> &tempStorage, 
+void LeftwardDividedDifference(const Eigen::MatrixBase<DerivedA> &x,
+                               Eigen::MatrixBase<DerivedB> &output,
+                               Eigen::MatrixBase<DerivedB> &tempStorage,
                                const int &n,
-                               const int &xLeftOffset, 
-                               const int &xRightOffset, 
-                               const int &M, 
+                               const int &xLeftOffset,
+                               const int &xRightOffset,
+                               const int &M,
                                const int &yCols) {
 
     tempStorage.block(xLeftOffset, 0, M-n, yCols) = output.block(xLeftOffset, 0, M-n, yCols) - output.block(xLeftOffset-1, 0, M-n, yCols);
@@ -255,17 +253,17 @@ void LeftwardDividedDifference(const Eigen::MatrixBase<DerivedA> &x,
 
 }
 
-// Performs a single right-biased difference. 
+// Performs a single right-biased difference.
 // Uses the given indices to determine which interior nodes need to be updated, and also
 // divides by certain x-differences dependent on n.
 template<typename DerivedA, typename DerivedB>
-void RightwardDividedDifference(const Eigen::MatrixBase<DerivedA> &x, 
-                                Eigen::MatrixBase<DerivedB> &output, 
-                                Eigen::MatrixBase<DerivedB> &tempStorage, 
+void RightwardDividedDifference(const Eigen::MatrixBase<DerivedA> &x,
+                                Eigen::MatrixBase<DerivedB> &output,
+                                Eigen::MatrixBase<DerivedB> &tempStorage,
                                 const int &n,
-                                const int &xLeftOffset, 
-                                const int &xRightOffset, 
-                                const int &M, 
+                                const int &xLeftOffset,
+                                const int &xRightOffset,
+                                const int &M,
                                 const int &yCols) {
 
     tempStorage.block(xLeftOffset, 0, M-n, yCols) = output.block(xLeftOffset, 0, M-n, yCols) - output.block(xLeftOffset+1, 0, M-n, yCols);
@@ -278,9 +276,9 @@ void RightwardDividedDifference(const Eigen::MatrixBase<DerivedA> &x,
 
 // Copies central edge values to all boundary locations
 template<typename Derived>
-void PostDifferencingBoundaryCopying(Eigen::MatrixBase<Derived> &output, 
-                                     const int &xLeftOffset, 
-                                     const int &xRightOffset, 
+void PostDifferencingBoundaryCopying(Eigen::MatrixBase<Derived> &output,
+                                     const int &xLeftOffset,
+                                     const int &xRightOffset,
                                      const int &M,
                                      const int &yCols) {
 
@@ -298,26 +296,26 @@ void PostDifferencingBoundaryCopying(Eigen::MatrixBase<Derived> &output,
 
 // Performs factorial normalization
 template<typename Derived>
-void PostDifferencingDerivativeNormalization(Eigen::MatrixBase<Derived> &output, 
-                                             const int &currentN, 
+void PostDifferencingDerivativeNormalization(Eigen::MatrixBase<Derived> &output,
+                                             const int &currentN,
                                              const int &N) {
 
     // Could save a little here with Pochhammer symbols
-    output *= (Factorial<typename Derived::Scalar>(N)) / 
+    output *= (Factorial<typename Derived::Scalar>(N)) /
               (Factorial<typename Derived::Scalar>(currentN));
 
 }
 
-/////////////////////////////////////////////////////////////////////////////////
+//
 //                End utility methods for Finite Differences                   //
-/////////////////////////////////////////////////////////////////////////////////
+//
 
 // Takes a derivative of order currentN, and updates to a derivative of order N >= currentN.
 // It edits y in-place for the output.
-// NOTE: This function, given currentN, assumes some very special structure about x and y, 
+// NOTE: This function, given currentN, assumes some very special structure about x and y,
 // and so it may not work the way one expects for general x and y.
 // E.g. IncrementalDerivative(x, y, 0, 2) computes a second derivative of data y
-// E.g. IncrementalDerivative(x, y, 1, 2) assumes y is a first derivative and 
+// E.g. IncrementalDerivative(x, y, 1, 2) assumes y is a first derivative and
 // overwrites it with the second derivative.
 template<typename DerivedA, typename DerivedB>
 void IncrementalDerivative(const Eigen::MatrixBase<DerivedA> &x,
@@ -370,10 +368,9 @@ void IncrementalDerivative(const Eigen::MatrixBase<DerivedA> &x,
 
 }
 
-
 // Takes N'th order derivative of y wrt x, putting data in "output".
 // This is the simplest method: does things with as little allocation as possible
-// The stencil is automatically computed with size N+1, centered around a point, with a 
+// The stencil is automatically computed with size N+1, centered around a point, with a
 // bias to the left in the case of N odd.
 // This sacrifices a lot of flexibility for more general procedures but is quite fast.
 // The powerhouse behind this is divided differences
@@ -388,8 +385,7 @@ void Derivative(const Eigen::MatrixBase<DerivedA> &x,
 
 }
 
-
-//////////////////////////////// Utilities /////////////////////////////
+// Utilities /////////////////////////////
 
 // Requires t.rows() == xy.rows()
 template<typename DerivedA, typename DerivedB>
@@ -404,7 +400,7 @@ DerivedB JerkOrthogonalToVelocity(const Eigen::MatrixBase<DerivedA> &t,
 
     DerivedB jerk = velocity;
     IncrementalDerivative(t, jerk, 1, 3);
-    
+
     int N = xy.rows();
 
     DebugAssert(N==t.rows());
@@ -414,8 +410,8 @@ DerivedB JerkOrthogonalToVelocity(const Eigen::MatrixBase<DerivedA> &t,
 
     // Numerator is j.*v
     // Denominator is |v|.^2
-    ProjectionFactors = ( velocity.array() * jerk.array() ).rowwise().sum().array() / 
-                        ( velocity.array().square()       ).rowwise().sum().array(); 
+    ProjectionFactors = ( velocity.array() * jerk.array() ).rowwise().sum().array() /
+                        ( velocity.array().square()       ).rowwise().sum().array();
 
     // We're mostly concerned with xy.cols==2, so a for-loop should be fine on performance
     for (int i = 0; i < xy.cols(); ++i) {
@@ -426,11 +422,10 @@ DerivedB JerkOrthogonalToVelocity(const Eigen::MatrixBase<DerivedA> &t,
     return jerk;
 }
 
-    
 template<typename DerivedA, typename DerivedB>
 DerivedB D4OrthogonalToVelocity(const Eigen::MatrixBase<DerivedA> &t,
                                 const Eigen::MatrixBase<DerivedB> &xy) {
-    
+
     //DerivedB velocity = NthDerivative(t, xy, 1);
     //DerivedB d4 = NthDerivative(t, xy, 4);
 
@@ -441,35 +436,35 @@ DerivedB D4OrthogonalToVelocity(const Eigen::MatrixBase<DerivedA> &t,
     IncrementalDerivative(t, d4, 1, 4);
 
     //DerivedB output(d4);
-    
+
     int N = xy.rows();
-    
+
     DebugAssert(N==t.rows());
-    
+
     Matrix<typename DerivedB::Scalar, Dynamic, 1> ProjectionFactors;
     ProjectionFactors.resize(N, 1);
-    
+
     // prevent NaN
     velocity.array() += .00001f;
-    
+
     // Numerator is j.*v
     // Denominator is |v|.^2
     ProjectionFactors = ( velocity.array() * d4.array() ).rowwise().sum().array() /
     ( velocity.array().square()       ).rowwise().sum().array();
-    
+
     // We're mostly concerned with xy.cols==2, so a for-loop should be fine on performance
     for (int i = 0; i < xy.cols(); ++i) {
         //output.block(0,i,N,1).array() -= (velocity.block(0,i,N,1).array() * ProjectionFactors.array());
         d4.block(0,i,N,1).array() -= (velocity.block(0,i,N,1).array() * ProjectionFactors.array());
     }
-    
+
     return d4;
 }
-    
+
 template<typename DerivedA, typename DerivedB>
 DerivedB D2OrthogonalToVelocity(const Eigen::MatrixBase<DerivedA> &t,
                                 const Eigen::MatrixBase<DerivedB> &xy) {
-    
+
     //DerivedB velocity = NthDerivative(t, xy, 1);
     //DerivedB d2 = NthDerivative(t, xy, 2);
 
@@ -480,25 +475,25 @@ DerivedB D2OrthogonalToVelocity(const Eigen::MatrixBase<DerivedA> &t,
     IncrementalDerivative(t, d2, 1, 2);
 
     int N = xy.rows();
-    
+
     DebugAssert(N==t.rows());
-    
+
     Matrix<typename DerivedB::Scalar, Dynamic, 1> ProjectionFactors;
     ProjectionFactors.resize(N, 1);
-    
+
     // Numerator is j.*v
     // Denominator is |v|.^2
     ProjectionFactors = ( velocity.array() * d2.array() ).rowwise().sum().array() /
     ( velocity.array().square()       ).rowwise().sum().array();
-    
+
     // We're mostly concerned with xy.cols==2, so a for-loop should be fine on performance
     for (int i = 0; i < xy.cols(); ++i) {
         //output.block(0,i,N,1).array() -= (velocity.block(0,i,N,1).array() * ProjectionFactors.array());
         d2.block(0,i,N,1).array() -= (velocity.block(0,i,N,1).array() * ProjectionFactors.array());
     }
-    
+
     return d2;
-    
+
 }
 
 /*
@@ -548,8 +543,8 @@ double yraw[] = {
 curves::Stroke::Ptr stroke = curves::Stroke::New();
 for (int i = 0; i < 10; ++i) {
     Eigen::Vector2f tempXY;
-    tempXY(0) = (float) xraw[i]; 
-    tempXY(1) = (float) yraw[i]; 
+    tempXY(0) = (float) xraw[i];
+    tempXY(1) = (float) yraw[i];
 
     stroke->AddPoint(tempXY, traw[i]);
 }

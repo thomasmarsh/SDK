@@ -1,19 +1,20 @@
 //
 //  CommonDeclarations.h
-//  Classification
+//  FiftyThreeSdk
 //
-//  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
+//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
 
 #pragma once
 
-#include <Eigen/Geometry>
-#include <vector>
 #include <boost/assign.hpp>
 #include <boost/strong_typedef.hpp>
+#include <vector>
+
+#include "Classifier.h"
+#include "Common/Eigen.h"
 #include "Common/Enum.h"
 #include "Common/Touch/Touch.h"
-#include "Classifier.h"
 
 namespace fiftythree
 {
@@ -23,11 +24,10 @@ namespace sdk
 typedef std::map<common::TouchId, float> IdFloatMap;
 typedef std::map<common::TouchId, TouchType> IdTypeMap;
 typedef std::pair<common::TouchId, TouchType> IdTypePair;
-    
 
 static const float Inf = std::numeric_limits<float>::infinity();
 static const int intInf = std::numeric_limits<int>::max() -3 ; // -3 because of indexing issues
-    
+
 // Like TouchId, valid ids are non-negative
 //typedef int PenEventId;
 BOOST_STRONG_TYPEDEF(int, PenEventId);
@@ -122,4 +122,3 @@ struct Interval
 };
 }
 }
-

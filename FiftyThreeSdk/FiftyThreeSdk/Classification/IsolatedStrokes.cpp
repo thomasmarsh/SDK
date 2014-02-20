@@ -5,10 +5,10 @@
 //  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
 
-#include <Eigen/Geometry>
 #include <math.h>
 #include <numeric>
 
+#include "Common/Eigen.h"
 #include "FiftyThreeSdk/Classification/ClassificationProxy.h"
 #include "FiftyThreeSdk/Classification/EigenLAB.h"
 #include "FiftyThreeSdk/Classification/FiniteDifferences.h"

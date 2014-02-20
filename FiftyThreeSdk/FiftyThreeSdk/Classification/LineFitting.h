@@ -9,9 +9,8 @@
 
 #include<type_traits>
 
-#include <Eigen/Dense>
-
 #include "FiftyThreeSdk/Classification/CommonDeclarations.h" // This is only for DebugAssert...where was it defined?
+#include "FiftyThreeSdk/Classification/Eigen.h"
 #include "FiftyThreeSdk/Classification/EigenLAB.h"
 #include "FiftyThreeSdk/Classification/LinAlgHelpers.h"
 

@@ -7,10 +7,10 @@
 
 #include <boost/assign.hpp>
 #include <boost/foreach.hpp>
-#include <Eigen/Geometry>
 #include <iomanip>
 #include <tuple>
 
+#include "Common/Eigen.h"
 #include "Common/Touch/Touch.h"
 #include "Common/Touch/TouchTracker.h"
 #include "FiftyThreeSdk/Classification/ClassificationProxy.h"

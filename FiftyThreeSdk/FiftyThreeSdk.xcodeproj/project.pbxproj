@@ -126,6 +126,7 @@
 		0416CAB718A42B51004EAC00 /* TouchLogger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TouchLogger.h; sourceTree = "<group>"; };
 		0416CAB818A42B51004EAC00 /* UIDeviceHardware.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UIDeviceHardware.h; sourceTree = "<group>"; };
 		0416CAB918A42B51004EAC00 /* UIDeviceHardware.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UIDeviceHardware.m; sourceTree = "<group>"; };
+		0493D9DC18B6957B0049FEFC /* Eigen.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Eigen.h; sourceTree = "<group>"; };
 		349A642F174FD5D80071D899 /* Common.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Common.xcodeproj; path = ../../Common/Common.xcodeproj; sourceTree = "<group>"; };
 		3C02E083183698E100420B95 /* FTLog.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FTLog.m; path = FiftyThreeSdk/FTLog.m; sourceTree = "<group>"; };
 		3C2F9C381780758300A5FFBC /* FTPeripheralDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FTPeripheralDelegate.h; path = FiftyThreeSdk/FTPeripheralDelegate.h; sourceTree = SOURCE_ROOT; };
@@ -251,6 +252,7 @@
 				0416CAB718A42B51004EAC00 /* TouchLogger.h */,
 				0416CAB818A42B51004EAC00 /* UIDeviceHardware.h */,
 				0416CAB918A42B51004EAC00 /* UIDeviceHardware.m */,
+				0493D9DC18B6957B0049FEFC /* Eigen.h */,
 			);
 			name = Classification;
 			path = FiftyThreeSdk/Classification;

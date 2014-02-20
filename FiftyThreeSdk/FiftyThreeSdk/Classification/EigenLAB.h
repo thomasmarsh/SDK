@@ -1,8 +1,8 @@
 //
 //  EigenLAB.h
-//  Curves
+//  FiftyThreeSdk
 //
-//  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
+//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
 
 #pragma once
@@ -19,10 +19,10 @@
  */
 
 #include <ios>
-#include <sys/time.h>
-#include <Eigen/Geometry>
 #include <limits>
+#include <sys/time.h>
 
+#include "Common/Eigen.h"
 #include "FiftyThreeSdk/Classification/CommonDeclarations.h"
 #include "FiftyThreeSdk/Classification/CubicPolynomial.hpp"
 
@@ -30,7 +30,7 @@ namespace fiftythree
 {
 namespace sdk
 {
-    
+
 template<typename T>
 T round(T val)
 {
@@ -49,7 +49,7 @@ float                               SquaredNorm(std::vector< Eigen::Vector2f > c
 
 // For some reason .squaredNorm() doesn't work for vector subsets of matrices
 template<typename DerivedA>
-typename DerivedA::Scalar SquaredNorm(const Eigen::MatrixBase<DerivedA> &A) { 
+typename DerivedA::Scalar SquaredNorm(const Eigen::MatrixBase<DerivedA> &A) {
 
     DebugAssert( ( A.rows() == 1 ) || ( A.cols() == 1) );
 
@@ -76,19 +76,18 @@ void NormalizeVectorInPlace(Eigen::MatrixBase<DerivedA> &A) {
     typename DerivedA::Scalar ANorm = std::sqrt(SquaredNorm(A));
 
     // If the vector is the zero vector, don't normalize
-    if ( ! IsFPZero(ANorm) ) 
+    if ( ! IsFPZero(ANorm) )
     {
         A /= std::sqrt(SquaredNorm(A));
     }
 }
 
-
-// Returns the covariance matrix, in Matlab parlance: (D-mean(D))*(D-mean(D)' 
+// Returns the covariance matrix, in Matlab parlance: (D-mean(D))*(D-mean(D)'
 Eigen::MatrixXf                     Covariance(std::vector<Eigen::Vector2f> const & D);
 
 // Computes weighted mean of each column of XY
 template<typename DerivedData, typename DerivedWeights>
-Eigen::Matrix<typename DerivedData::Scalar, 1, Eigen::Dynamic> WeightedMean(const Eigen::MatrixBase<DerivedData> &XY, 
+Eigen::Matrix<typename DerivedData::Scalar, 1, Eigen::Dynamic> WeightedMean(const Eigen::MatrixBase<DerivedData> &XY,
                                                                const Eigen::MatrixBase<DerivedWeights> &weights)
 {
     DebugAssert(XY.rows() == weights.rows());
@@ -101,7 +100,7 @@ Eigen::Matrix<typename DerivedData::Scalar, 1, Eigen::Dynamic> WeightedMean(cons
 
     return output;
 }
-    
+
 // Returns returns the principal component (In this 2D case, the second one is just perp the first.) of the
 // data D.
 //
@@ -116,7 +115,7 @@ void                                PCA2f(Eigen::MatrixX2f const & D,
 
 std::vector< Eigen::Vector2f >      Tail(std::vector< Eigen::Vector2f > const & Z, size_t n);
 void                                Append(std::vector< Eigen::Vector2f > & to, std::vector< Eigen::Vector2f > const & from);
-    
+
 Eigen::Vector2f                     CenterOfMass(std::vector<Eigen::Vector2f> const &points);
 float                               RadialMoment(std::vector<Eigen::Vector2f> points);
 float                               RadialMomentOfInertia(std::vector<Eigen::Vector2f> points);
@@ -128,7 +127,7 @@ std::vector<float>                  Diff(std::vector<float> const &X);
 Eigen::VectorXf                     Diff(Eigen::VectorXf const &X);
 
 Eigen::VectorXf                     CumSum0NormDiff(std::vector<Eigen::Vector2f> const &Z);
-    
+
 Eigen::VectorXf  CumSum(Eigen::VectorXf const & Z);
 // like MATLAB cumsum (cumulative sum) but with a zero in the first entry for convenience when
 // you're integrating somebody's derivative and you want the output to have the same length as input
@@ -200,7 +199,7 @@ ContainerType Interp(float const *t, ContainerType const &Z, float const *ti, in
 
 // assumes edges are in increasing order, otherwise results are wrong
 int HistogramBinIndex(float value, std::vector<float> const & edges);
-    
+
 template <class ContainerType>
 ContainerType Interp(Eigen::VectorXf const &t, ContainerType const &Z, Eigen::VectorXf const &ti)
 {
@@ -212,9 +211,8 @@ inline Eigen::Map<Eigen::VectorXf> Map(std::vector< Eigen::Vector2f > const & Z)
 inline Eigen::Map<Eigen::VectorXf> Map(std::vector<float> const & R);
 Eigen::Map<Eigen::VectorXi> Map(std::vector<int> const & R);
 
-    
 inline Eigen::Map<Eigen::VectorXf> Map(Eigen::MatrixXf const & A);
-    
+
 inline Stride2Map XMap(std::vector< Eigen::Vector2f > const & Z);
 
 inline Stride2Map YMap(std::vector< Eigen::Vector2f > const & Z);
@@ -295,7 +293,7 @@ double toc();
 // [   .    .  ]          [   .    .  ]
 // [   .    .  ]          [   .    .  ]
 // [ xN1   xN2 ]          [ yN1   yN2 ]
-template<typename DerivedA> 
+template<typename DerivedA>
 DerivedA OrthogonalizeXAgainstY(const Eigen::MatrixBase<DerivedA> &x,
                                 const Eigen::MatrixBase<DerivedA> &y) {
 
@@ -307,11 +305,11 @@ DerivedA OrthogonalizeXAgainstY(const Eigen::MatrixBase<DerivedA> &x,
 
     Eigen::Matrix<typename DerivedA::Scalar, Eigen::Dynamic, 1> ProjectionFactors;
     ProjectionFactors.resize(N, 1);
-    
+
     // Numerator is x.*y
     // Denominator is |y|.^2
-    ProjectionFactors = ( x.array() * y.array() ).rowwise().sum().array() / 
-                        ( y.array().square()    ).rowwise().sum().array(); 
+    ProjectionFactors = ( x.array() * y.array() ).rowwise().sum().array() /
+                        ( y.array().square()    ).rowwise().sum().array();
 
     for (int i = 0; i < x.cols(); ++i) {
         result.block(0,i,N,1).array() -= (y.block(0,i,N,1).array() * ProjectionFactors.array());

@@ -1,14 +1,13 @@
 //
 //  Quadrature.h
-//  Classification
+//  FiftyThreeSdk
 //
-//  Created by Akil Narayan on 2013/08/17.
-//  Copyright (c) 2013 Peter Sibley. All rights reserved.
+//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
 
 #pragma once
 
-#include <Eigen/Geometry>
+#include "Common/Eigen.h"
 #include "FiftyThreeSdk/Classification//EigenLAB.h"
 
 namespace fiftythree {
@@ -21,12 +20,12 @@ T TrapezoidRule(const Eigen::Matrix<T, Eigen::Dynamic, 1> &x,
 
     int N = x.size();
     DebugAssert( N == y.size() );
-    
+
     T factor = (T) (1.0/2.0);
 
-    return factor * ( 
+    return factor * (
                         (x.segment(1, N-1) - x.segment(0, N-1)).cwiseProduct(
-                            y.segment(1, N-1) + y.segment(0, N-1) ) 
+                            y.segment(1, N-1) + y.segment(0, N-1) )
                     ).sum();
 
 }
@@ -42,8 +41,6 @@ T TrapezoidRule(const std::vector<T> &x,
 
     return TrapezoidRule<T>(xMap, yMap);
 }
-
-
 
 // Return weights for Trapezoid rule
 template <typename T>
@@ -81,6 +78,6 @@ std::vector<T> TrapezoidRuleWeights(const std::vector<T> &x) {
 
     return output;
 }
-    
+
 }
 }

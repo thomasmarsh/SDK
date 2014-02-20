@@ -1,14 +1,15 @@
 //
-//  CommonDeclarations.h
-//  Curves
+//  CommonDeclarationsCurves.h
+//  FiftyThreeSdk
 //
-//  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
+//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
 
 #pragma once
 
-#include <Eigen/Geometry>
 #include <vector>
+
+#include "Common/Eigen.h"
 
 namespace fiftythree
 {

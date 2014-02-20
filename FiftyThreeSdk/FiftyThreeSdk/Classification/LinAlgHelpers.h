@@ -1,20 +1,18 @@
 //
 //  LinAlgHelpers.h
-//  Classification
+//  FiftyThreeSdk
 //
-//  Created by Akil Narayan on 2013/11/11.
-//  Copyright (c) 2013 Peter Sibley. All rights reserved.
+//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
-//  Some linear algebra routines, mostly interfacing from Eigen
-//  I didn't see this stuff in the Eigen documentation, but it feels weird that they 
-//  wouldn't already have it implemented somewhere. 
 
 #pragma once
 
 #include <cmath>
 #include <Eigen/Dense>
 #include <Eigen/QR>
+
 #include "Common/Asserts.h"
+#include "FiftyThreeSdk/Classification/Eigen.h"
 #include "FiftyThreeSdk/Classification/EigenLAB.h" // For SquaredNorm
 
 using namespace Eigen;
@@ -42,13 +40,13 @@ Eigen::Matrix<typename DerivedA::Scalar, Dynamic, 1> LinearLeastSquaresSolve(con
     //output.resize(A.cols());
     //
     //DerivedB output = A.jacobiSvd(ComputeThinU | ComputeThinV).solve(b);
-    
+
     ColPivHouseholderQR<DerivedA> QR = A.colPivHouseholderQr();
 
     // I'd be happy to use something like
-    //DerivedB output = QR.solve(b); 
-    // But Eigen's documentation says some scary stuff: 
-    //   "This method just tries to find as good a solution as possible. " 
+    //DerivedB output = QR.solve(b);
+    // But Eigen's documentation says some scary stuff:
+    //   "This method just tries to find as good a solution as possible. "
     //   "If there exists more than one solution, this method will arbitrarily choose one."
     // Yikes. No idea what that means.
     //
@@ -66,7 +64,7 @@ Eigen::Matrix<typename DerivedA::Scalar, Dynamic, 1> LinearLeastSquaresSolve(con
     //DerivedB output = QR.colsPermutation() * ( R.lu().solve(Q.transpose()*b) );
 
     // *sigh*, attempt to pre-empt more template snafu's
-    Eigen::Matrix<typename DerivedA::Scalar, Dynamic, 1> bCopy = b.template cast<typename DerivedA::Scalar>(); 
+    Eigen::Matrix<typename DerivedA::Scalar, Dynamic, 1> bCopy = b.template cast<typename DerivedA::Scalar>();
     //bCopy.applyOnTheLeft(QR.householderQ().setLength(QR.rank()).adjoint());
     bCopy.applyOnTheLeft(QR.householderQ().adjoint());
 
@@ -79,10 +77,10 @@ Eigen::Matrix<typename DerivedA::Scalar, Dynamic, 1> LinearLeastSquaresSolve(con
 
     residual = 0; // implicit cast
     if (QR.rank() < bCopy.rows()) {
-        residual = std::sqrt( 
+        residual = std::sqrt(
                         SquaredNorm(
-                            bCopy.segment(QR.rank(), bCopy.rows() - QR.rank()) 
-                        ) 
+                            bCopy.segment(QR.rank(), bCopy.rows() - QR.rank())
+                        )
                    );
     }
 
@@ -92,7 +90,7 @@ Eigen::Matrix<typename DerivedA::Scalar, Dynamic, 1> LinearLeastSquaresSolve(con
 // Throw away residual
 template<typename DerivedA, typename DerivedB>
 DerivedB LinearLeastSquaresSolve(const MatrixBase<DerivedA> &A,
-                                 const MatrixBase<DerivedB> &b) 
+                                 const MatrixBase<DerivedB> &b)
 {
 
     typename DerivedB::Scalar residual;
@@ -110,7 +108,7 @@ DerivedB LinearLeastSquaresSolve(const MatrixBase<DerivedA> &A,
 
     DerivedA tempA = w.cwiseSqrt().asDiagonal()*A;
     DerivedB tempB = w.cwiseSqrt().array()*b.array();
-    
+
     // Hopefully the compiler optimizes this
     DerivedB output = LinearLeastSquaresSolve<DerivedA, DerivedB>(tempA,tempB);
     return output;
