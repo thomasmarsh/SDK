@@ -47,7 +47,7 @@ template <typename T>
 Eigen::Matrix<T, Eigen::Dynamic, 1> TrapezoidRuleWeights(const Eigen::Matrix<T, Eigen::Dynamic, 1> &x) {
 
     Eigen::Matrix<T, Eigen::Dynamic, 1> weights;
-    int N = x.size();
+    size_t N = x.size();
     weights.setZero(N,1);
 
     Eigen::Matrix<T, Eigen::Dynamic, 1> dx;

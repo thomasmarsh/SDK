@@ -124,7 +124,7 @@ std::vector<float> Diff(std::vector<float> const &X)
 }
 
 Eigen::VectorXf Diff(Eigen::VectorXf const & X) {
-    int N = X.size()-1;
+    size_t N = X.size()-1;
     return X.segment(1,N) - X.segment(0,N);
 }
 
@@ -133,7 +133,7 @@ Eigen::VectorXf Diff(Eigen::VectorXf const & X) {
 // like centroid size
 float  Variance(std::vector<float> const & X)
 {
-    int N = X.size();
+    size_t N = X.size();
 
     if(N <= 1)
     {

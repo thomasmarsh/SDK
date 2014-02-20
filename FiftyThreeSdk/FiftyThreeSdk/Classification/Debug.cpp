@@ -1,16 +1,16 @@
 //
 //  Debug.cpp
-//  Classification
+//  FiftyThreeSdk
 //
-//  Created by Akil Narayan on 2013/10/23.
-//  Copyright (c) 2013 Peter Sibley. All rights reserved.
+//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
 
 #include <ctime>
+
+#include "FiftyThreeSdk/Classification//EigenLAB.h"
+#include "FiftyThreeSdk/Classification//Stroke.h"
 #include "FiftyThreeSdk/Classification/Debug.h"
 #include "FiftyThreeSdk/Classification/FiniteDifferences.h"
-#include "FiftyThreeSdk/Classification//Stroke.h"
-#include "FiftyThreeSdk/Classification//EigenLAB.h"
 
 using fiftythree::common::TouchId;
 
@@ -60,7 +60,7 @@ Eigen::VectorXd StrokeT(int strokeId) {
         }
 
         case 3: {
-            output.resize(7); 
+            output.resize(7);
             output << 605707.356568541,
                       605707.372637791,
                       605707.388609375,
@@ -84,7 +84,7 @@ Eigen::VectorXf StrokeX(int strokeId) {
     switch(strokeId) {
         case 1:  {
             output.resize(6);
-            output << 
+            output <<
                            632,
                          634.5,
                          634.5,
@@ -96,7 +96,7 @@ Eigen::VectorXf StrokeX(int strokeId) {
 
         case 2:  {
             output.resize(19);
-            output << 
+            output <<
                            614,
                            612,
                            615,
@@ -121,7 +121,7 @@ Eigen::VectorXf StrokeX(int strokeId) {
 
         case 3: {
             output.resize(7);
-            output << 
+            output <<
                    463,
                    461,
                    460,
@@ -136,7 +136,7 @@ Eigen::VectorXf StrokeX(int strokeId) {
     }
 
     return output;
-    
+
 }
 
 Eigen::VectorXf StrokeY(int strokeId) {
@@ -146,7 +146,7 @@ Eigen::VectorXf StrokeY(int strokeId) {
     switch(strokeId) {
         case 1: {
             output.resize(6);
-            output << 
+            output <<
                         383.5,
                          376.5,
                            368,
@@ -158,7 +158,7 @@ Eigen::VectorXf StrokeY(int strokeId) {
 
         case 2: {
             output.resize(19);
-            output << 
+            output <<
                            552,
                          552.5,
                            554,
@@ -183,7 +183,7 @@ Eigen::VectorXf StrokeY(int strokeId) {
 
         case 3: {
             output.resize(7);
-            output << 
+            output <<
                    226,
                    237,
                    273,
@@ -209,7 +209,7 @@ Eigen::VectorXf StrokeScores(int strokeId) {
 
     switch(strokeId) {
         case 1: {
-            output << 
+            output <<
                    17.9739,
                   -10.4239,
                    16.3904,
@@ -263,17 +263,17 @@ void EtaModelTest(IsolatedStrokesClassifier* isolatedStrokesClassifier) {
 
     float alpha = 0.02;
     float etas[] = {
-           -2.608, 
-           -2.392, 
-           -2.332, 
-           -2.439, 
-           -2.234, 
-           -2.392, 
-           -2.025, 
-           -2.158, 
-           -1.982, 
-           -1.551, 
-           -2.383, 
+           -2.608,
+           -2.392,
+           -2.332,
+           -2.439,
+           -2.234,
+           -2.392,
+           -2.025,
+           -2.158,
+           -1.982,
+           -1.551,
+           -2.383,
            -1.327
     };
 
@@ -418,7 +418,7 @@ void LogLikelihoodsTest(TouchLogger* touchLog, IsolatedStrokesClassifier* isolat
 //
 //    std::cout << "For stencil ";
 //    for (int i = 0; i < stencil.size(); ++i) {
-//        std::cout << stencil[i] << " "; 
+//        std::cout << stencil[i] << " ";
 //    }
 //    std::cout << std::endl;
 //
@@ -443,7 +443,7 @@ void LogLikelihoodsTest(TouchLogger* touchLog, IsolatedStrokesClassifier* isolat
 //
 //    std::cout << "For stencil ";
 //    for (int i = 0; i < stencil.size(); ++i) {
-//        std::cout << stencil[i] << " "; 
+//        std::cout << stencil[i] << " ";
 //    }
 //    std::cout << std::endl;
 //
@@ -663,7 +663,7 @@ void VectorComparison(Eigen::VectorXf v, Eigen::VectorXf w) {
 
     assert(v.rows() == w.rows());
 
-    int N = v.rows();
+    size_t N = v.rows();
     Eigen::MatrixX2f vectors;
     vectors.resize(N, 2);
     vectors.block(0,0,N,1) = v;
@@ -788,8 +788,7 @@ float LinearParamLineFitResidual(int testId) {
 
 }
 
-
-Eigen::MatrixX2f LineFitData(int testId) 
+Eigen::MatrixX2f LineFitData(int testId)
 {
 
     Eigen::MatrixX2f output;
@@ -805,7 +804,7 @@ Eigen::MatrixX2f LineFitData(int testId)
 
             break;
         }
-        
+
         case 2: {
 
             output.resize(20, 2);
@@ -833,7 +832,7 @@ Eigen::MatrixX2f LineFitData(int testId)
             break;
         }
 
-        default: 
+        default:
             DebugAssert(false);
     }
 
@@ -841,13 +840,13 @@ Eigen::MatrixX2f LineFitData(int testId)
 
 }
 
-Eigen::VectorXf LineFitParameterData(int testId) 
+Eigen::VectorXf LineFitParameterData(int testId)
 {
 
     Eigen::VectorXf t;
 
     switch (testId) {
-        
+
         case 2: {
 
             t.resize(20, 1);
@@ -874,7 +873,7 @@ Eigen::VectorXf LineFitParameterData(int testId)
             break;
         }
 
-        default: 
+        default:
             DebugAssert(false);
     }
 
@@ -888,7 +887,7 @@ void GeometricLineFitTest() {
     Eigen::MatrixX2f XY = LineFitData(testId);
 
     Geometric2DLine<float> line = GeometricLeastSquaresLineFit(XY);
-    Eigen::Matrix<float, 3, 1> abc; 
+    Eigen::Matrix<float, 3, 1> abc;
     abc(0) = line.Orientation()(0);
     abc(1) = line.Orientation()(1);
     abc(2) = line.OffsetParameter();
@@ -912,16 +911,16 @@ void LinearParameterizationLineFitTest() {
      * float residual = 0.0f; // storage for residual
      * LinearlyParameterized2DLine<float> paramLine = LeastSquaresLinearlyParameterizedLine(t, XY, residual);
      *
-     * Now "residual" is the sqrt(sum-of-squares) error between the samples and 
+     * Now "residual" is the sqrt(sum-of-squares) error between the samples and
      * points on the parametric line with the same time parameter
      * and the object paramLine is a 2D line. Things like
      * paramLine.Direction() give you a 1 x 2 unit vector
      * paramLine.Speed() gives you a positive scalar that's the speed
-     * You can 
+     * You can
      * paramLine.Evaluate(time-float-or-VectorXf)
      * which returns a MatrixX2f evaluation on the line.
      *
-     * You have to hold the compiler's hand by forcing the template <float> for 
+     * You have to hold the compiler's hand by forcing the template <float> for
      * the line object. (Or whatever other data type.)
      */
 
@@ -934,7 +933,7 @@ void LinearParameterizationLineFitTest() {
     float exactResidual = GeometricLineFitResidual(testId);
     float residual = 0.0f;
     Geometric2DLine<float> line = GeometricLeastSquaresLineFit(XY, residual);
-    Eigen::Matrix<float, 3, 1> abc; 
+    Eigen::Matrix<float, 3, 1> abc;
     abc(0) = line.Orientation()(0);
     abc(1) = line.Orientation()(1);
     abc(2) = line.OffsetParameter();

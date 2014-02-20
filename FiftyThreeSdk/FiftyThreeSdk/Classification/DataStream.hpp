@@ -1,8 +1,8 @@
 //
 //  DataStream.hpp
-//  Curves
+//  FiftyThreeSdk
 //
-//  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
+//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
 
 #pragma once
@@ -14,9 +14,8 @@
 //  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
 //
 
-#include "Common/Memory.h"
-
 #include "Common/Enum.h"
+#include "Common/Memory.h"
 #include "FiftyThreeSdk/Classification/CommonDeclarations.h"
 #include "FiftyThreeSdk/Classification/CubicPolynomial.hpp"
 #include "FiftyThreeSdk/Classification/EigenLAB.h"
@@ -50,7 +49,7 @@ protected:
     // make a special case for the most recent.  every so often the float conversion
     // causes issues.
     double _mostRecentTimestamp;
-    
+
     int ClampedIndex(int index) const
     {
         return std::max(0, std::min(index, (int) _data.size() - 1));
@@ -88,7 +87,7 @@ public:
         {
             _t0 = timestamp;
         }
-        
+
         _mostRecentTimestamp = timestamp;
 
         _data.push_back(value);
@@ -278,7 +277,7 @@ public:
     {
         return RelativeTimestamp(LastValidIndex() - idx);
     }
-    
+
     double       ReverseAbsoluteTimestamp(int idx) const
     {
         return AbsoluteTimestamp(LastValidIndex() - idx);
@@ -386,13 +385,13 @@ public:
     }
 
     // returns -1 if size is zero
-    int LastValidIndex() const { return _data.size() - 1; }
+    int LastValidIndex() const { return (int)_data.size() - 1; }
 
     Interval MaximalInterval() const { return Interval(0, Size()); }
 
     double   AbsoluteTimestamp(int idx) const
     {
-        
+
         if(idx == LastValidIndex())
         {
             return _mostRecentTimestamp;
@@ -429,7 +428,7 @@ public:
         }
         else
         {
-            return RelativeTimestamp(Size()-1);
+            return RelativeTimestamp((int)Size()-1);
         }
     }
 

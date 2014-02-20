@@ -313,13 +313,13 @@ std::vector<TouchId>::iterator Cluster::FindTouch(common::TouchId touchId)
 // the touch will still be known to the TouchLogger
 bool Cluster::RemoveTouch(common::TouchId touchId)
 {
-    std::vector<TouchId>::iterator it = FindTouch(touchId);
+    auto it = FindTouch(touchId);
     if(it == _touchIds.end())
     {
         return false;
     }
 
-    int index = it - _touchIds.begin();
+    long index = it - _touchIds.begin();
 
     _touchIds.erase(it);
     _touchData.erase(_touchData.begin() + index);

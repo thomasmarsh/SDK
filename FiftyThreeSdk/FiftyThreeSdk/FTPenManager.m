@@ -2,7 +2,7 @@
 //  FTPenManager.m
 //  FiftyThreeSdk
 //
-//  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
+//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
 
 #import <CoreBluetooth/CoreBluetooth.h>
@@ -1394,10 +1394,10 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
      advertisementData:(NSDictionary *)advertisementData
                   RSSI:(NSNumber *)RSSI
 {
-    [FTLog logWithFormat:@"Discovered peripheral with name: \"%@\" IsReconciling: %d RSSI: %d.",
+    [FTLog logWithFormat:@"Discovered peripheral with name: \"%@\" IsReconciling: %d RSSI: %ld.",
      peripheral.name,
      [self isPeripheralReconciling:advertisementData],
-     [RSSI integerValue]];
+     (long)[RSSI integerValue]];
 
     BOOL isPeripheralReconciling = [self isPeripheralReconciling:advertisementData];
 

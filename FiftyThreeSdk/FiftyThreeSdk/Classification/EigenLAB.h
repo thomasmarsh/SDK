@@ -203,7 +203,7 @@ int HistogramBinIndex(float value, std::vector<float> const & edges);
 template <class ContainerType>
 ContainerType Interp(Eigen::VectorXf const &t, ContainerType const &Z, Eigen::VectorXf const &ti)
 {
-    return Interp<ContainerType>((float*) t.data(), Z, (float*) ti.data(), t.size(), ti.size());
+    return Interp<ContainerType>((float*) t.data(), Z, (float*) ti.data(), (int)t.size(), (int)ti.size());
 }
 
 inline Eigen::Map<Eigen::VectorXf> Map(std::vector< Eigen::Vector2f > const & Z);
@@ -299,7 +299,7 @@ DerivedA OrthogonalizeXAgainstY(const Eigen::MatrixBase<DerivedA> &x,
 
     DebugAssert(x.rows() == y.rows());
     DebugAssert(x.cols() == y.cols());
-    int N = x.rows();
+    size_t N = x.rows();
 
     DerivedA result(x);
 
@@ -338,7 +338,7 @@ Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> VandermondeMatrix(Eigen::Matrix
     // Degree needs to be non-negative
     DebugAssert(maxDegree >= 0);
 
-    int Nx = x.rows();
+    int Nx = (int)x.rows();
 
     Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> output;
     output.resize(Nx, maxDegree + 1);

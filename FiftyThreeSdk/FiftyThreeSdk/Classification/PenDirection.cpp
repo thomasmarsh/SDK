@@ -37,7 +37,7 @@ void PenTracker::UpdateLocations()
     // clustering doesn't really work since the palms don't cluster all that well.
     // we should probably add a special case for identifying thumbs near the edge.
 
-    int N = allClusters.size();
+    int N = (int)allClusters.size();
 
     Vector2f medianPalm = Vector2f::Zero();
 
@@ -391,7 +391,7 @@ Cluster::Ptr PenTracker::PenEndCluster(std::vector<Cluster::Ptr> const & ordered
     Cluster::Ptr pen;
     if(dot > 0.0f)
     {
-        for(int j=orderedClusters.size(); j--; )
+        for(int j=(int)orderedClusters.size(); j--; )
         {
 
             EdgeThumbState state = orderedClusters[j]->_edgeThumbState;
@@ -484,12 +484,12 @@ Eigen::VectorXf PenTracker::UpdateDirectionPrior(std::vector<Cluster::Ptr> const
         }
 
         // now get the other end
-        for (int k=arcLength.size()-1; k>0; k--)
+        for (int k=(int)arcLength.size()-1; k>0; k--)
         {
             Cluster::Ptr cluster = orderedClusters[k];
             if (cluster->IsPenType() && cluster->AllTouchesEnded())
             {
-                for (int j=arcLength.size()-1; j>=k; j--)
+                for (int j=(int)arcLength.size()-1; j>=k; j--)
                 {
                     arcLength[j] = arcLength[k-1];
                 }

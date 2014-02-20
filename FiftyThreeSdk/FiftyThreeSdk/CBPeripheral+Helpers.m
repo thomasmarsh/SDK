@@ -2,7 +2,7 @@
 //  CBPeripheral+Helpers.m
 //  FiftyThreeSdk
 //
-//  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
+//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
 
 #import "CBPeripheral+Helpers.h"
@@ -25,13 +25,13 @@ forCharacteristic:(CBCharacteristic *)characteristic
     }
 }
 
-- (void)writeNSUInteger:(NSUInteger)value
-      forCharacteristic:(CBCharacteristic *)characteristic
-                   type:(CBCharacteristicWriteType)type
+- (void)writeUInt32:(uint32_t)value
+  forCharacteristic:(CBCharacteristic *)characteristic
+               type:(CBCharacteristicWriteType)type
 {
     if (characteristic)
     {
-        uint32_t littleEndianValue = CFSwapInt32HostToLittle(value);
+        uint32_t littleEndianValue = (uint32_t)CFSwapInt32HostToLittle(value);
         NSData *data = [NSData dataWithBytes:&littleEndianValue length:sizeof(littleEndianValue)];
         [self writeValue:data forCharacteristic:characteristic type:type];
     }

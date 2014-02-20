@@ -1061,7 +1061,7 @@ int IsolatedStrokesClassifier::TouchIdIsolatedSize(common::TouchId id) {
     static float tol = 1e-6f;
 
     Stroke::Ptr const & stroke = _clusterTracker->Stroke(id);
-    int N = stroke->Size();
+    int N = (int)stroke->Size();
 
     if (N < 2) {
         return N;
@@ -1096,7 +1096,7 @@ Eigen::VectorXf PolynomialModel::Evaluate(Eigen::VectorXf x) {
     x.array() -= _shift;
     x /= _scale;
 
-    Eigen::MatrixXf V = VandermondeMatrix(x, _coefficients.rows()-1);
+    Eigen::MatrixXf V = VandermondeMatrix(x, (int)_coefficients.rows()-1l);
     std::cerr << "\nVandermonde = " << V;
 
     return (V*_coefficients).array();

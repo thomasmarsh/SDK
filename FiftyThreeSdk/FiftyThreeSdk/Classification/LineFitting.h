@@ -148,7 +148,7 @@ public:
     // Test first with IsLineVertical()
     // In this case, the function simply returns 0 for all values of y.
     Eigen::Matrix<T, Dynamic, 1> EvaluateAtX(const Eigen::Matrix<T, Dynamic, 1> &x) {
-        int N = x.rows();
+        size_t N = x.rows();
 
         Eigen::Matrix<T, Dynamic, 1> output;
         output.setZero(N, 1);
@@ -174,7 +174,7 @@ public:
     // Test first with IsLineHorizontal()
     // In this case, the function simply returns 0 for all values of x.
     Eigen::Matrix<T, Dynamic, 1> EvaluateAtY(const Eigen::Matrix<T, Dynamic, 1> &y) {
-        int N = y.rows();
+        size_t N = y.rows();
 
         Eigen::Matrix<T, Dynamic, 1> output;
         output.setZero(N, 1);
@@ -410,7 +410,7 @@ Geometric2DLine<typename DerivedA::Scalar> GeometricLeastSquaresLineFit(const Ma
 
     typedef typename DerivedA::Scalar DataT;
     typedef Eigen::Matrix<DataT, Dynamic, 1> DataVector;
-    int N = XY.rows();
+    size_t N = XY.rows();
 
     Eigen::Matrix<DataT, 3, 1> coeffs;
 
@@ -585,7 +585,7 @@ LinearlyParameterized2DLine<typename DerivedD::Scalar> LeastSquaresLinearlyParam
     typedef typename DerivedD::Scalar DataT;
     typedef typename DerivedT::Scalar ParameterT;
 
-    int N = XY.rows();
+    size_t N = XY.rows();
 
     // First find line:
     Geometric2DLine<DataT> line = GeometricLeastSquaresLineFit(XY);

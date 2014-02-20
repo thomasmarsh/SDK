@@ -1,36 +1,33 @@
 //
 //  Stroke.h
-//  Curves
+//  FiftyThreeSdk
 //
-//  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
+//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
 
 #pragma once
 
-#include "Eigen/Dense"
-#include "Common/Memory.h"
+#include <Eigen/Dense>
 #include <sstream>
 
 #include "Common/Enum.h"
-#include "FiftyThreeSdk/Classification/Screen.h"
+#include "Common/Memory.h"
 #include "FiftyThreeSdk/Classification/CommonDeclarations.h"
 #include "FiftyThreeSdk/Classification/DataStream.hpp"
-#include "FiftyThreeSdk/Classification/CommonDeclarations.h"
+#include "FiftyThreeSdk/Classification/Screen.h"
 
 // this line doesn't need to be here -- but sometimes LLVM gets confused and shows errors
 // all over the place about the Ptr typedef.  it compiles fine though.  odd.
 #include <boost/smart_ptr/shared_ptr.hpp>
 
-
-
 namespace fiftythree
 {
 namespace sdk
 {
-    
+
 struct StrokeStatistics
 {
-  
+
     typedef fiftythree::common::shared_ptr<StrokeStatistics> Ptr;
     typedef fiftythree::common::shared_ptr<const StrokeStatistics> cPtr;
 
@@ -38,24 +35,22 @@ struct StrokeStatistics
     // the optimal value will depend on screen size and pixel/point coordinate system.
     // for iPad data 1.0f seems about right.  change this if needed in the future.
     float _smoothLengthConstant = 1.0f;
-    
-    
+
     // shrinkage for denoising spatial second differences.  lots of little curvatures occur
     // due to iOS rounding to pixel coordinates.  real curvatures from palms are much larger
     float _d2Shrinkage = 2.0f;
-    
-    
+
     // expected sample delta-t
     float _expectedSamplingRate = 1.0f / 60.0f;
-    
+
     // shrinkage denoising for sample rate errors.  small fluctuations are not uncommon.
     float _samplingRateErrorShrinkage = .1f / 60.0f;
-    
+
     static Ptr New()
     {
         return fiftythree::common::make_shared<StrokeStatistics>();
     }
-    
+
     StrokeStatistics() :
     _arcLength(0.0f),
     _strokeTime(0.0f),
@@ -87,7 +82,7 @@ struct StrokeStatistics
     // Handy for debugging. Not performant at all.
     std::string ToString() const
     {
-        
+
         std::stringstream ss;
 // Odd spacing to allow easy additions.
 ss
@@ -113,18 +108,16 @@ ss
 << " maxTravel: " << _maxTravel
 << " minStepSize: " << _minStepSize
 << std::endl;
-        
+
         return ss.str();
     }
 
-    
-    
     // D2InSpace means we just take second differences of the sample points
     // without taking arrival times into account.
     Eigen::Vector2f _totalD2InSpace;
     float           _totalAbsoluteD2InSpace;
     float           _totalSquaredD2InSpace;
-    
+
     float           _arcLength;
     float           _strokeTime;
     float           _dtVariance;
@@ -133,46 +126,43 @@ ss
 
     Eigen::VectorXf _arclengthParameter;
 
-    
     float           _normalD2;
     float           _tangentialD2;
     float           _totalD2;
-    
+
     float           _normalD3;
     float           _tangentialD3;
-    
+
     float           _normalD4;
     float           _tangentialD4;
-    
+
     // integral of speed divided by curvature.  like length, but prefers straight lines
     // and not wiggly curves.
     float           _smoothLength;
-    
+
     std::vector<float> _totalD2AtScale;
-    
+
     // deviation of sample timings from the expected sampling rate.  palms have irregular timing.
     // this does not include the very first dt.  that's considered special, since people sometimes
     // rest the pen and pause.  if you want that, look at _firstDeltaT as well.
     float           _sampleTimingSquaredError;
     float           _sampleTimingMeanSquaredError;
-    
+
     // length of time between the first and second samples to arrive.
     float           _firstDeltaT;
-    
+
     // largest delta T after the first
     float           _maxDeltaT;
-    
+
     // a poor-man's diameter.  maximum distance traveled from the initial point
     float           _maxTravel;
 
     // shortest distance between 2 adjacent points
     float           _minStepSize;
-    
-    
-    
+
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
-    
+
 class Stroke
 {
 
@@ -200,33 +190,32 @@ protected:
     std::vector<Vector7f>         _pressure7D;
 
     std::vector<Vector1f>         _touchRadius;
-    
 
     // due to Eigen alignment issues, we have to dynamically allocate this guy
     // to make sure he gets aligned or your code may crash depending on compiler
     // settings passed to Eigen.
     StrokeStatistics::Ptr         _statistics;
-    
+
     // for some cases like early detection you get better performance by ignoring data after
     // the first N points
     StrokeStatistics::Ptr         _earlyStatistics;
-    
+
     int ClampedIndex(int index) const;
 
 public:
 
     bool _computeStatistics;
-   
+
     StrokeStatistics::cPtr Statistics() const
     {
         return _statistics;
     }
-    
+
     StrokeStatistics::cPtr EarlyStatistics() const
     {
         return _earlyStatistics;
     }
-    
+
     float NormalizedSmoothLength()
     {
         if(_computeStatistics && Size() >= 5)
@@ -239,7 +228,6 @@ public:
         }
     }
 
-    
     DataStream2f & XYDataStream()
     {
         return _XYDataStream;
@@ -253,7 +241,7 @@ public:
     //double             _t0;
 
     fiftythree::sdk::TouchType _touchType;
-    
+
     SamplingType _samplingType;
     float        _XYSamplesPerSecond;
 
@@ -270,9 +258,8 @@ public:
         {
             _statistics = StrokeStatistics::New();
         }
-    
-    }
 
+    }
 
     void ToNormalizedCoordinates(Screen const & screen);
     void ToScreenCoordinates(Screen const & screen);
@@ -298,15 +285,15 @@ public:
     {
         return XMap(MaximalInterval());
     }
-    
+
     Stride2Map YMap() const
     {
         return YMap(MaximalInterval());
     }
-    
+
     Stride2Map VelocityXMap(Interval const & I);
     Stride2Map VelocityYMap(Interval const & I);
-    
+
     float* XYPointer() const
     {
         return (float*) &(_XYDataStream.Data()[0]);
@@ -317,11 +304,10 @@ public:
         return (float*) &(_XYDataStream.RelativeTimestamp()[0]);
     }
 
-    float* ArclengthParameterPointer() const 
+    float* ArclengthParameterPointer() const
     {
         return (float*) &(_statistics->_arclengthParameter(0));
     }
-
 
     void AddVelocity(Eigen::Vector2f velocity) { _velocity.push_back(velocity); }
 
@@ -333,7 +319,7 @@ public:
     {
         _touchRadius.push_back(radius);
     }
-    
+
     void AddTouchRadius(float radius)
     {
         Vector1f radius1f = Vector1f::Constant(radius);
@@ -345,27 +331,26 @@ public:
     std::vector<float> TouchRadiusFloat()
     {
         std::vector<float> out((float*) &(_touchRadius[0]), ((float*) &(_touchRadius[_touchRadius.size()])));
-        
+
         return out;
     }
-    
+
     Eigen::Map< Eigen::VectorXf > TouchRadiusXf()
     {
         return Eigen::Map< Eigen::VectorXf >((float*) &(_touchRadius[0]), _touchRadius.size());
     }
 
-    
     std::vector<Vector1f> & TouchRadius()
     {
         return _touchRadius;
     }
-    
+
     float ArcLength() const;
     float ArcLength(int endIndex) const;
     float StrokeTime();
     float StrokeTime(int endIndex);
     void  UpdateSummaryStatistics();
-    
+
     void AppendStroke(Stroke const & other, float initialDt);
     void AppendStroke(Stroke const & other);
 
@@ -388,7 +373,7 @@ public:
     Stroke SubStroke(Interval subInterval) const;
 
     // returns -1 if size is zero
-    int LastValidIndex() const { return _XYDataStream.Size() - 1; }
+    int LastValidIndex() const { return (int)_XYDataStream.Size() - 1; }
     // returns -1 if effective size is 1
     int SecondValidIndex() const;
     // returns -1 if effective size is 1
@@ -420,12 +405,12 @@ public:
         {
             return 0.0;
         }
-        
+
         return AbsoluteTimestamp(LastValidIndex());
     }
 
     float            TimestampRelativeToTime(int idx, double referenceTime);
-    
+
     double           AbsoluteTimestamp(int idx) const
     {
         //return _t0 + double(RelativeTimestamp(idx));
@@ -433,7 +418,7 @@ public:
     }
 
     std::vector<double> TimeStamps() {
-        
+
         int start = 0;
         // TODO: WTF
         if (_XYDataStream.AbsoluteTimestamp(0) < 000.0f) {
@@ -454,7 +439,7 @@ public:
 
     float            RelativeTimestamp(int idx) const;
     float            LastRelativeTimestamp() const;
-    
+
     float            Lifetime() const
     {
         if(IsEmpty())

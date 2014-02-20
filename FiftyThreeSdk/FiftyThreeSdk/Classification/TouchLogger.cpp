@@ -1032,7 +1032,7 @@ bool TouchLogger::IsIdLogged(common::TouchId id) {
 }
 
 int TouchLogger::LoggedPenEventCount() {
-    return _penEventData.size();
+    return (int)_penEventData.size();
 }
 
 TouchIdVector TouchLogger::ActiveNonEndedIds() {
@@ -1098,7 +1098,7 @@ void TouchLogger::AssertPenEvents(PenEventIdVector ids) {
 }
 
 int TouchLogger::NumberOfTouches() {
-    return _touchData.size();
+    return (int)_touchData.size();
 }
 
 // Ids begun within specified (absolute) time interval
@@ -1447,7 +1447,7 @@ void TouchLogger::InsertStroke(common::TouchId touchId, Eigen::VectorXd t, Eigen
 
 void TouchLogger::InsertStroke(common::TouchId touchId, Eigen::VectorXd t, Eigen::VectorXf x, Eigen::VectorXf y) {
 
-    InsertStroke(touchId, t, x, y, 0, t.rows()-1);
+    InsertStroke(touchId, t, x, y, 0, (int)t.rows()-1);
 
 }
 

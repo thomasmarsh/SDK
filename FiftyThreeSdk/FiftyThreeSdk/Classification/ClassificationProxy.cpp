@@ -438,7 +438,7 @@ TouchType TouchClassificationProxy::ClassifyForGesture(common::TouchId touch0, c
 
                     float lambda = std::min(1.0f, std::max(0.0f, (dt - _minTapGestureTapDuration) / (_maxTapGestureTapDuration - _minTapGestureTapDuration)));
                     float maxLength = lambda * _maxTapGestureTapArcLengthAtMaxDuration + (1.0f - lambda) * _maxTapGestureTapArcLengthAtMinDuration;
-                    int numSamples = stroke->Size();
+                    size_t numSamples = stroke->Size();
 
                     bool isFingerTap =  isEndIsolated && isStartIsolated && (L < maxLength) && (numSamples == 2 || L >= 0.00f)  && (dt >= _minTapGestureTapDuration) && (dt < _maxTapGestureTapDuration);
 
@@ -479,7 +479,7 @@ TouchType TouchClassificationProxy::ClassifyForGesture(common::TouchId touch0, c
                     float L = stroke->ArcLength();
                     float maxTravelOverL = stroke->Statistics()->_maxTravel / L;
                     float dt = stroke->LastAbsoluteTimestamp() - stroke->FirstAbsoluteTimestamp();
-                    int numSamples = stroke->Size();
+                    size_t numSamples = stroke->Size();
 
                     // As we get more information we put more faith in the maxTravel heuristic and tighten
                     // the time window.
@@ -2067,7 +2067,7 @@ bool TouchClassificationProxy::ReclassifyIfNeeded(double timestamp)
             SetCurrentTime(NSProcessInfoSystemUptime());
         }
 
-        int countOnEntry = _clusterTracker->CurrentEventAllClusters().size();
+        size_t countOnEntry = _clusterTracker->CurrentEventAllClusters().size();
 
         _clusterTracker->MarkStaleClusters(_clusterTracker->CurrentTime());
         _clusterTracker->RemoveUnusedStaleClusters();

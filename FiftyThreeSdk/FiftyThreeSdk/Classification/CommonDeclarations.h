@@ -99,7 +99,7 @@ struct Interval
 
     int  LastIndex() const
     {
-        return _index + _count - 1;
+        return (int)_index +(int) _count - 1;
     }
 
     static Interval Zero()
@@ -110,7 +110,7 @@ struct Interval
     Interval Intersection(Interval const &other) const
     {
 
-        int a = std::max(_index, other._index);
+        int a = std::max((int)_index, (int)other._index);
         int b = std::min(LastIndex(), other.LastIndex());
         return Interval(a, std::max(0, b-a+1));
     }

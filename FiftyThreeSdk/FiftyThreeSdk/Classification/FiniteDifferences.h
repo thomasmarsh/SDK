@@ -12,6 +12,7 @@
 //#include <boost/math/special_functions/factorials.hpp>
 
 #include <boost/foreach.hpp>
+#include <type_traits>
 #include <typeinfo>
 
 #include "Common/Eigen.h"
@@ -27,8 +28,9 @@ typedef std::pair < int, std::vector < int > > LocationStencilPair;
 typedef std::vector < LocationStencilPair > BoundaryStencil;
 typedef std::map < int, std::vector< int > > BoundaryStencilMap;
 
-template<typename T>
-T Factorial(const int &num) {
+template<typename T, typename I>
+T Factorial(const I & num) {
+    static_assert(std::is_integral<I>::value, "Should be integral type");
 
     DebugAssert(num >= 0);
     T result = 1.0;
@@ -50,7 +52,7 @@ template<typename DerivedA, typename DerivedB>
                                     const int &order) {
 
     DebugAssert(x.cols() == 1);
-    int N = x.rows();
+    size_t N = x.rows();
     DerivedA scaling = DerivedA::Ones(N);
 
     if (N <= order) {
@@ -132,7 +134,7 @@ void NthDerivativeFromCrossValidation(const Eigen::Map<DerivedA> &x,
                                       const int &order) {
 
     DebugAssert(x.cols() == 1);
-    int N = x.rows();
+    size_t N = x.rows();
     DerivedA scaling = DerivedA::Ones(N);
 
     if (N <= order) {
@@ -221,12 +223,12 @@ void NthDerivativeFromCrossValidation(const Eigen::MatrixBase<DerivedA> &x,
 template<typename DerivedA, typename DerivedB>
 void ColumnWiseDividedDifferenceDivision(const Eigen::MatrixBase<DerivedA> &x,
                                          Eigen::MatrixBase<DerivedB> &y,
-                                         const int &startIndex,
-                                         const int &nRows,
-                                         const int &xLeftOffset,
-                                         const int &xRightOffset) {
+                                         const size_t &startIndex,
+                                         const size_t &nRows,
+                                         const size_t &xLeftOffset,
+                                         const size_t &xRightOffset) {
 
-for (int i = 0; i < y.cols(); ++i) {
+for (size_t i = 0; i < y.cols(); ++i) {
     y.block(startIndex, i, nRows, 1) = y.block(startIndex, i, nRows, 1).cwiseQuotient( (x.segment(startIndex + xLeftOffset, nRows) - x.segment(startIndex + xRightOffset, nRows)).template cast<typename DerivedB::Scalar>() );
 }
 
@@ -239,11 +241,11 @@ template<typename DerivedA, typename DerivedB>
 void LeftwardDividedDifference(const Eigen::MatrixBase<DerivedA> &x,
                                Eigen::MatrixBase<DerivedB> &output,
                                Eigen::MatrixBase<DerivedB> &tempStorage,
-                               const int &n,
-                               const int &xLeftOffset,
-                               const int &xRightOffset,
-                               const int &M,
-                               const int &yCols) {
+                               const size_t &n,
+                               const size_t &xLeftOffset,
+                               const size_t &xRightOffset,
+                               const size_t &M,
+                               const size_t &yCols) {
 
     tempStorage.block(xLeftOffset, 0, M-n, yCols) = output.block(xLeftOffset, 0, M-n, yCols) - output.block(xLeftOffset-1, 0, M-n, yCols);
 
@@ -260,11 +262,11 @@ template<typename DerivedA, typename DerivedB>
 void RightwardDividedDifference(const Eigen::MatrixBase<DerivedA> &x,
                                 Eigen::MatrixBase<DerivedB> &output,
                                 Eigen::MatrixBase<DerivedB> &tempStorage,
-                                const int &n,
-                                const int &xLeftOffset,
-                                const int &xRightOffset,
-                                const int &M,
-                                const int &yCols) {
+                                const size_t &n,
+                                const size_t &xLeftOffset,
+                                const size_t &xRightOffset,
+                                const size_t &M,
+                                const size_t &yCols) {
 
     tempStorage.block(xLeftOffset, 0, M-n, yCols) = output.block(xLeftOffset, 0, M-n, yCols) - output.block(xLeftOffset+1, 0, M-n, yCols);
 
@@ -277,18 +279,18 @@ void RightwardDividedDifference(const Eigen::MatrixBase<DerivedA> &x,
 // Copies central edge values to all boundary locations
 template<typename Derived>
 void PostDifferencingBoundaryCopying(Eigen::MatrixBase<Derived> &output,
-                                     const int &xLeftOffset,
-                                     const int &xRightOffset,
-                                     const int &M,
-                                     const int &yCols) {
+                                     const size_t &xLeftOffset,
+                                     const size_t &xRightOffset,
+                                     const size_t &M,
+                                     const size_t &yCols) {
 
-    int endIndex = M - 1 - xRightOffset;
+    size_t endIndex = M - 1 - xRightOffset;
 
-    for (int i = 0; i < xLeftOffset; ++i)
+    for (size_t i = 0; i < xLeftOffset; ++i)
     {
         output.block(i, 0, 1, yCols) = output.block(xLeftOffset, 0, 1, yCols);
     }
-    for (int i = 0; i < xRightOffset; ++i) {
+    for (size_t i = 0; i < xRightOffset; ++i) {
         output.block(M-1-i, 0, 1, yCols) = output.block(endIndex, 0, 1, yCols);
     }
 
@@ -297,8 +299,8 @@ void PostDifferencingBoundaryCopying(Eigen::MatrixBase<Derived> &output,
 // Performs factorial normalization
 template<typename Derived>
 void PostDifferencingDerivativeNormalization(Eigen::MatrixBase<Derived> &output,
-                                             const int &currentN,
-                                             const int &N) {
+                                             const size_t &currentN,
+                                             const size_t &N) {
 
     // Could save a little here with Pochhammer symbols
     output *= (Factorial<typename Derived::Scalar>(N)) /
@@ -320,8 +322,8 @@ void PostDifferencingDerivativeNormalization(Eigen::MatrixBase<Derived> &output,
 template<typename DerivedA, typename DerivedB>
 void IncrementalDerivative(const Eigen::MatrixBase<DerivedA> &x,
                            Eigen::MatrixBase<DerivedB> &y,
-                           const int &currentN,
-                           const int &N) {
+                           const size_t &currentN,
+                           const size_t &N) {
 
     DebugAssert(N >= currentN);
 
@@ -329,22 +331,22 @@ void IncrementalDerivative(const Eigen::MatrixBase<DerivedA> &x,
         return;
     }
 
-    int M = x.rows();
+    size_t M = x.rows();
     DebugAssert(M == y.rows());
     if (N - currentN >= M) {
         y.setZero();
         return;
     }
 
-    int yCols = y.cols();
+    size_t yCols = y.cols();
 
     DerivedB tempStorage = y;
 
     // Given currentN we can infer these parameters
-    int xLeftOffset = (currentN+1)/2;
-    int xRightOffset = xLeftOffset - (currentN % 2);
+    size_t xLeftOffset = (currentN+1)/2;
+    size_t xRightOffset = xLeftOffset - (currentN % 2);
 
-    for (int n = currentN+1; n <= N; ++n) {
+    for (size_t n = currentN+1; n <= N; ++n) {
 
         if ( (n % 2) == 1 ) // We add a stencil point on the left
         {
@@ -401,7 +403,7 @@ DerivedB JerkOrthogonalToVelocity(const Eigen::MatrixBase<DerivedA> &t,
     DerivedB jerk = velocity;
     IncrementalDerivative(t, jerk, 1, 3);
 
-    int N = xy.rows();
+    size_t N = xy.rows();
 
     DebugAssert(N==t.rows());
 
@@ -437,7 +439,7 @@ DerivedB D4OrthogonalToVelocity(const Eigen::MatrixBase<DerivedA> &t,
 
     //DerivedB output(d4);
 
-    int N = xy.rows();
+    size_t N = xy.rows();
 
     DebugAssert(N==t.rows());
 
@@ -474,7 +476,7 @@ DerivedB D2OrthogonalToVelocity(const Eigen::MatrixBase<DerivedA> &t,
     DerivedB d2(velocity);
     IncrementalDerivative(t, d2, 1, 2);
 
-    int N = xy.rows();
+    size_t N = xy.rows();
 
     DebugAssert(N==t.rows());
 
