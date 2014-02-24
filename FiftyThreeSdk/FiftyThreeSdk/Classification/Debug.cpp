@@ -735,7 +735,7 @@ Eigen::Matrix<float, 3, 1> GeometricLineFitSolution(int testId) {
 
 float GeometricLineFitResidual(int testId) {
 
-    float output;
+    float output = 0.0f;
 
     switch (testId) {
 
@@ -772,7 +772,7 @@ Eigen::Matrix<float, 3, 1> LinearParamLineFitSolution(int testId) {
 
 float LinearParamLineFitResidual(int testId) {
 
-    float output;
+    float output = 0.0f;
 
     switch (testId) {
 
