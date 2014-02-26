@@ -7,8 +7,8 @@
 
 #pragma once
 
-#include "Common/Memory.h"
 #include "Common/Touch/Touch.h"
+#include "Core/Memory.h"
 #include "FiftyThreeSdk/PenEvent.h"
 
 namespace fiftythree
@@ -28,8 +28,8 @@ DEFINE_ENUM(FTTouchType,
 class FTPenAndTouchManager
 {
 public:
-    typedef fiftythree::common::shared_ptr<FTPenAndTouchManager> Ptr;
-    typedef const fiftythree::common::shared_ptr<FTPenAndTouchManager> cPtr;
+    typedef fiftythree::core::shared_ptr<FTPenAndTouchManager> Ptr;
+    typedef const fiftythree::core::shared_ptr<FTPenAndTouchManager> cPtr;
 
 protected:
     ~FTPenAndTouchManager() {}

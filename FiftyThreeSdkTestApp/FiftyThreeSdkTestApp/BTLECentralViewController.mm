@@ -8,11 +8,11 @@
 #include <sstream>
 
 #include "Canvas/GLCanvasController.h"
-#include "Common/Memory.h"
 #include "Common/Timer.h"
-#include "Common/Touch/InputSample.h"
 #include "Common/Touch/TouchManager.h"
 #include "Common/Touch/TouchTracker.h"
+#include "Core/Memory.h"
+#include "Core/Touch/InputSample.h"
 #include "FiftyThreeSdk/FTPenAndTouchManager.h"
 
 #import <CoreBluetooth/CoreBluetooth.h>
@@ -26,13 +26,10 @@
 #import "FiftyThreeSdk/FTPenManager.h"
 #import "FTConnectLatencyTester.h"
 
-using namespace fiftythree::common;
 using namespace fiftythree::canvas;
+using namespace fiftythree::common;
+using namespace fiftythree::core;
 using namespace fiftythree::sdk;
-using fiftythree::common::static_pointer_cast;
-using fiftythree::common::dynamic_pointer_cast;
-using fiftythree::common::shared_ptr;
-using fiftythree::common::make_shared;
 using std::stringstream;
 
 class TouchObserver;
@@ -144,7 +141,7 @@ public:
 
     _PenAndTouchManager = FTPenAndTouchManager::New();
     _PenAndTouchManager->RegisterForEvents();
-  
+
     _TouchObserver = make_shared<TouchObserver>(self);
     _PenAndTouchManager->TouchTypeChanged().AddListener(_TouchObserver, &TouchObserver::TouchTypeChanged);
     _PenAndTouchManager->ShouldStartTrialSeparation().AddListener(_TouchObserver, &TouchObserver::ShouldStartTrialSeparation);
@@ -866,7 +863,7 @@ Last Connect Date = %@\n \
 
 - (IBAction)shareButtonPressed:(id)sender
 {
- 
+
 }
 
 @end

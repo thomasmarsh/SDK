@@ -20,10 +20,9 @@ LIBRARY_SEARCH_PATHS = $(inherited) "$(SRCROOT)/lib" "$(SRCROOT)/../../../ThirdP
 
 HEADER_SEARCH_PATHS = "$(SRCROOT)/../../../ThirdParty" "$(SRCROOT)/../../../../ThirdParty"
 
-USER_HEADER_SEARCH_PATHS = $(inherited) "$(SRCROOT)/../../FiftyThreeSdk" "$(SRCROOT)/../../../ThirdParty" "$(SRCROOT)/../../../../ThirdParty" "$(SRCROOT)/../../../Common" "$(SRCROOT)/../../../ThirdParty/AppBlade/iOS/Framework"
+USER_HEADER_SEARCH_PATHS = $(inherited) "$(SRCROOT)/../../FiftyThreeSdk" "$(SRCROOT)/../../../ThirdParty" "$(SRCROOT)/../../../../ThirdParty"  "$(SRCROOT)/../../../Core" "$(SRCROOT)/../../../Common" "$(SRCROOT)/../../../ThirdParty/AppBlade/iOS/Framework"
 
 // TODO: Revert once we sort out the "only run Crashlytics on Jenkins" issue
 DEBUG_INFORMATION_FORMAT = dwarf-with-dsym
 
 ARCHS = $(ARCHS_STANDARD)
-

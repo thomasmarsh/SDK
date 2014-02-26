@@ -1,27 +1,24 @@
 //
 //  IsolatedStrokes.h
-//  Classification
+//  FiftyThreeSdk
 //
-//  Created by matt on 8/5/13.
-//  Copyright (c) 2013 Peter Sibley. All rights reserved.
+//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
-
 
 #pragma once
 
 #include "Common/Touch/Touch.h"
-#include "FiftyThreeSdk/Classification/Stroke.h"
-#include "FiftyThreeSdk/Classification/EigenLAB.h"
-
-#include "FiftyThreeSdk/Classification/CommonDeclarations.h"
-#include "FiftyThreeSdk/Classification/TouchLogger.h"
 #include "FiftyThreeSdk/Classification/Cluster.h"
+#include "FiftyThreeSdk/Classification/CommonDeclarations.h"
+#include "FiftyThreeSdk/Classification/EigenLAB.h"
+#include "FiftyThreeSdk/Classification/Stroke.h"
+#include "FiftyThreeSdk/Classification/TouchLogger.h"
 
 namespace fiftythree {
 namespace sdk {
 
 typedef std::pair<TouchType, bool> TypeBoolPair;
-    
+
 class PolynomialModel
 {
 protected:
@@ -52,11 +49,11 @@ public:
     };
 };
 
-// Calibration for determining how many scores we have, what their normalizations 
+// Calibration for determining how many scores we have, what their normalizations
 // and likelihoods are, etc
-struct ScoreCalibration 
+struct ScoreCalibration
 {
-    typedef fiftythree::common::shared_ptr<ScoreCalibration> Ptr;
+    typedef fiftythree::core::shared_ptr<ScoreCalibration> Ptr;
     ScoreCalibration();
     static ScoreCalibration::Ptr New();
 
@@ -74,9 +71,9 @@ struct ScoreCalibration
 };
 
 // Calibration for the Neyman-Pearson statistical tests
-struct NPCalibration 
+struct NPCalibration
 {
-    typedef fiftythree::common::shared_ptr<NPCalibration> Ptr;
+    typedef fiftythree::core::shared_ptr<NPCalibration> Ptr;
     NPCalibration();
     static NPCalibration::Ptr New();
 
@@ -91,9 +88,9 @@ struct NPCalibration
 };
 
 // Calibration for the Bayesian classification
-struct BayesCalibration 
+struct BayesCalibration
 {
-    typedef fiftythree::common::shared_ptr<BayesCalibration> Ptr;
+    typedef fiftythree::core::shared_ptr<BayesCalibration> Ptr;
     BayesCalibration();
     static BayesCalibration::Ptr New();
 
@@ -106,9 +103,9 @@ struct BayesCalibration
 };
 
 // Calibration for Adaptive Boosting calibration
-struct AdaboostCalibration 
+struct AdaboostCalibration
 {
-    typedef fiftythree::common::shared_ptr<AdaboostCalibration> Ptr;
+    typedef fiftythree::core::shared_ptr<AdaboostCalibration> Ptr;
     AdaboostCalibration();
     static AdaboostCalibration::Ptr New();
 
@@ -126,7 +123,7 @@ struct AdaboostCalibration
 // Keeps data for touchId's for reclassification of strokes
 struct StrokeChunkLog
 {
-    typedef fiftythree::common::shared_ptr<StrokeChunkLog> Ptr;
+    typedef fiftythree::core::shared_ptr<StrokeChunkLog> Ptr;
     StrokeChunkLog();
     static StrokeChunkLog::Ptr New();
     StrokeChunkLog(int chunkIndex);
@@ -152,7 +149,7 @@ protected:
 
     std::map<ClusterId, TouchType> _classifiedClusters;
 
-    // If a score is 0 we can't take log's 
+    // If a score is 0 we can't take log's
     // This is an additive nugget for base scores
     float _baseIsolatedScoreNugget = 1e-8f;
 
@@ -162,7 +159,7 @@ protected:
 
 public:
     // members
-    
+
 protected:
     // methods
 
@@ -200,8 +197,7 @@ public:
     EdgeThumbState TestEdgeThumb(common::TouchId touchId);
     void           MarkEdgeThumbs();
     bool           IsEdgeThumb(common::TouchId touchId);
-    
-    
+
     // this gives a number in [0,1] where larger values indicate "badness"
     // (i.e. likelihood of being a palm), since that's the way most of the weak
     // classifiers work -- larger values mean palm.
@@ -209,7 +205,7 @@ public:
 
     TouchType TestFingerVsPalm(Cluster::Ptr const & cluster);
     bool      IsPalmCluster(Cluster::Ptr const & cluster);
-    
+
     void ScoreAssert(int scoreId, int chunkSize);
 
     float PenLogDensity(float score, int scoreId, int chunkSize);
@@ -257,14 +253,14 @@ public:
 
     // Peter: computes raw log-(max curvature) from the isolated scores.
     float LogMaxCurvature(common::TouchId id);
-    
+
     // Peter: My computation of max curvature tends to not be a good indicator
     // of much. But you can be pretty darn near sure that something's a palm if
     // this normalized score is bigger than -17.9164453792496
     // If you're trying to differentiate gestures, I don't know what to use
     float NormalizedMaxCurvature(common::TouchId id);
 
-    // Prunes the last sample if it's both TouchPhase::Ended and has coincident 
+    // Prunes the last sample if it's both TouchPhase::Ended and has coincident
     // location to penultimate sample.
     int TouchIdIsolatedSize(common::TouchId id);
 
@@ -273,7 +269,6 @@ public:
     // Deals with most accounting in _touchId*Map's
     void UpdateIdStoredData(common::TouchId id);
 
-    
     std::pair<TouchType, bool> ClassifyForPinchOrPanGesture(common::TouchId touchId);
     bool IsTap(common::TouchId touchId);
 

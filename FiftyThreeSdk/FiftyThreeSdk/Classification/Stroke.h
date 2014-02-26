@@ -10,8 +10,8 @@
 #include <Eigen/Dense>
 #include <sstream>
 
-#include "Common/Enum.h"
-#include "Common/Memory.h"
+#include "Core/Enum.h"
+#include "Core/Memory.h"
 #include "FiftyThreeSdk/Classification/CommonDeclarations.h"
 #include "FiftyThreeSdk/Classification/DataStream.hpp"
 #include "FiftyThreeSdk/Classification/Screen.h"
@@ -28,8 +28,8 @@ namespace sdk
 struct StrokeStatistics
 {
 
-    typedef fiftythree::common::shared_ptr<StrokeStatistics> Ptr;
-    typedef fiftythree::common::shared_ptr<const StrokeStatistics> cPtr;
+    typedef fiftythree::core::shared_ptr<StrokeStatistics> Ptr;
+    typedef fiftythree::core::shared_ptr<const StrokeStatistics> cPtr;
 
     // 1.0 is a constant which was obtained from training data.
     // the optimal value will depend on screen size and pixel/point coordinate system.
@@ -48,7 +48,7 @@ struct StrokeStatistics
 
     static Ptr New()
     {
-        return fiftythree::common::make_shared<StrokeStatistics>();
+        return fiftythree::core::make_shared<StrokeStatistics>();
     }
 
     StrokeStatistics() :
@@ -168,7 +168,7 @@ class Stroke
 
 public:
 
-    typedef fiftythree::common::shared_ptr<Stroke> Ptr;
+    typedef fiftythree::core::shared_ptr<Stroke> Ptr;
 
     DEFINE_ENUM(SamplingType,
                 UniformInTime,

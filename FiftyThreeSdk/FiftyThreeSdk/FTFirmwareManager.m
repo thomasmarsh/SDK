@@ -7,7 +7,7 @@
 
 #import <UIKit/UIKit.h>
 
-#import "Common/Asserts.h"
+#import "Core/Asserts.h"
 #import "FTFirmwareManager.h"
 #import "FTPen.h"
 

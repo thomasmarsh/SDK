@@ -8,7 +8,7 @@
 #include <math.h>
 #include <numeric>
 
-#include "Common/Eigen.h"
+#include "Core/Eigen.h"
 #include "FiftyThreeSdk/Classification/ClassificationProxy.h"
 #include "FiftyThreeSdk/Classification/EigenLAB.h"
 #include "FiftyThreeSdk/Classification/FiniteDifferences.h"

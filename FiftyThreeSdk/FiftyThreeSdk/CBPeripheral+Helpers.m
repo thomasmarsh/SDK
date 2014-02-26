@@ -6,7 +6,7 @@
 //
 
 #import "CBPeripheral+Helpers.h"
-#import "Common/Asserts.h"
+#import "Core/Asserts.h"
 
 @implementation CBPeripheral (Helpers)
 

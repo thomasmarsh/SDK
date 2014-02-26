@@ -5,10 +5,10 @@
 //  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
 
-#include "Common/Memory.h"
+#include "Core/Memory.h"
 #include "PenEvent.h"
 
-using namespace fiftythree::common;
+using namespace fiftythree::core;
 using namespace fiftythree::sdk;
 
 class PenEventImpl : public PenEvent
@@ -29,5 +29,5 @@ public:
 
 PenEvent::Ptr PenEvent::New(double timestamp, FTPenEventType type, FTPenTip tip)
 {
-    return fiftythree::common::make_shared<PenEventImpl>(timestamp, type, tip);
+    return fiftythree::core::make_shared<PenEventImpl>(timestamp, type, tip);
 }

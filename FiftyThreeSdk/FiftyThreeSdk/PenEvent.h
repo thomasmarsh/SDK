@@ -7,10 +7,10 @@
 
 #pragma once
 
-#include "Common/Enum.h"
-#include "Common/Memory.h"
-#include "Common/NoCopy.h"
 #include "Common/Touch/PenManager.h"
+#include "Core/Enum.h"
+#include "Core/Memory.h"
+#include "Core/NoCopy.h"
 
 namespace fiftythree
 {
@@ -28,10 +28,10 @@ DEFINE_ENUM(FTPenTip,
 class PenEvent
 {
 public:
-    typedef fiftythree::common::shared_ptr<PenEvent> Ptr;
-    typedef fiftythree::common::shared_ptr<const PenEvent> cPtr;
+    typedef fiftythree::core::shared_ptr<PenEvent> Ptr;
+    typedef fiftythree::core::shared_ptr<const PenEvent> cPtr;
 
-    fiftythree::common::InputSample Sample;
+    fiftythree::core::InputSample Sample;
     FTPenEventType Type;
     FTPenTip Tip;
 

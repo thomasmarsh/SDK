@@ -245,7 +245,7 @@ public:
         return _touchStatistics;
     }
 
-    typedef fiftythree::common::shared_ptr<TouchClassificationProxy> Ptr;
+    typedef fiftythree::core::shared_ptr<TouchClassificationProxy> Ptr;
 
     TouchType CurrentClass(common::TouchId touchId);
 

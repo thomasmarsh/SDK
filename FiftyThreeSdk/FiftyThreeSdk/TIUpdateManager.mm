@@ -2,14 +2,14 @@
 //  TIUpdateManager.mm
 //  FiftyThreeSdk
 //
-//  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
+//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
 
 #include "Common/Timer.h"
 
 #import <CoreBluetooth/CoreBluetooth.h>
 
-#import "Common/Asserts.h"
+#import "Core/Asserts.h"
 #import "FTError.h"
 #import "FTLog.h"
 #import "TIUpdateManager.h"

@@ -12,9 +12,9 @@
 #include <vector>
 
 #include "Classifier.h"
-#include "Common/Eigen.h"
-#include "Common/Enum.h"
 #include "Common/Touch/Touch.h"
+#include "Core/Eigen.h"
+#include "Core/Enum.h"
 
 namespace fiftythree
 {

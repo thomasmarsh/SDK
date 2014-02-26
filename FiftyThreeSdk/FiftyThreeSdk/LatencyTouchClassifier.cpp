@@ -288,5 +288,5 @@ public:
 
 LatencyTouchClassifier::Ptr LatencyTouchClassifier::New()
 {
-    return fiftythree::common::make_shared<LatencyTouchClassifierImpl>();
+    return fiftythree::core::make_shared<LatencyTouchClassifierImpl>();
 }

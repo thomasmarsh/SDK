@@ -11,7 +11,7 @@
 #include <Eigen/Dense>
 #include <Eigen/QR>
 
-#include "Common/Asserts.h"
+#include "Core/Asserts.h"
 #include "FiftyThreeSdk/Classification/Eigen.h"
 #include "FiftyThreeSdk/Classification/EigenLAB.h" // For SquaredNorm
 

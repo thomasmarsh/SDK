@@ -20,6 +20,6 @@ LIBRARY_SEARCH_PATHS = $(inherited) "$(SRCROOT)/../../ThirdParty/PogoConnect"
 
 HEADER_SEARCH_PATHS = "$(SRCROOT)/../../ThirdParty" "$(SRCROOT)/../../../ThirdParty" "$(SRCROOT)/../../../iOS/Canvas"
 
-USER_HEADER_SEARCH_PATHS = $(inherited) "$(SRCROOT)/../FiftyThreeSdk" "$(SRCROOT)/../../ThirdParty" "$(SRCROOT)/../../../ThirdParty" "$(SRCROOT)/../../Common" "$(SRCROOT)/../../ThirdParty/AppBlade/iOS/Framework"
+USER_HEADER_SEARCH_PATHS = $(inherited) "$(SRCROOT)/../FiftyThreeSdk" "$(SRCROOT)/../../ThirdParty" "$(SRCROOT)/../../../ThirdParty" "$(SRCROOT)/../../Core" "$(SRCROOT)/../../Common" "$(SRCROOT)/../../ThirdParty/AppBlade/iOS/Framework"
 
 ARCHS = $(ARCHS_STANDARD)

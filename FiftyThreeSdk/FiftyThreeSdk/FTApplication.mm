@@ -11,6 +11,8 @@
 #import "FTPenManager.h"
 
 using namespace fiftythree::common;
+using namespace fiftythree::core;
+
 using boost::optional;
 
 @interface FTApplication () {
@@ -40,8 +42,7 @@ using boost::optional;
                                                      name:kFTPenManagerDidUpdateStateNotificationName
                                                    object:nil];
     }
-    
-    
+
     // Initialize the classifier here, as early as possible, since other components may try to consume it
     // in their initialization.
     [self classifier];

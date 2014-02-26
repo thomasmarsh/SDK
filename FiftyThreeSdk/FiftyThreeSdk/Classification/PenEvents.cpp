@@ -7,9 +7,9 @@
 
 #include <boost/foreach.hpp>
 
-#include "Common/Eigen.h"
 #include "Common/Touch/Touch.h"
 #include "Common/Touch/TouchTracker.h"
+#include "Core/Eigen.h"
 #include "FiftyThreeSdk/Classification/ClassificationProxy.h"
 #include "FiftyThreeSdk/Classification/Cluster.h"
 #include "FiftyThreeSdk/Classification/CommonDeclarations.h"

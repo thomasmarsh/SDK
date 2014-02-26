@@ -54,30 +54,6 @@
 		66D779BC16E57461001C4F55 /* TIUpdateManager.mm in Sources */ = {isa = PBXBuildFile; fileRef = 66D779B816E57461001C4F55 /* TIUpdateManager.mm */; };
 /* End PBXBuildFile section */
 
-/* Begin PBXContainerItemProxy section */
-		349A6434174FD5D90071D899 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 349A642F174FD5D80071D899 /* Common.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = B96AD1D213949F8F0036028E;
-			remoteInfo = Common;
-		};
-		349A6436174FD5D90071D899 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 349A642F174FD5D80071D899 /* Common.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = B96AD1DF13949F8F0036028E;
-			remoteInfo = CommonTests;
-		};
-		349A6438174FD5E30071D899 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 349A642F174FD5D80071D899 /* Common.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = B96AD1D113949F8F0036028E;
-			remoteInfo = Common;
-		};
-/* End PBXContainerItemProxy section */
-
 /* Begin PBXFileReference section */
 		0416CA8B18A42B51004EAC00 /* ClassificationProxy.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ClassificationProxy.cpp; sourceTree = "<group>"; };
 		0416CA8C18A42B51004EAC00 /* ClassificationProxy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ClassificationProxy.h; sourceTree = "<group>"; };
@@ -127,7 +103,6 @@
 		0416CAB818A42B51004EAC00 /* UIDeviceHardware.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UIDeviceHardware.h; sourceTree = "<group>"; };
 		0416CAB918A42B51004EAC00 /* UIDeviceHardware.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UIDeviceHardware.m; sourceTree = "<group>"; };
 		0493D9DC18B6957B0049FEFC /* Eigen.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Eigen.h; sourceTree = "<group>"; };
-		349A642F174FD5D80071D899 /* Common.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Common.xcodeproj; path = ../../Common/Common.xcodeproj; sourceTree = "<group>"; };
 		3C02E083183698E100420B95 /* FTLog.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FTLog.m; path = FiftyThreeSdk/FTLog.m; sourceTree = "<group>"; };
 		3C2F9C381780758300A5FFBC /* FTPeripheralDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FTPeripheralDelegate.h; path = FiftyThreeSdk/FTPeripheralDelegate.h; sourceTree = SOURCE_ROOT; };
 		3C2F9C391780758300A5FFBC /* FTPeripheralDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FTPeripheralDelegate.m; path = FiftyThreeSdk/FTPeripheralDelegate.m; sourceTree = SOURCE_ROOT; };
@@ -258,15 +233,6 @@
 			path = FiftyThreeSdk/Classification;
 			sourceTree = "<group>";
 		};
-		349A6430174FD5D80071D899 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				349A6435174FD5D90071D899 /* libCommon.a */,
-				349A6437174FD5D90071D899 /* CommonTests.xctest */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
 		3C2F9C3E17807FCF00A5FFBC /* Services */ = {
 			isa = PBXGroup;
 			children = (
@@ -366,7 +332,6 @@
 		66A8387316E52D840048FFE4 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				349A642F174FD5D80071D899 /* Common.xcodeproj */,
 				6644317216F7FB920049E570 /* boost.framework */,
 				66A8387416E52D840048FFE4 /* Foundation.framework */,
 			);
@@ -436,7 +401,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				349A6439174FD5E30071D899 /* PBXTargetDependency */,
 			);
 			name = FiftyThreeSdk;
 			productName = sdk;
@@ -462,35 +426,12 @@
 			mainGroup = 66A8386816E52D840048FFE4;
 			productRefGroup = 66A8387216E52D840048FFE4 /* Products */;
 			projectDirPath = "";
-			projectReferences = (
-				{
-					ProductGroup = 349A6430174FD5D80071D899 /* Products */;
-					ProjectRef = 349A642F174FD5D80071D899 /* Common.xcodeproj */;
-				},
-			);
 			projectRoot = "";
 			targets = (
 				66A8387016E52D840048FFE4 /* FiftyThreeSdk */,
 			);
 		};
 /* End PBXProject section */
-
-/* Begin PBXReferenceProxy section */
-		349A6435174FD5D90071D899 /* libCommon.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libCommon.a;
-			remoteRef = 349A6434174FD5D90071D899 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		349A6437174FD5D90071D899 /* CommonTests.xctest */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.cfbundle;
-			path = CommonTests.xctest;
-			remoteRef = 349A6436174FD5D90071D899 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-/* End PBXReferenceProxy section */
 
 /* Begin PBXSourcesBuildPhase section */
 		66A8386D16E52D840048FFE4 /* Sources */ = {
@@ -545,14 +486,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXTargetDependency section */
-		349A6439174FD5E30071D899 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = Common;
-			targetProxy = 349A6438174FD5E30071D899 /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		3C44210D186360E70002CFE5 /* Internal */ = {

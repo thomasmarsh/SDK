@@ -8,9 +8,9 @@
 #include <set>
 #include <vector>
 
-#include "Common/Asserts.h"
-#include "Common/Memory.h"
 #include "Common/Touch/TouchManager.h"
+#include "Core/Asserts.h"
+#include "Core/Memory.h"
 #include "LatencyTouchClassifier.h"
 #include "TouchClassifier.h"
 #include "TouchClassifierManager.h"
@@ -18,7 +18,7 @@
 using namespace fiftythree::common;
 using namespace fiftythree::sdk;
 
-class TouchClassifierManagerImpl : public TouchClassifierManager, public fiftythree::common::enable_shared_from_this<TouchClassifierManagerImpl>
+class TouchClassifierManagerImpl : public TouchClassifierManager, public fiftythree::core::enable_shared_from_this<TouchClassifierManagerImpl>
 {
 private:
     std::vector<TouchClassifier::Ptr> _Classifiers;
@@ -106,5 +106,5 @@ public:
 
 TouchClassifierManager::Ptr TouchClassifierManager::New()
 {
-    return fiftythree::common::make_shared<TouchClassifierManagerImpl>();
+    return fiftythree::core::make_shared<TouchClassifierManagerImpl>();
 }

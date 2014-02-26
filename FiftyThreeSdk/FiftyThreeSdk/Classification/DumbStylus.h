@@ -34,7 +34,7 @@ class DumbStylusClassifier
 
 public:
 
-    typedef fiftythree::common::shared_ptr<DumbStylusClassifier> Ptr;
+    typedef fiftythree::core::shared_ptr<DumbStylusClassifier> Ptr;
 
     DumbStylusClassifier(TouchLogger*      logPtr,
                          const CommonData* dataPtr) :

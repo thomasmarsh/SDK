@@ -9,8 +9,8 @@
 
 #include <set>
 
-#include "Common/Memory.h"
 #include "Common/Touch/TouchManager.h"
+#include "Core/Memory.h"
 #include "FTPenAndTouchManager.h"
 #include "PenEvent.h"
 
@@ -22,8 +22,8 @@ namespace sdk
 class TouchClassifier
 {
 public:
-    typedef fiftythree::common::shared_ptr<TouchClassifier> Ptr;
-    typedef const fiftythree::common::shared_ptr<TouchClassifier> cPtr;
+    typedef fiftythree::core::shared_ptr<TouchClassifier> Ptr;
+    typedef const fiftythree::core::shared_ptr<TouchClassifier> cPtr;
 
 protected:
     ~TouchClassifier() {}

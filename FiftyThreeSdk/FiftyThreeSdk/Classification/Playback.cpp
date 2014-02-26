@@ -14,7 +14,7 @@
 
 using namespace boost::algorithm;
 using boost::lexical_cast;
-using fiftythree::common::make_shared;
+using fiftythree::core::make_shared;
 
 namespace
 {
@@ -88,7 +88,7 @@ PlaybackSequence::PlaybackSequence(std::istream & str)
             float      y     = lexical_cast<float>(row[6]);
 
             Eigen::Vector2f z(x,y);
-            common::InputSample sample(z, z, timestamp);
+            core::InputSample sample(z, z, timestamp);
 
             Touch::Ptr touch = Touch::New(touchId, phase, sample);
 
@@ -128,7 +128,7 @@ void PlaybackSequence::Write(std::ostream & str)
         {
             BOOST_FOREACH(const common::Touch::cPtr & touch, entry->_touches)
             {
-                common::InputSample snapshotSample = touch->CurrentSample();
+                core::InputSample snapshotSample = touch->CurrentSample();
 
                 str << counter << ", " << snapshotSample.TimestampSeconds() <<  ", " << entry->_type << ", ";
 

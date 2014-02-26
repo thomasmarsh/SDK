@@ -1,17 +1,17 @@
 //
 //  Classifier.h
-//  Classification
+//  FiftyThreeSdk
 //
-//  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
+//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
 
 #pragma once
 
-#include "Common/Memory.h"
-#include "Common/Enum.h"
-#include "Common/Event.hpp"
 #include "Common/Touch/Touch.h"
 #include "Common/Touch/TouchClassifier.h"
+#include "Core/Enum.h"
+#include "Core/Event.hpp"
+#include "Core/Memory.h"
 
 namespace fiftythree
 {
@@ -39,14 +39,14 @@ DEFINE_ENUM(EdgeThumbState,
             NotThumb,
             Possible,
             Thumb);
-    
+
 struct PenEvent
 {
     PenEventType _type;
     double       _timestamp;
 
     PenEvent() : _type(PenEventType::Tip1Up), _timestamp(0.0) {}
-    
+
     bool UpEvent() const
     {
         return _type == PenEventType::Tip1Up || _type == PenEventType::Tip2Up;
@@ -67,13 +67,12 @@ DEFINE_ENUM(SingleTouchGesture,
                 Longpress,
                 LoupeDragStart);
 
-    
 // This is the primary API to communicate with this module.
 class Classifier
 {
 public:
-    typedef fiftythree::common::shared_ptr<Classifier> Ptr;
-    typedef fiftythree::common::shared_ptr<const Classifier> cPtr;
+    typedef fiftythree::core::shared_ptr<Classifier> Ptr;
+    typedef fiftythree::core::shared_ptr<const Classifier> cPtr;
 
     // Subscribe to this event to get notified
     virtual Event<Unit> & LongPressWithPencilTip() = 0;
@@ -100,10 +99,10 @@ public:
 
     // Given a pair of touches what are their most likely type.
     virtual TouchType ClassifyPair(common::TouchId touch0, common::TouchId touch1, const TwoTouchPairType & type)  = 0;
-    
+
     // Given a single touch what is mostly likely for 1-touch gestures.
     virtual TouchType ClassifyForGesture(common::TouchId touch0, const SingleTouchGesture & type) = 0;
-    
+
     // TODO:
     //  Revisit this API once isolated stroke stuff has settled down a bit.
     //  Ideally GRs ask binary questions rather than have to know about ranges and valid stats...
@@ -123,17 +122,17 @@ public:
     virtual bool AreAnyTouchesCurrentlyPenOrEraser() = 0;
 
     virtual bool HasPenActivityOccurredRecently() = 0;
-    
+
     // TODO:
     //     API clean up. This needs to play nicely with debouncing etc..
     virtual bool IsAnySwitchDown() = 0;
 
     virtual void ClearSessionStatistics() = 0;
     virtual fiftythree::common::SessionStatistics::Ptr SessionStatistics() = 0;
-    
+
     // TODO:
     //    API clean up. Rightnow these live in an interface so we can get at them from within Paper.
-    
+
     //  IsolatedStrokes::IsTap uses these.
     // values from Amit's work
     float _maxTapArcLengthAtMaxDuration  = 85;
@@ -147,7 +146,6 @@ public:
     float _longFingerLength     = 66.0f;
     float _longDuration         = 1.2f;
     float _fingerTapIsolationSeconds = 0.0929603f;
-    
 
     // we remove bogus up-down pairs.  sometimes this removes the wrong things.
     // we have a workaround which prevents pens from being reclassified as palms when they are at the pen
@@ -156,20 +154,19 @@ public:
     // is very unlikely.
     bool  _debounceWorkaroundEnabled       = true;
     float _debounceWorkaroundMinPenDownDt  = 0.0f;
-    
+
     bool  _trustHandednessOnceLocked       = true;
-    
+
     bool  _handednessRequirePenDown        = false;
     bool  _handednessNoPenDownMinLength    = 11.0f;
     float _handednessRecentPenEventDt      = .3f;
     float _handednessMinPenDownDt          = -.0167;
     float _handednessMaxPenDownDt          = .5f;
-    
-    
+
     // required predelay for a finger smudge sequence.  once a sequence begins,
     // subsequent touches don't need any temporal isolation from each other
     float _fingerSmudgeIsolationSeconds = .0929f;
-    
+
     // the smudge isolation above is used to control the predelay before a smudge sequence.
     // this controls temporal isolation for taps within a sequence.
     float _smudgeTapIsolationSeconds    = .0929603f;
@@ -179,14 +176,11 @@ public:
     // the isolation rule anymore.  assume they're just tapping really fast.
     // we still apply the other rules for declaring finger, so this should be pretty safe
     int   _smudgeCommitCount         = 2;
-    
-    
-    float _minFingerIsolatedStrokeTravel = 5.0f; // Was 44, see IsolatedStrokes TestPalmVFinger.                                                                                                                                                          
+
+    float _minFingerIsolatedStrokeTravel = 5.0f; // Was 44, see IsolatedStrokes TestPalmVFinger.
     // number of cycles we're allowing pen events to arrive before touches.
     float _penDownBeforeTouchCycleThreshold = 8.0f;
     float _penUpAfterTouchCycleThreshold = 8.0f;
-    
-    
 
     // The parameters below are used in ClassifyPairs. See sliders in PalmRejectionTestApp to create them...
     float _pairwisePinchTotalTravelThreshold = 11.029411;
@@ -204,19 +198,17 @@ public:
     float _pairwisePanStartDistanceThreshold = 235.705887;
     float _pairwisePanPalmCentroidTime = 0.756863;
     float _pairwisePanPalmCentroidThreshold = 108.221474;
-    
+
     float _maxTapGestureTapArcLengthAtMaxDuration  = 22;
     float _maxTapGestureTapArcLengthAtMinDuration  = 13;
     // values from Matt.
     float _minTapGestureTapDuration   =  0.0f;
     float _maxTapGestureTapDuration   =  0.32;
 
-
     // only debounce the really insane ones.  if we debounce everything, we end up eliminating valid
     // data which has lousy timing data.
     float _debounceInterval           = .005f;
-    
-                                                                                     
+
     static Classifier::Ptr New();
 };
 

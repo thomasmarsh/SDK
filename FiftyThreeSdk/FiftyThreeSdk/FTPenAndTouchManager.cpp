@@ -9,9 +9,9 @@
 
 #include "Common/DispatchTimer.h"
 #include "Common/Mathiness.h"
-#include "Common/Memory.h"
-#include "Common/NoCopy.h"
 #include "Common/Touch/TouchTracker.h"
+#include "Core/Memory.h"
+#include "Core/NoCopy.h"
 #include "FTPenAndTouchManager.h"
 #include "LatencyTouchClassifier.h"
 #include "TouchClassifierManager.h"
@@ -24,7 +24,7 @@ using std::pair;
 
 typedef unordered_map<Touch::cPtr, FTTouchType> TouchToTypeMap;
 
-class FTPenAndTouchManagerImpl : public FTPenAndTouchManager, public fiftythree::common::enable_shared_from_this<FTPenAndTouchManagerImpl>
+class FTPenAndTouchManagerImpl : public FTPenAndTouchManager, public fiftythree::core::enable_shared_from_this<FTPenAndTouchManagerImpl>
 {
 private:
     TouchClassifierManager::Ptr _ClassifierManager;
@@ -191,5 +191,5 @@ public:
 
 FTPenAndTouchManager::Ptr FTPenAndTouchManager::New()
 {
-    return fiftythree::common::make_shared<FTPenAndTouchManagerImpl>();
+    return fiftythree::core::make_shared<FTPenAndTouchManagerImpl>();
 }

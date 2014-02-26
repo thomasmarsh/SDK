@@ -2,13 +2,13 @@
 //  TouchClassifierManager.h
 //  FiftyThreeSdk
 //
-//  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
+//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
 
 #pragma once
 
-#include "Common/Memory.h"
-#include "Common/NoCopy.h"
+#include "Core/Memory.h"
+#include "Core/NoCopy.h"
 #include "TouchClassifier.h"
 
 namespace fiftythree
@@ -19,8 +19,8 @@ namespace sdk
 class TouchClassifierManager : public TouchClassifier
 {
 public:
-    typedef fiftythree::common::shared_ptr<TouchClassifierManager> Ptr;
-    typedef const fiftythree::common::shared_ptr<TouchClassifierManager> cPtr;
+    typedef fiftythree::core::shared_ptr<TouchClassifierManager> Ptr;
+    typedef const fiftythree::core::shared_ptr<TouchClassifierManager> cPtr;
 
 protected:
     ~TouchClassifierManager() {}

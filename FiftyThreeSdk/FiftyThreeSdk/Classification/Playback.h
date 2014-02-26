@@ -1,16 +1,17 @@
 //
 //  Playback.h
-//  Classification
+//  FiftyThreeSdk
 //
-//  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
+//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
 
 #pragma once
 
 #include <boost/foreach.hpp>
 #include <boost/smart_ptr.hpp>
-#include "Common/Enum.h"
+
 #include "Common/Touch/Touch.h"
+#include "Core/Enum.h"
 #include "FiftyThreeSdk/Classification/CommonDeclarations.h"
 
 namespace fiftythree
@@ -25,7 +26,7 @@ DEFINE_ENUM(PlaybackEntryType,
 
 struct PlaybackEntry
 {
-    typedef fiftythree::common::shared_ptr<PlaybackEntry> Ptr;
+    typedef fiftythree::core::shared_ptr<PlaybackEntry> Ptr;
 
     PlaybackEntryType               _type;
     std::set<common::Touch::Ptr>   _touches;

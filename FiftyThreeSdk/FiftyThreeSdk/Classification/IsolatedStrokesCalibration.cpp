@@ -5,7 +5,7 @@
 //  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
 
-#include "Common/Eigen.h"
+#include "Core/Eigen.h"
 #include "FiftyThreeSdk/Classification/IsolatedStrokes.h"
 
 using namespace Eigen;

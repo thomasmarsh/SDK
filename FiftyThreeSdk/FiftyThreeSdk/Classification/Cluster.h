@@ -59,7 +59,7 @@ struct ClusterEventStatistics
     {
     }
 
-    typedef fiftythree::common::shared_ptr<ClusterEventStatistics> Ptr;
+    typedef fiftythree::core::shared_ptr<ClusterEventStatistics> Ptr;
 
     // some stats used to help build confidence in the event
     // early on in an event we may need to consider orientation change,
@@ -129,7 +129,7 @@ struct Cluster
     std::vector<common::TouchId> _touchIds;
     boost::container::flat_map<common::TouchId, TouchData::Ptr> _touchData;
 
-    typedef fiftythree::common::shared_ptr<Cluster> Ptr;
+    typedef fiftythree::core::shared_ptr<Cluster> Ptr;
 
     Cluster();
 
@@ -269,7 +269,7 @@ typedef std::pair<ClusterId, Cluster::Ptr &> IdClusterPtrRefPair;
 class ClusterTracker {
 
 public:
-    typedef fiftythree::common::shared_ptr<ClusterTracker> Ptr;
+    typedef fiftythree::core::shared_ptr<ClusterTracker> Ptr;
 
 protected:
 

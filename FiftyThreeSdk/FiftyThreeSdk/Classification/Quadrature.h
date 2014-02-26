@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "Common/Eigen.h"
+#include "Core/Eigen.h"
 #include "FiftyThreeSdk/Classification//EigenLAB.h"
 
 namespace fiftythree {

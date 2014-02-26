@@ -8,8 +8,8 @@
 #import <CoreBluetooth/CoreBluetooth.h>
 #import <UIKit/UIKit.h>
 
-#import "Common/Asserts.h"
 #import "Common/NSString+Helpers.h"
+#import "Core/Asserts.h"
 #import "FTFirmwareManager.h"
 #import "FTLog.h"
 #import "FTPen+Private.h"

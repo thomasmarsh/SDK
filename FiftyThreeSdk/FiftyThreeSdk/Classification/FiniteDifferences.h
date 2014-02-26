@@ -15,7 +15,7 @@
 #include <type_traits>
 #include <typeinfo>
 
-#include "Common/Eigen.h"
+#include "Core/Eigen.h"
 #include "FiftyThreeSdk/Classification/CommonDeclarations.h"
 #include "FiftyThreeSdk/Classification/EigenLAB.h"
 

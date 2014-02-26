@@ -9,7 +9,7 @@
 
 #include <vector>
 
-#include "Common/Eigen.h"
+#include "Core/Eigen.h"
 
 namespace fiftythree
 {

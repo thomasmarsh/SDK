@@ -10,9 +10,9 @@
 #include <iomanip>
 #include <tuple>
 
-#include "Common/Eigen.h"
 #include "Common/Touch/Touch.h"
 #include "Common/Touch/TouchTracker.h"
+#include "Core/Eigen.h"
 #include "FiftyThreeSdk/Classification/ClassificationProxy.h"
 #include "FiftyThreeSdk/Classification/FiniteDifferences.h"
 #include "FiftyThreeSdk/Classification/Helpers.h"
@@ -756,7 +756,7 @@ TouchType TouchClassificationProxy::CurrentClass(common::TouchId touchId)
 
 void TouchClassificationProxy::ClearSessionStatistics()
 {
-    _sessionStatistics = fiftythree::common::make_shared<struct SessionStatistics>();
+    _sessionStatistics = fiftythree::core::make_shared<struct SessionStatistics>();
 }
 
 SessionStatistics::Ptr TouchClassificationProxy::SessionStatistics()
@@ -2216,7 +2216,7 @@ void TouchClassificationProxy::SetIsolatedStrokes(bool value) {
 
 Classifier::Ptr Classifier::New()
 {
-    return fiftythree::common::make_shared<TouchClassificationProxy>();
+    return fiftythree::core::make_shared<TouchClassificationProxy>();
 }
 
 }

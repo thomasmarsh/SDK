@@ -2,14 +2,14 @@
 //  FTPenServiceClient.m
 //  FiftyThreeSdk
 //
-//  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
+//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>
 
 #import "CBCharacteristic+Helpers.h"
 #import "CBPeripheral+Helpers.h"
-#import "Common/Asserts.h"
+#import "Core/Asserts.h"
 #import "FTError.h"
 #import "FTLog.h"
 #import "FTPenManager.h"

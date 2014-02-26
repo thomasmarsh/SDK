@@ -19,6 +19,7 @@
 
 using namespace Eigen;
 using namespace fiftythree::common;
+using namespace fiftythree::core;
 
 namespace fiftythree {
 namespace sdk {

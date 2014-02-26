@@ -22,7 +22,7 @@
 #include <limits>
 #include <sys/time.h>
 
-#include "Common/Eigen.h"
+#include "Core/Eigen.h"
 #include "FiftyThreeSdk/Classification/CommonDeclarations.h"
 #include "FiftyThreeSdk/Classification/CubicPolynomial.hpp"
 

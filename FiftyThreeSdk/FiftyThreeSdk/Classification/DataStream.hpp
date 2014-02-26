@@ -14,8 +14,8 @@
 //  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
 //
 
-#include "Common/Enum.h"
-#include "Common/Memory.h"
+#include "Core/Enum.h"
+#include "Core/Memory.h"
 #include "FiftyThreeSdk/Classification/CommonDeclarations.h"
 #include "FiftyThreeSdk/Classification/CubicPolynomial.hpp"
 #include "FiftyThreeSdk/Classification/EigenLAB.h"
@@ -39,7 +39,7 @@ public:
     typedef std::vector<DataType> ContainerType;
 
     typedef DataStream<DataType> Stream;
-    typedef fiftythree::common::shared_ptr< DataStream<DataType> > Ptr;
+    typedef fiftythree::core::shared_ptr< DataStream<DataType> > Ptr;
 
 protected:
 

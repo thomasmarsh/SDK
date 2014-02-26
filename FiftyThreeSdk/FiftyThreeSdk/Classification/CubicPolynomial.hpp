@@ -9,7 +9,7 @@
 
 #include <type_traits>
 
-#include "Common/Asserts.h"
+#include "Core/Asserts.h"
 #include "FiftyThreeSdk/Classification/CommonDeclarations.h"
 
 namespace fiftythree
