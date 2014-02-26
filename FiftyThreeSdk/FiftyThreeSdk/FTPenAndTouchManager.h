@@ -7,8 +7,8 @@
 
 #pragma once
 
-#include "Common/Touch/Touch.h"
 #include "Core/Memory.h"
+#include "Core/Touch/Touch.h"
 #include "FiftyThreeSdk/PenEvent.h"
 
 namespace fiftythree

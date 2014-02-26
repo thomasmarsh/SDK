@@ -7,11 +7,11 @@
 
 #pragma once
 
-#include "Common/Touch/Touch.h"
 #include "Common/Touch/TouchClassifier.h"
 #include "Core/Enum.h"
 #include "Core/Event.hpp"
 #include "Core/Memory.h"
+#include "Core/Touch/Touch.h"
 
 namespace fiftythree
 {

@@ -9,9 +9,9 @@
 
 #include <boost/foreach.hpp>
 
-#include "Common/Touch/Touch.h"
 #include "CommonDeclarations.h"
 #include "Core/Enum.h"
+#include "Core/Touch/Touch.h"
 #include "FiftyThreeSdk/Classification/Classifier.h"
 
 namespace fiftythree

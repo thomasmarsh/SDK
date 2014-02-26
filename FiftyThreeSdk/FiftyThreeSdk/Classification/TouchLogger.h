@@ -10,8 +10,8 @@
 #include <boost/container/flat_map.hpp>
 #include <iostream>
 
-#include "Common/Touch/Touch.h"
 #include "Core/Memory.h"
+#include "Core/Touch/Touch.h"
 #include "FiftyThreeSdk/Classification/CommonDeclarations.h"
 #include "FiftyThreeSdk/Classification/Stroke.h"
 

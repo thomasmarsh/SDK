@@ -9,7 +9,7 @@
 
 #include <dispatch/dispatch.h>
 
-#include "Common/Touch/Touch.h"
+#include "Core/Touch/Touch.h"
 #include "FiftyThreeSdk/Classification/Cluster.h"
 #include "FiftyThreeSdk/Classification/CommonDeclarations.h"
 #include "FiftyThreeSdk/Classification/Stroke.h"

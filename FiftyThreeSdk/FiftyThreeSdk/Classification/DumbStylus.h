@@ -10,7 +10,7 @@
 #include <boost/foreach.hpp>
 #include <tuple>
 
-#include "Common/Touch/Touch.h"
+#include "Core/Touch/Touch.h"
 #include "FiftyThreeSdk/Classification/Cluster.h"
 #include "FiftyThreeSdk/Classification/CommonDeclarations.h"
 #include "FiftyThreeSdk/Classification/EigenLAB.h"
