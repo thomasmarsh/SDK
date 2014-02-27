@@ -16,6 +16,8 @@
 #include "TouchClassifierManager.h"
 
 using namespace fiftythree::common;
+using namespace fiftythree::core;
+
 using namespace fiftythree::sdk;
 
 class TouchClassifierManagerImpl : public TouchClassifierManager, public fiftythree::core::enable_shared_from_this<TouchClassifierManagerImpl>
@@ -43,7 +45,7 @@ public:
         _Classifiers.erase(std::remove(_Classifiers.begin(), _Classifiers.end(), classifier), _Classifiers.end());
     }
 
-    virtual void TouchesBegan(const fiftythree::common::TouchesSet & touches)
+    virtual void TouchesBegan(const TouchesSet & touches)
     {
         for (const TouchClassifier::Ptr & classifier : _Classifiers)
         {
@@ -51,7 +53,7 @@ public:
         }
     }
 
-    virtual void TouchesMoved(const fiftythree::common::TouchesSet & touches)
+    virtual void TouchesMoved(const TouchesSet & touches)
     {
         for (const TouchClassifier::Ptr & classifier : _Classifiers)
         {
@@ -59,7 +61,7 @@ public:
         }
     }
 
-    virtual void TouchesEnded(const fiftythree::common::TouchesSet & touches)
+    virtual void TouchesEnded(const TouchesSet & touches)
     {
         for (const TouchClassifier::Ptr & classifier : _Classifiers)
         {
@@ -67,7 +69,7 @@ public:
         }
     }
 
-    virtual void TouchesCancelled(const fiftythree::common::TouchesSet & touches)
+    virtual void TouchesCancelled(const TouchesSet & touches)
     {
         for (const TouchClassifier::Ptr & classifier : _Classifiers)
         {
@@ -86,7 +88,7 @@ public:
         }
     }
 
-    virtual FTTouchType GetTouchType(const fiftythree::common::Touch::cPtr & touch)
+    virtual FTTouchType GetTouchType(const fiftythree::core::Touch::cPtr & touch)
     {
         return _Classifiers[0]->GetTouchType(touch); // BUGBUG - figure out how to combine
     }

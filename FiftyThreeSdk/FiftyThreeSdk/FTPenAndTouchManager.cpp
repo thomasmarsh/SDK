@@ -12,11 +12,13 @@
 #include "Common/Touch/TouchTracker.h"
 #include "Core/Memory.h"
 #include "Core/NoCopy.h"
+#include "Core/Touch/Touch.h"
 #include "FTPenAndTouchManager.h"
 #include "LatencyTouchClassifier.h"
 #include "TouchClassifierManager.h"
 
 using namespace fiftythree::common;
+using namespace fiftythree::core;
 using namespace fiftythree::sdk;
 using boost::unordered_map;
 using std::make_pair;

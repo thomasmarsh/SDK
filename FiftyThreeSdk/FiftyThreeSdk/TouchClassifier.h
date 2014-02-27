@@ -31,15 +31,15 @@ protected:
 public:
     virtual bool HandlesPenInput() = 0;
 
-    virtual void TouchesBegan(const fiftythree::common::TouchesSet & touches) = 0;
-    virtual void TouchesMoved(const fiftythree::common::TouchesSet & touches) = 0;
-    virtual void TouchesEnded(const fiftythree::common::TouchesSet & touches) = 0;
-    virtual void TouchesCancelled(const fiftythree::common::TouchesSet & touches) = 0;
+    virtual void TouchesBegan(const core::TouchesSet & touches) = 0;
+    virtual void TouchesMoved(const core::TouchesSet & touches) = 0;
+    virtual void TouchesEnded(const core::TouchesSet & touches) = 0;
+    virtual void TouchesCancelled(const core::TouchesSet & touches) = 0;
 
     virtual void ProcessPenEvent(const PenEvent::Ptr & event) = 0;
 
-    virtual FTTouchType GetTouchType(const fiftythree::common::Touch::cPtr & touch) = 0;
-    virtual Event<const common::Touch::cPtr &> & TouchTypeChanged() = 0;
+    virtual FTTouchType GetTouchType(const fiftythree::core::Touch::cPtr & touch) = 0;
+    virtual Event<const core::Touch::cPtr &> & TouchTypeChanged() = 0;
 };
 
 }

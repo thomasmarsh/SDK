@@ -88,25 +88,25 @@ public:
 
     // Let the classifier know of changes to the world.
     virtual void OnPenEvent(const PenEvent & pen) = 0;
-    virtual void OnTouchesChanged(const std::set<common::Touch::Ptr> & set) = 0;
+    virtual void OnTouchesChanged(const std::set<core::Touch::Ptr> & set) = 0;
 
     // The caller can let the classifier know a touch has been marked
-    virtual void RemoveTouchFromClassification(common::TouchId touchId) = 0;
+    virtual void RemoveTouchFromClassification(core::TouchId touchId) = 0;
 
     // Invoke this on each touch ID, to get the latest classification. Note, this
     // may take a few frames to be up-to-date.
-    virtual TouchType Classify(common::TouchId touchID)  = 0;
+    virtual TouchType Classify(core::TouchId touchID)  = 0;
 
     // Given a pair of touches what are their most likely type.
-    virtual TouchType ClassifyPair(common::TouchId touch0, common::TouchId touch1, const TwoTouchPairType & type)  = 0;
+    virtual TouchType ClassifyPair(core::TouchId touch0, core::TouchId touch1, const TwoTouchPairType & type)  = 0;
 
     // Given a single touch what is mostly likely for 1-touch gestures.
-    virtual TouchType ClassifyForGesture(common::TouchId touch0, const SingleTouchGesture & type) = 0;
+    virtual TouchType ClassifyForGesture(core::TouchId touch0, const SingleTouchGesture & type) = 0;
 
     // TODO:
     //  Revisit this API once isolated stroke stuff has settled down a bit.
     //  Ideally GRs ask binary questions rather than have to know about ranges and valid stats...
-    virtual Eigen::VectorXf GeometricStatistics(common::TouchId  touch0) = 0;
+    virtual Eigen::VectorXf GeometricStatistics(core::TouchId  touch0) = 0;
 
     // This enables the use of a simple prior based on pathRadius on UIKit's touch object.
     // this is a private API thus off by default.
@@ -115,7 +115,7 @@ public:
     virtual void SetUseDebugLogging(bool v) = 0;
 
     // Returns a list of touch ids since the last call to ClearTouchesReclassified
-    virtual std::vector<common::TouchId> TouchesReclassified() = 0;
+    virtual std::vector<core::TouchId> TouchesReclassified() = 0;
 
     virtual void ClearTouchesReclassified() = 0;
 

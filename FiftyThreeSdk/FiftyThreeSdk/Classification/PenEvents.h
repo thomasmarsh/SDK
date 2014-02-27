@@ -35,8 +35,8 @@ protected:
     std::map< ClusterId, std::pair<TouchType, float> > _clusterTypesAndScores;
 
     // store these so the classifier can resolve collisions
-    std::map< common::TouchId, PenEventId > _bestPenDownEventForTouch;
-    std::map< common::TouchId, PenEventId > _bestPenUpEventForTouch;
+    std::map< core::TouchId, PenEventId > _bestPenDownEventForTouch;
+    std::map< core::TouchId, PenEventId > _bestPenUpEventForTouch;
 
     // switch timing delay constant for switch arrival time exponentials.
     // 1 / lambda is the expected switch delay time
@@ -52,7 +52,7 @@ public:
 
 protected:
 
-    void            MarkTouchTypes(IdTypeMap* touches, common::TouchId id, TouchType type);
+    void            MarkTouchTypes(IdTypeMap* touches, core::TouchId id, TouchType type);
     void            MarkTouchTypes(IdTypeMap* touches, TouchIdVector ids, TouchType type);
 
     void            FoundPenEventTouch(PenEventId id);
@@ -73,10 +73,10 @@ public:
 
     // returns probability that both down and up events were emitted by the given touch,
     // using some independence assumptions.
-    std::pair<TouchType, float> TypeAndScoreForTouch(common::TouchId touchId, PenEventIdSet &validPenEvents);
+    std::pair<TouchType, float> TypeAndScoreForTouch(core::TouchId touchId, PenEventIdSet &validPenEvents);
 
     // similar to above, but used for isolated strokes.  above is used by clusters.
-    std::pair<TouchType, float> TypeAndScoreForTouch(common::TouchId touchId);
+    std::pair<TouchType, float> TypeAndScoreForTouch(core::TouchId touchId);
 
     float SwitchDownLikelihoodForDeltaT(float deltaT);
     float SwitchUpLikelihoodForDeltaT(float deltaT);
@@ -85,24 +85,24 @@ public:
 
     std::pair<TouchType, float> TypeAndScoreForCluster(Cluster & cluster);
 
-    IdLikelihoodPair BestPenDownEventForTouch(common::TouchId touchId, PenEventIdSet const &penDownEvents);
-    IdLikelihoodPair BestPenUpEventForTouch(common::TouchId touchId,   PenEventIdSet const &penUpEvents);
+    IdLikelihoodPair BestPenDownEventForTouch(core::TouchId touchId, PenEventIdSet const &penDownEvents);
+    IdLikelihoodPair BestPenUpEventForTouch(core::TouchId touchId,   PenEventIdSet const &penUpEvents);
 
-    PenEventId BestPenDownEventForTouch(common::TouchId touchId);
-    PenEventId BestPenUpEventForTouch(common::TouchId touchId);
+    PenEventId BestPenDownEventForTouch(core::TouchId touchId);
+    PenEventId BestPenUpEventForTouch(core::TouchId touchId);
 
     // when classifying a touch, we do not consider touches which ended more than
     // IrrelevancyTimeWindow seconds prior to the probe touch's begin time.
     // used by the clusterTracker/touchLog to determine when we can safely remove data.
     double IrrelevancyTimeWindow() const;
 
-    float PenDownProbabilityForTouchGivenPenEvent(common::TouchId touchId, PenEventId downEventId,
+    float PenDownProbabilityForTouchGivenPenEvent(core::TouchId touchId, PenEventId downEventId,
                                                   TouchIdVector touchesBegan, Eigen::VectorXf prior);
 
-    float PenUpProbabilityForTouchGivenPenEvent(common::TouchId touchId,   PenEventId upEventId,
+    float PenUpProbabilityForTouchGivenPenEvent(core::TouchId touchId,   PenEventId upEventId,
                                                 TouchIdVector touchesEnded, Eigen::VectorXf prior);
 
-    float DurationTimeErrorProbabilityForTouch(common::TouchId probeId,
+    float DurationTimeErrorProbabilityForTouch(core::TouchId probeId,
                                                float switchOnDuration,
                                                TouchIdVector concurrentTouches,
                                                Eigen::VectorXf prior);

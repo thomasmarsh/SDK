@@ -22,7 +22,7 @@ using namespace Eigen;
 namespace fiftythree {
 namespace sdk {
 
-IdLikelihoodPair PenEventClassifier::BestPenDownEventForTouch(common::TouchId touchId, PenEventIdSet const &penDownEvents)
+IdLikelihoodPair PenEventClassifier::BestPenDownEventForTouch(core::TouchId touchId, PenEventIdSet const &penDownEvents)
 {
 
     IdLikelihoodPair bestPair(PenEventId(-1), 0.0f);
@@ -47,7 +47,7 @@ IdLikelihoodPair PenEventClassifier::BestPenDownEventForTouch(common::TouchId to
     return bestPair;
 }
 
-IdLikelihoodPair PenEventClassifier::BestPenUpEventForTouch(common::TouchId touchId, PenEventIdSet const &penUpEvents)
+IdLikelihoodPair PenEventClassifier::BestPenUpEventForTouch(core::TouchId touchId, PenEventIdSet const &penUpEvents)
 {
 
     IdLikelihoodPair bestPair(PenEventId(-1), 0.0f);
@@ -72,7 +72,7 @@ IdLikelihoodPair PenEventClassifier::BestPenUpEventForTouch(common::TouchId touc
     return bestPair;
 }
 
-PenEventId PenEventClassifier::BestPenDownEventForTouch(common::TouchId touchId)
+PenEventId PenEventClassifier::BestPenDownEventForTouch(core::TouchId touchId)
 {
     if(_bestPenDownEventForTouch.count(touchId))
     {
@@ -84,7 +84,7 @@ PenEventId PenEventClassifier::BestPenDownEventForTouch(common::TouchId touchId)
     }
 }
 
-PenEventId PenEventClassifier::BestPenUpEventForTouch(common::TouchId touchId)
+PenEventId PenEventClassifier::BestPenUpEventForTouch(core::TouchId touchId)
 {
     if(_bestPenUpEventForTouch.count(touchId))
     {
@@ -110,7 +110,7 @@ PenEventId PenEventClassifier::BestPenUpEventForTouch(common::TouchId touchId)
 // if P(T_j emitted down event) = 1
 // then it almost certainly emitted an up event as well.  this doesn't seem to matter -- it's another of those
 // places where our estimates for probabilities may be lousy but the classification is still good.
-float PenEventClassifier::PenDownProbabilityForTouchGivenPenEvent(common::TouchId probeId,
+float PenEventClassifier::PenDownProbabilityForTouchGivenPenEvent(core::TouchId probeId,
                                                                   PenEventId downEventId,
                                                                   TouchIdVector touchesBegan,
                                                                   VectorXf prior)
@@ -127,10 +127,10 @@ float PenEventClassifier::PenDownProbabilityForTouchGivenPenEvent(common::TouchI
     float totalMass  = 0.0f;
     float probePrior = 0.0f;
 
-    //BOOST_FOREACH(common::TouchId beganId, touchesBegan)
+    //BOOST_FOREACH(core::TouchId beganId, touchesBegan)
     for(int j=0; j<touchesBegan.size(); j++)
     {
-        common::TouchId beganId = touchesBegan[j];
+        core::TouchId beganId = touchesBegan[j];
 
         float likelihood  = SwitchDownLikelihoodForDeltaT(tDown - _clusterTracker->Data(beganId)->FirstTimestamp());
         totalMass        += prior[j] * likelihood;
@@ -154,7 +154,7 @@ float PenEventClassifier::PenDownProbabilityForTouchGivenPenEvent(common::TouchI
 
 }
 
-float PenEventClassifier::PenUpProbabilityForTouchGivenPenEvent(common::TouchId probeId,
+float PenEventClassifier::PenUpProbabilityForTouchGivenPenEvent(core::TouchId probeId,
                                                                 PenEventId upEventId,
                                                                 TouchIdVector touchesEnded,
                                                                 VectorXf prior)
@@ -179,7 +179,7 @@ float PenEventClassifier::PenUpProbabilityForTouchGivenPenEvent(common::TouchId 
     float probePrior = 0.0f;
     for(int j=0; j<touchesEnded.size(); j++)
     {
-        common::TouchId endedId = touchesEnded[j];
+        core::TouchId endedId = touchesEnded[j];
 
         float likelihood  = SwitchUpLikelihoodForDeltaT(tUp - _clusterTracker->Data(endedId)->LastTimestamp());
         totalMass        += prior[j] * likelihood;
@@ -204,7 +204,7 @@ float PenEventClassifier::PenUpProbabilityForTouchGivenPenEvent(common::TouchId 
 
 // todo: converting likelihoods to probabilities via Bayes' rule is becoming a common theme,
 // make it into a helper.
-float PenEventClassifier::DurationTimeErrorProbabilityForTouch(common::TouchId probeId,
+float PenEventClassifier::DurationTimeErrorProbabilityForTouch(core::TouchId probeId,
                                                                float switchOnDuration,
                                                                TouchIdVector concurrentTouches,
                                                                VectorXf prior)
@@ -218,7 +218,7 @@ float PenEventClassifier::DurationTimeErrorProbabilityForTouch(common::TouchId p
     float probeDuration = 0.0f;
     for(int j=0; j<concurrentTouches.size(); j++)
     {
-        common::TouchId otherId = concurrentTouches[j];
+        core::TouchId otherId = concurrentTouches[j];
 
         float touchDuration;
         if(_clusterTracker->TouchWithId(otherId)->IsPhaseEndedOrCancelled())
@@ -318,7 +318,7 @@ std::pair<TouchType, float> PenEventClassifier::TypeAndScoreForCluster(Cluster &
 
     float N            = 0.0f;
 
-    BOOST_FOREACH(common::TouchId touchId, cluster._touchIds)
+    BOOST_FOREACH(core::TouchId touchId, cluster._touchIds)
     {
         std::pair<TouchType, float> curr = TypeAndScoreForTouch(touchId, validPenEvents);
 
@@ -380,12 +380,12 @@ std::pair<TouchType, float> PenEventClassifier::TypeAndScoreForCluster(Cluster &
 
 }
 
-std::pair<TouchType, float> PenEventClassifier::TypeAndScoreForTouch(common::TouchId touchId)
+std::pair<TouchType, float> PenEventClassifier::TypeAndScoreForTouch(core::TouchId touchId)
 {
 
     std::pair<TouchType, float> pair(TouchType::Unknown, 0.0f);
 
-    if(touchId == common::InvalidTouchId())
+    if(touchId == core::InvalidTouchId())
     {
         return pair;
     }
@@ -498,7 +498,7 @@ double PenEventClassifier::IrrelevancyTimeWindow() const
     return _maxPenEventDelay + _commonData->proxy->ClusterTracker()->StaleInterval() + pad;
 }
 
-std::pair<TouchType, float> PenEventClassifier::TypeAndScoreForTouch(common::TouchId touchId, PenEventIdSet &validPenEvents)
+std::pair<TouchType, float> PenEventClassifier::TypeAndScoreForTouch(core::TouchId touchId, PenEventIdSet &validPenEvents)
 {
 
     float     score    = 0.0f;
@@ -604,7 +604,7 @@ std::pair<TouchType, float> PenEventClassifier::TypeAndScoreForTouch(common::Tou
             // we can't do the same trick for touchesBegan (at least not so naively) because
             // for taps it can indeed happen that the touch ends before the began event occurred.
             TouchIdVector   validTouchesEnded;
-            BOOST_FOREACH(common::TouchId touchId, touchesEnded)
+            BOOST_FOREACH(core::TouchId touchId, touchesEnded)
             {
                 //ClusterId otherCluster = _commonData->proxy->ClusterTracker()->ClusterIdForTouchId(touchId);
                 //bool stale = (otherCluster == InvalidClusterId()) || _commonData->proxy->ClusterTracker()->Cluster(otherCluster).Stale();
@@ -773,7 +773,7 @@ float PenEventClassifier::SwitchUpLikelihoodForDeltaT(float deltaT)
 
 }
 
-void PenEventClassifier::MarkTouchTypes(IdTypeMap* touches, common::TouchId id, TouchType type) {
+void PenEventClassifier::MarkTouchTypes(IdTypeMap* touches, core::TouchId id, TouchType type) {
     if (touches->count(id) > 0) {
         touches->at(id) = type;
     }
@@ -783,7 +783,7 @@ void PenEventClassifier::MarkTouchTypes(IdTypeMap* touches, common::TouchId id, 
 }
 
 void PenEventClassifier::MarkTouchTypes(IdTypeMap* touches, TouchIdVector ids, TouchType type) {
-    BOOST_FOREACH(common::TouchId id, ids) {
+    BOOST_FOREACH(core::TouchId id, ids) {
         MarkTouchTypes(touches, id, type);
     }
 }

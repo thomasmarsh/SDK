@@ -27,7 +27,7 @@ class DumbStylusClassifier
     const CommonData*     _commonData;
 
     std::map<ClusterId, TouchType>        _clusterTypes;
-    std::map<common::TouchId, TouchType>  _touchTypes;
+    std::map<core::TouchId, TouchType>  _touchTypes;
 
     IdTypeMap  ReclassifyByHandedness();
     void       SetClusterType(Cluster::Ptr const & cluster, TouchType newType, IdTypeMap &changedTypes);
@@ -45,7 +45,7 @@ public:
 
     IdTypeMap ReclassifyCurrentEvent();
 
-    TouchType CurrentType(common::TouchId touchId);
+    TouchType CurrentType(core::TouchId touchId);
     TouchType ClusterType(ClusterId clusterId);
 
     void      ClearStaleData();

@@ -21,9 +21,9 @@ namespace fiftythree
 namespace sdk
 {
 
-typedef std::map<common::TouchId, float> IdFloatMap;
-typedef std::map<common::TouchId, TouchType> IdTypeMap;
-typedef std::pair<common::TouchId, TouchType> IdTypePair;
+typedef std::map<core::TouchId, float> IdFloatMap;
+typedef std::map<core::TouchId, TouchType> IdTypeMap;
+typedef std::pair<core::TouchId, TouchType> IdTypePair;
 
 static const float Inf = std::numeric_limits<float>::infinity();
 static const int intInf = std::numeric_limits<int>::max() -3 ; // -3 because of indexing issues
@@ -36,13 +36,13 @@ class TouchClassificationProxy;
 
 struct CommonData
 {
-    const std::map<common::TouchId, TouchType>* const types;
-    const std::map<common::TouchId, bool>* const locked;
+    const std::map<core::TouchId, TouchType>* const types;
+    const std::map<core::TouchId, bool>* const locked;
 
     TouchClassificationProxy* proxy;
 
-    CommonData(std::map<common::TouchId, TouchType>* typesPointer,
-               std::map<common::TouchId, bool>* lockedPointer,
+    CommonData(std::map<core::TouchId, TouchType>* typesPointer,
+               std::map<core::TouchId, bool>* lockedPointer,
                TouchClassificationProxy* proxyPointer):
     types(typesPointer),
     locked(lockedPointer),

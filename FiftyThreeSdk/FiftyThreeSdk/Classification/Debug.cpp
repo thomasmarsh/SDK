@@ -12,7 +12,7 @@
 #include "FiftyThreeSdk/Classification/Debug.h"
 #include "FiftyThreeSdk/Classification/FiniteDifferences.h"
 
-using fiftythree::common::TouchId;
+using fiftythree::core::TouchId;
 
 namespace fiftythree {
 namespace sdk {

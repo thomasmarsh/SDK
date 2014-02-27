@@ -6,6 +6,7 @@
 //
 
 #import "Common/Touch/TouchTracker.h"
+#import "Core/Touch/Touch.h"
 #import "FTApplication.h"
 #import "FTPen.h"
 #import "FTPenManager.h"
@@ -90,12 +91,12 @@ using boost::optional;
         TouchClassifier::Ptr classifier = self.classifier;
         if (classifier)
         {
-            std::set<Touch::cPtr> touches;
+            std::set<fiftythree::core::Touch::cPtr> touches;
 
             for (UITouch *t in [event allTouches])
             {
 
-                Touch::cPtr touch = static_pointer_cast<TouchTrackerObjC>(TouchTracker::Instance())->TouchForUITouch(t);
+                auto touch = static_pointer_cast<TouchTrackerObjC>(TouchTracker::Instance())->TouchForUITouch(t);
                 touches.insert(touch);
             }
 

@@ -42,7 +42,7 @@ float Cluster::Staleness() const
 int Cluster::CountTouchesOfType(TouchType probeType) const
 {
     int count = 0;
-    BOOST_FOREACH(common::TouchId touchId, _touchIds)
+    BOOST_FOREACH(core::TouchId touchId, _touchIds)
     {
         if (_commonData->proxy->CurrentClass(touchId) == probeType)
         {
@@ -52,7 +52,7 @@ int Cluster::CountTouchesOfType(TouchType probeType) const
     return count;
 }
 
-common::TouchId Cluster::MostRecentTouch() const
+core::TouchId Cluster::MostRecentTouch() const
 {
     if(_touchIds.empty())
     {
@@ -66,7 +66,7 @@ common::TouchId Cluster::MostRecentTouch() const
 
 bool Cluster::AllTouchesEnded() const
 {
-    BOOST_FOREACH(common::TouchId currId, _touchIds)
+    BOOST_FOREACH(core::TouchId currId, _touchIds)
     {
         //Touch::Ptr touch = _touchLog->TouchWithId(currId);
 
@@ -92,9 +92,9 @@ float Cluster::ConcurrentDuration(Cluster const &other) const
 
 }
 
-bool Cluster::ContainsTouch(common::TouchId probeId) const
+bool Cluster::ContainsTouch(core::TouchId probeId) const
 {
-    BOOST_FOREACH(common::TouchId currId, _touchIds)
+    BOOST_FOREACH(core::TouchId currId, _touchIds)
     {
         if(currId == probeId)
         {
@@ -104,7 +104,7 @@ bool Cluster::ContainsTouch(common::TouchId probeId) const
     return false;
 }
 
-bool Cluster::ConcurrentWith(common::TouchId touchId, bool useStaleInterval) const
+bool Cluster::ConcurrentWith(core::TouchId touchId, bool useStaleInterval) const
 {
 
     Cluster const &otherCluster = *(_touchLog->Cluster(touchId));
@@ -202,7 +202,7 @@ bool Cluster::ConcurrentWith(Cluster::Ptr const &other, bool useStaleInterval) c
 
 }
 
-common::TouchId Cluster::FirstTouch() const
+core::TouchId Cluster::FirstTouch() const
 {
     if(_touchIds.empty())
     {
@@ -304,7 +304,7 @@ ClusterId InvalidClusterId()
     return ClusterId(-1);
 }
 
-std::vector<TouchId>::iterator Cluster::FindTouch(common::TouchId touchId)
+std::vector<TouchId>::iterator Cluster::FindTouch(core::TouchId touchId)
 {
     std::vector<TouchId>::iterator it = std::find(_touchIds.begin(), _touchIds.end(), touchId);
     return it;
@@ -312,7 +312,7 @@ std::vector<TouchId>::iterator Cluster::FindTouch(common::TouchId touchId)
 
 // this removes it from the cluster, but not from classification
 // the touch will still be known to the TouchLogger
-bool Cluster::RemoveTouch(common::TouchId touchId)
+bool Cluster::RemoveTouch(core::TouchId touchId)
 {
     auto it = FindTouch(touchId);
     if(it == _touchIds.end())
@@ -331,9 +331,9 @@ bool Cluster::RemoveTouch(common::TouchId touchId)
 
 }
 
-std::vector<common::TouchId> Cluster::ReclassifiableTouches() const
+std::vector<core::TouchId> Cluster::ReclassifiableTouches() const
 {
-    std::vector<common::TouchId> out;
+    std::vector<core::TouchId> out;
 
     BOOST_FOREACH(IdDataRefPair pair, _touchData)
     {
@@ -362,7 +362,7 @@ bool Cluster::ContainsReclassifiableTouch() const
     return false;
 }
 
-bool Cluster::InsertTouch(common::TouchId touchId)
+bool Cluster::InsertTouch(core::TouchId touchId)
 {
     if(! ContainsTouch(touchId))
     {
@@ -584,7 +584,7 @@ void ClusterTracker::MarkStaleClusters(double currentTimestamp)
     }
 }
 
-void ClusterTracker::AddPointToCluster(Vector2f p, double timestamp, Cluster::Ptr const & cluster, common::TouchId touchId)
+void ClusterTracker::AddPointToCluster(Vector2f p, double timestamp, Cluster::Ptr const & cluster, core::TouchId touchId)
 {
     _needComputeClusterOrder = true;
 
@@ -620,7 +620,7 @@ void ClusterTracker::AddPointToCluster(Vector2f p, double timestamp, Cluster::Pt
         {
             if (existingId != touchId)
             {
-                Touch::Ptr touch = _touchLog->TouchWithId(existingId);
+                auto touch = _touchLog->TouchWithId(existingId);
                 if(touch &&
                    (! touch->IsPhaseEndedOrCancelled()))
                 {
@@ -636,7 +636,7 @@ void ClusterTracker::AddPointToCluster(Vector2f p, double timestamp, Cluster::Pt
 
     if(_commonData->proxy->UsePrivateAPI())
     {
-         common::Touch::Ptr touch = _touchLog->TouchWithId(touchId);
+         core::Touch::Ptr touch = _touchLog->TouchWithId(touchId);
 
         if (touch && touch->CurrentSample().TouchRadius())
         {
@@ -660,7 +660,7 @@ void  Cluster::RemoveOldTouches(double cutoffTime)
 {
     auto copy = _touchIds;
 
-    BOOST_FOREACH(common::TouchId touchId, copy)
+    BOOST_FOREACH(core::TouchId touchId, copy)
     {
         DebugAssert(_touchData.count(touchId));
 
@@ -684,7 +684,7 @@ float Cluster::TotalLength() const
 {
     float totalLength = 0.0f;
 
-    BOOST_FOREACH(common::TouchId touchId, _touchIds)
+    BOOST_FOREACH(core::TouchId touchId, _touchIds)
     {
         DebugAssert(_touchData.count(touchId));
         totalLength += _touchData.at(touchId)->Stroke()->ArcLength();
@@ -698,7 +698,7 @@ Eigen::Vector2f Cluster::CenterOfMass() const
     float totalMass = 0.0f;
     Vector2f center = Vector2f::Zero();
 
-    BOOST_FOREACH(common::TouchId touchId, _touchIds)
+    BOOST_FOREACH(core::TouchId touchId, _touchIds)
     {
         Stroke::Ptr const & stroke = _touchData.at(touchId)->Stroke();
         float weight = stroke->Size();
@@ -719,7 +719,7 @@ int Cluster::PointCount() const
 {
     int N = 0;
 
-    BOOST_FOREACH(common::TouchId touchId, _touchIds)
+    BOOST_FOREACH(core::TouchId touchId, _touchIds)
     {
         Stroke::Ptr const & stroke = _commonData->proxy->ClusterTracker()->Stroke(touchId);
         N += stroke->Size();
@@ -741,7 +741,7 @@ bool ClusterTracker::IsEndpoint(Cluster::Ptr const & cluster)
     }
 }
 
-void ClusterTracker::RemoveTouchFromClassification(common::TouchId touchId)
+void ClusterTracker::RemoveTouchFromClassification(core::TouchId touchId)
 {
 
     Cluster::Ptr cluster = _touchLog->Cluster(touchId);
@@ -1105,9 +1105,9 @@ std::vector<Cluster::Ptr> ClusterTracker::ExactOrderedClusters(std::set<Cluster:
 
 }
 
-std::vector<common::TouchId> ClusterTracker::TouchesForCurrentClusters(bool activeClustersOnly)
+std::vector<core::TouchId> ClusterTracker::TouchesForCurrentClusters(bool activeClustersOnly)
 {
-    std::vector<common::TouchId> touchIds;
+    std::vector<core::TouchId> touchIds;
 
     BOOST_FOREACH(IdClusterPtrPair const & pair, _clusters)
     {
@@ -1125,7 +1125,7 @@ std::vector<common::TouchId> ClusterTracker::TouchesForCurrentClusters(bool acti
 
 }
 
-Stroke::Ptr const &      ClusterTracker::Stroke(common::TouchId id)
+Stroke::Ptr const &      ClusterTracker::Stroke(core::TouchId id)
 {
     return _touchLog->Stroke(id);
 }
@@ -1156,7 +1156,7 @@ Cluster::Ptr ClusterTracker::NewClusterForTouch(TouchId touchId)
 
 void ClusterTracker::UpdateEventStatistics()
 {
-    BOOST_FOREACH(common::TouchId touchId, _touchLog->ActiveIds())
+    BOOST_FOREACH(core::TouchId touchId, _touchLog->ActiveIds())
     {
         if(_touchLog->Phase(touchId) == TouchPhase::Ended)
         {
@@ -1249,7 +1249,7 @@ std::vector<Cluster::Ptr> ClusterTracker::NonEndedPenClusters()
     {
         if(cluster->IsPenType() && (! cluster->_touchIds.empty()))
         {
-            Touch::Ptr touch = _touchLog->TouchWithId(cluster->_touchIds.back());
+            auto touch = _touchLog->TouchWithId(cluster->_touchIds.back());
             if(touch && (! touch->IsPhaseEndedOrCancelled()))
             {
                 pens.push_back(cluster);
@@ -1259,7 +1259,7 @@ std::vector<Cluster::Ptr> ClusterTracker::NonEndedPenClusters()
     return pens;
 }
 
-void ClusterTracker::TouchesChanged(const std::set<common::Touch::Ptr> & touches)
+void ClusterTracker::TouchesChanged(const std::set<core::Touch::Ptr> & touches)
 {
     _touchLog->TouchesChanged(touches);
 
@@ -1283,7 +1283,7 @@ void ClusterTracker::UpdateClusters()
 
     UpdateEventStatistics();
 
-    BOOST_FOREACH(common::TouchId touchId, _touchLog->ActiveIds())
+    BOOST_FOREACH(core::TouchId touchId, _touchLog->ActiveIds())
     {
 
         Stroke::Ptr stroke = _commonData->proxy->ClusterTracker()->Stroke(touchId);
@@ -1373,7 +1373,7 @@ void ClusterTracker::RemoveUnusedTouches()
     TouchId oldestId  = _touchLog->OldestReclassifiableTouch();
     if(oldestId != InvalidTouchId())
     {
-        Touch::Ptr touch = _touchLog->TouchWithId(oldestId);
+        auto touch = _touchLog->TouchWithId(oldestId);
         if(touch)
         {
             double cutoffTime = touch->FirstSample().TimestampSeconds() - _commonData->proxy->PenEventClassifier()->IrrelevancyTimeWindow();

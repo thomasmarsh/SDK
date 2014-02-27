@@ -10,9 +10,11 @@
 #include <vector>
 
 #include "Common/Touch/TouchManager.h"
+#include "Core/Touch/Touch.h"
 #include "LatencyTouchClassifier.h"
 
 using namespace fiftythree::common;
+using namespace fiftythree::core;
 using namespace fiftythree::sdk;
 using std::numeric_limits;
 using std::string;
@@ -113,7 +115,7 @@ public:
         }
     }
 
-    void TouchesBegan(const fiftythree::common::TouchesSet & touches)
+    void TouchesBegan(const TouchesSet & touches)
     {
         DebugAssert(CountTouches() == _TouchCount);
 
@@ -132,7 +134,7 @@ public:
         DebugAssert(CountTouches() == _TouchCount);
     }
 
-    void TouchesMoved(const fiftythree::common::TouchesSet & touches)
+    void TouchesMoved(const TouchesSet & touches)
     {
         DebugAssert(CountTouches() == _TouchCount);
 
@@ -158,7 +160,7 @@ public:
         DebugAssert(CountTouches() == _TouchCount);
     }
 
-    void TouchesEnded(const fiftythree::common::TouchesSet & touches)
+    void TouchesEnded(const TouchesSet & touches)
     {
         DebugAssert(CountTouches() == _TouchCount);
 
@@ -207,7 +209,7 @@ public:
         DebugAssert(CountTouches() == _TouchCount);
     }
 
-    void TouchesCancelled(const fiftythree::common::TouchesSet & touches)
+    void TouchesCancelled(const TouchesSet & touches)
     {
         TouchesEnded(touches);
     }
@@ -236,7 +238,7 @@ public:
         DebugAssert(CountTouches() == _TouchCount);
     }
 
-    FTTouchType GetTouchType(const fiftythree::common::Touch::cPtr & touch)
+    FTTouchType GetTouchType(const fiftythree::core::Touch::cPtr & touch)
     {
         if (_PenTouch == touch)
         {

@@ -77,7 +77,7 @@ StrokeChunkLog::Ptr StrokeChunkLog::New(int chunkIndex) {
     return StrokeChunkLog::Ptr(new StrokeChunkLog(chunkIndex));
 }
 
-std::pair<TouchType, bool> IsolatedStrokesClassifier::ClassifyForPinchOrPanGesture(common::TouchId touchId)
+std::pair<TouchType, bool> IsolatedStrokesClassifier::ClassifyForPinchOrPanGesture(core::TouchId touchId)
 {
     Stroke::Ptr stroke            = _clusterTracker->Stroke(touchId);
 
@@ -222,7 +222,7 @@ std::pair<TouchType, bool> IsolatedStrokesClassifier::ClassifyForPinchOrPanGestu
 
 }
 
-EdgeThumbState IsolatedStrokesClassifier::TestEdgeThumb(common::TouchId touchId)
+EdgeThumbState IsolatedStrokesClassifier::TestEdgeThumb(core::TouchId touchId)
 {
     Cluster::Ptr cluster = _clusterTracker->Cluster(touchId);
     if(! cluster || (! _commonData->proxy->ClusterTracker()->IsEndpoint(cluster)))
@@ -265,7 +265,7 @@ EdgeThumbState IsolatedStrokesClassifier::TestEdgeThumb(common::TouchId touchId)
         }
         else
         {
-            if (_clusterTracker->Phase(touchId) != common::TouchPhase::Ended)
+            if (_clusterTracker->Phase(touchId) != core::TouchPhase::Ended)
             {
                 return EdgeThumbState::Possible;
             }
@@ -300,7 +300,7 @@ void IsolatedStrokesClassifier::MarkEdgeThumbs()
 
         if(! cluster->_touchIds.empty())
         {
-            common::TouchId touchId  = cluster->_touchIds.back();
+            core::TouchId touchId  = cluster->_touchIds.back();
             cluster->_edgeThumbState = TestEdgeThumb(touchId);
 
             // go until we hit something other than a thumb
@@ -321,7 +321,7 @@ void IsolatedStrokesClassifier::MarkEdgeThumbs()
         {
             if(! cluster->_touchIds.empty())
             {
-                common::TouchId touchId  = cluster->_touchIds.back();
+                core::TouchId touchId  = cluster->_touchIds.back();
                 cluster->_edgeThumbState = TestEdgeThumb(touchId);
 
                 // go until we hit something other than a thumb
@@ -335,7 +335,7 @@ void IsolatedStrokesClassifier::MarkEdgeThumbs()
 
 }
 
-bool IsolatedStrokesClassifier::IsEdgeThumb(common::TouchId touchId)
+bool IsolatedStrokesClassifier::IsEdgeThumb(core::TouchId touchId)
 {
 
     Cluster::Ptr cluster = _clusterTracker->Cluster(touchId);
@@ -350,7 +350,7 @@ bool IsolatedStrokesClassifier::IsEdgeThumb(common::TouchId touchId)
 
 IdTypeMap IsolatedStrokesClassifier::ReclassifyActiveTouches()
 {
-    std::vector<common::TouchId> ids = _clusterTracker->ActiveIds();
+    std::vector<core::TouchId> ids = _clusterTracker->ActiveIds();
 
     IdTypeMap types;
 
@@ -391,12 +391,12 @@ IdTypeMap IsolatedStrokesClassifier::ReclassifyActiveTouches()
     return types;
 }
 
-float IsolatedStrokesClassifier::Score(common::TouchId id)
+float IsolatedStrokesClassifier::Score(core::TouchId id)
 {
     return _scores[id];
 }
 
-float IsolatedStrokesClassifier::NormalizedScore(common::TouchId id)
+float IsolatedStrokesClassifier::NormalizedScore(core::TouchId id)
 {
 
     float score = Score(*(_clusterTracker->Stroke(id)));
@@ -404,11 +404,11 @@ float IsolatedStrokesClassifier::NormalizedScore(common::TouchId id)
     return std::max(0.0f, std::min(1.0f, score));
 }
 
-bool IsolatedStrokesClassifier::IsTap(common::TouchId touchId)
+bool IsolatedStrokesClassifier::IsTap(core::TouchId touchId)
 {
-    common::Touch::Ptr touch = _clusterTracker->TouchWithId(touchId);
+    core::Touch::Ptr touch = _clusterTracker->TouchWithId(touchId);
 
-    if(!touch || touch->Phase() != common::TouchPhase::Ended)
+    if(!touch || touch->Phase() != core::TouchPhase::Ended)
     {
         return false;
     }
@@ -479,7 +479,7 @@ float IsolatedStrokesClassifier::Score(Stroke  & stroke)
 
 }
 
-Eigen::VectorXf IsolatedStrokesClassifier::ScoresForId(common::TouchId id) {
+Eigen::VectorXf IsolatedStrokesClassifier::ScoresForId(core::TouchId id) {
 
     //if (_touchIdChunkIndexMap.count(id) < 1) {
     if (_touchIdChunkData.count(id) < 1) {
@@ -685,7 +685,7 @@ Eigen::VectorXf IsolatedStrokesClassifier::PalmLogDensity(Eigen::VectorXf scores
     return output;
 }
 
-void IsolatedStrokesClassifier::UpdateIdStoredData(common::TouchId id) {
+void IsolatedStrokesClassifier::UpdateIdStoredData(core::TouchId id) {
 
     if (TouchIdIsolatedSize(id) < 4) {
         // We ignore the touch in this case
@@ -714,7 +714,7 @@ void IsolatedStrokesClassifier::UpdateIdStoredData(common::TouchId id) {
 
 }
 
-int IsolatedStrokesClassifier::FindChunkIndexStartingWithIndex(common::TouchId id, int startIndex) {
+int IsolatedStrokesClassifier::FindChunkIndexStartingWithIndex(core::TouchId id, int startIndex) {
     int touchSize = TouchIdIsolatedSize(id);
 
     // Failsafe for debugging
@@ -736,7 +736,7 @@ int IsolatedStrokesClassifier::FindChunkIndexStartingWithIndex(common::TouchId i
     return startIndex;
 }
 
-Eigen::MatrixX2f IsolatedStrokesClassifier::StrokeLogLikelihoods(common::TouchId id) {
+Eigen::MatrixX2f IsolatedStrokesClassifier::StrokeLogLikelihoods(core::TouchId id) {
     // column 1: Pen log-densities
     // column 2: Palm log-densities
 
@@ -773,14 +773,14 @@ Eigen::MatrixX2f IsolatedStrokesClassifier::StrokeLogLikelihoods(common::TouchId
     return output;
 }
 
-int IsolatedStrokesClassifier::NPVoteCount(common::TouchId id) {
+int IsolatedStrokesClassifier::NPVoteCount(core::TouchId id) {
 
     //return NPVoteCountWithFalsePositiveRate(id, 0.02f);
     return NPVoteCountWithFalsePositiveRate(id, _NPData->_defaultFPRate);
 
 }
 
-int IsolatedStrokesClassifier::NPVoteCountWithFalsePositiveRate(common::TouchId id, float falsePositiveRate) {
+int IsolatedStrokesClassifier::NPVoteCountWithFalsePositiveRate(core::TouchId id, float falsePositiveRate) {
 
     AssertFalsePositiveRate(falsePositiveRate);
 
@@ -796,12 +796,12 @@ int IsolatedStrokesClassifier::NPVoteCountWithFalsePositiveRate(common::TouchId 
     return votes.cast<int>().sum();
 }
 
-TouchType IsolatedStrokesClassifier::NPVotingTest(common::TouchId id) {
+TouchType IsolatedStrokesClassifier::NPVotingTest(core::TouchId id) {
     //return NPVotingTestWithFalsePositiveRate(id, 0.02f);
     return NPVotingTestWithFalsePositiveRate(id, _NPData->_defaultFPRate);
 }
 
-TouchType IsolatedStrokesClassifier::NPVotingTestWithFalsePositiveRate(common::TouchId id, float falsePositiveRate) {
+TouchType IsolatedStrokesClassifier::NPVotingTestWithFalsePositiveRate(core::TouchId id, float falsePositiveRate) {
 
     if (! _enableIsolatedStrokesClassifier) {
         return TouchType::PenTip1;
@@ -824,14 +824,14 @@ TouchType IsolatedStrokesClassifier::NPVotingTestWithFalsePositiveRate(common::T
     return output;
 }
 
-float IsolatedStrokesClassifier::NPVoteScore(common::TouchId id) {
+float IsolatedStrokesClassifier::NPVoteScore(core::TouchId id) {
 
     //return NPVoteScoreWithFalsePositiveRate(id, 0.02f);
     return NPVoteScoreWithFalsePositiveRate(id, _NPData->_defaultFPRate);
 
 }
 
-float IsolatedStrokesClassifier::NPVoteScoreWithFalsePositiveRate(common::TouchId id, float falsePositiveRate)
+float IsolatedStrokesClassifier::NPVoteScoreWithFalsePositiveRate(core::TouchId id, float falsePositiveRate)
 {
 
     if (! _enableIsolatedStrokesClassifier) {
@@ -856,7 +856,7 @@ void IsolatedStrokesClassifier::AssertFalsePositiveRate(float alpha) {
 
 }
 
-TouchType IsolatedStrokesClassifier::BayesLikelihoodTestWithFalsePositiveRate(common::TouchId id, float falsePositiveRate) {
+TouchType IsolatedStrokesClassifier::BayesLikelihoodTestWithFalsePositiveRate(core::TouchId id, float falsePositiveRate) {
 
     if (! _enableIsolatedStrokesClassifier) {
         return TouchType::PenTip1;
@@ -880,11 +880,11 @@ TouchType IsolatedStrokesClassifier::BayesLikelihoodTestWithFalsePositiveRate(co
     return output;
 }
 
-TouchType IsolatedStrokesClassifier::BayesLikelihoodTest(common::TouchId id) {
+TouchType IsolatedStrokesClassifier::BayesLikelihoodTest(core::TouchId id) {
     return BayesLikelihoodTestWithFalsePositiveRate(id, _BayesData->_falsePositiveRate);
 }
 
-float IsolatedStrokesClassifier::BayesLikelihoodScoreWithFalsePositiveRate(common::TouchId id, float falsePositiveRate) {
+float IsolatedStrokesClassifier::BayesLikelihoodScoreWithFalsePositiveRate(core::TouchId id, float falsePositiveRate) {
 
     if (! _enableIsolatedStrokesClassifier) {
         return 0.5f;
@@ -904,11 +904,11 @@ float IsolatedStrokesClassifier::BayesLikelihoodScoreWithFalsePositiveRate(commo
     return output;
 }
 
-float IsolatedStrokesClassifier::BayesLikelihoodScore(common::TouchId id) {
+float IsolatedStrokesClassifier::BayesLikelihoodScore(core::TouchId id) {
     return BayesLikelihoodScoreWithFalsePositiveRate(id, _BayesData->_falsePositiveRate);
 }
 
-TouchType IsolatedStrokesClassifier::AdaboostTest(common::TouchId id) {
+TouchType IsolatedStrokesClassifier::AdaboostTest(core::TouchId id) {
 
     if (! _enableIsolatedStrokesClassifier) {
         return TouchType::PenTip1;
@@ -936,7 +936,7 @@ TouchType IsolatedStrokesClassifier::AdaboostTest(common::TouchId id) {
     return output;
 }
 
-float IsolatedStrokesClassifier::AdaboostScore(common::TouchId id) {
+float IsolatedStrokesClassifier::AdaboostScore(core::TouchId id) {
 
     if (! _enableIsolatedStrokesClassifier) {
         return 0.5f;
@@ -956,7 +956,7 @@ float IsolatedStrokesClassifier::AdaboostScore(common::TouchId id) {
     return output;
 }
 
-float IsolatedStrokesClassifier::ConvexScoreWithFalsePositiveRate(common::TouchId id, float falsePositiveRate) {
+float IsolatedStrokesClassifier::ConvexScoreWithFalsePositiveRate(core::TouchId id, float falsePositiveRate) {
 
     if (! _enableIsolatedStrokesClassifier) {
         return 0.5f;
@@ -975,7 +975,7 @@ float IsolatedStrokesClassifier::ConvexScoreWithFalsePositiveRate(common::TouchI
     return output;
 }
 
-float IsolatedStrokesClassifier::ConvexScore(common::TouchId id) {
+float IsolatedStrokesClassifier::ConvexScore(core::TouchId id) {
 
     if (! _enableIsolatedStrokesClassifier) {
         return 0.5f;
@@ -1013,7 +1013,7 @@ Eigen::VectorXf IsolatedStrokesClassifier::LogEtas(float falsePositiveRate) {
     return output;
 }
 
-float IsolatedStrokesClassifier::LogMaxCurvature(common::TouchId id) {
+float IsolatedStrokesClassifier::LogMaxCurvature(core::TouchId id) {
 
     int touchSize = TouchIdIsolatedSize(id);
 
@@ -1041,7 +1041,7 @@ float IsolatedStrokesClassifier::LogMaxCurvature(common::TouchId id) {
     //return std::log(RowWiseComponentNorm(NthDerivative(s, XY, 2)).cwiseAbs().maxCoeff());
 }
 
-float IsolatedStrokesClassifier::NormalizedMaxCurvature(common::TouchId id) {
+float IsolatedStrokesClassifier::NormalizedMaxCurvature(core::TouchId id) {
 
     int touchSize = TouchIdIsolatedSize(id);
 
@@ -1056,7 +1056,7 @@ float IsolatedStrokesClassifier::NormalizedMaxCurvature(common::TouchId id) {
     return score;
 }
 
-int IsolatedStrokesClassifier::TouchIdIsolatedSize(common::TouchId id) {
+int IsolatedStrokesClassifier::TouchIdIsolatedSize(core::TouchId id) {
 
     static float tol = 1e-6f;
 
@@ -1067,7 +1067,7 @@ int IsolatedStrokesClassifier::TouchIdIsolatedSize(common::TouchId id) {
         return N;
     }
 
-    if ( (_clusterTracker->Phase(id) == common::TouchPhase::Ended) ) {
+    if ( (_clusterTracker->Phase(id) == core::TouchPhase::Ended) ) {
 
         // No need to compute ds unless we're at TouchEnded
         float ds = (stroke->XY(N) - stroke->XY(N-1)).norm();
@@ -1123,7 +1123,7 @@ float PolynomialModel::Evaluate(float x) {
 
 }
 
-void IsolatedStrokesClassifier::TouchIdNoLongerLogged(common::TouchId touchId) {
+void IsolatedStrokesClassifier::TouchIdNoLongerLogged(core::TouchId touchId) {
 
     _touchIdChunkData.erase(touchId);
 }

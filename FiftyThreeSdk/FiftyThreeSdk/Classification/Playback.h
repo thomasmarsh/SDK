@@ -29,17 +29,17 @@ struct PlaybackEntry
     typedef fiftythree::core::shared_ptr<PlaybackEntry> Ptr;
 
     PlaybackEntryType               _type;
-    std::set<common::Touch::Ptr>   _touches;
+    std::set<core::Touch::Ptr>   _touches;
     PenEvent                        _penEvent;
 
     PlaybackEntry(PlaybackEntryType type) : _type(type) {}
 
-    PlaybackEntry(const std::set<common::Touch::Ptr> & touches) : _type(PlaybackEntryType::TouchesChanged)
+    PlaybackEntry(const std::set<core::Touch::Ptr> & touches) : _type(PlaybackEntryType::TouchesChanged)
     {
 
-        BOOST_FOREACH(const common::Touch::Ptr & touch, touches)
+        BOOST_FOREACH(const core::Touch::Ptr & touch, touches)
         {
-            common::Touch::Ptr copyOfTouch = common::Touch::New(touch->Id(), touch->Phase(), touch->CurrentSample());
+            core::Touch::Ptr copyOfTouch = core::Touch::New(touch->Id(), touch->Phase(), touch->CurrentSample());
 
             std::string k; boost::any v;
 
@@ -65,7 +65,7 @@ struct PlaybackEntry
         {
             double tMax = 0.0;
 
-            BOOST_FOREACH(const common::Touch::cPtr & touch, _touches)
+            BOOST_FOREACH(const core::Touch::cPtr & touch, _touches)
             {
                 if(touch->CurrentSample().TimestampSeconds() > tMax)
                 {

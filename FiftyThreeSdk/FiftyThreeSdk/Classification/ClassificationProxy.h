@@ -122,26 +122,26 @@ public:
 
     // Let the classifier know of changes to the world.
     void OnPenEvent(const PenEvent & pen);
-    void OnTouchesChanged(const std::set<common::Touch::Ptr> & set);
+    void OnTouchesChanged(const std::set<core::Touch::Ptr> & set);
 
     // The caller can let the classifier know a touch has been marked
-    void RemoveTouchFromClassification(common::TouchId touchId);
+    void RemoveTouchFromClassification(core::TouchId touchId);
 
-    TouchType Classify(common::TouchId touchID);
+    TouchType Classify(core::TouchId touchID);
 
     void SetUsePrivateAPI(bool v);
 
     void SetUseDebugLogging(bool v);
 
-    std::vector<common::TouchId> TouchesReclassified();
+    std::vector<core::TouchId> TouchesReclassified();
 
     void ClearTouchesReclassified();
 
-    TouchType ClassifyPair(common::TouchId touch0, common::TouchId touch1, const TwoTouchPairType & type);
+    TouchType ClassifyPair(core::TouchId touch0, core::TouchId touch1, const TwoTouchPairType & type);
 
-    TouchType ClassifyForGesture(common::TouchId touch0, const SingleTouchGesture & type);
+    TouchType ClassifyForGesture(core::TouchId touch0, const SingleTouchGesture & type);
 
-    Eigen::VectorXf GeometricStatistics(common::TouchId  touch0);
+    Eigen::VectorXf GeometricStatistics(core::TouchId  touch0);
 
     bool AreAnyTouchesCurrentlyPenOrEraser();
 
@@ -149,7 +149,7 @@ public:
 
     bool IsAnySwitchDown();
 
-    bool IsReclassifiable(common::Touch::Ptr const & touch, Stroke::Ptr const &stroke);
+    bool IsReclassifiable(core::Touch::Ptr const & touch, Stroke::Ptr const &stroke);
 
     void RemoveEdgeThumbs();
 
@@ -168,11 +168,11 @@ protected:
     const float _noReclassifyTimeSinceEnded =  .3f;
 
     Event<Unit> _LongPressWithPencilTip;
-    std::map<common::TouchId, TouchType> _currentTypes;
+    std::map<core::TouchId, TouchType> _currentTypes;
 
-    std::map<common::TouchId, bool>      _touchLocked;
+    std::map<core::TouchId, bool>      _touchLocked;
 
-    std::map<common::TouchId, TouchStatistics> _touchStatistics;
+    std::map<core::TouchId, TouchStatistics> _touchStatistics;
 
     ClusterTracker::Ptr                  _clusterTracker;
 
@@ -195,8 +195,8 @@ protected:
 
     const CommonData _commonData;
 
-    std::vector<common::TouchId> _endedTouchesReclassified;
-    std::vector<common::TouchId> _activeTouchesReclassified;
+    std::vector<core::TouchId> _endedTouchesReclassified;
+    std::vector<core::TouchId> _activeTouchesReclassified;
 
     Eigen::Vector2f    _penDirection;
 
@@ -206,7 +206,7 @@ protected:
 
     void UpdateSessionStatistics();
 
-    void SaveCurrentPenTipTouch(common::TouchId touchId);
+    void SaveCurrentPenTipTouch(core::TouchId touchId);
 
     void ClassifyIsolatedStrokes();
 
@@ -240,14 +240,14 @@ public:
     // this is not going to work when running RTs, and should not affect anything.
     bool _rtFlag;
 
-    std::map<common::TouchId, TouchStatistics> & TouchStatistics()
+    std::map<core::TouchId, TouchStatistics> & TouchStatistics()
     {
         return _touchStatistics;
     }
 
     typedef fiftythree::core::shared_ptr<TouchClassificationProxy> Ptr;
 
-    TouchType CurrentClass(common::TouchId touchId);
+    TouchType CurrentClass(core::TouchId touchId);
 
     bool      PenActive();
 
@@ -257,8 +257,8 @@ public:
 
     void      InitializeTouchTypes();
 
-    void      LockTypeForTouch(common::TouchId touchId);
-    bool      IsLocked(common::TouchId touchId);
+    void      LockTypeForTouch(core::TouchId touchId);
+    bool      IsLocked(core::TouchId touchId);
 
     float     MaximumPenEventWaitTime() const;
 
@@ -281,7 +281,7 @@ public:
     // if the worst ratio is very large, this guy dominates the others and should suppress them.
     float     DominationScore(Cluster::Ptr const & probeCluster);
 
-    bool      IsLongestConcurrentTouch(common::TouchId probeId);
+    bool      IsLongestConcurrentTouch(core::TouchId probeId);
 
     void      DebugPrintClusterStatus();
 
@@ -291,10 +291,10 @@ public:
     void      IgnorePenEvents();
     void      ListenForPenEvents();
 
-    std::vector<common::TouchId> EndedTouchesReclassified();
+    std::vector<core::TouchId> EndedTouchesReclassified();
     void ClearEndedTouchesReclassified();
 
-    std::vector<common::TouchId> ActiveTouchesReclassified();
+    std::vector<core::TouchId> ActiveTouchesReclassified();
     void ClearActiveTouchesReclassified();
 
     bool UseIsolatedStrokes() {
@@ -339,7 +339,7 @@ public:
 
     void SetCurrentTime(double timestamp);
 
-    std::vector<float> SizeDataForTouch(common::TouchId touchId);
+    std::vector<float> SizeDataForTouch(core::TouchId touchId);
 
     TouchType       TouchTypeForNewCluster()
     {

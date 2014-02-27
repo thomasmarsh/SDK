@@ -145,7 +145,7 @@ protected:
     BayesCalibration::Ptr       _BayesData;
     AdaboostCalibration::Ptr    _AdaboostData;
 
-    std::vector<common::TouchId> _checkedTouches;
+    std::vector<core::TouchId> _checkedTouches;
 
     std::map<ClusterId, TouchType> _classifiedClusters;
 
@@ -153,7 +153,7 @@ protected:
     // This is an additive nugget for base scores
     float _baseIsolatedScoreNugget = 1e-8f;
 
-    std::map<common::TouchId, StrokeChunkLog::Ptr> _touchIdChunkData;
+    std::map<core::TouchId, StrokeChunkLog::Ptr> _touchIdChunkData;
 
     bool _enableIsolatedStrokesClassifier;
 
@@ -191,17 +191,17 @@ public:
 
     IdTypeMap ReclassifyActiveTouches();
 
-    float Score(common::TouchId id);
+    float Score(core::TouchId id);
     float Score(Stroke  & stroke);
 
-    EdgeThumbState TestEdgeThumb(common::TouchId touchId);
+    EdgeThumbState TestEdgeThumb(core::TouchId touchId);
     void           MarkEdgeThumbs();
-    bool           IsEdgeThumb(common::TouchId touchId);
+    bool           IsEdgeThumb(core::TouchId touchId);
 
     // this gives a number in [0,1] where larger values indicate "badness"
     // (i.e. likelihood of being a palm), since that's the way most of the weak
     // classifiers work -- larger values mean palm.
-    float NormalizedScore(common::TouchId id);
+    float NormalizedScore(core::TouchId id);
 
     TouchType TestFingerVsPalm(Cluster::Ptr const & cluster);
     bool      IsPalmCluster(Cluster::Ptr const & cluster);
@@ -217,31 +217,31 @@ public:
     // This returns loglikelihoods, hiding all the crap under the hood
     // column 1: log-prob that stroke data came from a pen
     // column 2: log-prob that stroke data came from a palm
-    Eigen::MatrixX2f StrokeLogLikelihoods(common::TouchId id);
+    Eigen::MatrixX2f StrokeLogLikelihoods(core::TouchId id);
 
     void AssertFalsePositiveRate(float alpha);
 
-    TouchType NPVotingTest(common::TouchId id);
-    TouchType NPVotingTestWithFalsePositiveRate(common::TouchId id, float falsePositiveRate);
+    TouchType NPVotingTest(core::TouchId id);
+    TouchType NPVotingTestWithFalsePositiveRate(core::TouchId id, float falsePositiveRate);
     // The number of votes for the null hypothesis (pen)
-    int NPVoteCount(common::TouchId id);
-    int NPVoteCountWithFalsePositiveRate(common::TouchId id, float falsePositiveRate);
-    float NPVoteScore(common::TouchId id);
-    float NPVoteScoreWithFalsePositiveRate(common::TouchId id, float falsePositiveRate);
+    int NPVoteCount(core::TouchId id);
+    int NPVoteCountWithFalsePositiveRate(core::TouchId id, float falsePositiveRate);
+    float NPVoteScore(core::TouchId id);
+    float NPVoteScoreWithFalsePositiveRate(core::TouchId id, float falsePositiveRate);
 
-    TouchType BayesLikelihoodTestWithFalsePositiveRate(common::TouchId id, float falsePositiveRate);
-    TouchType BayesLikelihoodTest(common::TouchId id);
+    TouchType BayesLikelihoodTestWithFalsePositiveRate(core::TouchId id, float falsePositiveRate);
+    TouchType BayesLikelihoodTest(core::TouchId id);
 
-    float BayesLikelihoodScoreWithFalsePositiveRate(common::TouchId id, float falsePositiveRate);
-    float BayesLikelihoodScore(common::TouchId id);
+    float BayesLikelihoodScoreWithFalsePositiveRate(core::TouchId id, float falsePositiveRate);
+    float BayesLikelihoodScore(core::TouchId id);
 
     // Adaboost doesn't support specification of false positive rates
-    TouchType AdaboostTest(common::TouchId id);
-    float AdaboostScore(common::TouchId id);
+    TouchType AdaboostTest(core::TouchId id);
+    float AdaboostScore(core::TouchId id);
 
     // For now, this false positive rate isn't a false positive rate in the standard sense.
-    float ConvexScoreWithFalsePositiveRate(common::TouchId id, float falsePositiveRate);
-    float ConvexScore(common::TouchId id);
+    float ConvexScoreWithFalsePositiveRate(core::TouchId id, float falsePositiveRate);
+    float ConvexScore(core::TouchId id);
 
     float EtaEvaluation(float falsePositiveRate, int scoreId);
 
@@ -249,30 +249,30 @@ public:
     Eigen::VectorXf LogEtas(float falsePositiveRate);
 
     // Updates statistics held in Curves::Stroke
-    Eigen::VectorXf ScoresForId(common::TouchId id);
+    Eigen::VectorXf ScoresForId(core::TouchId id);
 
     // Peter: computes raw log-(max curvature) from the isolated scores.
-    float LogMaxCurvature(common::TouchId id);
+    float LogMaxCurvature(core::TouchId id);
 
     // Peter: My computation of max curvature tends to not be a good indicator
     // of much. But you can be pretty darn near sure that something's a palm if
     // this normalized score is bigger than -17.9164453792496
     // If you're trying to differentiate gestures, I don't know what to use
-    float NormalizedMaxCurvature(common::TouchId id);
+    float NormalizedMaxCurvature(core::TouchId id);
 
     // Prunes the last sample if it's both TouchPhase::Ended and has coincident
     // location to penultimate sample.
-    int TouchIdIsolatedSize(common::TouchId id);
+    int TouchIdIsolatedSize(core::TouchId id);
 
-    int FindChunkIndexStartingWithIndex(common::TouchId id, int startIndex);
+    int FindChunkIndexStartingWithIndex(core::TouchId id, int startIndex);
 
     // Deals with most accounting in _touchId*Map's
-    void UpdateIdStoredData(common::TouchId id);
+    void UpdateIdStoredData(core::TouchId id);
 
-    std::pair<TouchType, bool> ClassifyForPinchOrPanGesture(common::TouchId touchId);
-    bool IsTap(common::TouchId touchId);
+    std::pair<TouchType, bool> ClassifyForPinchOrPanGesture(core::TouchId touchId);
+    bool IsTap(core::TouchId touchId);
 
-    void TouchIdNoLongerLogged(common::TouchId touchId);
+    void TouchIdNoLongerLogged(core::TouchId touchId);
 
 };
 

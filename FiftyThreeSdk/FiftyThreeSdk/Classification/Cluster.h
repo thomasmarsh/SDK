@@ -121,13 +121,13 @@ struct Cluster
 
     EdgeThumbState  _edgeThumbState;
 
-    //std::set<common::TouchId> _touchIds;
+    //std::set<core::TouchId> _touchIds;
 
     // While we do some set and map operations on these vectors, addition and removal of elements is uncommon.
     // The number of entries is so small that in every other circumstance it's a big win.
     // we also occasionally need arrival order, or at least first and last touches, so we need the vector.
-    std::vector<common::TouchId> _touchIds;
-    boost::container::flat_map<common::TouchId, TouchData::Ptr> _touchData;
+    std::vector<core::TouchId> _touchIds;
+    boost::container::flat_map<core::TouchId, TouchData::Ptr> _touchData;
 
     typedef fiftythree::core::shared_ptr<Cluster> Ptr;
 
@@ -155,8 +155,8 @@ struct Cluster
     // can be artifically large if a cluster has a number of touches with small scores
     float _penTotalScore;
 
-    common::TouchId MostRecentTouch() const;
-    common::TouchId FirstTouch() const;
+    core::TouchId MostRecentTouch() const;
+    core::TouchId FirstTouch() const;
 
     float Staleness() const;
 
@@ -215,18 +215,18 @@ struct Cluster
     float           TotalLength() const;
 
     // returns true if the touch was added to the vector, false if it was already there.
-    bool InsertTouch(common::TouchId touchId);
+    bool InsertTouch(core::TouchId touchId);
 
     // true if touch was erased, false if not found
-    bool RemoveTouch(common::TouchId touchId);
+    bool RemoveTouch(core::TouchId touchId);
 
-    std::vector<common::TouchId>::iterator FindTouch(common::TouchId touchId);
+    std::vector<core::TouchId>::iterator FindTouch(core::TouchId touchId);
 
-    bool ContainsTouch(common::TouchId probeId) const;
+    bool ContainsTouch(core::TouchId probeId) const;
 
     bool ConcurrentWith(Cluster::Ptr const &other, bool useStaleInterval = true) const;
 
-    bool ConcurrentWith(common::TouchId touchId, bool useStaleInterval = true) const;
+    bool ConcurrentWith(core::TouchId touchId, bool useStaleInterval = true) const;
 
     bool ConcurrentWith(Cluster::Ptr const & other, float temporalPadding) const;
 
@@ -239,7 +239,7 @@ struct Cluster
 
     bool ContainsReclassifiableTouch() const;
 
-    std::vector<common::TouchId> ReclassifiableTouches() const;
+    std::vector<core::TouchId> ReclassifiableTouches() const;
 
 };
 
@@ -325,9 +325,9 @@ public:
     Eigen::MatrixXf DistanceMatrix(std::set<Cluster::Ptr> const & clusters);
 
     void UpdateClusters();
-    void AddPointToCluster(Eigen::Vector2f p, double timestamp, Cluster::Ptr const & cluster, common::TouchId touchId);
+    void AddPointToCluster(Eigen::Vector2f p, double timestamp, Cluster::Ptr const & cluster, core::TouchId touchId);
 
-    Cluster::Ptr NewClusterForTouch(common::TouchId touchId);
+    Cluster::Ptr NewClusterForTouch(core::TouchId touchId);
 
     ClusterEventStatistics::Ptr CurrentEventStatistics()
     {
@@ -338,7 +338,7 @@ public:
 
     Cluster::Ptr ClusterOfTypeForPenDownEvent(TouchType touchType, PenEventId penEventId);
 
-    void RemoveTouchFromClassification(common::TouchId touchId);
+    void RemoveTouchFromClassification(core::TouchId touchId);
 
     std::vector<Cluster::Ptr> NonEndedPenClusters();
 
@@ -407,7 +407,7 @@ public:
         return all;
     }
 
-    std::vector<common::TouchId> TouchesForCurrentClusters(bool activeClustersOnly);
+    std::vector<core::TouchId> TouchesForCurrentClusters(bool activeClustersOnly);
 
     bool ContainsClusterForKey(ClusterId key) const
     {
@@ -443,7 +443,7 @@ public:
 
     //////////////////////////////////////////////////////////////////////////////
 
-    TouchData::Ptr    const &        Data(common::TouchId id)
+    TouchData::Ptr    const &        Data(core::TouchId id)
     {
         return _touchLog->Data(id);
     }
@@ -452,21 +452,21 @@ public:
 
     // if/when TouchTracker gets modified to hold the ended touches the classifier needs
     // we can remove this call and replace it with the like-named TouchTracker call.
-    common::Touch::Ptr const &       TouchWithId(common::TouchId touchId)
+    core::Touch::Ptr const &       TouchWithId(core::TouchId touchId)
     {
         return _touchLog->TouchWithId(touchId);
     }
 
-    //bool                             ContainsTouchWithId(common::TouchId touchId);
+    //bool                             ContainsTouchWithId(core::TouchId touchId);
 
-    Stroke::Ptr const &      Stroke(common::TouchId id);
+    Stroke::Ptr const &      Stroke(core::TouchId id);
 
     //std::vector<curves::Stroke::Ptr> Stroke(TouchIdVector ids);
 
-    //ClusterPtr                       Cluster(common::TouchId touchId);
+    //ClusterPtr                       Cluster(core::TouchId touchId);
 
-    //common::TouchPhase               Phase(common::TouchId id);
-    //std::vector<common::TouchPhase>  Phase(TouchIdVector ids);
+    //core::TouchPhase               Phase(core::TouchId id);
+    //std::vector<core::TouchPhase>  Phase(TouchIdVector ids);
 
     PenEventData::Ptr const &        PenData(PenEventId id)
     {
@@ -503,12 +503,12 @@ public:
                                                         interval_end);
     }
 
-    TouchIdVector                   ConcurrentTouches(common::TouchId probeId)
+    TouchIdVector                   ConcurrentTouches(core::TouchId probeId)
     {
         return _touchLog->ConcurrentTouches(probeId);
     }
 
-    common::TouchId                 TouchPrecedingTouch(common::TouchId probeId)
+    core::TouchId                 TouchPrecedingTouch(core::TouchId probeId)
     {
         return _touchLog->TouchPrecedingTouch(probeId);
     }
@@ -532,12 +532,12 @@ public:
         return _touchLog->PenEventsInTimeInterval(t0, t1, includeEndpoints);
     }
 
-    ClusterPtr                       Cluster(common::TouchId touchId)
+    ClusterPtr                       Cluster(core::TouchId touchId)
     {
         return _touchLog->Cluster(touchId);
     }
 
-    common::TouchPhase               Phase(common::TouchId id)
+    core::TouchPhase               Phase(core::TouchId id)
     {
         return _touchLog->Phase(id);
     }
@@ -552,7 +552,7 @@ public:
         return _touchLog->MostRecentPenEvent();
     }
 
-    bool                            IsIdLogged(common::TouchId id)
+    bool                            IsIdLogged(core::TouchId id)
     {
         return _touchLog->IsIdLogged(id);
     }
@@ -562,7 +562,7 @@ public:
         return _touchLog->MostRecentPenTipType();
     }
 
-    common::TouchId                 MostRecentTouch()
+    core::TouchId                 MostRecentTouch()
     {
         return _touchLog->MostRecentTouch();
     }
@@ -572,12 +572,12 @@ public:
         return _touchLog->LiveTouches();
     }
 
-    bool                            IsEnded(common::TouchId touchId)
+    bool                            IsEnded(core::TouchId touchId)
     {
         return _touchLog->IsEnded(touchId);
     }
 
-    void TouchesChanged(const std::set<common::Touch::Ptr> & touches);
+    void TouchesChanged(const std::set<core::Touch::Ptr> & touches);
 
     bool                            AllCancelledFlag()
     {
@@ -599,12 +599,12 @@ public:
         return _touchLog->LogPenEvent(event);
     }
 
-    bool                             ContainsTouchWithId(common::TouchId touchId)
+    bool                             ContainsTouchWithId(core::TouchId touchId)
     {
         return _touchLog->ContainsTouchWithId(touchId);
     }
 
-    bool Removed(common::TouchId touchId)
+    bool Removed(core::TouchId touchId)
     {
         return _touchLog->Removed(touchId);
     }
@@ -614,7 +614,7 @@ public:
         return _touchLog->UpdateTime(t);
     }
 
-    std::vector<common::TouchId> const & NewlyEndedTouches()
+    std::vector<core::TouchId> const & NewlyEndedTouches()
     {
         return _touchLog->NewlyEndedTouches();
     }
@@ -624,7 +624,7 @@ public:
         return _touchLog->ClearAllData();
     }
 
-    TouchIdVector                   IdsInPhase(common::TouchPhase phase)
+    TouchIdVector                   IdsInPhase(core::TouchPhase phase)
     {
         return _touchLog->IdsInPhase(phase);
     }

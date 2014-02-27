@@ -13,6 +13,7 @@
 #include "FiftyThreeSdk/Classification/Playback.h"
 
 using namespace boost::algorithm;
+using namespace fiftythree::core;
 using boost::lexical_cast;
 using fiftythree::core::make_shared;
 
@@ -90,7 +91,7 @@ PlaybackSequence::PlaybackSequence(std::istream & str)
             Eigen::Vector2f z(x,y);
             core::InputSample sample(z, z, timestamp);
 
-            Touch::Ptr touch = Touch::New(touchId, phase, sample);
+            auto touch = core::Touch::New(touchId, phase, sample);
 
             if (row.size() >= 8)
             {
@@ -126,7 +127,7 @@ void PlaybackSequence::Write(std::ostream & str)
         }
         else
         {
-            BOOST_FOREACH(const common::Touch::cPtr & touch, entry->_touches)
+            BOOST_FOREACH(const core::Touch::cPtr & touch, entry->_touches)
             {
                 core::InputSample snapshotSample = touch->CurrentSample();
 

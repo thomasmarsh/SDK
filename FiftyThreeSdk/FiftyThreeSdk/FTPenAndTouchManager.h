@@ -42,8 +42,8 @@ public:
     virtual void Clear() = 0;
     virtual void HandlePenEvent(const PenEvent::Ptr & event) = 0; // TODO - should register for pen events as with touch events, for now pass them in
 
-    virtual FTTouchType GetTouchType(const common::Touch::cPtr & touch) = 0;
-    virtual Event<const common::Touch::cPtr &> & TouchTypeChanged() = 0;
+    virtual FTTouchType GetTouchType(const core::Touch::cPtr & touch) = 0;
+    virtual Event<const core::Touch::cPtr &> & TouchTypeChanged() = 0;
     virtual Event<Unit> & ShouldStartTrialSeparation() = 0;
 
     static Ptr New();
