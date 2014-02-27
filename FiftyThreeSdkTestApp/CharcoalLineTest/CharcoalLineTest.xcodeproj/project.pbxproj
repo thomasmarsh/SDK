@@ -7,10 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		048127E218BFBA0700D424D5 /* icon72.png in Resources */ = {isa = PBXBuildFile; fileRef = 048127E018BFBA0700D424D5 /* icon72.png */; };
+		048127E318BFBA0700D424D5 /* icon144.png in Resources */ = {isa = PBXBuildFile; fileRef = 048127E118BFBA0700D424D5 /* icon144.png */; };
 		155C183218BE468500537529 /* libCore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 155C182F18BE467700537529 /* libCore.a */; };
 		34986FD0174FAC8300A3088E /* libFiftyThreeSdk.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 34986FCD174FAC6400A3088E /* libFiftyThreeSdk.a */; };
 		34986FDF174FAF8800A3088E /* libCommon.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 34986FDA174FAF7C00A3088E /* libCommon.a */; };
-		3C093CD417CF8E3D003B4A0D /* libCanvas.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3C093CCE17CF8E19003B4A0D /* libCanvas.a */; };
 		3C093CE517CF90F2003B4A0D /* libAFNetworking.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3C093CDA17CF90CC003B4A0D /* libAFNetworking.a */; };
 		3C093CE617CF90F2003B4A0D /* libGlobalSettings.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3C093CE017CF90DE003B4A0D /* libGlobalSettings.a */; };
 		3C23828217B3174000161277 /* Crashlytics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3C23828117B3174000161277 /* Crashlytics.framework */; };
@@ -19,8 +20,6 @@
 		3C8173971815CAAC000C4FFD /* boost.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6669D063173C0D6E00BB15C3 /* boost.framework */; };
 		3C94A5B217F609BD00BCDB43 /* PencilFirmware.bin in Resources */ = {isa = PBXBuildFile; fileRef = 3C94A5B117F609BD00BCDB43 /* PencilFirmware.bin */; };
 		3CC736AB1863754A005BD0C7 /* libT1PogoManager.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3CE80C0917CE7CA000AA73A0 /* libT1PogoManager.a */; };
-		3CD6FA3A17DE1D6B001E5F82 /* icon72.png in Resources */ = {isa = PBXBuildFile; fileRef = 3CD6FA3817DE1D6B001E5F82 /* icon72.png */; };
-		3CD6FA3B17DE1D6B001E5F82 /* icon144.png in Resources */ = {isa = PBXBuildFile; fileRef = 3CD6FA3917DE1D6B001E5F82 /* icon144.png */; };
 		3CD6FA4717DE3063001E5F82 /* libAppBlade.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3CD6FA4417DE3056001E5F82 /* libAppBlade.a */; };
 		3CD6FA4C17DE314D001E5F82 /* AppBladeKeys.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3CD6FA4A17DE314D001E5F82 /* AppBladeKeys.plist */; };
 		3CD6FA4D17DE314D001E5F82 /* ResourceRules.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3CD6FA4B17DE314D001E5F82 /* ResourceRules.plist */; };
@@ -111,27 +110,6 @@
 			remoteGlobalIDString = B96AD1D113949F8F0036028E;
 			remoteInfo = Common;
 		};
-		3C093CCD17CF8E19003B4A0D /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 3C093CC817CF8E18003B4A0D /* Canvas.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = B9F296FB14DB374D00D204D9;
-			remoteInfo = Canvas;
-		};
-		3C093CCF17CF8E19003B4A0D /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 3C093CC817CF8E18003B4A0D /* Canvas.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = B9F2970B14DB374D00D204D9;
-			remoteInfo = CanvasTests;
-		};
-		3C093CD217CF8E2F003B4A0D /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 3C093CC817CF8E18003B4A0D /* Canvas.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = B9F296FA14DB374D00D204D9;
-			remoteInfo = Canvas;
-		};
 		3C093CD917CF90CC003B4A0D /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 3C093CD517CF90CC003B4A0D /* AFNetworking.xcodeproj */;
@@ -205,10 +183,11 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		048127E018BFBA0700D424D5 /* icon72.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = icon72.png; sourceTree = "<group>"; };
+		048127E118BFBA0700D424D5 /* icon144.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = icon144.png; sourceTree = "<group>"; };
 		155C182918BE467700537529 /* Core.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Core.xcodeproj; path = ../../../Core/Core.xcodeproj; sourceTree = "<group>"; };
 		34986FC8174FAC6300A3088E /* FiftyThreeSdk.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = FiftyThreeSdk.xcodeproj; path = ../../FiftyThreeSdk/FiftyThreeSdk.xcodeproj; sourceTree = "<group>"; };
 		34986FD4174FAF7B00A3088E /* Common.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Common.xcodeproj; path = ../../../Common/Common.xcodeproj; sourceTree = "<group>"; };
-		3C093CC817CF8E18003B4A0D /* Canvas.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Canvas.xcodeproj; path = ../../../Canvas/Canvas.xcodeproj; sourceTree = "<group>"; };
 		3C093CD517CF90CC003B4A0D /* AFNetworking.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = AFNetworking.xcodeproj; path = ../../../AFNetworking/AFNetworking.xcodeproj; sourceTree = "<group>"; };
 		3C093CDB17CF90DE003B4A0D /* GlobalSettings.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = GlobalSettings.xcodeproj; path = ../../../GlobalSettings/GlobalSettings.xcodeproj; sourceTree = "<group>"; };
 		3C23828117B3174000161277 /* Crashlytics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Crashlytics.framework; path = ../../../ThirdParty/Crashlytics/Crashlytics.framework; sourceTree = "<group>"; };
@@ -284,7 +263,6 @@
 				3CD6FA4717DE3063001E5F82 /* libAppBlade.a in Frameworks */,
 				3C093CE517CF90F2003B4A0D /* libAFNetworking.a in Frameworks */,
 				3C093CE617CF90F2003B4A0D /* libGlobalSettings.a in Frameworks */,
-				3C093CD417CF8E3D003B4A0D /* libCanvas.a in Frameworks */,
 				3C2FE9691819EF1900FE7190 /* AdSupport.framework in Frameworks */,
 				3CE80C0C17CE7CBB00AA73A0 /* AVFoundation.framework in Frameworks */,
 				3CE80C0817CE7BE900AA73A0 /* MobileCoreServices.framework in Frameworks */,
@@ -330,7 +308,7 @@
 			isa = PBXGroup;
 			children = (
 				155C182F18BE467700537529 /* libCore.a */,
-				155C183118BE467700537529 /* CoreTests.xctest */,
+				155C183118BE467700537529 /* Core.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -348,15 +326,6 @@
 			children = (
 				34986FDA174FAF7C00A3088E /* libCommon.a */,
 				34986FDC174FAF7C00A3088E /* CommonTests.xctest */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
-		3C093CC917CF8E18003B4A0D /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				3C093CCE17CF8E19003B4A0D /* libCanvas.a */,
-				3C093CD017CF8E19003B4A0D /* CanvasTests.octest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -419,6 +388,8 @@
 		6669CFEF173C008C00BB15C3 = {
 			isa = PBXGroup;
 			children = (
+				048127E018BFBA0700D424D5 /* icon72.png */,
+				048127E118BFBA0700D424D5 /* icon144.png */,
 				3CF4D86A17C7E4FD002CD082 /* BuildConfigurations */,
 				6669D001173C008C00BB15C3 /* CharcoalLineTest */,
 				6669D025173C008D00BB15C3 /* CharcoalLineTestTests */,
@@ -447,7 +418,6 @@
 				3CD6FA3E17DE3055001E5F82 /* AppBlade.xcodeproj */,
 				3CE80C0B17CE7CBB00AA73A0 /* AVFoundation.framework */,
 				6669D063173C0D6E00BB15C3 /* boost.framework */,
-				3C093CC817CF8E18003B4A0D /* Canvas.xcodeproj */,
 				3CE80BEF17CE79BD00AA73A0 /* CFNetwork.framework */,
 				34986FD4174FAF7B00A3088E /* Common.xcodeproj */,
 				155C182918BE467700537529 /* Core.xcodeproj */,
@@ -579,7 +549,6 @@
 				3CD6FA4917DE3068001E5F82 /* PBXTargetDependency */,
 				3C093CE217CF90EE003B4A0D /* PBXTargetDependency */,
 				3C093CE417CF90EE003B4A0D /* PBXTargetDependency */,
-				3C093CD317CF8E2F003B4A0D /* PBXTargetDependency */,
 				34986FDE174FAF8300A3088E /* PBXTargetDependency */,
 				34986FCF174FAC7E00A3088E /* PBXTargetDependency */,
 			);
@@ -641,10 +610,6 @@
 					ProjectRef = 3CD6FA3E17DE3055001E5F82 /* AppBlade.xcodeproj */;
 				},
 				{
-					ProductGroup = 3C093CC917CF8E18003B4A0D /* Products */;
-					ProjectRef = 3C093CC817CF8E18003B4A0D /* Canvas.xcodeproj */;
-				},
-				{
 					ProductGroup = 34986FD5174FAF7B00A3088E /* Products */;
 					ProjectRef = 34986FD4174FAF7B00A3088E /* Common.xcodeproj */;
 				},
@@ -681,10 +646,10 @@
 			remoteRef = 155C182E18BE467700537529 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		155C183118BE467700537529 /* CoreTests.xctest */ = {
+		155C183118BE467700537529 /* Core.xctest */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.cfbundle;
-			path = CoreTests.xctest;
+			path = Core.xctest;
 			remoteRef = 155C183018BE467700537529 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
@@ -707,20 +672,6 @@
 			fileType = wrapper.cfbundle;
 			path = CommonTests.xctest;
 			remoteRef = 34986FDB174FAF7C00A3088E /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		3C093CCE17CF8E19003B4A0D /* libCanvas.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libCanvas.a;
-			remoteRef = 3C093CCD17CF8E19003B4A0D /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		3C093CD017CF8E19003B4A0D /* CanvasTests.octest */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.cfbundle;
-			path = CanvasTests.octest;
-			remoteRef = 3C093CCF17CF8E19003B4A0D /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		3C093CDA17CF90CC003B4A0D /* libAFNetworking.a */ = {
@@ -765,13 +716,13 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				048127E218BFBA0700D424D5 /* icon72.png in Resources */,
+				048127E318BFBA0700D424D5 /* icon144.png in Resources */,
 				6669D006173C008C00BB15C3 /* InfoPlist.strings in Resources */,
 				6669D00E173C008C00BB15C3 /* Default.png in Resources */,
 				6669D010173C008C00BB15C3 /* Default@2x.png in Resources */,
 				6669D012173C008C00BB15C3 /* Default-568h@2x.png in Resources */,
 				6669D05C173C066800BB15C3 /* ViewController.xib in Resources */,
-				3CD6FA3A17DE1D6B001E5F82 /* icon72.png in Resources */,
-				3CD6FA3B17DE1D6B001E5F82 /* icon144.png in Resources */,
 				3CD6FA4C17DE314D001E5F82 /* AppBladeKeys.plist in Resources */,
 				3CD6FA4D17DE314D001E5F82 /* ResourceRules.plist in Resources */,
 				3C94A5B217F609BD00BCDB43 /* PencilFirmware.bin in Resources */,
@@ -848,11 +799,6 @@
 			isa = PBXTargetDependency;
 			name = Common;
 			targetProxy = 34986FDD174FAF8300A3088E /* PBXContainerItemProxy */;
-		};
-		3C093CD317CF8E2F003B4A0D /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = Canvas;
-			targetProxy = 3C093CD217CF8E2F003B4A0D /* PBXContainerItemProxy */;
 		};
 		3C093CE217CF90EE003B4A0D /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
