@@ -30,6 +30,7 @@ NSString *applicationDocumentsDirectory()
     return basePath;
 }
 
+using fiftythree::core::Timer;
 using namespace fiftythree::common;
 
 @interface ViewController () <UIAlertViewDelegate,
