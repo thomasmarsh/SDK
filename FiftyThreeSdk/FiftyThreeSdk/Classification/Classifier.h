@@ -7,33 +7,16 @@
 
 #pragma once
 
-#include "Common/Touch/TouchClassifier.h"
 #include "Core/Enum.h"
 #include "Core/Event.hpp"
 #include "Core/Memory.h"
 #include "Core/Touch/Touch.h"
+#include "FiftyThreeSdk/TouchClassifier.h"
 
 namespace fiftythree
 {
 namespace sdk
 {
-DEFINE_ENUM(TouchType,
-            Unknown,
-            PenTip1,
-            PenTip2,
-            Finger,
-            Palm,
-            Cancelled,
-            UnknownDisconnected,
-            RemovedFromClassification,
-            UntrackedTouch);
-
-DEFINE_ENUM(PenEventType,
-            Tip1Down,
-            Tip1Up,
-            Tip2Down,
-            Tip2Up,
-            Unknown);
 
 DEFINE_ENUM(EdgeThumbState,
             NotThumb,
@@ -58,15 +41,6 @@ struct PenEvent
     }
 };
 
-DEFINE_ENUM(TwoTouchPairType,
-            Pinch,
-            Pan);
-
-DEFINE_ENUM(SingleTouchGesture,
-                Tap,
-                Longpress,
-                LoupeDragStart);
-
 // This is the primary API to communicate with this module.
 class Classifier
 {
@@ -79,7 +53,7 @@ public:
 
     // Invoke these on pen connections & disconnections.
     // If the pen is disconnected the classifier returns all Touches with state
-    // TouchType::UnknownDisconnected.
+    // TouchClassification::UnknownDisconnected.
     virtual void StylusConnected() = 0;
     virtual void StylusDisconnected() = 0;
 
@@ -92,13 +66,13 @@ public:
 
     // Invoke this on each touch ID, to get the latest classification. Note, this
     // may take a few frames to be up-to-date.
-    virtual TouchType Classify(core::TouchId touchID)  = 0;
+    virtual core::TouchClassification Classify(core::TouchId touchID)  = 0;
 
     // Given a pair of touches what are their most likely type.
-    virtual TouchType ClassifyPair(core::TouchId touch0, core::TouchId touch1, const TwoTouchPairType & type)  = 0;
+    virtual core::TouchClassification ClassifyPair(core::TouchId touch0, core::TouchId touch1, const TwoTouchPairType & type)  = 0;
 
     // Given a single touch what is mostly likely for 1-touch gestures.
-    virtual TouchType ClassifyForGesture(core::TouchId touch0, const SingleTouchGesture & type) = 0;
+    virtual core::TouchClassification ClassifyForGesture(core::TouchId touch0, const SingleTouchGestureType & type) = 0;
 
     // TODO:
     //  Revisit this API once isolated stroke stuff has settled down a bit.
@@ -125,7 +99,7 @@ public:
     virtual bool IsAnySwitchDown() = 0;
 
     virtual void ClearSessionStatistics() = 0;
-    virtual fiftythree::common::SessionStatistics::Ptr SessionStatistics() = 0;
+    virtual fiftythree::sdk::SessionStatistics::Ptr SessionStatistics() = 0;
 
     // TODO:
     //    API clean up. Rightnow these live in an interface so we can get at them from within Paper.

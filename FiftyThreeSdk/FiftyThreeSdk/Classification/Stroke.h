@@ -240,7 +240,7 @@ public:
 
     //double             _t0;
 
-    fiftythree::sdk::TouchType _touchType;
+    core::TouchClassification _touchType;
 
     SamplingType _samplingType;
     float        _XYSamplesPerSecond;

@@ -20,6 +20,8 @@
 #include "FiftyThreeSdk/Classification/TouchLogger.h"
 #include "math.h"
 
+using fiftythree::core::TouchClassification;
+
 // It's expected that the application routes touch and pen events
 // to the classifier.
 
@@ -34,9 +36,9 @@
 /*
  _classificationProxy public methods: (all void-type)
 
- AllowNonPenEventTouches();         Allow non-PenEvent touches as TouchType::PenTip1 (default, and current
+ AllowNonPenEventTouches();         Allow non-PenEvent touches as TouchClassification::Pen (default, and current
  implementation)
- RejectNonPenEventTouches();        Reject all non-PenEvent touches as TouchType::Palm
+ RejectNonPenEventTouches();        Reject all non-PenEvent touches as TouchClassification::Palm
  StylusConnected();                 Enables explicit PenEvent classification decision tree
  StylusDisconnected();              Uses implicit PenEvent classification decision tree (default, and current
  implementation)
@@ -122,7 +124,7 @@ public:
     // The caller can let the classifier know a touch has been marked
     void RemoveTouchFromClassification(core::TouchId touchId);
 
-    TouchType Classify(core::TouchId touchID);
+    TouchClassification Classify(core::TouchId touchID);
 
     void SetUsePrivateAPI(bool v);
 
@@ -132,9 +134,9 @@ public:
 
     void ClearTouchesReclassified();
 
-    TouchType ClassifyPair(core::TouchId touch0, core::TouchId touch1, const TwoTouchPairType & type);
+    core::TouchClassification ClassifyPair(core::TouchId touch0, core::TouchId touch1, const TwoTouchPairType & type);
 
-    TouchType ClassifyForGesture(core::TouchId touch0, const SingleTouchGesture & type);
+    core::TouchClassification ClassifyForGesture(core::TouchId touch0, const SingleTouchGestureType & type);
 
     Eigen::VectorXf GeometricStatistics(core::TouchId  touch0);
 
@@ -149,11 +151,11 @@ public:
     void RemoveEdgeThumbs();
 
     void ClearSessionStatistics();
-    fiftythree::common::SessionStatistics::Ptr SessionStatistics();
+    SessionStatistics::Ptr SessionStatistics();
 
 protected:
 
-    fiftythree::common::SessionStatistics::Ptr _sessionStatistics;
+    SessionStatistics::Ptr _sessionStatistics;
 
     // not really clear if these need to be exposed as tuning parameters.
     // they are used to decide when a touch can no longer be reclassified and
@@ -162,7 +164,7 @@ protected:
     const float _noReclassifyDuration       = 2.0f;
     const float _noReclassifyTimeSinceEnded =  .3f;
 
-    std::map<core::TouchId, TouchType> _currentTypes;
+    std::map<core::TouchId, core::TouchClassification> _currentTypes;
 
     std::map<core::TouchId, bool>      _touchLocked;
 
@@ -206,7 +208,7 @@ protected:
 
     void FingerTapIsolationRule(IdTypeMap& newTypes);
 
-    void SetClusterType(Cluster::Ptr const & cluster, TouchType newType, IdTypeMap &changedTypes);
+    void SetClusterType(Cluster::Ptr const & cluster, TouchClassification newType, IdTypeMap &changedTypes);
 
     IdTypeMap ReclassifyCurrentEvent();
 
@@ -239,7 +241,7 @@ public:
 
     typedef fiftythree::core::shared_ptr<TouchClassificationProxy> Ptr;
 
-    TouchType CurrentClass(core::TouchId touchId);
+    TouchClassification CurrentClass(core::TouchId touchId);
 
     bool      PenActive();
 
@@ -327,21 +329,21 @@ public:
     // this is a backstop which makes sure they get assigned to something before the
     // cluster is marked stale. assigning them to palm right when they end might cause problems
     // if the pen events are just late.  (this is actually common with taps).
-    void SetOldUnknownTouchesToType(TouchType newType);
+    void SetOldUnknownTouchesToType(TouchClassification newType);
 
     void SetCurrentTime(double timestamp);
 
     std::vector<float> SizeDataForTouch(core::TouchId touchId);
 
-    TouchType       TouchTypeForNewCluster()
+    TouchClassification       TouchTypeForNewCluster()
     {
         if(_activeStylusConnected || _testingIsolated)
         {
-            return TouchType::Unknown;
+            return TouchClassification::Unknown;
         }
         else
         {
-            return TouchType::UnknownDisconnected;
+            return TouchClassification::UnknownDisconnected;
         }
     }
 

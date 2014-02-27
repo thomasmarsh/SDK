@@ -22,8 +22,8 @@ namespace sdk
 {
 
 typedef std::map<core::TouchId, float> IdFloatMap;
-typedef std::map<core::TouchId, TouchType> IdTypeMap;
-typedef std::pair<core::TouchId, TouchType> IdTypePair;
+typedef std::map<core::TouchId, core::TouchClassification> IdTypeMap;
+typedef std::pair<core::TouchId, core::TouchClassification> IdTypePair;
 
 static const float Inf = std::numeric_limits<float>::infinity();
 static const int intInf = std::numeric_limits<int>::max() -3 ; // -3 because of indexing issues
@@ -36,12 +36,12 @@ class TouchClassificationProxy;
 
 struct CommonData
 {
-    const std::map<core::TouchId, TouchType>* const types;
+    const std::map<core::TouchId, core::TouchClassification>* const types;
     const std::map<core::TouchId, bool>* const locked;
 
     TouchClassificationProxy* proxy;
 
-    CommonData(std::map<core::TouchId, TouchType>* typesPointer,
+    CommonData(std::map<core::TouchId, core::TouchClassification>* typesPointer,
                std::map<core::TouchId, bool>* lockedPointer,
                TouchClassificationProxy* proxyPointer):
     types(typesPointer),
@@ -51,8 +51,8 @@ struct CommonData
     }
 };
 
-typedef std::vector<TouchType> TouchTypeVector;
-typedef std::vector<TouchType>::iterator TouchTypeIterator;
+typedef std::vector<core::TouchClassification> TouchTypeVector;
+typedef std::vector<core::TouchClassification>::iterator TouchTypeIterator;
 
 // This is fairly arbitrary: we only update isolated stroke data when the number of samples reaches
 // one of the threshold values below.

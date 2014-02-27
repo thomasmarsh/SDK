@@ -9,8 +9,8 @@
 #include <boost/foreach.hpp>
 #include <tuple>
 
-#include "Core/Touch/TouchTracker.h"
 #include "Core/Touch/Touch.h"
+#include "Core/Touch/TouchTracker.h"
 #include "FiftyThreeSdk/Classification/ClassificationProxy.h"
 #include "FiftyThreeSdk/Classification/Cluster.h"
 #include "FiftyThreeSdk/Classification/CommonDeclarations.h"
@@ -18,7 +18,6 @@
 #include "FiftyThreeSdk/Classification/TouchLogger.h"
 
 using namespace Eigen;
-using namespace fiftythree::common;
 using namespace fiftythree::core;
 
 namespace fiftythree {
@@ -39,7 +38,7 @@ float Cluster::Staleness() const
 
 }
 
-int Cluster::CountTouchesOfType(TouchType probeType) const
+int Cluster::CountTouchesOfType(TouchClassification probeType) const
 {
     int count = 0;
     BOOST_FOREACH(core::TouchId touchId, _touchIds)
@@ -224,7 +223,7 @@ int ClusterTracker::CurrentEventFingerCount()
     int count = 0;
     BOOST_FOREACH(IdClusterPtrPair const & pair, _clusters)
     {
-        count += pair.second->CountTouchesOfType(TouchType::Finger);
+        count += pair.second->CountTouchesOfType(TouchClassification::Finger);
     }
     return count;
 }
@@ -411,7 +410,7 @@ Cluster::Ptr Cluster::New()
     return Cluster::Ptr(new Cluster);
 }
 
-Cluster::Ptr ClusterTracker::NewCluster(Vector2f center, double timestamp, TouchType defaultTouchType)
+Cluster::Ptr ClusterTracker::NewCluster(Vector2f center, double timestamp, TouchClassification defaultTouchType)
 {
 
     if(_clusters.empty())
@@ -757,7 +756,7 @@ void ClusterTracker::RemoveTouchFromClassification(core::TouchId touchId)
 
         if(cluster->_touchIds.empty())
         {
-            cluster->_clusterTouchType = TouchType::RemovedFromClassification;
+            cluster->_clusterTouchType = TouchClassification::RemovedFromClassification;
             _currentEventActiveClusters.erase(cluster);
             _currentEventStaleClusters.erase(cluster);
             _needComputeClusterOrder = true;
@@ -769,7 +768,7 @@ void ClusterTracker::RemoveTouchFromClassification(core::TouchId touchId)
 
 }
 
-Cluster::Ptr ClusterTracker::ClusterOfTypeForPenDownEvent(TouchType touchType, PenEventId probeEvent)
+Cluster::Ptr ClusterTracker::ClusterOfTypeForPenDownEvent(TouchClassification touchType, PenEventId probeEvent)
 {
 
     BOOST_FOREACH(IdClusterPtrPair const & pair, _clusters)
@@ -1160,9 +1159,9 @@ void ClusterTracker::UpdateEventStatistics()
     {
         if(_touchLog->Phase(touchId) == TouchPhase::Ended)
         {
-            TouchType type = _commonData->proxy->CurrentClass(touchId);
+            TouchClassification type = _commonData->proxy->CurrentClass(touchId);
 
-            if(type == TouchType::PenTip1 || type == TouchType::PenTip2)
+            if(type == TouchClassification::Pen || type == TouchClassification::Eraser)
             {
                 _currentEventStatistics->_endedPenCount++;
                 _currentEventStatistics->_endedPenSmoothLength += _touchLog->Stroke(touchId)->Statistics()->_smoothLength;
@@ -1183,7 +1182,7 @@ void ClusterTracker::UpdateEventStatistics()
                 _currentEventStatistics->_endedPenDirectionScore += trackingConfidence * 2.0f * (isCorrectEnd - .5f);
 
             }
-            else if(type == TouchType::Palm)
+            else if(type == TouchClassification::Palm)
             {
                 _currentEventStatistics->_endedPalmCount++;
                 _currentEventStatistics->_endedPalmSmoothLength += _touchLog->Stroke(touchId)->Statistics()->_smoothLength;

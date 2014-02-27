@@ -27,12 +27,12 @@ protected:
     bool _tip1DownDetected;
     bool _tip1UpDetected;
 
-    TouchType _mostRecentTipType;
+    core::TouchClassification _mostRecentTipType;
 
     std::list<PenEventId> _penDownCleared;
 
     // cache scores so we don't recompute on each request for a score
-    std::map< ClusterId, std::pair<TouchType, float> > _clusterTypesAndScores;
+    std::map< ClusterId, std::pair<core::TouchClassification, float> > _clusterTypesAndScores;
 
     // store these so the classifier can resolve collisions
     std::map< core::TouchId, PenEventId > _bestPenDownEventForTouch;
@@ -52,8 +52,8 @@ public:
 
 protected:
 
-    void            MarkTouchTypes(IdTypeMap* touches, core::TouchId id, TouchType type);
-    void            MarkTouchTypes(IdTypeMap* touches, TouchIdVector ids, TouchType type);
+    void            MarkTouchTypes(IdTypeMap* touches, core::TouchId id, core::TouchClassification type);
+    void            MarkTouchTypes(IdTypeMap* touches, TouchIdVector ids, core::TouchClassification type);
 
     void            FoundPenEventTouch(PenEventId id);
     bool            IsPenEventTouchFound(PenEventId id);
@@ -73,17 +73,17 @@ public:
 
     // returns probability that both down and up events were emitted by the given touch,
     // using some independence assumptions.
-    std::pair<TouchType, float> TypeAndScoreForTouch(core::TouchId touchId, PenEventIdSet &validPenEvents);
+    std::pair<core::TouchClassification, float> TypeAndScoreForTouch(core::TouchId touchId, PenEventIdSet &validPenEvents);
 
     // similar to above, but used for isolated strokes.  above is used by clusters.
-    std::pair<TouchType, float> TypeAndScoreForTouch(core::TouchId touchId);
+    std::pair<core::TouchClassification, float> TypeAndScoreForTouch(core::TouchId touchId);
 
     float SwitchDownLikelihoodForDeltaT(float deltaT);
     float SwitchUpLikelihoodForDeltaT(float deltaT);
 
     float SwitchDurationLikelihoodForTimingError(float timingError);
 
-    std::pair<TouchType, float> TypeAndScoreForCluster(Cluster & cluster);
+    std::pair<core::TouchClassification, float> TypeAndScoreForCluster(Cluster & cluster);
 
     IdLikelihoodPair BestPenDownEventForTouch(core::TouchId touchId, PenEventIdSet const &penDownEvents);
     IdLikelihoodPair BestPenUpEventForTouch(core::TouchId touchId,   PenEventIdSet const &penUpEvents);

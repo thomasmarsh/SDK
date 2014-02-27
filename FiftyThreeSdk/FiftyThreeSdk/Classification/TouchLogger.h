@@ -175,22 +175,22 @@ public:
         return _eventType == PenEventType::Tip1Up || _eventType == PenEventType::Tip2Up;
     }
 
-    TouchType       TouchType()
+    core::TouchClassification TouchType()
     {
         switch (_eventType)
         {
             case PenEventType::Tip1Down:
             case PenEventType::Tip1Up:
-                return TouchType::PenTip1;
+                return core::TouchClassification::Pen;
                 break;
 
             case PenEventType::Tip2Down:
             case PenEventType::Tip2Up:
-                return TouchType::PenTip2;
+                return core::TouchClassification::Eraser;
                 break;
 
             default:
-                return TouchType::Unknown;
+                return core::TouchClassification::Unknown;
                 break;
 
         }
@@ -394,7 +394,7 @@ public:
 
     core::TouchId                 MostRecentEndedPen();
 
-    TouchType                       MostRecentPenTipType();
+    core::TouchClassification MostRecentPenTipType();
 
     PenEventIdVector                PenBeganEventsInTimeInterval(double t0, double t1);
     PenEventIdVector                PenEndedEventsInTimeInterval(double t0, double t1);
@@ -450,11 +450,11 @@ public:
     // Processing: determine Ids satisfying some state condition
     TouchIdVector                   IdsInPhase(core::TouchPhase phase);
     TouchIdVector                   LiveTouches();
-    TouchIdVector                   LiveTouchesOfType(TouchType type);
+    TouchIdVector                   LiveTouchesOfType(core::TouchClassification type);
     TouchIdVector                   LiveTouchesInPhase(core::TouchPhase phase);
-    TouchIdVector                   LiveTouchesOfTypeInPhase(TouchType type,
+    TouchIdVector                   LiveTouchesOfTypeInPhase(core::TouchClassification type,
                                                              core::TouchPhase phase);
-    TouchIdVector                   TouchesOfTypeInPhase(TouchType type, core::TouchPhase phase);
+    TouchIdVector                   TouchesOfTypeInPhase(core::TouchClassification type, core::TouchPhase phase);
 
     // Lists of Id's, and testing for existence of Id
     int                             NumberOfTouches();

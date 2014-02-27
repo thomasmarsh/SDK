@@ -17,7 +17,7 @@
 namespace fiftythree {
 namespace sdk {
 
-typedef std::pair<TouchType, bool> TypeBoolPair;
+typedef std::pair<core::TouchClassification, bool> TypeBoolPair;
 
 class PolynomialModel
 {
@@ -147,7 +147,7 @@ protected:
 
     std::vector<core::TouchId> _checkedTouches;
 
-    std::map<ClusterId, TouchType> _classifiedClusters;
+    std::map<ClusterId, core::TouchClassification> _classifiedClusters;
 
     // If a score is 0 we can't take log's
     // This is an additive nugget for base scores
@@ -203,7 +203,7 @@ public:
     // classifiers work -- larger values mean palm.
     float NormalizedScore(core::TouchId id);
 
-    TouchType TestFingerVsPalm(Cluster::Ptr const & cluster);
+    core::TouchClassification TestFingerVsPalm(Cluster::Ptr const & cluster);
     bool      IsPalmCluster(Cluster::Ptr const & cluster);
 
     void ScoreAssert(int scoreId, int chunkSize);
@@ -221,22 +221,22 @@ public:
 
     void AssertFalsePositiveRate(float alpha);
 
-    TouchType NPVotingTest(core::TouchId id);
-    TouchType NPVotingTestWithFalsePositiveRate(core::TouchId id, float falsePositiveRate);
+    core::TouchClassification NPVotingTest(core::TouchId id);
+    core::TouchClassification NPVotingTestWithFalsePositiveRate(core::TouchId id, float falsePositiveRate);
     // The number of votes for the null hypothesis (pen)
     int NPVoteCount(core::TouchId id);
     int NPVoteCountWithFalsePositiveRate(core::TouchId id, float falsePositiveRate);
     float NPVoteScore(core::TouchId id);
     float NPVoteScoreWithFalsePositiveRate(core::TouchId id, float falsePositiveRate);
 
-    TouchType BayesLikelihoodTestWithFalsePositiveRate(core::TouchId id, float falsePositiveRate);
-    TouchType BayesLikelihoodTest(core::TouchId id);
+    core::TouchClassification BayesLikelihoodTestWithFalsePositiveRate(core::TouchId id, float falsePositiveRate);
+    core::TouchClassification BayesLikelihoodTest(core::TouchId id);
 
     float BayesLikelihoodScoreWithFalsePositiveRate(core::TouchId id, float falsePositiveRate);
     float BayesLikelihoodScore(core::TouchId id);
 
     // Adaboost doesn't support specification of false positive rates
-    TouchType AdaboostTest(core::TouchId id);
+    core::TouchClassification AdaboostTest(core::TouchId id);
     float AdaboostScore(core::TouchId id);
 
     // For now, this false positive rate isn't a false positive rate in the standard sense.
@@ -269,7 +269,7 @@ public:
     // Deals with most accounting in _touchId*Map's
     void UpdateIdStoredData(core::TouchId id);
 
-    std::pair<TouchType, bool> ClassifyForPinchOrPanGesture(core::TouchId touchId);
+    std::pair<core::TouchClassification, bool> ClassifyForPinchOrPanGesture(core::TouchId touchId);
     bool IsTap(core::TouchId touchId);
 
     void TouchIdNoLongerLogged(core::TouchId touchId);

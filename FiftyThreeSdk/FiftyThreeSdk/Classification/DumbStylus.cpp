@@ -8,10 +8,9 @@
 #include "ClassificationProxy.h"
 #include "DumbStylus.h"
 
-using namespace fiftythree::common;
 using namespace fiftythree::sdk;
 
-TouchType DumbStylusClassifier::ClusterType(ClusterId clusterId)
+TouchClassification DumbStylusClassifier::ClusterType(ClusterId clusterId)
 {
     if(_clusterTypes.count(clusterId))
     {
@@ -19,11 +18,11 @@ TouchType DumbStylusClassifier::ClusterType(ClusterId clusterId)
     }
     else
     {
-        return TouchType::UntrackedTouch;
+        return TouchClassification::UntrackedTouch;
     }
 }
 
-TouchType DumbStylusClassifier::CurrentType(core::TouchId touchId)
+TouchClassification DumbStylusClassifier::CurrentType(core::TouchId touchId)
 {
     if(_touchTypes.count(touchId))
     {
@@ -31,7 +30,7 @@ TouchType DumbStylusClassifier::CurrentType(core::TouchId touchId)
     }
     else
     {
-        return TouchType::UntrackedTouch;
+        return TouchClassification::UntrackedTouch;
     }
 }
 
@@ -58,12 +57,12 @@ IdTypeMap DumbStylusClassifier::ReclassifyByHandedness()
            cluster->_wasInterior ||
            wasAtPalmEnd)
         {
-            SetClusterType(cluster, TouchType::Palm, changedTypes);
+            SetClusterType(cluster, TouchClassification::Palm, changedTypes);
         }
         else
         {
             // it isn't a thumb, it was never interior, and it's at the correct end.
-            SetClusterType(cluster, TouchType::PenTip1, changedTypes);
+            SetClusterType(cluster, TouchClassification::Pen, changedTypes);
         }
     }
 
@@ -82,7 +81,7 @@ IdTypeMap DumbStylusClassifier::ReclassifyCurrentEvent()
         return changedTypes;
     }
 
-    std::map<Cluster::Ptr, TouchType> newTypes;
+    std::map<Cluster::Ptr, TouchClassification> newTypes;
 
     std::vector<Cluster::Ptr> timeOrderedClusters = _commonData->proxy->ClusterTracker()->CurrentEventTimeOrderedClusters();
 
@@ -97,14 +96,14 @@ IdTypeMap DumbStylusClassifier::ReclassifyCurrentEvent()
 
         if(cluster->_simultaneousTouches || (cluster->_touchIds.size() > 1))
         {
-            newTypes[cluster] = TouchType::Palm;
+            newTypes[cluster] = TouchClassification::Palm;
             cluster->_probabilityOneFlag = true;
             continue;
         }
 
         if(cluster->_wasInterior)
         {
-            newTypes[cluster] = TouchType::Palm;
+            newTypes[cluster] = TouchClassification::Palm;
             cluster->_probabilityOneFlag = true;
             continue;
         }
@@ -116,9 +115,9 @@ IdTypeMap DumbStylusClassifier::ReclassifyCurrentEvent()
 
             if(! isPalm)
             {
-                std::pair<TouchType, bool> pair = _commonData->proxy->IsolatedStrokesClassifier()->ClassifyForPinchOrPanGesture(touchId);
+                std::pair<TouchClassification, bool> pair = _commonData->proxy->IsolatedStrokesClassifier()->ClassifyForPinchOrPanGesture(touchId);
                 probabilityOneFlag = probabilityOneFlag || pair.second;
-                isPalm = isPalm || (pair.first == TouchType::Palm);
+                isPalm = isPalm || (pair.first == TouchClassification::Palm);
             }
 
             if(probabilityOneFlag)
@@ -128,29 +127,29 @@ IdTypeMap DumbStylusClassifier::ReclassifyCurrentEvent()
 
             if(isPalm)
             {
-                newTypes[cluster] = TouchType::Palm;
+                newTypes[cluster] = TouchClassification::Palm;
             }
             else
             {
-                newTypes[cluster] = TouchType::PenTip1;
+                newTypes[cluster] = TouchClassification::Pen;
             }
         }
     }
 
     Cluster::Ptr cluster;
-    TouchType type;
+    TouchClassification type;
     BOOST_FOREACH(tie(cluster, type), newTypes)
     {
-        if(type == TouchType::PenTip1)
+        if(type == TouchClassification::Pen)
         {
 
             StrokeStatistics::cPtr stats = _touchLog->Stroke(cluster->_touchIds.back())->Statistics();
 
             Cluster::Ptr otherCluster;
-            TouchType    otherType;
+            TouchClassification    otherType;
             BOOST_FOREACH(Cluster::Ptr const &otherCluster, _commonData->proxy->ClusterTracker()->ConcurrentClusters(cluster, false))
             {
-                if(cluster == otherCluster || otherCluster->_clusterTouchType != TouchType::PenTip1)
+                if(cluster == otherCluster || otherCluster->_clusterTouchType != TouchClassification::Pen)
                 {
                     continue;
                 }
@@ -165,21 +164,21 @@ IdTypeMap DumbStylusClassifier::ReclassifyCurrentEvent()
 
                 if (prior(0) != prior.maxCoeff())
                 {
-                    newTypes[cluster] = TouchType::Palm;
+                    newTypes[cluster] = TouchClassification::Palm;
                 }
 
                 /*
                  if(otherStats->_arcLength > 88.0f &&
                  stats->_arcLength < 44.0f )
                  {
-                 newTypes[cluster] = TouchType::Palm;
+                 newTypes[cluster] = TouchClassification::Palm;
                  }
                  */
             }
         }
     }
 
-    typedef std::pair<Cluster::Ptr, TouchType> ClusterTypePair;
+    typedef std::pair<Cluster::Ptr, TouchClassification> ClusterTypePair;
     BOOST_FOREACH(ClusterTypePair pair, newTypes)
     {
         SetClusterType(pair.first, pair.second, changedTypes);
@@ -205,7 +204,7 @@ bool DumbStylusClassifier::HandednessLocked()
  NB: this doesn't update the touch type stored on the cluster.  It just updates the dumb-stylus classifier's
  opinion.
  */
-void DumbStylusClassifier::SetClusterType(Cluster::Ptr const & cluster, TouchType newType, IdTypeMap &changedTypes)
+void DumbStylusClassifier::SetClusterType(Cluster::Ptr const & cluster, TouchClassification newType, IdTypeMap &changedTypes)
 {
 
     float length   = cluster->TotalLength();
@@ -215,7 +214,7 @@ void DumbStylusClassifier::SetClusterType(Cluster::Ptr const & cluster, TouchTyp
 
     // the dumb stylus classifier puts a lot of faith in handedness.  once it locks on, it locks on.
     // when handedness isn't locked, we don't have enough confidence to convert pens to palms.
-    if(cluster->IsPenType() && newType == TouchType::Palm)
+    if(cluster->IsPenType() && newType == TouchClassification::Palm)
     {
         if(! HandednessLocked())
         {
@@ -235,12 +234,12 @@ void DumbStylusClassifier::SetClusterType(Cluster::Ptr const & cluster, TouchTyp
 
     BOOST_FOREACH(core::TouchId touchId, cluster->_touchIds)
     {
-        if(_commonData->proxy->CurrentClass(touchId) == TouchType::RemovedFromClassification)
+        if(_commonData->proxy->CurrentClass(touchId) == TouchClassification::RemovedFromClassification)
         {
             continue;
         }
 
-        if(onlyUpdateUnknownTouches && _commonData->proxy->CurrentClass(touchId) != TouchType::Unknown)
+        if(onlyUpdateUnknownTouches && _commonData->proxy->CurrentClass(touchId) != TouchClassification::Unknown)
         {
             continue;
         }

@@ -12,6 +12,7 @@
 #include "FiftyThreeSdk/Classification/Performance.h"
 
 using namespace boost::algorithm;
+using fiftythree::core::TouchClassification;
 using std::ignore;
 
 namespace
@@ -57,17 +58,17 @@ namespace sdk {
 
 PerformanceReport::PerformanceReport(std::string const & csvReport)  : _csvReport(csvReport)
 {
-    std::vector<TouchType> emptyVector;
+    std::vector<TouchClassification> emptyVector;
 
     init(csvReport, emptyVector);
 }
 
-PerformanceReport::PerformanceReport(std::string const & csvReport, std::vector<TouchType> const &trueClasses)  : _csvReport(csvReport)
+PerformanceReport::PerformanceReport(std::string const & csvReport, std::vector<TouchClassification> const &trueClasses)  : _csvReport(csvReport)
 {
     init(csvReport, trueClasses);
 }
 
-void PerformanceReport::init(std::string const & csvReport, std::vector<TouchType> const &trueClasses)
+void PerformanceReport::init(std::string const & csvReport, std::vector<TouchClassification> const &trueClasses)
 {
     std::istringstream istr(csvReport);
 
@@ -86,7 +87,7 @@ void PerformanceReport::init(std::string const & csvReport, std::vector<TouchTyp
             break;
         }
 
-        TouchType trueClass      = static_cast<TouchType::TouchTypeEnum>(std::atoi(row[indexTrue].c_str()));
+        TouchClassification trueClass      = static_cast<TouchClassification::TouchClassificationEnum>(std::atoi(row[indexTrue].c_str()));
         if(trueClasses.size() > 0)
         {
             trueClass = trueClasses[index];
@@ -94,7 +95,7 @@ void PerformanceReport::init(std::string const & csvReport, std::vector<TouchTyp
 
         _trueClasses.push_back(trueClass);
 
-        TouchType inferredClass  = static_cast<TouchType::TouchTypeEnum>(std::atoi(row[indexInferred].c_str()));
+        TouchClassification inferredClass  = static_cast<TouchClassification::TouchClassificationEnum>(std::atoi(row[indexInferred].c_str()));
 
         _counts[trueClass][inferredClass]++;
 
@@ -102,14 +103,14 @@ void PerformanceReport::init(std::string const & csvReport, std::vector<TouchTyp
     }
 }
 
-int PerformanceReport::InferredCountForType(TouchType probeType)
+int PerformanceReport::InferredCountForType(TouchClassification probeType)
 {
-    std::map<TouchType, int>  & probeCounts = CountsForTouchType(probeType);
+    std::map<TouchClassification, int>  & probeCounts = CountsForTouchType(probeType);
 
     return probeCounts[probeType];
 }
 
-float PerformanceReport::ScoreForType(TouchType probeType)
+float PerformanceReport::ScoreForType(TouchClassification probeType)
 {
     float inferredCount = InferredCountForType(probeType);
     float trueCount     = TrueCountForType(probeType);
@@ -120,7 +121,7 @@ float PerformanceReport::ScoreForType(TouchType probeType)
 int PerformanceReport::TotalTouchCount()
 {
     int count = 0;
-    TouchType type;
+    TouchClassification type;
     BOOST_FOREACH(tie(type, ignore), _counts)
     {
         count += TrueCountForType(type);
@@ -134,7 +135,7 @@ float PerformanceReport::OverallScore()
     float totalCount = TotalTouchCount();
     float totalScore = 0.0f;
 
-    TouchType type;
+    TouchClassification type;
     BOOST_FOREACH(tie(type, ignore), _counts)
     {
         float score      = ScoreForType(type);
@@ -148,11 +149,11 @@ float PerformanceReport::OverallScore()
 
 }
 
-int PerformanceReport::TrueCountForType(TouchType probeType)
+int PerformanceReport::TrueCountForType(TouchClassification probeType)
 {
     float total = 0.0f;
 
-    typedef std::pair<TouchType, int> TypeIntPair;
+    typedef std::pair<TouchClassification, int> TypeIntPair;
 
     BOOST_FOREACH(TypeIntPair pair, _counts[probeType])
     {

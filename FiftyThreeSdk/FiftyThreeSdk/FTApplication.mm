@@ -5,14 +5,14 @@
 //  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
 
-#import "Core/Touch/TouchTracker.h"
 #import "Core/Touch/Touch.h"
+#import "Core/Touch/TouchTracker.h"
 #import "FTApplication.h"
 #import "FTPen.h"
 #import "FTPenManager.h"
 
-using namespace fiftythree::common;
 using namespace fiftythree::core;
+using namespace fiftythree::sdk;
 
 using boost::optional;
 

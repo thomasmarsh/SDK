@@ -117,7 +117,7 @@ struct Cluster
     // indicate that we're really, really confident about _clusterTouchType.
     bool            _probabilityOneFlag;
 
-    TouchType       _clusterTouchType;
+    core::TouchClassification _clusterTouchType;
 
     EdgeThumbState  _edgeThumbState;
 
@@ -181,12 +181,12 @@ struct Cluster
 
     bool IsPenType() const
     {
-        return _clusterTouchType == TouchType::PenTip1 || _clusterTouchType == TouchType::PenTip2;
+        return _clusterTouchType == core::TouchClassification::Pen || _clusterTouchType == core::TouchClassification::Eraser;
     }
 
     bool IsFingerType() const
     {
-        return _clusterTouchType == TouchType::Finger;
+        return _clusterTouchType == core::TouchClassification::Finger;
     }
 
     // returns true if it is a thumb or it could be a thumb.
@@ -233,7 +233,7 @@ struct Cluster
     TouchIdVector ActiveTouches();
     TouchIdVector Touches();
 
-    int CountTouchesOfType(TouchType probeType) const;
+    int CountTouchesOfType(core::TouchClassification probeType) const;
 
     float ConcurrentDuration(Cluster const &other) const;
 
@@ -304,7 +304,7 @@ protected:
 protected:
     // methods
 
-    Cluster::Ptr NewCluster(Eigen::Vector2f center, double timestamp, TouchType defaultTouchType);
+    Cluster::Ptr NewCluster(Eigen::Vector2f center, double timestamp, core::TouchClassification defaultTouchType);
     void UpdateEventStatistics();
 
 public:
@@ -336,7 +336,7 @@ public:
 
     int CurrentEventFingerCount();
 
-    Cluster::Ptr ClusterOfTypeForPenDownEvent(TouchType touchType, PenEventId penEventId);
+    Cluster::Ptr ClusterOfTypeForPenDownEvent(core::TouchClassification touchType, PenEventId penEventId);
 
     void RemoveTouchFromClassification(core::TouchId touchId);
 
@@ -557,7 +557,7 @@ public:
         return _touchLog->IsIdLogged(id);
     }
 
-    TouchType                       MostRecentPenTipType()
+    core::TouchClassification                       MostRecentPenTipType()
     {
         return _touchLog->MostRecentPenTipType();
     }

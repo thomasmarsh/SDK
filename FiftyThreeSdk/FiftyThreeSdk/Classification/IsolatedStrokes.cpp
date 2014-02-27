@@ -77,7 +77,7 @@ StrokeChunkLog::Ptr StrokeChunkLog::New(int chunkIndex) {
     return StrokeChunkLog::Ptr(new StrokeChunkLog(chunkIndex));
 }
 
-std::pair<TouchType, bool> IsolatedStrokesClassifier::ClassifyForPinchOrPanGesture(core::TouchId touchId)
+std::pair<TouchClassification, bool> IsolatedStrokesClassifier::ClassifyForPinchOrPanGesture(core::TouchId touchId)
 {
     Stroke::Ptr stroke            = _clusterTracker->Stroke(touchId);
 
@@ -86,7 +86,7 @@ std::pair<TouchType, bool> IsolatedStrokesClassifier::ClassifyForPinchOrPanGestu
     if(! cluster)
     {
         DebugAssert(false);
-        return TypeBoolPair(TouchType::Palm, false);
+        return TypeBoolPair(TouchClassification::Palm, false);
     }
 
     StrokeStatistics::cPtr stats  = stroke->EarlyStatistics();
@@ -200,11 +200,11 @@ std::pair<TouchType, bool> IsolatedStrokesClassifier::ClassifyForPinchOrPanGestu
 
         if(L > 22.0f && npVoteScore > .99f)
         {
-            return TypeBoolPair(TouchType::PenTip1, true);
+            return TypeBoolPair(TouchClassification::Pen, true);
         }
         else
         {
-            return TypeBoolPair(TouchType::PenTip1, false);
+            return TypeBoolPair(TouchClassification::Pen, false);
         }
     }
     else
@@ -212,11 +212,11 @@ std::pair<TouchType, bool> IsolatedStrokesClassifier::ClassifyForPinchOrPanGestu
 
         if(npVoteScore < .01f)
         {
-            return TypeBoolPair(TouchType::Palm, true);
+            return TypeBoolPair(TouchClassification::Palm, true);
         }
         else
         {
-            return TypeBoolPair(TouchType::Palm, false);
+            return TypeBoolPair(TouchClassification::Palm, false);
         }
     }
 
@@ -379,11 +379,11 @@ IdTypeMap IsolatedStrokesClassifier::ReclassifyActiveTouches()
 
             if(score > thresh)
             {
-                types.insert(IdTypePair(ids[i],TouchType::Palm));
+                types.insert(IdTypePair(ids[i],TouchClassification::Palm));
             }
             else
             {
-                types.insert(IdTypePair(ids[i], TouchType::PenTip1));
+                types.insert(IdTypePair(ids[i], TouchClassification::Pen));
             }
         }
     }
@@ -424,16 +424,16 @@ bool IsolatedStrokesClassifier::IsTap(core::TouchId touchId)
     return (L < maxLength) && (dt > _commonData->proxy->_minTapDuration) && (dt < _commonData->proxy->_maxTapDuration);
 }
 
-TouchType IsolatedStrokesClassifier::TestFingerVsPalm(Cluster::Ptr const & cluster)
+TouchClassification IsolatedStrokesClassifier::TestFingerVsPalm(Cluster::Ptr const & cluster)
 {
     // todo: use some short-stroke isolated stuff here.
     if (cluster->_totalLength >= _commonData->proxy->_minFingerIsolatedStrokeTravel)
     {
-        return TouchType::Finger;
+        return TouchClassification::Finger;
     }
     else
     {
-        return TouchType::Palm;
+        return TouchClassification::Palm;
     }
 }
 
@@ -796,29 +796,29 @@ int IsolatedStrokesClassifier::NPVoteCountWithFalsePositiveRate(core::TouchId id
     return votes.cast<int>().sum();
 }
 
-TouchType IsolatedStrokesClassifier::NPVotingTest(core::TouchId id) {
+TouchClassification IsolatedStrokesClassifier::NPVotingTest(core::TouchId id) {
     //return NPVotingTestWithFalsePositiveRate(id, 0.02f);
     return NPVotingTestWithFalsePositiveRate(id, _NPData->_defaultFPRate);
 }
 
-TouchType IsolatedStrokesClassifier::NPVotingTestWithFalsePositiveRate(core::TouchId id, float falsePositiveRate) {
+TouchClassification IsolatedStrokesClassifier::NPVotingTestWithFalsePositiveRate(core::TouchId id, float falsePositiveRate) {
 
     if (! _enableIsolatedStrokesClassifier) {
-        return TouchType::PenTip1;
+        return TouchClassification::Pen;
     }
 
     if (TouchIdIsolatedSize(id) < 4) {
-        return TouchType::PenTip1;
+        return TouchClassification::Pen;
     }
 
     int voteCount = NPVoteCountWithFalsePositiveRate(id, falsePositiveRate);
 
-    TouchType output = TouchType::PenTip1; // Null
+    TouchClassification output = TouchClassification::Pen; // Null
 
     // Voting
     if (voteCount <= _scoreData->_chosenScoreCount - _NPData->_vetoThreshold)
     {
-        output = TouchType::Palm;
+        output = TouchClassification::Palm;
     }
 
     return output;
@@ -856,10 +856,10 @@ void IsolatedStrokesClassifier::AssertFalsePositiveRate(float alpha) {
 
 }
 
-TouchType IsolatedStrokesClassifier::BayesLikelihoodTestWithFalsePositiveRate(core::TouchId id, float falsePositiveRate) {
+TouchClassification IsolatedStrokesClassifier::BayesLikelihoodTestWithFalsePositiveRate(core::TouchId id, float falsePositiveRate) {
 
     if (! _enableIsolatedStrokesClassifier) {
-        return TouchType::PenTip1;
+        return TouchClassification::Pen;
     }
 
     AssertFalsePositiveRate(falsePositiveRate);
@@ -872,15 +872,15 @@ TouchType IsolatedStrokesClassifier::BayesLikelihoodTestWithFalsePositiveRate(co
 
     float eta = _BayesData->_logLikelihoodThreshold.Evaluate(std::log(falsePositiveRate));
 
-    TouchType output = TouchType::PenTip1;
+    TouchClassification output = TouchClassification::Pen;
     if (bayesScore < eta) {
-        output = TouchType::Palm;
+        output = TouchClassification::Palm;
     }
 
     return output;
 }
 
-TouchType IsolatedStrokesClassifier::BayesLikelihoodTest(core::TouchId id) {
+TouchClassification IsolatedStrokesClassifier::BayesLikelihoodTest(core::TouchId id) {
     return BayesLikelihoodTestWithFalsePositiveRate(id, _BayesData->_falsePositiveRate);
 }
 
@@ -890,11 +890,11 @@ float IsolatedStrokesClassifier::BayesLikelihoodScoreWithFalsePositiveRate(core:
         return 0.5f;
     }
 
-    TouchType result = BayesLikelihoodTestWithFalsePositiveRate(id, falsePositiveRate);
+    TouchClassification result = BayesLikelihoodTestWithFalsePositiveRate(id, falsePositiveRate);
 
     float output;
 
-    if (result == TouchType::PenTip1) {
+    if (result == TouchClassification::Pen) {
         output = std::exp(_BayesData->_penScore.Evaluate(std::log(falsePositiveRate)));
     }
     else {
@@ -908,10 +908,10 @@ float IsolatedStrokesClassifier::BayesLikelihoodScore(core::TouchId id) {
     return BayesLikelihoodScoreWithFalsePositiveRate(id, _BayesData->_falsePositiveRate);
 }
 
-TouchType IsolatedStrokesClassifier::AdaboostTest(core::TouchId id) {
+TouchClassification IsolatedStrokesClassifier::AdaboostTest(core::TouchId id) {
 
     if (! _enableIsolatedStrokesClassifier) {
-        return TouchType::PenTip1;
+        return TouchClassification::Pen;
     }
 
     Eigen::MatrixX2f likelihoods = StrokeLogLikelihoods(id);
@@ -927,10 +927,10 @@ TouchType IsolatedStrokesClassifier::AdaboostTest(core::TouchId id) {
 
     float result = _AdaboostData->_NPBoostingCoefficients.dot(classifiers);
 
-    TouchType output = TouchType::PenTip1;
+    TouchClassification output = TouchClassification::Pen;
 
     if (result < 0) {
-        output = TouchType::Palm;
+        output = TouchClassification::Palm;
     }
 
     return output;
@@ -942,11 +942,11 @@ float IsolatedStrokesClassifier::AdaboostScore(core::TouchId id) {
         return 0.5f;
     }
 
-    TouchType type = AdaboostTest(id);
+    TouchClassification type = AdaboostTest(id);
 
     float output;
 
-    if (type == TouchType::PenTip1) {
+    if (type == TouchClassification::Pen) {
         output = _AdaboostData->_penScore;
     }
     else {

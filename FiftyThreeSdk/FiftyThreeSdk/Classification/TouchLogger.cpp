@@ -9,8 +9,8 @@
 #include <boost/bind.hpp>
 #include <boost/foreach.hpp>
 
-#include "Core/Touch/TouchTracker.h"
 #include "Core/Touch/Touch.h"
+#include "Core/Touch/TouchTracker.h"
 #include "FiftyThreeSdk/Classification/ClassificationProxy.h"
 #include "FiftyThreeSdk/Classification/CommonDeclarations.h"
 #include "FiftyThreeSdk/Classification/Stroke.h"
@@ -29,7 +29,6 @@ namespace
     static const char *kClassifierUseCancelledTouch = "classifierUseCancelled";
 }
 
-using namespace fiftythree::common;
 using namespace fiftythree::core;
 
 namespace fiftythree {
@@ -1290,7 +1289,7 @@ core::TouchId TouchLogger::LastEndedTouch(TouchIdVector ids) {
     return id;
 }
 
-TouchType TouchLogger::MostRecentPenTipType()
+TouchClassification TouchLogger::MostRecentPenTipType()
 {
 
     if(! _penEventData.empty())
@@ -1301,7 +1300,7 @@ TouchType TouchLogger::MostRecentPenTipType()
     }
     else
     {
-        return TouchType::PenTip1;
+        return TouchClassification::Pen;
     }
 
 }
@@ -1368,7 +1367,7 @@ TouchIdVector TouchLogger::LiveTouchesInPhase(core::TouchPhase phase) {
 
 }
 
-TouchIdVector TouchLogger::LiveTouchesOfType(TouchType type) {
+TouchIdVector TouchLogger::LiveTouchesOfType(TouchClassification type) {
 
     TouchIdVector ids;
     ids.clear();
@@ -1382,7 +1381,7 @@ TouchIdVector TouchLogger::LiveTouchesOfType(TouchType type) {
     return ids;
 }
 
-TouchIdVector TouchLogger::LiveTouchesOfTypeInPhase(TouchType type, core::TouchPhase phase) {
+TouchIdVector TouchLogger::LiveTouchesOfTypeInPhase(TouchClassification type, core::TouchPhase phase) {
 
     TouchIdVector ids;
     ids.clear();
@@ -1400,7 +1399,7 @@ TouchIdVector TouchLogger::LiveTouchesOfTypeInPhase(TouchType type, core::TouchP
 
 }
 
-TouchIdVector TouchLogger::TouchesOfTypeInPhase(TouchType type, core::TouchPhase phase) {
+TouchIdVector TouchLogger::TouchesOfTypeInPhase(TouchClassification type, core::TouchPhase phase) {
     TouchIdVector ids;
     ids.clear();
 

@@ -28,6 +28,7 @@
 		0416CACD18A42B51004EAC00 /* TouchLogger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0416CAB618A42B51004EAC00 /* TouchLogger.cpp */; };
 		0416CACE18A42B51004EAC00 /* UIDeviceHardware.m in Sources */ = {isa = PBXBuildFile; fileRef = 0416CAB918A42B51004EAC00 /* UIDeviceHardware.m */; };
 		04E99BEC18BFE53500BC4DCB /* FTTrialSeparationMonitor.mm in Sources */ = {isa = PBXBuildFile; fileRef = 04E99BEB18BFE53500BC4DCB /* FTTrialSeparationMonitor.mm */; };
+		04E99C5418BFF12400BC4DCB /* TouchClassifier.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04E99C5218BFF12400BC4DCB /* TouchClassifier.cpp */; };
 		3C02E084183698E100420B95 /* FTLog.m in Sources */ = {isa = PBXBuildFile; fileRef = 3C02E083183698E100420B95 /* FTLog.m */; };
 		3C2F9C3A1780758300A5FFBC /* FTPeripheralDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 3C2F9C391780758300A5FFBC /* FTPeripheralDelegate.m */; };
 		3C2F9C3D1780786F00A5FFBC /* FTPenServiceClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 3C2F9C3C1780786F00A5FFBC /* FTPenServiceClient.m */; };
@@ -100,6 +101,8 @@
 		0493D9DC18B6957B0049FEFC /* Eigen.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Eigen.h; sourceTree = "<group>"; };
 		04E99BEA18BFE53500BC4DCB /* FTTrialSeparationMonitor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FTTrialSeparationMonitor.h; path = FiftyThreeSdk/FTTrialSeparationMonitor.h; sourceTree = "<group>"; };
 		04E99BEB18BFE53500BC4DCB /* FTTrialSeparationMonitor.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = FTTrialSeparationMonitor.mm; path = FiftyThreeSdk/FTTrialSeparationMonitor.mm; sourceTree = "<group>"; };
+		04E99C5218BFF12400BC4DCB /* TouchClassifier.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TouchClassifier.cpp; path = FiftyThreeSdk/TouchClassifier.cpp; sourceTree = "<group>"; };
+		04E99C5318BFF12400BC4DCB /* TouchClassifier.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TouchClassifier.h; path = FiftyThreeSdk/TouchClassifier.h; sourceTree = "<group>"; };
 		3C02E083183698E100420B95 /* FTLog.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FTLog.m; path = FiftyThreeSdk/FTLog.m; sourceTree = "<group>"; };
 		3C2F9C381780758300A5FFBC /* FTPeripheralDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FTPeripheralDelegate.h; path = FiftyThreeSdk/FTPeripheralDelegate.h; sourceTree = SOURCE_ROOT; };
 		3C2F9C391780758300A5FFBC /* FTPeripheralDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FTPeripheralDelegate.m; path = FiftyThreeSdk/FTPeripheralDelegate.m; sourceTree = SOURCE_ROOT; };
@@ -331,6 +334,8 @@
 		66A8387616E52D840048FFE4 /* FiftyThreeSdk */ = {
 			isa = PBXGroup;
 			children = (
+				04E99C5218BFF12400BC4DCB /* TouchClassifier.cpp */,
+				04E99C5318BFF12400BC4DCB /* TouchClassifier.h */,
 				0416CA8918A42B51004EAC00 /* Classification */,
 				666DC55B170CF31E00D6B3C2 /* AppSupport */,
 				66A8389C16E531E40048FFE4 /* export */,
@@ -441,6 +446,7 @@
 				0416CACE18A42B51004EAC00 /* UIDeviceHardware.m in Sources */,
 				3CF2306F177E13910049A9EF /* FTServiceUUIDs.m in Sources */,
 				3C2F9C3A1780758300A5FFBC /* FTPeripheralDelegate.m in Sources */,
+				04E99C5418BFF12400BC4DCB /* TouchClassifier.cpp in Sources */,
 				0416CAC018A42B51004EAC00 /* Helpers.mm in Sources */,
 				0416CAC718A42B51004EAC00 /* PenEvents.cpp in Sources */,
 				3C2F9C3D1780786F00A5FFBC /* FTPenServiceClient.m in Sources */,

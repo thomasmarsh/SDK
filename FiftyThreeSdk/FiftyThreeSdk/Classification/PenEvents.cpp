@@ -7,9 +7,9 @@
 
 #include <boost/foreach.hpp>
 
-#include "Core/Touch/TouchTracker.h"
 #include "Core/Eigen.h"
 #include "Core/Touch/Touch.h"
+#include "Core/Touch/TouchTracker.h"
 #include "FiftyThreeSdk/Classification/ClassificationProxy.h"
 #include "FiftyThreeSdk/Classification/Cluster.h"
 #include "FiftyThreeSdk/Classification/CommonDeclarations.h"
@@ -261,10 +261,10 @@ float PenEventClassifier::DurationTimeErrorProbabilityForTouch(core::TouchId pro
 
 // the score for each touch is the probability that the pen events were produced by the given stroke.
 // the score for the cluster is just the total probability mass summed over all touches in the cluster.
-std::pair<TouchType, float> PenEventClassifier::TypeAndScoreForCluster(Cluster & cluster)
+std::pair<TouchClassification, float> PenEventClassifier::TypeAndScoreForCluster(Cluster & cluster)
 {
 
-    std::pair<TouchType, float> pair(TouchType::Unknown, 0.0f);
+    std::pair<TouchClassification, float> pair(TouchClassification::Unknown, 0.0f);
 
     // if the cluster is stale or can't be reclassified, just return the last known
     // state.  this prevents chewing up a lot of CPU for nothing.
@@ -277,7 +277,7 @@ std::pair<TouchType, float> PenEventClassifier::TypeAndScoreForCluster(Cluster &
         return pair;
     }
 
-    std::map< ClusterId, std::pair<TouchType, float> >::iterator it = _clusterTypesAndScores.find(cluster._id);
+    std::map< ClusterId, std::pair<TouchClassification, float> >::iterator it = _clusterTypesAndScores.find(cluster._id);
 
     // we cache the scores, clearing cache when SetNeedsClassification is called.
     if(it != _clusterTypesAndScores.end())
@@ -320,7 +320,7 @@ std::pair<TouchType, float> PenEventClassifier::TypeAndScoreForCluster(Cluster &
 
     BOOST_FOREACH(core::TouchId touchId, cluster._touchIds)
     {
-        std::pair<TouchType, float> curr = TypeAndScoreForTouch(touchId, validPenEvents);
+        std::pair<TouchClassification, float> curr = TypeAndScoreForTouch(touchId, validPenEvents);
 
         DebugAssert(curr.second <= 1.0001f);
 
@@ -329,7 +329,7 @@ std::pair<TouchType, float> PenEventClassifier::TypeAndScoreForCluster(Cluster &
         bool waitingForPenDown = ((! _clusterTracker->TouchWithId(touchId)->IsPhaseEndedOrCancelled()) &&
                                   (_clusterTracker->CurrentTime() - _clusterTracker->Data(touchId)->FirstTimestamp()) < .1);
 
-        if (waitingForPenDown && curr.first == TouchType::Unknown)
+        if (waitingForPenDown && curr.first == TouchClassification::Unknown)
         {
             // just ignore this guy for now
             continue;
@@ -349,7 +349,7 @@ std::pair<TouchType, float> PenEventClassifier::TypeAndScoreForCluster(Cluster &
 
     }
 
-    if(false) //pair.first == TouchType::Unknown || N == 0.0f)
+    if(false) //pair.first == TouchClassification::Unknown || N == 0.0f)
     {
         pair.second = 0.0f; // should be true already; just for documentation
     }
@@ -380,10 +380,10 @@ std::pair<TouchType, float> PenEventClassifier::TypeAndScoreForCluster(Cluster &
 
 }
 
-std::pair<TouchType, float> PenEventClassifier::TypeAndScoreForTouch(core::TouchId touchId)
+std::pair<TouchClassification, float> PenEventClassifier::TypeAndScoreForTouch(core::TouchId touchId)
 {
 
-    std::pair<TouchType, float> pair(TouchType::Unknown, 0.0f);
+    std::pair<TouchClassification, float> pair(TouchClassification::Unknown, 0.0f);
 
     if(touchId == core::InvalidTouchId())
     {
@@ -498,11 +498,11 @@ double PenEventClassifier::IrrelevancyTimeWindow() const
     return _maxPenEventDelay + _commonData->proxy->ClusterTracker()->StaleInterval() + pad;
 }
 
-std::pair<TouchType, float> PenEventClassifier::TypeAndScoreForTouch(core::TouchId touchId, PenEventIdSet &validPenEvents)
+std::pair<TouchClassification, float> PenEventClassifier::TypeAndScoreForTouch(core::TouchId touchId, PenEventIdSet &validPenEvents)
 {
 
     float     score    = 0.0f;
-    TouchType type     = TouchType::Unknown;
+    TouchClassification type     = TouchClassification::Unknown;
 
     double touchFirstTimestamp = _clusterTracker->Data(touchId)->FirstTimestamp();
     double touchLastTimestamp  = _clusterTracker->Data(touchId)->LastTimestamp();
@@ -527,7 +527,7 @@ std::pair<TouchType, float> PenEventClassifier::TypeAndScoreForTouch(core::Touch
 
     if(validPenBeganSet.empty())
     {
-        return std::pair<TouchType,float>(TouchType::Unknown, 0.0f);
+        return std::pair<TouchClassification,float>(TouchClassification::Unknown, 0.0f);
     }
 
     IdLikelihoodPair downPair = BestPenDownEventForTouch(touchId,
@@ -535,7 +535,7 @@ std::pair<TouchType, float> PenEventClassifier::TypeAndScoreForTouch(core::Touch
 
     if(downPair.first < 0)
     {
-        return std::pair<TouchType, float>(TouchType::Unknown, 0.0f);
+        return std::pair<TouchClassification, float>(TouchClassification::Unknown, 0.0f);
     }
 
     validPenEvents.erase(downPair.first);
@@ -619,7 +619,7 @@ std::pair<TouchType, float> PenEventClassifier::TypeAndScoreForTouch(core::Touch
             if (validTouchesEnded.empty())
             {
                 DebugAssert(! validTouchesEnded.empty());
-                return std::pair<TouchType,float>(TouchType::Unknown, 0.0f);
+                return std::pair<TouchClassification,float>(TouchClassification::Unknown, 0.0f);
             }
 
             priorBegan          = _commonData->proxy->PenPriorForTouches(touchesBegan);
@@ -695,7 +695,7 @@ std::pair<TouchType, float> PenEventClassifier::TypeAndScoreForTouch(core::Touch
         DebugAssert(tTouchEnd - tTouchBegin > 0.0f);
     }
 
-    return std::pair<TouchType, float>(type, score);
+    return std::pair<TouchClassification, float>(type, score);
 
 }
 
@@ -773,7 +773,7 @@ float PenEventClassifier::SwitchUpLikelihoodForDeltaT(float deltaT)
 
 }
 
-void PenEventClassifier::MarkTouchTypes(IdTypeMap* touches, core::TouchId id, TouchType type) {
+void PenEventClassifier::MarkTouchTypes(IdTypeMap* touches, core::TouchId id, TouchClassification type) {
     if (touches->count(id) > 0) {
         touches->at(id) = type;
     }
@@ -782,7 +782,7 @@ void PenEventClassifier::MarkTouchTypes(IdTypeMap* touches, core::TouchId id, To
     }
 }
 
-void PenEventClassifier::MarkTouchTypes(IdTypeMap* touches, TouchIdVector ids, TouchType type) {
+void PenEventClassifier::MarkTouchTypes(IdTypeMap* touches, TouchIdVector ids, TouchClassification type) {
     BOOST_FOREACH(core::TouchId id, ids) {
         MarkTouchTypes(touches, id, type);
     }

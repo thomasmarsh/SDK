@@ -36,8 +36,6 @@ std::vector<std::string> CSVgetNextLineAndSplitIntoTokens(std::istream & str)
 
 }
 
-using namespace fiftythree::common;
-
 namespace fiftythree
 {
 namespace sdk

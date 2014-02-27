@@ -19,15 +19,15 @@ namespace fiftythree
 namespace sdk
 {
 
-    typedef std::pair<TouchType, std::map<TouchType, int> > TypeCountsPair;
+    typedef std::pair<core::TouchClassification, std::map<core::TouchClassification, int> > TypeCountsPair;
 
     class PerformanceReport
     {
 
-        std::map<TouchType, std::map<TouchType, int> > _counts;
+        std::map<core::TouchClassification, std::map<core::TouchClassification, int> > _counts;
         std::string                                    _csvReport;
 
-        std::vector<TouchType>                         _trueClasses;
+        std::vector<core::TouchClassification>                         _trueClasses;
 
     public:
 
@@ -41,17 +41,17 @@ namespace sdk
 
         // override the TRUE_CLASS column from the file with the spec'd data.  Used
         // when running RT's to allow labeled data to override the default.
-        PerformanceReport(std::string const & csvReport, std::vector<TouchType> const &trueClasses);
+        PerformanceReport(std::string const & csvReport, std::vector<core::TouchClassification> const &trueClasses);
 
-        void init(std::string const & csvReport, std::vector<TouchType> const &trueClasses);
+        void init(std::string const & csvReport, std::vector<core::TouchClassification> const &trueClasses);
 
-        std::vector<TouchType> const & TrueClasses()
+        std::vector<core::TouchClassification> const & TrueClasses()
         {
             return _trueClasses;
         }
 
         // not returning const ref because then you can't use bracket[] operator.
-        std::map<TouchType, int> & CountsForTouchType(TouchType probeType)
+        std::map<core::TouchClassification, int> & CountsForTouchType(core::TouchClassification probeType)
         {
             return _counts[probeType];
         }
@@ -61,13 +61,13 @@ namespace sdk
             return _csvReport;
         }
 
-        int TrueCountForType(TouchType probeType);
+        int TrueCountForType(core::TouchClassification probeType);
 
-        int InferredCountForType(TouchType probeType);
+        int InferredCountForType(core::TouchClassification probeType);
 
         int TotalTouchCount();
 
-        float ScoreForType(TouchType probeType);
+        float ScoreForType(core::TouchClassification probeType);
 
         float OverallScore();
 
