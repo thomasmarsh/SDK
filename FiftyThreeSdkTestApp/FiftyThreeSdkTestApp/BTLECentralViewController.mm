@@ -8,11 +8,11 @@
 #include <sstream>
 
 #include "Canvas/GLCanvasController.h"
-#include "Common/Timer.h"
 #include "Common/Touch/TouchManager.h"
-#include "Core/Touch/TouchTracker.h"
 #include "Core/Memory.h"
+#include "Core/Timer.h"
 #include "Core/Touch/InputSample.h"
+#include "Core/Touch/TouchTracker.h"
 #include "FiftyThreeSdk/FTPenAndTouchManager.h"
 
 #import <CoreBluetooth/CoreBluetooth.h>

@@ -5,7 +5,7 @@
 //  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
 
-#include "Common/Timer.h"
+#include "Core/Timer.h"
 
 #import <CoreBluetooth/CoreBluetooth.h>
 

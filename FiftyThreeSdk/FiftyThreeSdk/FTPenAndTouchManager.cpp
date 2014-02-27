@@ -7,12 +7,12 @@
 
 #include <boost/unordered_map.hpp>
 
-#include "Common/DispatchTimer.h"
 #include "Common/Mathiness.h"
-#include "Core/Touch/TouchTracker.h"
+#include "Core/DispatchTimer.h"
 #include "Core/Memory.h"
 #include "Core/NoCopy.h"
 #include "Core/Touch/Touch.h"
+#include "Core/Touch/TouchTracker.h"
 #include "FTPenAndTouchManager.h"
 #include "LatencyTouchClassifier.h"
 #include "TouchClassifierManager.h"
