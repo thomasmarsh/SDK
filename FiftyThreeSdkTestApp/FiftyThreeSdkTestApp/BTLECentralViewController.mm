@@ -10,7 +10,7 @@
 #include "Canvas/GLCanvasController.h"
 #include "Common/Timer.h"
 #include "Common/Touch/TouchManager.h"
-#include "Common/Touch/TouchTracker.h"
+#include "Core/Touch/TouchTracker.h"
 #include "Core/Memory.h"
 #include "Core/Touch/InputSample.h"
 #include "FiftyThreeSdk/FTPenAndTouchManager.h"

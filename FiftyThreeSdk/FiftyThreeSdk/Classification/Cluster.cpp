@@ -9,7 +9,7 @@
 #include <boost/foreach.hpp>
 #include <tuple>
 
-#include "Common/Touch/TouchTracker.h"
+#include "Core/Touch/TouchTracker.h"
 #include "Core/Touch/Touch.h"
 #include "FiftyThreeSdk/Classification/ClassificationProxy.h"
 #include "FiftyThreeSdk/Classification/Cluster.h"

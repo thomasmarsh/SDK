@@ -1,19 +1,18 @@
 //
 //  UIDeviceHardware.m
-//  Classification
+//  FiftyThreeSdk
 //
-//  Created by Akil Narayan on 2013/07/10.
-//  Copyright (c) 2013 Peter Sibley. All rights reserved.
+//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
-//  Used to determine version of device software is running on.
+
+#import <sys/sysctl.h>
+#import <sys/types.h>
 
 #import "UIDeviceHardware.h"
-#include <sys/types.h>
-#include <sys/sysctl.h>
 
 @implementation UIDeviceHardware
 
-- (NSString *) platform{
+- (NSString *)platform{
     size_t size;
     sysctlbyname("hw.machine", NULL, &size, NULL, 0);
     char *machine = malloc(size);
@@ -23,7 +22,7 @@
     return platform;
 }
 
-- (NSString *) platformString{
+- (NSString *)platformString{
     NSString *platform = [self platform];
     if ([platform isEqualToString:@"iPhone1,1"])    return @"iPhone 1G";
     if ([platform isEqualToString:@"iPhone1,2"])    return @"iPhone 3G";

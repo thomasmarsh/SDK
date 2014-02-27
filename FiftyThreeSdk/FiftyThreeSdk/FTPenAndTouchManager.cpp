@@ -9,7 +9,7 @@
 
 #include "Common/DispatchTimer.h"
 #include "Common/Mathiness.h"
-#include "Common/Touch/TouchTracker.h"
+#include "Core/Touch/TouchTracker.h"
 #include "Core/Memory.h"
 #include "Core/NoCopy.h"
 #include "Core/Touch/Touch.h"

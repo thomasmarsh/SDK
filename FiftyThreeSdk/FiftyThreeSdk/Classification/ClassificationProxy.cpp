@@ -10,7 +10,7 @@
 #include <iomanip>
 #include <tuple>
 
-#include "Common/Touch/TouchTracker.h"
+#include "Core/Touch/TouchTracker.h"
 #include "Core/Eigen.h"
 #include "Core/Touch/Touch.h"
 #include "FiftyThreeSdk/Classification/ClassificationProxy.h"

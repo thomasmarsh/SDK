@@ -5,7 +5,7 @@
 //  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
 
-#import "Common/Touch/TouchTracker.h"
+#import "Core/Touch/TouchTracker.h"
 #import "Core/Touch/Touch.h"
 #import "FTApplication.h"
 #import "FTPen.h"
