@@ -44,7 +44,7 @@ public:
 
         _TrialSeparationTimer = DispatchTimer::New();
         _TrialSeparationTimer->New();
-        _TrialSeparationTimer->SetCallback(bind(&FTPenAndTouchManagerImpl::TrialSeparationTimerExpired, this));
+        _TrialSeparationTimer->SetCallback(std::bind(&FTPenAndTouchManagerImpl::TrialSeparationTimerExpired, this));
     }
 
     ~FTPenAndTouchManagerImpl()
