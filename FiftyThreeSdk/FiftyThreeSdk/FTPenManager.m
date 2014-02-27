@@ -17,6 +17,7 @@
 #import "FTPenManager+Private.h"
 #import "FTPenManager.h"
 #import "FTServiceUUIDs.h"
+#import "FTTrialSeparationMonitor.h"
 #import "TIUpdateManager.h"
 #import "TransitionKit.h"
 
@@ -195,6 +196,8 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
 @property (nonatomic) UIBackgroundTaskIdentifier backgroundTaskId;
 
+@property (nonatomic) FTTrialSeparationMonitor *trialSeparationMonitor;
+
 @end
 
 @implementation FTPenManager
@@ -257,6 +260,9 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
         }
 
         [self initializeStateMachine];
+
+        self.trialSeparationMonitor = [[FTTrialSeparationMonitor alloc] init];
+        self.trialSeparationMonitor.penManager = self;
     }
 
     return self;
@@ -284,6 +290,8 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
     _centralManager.delegate = nil;
     _centralManager = nil;
+
+    self.trialSeparationMonitor = nil;
 }
 
 #pragma mark - Properties

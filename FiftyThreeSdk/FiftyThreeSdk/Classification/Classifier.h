@@ -74,9 +74,6 @@ public:
     typedef fiftythree::core::shared_ptr<Classifier> Ptr;
     typedef fiftythree::core::shared_ptr<const Classifier> cPtr;
 
-    // Subscribe to this event to get notified
-    virtual Event<Unit> & LongPressWithPencilTip() = 0;
-
     // Invoke this to update internal classification structures.
     virtual bool ReclassifyIfNeeded(double timestamp = -1.0) = 0;
 

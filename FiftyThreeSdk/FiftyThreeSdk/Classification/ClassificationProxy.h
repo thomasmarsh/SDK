@@ -7,8 +7,6 @@
 
 #pragma once
 
-#include <iostream>
-
 #include "FiftyThreeSdk/Classification/Cluster.h"
 #include "FiftyThreeSdk/Classification/CommonDeclarations.h"
 #include "FiftyThreeSdk/Classification/Debug.h"
@@ -16,7 +14,6 @@
 #include "FiftyThreeSdk/Classification/EigenLAB.h"
 #include "FiftyThreeSdk/Classification/FiniteDifferences.h"
 #include "FiftyThreeSdk/Classification/IsolatedStrokes.h"
-#include "FiftyThreeSdk/Classification/OffscreenPenLongPress.h"
 #include "FiftyThreeSdk/Classification/PenDirection.h"
 #include "FiftyThreeSdk/Classification/PenEvents.h"
 #include "FiftyThreeSdk/Classification/Quadrature.h"
@@ -112,8 +109,6 @@ class TouchClassificationProxy : public Classifier
 public:
 
 #pragma mark - Classifier interface.
-    // Subscribe to this event to get notified
-    Event<Unit> & LongPressWithPencilTip();
 
     bool ReclassifyIfNeeded(double timestamp = -1.0);
 
@@ -167,7 +162,6 @@ protected:
     const float _noReclassifyDuration       = 2.0f;
     const float _noReclassifyTimeSinceEnded =  .3f;
 
-    Event<Unit> _LongPressWithPencilTip;
     std::map<core::TouchId, TouchType> _currentTypes;
 
     std::map<core::TouchId, bool>      _touchLocked;
@@ -179,8 +173,6 @@ protected:
     IsolatedStrokesClassifier            _isolatedStrokesClassifier;
     PenEventClassifier                   _penEventClassifier;
     PenTracker                           _penTracker;
-
-    OffscreenPenLongPressGestureRecognizer _offscreenPenLongPressGR;
 
     std::deque<PenEvent>                 _debounceQueue;
 
@@ -370,7 +362,6 @@ public:
     _penTracker(_clusterTracker, &_commonData),
     _usePrivateTouchSizeAPI(false),
     _showDebugLogMessages(false),
-    _offscreenPenLongPressGR(_clusterTracker, &_commonData, 3.0f),
     _rtFlag(false),
     _testingIsolated(false),
     _clearStaleStatistics(true),

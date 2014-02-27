@@ -10,9 +10,9 @@
 #include <iomanip>
 #include <tuple>
 
-#include "Core/Touch/TouchTracker.h"
 #include "Core/Eigen.h"
 #include "Core/Touch/Touch.h"
+#include "Core/Touch/TouchTracker.h"
 #include "FiftyThreeSdk/Classification/ClassificationProxy.h"
 #include "FiftyThreeSdk/Classification/FiniteDifferences.h"
 #include "FiftyThreeSdk/Classification/Helpers.h"
@@ -53,11 +53,6 @@ bool TouchClassificationProxy::PenActive()
         }
     }
     return false;
-}
-
-Event<Unit> & TouchClassificationProxy::LongPressWithPencilTip()
-{
-    return _LongPressWithPencilTip;
 }
 
 bool TouchClassificationProxy::IsAnySwitchDown()
@@ -2155,12 +2150,10 @@ void TouchClassificationProxy::InitializeTouchTypes() {
 }
 
 void TouchClassificationProxy::StylusConnected() {
-    _offscreenPenLongPressGR.SetPaused(false);
     _activeStylusConnected = true;
 }
 
 void TouchClassificationProxy::StylusDisconnected() {
-    _offscreenPenLongPressGR.SetPaused(true);
     _activeStylusConnected = false;
 }
 
