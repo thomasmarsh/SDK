@@ -1,29 +1,29 @@
 //
-//  Helpers.m
-//  Classification
+//  Helpers.mm
+//  FiftyThreeSdk
 //
-//  Created by matt on 10/10/13.
-//  Copyright (c) 2013 Peter Sibley. All rights reserved.
+//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
 
-#import "Helpers.h"
-#import "HelpersObjC.h"
+#import "FiftyThreeSdk/Classification/Helpers.h"
+#import "FiftyThreeSdk/Classification/HelpersObjC.h"
 
 @implementation Helpers
-
 
 +(double) NSProcessInfoSystemUptime;
 {
     return [NSProcessInfo processInfo].systemUptime;
 }
 
-
 @end
 
-
+namespace fiftythree
+{
+namespace sdk
+{
 double NSProcessInfoSystemUptime()
 {
     return [Helpers NSProcessInfoSystemUptime];
 }
-
-
+}
+}

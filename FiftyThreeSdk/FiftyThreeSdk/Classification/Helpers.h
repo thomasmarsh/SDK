@@ -1,11 +1,16 @@
 //
 //  Helpers.h
-//  Classification
+//  FiftyThreeSdk
 //
-//  Created by matt on 10/10/13.
-//  Copyright (c) 2013 Peter Sibley. All rights reserved.
+//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
+
 #pragma once
 
+namespace fiftythree
+{
+namespace sdk
+{
 double NSProcessInfoSystemUptime();
-
+}
+}
