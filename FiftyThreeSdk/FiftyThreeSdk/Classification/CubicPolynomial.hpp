@@ -31,7 +31,7 @@ class CubicPolynomial
 {
 
     static_assert((T::ColsAtCompileTime == 1 &&
-                         T::IsVectorAtCompileTime),
+                   T::IsVectorAtCompileTime),
                   "Ensures it's an Eigen fixed sized column vector.");
 
 protected:
@@ -54,8 +54,8 @@ public:
     T ValueAt(float t) const
     {
         return  _a * (t * t * t)    +
-        _b * (t * t)        +
-        _c * t              +
+        _b * (t * t) +
+        _c * t +
         _d;
     }
 
@@ -100,7 +100,6 @@ public:
         T b = .5f * this->SecondDerivativeAt(1);
         T c =       this->FirstDerivativeAt(1);
         T d =       this->ValueAt(1);
-
         T a =       value - (b + c + d);
 
         return CubicPolynomial(a,b,c,d);
@@ -131,11 +130,9 @@ public:
 
         T c =       this->FirstDerivativeAt(1.0f);
         T d =       this->ValueAt(1.0f);
-
         T b =       value - (c + d);
 
         return CubicPolynomial(CubicPolynomial<T>::Zero(),b,c,d);
-
     }
 
     // this works for Eigen vector types.
@@ -188,7 +185,8 @@ public:
     float LastDefiningTimestamp() const
     {
 
-        switch (_definingValueCount) {
+        switch (_definingValueCount)
+        {
             case 1:
                 return _t0;
                 break;
@@ -300,20 +298,11 @@ public:
         P._t2 = t2;
         P._t3 = t3;
 
-//        _globalIntervalLeft = std::min(t0, t1, t2, t3);
-//        std::min(&t0, &t1);
-//        _globalIntervalRight = std::max(t0, t1, t2, t3);
-
         // Uhhh..I think this is supposed to be 4? Possible breakage....
         //P._definingValueCount = 3;
         P._definingValueCount = 4;
 
         return P;
-
-    }
-
-    // Returns coefficients for L_0, L_1, L_2, and L_3, the normalized Legendre polynomials
-    std::vector<T> NormalizedLegendreCoefficients() {
 
     }
 
@@ -353,10 +342,11 @@ public:
 protected:
 
     // Just an affine map to the standard interval
-    std::vector<float> MapToStandardInterval(std::vector<float> t) {
-
+    std::vector<float> MapToStandardInterval(std::vector<float> t)
+    {
         // If this is not defined with samples, abort
-        if (_definingValueCount < 4) {
+        if (_definingValueCount < 4)
+        {
             return std::vector<float>();
         }
 
@@ -371,6 +361,5 @@ protected:
 
 typedef CubicPolynomial<Eigen::Vector2f> CubicPolynomial2f;
 typedef CubicPolynomial<Vector1f> CubicPolynomial1f;
-
 }
 }
