@@ -21,10 +21,8 @@ namespace fiftythree
 {
 namespace sdk
 {
-
 double tic(bool reset)
 {
-
     static double __sec;
     if (reset)
     {
@@ -38,9 +36,9 @@ double toc()
     return (get_time() - tic(0));
 }
 
-Eigen::Map<Eigen::VectorXf> Map(vector< Vector2f > const & Z)
+Eigen::Map<Eigen::VectorXf> Map(vector<Vector2f> const & Z)
 {
-    return Eigen::Map< Eigen::VectorXf >((float*) &(Z[0]), Z.size() * 2);
+    return Eigen::Map<Eigen::VectorXf>((float*) &(Z[0]), Z.size() * 2);
 }
 
 Eigen::Map<Eigen::VectorXf> Map(vector<float> const & R)
@@ -48,21 +46,22 @@ Eigen::Map<Eigen::VectorXf> Map(vector<float> const & R)
     return Eigen::Map<Eigen::VectorXf>((float*) &R[0], R.size());
 }
 
-Eigen::Map<Eigen::VectorXi> Map(std::vector<int> const & R)
+Eigen::Map<Eigen::VectorXi> Map(vector<int> const & R)
 {
     return Eigen::Map<Eigen::VectorXi>((int*) &R[0], R.size());
 }
 
-Eigen::Map<Eigen::VectorXf> Map(Eigen::MatrixXf const & A) {
+Eigen::Map<Eigen::VectorXf> Map(Eigen::MatrixXf const & A)
+{
     return Eigen::Map<Eigen::VectorXf>((float*) A.data(), A.rows()*A.cols());
 }
 
-Stride2Map XMap(vector< Vector2f > const & Z)
+Stride2Map XMap(vector<Vector2f> const & Z)
 {
     return Stride2Map((float*) &Z[0], Z.size());
 }
 
-Stride2Map YMap(vector< Vector2f > const & Z)
+Stride2Map YMap(vector<Vector2f> const & Z)
 {
     float  *data = (float*) &Z[0];
     return Stride2Map(data+1, Z.size());
@@ -70,9 +69,7 @@ Stride2Map YMap(vector< Vector2f > const & Z)
 
 float ShrinkTowardsZero(float x, float shrinkageAmount)
 {
-
     return sgn(x) * std::max(0.0f, fabsf(x) - shrinkageAmount);
-
 }
 
 int sgn(float x)
@@ -85,29 +82,29 @@ float Cross2f(Eigen::Vector2f const &v, Eigen::Vector2f const &w)
     return v.x() * w.y() - v.y() * w.x();
 }
 
-vector< Vector2f > Tail(vector< Vector2f > const & Z, size_t n)
+vector<Vector2f > Tail(vector< Vector2f> const & Z, size_t n)
 {
-    vector< Vector2f > W;
+    vector<Vector2f> W;
     if (Z.size() < n)
     {
         return W;
     }
 
-    W = vector< Vector2f >(Z.end()-n, Z.end());
+    W = vector<Vector2f>(Z.end()-n, Z.end());
 
     return W;
 
 }
 
-void Append(vector< Vector2f > & to, vector< Vector2f > const & from)
+void Append(vector<Vector2f > & to, vector< Vector2f> const & from)
 {
     to.insert(to.end(), from.begin(), from.end());
 }
 
-std::vector<float> Diff(std::vector<float> const &X)
+vector<float> Diff(vector<float> const &X)
 {
 
-    vector< float > X_out(std::max(0, (int)X.size()-1));
+    vector<float> X_out(std::max(0, (int)X.size()-1));
 
     if (X.empty())
     {
@@ -123,7 +120,8 @@ std::vector<float> Diff(std::vector<float> const &X)
 
 }
 
-Eigen::VectorXf Diff(Eigen::VectorXf const & X) {
+Eigen::VectorXf Diff(Eigen::VectorXf const & X)
+{
     size_t N = X.size()-1;
     return X.segment(1,N) - X.segment(0,N);
 }
@@ -131,11 +129,11 @@ Eigen::VectorXf Diff(Eigen::VectorXf const & X) {
 // Note: this actually uses the statistician's normalization 1 / (N-1)
 // which may not be what you want if you're using variance to compute geometric things
 // like centroid size
-float  Variance(std::vector<float> const & X)
+float  Variance(vector<float> const & X)
 {
     size_t N = X.size();
 
-    if(N <= 1)
+    if (N <= 1)
     {
         return 0;
     }
@@ -143,30 +141,22 @@ float  Variance(std::vector<float> const & X)
     Eigen::Map<Eigen::VectorXf> XM = Map(X);  //(&(X[0]), X.size());
 
     return Variance(XM);
-
-    //float mu = XM.array().mean();
-    //
-    //Eigen::VectorXf XMinusMu = XM.array() - mu;
-    //
-    //return (1.0f / (N - 1.0f)) * XMinusMu.squaredNorm();
-
 }
 
-float Variance(Eigen::VectorXf const & X) {
-
+float Variance(Eigen::VectorXf const & X)
+{
     float mu = X.array().mean();
     int N = (int) X.size();
 
     return (1.0f / (N - 1.0f)) * ((Eigen::VectorXf) (X.array() - mu)).squaredNorm();
-
 }
 
-int HistogramBinIndex(float value, std::vector<float> const & edges)
+int HistogramBinIndex(float value, vector<float> const & edges)
 {
     int index = 0;
     for ( ; index < edges.size(); index++)
     {
-        if(value < edges[index])
+        if (value < edges[index])
         {
             break;
         }
@@ -174,7 +164,7 @@ int HistogramBinIndex(float value, std::vector<float> const & edges)
     return index;
 }
 
-Eigen::MatrixXf Covariance(std::vector<Eigen::Vector2f> const & D)
+Eigen::MatrixXf Covariance(vector<Eigen::Vector2f> const & D)
 {
     Eigen::MatrixXf result;
     const float N = D.size();
@@ -185,8 +175,8 @@ Eigen::MatrixXf Covariance(std::vector<Eigen::Vector2f> const & D)
         return result;
     }
     Vector2f mean = CenterOfMass(D);
-    // TODO: Matt/Akil, is there a nicer repmat-ish way of doing this?
-    std::vector<Eigen::Vector2f> meanVec(D.size(), mean);
+
+    vector<Eigen::Vector2f> meanVec(D.size(), mean);
 
     Eigen::VectorXf DMinusMu =  Map(D) - Map(meanVec);
 
@@ -228,15 +218,18 @@ void PCA2f(Eigen::MatrixX2f const & D,
      }
 }
 
-Eigen::Vector2f CenterOfMass(std::vector<Eigen::Vector2f> const &points) {
+Eigen::Vector2f CenterOfMass(vector<Eigen::Vector2f> const &points)
+{
 
     Eigen::Vector2f center;
 
-    if ( points.size() < 1 ) {
+    if ( points.size() < 1 )
+    {
         return center;
     }
 
-    BOOST_FOREACH(Eigen::Vector2f point, points) {
+    for (const Eigen::Vector2f & point :  points)
+    {
         center += point;
     }
 
@@ -245,35 +238,38 @@ Eigen::Vector2f CenterOfMass(std::vector<Eigen::Vector2f> const &points) {
     return center;
 }
 
-float RadialMoment(std::vector<Eigen::Vector2f> points) {
-
+float RadialMoment(vector<Eigen::Vector2f> points)
+{
     Eigen::Vector2f center = CenterOfMass(points);
     float moment = 0.0f;
-    if ( points.size() < 1) {
+    if (points.size() < 1)
+    {
         return moment;
     }
 
-    BOOST_FOREACH(Eigen::Vector2f point, points) {
+    for (const Eigen::Vector2f & point :  points)
+    {
         moment += std::sqrt((point - center).squaredNorm());
     }
 
     return moment;
 }
 
-float RadialMomentOfInertia(std::vector<Eigen::Vector2f> points) {
-
+float RadialMomentOfInertia(vector<Eigen::Vector2f> points)
+{
     Eigen::Vector2f center = CenterOfMass(points);
     float moment = 0.0f;
-    if ( points.size() < 1) {
+    if ( points.size() < 1)
+    {
         return moment;
     }
 
-    BOOST_FOREACH(Eigen::Vector2f point, points) {
+    for (const Eigen::Vector2f & point :  points)
+    {
         moment += (point - center).squaredNorm();
     }
 
     return std::sqrt(moment);
-
 }
 
 VectorXf Linspace(float from, float to, size_t size)
@@ -321,14 +317,12 @@ float ArcLength(CubicPolynomial<XYType> const & P)
         prev = curr;
 
     }
-
     return s;
-
 }
 
 // making a special case since this often needs to be optimized.
 // nothing calling it requires optimization at the moment.
-Eigen::VectorXf CumSum0NormDiff(std::vector<Eigen::Vector2f> const &Z)
+Eigen::VectorXf CumSum0NormDiff(vector<Eigen::Vector2f> const &Z)
 {
     int N_out = (int) Z.size() - 1;
     VectorXf ds(N_out);
@@ -351,9 +345,8 @@ Eigen::VectorXf CumSum0NormDiff(std::vector<Eigen::Vector2f> const &Z)
 
 vector<float> NormDiff(vector<Vector2f> const &Z)
 {
-
     int N_out = (int) Z.size() - 1;
-    vector< float > ds(N_out);
+    vector<float> ds(N_out);
 
     if (N_out <= 0)
     {
@@ -369,12 +362,11 @@ vector<float> NormDiff(vector<Vector2f> const &Z)
               (mapY.segment(1, N_out) - mapY.segment(0, N_out)).array().square()).sqrt();
 
     return ds;
-
 }
 
-vector< Vector2f > Diff(vector< Vector2f > const & Z)
+vector<Vector2f > Diff(vector< Vector2f> const & Z)
 {
-    vector< Vector2f > Z_out(Z.size()-1);
+    vector<Vector2f> Z_out(Z.size()-1);
 
     if (Z.empty())
     {
@@ -391,7 +383,7 @@ vector< Vector2f > Diff(vector< Vector2f > const & Z)
     return Z_out;
 }
 
-vector< Vector2f > DividedDiff(vector< float > const &t, vector< Vector2f > const &Z)
+vector<Vector2f > DividedDiff(vector< float > const &t, vector< Vector2f> const &Z)
 {
     DebugAssert(t.size() == Z.size());
 
@@ -399,7 +391,7 @@ vector< Vector2f > DividedDiff(vector< float > const &t, vector< Vector2f > cons
     MatrixXf     tCopy = tMap.replicate<1, 2>().transpose();
     VectorXfMap  tCopyMap = Map(tCopy);
 
-    vector< Vector2f > Z_out(Z.size()-1);
+    vector<Vector2f> Z_out(Z.size()-1);
 
     if (Z.empty())
     {
@@ -417,33 +409,37 @@ vector< Vector2f > DividedDiff(vector< float > const &t, vector< Vector2f > cons
     return Z_out;
 }
 
-vector< Vector2f >  NewtonCoefficient(vector< float > const &t, vector< Vector2f > const &Z, int D) {
+vector<Vector2f>  NewtonCoefficient(vector<float > const &t, vector< Vector2f> const &Z, int D)
+{
 
     DebugAssert(t.size() == Z.size());
     DebugAssert(D > -1);
 
-    if (D==0) {
-        vector< Vector2f > Z_out(Z);
+    if (D==0)
+    {
+        vector<Vector2f> Z_out(Z);
         return Z_out;
     }
-    else if (D > Z.size()-1) {
-        vector< Vector2f > Z_out(-1);
+    else if (D > Z.size()-1)
+    {
+        vector<Vector2f> Z_out(-1);
         return Z_out;
     }
 
-    vector< Vector2f > Z_out(Z.size());
-    vector< Vector2f > Z_in(Z);
+    vector<Vector2f> Z_out(Z.size());
+    vector<Vector2f> Z_in(Z);
 
     if (Z.empty())
     {
         return Z_out;
     }
 
-    VectorXfMap  tMap    = Map(t);
-    MatrixXf     tCopy = tMap.replicate<1, 2>().transpose();
+    VectorXfMap tMap = Map(t);
+    MatrixXf tCopy = tMap.replicate<1, 2>().transpose();
     VectorXfMap  tCopyMap = Map(tCopy);
 
-    for (int d=1; d <= D; ++d) {
+    for (int d=1; d <= D; ++d)
+    {
         size_t N = 2 * (Z.size() - d);
 
         Z_out.pop_back();
@@ -460,7 +456,8 @@ vector< Vector2f >  NewtonCoefficient(vector< float > const &t, vector< Vector2f
 
 }
 
-Eigen::VectorXf  CumSum(Eigen::VectorXf const & Z) {
+Eigen::VectorXf  CumSum(Eigen::VectorXf const & Z)
+{
     Eigen::VectorXf sum(Z.size());
 
     sum(0) = Z(0);
@@ -487,21 +484,18 @@ Eigen::VectorXf  CumSum0(Eigen::VectorXf const & Z)
 
 Eigen::Vector2f ComplexMultiply(Eigen::Vector2f const & z, Eigen::Vector2f const & w)
 {
-
     float a = z.x();
     float b = z.y();
-
     float c = w.x();
     float d = w.y();
 
     return Vector2f(a * c - b * d, a * d + b * c);
-
 }
 
 // this gives the sum of all squared X and Y values (it's the 2-norm of the vector Z
 // when you think of Z complex, i.e. Z = X + iY)
 // in real-life one usually says "norm squared" but we're going with Eigen's terminology
-float SquaredNorm(vector< Eigen::Vector2f > const & Z)
+float SquaredNorm(vector<Eigen::Vector2f> const & Z)
 {
     if (Z.empty())
     {
@@ -513,7 +507,7 @@ float SquaredNorm(vector< Eigen::Vector2f > const & Z)
     return mapZ.squaredNorm();
 }
 
-Eigen::VectorXf ComponentWiseNorm(vector< Vector2f > const & Z)
+Eigen::VectorXf ComponentWiseNorm(vector<Vector2f> const & Z)
 {
     VectorXf W(Z.size());
 
@@ -522,19 +516,18 @@ Eigen::VectorXf ComponentWiseNorm(vector< Vector2f > const & Z)
         return W;
     }
 
-    Stride2Map  mapInX  = XMap(Z);
-    Stride2Map  mapInY  = YMap(Z);
+    Stride2Map mapInX = XMap(Z);
+    Stride2Map mapInY = YMap(Z);
 
-    W                   = (mapInX.array().square() + mapInY.array().square()).sqrt();
+    W = (mapInX.array().square() + mapInY.array().square()).sqrt();
 
     return W;
 }
 
-Eigen::VectorXf RowWiseComponentNorm(Eigen::MatrixXf M) {
-    // In matlab: (sqrt(sum(M.^2, 2)))
-
+// In matlab: (sqrt(sum(M.^2, 2)))
+Eigen::VectorXf RowWiseComponentNorm(const Eigen::MatrixXf & M)
+{
     return M.rowwise().squaredNorm().cwiseSqrt();
 }
-
 }
 }

@@ -42,7 +42,7 @@ std::vector<float> NormDiff(std::vector<Eigen::Vector2f> const &Z);
 Eigen::VectorXf ComponentWiseNorm(std::vector< Eigen::Vector2f > const & Z);
 
 // In matlab: (sqrt(sum(M.^2, 2)))
-Eigen::VectorXf RowWiseComponentNorm(Eigen::MatrixXf M);
+Eigen::VectorXf RowWiseComponentNorm(const Eigen::MatrixXf & M);
 
 float SquaredNorm(std::vector< Eigen::Vector2f > const & Z);
 
@@ -83,7 +83,7 @@ void NormalizeVectorInPlace(Eigen::MatrixBase<DerivedA> &A)
 }
 
 // Returns the covariance matrix, in Matlab parlance: (D-mean(D))*(D-mean(D)'
-Eigen::MatrixXf                     Covariance(std::vector<Eigen::Vector2f> const & D);
+Eigen::MatrixXf Covariance(std::vector<Eigen::Vector2f> const & D);
 
 // Computes weighted mean of each column of XY
 template<typename DerivedData, typename DerivedWeights>
