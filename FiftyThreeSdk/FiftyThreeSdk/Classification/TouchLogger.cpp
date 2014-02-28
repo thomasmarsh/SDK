@@ -521,14 +521,14 @@ void TouchLogger::LogPenEvent(PenEvent event)
 
 core::TouchId TouchLogger::MostRecentEndedPen()
 {
-    BOOST_REVERSE_FOREACH(IdDataRefPair pair, _touchData)
+    for (auto it = _touchData.rbegin(); it != _touchData.rend(); ++it)
     {
-        if (pair.second->Phase() == TouchPhase::Ended)
+        if (it->second->Phase() == TouchPhase::Ended)
         {
-            const auto & cluster = pair.second->Cluster();
+            const auto & cluster = it->second->Cluster();
             if (cluster->IsPenType())
             {
-                return pair.first;
+                return it->first;
             }
         }
     }

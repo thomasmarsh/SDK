@@ -11,31 +11,30 @@
 // All we need is a floating-point factorial, so just implement in here
 //#include <boost/math/special_functions/factorials.hpp>
 
-#include <boost/foreach.hpp>
 #include <type_traits>
-#include <typeinfo>
 
 #include "Core/Eigen.h"
 #include "FiftyThreeSdk/Classification/CommonDeclarations.h"
 #include "FiftyThreeSdk/Classification/EigenLAB.h"
 
-using namespace Eigen;
-
-namespace fiftythree {
-namespace sdk {
-
-typedef std::pair < int, std::vector < int > > LocationStencilPair;
-typedef std::vector < LocationStencilPair > BoundaryStencil;
-typedef std::map < int, std::vector< int > > BoundaryStencilMap;
+namespace fiftythree
+{
+namespace sdk
+{
+typedef std::pair <int, std::vector <int>> LocationStencilPair;
+typedef std::vector <LocationStencilPair> BoundaryStencil;
+typedef std::map <int, std::vector<int>> BoundaryStencilMap;
 
 template<typename T, typename I>
-T Factorial(const I & num) {
+T Factorial(const I & num)
+{
     static_assert(std::is_integral<I>::value, "Should be integral type");
 
     DebugAssert(num >= 0);
     T result = 1.0;
 
-    for (int i=0; i < num; ++i) {
+    for (int i=0; i < num; ++i)
+    {
         result *= (T) (i+1);
     }
 
@@ -47,20 +46,22 @@ T Factorial(const I & num) {
 // Computes (order-1) piecewise cross-validation error from the order'th
 // derivative. E.g. for order=2 we get a piecewise-linear deviation.
 template<typename DerivedA, typename DerivedB>
-    void NthDerivativeToCrossValidation(const Eigen::Map<DerivedA> &x,
-                                    Eigen::Map<DerivedB> &derivative,
-                                    const int &order) {
-
+void NthDerivativeToCrossValidation(const Eigen::Map<DerivedA> &x,
+                                Eigen::Map<DerivedB> &derivative,
+                                const int &order)
+{
     DebugAssert(x.cols() == 1);
     size_t N = x.rows();
     DerivedA scaling = DerivedA::Ones(N);
 
-    if (N <= order) {
+    if (N <= order)
+    {
         // This is a spurious call -- we shouldn't do anything
         return;
     }
 
-    switch (order) {
+    switch (order)
+    {
         case 0:
             // Do nothing -- Non-sensical
             break;
@@ -119,30 +120,31 @@ template<typename DerivedA, typename DerivedB>
 template<typename DerivedA, typename DerivedB>
 void NthDerivativeToCrossValidation(const Eigen::MatrixBase<DerivedA> &x,
                                     Eigen::MatrixBase<DerivedB> &derivative,
-                                    const int &order) {
-
+                                    const int &order)
+{
     Eigen::Map<DerivedA> mapX((typename DerivedA::Scalar*) &x(0), x.rows(), x.cols());
     Eigen::Map<DerivedB> mapDerivative((typename DerivedB::Scalar*) &derivative(0), derivative.rows(), derivative.cols());
 
     NthDerivativeToCrossValidation<DerivedA, DerivedB>(mapX, mapDerivative, order);
-
 }
 
 template<typename DerivedA, typename DerivedB>
 void NthDerivativeFromCrossValidation(const Eigen::Map<DerivedA> &x,
                                       Eigen::Map<DerivedB> &derivative,
-                                      const int &order) {
-
+                                      const int &order)
+{
     DebugAssert(x.cols() == 1);
     size_t N = x.rows();
     DerivedA scaling = DerivedA::Ones(N);
 
-    if (N <= order) {
+    if (N <= order)
+    {
         // This is a spurious call -- we shouldn't do anything
         return;
     }
 
-    switch (order) {
+    switch (order)
+    {
         case 0:
             // Do nothing -- Non-sensical
             break;
@@ -203,13 +205,12 @@ void NthDerivativeFromCrossValidation(const Eigen::Map<DerivedA> &x,
 template<typename DerivedA, typename DerivedB>
 void NthDerivativeFromCrossValidation(const Eigen::MatrixBase<DerivedA> &x,
                                       Eigen::MatrixBase<DerivedB> &derivative,
-                                      const int &order) {
-
+                                      const int &order)
+{
     Eigen::Map<DerivedA> mapX((typename DerivedA::Scalar*) &x(0), x.rows(), x.cols());
     Eigen::Map<DerivedB> mapDerivative((typename DerivedB::Scalar*) &derivative(0), derivative.rows(), derivative.cols());
 
     NthDerivativeFromCrossValidation<DerivedA, DerivedB>(mapX, mapDerivative, order);
-
 }
 
 //
@@ -226,12 +227,12 @@ void ColumnWiseDividedDifferenceDivision(const Eigen::MatrixBase<DerivedA> &x,
                                          const size_t &startIndex,
                                          const size_t &nRows,
                                          const size_t &xLeftOffset,
-                                         const size_t &xRightOffset) {
-
-for (size_t i = 0; i < y.cols(); ++i) {
-    y.block(startIndex, i, nRows, 1) = y.block(startIndex, i, nRows, 1).cwiseQuotient( (x.segment(startIndex + xLeftOffset, nRows) - x.segment(startIndex + xRightOffset, nRows)).template cast<typename DerivedB::Scalar>() );
-}
-
+                                         const size_t &xRightOffset)
+{
+    for (size_t i = 0; i < y.cols(); ++i)
+    {
+        y.block(startIndex, i, nRows, 1) = y.block(startIndex, i, nRows, 1).cwiseQuotient( (x.segment(startIndex + xLeftOffset, nRows) - x.segment(startIndex + xRightOffset, nRows)).template cast<typename DerivedB::Scalar>());
+    }
 }
 
 // Performs a single left-biased difference.
@@ -245,14 +246,13 @@ void LeftwardDividedDifference(const Eigen::MatrixBase<DerivedA> &x,
                                const size_t &xLeftOffset,
                                const size_t &xRightOffset,
                                const size_t &M,
-                               const size_t &yCols) {
-
+                               const size_t &yCols)
+{
     tempStorage.block(xLeftOffset, 0, M-n, yCols) = output.block(xLeftOffset, 0, M-n, yCols) - output.block(xLeftOffset-1, 0, M-n, yCols);
 
     output.block(xLeftOffset, 0, M-n, yCols) = tempStorage.block(xLeftOffset, 0, M-n, yCols);
 
     ColumnWiseDividedDifferenceDivision(x, output, xLeftOffset, M-n, xRightOffset, -xLeftOffset);
-
 }
 
 // Performs a single right-biased difference.
@@ -266,14 +266,13 @@ void RightwardDividedDifference(const Eigen::MatrixBase<DerivedA> &x,
                                 const size_t &xLeftOffset,
                                 const size_t &xRightOffset,
                                 const size_t &M,
-                                const size_t &yCols) {
-
+                                const size_t &yCols)
+{
     tempStorage.block(xLeftOffset, 0, M-n, yCols) = output.block(xLeftOffset, 0, M-n, yCols) - output.block(xLeftOffset+1, 0, M-n, yCols);
 
     output.block(xLeftOffset, 0, M-n, yCols) = tempStorage.block(xLeftOffset, 0, M-n, yCols);
 
     ColumnWiseDividedDifferenceDivision(x, output, xLeftOffset, M-n, -xLeftOffset, xRightOffset);
-
 }
 
 // Copies central edge values to all boundary locations
@@ -282,26 +281,26 @@ void PostDifferencingBoundaryCopying(Eigen::MatrixBase<Derived> &output,
                                      const size_t &xLeftOffset,
                                      const size_t &xRightOffset,
                                      const size_t &M,
-                                     const size_t &yCols) {
-
+                                     const size_t &yCols)
+{
     size_t endIndex = M - 1 - xRightOffset;
 
     for (size_t i = 0; i < xLeftOffset; ++i)
     {
         output.block(i, 0, 1, yCols) = output.block(xLeftOffset, 0, 1, yCols);
     }
-    for (size_t i = 0; i < xRightOffset; ++i) {
+    for (size_t i = 0; i < xRightOffset; ++i)
+    {
         output.block(M-1-i, 0, 1, yCols) = output.block(endIndex, 0, 1, yCols);
     }
-
 }
 
 // Performs factorial normalization
 template<typename Derived>
 void PostDifferencingDerivativeNormalization(Eigen::MatrixBase<Derived> &output,
                                              const size_t &currentN,
-                                             const size_t &N) {
-
+                                             const size_t &N)
+{
     // Could save a little here with Pochhammer symbols
     output *= (Factorial<typename Derived::Scalar>(N)) /
               (Factorial<typename Derived::Scalar>(currentN));
@@ -323,17 +322,19 @@ template<typename DerivedA, typename DerivedB>
 void IncrementalDerivative(const Eigen::MatrixBase<DerivedA> &x,
                            Eigen::MatrixBase<DerivedB> &y,
                            const size_t &currentN,
-                           const size_t &N) {
-
+                           const size_t &N)
+{
     DebugAssert(N >= currentN);
 
-    if (N == currentN) {
+    if (N == currentN)
+    {
         return;
     }
 
     size_t M = x.rows();
     DebugAssert(M == y.rows());
-    if (N - currentN >= M) {
+    if (N - currentN >= M)
+    {
         y.setZero();
         return;
     }
@@ -346,7 +347,8 @@ void IncrementalDerivative(const Eigen::MatrixBase<DerivedA> &x,
     size_t xLeftOffset = (currentN+1)/2;
     size_t xRightOffset = xLeftOffset - (currentN % 2);
 
-    for (size_t n = currentN+1; n <= N; ++n) {
+    for (size_t n = currentN+1; n <= N; ++n)
+    {
 
         if ( (n % 2) == 1 ) // We add a stencil point on the left
         {
@@ -367,7 +369,6 @@ void IncrementalDerivative(const Eigen::MatrixBase<DerivedA> &x,
 
     PostDifferencingBoundaryCopying(y, xLeftOffset, xRightOffset, M, yCols);
     PostDifferencingDerivativeNormalization(y, currentN, N);
-
 }
 
 // Takes N'th order derivative of y wrt x, putting data in "output".
@@ -380,11 +381,10 @@ template<typename DerivedA, typename DerivedB>
 void Derivative(const Eigen::MatrixBase<DerivedA> &x,
                 const Eigen::MatrixBase<DerivedB> &y,
                 Eigen::MatrixBase<DerivedB> &output,
-                const int &N) {
-
+                const int &N)
+{
     output = y;
     IncrementalDerivative(x, output, 0, N);
-
 }
 
 // Utilities /////////////////////////////
@@ -392,8 +392,8 @@ void Derivative(const Eigen::MatrixBase<DerivedA> &x,
 // Requires t.rows() == xy.rows()
 template<typename DerivedA, typename DerivedB>
 DerivedB JerkOrthogonalToVelocity(const Eigen::MatrixBase<DerivedA> &t,
-                                  const Eigen::MatrixBase<DerivedB> &xy) {
-
+                                  const Eigen::MatrixBase<DerivedB> &xy)
+{
     //DerivedB velocity = NthDerivative(t, xy, 1);
     //DerivedB jerk = NthDerivative(t, xy, 3);
 
@@ -407,7 +407,7 @@ DerivedB JerkOrthogonalToVelocity(const Eigen::MatrixBase<DerivedA> &t,
 
     DebugAssert(N==t.rows());
 
-    Matrix<typename DerivedB::Scalar, Dynamic, 1> ProjectionFactors;
+    Eigen::Matrix<typename DerivedB::Scalar, Eigen::Dynamic, 1> ProjectionFactors;
     ProjectionFactors.resize(N, 1);
 
     // Numerator is j.*v
@@ -416,7 +416,8 @@ DerivedB JerkOrthogonalToVelocity(const Eigen::MatrixBase<DerivedA> &t,
                         ( velocity.array().square()       ).rowwise().sum().array();
 
     // We're mostly concerned with xy.cols==2, so a for-loop should be fine on performance
-    for (int i = 0; i < xy.cols(); ++i) {
+    for (int i = 0; i < xy.cols(); ++i)
+    {
         //output.block(0,i,N,1).array() -= (velocity.block(0,i,N,1).array() * ProjectionFactors.array());
         jerk.block(0,i,N,1).array() -= (velocity.block(0,i,N,1).array() * ProjectionFactors.array());
     }
@@ -426,8 +427,8 @@ DerivedB JerkOrthogonalToVelocity(const Eigen::MatrixBase<DerivedA> &t,
 
 template<typename DerivedA, typename DerivedB>
 DerivedB D4OrthogonalToVelocity(const Eigen::MatrixBase<DerivedA> &t,
-                                const Eigen::MatrixBase<DerivedB> &xy) {
-
+                                const Eigen::MatrixBase<DerivedB> &xy)
+{
     //DerivedB velocity = NthDerivative(t, xy, 1);
     //DerivedB d4 = NthDerivative(t, xy, 4);
 
@@ -443,7 +444,7 @@ DerivedB D4OrthogonalToVelocity(const Eigen::MatrixBase<DerivedA> &t,
 
     DebugAssert(N==t.rows());
 
-    Matrix<typename DerivedB::Scalar, Dynamic, 1> ProjectionFactors;
+    Eigen::Matrix<typename DerivedB::Scalar, Eigen::Dynamic, 1> ProjectionFactors;
     ProjectionFactors.resize(N, 1);
 
     // prevent NaN
@@ -455,7 +456,8 @@ DerivedB D4OrthogonalToVelocity(const Eigen::MatrixBase<DerivedA> &t,
     ( velocity.array().square()       ).rowwise().sum().array();
 
     // We're mostly concerned with xy.cols==2, so a for-loop should be fine on performance
-    for (int i = 0; i < xy.cols(); ++i) {
+    for (int i = 0; i < xy.cols(); ++i)
+    {
         //output.block(0,i,N,1).array() -= (velocity.block(0,i,N,1).array() * ProjectionFactors.array());
         d4.block(0,i,N,1).array() -= (velocity.block(0,i,N,1).array() * ProjectionFactors.array());
     }
@@ -465,7 +467,8 @@ DerivedB D4OrthogonalToVelocity(const Eigen::MatrixBase<DerivedA> &t,
 
 template<typename DerivedA, typename DerivedB>
 DerivedB D2OrthogonalToVelocity(const Eigen::MatrixBase<DerivedA> &t,
-                                const Eigen::MatrixBase<DerivedB> &xy) {
+                                const Eigen::MatrixBase<DerivedB> &xy)
+{
 
     //DerivedB velocity = NthDerivative(t, xy, 1);
     //DerivedB d2 = NthDerivative(t, xy, 2);
@@ -480,7 +483,7 @@ DerivedB D2OrthogonalToVelocity(const Eigen::MatrixBase<DerivedA> &t,
 
     DebugAssert(N==t.rows());
 
-    Matrix<typename DerivedB::Scalar, Dynamic, 1> ProjectionFactors;
+    Eigen::Matrix<typename DerivedB::Scalar, Eigen::Dynamic, 1> ProjectionFactors;
     ProjectionFactors.resize(N, 1);
 
     // Numerator is j.*v
@@ -489,20 +492,21 @@ DerivedB D2OrthogonalToVelocity(const Eigen::MatrixBase<DerivedA> &t,
     ( velocity.array().square()       ).rowwise().sum().array();
 
     // We're mostly concerned with xy.cols==2, so a for-loop should be fine on performance
-    for (int i = 0; i < xy.cols(); ++i) {
+    for (int i = 0; i < xy.cols(); ++i)
+    {
         //output.block(0,i,N,1).array() -= (velocity.block(0,i,N,1).array() * ProjectionFactors.array());
         d2.block(0,i,N,1).array() -= (velocity.block(0,i,N,1).array() * ProjectionFactors.array());
     }
 
     return d2;
-
 }
 
 /*
 Matt: "JerkOrthogonalToVelocity" is the function you wanted, and here's code to test:
 
 // This is just from (x(t), y(t)) = (cos(t), 2*sin(t))
-double traw[] = {
+double traw[] =
+{
                  0,
  0.349065850398866,
  0.698131700797732,
@@ -515,7 +519,8 @@ double traw[] = {
   3.14159265358979
 };
 
-double xraw[] = {
+double xraw[] =
+{
                  1,
  0.939692620785908,
  0.766044443118978,
@@ -528,7 +533,8 @@ double xraw[] = {
                 -1
 };
 
-double yraw[] = {
+double yraw[] =
+{
                  0,
  0.684040286651337,
   1.28557521937308,
@@ -543,7 +549,8 @@ double yraw[] = {
 
 // Create a stroke from the raw data
 curves::Stroke::Ptr stroke = curves::Stroke::New();
-for (int i = 0; i < 10; ++i) {
+for (int i = 0; i < 10; ++i)
+{
     Eigen::Vector2f tempXY;
     tempXY(0) = (float) xraw[i];
     tempXY(1) = (float) yraw[i];
@@ -585,6 +592,5 @@ std::cout << "Answer:\n" << answer << std::endl;
 //         0.339403393304608       -0.0299229877918046
 
  */
-
 }
 }
