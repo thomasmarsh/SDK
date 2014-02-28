@@ -430,7 +430,7 @@ TouchType TouchClassificationProxy::ClassifyForGesture(core::TouchId touch0, con
                         return TouchType::Unknown;
                     }
 
-                    bool isStartIsolated = _touchStatistics[touch0]._preIsolation  > 0.05f;;
+                    bool isStartIsolated = _touchStatistics[touch0]._preIsolation  > 0.05f;
                     bool isEndIsolated = _touchStatistics[touch0]._postIsolation  > 0.06f;
 
                     float dt = stroke->LastAbsoluteTimestamp() - stroke->FirstAbsoluteTimestamp();

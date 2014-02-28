@@ -114,7 +114,7 @@ NSString * const kFTPenAuthenticationCodePropertyName = @"authenticationCode";
     FTAssert(data.length == 10, @"PressureSetup data is 10 bytes long");
 
     uint8_t *bytes = (uint8_t *)data.bytes;
-    bytes[0] = _samplePeriodMilliseconds;;
+    bytes[0] = _samplePeriodMilliseconds;
     bytes[1] = _notificatinPeriodMilliseconds;
     bytes[2] = _tipFloorThreshold;
     bytes[3] = _tipMinThreshold;
