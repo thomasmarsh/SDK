@@ -13,12 +13,15 @@
 #include "FiftyThreeSdk/Classification/Stroke.h"
 #include "FiftyThreeSdk/Classification/TouchLogger.h"
 
-namespace fiftythree {
-namespace sdk {
+namespace fiftythree
+{
+namespace sdk
+{
 
 typedef std::pair<PenEventId, float> IdLikelihoodPair;
 
-class PenEventClassifier {
+class PenEventClassifier
+{
 protected:
     // members
     ClusterTracker::Ptr  _clusterTracker;
@@ -32,11 +35,11 @@ protected:
     std::list<PenEventId> _penDownCleared;
 
     // cache scores so we don't recompute on each request for a score
-    std::map< ClusterId, std::pair<core::TouchClassification, float> > _clusterTypesAndScores;
+    std::map<ClusterId, std::pair<core::TouchClassification, float>> _clusterTypesAndScores;
 
     // store these so the classifier can resolve collisions
-    std::map< core::TouchId, PenEventId > _bestPenDownEventForTouch;
-    std::map< core::TouchId, PenEventId > _bestPenUpEventForTouch;
+    std::map<core::TouchId, PenEventId> _bestPenDownEventForTouch;
+    std::map<core::TouchId, PenEventId> _bestPenUpEventForTouch;
 
     // switch timing delay constant for switch arrival time exponentials.
     // 1 / lambda is the expected switch delay time
@@ -52,11 +55,11 @@ public:
 
 protected:
 
-    void            MarkTouchTypes(IdTypeMap* touches, core::TouchId id, core::TouchClassification type);
-    void            MarkTouchTypes(IdTypeMap* touches, TouchIdVector ids, core::TouchClassification type);
+    void MarkTouchTypes(IdTypeMap* touches, core::TouchId id, core::TouchClassification type);
+    void MarkTouchTypes(IdTypeMap* touches, TouchIdVector ids, core::TouchClassification type);
 
-    void            FoundPenEventTouch(PenEventId id);
-    bool            IsPenEventTouchFound(PenEventId id);
+    void FoundPenEventTouch(PenEventId id);
+    bool IsPenEventTouchFound(PenEventId id);
 
 public:
     inline PenEventClassifier(ClusterTracker::Ptr clusterTracker, const CommonData* dataPtr) :
@@ -110,8 +113,6 @@ public:
     float SwitchOnDurationInTimeInterval(double t0, double t1);
 
     void SetNeedsClassification();
-
 };
-
 }
 }
