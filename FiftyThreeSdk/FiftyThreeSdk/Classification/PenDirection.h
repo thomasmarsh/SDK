@@ -15,16 +15,17 @@
 #include "FiftyThreeSdk/Classification/Stroke.h"
 #include "FiftyThreeSdk/Classification/TouchLogger.h"
 
-namespace fiftythree {
-namespace sdk {
-
-class PenTracker {
+namespace fiftythree
+{
+namespace sdk
+{
+class PenTracker
+{
 
 public:
     typedef fiftythree::core::shared_ptr<PenTracker> Ptr;
 
 protected:
-
     ClusterTracker::Ptr _clusterTracker;
     const CommonData*   _commonData;
 
@@ -65,7 +66,7 @@ public:
     Cluster::Ptr PenEndCluster(std::vector<Cluster::Ptr> const & orderedClusters, bool ignorePossibleThumbs);
     Cluster::Ptr PalmEndCluster(std::vector<Cluster::Ptr> const & orderedClusters);
 
-    bool         WasAtPalmEnd(Cluster::Ptr const &cluster);
+    bool WasAtPalmEnd(Cluster::Ptr const &cluster);
 
     // typically there's only one pen at the pen end, but stray edge thumbs need to be considered
     // as begin at the pen end until they get marked as EdgeThumbType::Thumb
@@ -84,8 +85,6 @@ public:
 
     // direction prior is actually stored in the clusters so the return value can be ignored if desired
     Eigen::VectorXf UpdateDirectionPrior(std::vector<Cluster::Ptr> const &orderedClusters) const;
-
 };
-
 }
 }
