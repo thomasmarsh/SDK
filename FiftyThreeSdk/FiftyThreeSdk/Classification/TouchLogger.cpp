@@ -1017,16 +1017,6 @@ TouchIdVector TouchLogger::IdsInPhase(core::TouchPhase phase) {
     return ids;
 }
 
-TouchIdVector TouchLogger::LoggedIds() {
-    TouchIdVector ids;
-
-    BOOST_FOREACH(TouchDataPair  const & pair, _touchData) {
-        ids.push_back(pair.first);
-    }
-
-    return ids;
-}
-
 bool TouchLogger::IsIdLogged(core::TouchId id) {
     return (_touchData.count(id) > 0);
 }
@@ -1255,40 +1245,6 @@ TouchIdVector TouchLogger::ConcurrentTouches(core::TouchId probeId)
     return out;
 }
 
-TouchIdVector TouchLogger::TouchIdsActiveAtTime(TouchIdVector ids, double time) {
-
-    TouchIdVector activeIds;
-
-    BOOST_FOREACH(core::TouchId id, ids) {
-        double touchBegan = Data(id)->FirstTimestamp();
-        double touchEnded = Data(id)->LastTimestamp();
-
-        if ( ( time >= touchBegan) &&
-             ( time <= touchEnded) )
-        {
-            activeIds.push_back(id);
-        }
-
-    }
-
-    return activeIds;
-}
-
-core::TouchId TouchLogger::LastEndedTouch(TouchIdVector ids) {
-    core::TouchId id =  InvalidTouchId();
-    double lastTime = -Inf;
-
-    BOOST_FOREACH(core::TouchId probeId, ids) {
-        double probeTime = Data(probeId)->LastTimestamp();
-        if ( probeTime  > lastTime ) {
-            id = probeId;
-            lastTime = probeTime;
-        }
-    }
-
-    return id;
-}
-
 TouchClassification TouchLogger::MostRecentPenTipType()
 {
 
@@ -1344,73 +1300,8 @@ PenEventId TouchLogger::MostRecentPenDownEvent() {
 }
 
 TouchIdVector TouchLogger::LiveTouches() {
-    TouchIdVector ids;
-    BOOST_FOREACH(core::TouchId touchId, _activeTouches) {
-        ids.push_back(touchId);
-    }
+    TouchIdVector ids(_activeTouches.begin(), _activeTouches.end());
 
-    return ids;
-}
-
-TouchIdVector TouchLogger::LiveTouchesInPhase(core::TouchPhase phase) {
-
-    TouchIdVector ids;
-    ids.clear();
-
-    BOOST_FOREACH(core::TouchId touchId, _activeTouches) {
-        if (Phase(touchId) == phase ) {
-            ids.push_back(touchId);
-        }
-    }
-
-    return ids;
-
-}
-
-TouchIdVector TouchLogger::LiveTouchesOfType(TouchClassification type) {
-
-    TouchIdVector ids;
-    ids.clear();
-
-    BOOST_FOREACH(core::TouchId touchId, _activeTouches) {
-        if (_commonData->proxy->CurrentClass(touchId) == type ) {
-            ids.push_back(touchId);
-        }
-    }
-
-    return ids;
-}
-
-TouchIdVector TouchLogger::LiveTouchesOfTypeInPhase(TouchClassification type, core::TouchPhase phase) {
-
-    TouchIdVector ids;
-    ids.clear();
-
-    BOOST_FOREACH(core::TouchId touchId, _activeTouches) {
-        if ( (_commonData->proxy->CurrentClass(touchId) == type) &&
-             (Phase(touchId)==phase)
-           )
-        {
-            ids.push_back(touchId);
-        }
-    }
-
-    return ids;
-
-}
-
-TouchIdVector TouchLogger::TouchesOfTypeInPhase(TouchClassification type, core::TouchPhase phase) {
-    TouchIdVector ids;
-    ids.clear();
-
-    BOOST_FOREACH(IdDataPair  const & pair, _touchData) {
-        if ( (_commonData->proxy->CurrentClass(pair.first) == type ) &&
-             (Phase(pair.first)==phase)
-            )
-        {
-            ids.push_back(pair.first);
-        }
-    }
     return ids;
 }
 

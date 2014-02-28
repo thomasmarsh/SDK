@@ -438,37 +438,12 @@ public:
         return _endedTouches;
     }
 
-    //////////////////////////////////////////////////////////
-    //
-    // End actively-used methods
-    //
-    /////////////////////////////////////////////////
-
-    // PETER -- I believe the classifier is not using the methods below here at the moment.
-    // I am leaving them here because they do something potentially useful though.
-
-    // Processing: determine Ids satisfying some state condition
-    TouchIdVector                   IdsInPhase(core::TouchPhase phase);
     TouchIdVector                   LiveTouches();
-    TouchIdVector                   LiveTouchesOfType(core::TouchClassification type);
-    TouchIdVector                   LiveTouchesInPhase(core::TouchPhase phase);
-    TouchIdVector                   LiveTouchesOfTypeInPhase(core::TouchClassification type,
-                                                             core::TouchPhase phase);
-    TouchIdVector                   TouchesOfTypeInPhase(core::TouchClassification type, core::TouchPhase phase);
 
-    // Lists of Id's, and testing for existence of Id
-    int                             NumberOfTouches();
-    TouchIdVector                   LoggedIds();
-
+    TouchIdVector                   IdsInPhase(core::TouchPhase phase);
     bool                            IsEnded(core::TouchId touchId);
-
+    int                             NumberOfTouches();
     int                             LoggedPenEventCount();
-
-    // Find which touches from the given set are active at a given time
-    TouchIdVector                   TouchIdsActiveAtTime(TouchIdVector ids, double time);
-
-    core::TouchId                 LastEndedTouch(TouchIdVector ids);
-
 };
 
 core::TouchId InvalidTouchId();
