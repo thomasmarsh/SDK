@@ -1,26 +1,28 @@
 //
 //  FiniteDifferences.cpp
-//  Curves
+//  FiftyThreeSdk
 //
-//  Created by Akil Narayan on 2013/08/10.
-//  Copyright (c) 2013 Peter Sibley. All rights reserved.
+//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
 
-#include <boost/foreach.hpp>
-#include <iostream>
 #include <algorithm>
 #include <map>
-#include <boost/math/special_functions/factorials.hpp>
-#include <Eigen/Eigen>
 
+#include "FiftyThreeSdk/Classification/Eigen.h"
 #include "FiftyThreeSdk/Classification/EigenLAB.h"
 #include "FiftyThreeSdk/Classification/FiniteDifferences.h"
 
-namespace fiftythree {
-namespace sdk {
+using std::make_pair;
+using std::map;
+using std::vector;
 
+namespace fiftythree
+{
+namespace sdk
+{
 // local divided difference stencil
-std::vector<int> DividedDifferenceStencil(const int &order) {
+vector<int> DividedDifferenceStencil(const int &order)
+{
     // If order = 3, this returns the following vector:
     // [ -2 1 -1 0]
     // If order = 4, this returns the following vector:
@@ -31,17 +33,17 @@ std::vector<int> DividedDifferenceStencil(const int &order) {
     // - we want the central point to be the last added so that by default the last
     //   finite difference computed is a measure of cross-validation error
     // - with this order, then by computing backward differences we effectively get an
-    //   estimate (a) for cross-validation at the central location by adding one 
-    //   point at a time and (b) for successive derivative evaluations at the 
+    //   estimate (a) for cross-validation at the central location by adding one
+    //   point at a time and (b) for successive derivative evaluations at the
     //   central location by adding one point at a time.
-    
-    static std::map< int, 
-                     std::vector<int> > StoredResults;
+
+    static map< int, vector<int>> StoredResults;
 
     // Hard-coding of stencils because we only care about derivatives less than
     // 4. More general code is below.
-    if (StoredResults.empty()) {
-        std::vector<int> stencil;
+    if (StoredResults.empty())
+    {
+        vector<int> stencil;
 
         int tempOrder = 0;
         // [0]
@@ -68,35 +70,36 @@ std::vector<int> DividedDifferenceStencil(const int &order) {
         stencil[1] = 1;
         stencil[2] = -1;
         StoredResults.insert( std::make_pair(tempOrder, stencil) );
-    } 
+    }
 
     DebugAssert(order >= 0);
-    std::vector< int > stencil(order+1);
+    vector< int > stencil(order+1);
 
-    if (StoredResults.count(order) > 0) {
+    if (StoredResults.count(order) > 0)
+    {
         stencil = StoredResults[order];
     }
-    else {
+    else
+    {
         // The general code which generates the special cases above.
-        
-        for (int i=0; i < order; ++i) {
+
+        for (int i=0; i < order; ++i)
+        {
             stencil[i] = (int) std::floor((i+2)/2.0f);
-            
-            if ( (i % 2) == 0 ) {
+
+            if ((i % 2) == 0)
+            {
                 stencil[i] *= -1;
             }
         }
 
         std::reverse(stencil.begin(), stencil.end()-1);
-        
+
         stencil[order] = 0;
 
-        StoredResults.insert( std::make_pair(order, stencil) );
-        
+        StoredResults.insert(make_pair(order, stencil));
     }
-
     return stencil;
 }
-
 }
 }
