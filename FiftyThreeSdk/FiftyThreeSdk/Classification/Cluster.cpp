@@ -6,8 +6,9 @@
 //
 
 #include <algorithm>
-#include <boost/foreach.hpp>
+#include <list>
 #include <tuple>
+#include <vector>
 
 #include "Core/Touch/Touch.h"
 #include "Core/Touch/TouchTracker.h"
@@ -19,9 +20,14 @@
 
 using namespace Eigen;
 using namespace fiftythree::core;
+using std::list;
+using std::tie;
+using std::vector;
 
-namespace fiftythree {
-namespace sdk {
+namespace fiftythree
+{
+namespace sdk
+{
 
 float Cluster::Staleness() const
 {
@@ -29,7 +35,7 @@ float Cluster::Staleness() const
     float dt = _commonData->proxy->ClusterTracker()->CurrentTime() - LastTimestamp();
 
     float staleTime = _commonData->proxy->ClusterTracker()->_staleInterval;
-    if(this->IsPenType())
+    if (this->IsPenType())
     {
         staleTime = _commonData->proxy->ClusterTracker()->_penStaleInterval;
     }
@@ -41,7 +47,7 @@ float Cluster::Staleness() const
 int Cluster::CountTouchesOfType(TouchClassification probeType) const
 {
     int count = 0;
-    BOOST_FOREACH(core::TouchId touchId, _touchIds)
+    for (core::TouchId touchId:_touchIds)
     {
         if (_commonData->proxy->CurrentClass(touchId) == probeType)
         {
@@ -53,7 +59,7 @@ int Cluster::CountTouchesOfType(TouchClassification probeType) const
 
 core::TouchId Cluster::MostRecentTouch() const
 {
-    if(_touchIds.empty())
+    if (_touchIds.empty())
     {
         return InvalidTouchId();
     }
@@ -65,14 +71,14 @@ core::TouchId Cluster::MostRecentTouch() const
 
 bool Cluster::AllTouchesEnded() const
 {
-    BOOST_FOREACH(core::TouchId currId, _touchIds)
+    for (core::TouchId currId:_touchIds)
     {
         //Touch::Ptr touch = _touchLog->TouchWithId(currId);
 
         DebugAssert(_touchData.count(currId));
 
         TouchData::Ptr const & touch = _touchData.at(currId);
-        if(touch && (! touch->IsPhaseEndedOrCancelled()))
+        if (touch && (! touch->IsPhaseEndedOrCancelled()))
         {
             return false;
         }
@@ -93,9 +99,9 @@ float Cluster::ConcurrentDuration(Cluster const &other) const
 
 bool Cluster::ContainsTouch(core::TouchId probeId) const
 {
-    BOOST_FOREACH(core::TouchId currId, _touchIds)
+    for (core::TouchId currId:_touchIds)
     {
-        if(currId == probeId)
+        if (currId == probeId)
         {
             return true;
         }
@@ -122,7 +128,7 @@ bool Cluster::ConcurrentWith(core::TouchId touchId, bool useStaleInterval) const
 
     if (! useStaleInterval)
     {
-        if(AllTouchesEnded())
+        if (AllTouchesEnded())
         {
             t1 = LastTimestamp();
         }
@@ -131,7 +137,7 @@ bool Cluster::ConcurrentWith(core::TouchId touchId, bool useStaleInterval) const
             t1 = _touchLog->CurrentTime();
         }
 
-        if(_touchData.at(touchId)->Touch()->IsPhaseEndedOrCancelled())
+        if (_touchData.at(touchId)->Touch()->IsPhaseEndedOrCancelled())
         {
             s1 = data->LastTimestamp();
         }
@@ -178,7 +184,7 @@ bool Cluster::ConcurrentWith(Cluster::Ptr const &other, bool useStaleInterval) c
 
     if (! useStaleInterval)
     {
-        if(AllTouchesEnded())
+        if (AllTouchesEnded())
         {
             t1 = LastTimestamp();
         }
@@ -187,7 +193,7 @@ bool Cluster::ConcurrentWith(Cluster::Ptr const &other, bool useStaleInterval) c
             t1 = _touchLog->CurrentTime();
         }
 
-        if(other->AllTouchesEnded())
+        if (other->AllTouchesEnded())
         {
             s1 = other->LastTimestamp();
         }
@@ -203,7 +209,7 @@ bool Cluster::ConcurrentWith(Cluster::Ptr const &other, bool useStaleInterval) c
 
 core::TouchId Cluster::FirstTouch() const
 {
-    if(_touchIds.empty())
+    if (_touchIds.empty())
     {
         return InvalidTouchId();
     }
@@ -221,7 +227,7 @@ core::TouchId Cluster::FirstTouch() const
 int ClusterTracker::CurrentEventFingerCount()
 {
     int count = 0;
-    BOOST_FOREACH(IdClusterPtrPair const & pair, _clusters)
+    for (IdClusterPtrPair const & pair:_clusters)
     {
         count += pair.second->CountTouchesOfType(TouchClassification::Finger);
     }
@@ -234,10 +240,10 @@ Cluster::Ptr ClusterTracker::NearestStaleCluster(Eigen::Vector2f p)
     Cluster::Ptr best;
     float d2Best = std::numeric_limits<float>::max();
 
-    BOOST_FOREACH(Cluster::Ptr const & cluster, _currentEventStaleClusters)
+    for (Cluster::Ptr const & cluster:_currentEventStaleClusters)
     {
         float d2 = (cluster->_center - p).squaredNorm();
-        if(d2 < d2Best)
+        if (d2 < d2Best)
         {
             best   = cluster;
             d2Best = d2;
@@ -253,16 +259,16 @@ Cluster::Ptr ClusterTracker::NearestActiveCluster(Vector2f p)
     Cluster::Ptr   best;
     float d2Best = std::numeric_limits<float>::max();
 
-    BOOST_FOREACH(Cluster::Ptr const & cluster, _currentEventActiveClusters)
+    for (Cluster::Ptr const & cluster:_currentEventActiveClusters)
     {
 
-        if(cluster->_closedToNewTouches)
+        if (cluster->_closedToNewTouches)
         {
             continue;
         }
 
         float d2 = (cluster->_center - p).squaredNorm();
-        if(d2 < d2Best)
+        if (d2 < d2Best)
         {
             best = cluster;
             d2Best = d2;
@@ -278,7 +284,7 @@ Cluster::Ptr ClusterTracker::NearestActiveNonPenCluster(Vector2f p)
     Cluster::Ptr   best;
     float d2Best = std::numeric_limits<float>::max();
 
-    BOOST_FOREACH(Cluster::Ptr cluster, _currentEventActiveClusters)
+    for (Cluster::Ptr cluster:_currentEventActiveClusters)
     {
 
         if (cluster->IsPenType() || cluster->IsFingerType() ||
@@ -288,7 +294,7 @@ Cluster::Ptr ClusterTracker::NearestActiveNonPenCluster(Vector2f p)
         }
 
         float d2 = (cluster->_center - p).squaredNorm();
-        if(d2 < d2Best)
+        if (d2 < d2Best)
         {
             best   = cluster;
             d2Best = d2;
@@ -303,9 +309,9 @@ ClusterId InvalidClusterId()
     return ClusterId(-1);
 }
 
-std::vector<TouchId>::iterator Cluster::FindTouch(core::TouchId touchId)
+vector<TouchId>::iterator Cluster::FindTouch(core::TouchId touchId)
 {
-    std::vector<TouchId>::iterator it = std::find(_touchIds.begin(), _touchIds.end(), touchId);
+    vector<TouchId>::iterator it = std::find(_touchIds.begin(), _touchIds.end(), touchId);
     return it;
 }
 
@@ -314,7 +320,7 @@ std::vector<TouchId>::iterator Cluster::FindTouch(core::TouchId touchId)
 bool Cluster::RemoveTouch(core::TouchId touchId)
 {
     auto it = FindTouch(touchId);
-    if(it == _touchIds.end())
+    if (it == _touchIds.end())
     {
         return false;
     }
@@ -330,11 +336,11 @@ bool Cluster::RemoveTouch(core::TouchId touchId)
 
 }
 
-std::vector<core::TouchId> Cluster::ReclassifiableTouches() const
+vector<core::TouchId> Cluster::ReclassifiableTouches() const
 {
-    std::vector<core::TouchId> out;
+    vector<core::TouchId> out;
 
-    BOOST_FOREACH(IdDataRefPair pair, _touchData)
+    for (IdDataRefPair pair:_touchData)
     {
         if (_commonData->proxy->IsReclassifiable(pair.second->Touch(), pair.second->Stroke()))
         {
@@ -350,7 +356,7 @@ std::vector<core::TouchId> Cluster::ReclassifiableTouches() const
 // reclassifiable according to the current proxy's rules
 bool Cluster::ContainsReclassifiableTouch() const
 {
-    BOOST_FOREACH(IdDataRefPair pair, _touchData)
+    for (IdDataRefPair pair:_touchData)
     {
         if (_commonData->proxy->IsReclassifiable(pair.second->Touch(), pair.second->Stroke()))
         {
@@ -363,7 +369,7 @@ bool Cluster::ContainsReclassifiableTouch() const
 
 bool Cluster::InsertTouch(core::TouchId touchId)
 {
-    if(! ContainsTouch(touchId))
+    if (! ContainsTouch(touchId))
     {
         _touchIds.push_back(touchId);
         _touchData[touchId] = _touchLog->Data(touchId);
@@ -413,7 +419,7 @@ Cluster::Ptr Cluster::New()
 Cluster::Ptr ClusterTracker::NewCluster(Vector2f center, double timestamp, TouchClassification defaultTouchType)
 {
 
-    if(_clusters.empty())
+    if (_clusters.empty())
     {
         _currentEventBeganTimestamp = timestamp;
     }
@@ -460,7 +466,7 @@ void ClusterTracker::Reset()
 
 void ClusterTracker::RemoveUnusedStaleClusters()
 {
-    if(_currentEventActiveClusters.empty())
+    if (_currentEventActiveClusters.empty())
     {
         Reset();
         _commonData->proxy->OnClusterEventEnded();
@@ -471,13 +477,13 @@ void ClusterTracker::RemoveUnusedStaleClusters()
 
         // stale clusters can be removed so long as they are not concurrent with
         // reclassifiable clusters.
-        BOOST_FOREACH(Cluster::Ptr const & stale, _currentEventStaleClusters)
+        for (Cluster::Ptr const & stale:_currentEventStaleClusters)
         {
-            BOOST_FOREACH(Cluster::Ptr const & cluster, _currentEventActiveClusters)
+            for (Cluster::Ptr const & cluster:_currentEventActiveClusters)
             {
-                if(cluster->ContainsReclassifiableTouch())
+                if (cluster->ContainsReclassifiableTouch())
                 {
-                    if(stale->ConcurrentWith(cluster, false))
+                    if (stale->ConcurrentWith(cluster, false))
                     {
                         removableClusters.erase(stale);
                     }
@@ -490,12 +496,12 @@ void ClusterTracker::RemoveUnusedStaleClusters()
         // if it could be, the cluster is not removable
 
         TouchId oldestReclassifiableTouch = _touchLog->OldestReclassifiableTouch();
-        if(oldestReclassifiableTouch != InvalidTouchId())
+        if (oldestReclassifiableTouch != InvalidTouchId())
         {
             Cluster::Ptr const &cluster = _touchLog->Cluster(oldestReclassifiableTouch);
 
             double  tCutoff                   = _touchLog->Data(oldestReclassifiableTouch)->FirstTimestamp();
-            if(cluster)
+            if (cluster)
             {
                 tCutoff                        = cluster->FirstTimestamp();
             }
@@ -508,10 +514,10 @@ void ClusterTracker::RemoveUnusedStaleClusters()
             // touch in the cluster.
             tCutoff                          -= _commonData->proxy->PenEventClassifier()->_maxPenEventDelay;
 
-            BOOST_FOREACH(Cluster::Ptr const & cluster, _currentEventStaleClusters)
+            for (Cluster::Ptr const & cluster:_currentEventStaleClusters)
             {
 
-                if(cluster->LastTimestamp() > tCutoff)
+                if (cluster->LastTimestamp() > tCutoff)
                 {
                     removableClusters.erase(cluster);
                 }
@@ -519,7 +525,7 @@ void ClusterTracker::RemoveUnusedStaleClusters()
 
         }
 
-        BOOST_FOREACH(Cluster::Ptr const & removable, removableClusters)
+        for (Cluster::Ptr const & removable:removableClusters)
         {
             _currentEventStaleClusters.erase(removable);
             _clusters.erase(removable->_id);
@@ -531,7 +537,7 @@ void ClusterTracker::RemoveUnusedStaleClusters()
 
 void ClusterTracker::ForceAllClustersStale(double currentTimestamp)
 {
-    BOOST_FOREACH(Cluster::Ptr const & cluster, _currentEventActiveClusters)
+    for (Cluster::Ptr const & cluster:_currentEventActiveClusters)
     {
         _currentEventStaleClusters.insert(cluster);
         cluster->_becameStaleTime = currentTimestamp;
@@ -547,7 +553,7 @@ void ClusterTracker::ForceAllClustersStale(double currentTimestamp)
 
     float dt = currentTime - cluster->LastTimestamp();
 
-    if(dt >= _staleInterval && cluster->AllTouchesEnded())
+    if (dt >= _staleInterval && cluster->AllTouchesEnded())
     {
         _currentEventActiveClusters.erase(cluster);
         _currentEventStaleClusters.insert(cluster);
@@ -561,19 +567,19 @@ void ClusterTracker::ForceAllClustersStale(double currentTimestamp)
 void ClusterTracker::MarkStaleClusters(double currentTimestamp)
 {
 
-    std::vector<Cluster::Ptr> newlyStale;
+    vector<Cluster::Ptr> newlyStale;
 
-    BOOST_FOREACH(Cluster::Ptr const & cluster, _currentEventActiveClusters)
+    for (Cluster::Ptr const & cluster:_currentEventActiveClusters)
     {
         float dt = currentTimestamp - cluster->LastTimestamp();
 
-        if(dt >= _staleInterval && cluster->AllTouchesEnded())
+        if (dt >= _staleInterval && cluster->AllTouchesEnded())
         {
             newlyStale.push_back(cluster);
         }
     }
 
-    BOOST_FOREACH(Cluster::Ptr const & cluster, newlyStale)
+    for (Cluster::Ptr const & cluster:newlyStale)
     {
         _currentEventActiveClusters.erase(cluster);
         _currentEventStaleClusters.insert(cluster);
@@ -592,7 +598,7 @@ void ClusterTracker::AddPointToCluster(Vector2f p, double timestamp, Cluster::Pt
     // it is safe to use _touchLog here since the touch is active.  in other places
     // it is possible the touchLog will have discarded data so we use the cluster's ptr.
     Stroke::Ptr const & stroke = _touchLog->Stroke(touchId);
-    if(stroke->Size() > 1)
+    if (stroke->Size() > 1)
     {
         int lastIndex = stroke->LastValidIndex();
         cluster->_totalLength += (stroke->XY(lastIndex) - stroke->XY(lastIndex-1)).norm();
@@ -615,12 +621,12 @@ void ClusterTracker::AddPointToCluster(Vector2f p, double timestamp, Cluster::Pt
     if ( newTouchAdded && (! cluster->_simultaneousTouches))
     {
 
-        BOOST_FOREACH(TouchId existingId, cluster->_touchIds)
+        for (TouchId existingId:cluster->_touchIds)
         {
             if (existingId != touchId)
             {
                 auto touch = _touchLog->TouchWithId(existingId);
-                if(touch &&
+                if (touch &&
                    (! touch->IsPhaseEndedOrCancelled()))
                 {
                     // Then there are already active touches in the cluster but we just added a new touch point
@@ -633,7 +639,7 @@ void ClusterTracker::AddPointToCluster(Vector2f p, double timestamp, Cluster::Pt
 
      // update mean size
 
-    if(_commonData->proxy->UsePrivateAPI())
+    if (_commonData->proxy->UsePrivateAPI())
     {
          core::Touch::Ptr touch = _touchLog->TouchWithId(touchId);
 
@@ -642,7 +648,7 @@ void ClusterTracker::AddPointToCluster(Vector2f p, double timestamp, Cluster::Pt
             float r  = *(touch->CurrentSample().TouchRadius());
 
             float lambda = .02f;
-            if(cluster->_meanTouchRadius == 0.0f)
+            if (cluster->_meanTouchRadius == 0.0f)
             {
                 lambda = 1.0f;
             }
@@ -659,7 +665,7 @@ void  Cluster::RemoveOldTouches(double cutoffTime)
 {
     auto copy = _touchIds;
 
-    BOOST_FOREACH(core::TouchId touchId, copy)
+    for (core::TouchId touchId:copy)
     {
         DebugAssert(_touchData.count(touchId));
 
@@ -667,7 +673,7 @@ void  Cluster::RemoveOldTouches(double cutoffTime)
         if (touch->IsPhaseEndedOrCancelled())
         {
             double endedTime = touch->LastTimestamp();
-            if(endedTime < cutoffTime &&
+            if (endedTime < cutoffTime &&
                (! _commonData->proxy->IsReclassifiable(_touchLog->TouchWithId(touchId), _touchLog->Stroke(touchId))))
             {
                 RemoveTouch(touchId);
@@ -683,7 +689,7 @@ float Cluster::TotalLength() const
 {
     float totalLength = 0.0f;
 
-    BOOST_FOREACH(core::TouchId touchId, _touchIds)
+    for (core::TouchId touchId:_touchIds)
     {
         DebugAssert(_touchData.count(touchId));
         totalLength += _touchData.at(touchId)->Stroke()->ArcLength();
@@ -697,7 +703,7 @@ Eigen::Vector2f Cluster::CenterOfMass() const
     float totalMass = 0.0f;
     Vector2f center = Vector2f::Zero();
 
-    BOOST_FOREACH(core::TouchId touchId, _touchIds)
+    for (core::TouchId touchId:_touchIds)
     {
         Stroke::Ptr const & stroke = _touchData.at(touchId)->Stroke();
         float weight = stroke->Size();
@@ -718,7 +724,7 @@ int Cluster::PointCount() const
 {
     int N = 0;
 
-    BOOST_FOREACH(core::TouchId touchId, _touchIds)
+    for (core::TouchId touchId:_touchIds)
     {
         Stroke::Ptr const & stroke = _commonData->proxy->ClusterTracker()->Stroke(touchId);
         N += stroke->Size();
@@ -728,9 +734,9 @@ int Cluster::PointCount() const
 
 bool ClusterTracker::IsEndpoint(Cluster::Ptr const & cluster)
 {
-    std::vector<Cluster::Ptr> orderedClusters = FastOrderedClusters();
+    vector<Cluster::Ptr> orderedClusters = FastOrderedClusters();
 
-    if(orderedClusters.empty())
+    if (orderedClusters.empty())
     {
         return false;
     }
@@ -750,11 +756,11 @@ void ClusterTracker::RemoveTouchFromClassification(core::TouchId touchId)
         std::cerr << "\nREMOVE FROM CLASSIFICATION: " << touchId;
     }
 
-    if(cluster)
+    if (cluster)
     {
         cluster->RemoveTouch(touchId);
 
-        if(cluster->_touchIds.empty())
+        if (cluster->_touchIds.empty())
         {
             cluster->_clusterTouchType = TouchClassification::RemovedFromClassification;
             _currentEventActiveClusters.erase(cluster);
@@ -771,12 +777,12 @@ void ClusterTracker::RemoveTouchFromClassification(core::TouchId touchId)
 Cluster::Ptr ClusterTracker::ClusterOfTypeForPenDownEvent(TouchClassification touchType, PenEventId probeEvent)
 {
 
-    BOOST_FOREACH(IdClusterPtrPair const & pair, _clusters)
+    for (IdClusterPtrPair const & pair:_clusters)
     {
-        if(pair.second->_clusterTouchType == touchType)
+        if (pair.second->_clusterTouchType == touchType)
         {
 
-            BOOST_FOREACH(TouchId touchId, pair.second->_touchIds)
+            for (TouchId touchId:pair.second->_touchIds)
             {
 
                 PenEventId bestEvent = _commonData->proxy->PenEventClassifier()->BestPenDownEventForTouch(touchId);
@@ -792,16 +798,18 @@ Cluster::Ptr ClusterTracker::ClusterOfTypeForPenDownEvent(TouchClassification to
     return Cluster::Ptr();
 }
 
-std::vector<Cluster::Ptr> ClusterTracker::ConcurrentClusters(Cluster::Ptr const & probe, float temporalPadding)
+vector<Cluster::Ptr> ClusterTracker::ConcurrentClusters(Cluster::Ptr const & probe, float temporalPadding)
 {
 
-    std::vector<Cluster::Ptr> concurrent;
+    vector<Cluster::Ptr> concurrent;
 
     ClusterId otherId;
     Cluster::Ptr otherCluster;
-    BOOST_FOREACH(tie(otherId, otherCluster), _clusters)
+    for (const auto & pair : _clusters)
     {
-        if((otherId != probe->_id) && probe->ConcurrentWith(otherCluster, temporalPadding))
+        tie(otherId, otherCluster) = pair;
+
+        if ((otherId != probe->_id) && probe->ConcurrentWith(otherCluster, temporalPadding))
         {
             concurrent.push_back(otherCluster);
         }
@@ -810,16 +818,18 @@ std::vector<Cluster::Ptr> ClusterTracker::ConcurrentClusters(Cluster::Ptr const 
     return concurrent;
 }
 
-std::vector<Cluster::Ptr> ClusterTracker::ConcurrentClusters(Cluster::Ptr const & probe, bool useStaleInterval)
+vector<Cluster::Ptr> ClusterTracker::ConcurrentClusters(Cluster::Ptr const & probe, bool useStaleInterval)
 {
 
-    std::vector<Cluster::Ptr> concurrent;
+    vector<Cluster::Ptr> concurrent;
 
     ClusterId otherId;
     Cluster::Ptr otherCluster;
-    BOOST_FOREACH(tie(otherId, otherCluster), _clusters)
+    for (const auto & pair : _clusters)
     {
-        if((otherId != probe->_id) && probe->ConcurrentWith(otherCluster, useStaleInterval))
+        tie(otherId, otherCluster) = pair;
+
+        if ((otherId != probe->_id) && probe->ConcurrentWith(otherCluster, useStaleInterval))
         {
             concurrent.push_back(otherCluster);
         }
@@ -839,10 +849,10 @@ Eigen::MatrixXf ClusterTracker::DistanceMatrix(std::set<Cluster::Ptr> const & cl
     int n = 0;
 
     // This matrix is small so I didn't bother exploiting symmetry in the loop.
-    BOOST_FOREACH(Cluster::Ptr const & row, clusters)
+    for (Cluster::Ptr const & row:clusters)
     {
         n=0;
-        BOOST_FOREACH(Cluster::Ptr const & col, clusters)
+        for (Cluster::Ptr const & col:clusters)
         {
 
             Vector2f p = row->_center;
@@ -857,17 +867,17 @@ Eigen::MatrixXf ClusterTracker::DistanceMatrix(std::set<Cluster::Ptr> const & cl
     return D;
 }
 
-std::vector<Cluster::Ptr> ClusterTracker::FastOrderedClusters()
+vector<Cluster::Ptr> ClusterTracker::FastOrderedClusters()
 {
 
-    if(_needComputeClusterOrder)
+    if (_needComputeClusterOrder)
     {
 
         int N = (int) _currentEventActiveClusters.size();
 
-        std::vector<Cluster::Ptr> bestOrder;
+        vector<Cluster::Ptr> bestOrder;
 
-        if(N <= 6)
+        if (N <= 6)
         {
             bestOrder = ExactOrderedClusters(_currentEventActiveClusters);
         }
@@ -879,7 +889,7 @@ std::vector<Cluster::Ptr> ClusterTracker::FastOrderedClusters()
 
             Eigen::MatrixXf D = DistanceMatrix(_currentEventActiveClusters);
 
-            std::list<int> bestPath;
+            list<int> bestPath;
             float          bestPathLength = std::numeric_limits<float>::max();
 
             for (int start = 1; start<N; start++)
@@ -888,12 +898,13 @@ std::vector<Cluster::Ptr> ClusterTracker::FastOrderedClusters()
                 {
                     // the int's in these lists represent active clusters in the order
                     // in which they appear in _currentEventActiveClusters
-                    std::list<int> path;
-                    std::list<int> freeList;
+                    list<int> path;
+                    list<int> freeList;
 
                     for (int j=0; j<N; j++)
                     {
-                        if (j != start && j != finish) {
+                        if (j != start && j != finish)
+                        {
                             freeList.push_back(j);
                         }
                     }
@@ -907,16 +918,16 @@ std::vector<Cluster::Ptr> ClusterTracker::FastOrderedClusters()
                     for (int k=0; k<N-2; k++)
                     {
                         float dFurthest = 0.0f;
-                        std::list<int>::iterator furthestNode;
-                        std::list<int>::iterator currentNode;
+                        list<int>::iterator furthestNode;
+                        list<int>::iterator currentNode;
 
                         // first, find the guy in freeList whose nearest neighbor in path
                         // lies furthest away
                         for (currentNode = freeList.begin(); currentNode != freeList.end(); currentNode++)
                         {
-                            for(std::list<int>::iterator it = path.begin(); it != path.end(); it++)
+                            for (list<int>::iterator it = path.begin(); it != path.end(); it++)
                             {
-                                if(D(*it, *currentNode) > dFurthest)
+                                if (D(*it, *currentNode) > dFurthest)
                                 {
                                     dFurthest    = D(*it, *currentNode);
                                     furthestNode = currentNode;
@@ -928,16 +939,16 @@ std::vector<Cluster::Ptr> ClusterTracker::FastOrderedClusters()
                         float dBest = std::numeric_limits<float>::max();
 
                         // we'll try to insert him between node1 and node2 and compute the arc length
-                        std::list<int>::iterator bestLocation;
-                        std::list<int>::iterator node1 = path.begin();
-                        std::list<int>::iterator node2 = path.begin();
+                        list<int>::iterator bestLocation;
+                        list<int>::iterator node1 = path.begin();
+                        list<int>::iterator node2 = path.begin();
                         node2++;
 
                         for (; node2 != path.end(); node2++, node1++)
                         {
 
                             float d_total = D(*furthestNode, *node1) + D(*furthestNode, *node2);
-                            if(d_total < dBest)
+                            if (d_total < dBest)
                             {
                                 dBest         = d_total;
                                 bestLocation  = node2;
@@ -949,15 +960,15 @@ std::vector<Cluster::Ptr> ClusterTracker::FastOrderedClusters()
                     }
 
                     float pathLength = 0.0f;
-                    std::list<int>::iterator node1 = path.begin();
-                    std::list<int>::iterator node2 = path.begin();
+                    list<int>::iterator node1 = path.begin();
+                    list<int>::iterator node2 = path.begin();
 
                     for (std::advance(node2,1); node2 != path.end(); node2++, node1++)
                     {
                         pathLength += D(*node1, *node2);
                     }
 
-                    if(pathLength < bestPathLength)
+                    if (pathLength < bestPathLength)
                     {
                         bestPathLength   = pathLength;
                         bestPath         = path;
@@ -968,13 +979,13 @@ std::vector<Cluster::Ptr> ClusterTracker::FastOrderedClusters()
                 }
             }  // END OUTER LOOP
 
-            std::vector<Cluster::Ptr> activeClusters;
-            BOOST_FOREACH(Cluster::Ptr const & cluster, _currentEventActiveClusters)
+            vector<Cluster::Ptr> activeClusters;
+            for (Cluster::Ptr const & cluster:_currentEventActiveClusters)
             {
                 activeClusters.push_back(cluster);
             }
 
-            BOOST_FOREACH(int index, bestPath)
+            for (int index:bestPath)
             {
                 bestOrder.push_back(activeClusters[index]);
             }
@@ -985,7 +996,6 @@ std::vector<Cluster::Ptr> ClusterTracker::FastOrderedClusters()
 
         _needComputeClusterOrder = false;
         _orderedClustersCache    = bestOrder;
-
     }
 
     return _orderedClustersCache;
@@ -997,31 +1007,30 @@ void ClusterTracker::MarkInteriorClusters()
     // don't bother marking ended pens.  they shouldn't get marked in the first place
     // and they make the calculation slow if we run the shortest-curve stuff.
     std::set<Cluster::Ptr> clusters;
-    BOOST_FOREACH(Cluster::Ptr const & cluster, _currentEventActiveClusters)
+    for (Cluster::Ptr const & cluster:_currentEventActiveClusters)
     {
-        if(! (cluster->IsPenType() && cluster->AllTouchesEnded()))
+        if (! (cluster->IsPenType() && cluster->AllTouchesEnded()))
         {
             clusters.insert(cluster);
         }
 
-        if(! cluster->AllTouchesEnded())
+        if (! cluster->AllTouchesEnded())
         {
             cluster->_endedPenDirectionScore = CurrentEventStatistics()->_endedPenDirectionScore;
         }
-
     }
 
-    if(clusters.size() > 6)
+    if (clusters.size() > 6)
     {
         return;
     }
 
-    std::vector<Cluster::Ptr> orderedClusters = _commonData->proxy->PenTracker()->CopyInPenToPalmOrder(ExactOrderedClusters(clusters));
+    vector<Cluster::Ptr> orderedClusters = _commonData->proxy->PenTracker()->CopyInPenToPalmOrder(ExactOrderedClusters(clusters));
 
     for (int j=1; j<int(orderedClusters.size())-1; j++)
     {
         Cluster::Ptr const & cluster = orderedClusters[j];
-        if(cluster->_edgeThumbState != EdgeThumbState::NotThumb)
+        if (cluster->_edgeThumbState != EdgeThumbState::NotThumb)
         {
             continue;
         }
@@ -1029,7 +1038,7 @@ void ClusterTracker::MarkInteriorClusters()
         cluster->_wasInterior = true;
     }
 
-    if(orderedClusters.size() > 1)
+    if (orderedClusters.size() > 1)
     {
         Cluster::Ptr p = orderedClusters.front();
         Cluster::Ptr q = orderedClusters.back();
@@ -1047,30 +1056,30 @@ void ClusterTracker::MarkInteriorClusters()
 // this gives a nice curve joining them.  we can basically ignore
 // any touches in the interior since the pen cluster is always an endpoint.
 // with only a handful of touches, brute-force performance is fine.
-std::vector<Cluster::Ptr> ClusterTracker::ExactOrderedClusters(std::set<Cluster::Ptr> const & clusters)
+vector<Cluster::Ptr> ClusterTracker::ExactOrderedClusters(std::set<Cluster::Ptr> const & clusters)
 {
 
     Eigen::MatrixXf D = DistanceMatrix(clusters);
 
     int N = (int) clusters.size();
 
-    std::vector<Cluster::Ptr> bestPerm;
-    std::vector<Cluster::Ptr> allClusters;
+    vector<Cluster::Ptr> bestPerm;
+    vector<Cluster::Ptr> allClusters;
 
     // the algorithm permutes these int's, which index into allClusters.
-    std::vector<int> positions;
-    std::vector<int> bestPositions(N);
+    vector<int> positions;
+    vector<int> bestPositions(N);
     int index = 0;
-    BOOST_FOREACH(Cluster::Ptr const & cluster, clusters)
+    for (Cluster::Ptr const & cluster:clusters)
     {
         allClusters.push_back(cluster);
         positions.push_back(index);
         index++;
     }
 
-    if(N <= 2)
+    if (N <= 2)
     {
-        BOOST_FOREACH(Cluster::Ptr const & cluster, allClusters)
+        for (Cluster::Ptr const & cluster:allClusters)
         {
             bestPerm.push_back(cluster);
         }
@@ -1079,7 +1088,8 @@ std::vector<Cluster::Ptr> ClusterTracker::ExactOrderedClusters(std::set<Cluster:
 
     float d_best = std::numeric_limits<float>::max();
 
-    do {
+    do
+    {
 
         float d_curr = 0.0f;
         for (int j=0; j<N-1; j++)
@@ -1087,7 +1097,7 @@ std::vector<Cluster::Ptr> ClusterTracker::ExactOrderedClusters(std::set<Cluster:
             d_curr += D(positions[j], positions[j+1]);
         }
 
-        if(d_curr < d_best)
+        if (d_curr < d_best)
         {
             bestPositions  = positions;
             d_best         = d_curr;
@@ -1104,14 +1114,14 @@ std::vector<Cluster::Ptr> ClusterTracker::ExactOrderedClusters(std::set<Cluster:
 
 }
 
-std::vector<core::TouchId> ClusterTracker::TouchesForCurrentClusters(bool activeClustersOnly)
+vector<core::TouchId> ClusterTracker::TouchesForCurrentClusters(bool activeClustersOnly)
 {
-    std::vector<core::TouchId> touchIds;
+    vector<core::TouchId> touchIds;
 
-    BOOST_FOREACH(IdClusterPtrPair const & pair, _clusters)
+    for (IdClusterPtrPair const & pair:_clusters)
     {
 
-        if(activeClustersOnly && pair.second->Stale())
+        if (activeClustersOnly && pair.second->Stale())
         {
             continue;
         }
@@ -1133,7 +1143,7 @@ Cluster::Ptr ClusterTracker::NewClusterForTouch(TouchId touchId)
 {
     Cluster::Ptr oldCluster = _touchLog->Cluster(touchId);
 
-    if(oldCluster)
+    if (oldCluster)
     {
         oldCluster->RemoveTouch(touchId);
     }
@@ -1144,7 +1154,7 @@ Cluster::Ptr ClusterTracker::NewClusterForTouch(TouchId touchId)
 
     _touchLog->Data(touchId)->SetCluster(newCluster);
 
-    for(int j=0; j<stroke->Size(); j++)
+    for (int j=0; j<stroke->Size(); j++)
     {
         AddPointToCluster(stroke->XY(j), stroke->AbsoluteTimestamp(j), newCluster, touchId);
     }
@@ -1155,13 +1165,13 @@ Cluster::Ptr ClusterTracker::NewClusterForTouch(TouchId touchId)
 
 void ClusterTracker::UpdateEventStatistics()
 {
-    BOOST_FOREACH(core::TouchId touchId, _touchLog->ActiveIds())
+    for (core::TouchId touchId:_touchLog->ActiveIds())
     {
-        if(_touchLog->Phase(touchId) == TouchPhase::Ended)
+        if (_touchLog->Phase(touchId) == TouchPhase::Ended)
         {
             TouchClassification type = _commonData->proxy->CurrentClass(touchId);
 
-            if(type == TouchClassification::Pen || type == TouchClassification::Eraser)
+            if (type == TouchClassification::Pen || type == TouchClassification::Eraser)
             {
                 _currentEventStatistics->_endedPenCount++;
                 _currentEventStatistics->_endedPenSmoothLength += _touchLog->Stroke(touchId)->Statistics()->_smoothLength;
@@ -1174,7 +1184,7 @@ void ClusterTracker::UpdateEventStatistics()
                 float trackingConfidence = sepConfidence * dirChangeScore;
                 float isCorrectEnd       = penTracker->AtPenEnd(_touchLog->Cluster(touchId), FastOrderedClusters(), true);
 
-                if(trackingConfidence > .5f && isCorrectEnd != 1.0f)
+                if (trackingConfidence > .5f && isCorrectEnd != 1.0f)
                 {
                     isCorrectEnd       = penTracker->AtPenEnd(_touchLog->Cluster(touchId), FastOrderedClusters(), true);
                 }
@@ -1182,7 +1192,7 @@ void ClusterTracker::UpdateEventStatistics()
                 _currentEventStatistics->_endedPenDirectionScore += trackingConfidence * 2.0f * (isCorrectEnd - .5f);
 
             }
-            else if(type == TouchClassification::Palm)
+            else if (type == TouchClassification::Palm)
             {
                 _currentEventStatistics->_endedPalmCount++;
                 _currentEventStatistics->_endedPalmSmoothLength += _touchLog->Stroke(touchId)->Statistics()->_smoothLength;
@@ -1198,24 +1208,24 @@ float ClusterTracker::NearestEndedPenDistance(Eigen::Vector2f p)
     Cluster::Ptr   best;
     float d2Best = std::numeric_limits<float>::max();
 
-    BOOST_FOREACH(Cluster::Ptr const & cluster, _currentEventActiveClusters)
+    for (Cluster::Ptr const & cluster:_currentEventActiveClusters)
     {
         bool isPen = cluster->IsPenType() || cluster->IsFingerType();
 
-        if((! isPen) || cluster->_closedToNewTouches)
+        if ((! isPen) || cluster->_closedToNewTouches)
         {
             continue;
         }
 
         float d2 = (cluster->_center - p).squaredNorm();
-        if(d2 < d2Best)
+        if (d2 < d2Best)
         {
             best = cluster;
             d2Best = d2;
         }
     }
 
-    if(! best)
+    if (! best)
     {
         return std::numeric_limits<float>::max();
     }
@@ -1229,7 +1239,7 @@ float ClusterTracker::NearestEndedPenDistance(Eigen::Vector2f p)
 float ClusterTracker::NearestActiveClusterDistance(Eigen::Vector2f p)
 {
     Cluster::Ptr cluster = NearestActiveCluster(p);
-    if(! cluster)
+    if (! cluster)
     {
         return std::numeric_limits<float>::max();
     }
@@ -1240,16 +1250,16 @@ float ClusterTracker::NearestActiveClusterDistance(Eigen::Vector2f p)
 }
 
 // strictly speaking there could be more than one
-std::vector<Cluster::Ptr> ClusterTracker::NonEndedPenClusters()
+vector<Cluster::Ptr> ClusterTracker::NonEndedPenClusters()
 {
-    std::vector<Cluster::Ptr> pens;
+    vector<Cluster::Ptr> pens;
 
-    BOOST_FOREACH(Cluster::Ptr const & cluster, _currentEventActiveClusters)
+    for (Cluster::Ptr const & cluster:_currentEventActiveClusters)
     {
-        if(cluster->IsPenType() && (! cluster->_touchIds.empty()))
+        if (cluster->IsPenType() && (! cluster->_touchIds.empty()))
         {
             auto touch = _touchLog->TouchWithId(cluster->_touchIds.back());
-            if(touch && (! touch->IsPhaseEndedOrCancelled()))
+            if (touch && (! touch->IsPhaseEndedOrCancelled()))
             {
                 pens.push_back(cluster);
             }
@@ -1263,7 +1273,7 @@ void ClusterTracker::TouchesChanged(const std::set<core::Touch::Ptr> & touches)
     _touchLog->TouchesChanged(touches);
 
     // iOS cancelled all the touches, because an alert popped up, phone call, etc.
-    if(_touchLog->AllCancelledFlag())
+    if (_touchLog->AllCancelledFlag())
     {
         ForceAllClustersStale(CurrentTime());
 
@@ -1282,7 +1292,7 @@ void ClusterTracker::UpdateClusters()
 
     UpdateEventStatistics();
 
-    BOOST_FOREACH(core::TouchId touchId, _touchLog->ActiveIds())
+    for (core::TouchId touchId:_touchLog->ActiveIds())
     {
 
         Stroke::Ptr stroke = _commonData->proxy->ClusterTracker()->Stroke(touchId);
@@ -1300,7 +1310,7 @@ void ClusterTracker::UpdateClusters()
             const float dMax = 150.0f;
 
             bool nearestWasPen = false;
-            if(nearestCluster)
+            if (nearestCluster)
             {
 
                 float dPen = NearestEndedPenDistance(q);
@@ -1315,7 +1325,7 @@ void ClusterTracker::UpdateClusters()
                 }
             }
 
-            if(! nearestCluster)
+            if (! nearestCluster)
             {
                 useCluster = NewCluster(q, CurrentTime(), _commonData->proxy->TouchTypeForNewCluster());
             }
@@ -1323,7 +1333,7 @@ void ClusterTracker::UpdateClusters()
             {
                 float d2 = (nearestCluster->_center - q).squaredNorm();
 
-                if( (d2 > (dMax * dMax)) && (_currentEventActiveClusters.size() < 6 || nearestWasPen))
+                if ( (d2 > (dMax * dMax)) && (_currentEventActiveClusters.size() < 6 || nearestWasPen))
                 {
                     useCluster = NewCluster(q, CurrentTime(), _commonData->proxy->TouchTypeForNewCluster());
                 }
@@ -1337,7 +1347,7 @@ void ClusterTracker::UpdateClusters()
             _touchLog->Data(touchId)->SetCluster(useCluster);
 
             DebugAssert(useCluster);
-            for(int j=0; j<stroke->Size(); j++)
+            for (int j=0; j<stroke->Size(); j++)
             {
                 AddPointToCluster(stroke->XY(j), stroke->AbsoluteTimestamp(j), useCluster, touchId);
             }
@@ -1370,13 +1380,13 @@ void ClusterTracker::RemoveUnusedTouches()
     // classification hang around long past their useful life.
     // this loop removes anobody who ended long before the oldest reclassifiable touch arrived.
     TouchId oldestId  = _touchLog->OldestReclassifiableTouch();
-    if(oldestId != InvalidTouchId())
+    if (oldestId != InvalidTouchId())
     {
         auto touch = _touchLog->TouchWithId(oldestId);
-        if(touch)
+        if (touch)
         {
             double cutoffTime = touch->FirstSample().TimestampSeconds() - _commonData->proxy->PenEventClassifier()->IrrelevancyTimeWindow();
-            BOOST_FOREACH(IdClusterPtrPair const & pair, _clusters)
+            for (IdClusterPtrPair const & pair:_clusters)
             {
                 pair.second->RemoveOldTouches(cutoffTime);
             }
