@@ -21,7 +21,6 @@
 		0416CAC718A42B51004EAC00 /* PenEvents.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0416CAAA18A42B51004EAC00 /* PenEvents.cpp */; };
 		0416CAC818A42B51004EAC00 /* Performance.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0416CAAC18A42B51004EAC00 /* Performance.cpp */; };
 		0416CAC918A42B51004EAC00 /* Playback.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0416CAAE18A42B51004EAC00 /* Playback.cpp */; };
-		0416CACA18A42B51004EAC00 /* Quadrature.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0416CAB018A42B51004EAC00 /* Quadrature.cpp */; };
 		0416CACB18A42B51004EAC00 /* Screen.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0416CAB218A42B51004EAC00 /* Screen.cpp */; };
 		0416CACC18A42B51004EAC00 /* Stroke.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0416CAB418A42B51004EAC00 /* Stroke.cpp */; };
 		0416CACD18A42B51004EAC00 /* TouchLogger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0416CAB618A42B51004EAC00 /* TouchLogger.cpp */; };
@@ -85,7 +84,6 @@
 		0416CAAD18A42B51004EAC00 /* Performance.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Performance.h; sourceTree = "<group>"; };
 		0416CAAE18A42B51004EAC00 /* Playback.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Playback.cpp; sourceTree = "<group>"; };
 		0416CAAF18A42B51004EAC00 /* Playback.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Playback.h; sourceTree = "<group>"; };
-		0416CAB018A42B51004EAC00 /* Quadrature.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Quadrature.cpp; sourceTree = "<group>"; };
 		0416CAB118A42B51004EAC00 /* Quadrature.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Quadrature.h; sourceTree = "<group>"; };
 		0416CAB218A42B51004EAC00 /* Screen.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Screen.cpp; sourceTree = "<group>"; };
 		0416CAB318A42B51004EAC00 /* Screen.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Screen.h; sourceTree = "<group>"; };
@@ -203,7 +201,6 @@
 				0416CAAD18A42B51004EAC00 /* Performance.h */,
 				0416CAAE18A42B51004EAC00 /* Playback.cpp */,
 				0416CAAF18A42B51004EAC00 /* Playback.h */,
-				0416CAB018A42B51004EAC00 /* Quadrature.cpp */,
 				0416CAB118A42B51004EAC00 /* Quadrature.h */,
 				0416CAB218A42B51004EAC00 /* Screen.cpp */,
 				0416CAB318A42B51004EAC00 /* Screen.h */,
@@ -447,7 +444,6 @@
 				3C2F9C411780802600A5FFBC /* FTServiceClient.m in Sources */,
 				3C2F9C441780A7BA00A5FFBC /* FTPenUsageServiceClient.m in Sources */,
 				0416CABF18A42B51004EAC00 /* FiniteDifferences.cpp in Sources */,
-				0416CACA18A42B51004EAC00 /* Quadrature.cpp in Sources */,
 				04E99BEC18BFE53500BC4DCB /* FTTrialSeparationMonitor.mm in Sources */,
 				3C404F7B1784C5A200EB7B9A /* FTError.m in Sources */,
 				3CC31DF417933C5F002CD4FB /* TKEvent.m in Sources */,

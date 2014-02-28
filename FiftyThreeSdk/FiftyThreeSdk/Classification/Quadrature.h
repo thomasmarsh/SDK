@@ -10,13 +10,15 @@
 #include "Core/Eigen.h"
 #include "FiftyThreeSdk/Classification//EigenLAB.h"
 
-namespace fiftythree {
-namespace sdk {
-
+namespace fiftythree
+{
+namespace sdk
+{
 // Integrate via Trapezoid rule
 template <typename T>
-T TrapezoidRule(const Eigen::Matrix<T, Eigen::Dynamic, 1> &x,
-                const Eigen::Matrix<T, Eigen::Dynamic, 1> &y) {
+T TrapezoidRule(const Eigen::Matrix<T, Eigen::Dynamic, 1> & x,
+                const Eigen::Matrix<T, Eigen::Dynamic, 1> & y)
+{
 
     int N = x.size();
     DebugAssert( N == y.size() );
@@ -32,19 +34,21 @@ T TrapezoidRule(const Eigen::Matrix<T, Eigen::Dynamic, 1> &x,
 
 // Overloading for std:vector
 template <typename T>
-T TrapezoidRule(const std::vector<T> &x,
-                const std::vector<T> &y) {
+T TrapezoidRule(const std::vector<T> & x,
+                const std::vector<T> & y)
+{
 
-    Eigen::Map< Eigen::Matrix<T, Eigen::Dynamic, 1> > xMap((T*) &x[0], x.size());
+    Eigen::Map<Eigen::Matrix<T, Eigen::Dynamic, 1>> xMap((T*) &x[0], x.size());
 
-    Eigen::Map< Eigen::Matrix<T, Eigen::Dynamic, 1> > yMap((T*) &y[0], y.size());
+    Eigen::Map<Eigen::Matrix<T, Eigen::Dynamic, 1>> yMap((T*) &y[0], y.size());
 
     return TrapezoidRule<T>(xMap, yMap);
 }
 
 // Return weights for Trapezoid rule
 template <typename T>
-Eigen::Matrix<T, Eigen::Dynamic, 1> TrapezoidRuleWeights(const Eigen::Matrix<T, Eigen::Dynamic, 1> &x) {
+Eigen::Matrix<T, Eigen::Dynamic, 1> TrapezoidRuleWeights(const Eigen::Matrix<T, Eigen::Dynamic, 1> & x)
+{
 
     Eigen::Matrix<T, Eigen::Dynamic, 1> weights;
     size_t N = x.size();
@@ -65,19 +69,18 @@ Eigen::Matrix<T, Eigen::Dynamic, 1> TrapezoidRuleWeights(const Eigen::Matrix<T, 
 
 // Overloading for std:vector
 template <typename T>
-std::vector<T> TrapezoidRuleWeights(const std::vector<T> &x) {
-
+std::vector<T> TrapezoidRuleWeights(const std::vector<T> & x)
+{
     int N = x.size();
-    Eigen::Map< Eigen::Matrix<T, Eigen::Dynamic, 1> > xMap((T*) &x[0], N);
+    Eigen::Map<Eigen::Matrix<T, Eigen::Dynamic, 1>> xMap((T*) &x[0], N);
 
     std::vector<T> output(N);
 
-    Eigen::Map< Eigen::Matrix<T, Eigen::Dynamic, 1> > outputMap((T*) &output[0], N);
+    Eigen::Map<Eigen::Matrix<T, Eigen::Dynamic, 1>> outputMap((T*) &output[0], N);
 
     outputMap = TrapezoidRuleWeights<T>(xMap);
 
     return output;
 }
-
 }
 }
