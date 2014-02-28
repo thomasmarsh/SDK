@@ -59,7 +59,6 @@
 		0416CA8E18A42B51004EAC00 /* Cluster.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Cluster.cpp; sourceTree = "<group>"; };
 		0416CA8F18A42B51004EAC00 /* Cluster.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Cluster.h; sourceTree = "<group>"; };
 		0416CA9018A42B51004EAC00 /* CommonDeclarations.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CommonDeclarations.h; sourceTree = "<group>"; };
-		0416CA9118A42B51004EAC00 /* CommonDeclarationsCurves.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CommonDeclarationsCurves.h; sourceTree = "<group>"; };
 		0416CA9218A42B51004EAC00 /* CubicPolynomial.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = CubicPolynomial.hpp; sourceTree = "<group>"; };
 		0416CA9318A42B51004EAC00 /* DataStream.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = DataStream.hpp; sourceTree = "<group>"; };
 		0416CA9418A42B51004EAC00 /* Debug.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Debug.cpp; sourceTree = "<group>"; };
@@ -179,7 +178,6 @@
 				0416CA8E18A42B51004EAC00 /* Cluster.cpp */,
 				0416CA8F18A42B51004EAC00 /* Cluster.h */,
 				0416CA9018A42B51004EAC00 /* CommonDeclarations.h */,
-				0416CA9118A42B51004EAC00 /* CommonDeclarationsCurves.h */,
 				0416CA9218A42B51004EAC00 /* CubicPolynomial.hpp */,
 				0416CA9318A42B51004EAC00 /* DataStream.hpp */,
 				0416CA9418A42B51004EAC00 /* Debug.cpp */,
