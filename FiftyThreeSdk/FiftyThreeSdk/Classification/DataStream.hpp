@@ -7,13 +7,6 @@
 
 #pragma once
 
-//
-//  Stroke.h
-//  PathInterpolation
-//
-//  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
-//
-
 #include "Core/Enum.h"
 #include "Core/Memory.h"
 #include "FiftyThreeSdk/Classification/CommonDeclarations.h"
@@ -35,7 +28,6 @@ class DataStream
 {
 
 public:
-
     typedef std::vector<DataType> ContainerType;
 
     typedef DataStream<DataType> Stream;
@@ -43,7 +35,7 @@ public:
 
 protected:
 
-    ContainerType      _data;
+    ContainerType _data;
     std::vector<float> _relativeTimestamp;
 
     // make a special case for the most recent.  every so often the float conversion
@@ -75,14 +67,11 @@ public:
 
     std::vector<DataType> ValuesAtTimes(std::vector<float> const & t)
     {
-
         return Interp< std::vector<DataType> >(&(_relativeTimestamp[0]), _data, &(t[0]), _relativeTimestamp.size(), t.size());
-
     }
 
     void AddPoint(DataType value, double timestamp)
     {
-
         if (_data.empty() && _t0 < 0.0)
         {
             _t0 = timestamp;
@@ -92,35 +81,30 @@ public:
 
         _data.push_back(value);
         _relativeTimestamp.push_back(timestamp - _t0);
-
     }
 
     CubicPolynomial<DataType> ReverseExtrapolatingSegment(int order = 3) const
     {
-
         DebugAssert(Size() >= 2);
 
         DebugAssert(order >= 1 && order <= 3);
 
         int pointCount = std::min(int(Size()), order + 1);
 
-        switch (pointCount) {
+        switch (pointCount)
+        {
             case 0:
-
                 return CubicPolynomial<DataType>();
                 break;
 
             case 1:
             {
-
                 return CubicPolynomial<DataType>::Constant(Data(0));
                 break;
-
             }
 
             case 2:
             {
-
                 DataType p0   = Data(1);
                 double   absoluteT0    = AbsoluteTimestamp(1);
                 float    t0   = 0;
@@ -129,15 +113,12 @@ public:
                 float    t1   = absoluteT0 - AbsoluteTimestamp(0);
 
                 return CubicPolynomial<DataType>::LineWithValuesAtTimes(p0, p1, t0, t1);
-
                 break;
-
             }
 
             case 3:
             default:
             {
-
                 DataType p0   = Data(2);
                 double   absoluteT0    = AbsoluteTimestamp(2);
                 float    t0   = 0;
@@ -149,82 +130,67 @@ public:
                 float    t2   = absoluteT0 - AbsoluteTimestamp(0);
 
                 return CubicPolynomial<DataType>::QuadraticWithValuesAtTimes(p0, p1, p2, t0, t1, t2);
-
                 break;
-
             }
         }
-
     }
 
     CubicPolynomial<DataType> ExtrapolatingSegment(int order = 3) const
     {
-
         DebugAssert(Size() >= 2);
 
         DebugAssert(order >= 1 && order <= 3);
 
         int pointCount = std::min(int(Size()), order + 1);
 
-        switch (pointCount) {
+        switch (pointCount)
+        {
             case 0:
-
+            {
                 return CubicPolynomial<DataType>();
                 break;
-
+            }
             case 1:
             {
-
                 return CubicPolynomial<DataType>::Constant(Data(0));
                 break;
-
             }
-
             case 2:
             {
+                DataType p0 = ReverseData(1);
+                double absoluteT0 = ReverseAbsoluteTimestamp(1);
+                float  t0 = 0;
 
-                DataType p0   = ReverseData(1);
-                double   absoluteT0    = ReverseAbsoluteTimestamp(1);
-                float    t0   = 0;
-
-                DataType p1   = ReverseData(0);
-                float    t1   = ReverseAbsoluteTimestamp(0) - absoluteT0;
+                DataType p1 = ReverseData(0);
+                float t1 = ReverseAbsoluteTimestamp(0) - absoluteT0;
 
                 return CubicPolynomial<DataType>::LineWithValuesAtTimes(p0, p1, t0, t1);
 
                 break;
-
             }
-
             case 3:
             default:
             {
+                DataType p0 = ReverseData(2);
+                double absoluteT0 = ReverseAbsoluteTimestamp(2);
+                float t0 = 0;
 
-                DataType p0   = ReverseData(2);
-                double   absoluteT0    = ReverseAbsoluteTimestamp(2);
-                float    t0   = 0;
+                DataType p1 = ReverseData(1);
+                float t1 = ReverseAbsoluteTimestamp(1) - absoluteT0;
 
-                DataType p1   = ReverseData(1);
-                float    t1   = ReverseAbsoluteTimestamp(1) - absoluteT0;
-
-                DataType p2   = ReverseData(0);
-                float    t2   = ReverseAbsoluteTimestamp(0) - absoluteT0;
+                DataType p2 = ReverseData(0);
+                float t2 = ReverseAbsoluteTimestamp(0) - absoluteT0;
 
                 return CubicPolynomial<DataType>::QuadraticWithValuesAtTimes(p0, p1, p2, t0, t1, t2);
-
                 break;
-
             }
         }
-
     }
 
     void AppendWithRelativeTimestamps(std::vector<DataType> const & inData, std::vector<float> const & inTimes)
     {
-
         _data.insert(_data.end(), inData.begin(), inData.end());
         _relativeTimestamp.insert(_relativeTimestamp.end(), inData.begin(), inData.end());
-
     }
 
     // this returns bogus values for the timestamps -- the first appended point
@@ -244,24 +210,21 @@ public:
         float lastRelativeTime = LastRelativeTimestamp();
         for (size_t j=other.Size(); j--; index++)
         {
-
             float newRelativeTime = (lastRelativeTime + initialDt) + (other.RelativeTimestamp(index) - other.RelativeTimestamp(0));
-
             AddPoint(other.Data(index), double(newRelativeTime) + _t0);
-
         }
     }
 
     void Clear() { _data.clear(); _relativeTimestamp.clear(); }
 
-    DataType      LastData() const
+    DataType LastData() const
     {
         return Data(LastValidIndex());
     }
 
     // "slow" accessors which do range-checking.
     // they return zeros when the _data is empty.
-    DataType            Data(int idx) const
+    DataType Data(int idx) const
     {
         if (_data.empty())
         {
@@ -273,19 +236,18 @@ public:
         }
     }
 
-    float        ReverseRelativeTimestamp(int idx) const
+    float ReverseRelativeTimestamp(int idx) const
     {
         return RelativeTimestamp(LastValidIndex() - idx);
     }
 
-    double       ReverseAbsoluteTimestamp(int idx) const
+    double ReverseAbsoluteTimestamp(int idx) const
     {
         return AbsoluteTimestamp(LastValidIndex() - idx);
     }
 
-    DataType     ReverseData(int idx) const
+    DataType ReverseData(int idx) const
     {
-
         if (IsEmpty())
         {
             return DataType::Zero();
@@ -296,9 +258,8 @@ public:
         return _data[safeIndex];
     }
 
-    DataType       LastPoint() const
+    DataType LastPoint() const
     {
-
         if (Size() == 0)
         {
             //return DataType(0);
@@ -310,7 +271,7 @@ public:
         }
     }
 
-    Stream         Tail(int count) const
+    Stream Tail(int count) const
     {
         if (IsEmpty() || count < 1)
         {
@@ -320,10 +281,9 @@ public:
         count = std::min(count, (int) Size());
 
         return SubStream(Interval(Size() - count, count));
-
     }
 
-    Stream         SubStream(Interval subInterval) const
+    Stream SubStream(Interval subInterval) const
     {
         Stream subStream;
 
@@ -351,10 +311,9 @@ public:
         DebugAssert(subStream.Size() == subInterval._count);
 
         return subStream;
-
     }
 
-    Stream   StreamByPrependingPoint(DataType point, double timestamp, double t0) const
+    Stream StreamByPrependingPoint(DataType point, double timestamp, double t0) const
     {
         Stream outStream;
 
@@ -381,7 +340,6 @@ public:
         }
 
         return outStream;
-
     }
 
     // returns -1 if size is zero
@@ -389,10 +347,9 @@ public:
 
     Interval MaximalInterval() const { return Interval(0, Size()); }
 
-    double   AbsoluteTimestamp(int idx) const
+    double AbsoluteTimestamp(int idx) const
     {
-
-        if(idx == LastValidIndex())
+        if (idx == LastValidIndex())
         {
             return _mostRecentTimestamp;
         }
@@ -402,13 +359,13 @@ public:
         }
     }
 
-    double   LastAbsoluteTimestamp() const
+    double LastAbsoluteTimestamp() const
     {
         int idx = LastValidIndex();
         return AbsoluteTimestamp(idx);
     }
 
-    float    RelativeTimestamp(int idx) const
+    float RelativeTimestamp(int idx) const
     {
         if (Size() == 0)
         {
@@ -420,7 +377,7 @@ public:
         }
     }
 
-    float            LastRelativeTimestamp() const
+    float LastRelativeTimestamp() const
     {
         if (Size() == 0)
         {
@@ -432,9 +389,8 @@ public:
         }
     }
 
-    size_t           Size()    const { return _data.size(); }
-    bool             IsEmpty() const { return _data.empty(); }
-
+    size_t Size()    const { return _data.size(); }
+    bool IsEmpty() const { return _data.empty(); }
 };
 }
 }
