@@ -6,6 +6,7 @@
 //
 
 #include <boost/algorithm/string.hpp>
+#include <iostream>
 #include <string>
 #include <tuple>
 
@@ -14,30 +15,32 @@
 using namespace boost::algorithm;
 using fiftythree::core::TouchClassification;
 using std::ignore;
+using std::string;
+using std::vector;
 
 namespace
 {
-std::vector<std::string> CSVgetNextLineAndSplitIntoTokens(std::istream & str)
+vector<string> CSVgetNextLineAndSplitIntoTokens(std::istream & str)
 {
-    std::string line;
+    string line;
     std::getline(str,line);
 
-    std::vector<std::string> parts;
+    vector<string> parts;
     boost::algorithm::split(parts, line, boost::is_any_of(","));
 
-    BOOST_FOREACH(std::string & part, parts)
+    for (string & part :  parts)
     {
         trim(part);
     }
     return parts;
 }
 
-int IndexOfString(std::string probe, std::vector<std::string> headers)
+int IndexOfString(string probe, vector<string> headers)
 {
     int index = 0;
-    BOOST_FOREACH(std::string &str, headers)
+    for (string &str :  headers)
     {
-        if(str == probe)
+        if (str == probe)
         {
             return index;
         }
@@ -49,30 +52,32 @@ int IndexOfString(std::string probe, std::vector<std::string> headers)
 
 }
 
-namespace fiftythree {
-namespace sdk {
+namespace fiftythree
+{
+namespace sdk
+{
 
 // CLUSTER_ID, TOUCH_ID, PEN_DOWN_DT, PEN_UP_DT, SWITCH_ON_DURATION, TOUCH_DURATION,
 // HANDEDNESS_PRIOR, ISOLATED_PRIOR, ORTHOGONAL_JERK, CURVATURE_SCORE, LENGTH_PRIOR,
 // CLUSTER_PRIOR, TOUCH_PRIOR, PEN_SCORE, INFERRED_CLASS, TRUE_CLASS
 
-PerformanceReport::PerformanceReport(std::string const & csvReport)  : _csvReport(csvReport)
+PerformanceReport::PerformanceReport(string const & csvReport)  : _csvReport(csvReport)
 {
-    std::vector<TouchClassification> emptyVector;
+    vector<TouchClassification> emptyVector;
 
     init(csvReport, emptyVector);
 }
 
-PerformanceReport::PerformanceReport(std::string const & csvReport, std::vector<TouchClassification> const &trueClasses)  : _csvReport(csvReport)
+PerformanceReport::PerformanceReport(string const & csvReport, vector<TouchClassification> const & trueClasses)  : _csvReport(csvReport)
 {
     init(csvReport, trueClasses);
 }
 
-void PerformanceReport::init(std::string const & csvReport, std::vector<TouchClassification> const &trueClasses)
+void PerformanceReport::init(string const & csvReport, vector<TouchClassification> const & trueClasses)
 {
     std::istringstream istr(csvReport);
 
-    std::vector<std::string> headers = CSVgetNextLineAndSplitIntoTokens(istr);
+    vector<string> headers = CSVgetNextLineAndSplitIntoTokens(istr);
 
     int indexInferred = IndexOfString("INFERRED_CLASS", headers);
     int indexTrue     = IndexOfString("TRUE_CLASS", headers);
@@ -80,15 +85,15 @@ void PerformanceReport::init(std::string const & csvReport, std::vector<TouchCla
     int index = 0;
     while (istr)
     {
-        std::vector<std::string> row = CSVgetNextLineAndSplitIntoTokens(istr);
+        vector<string> row = CSVgetNextLineAndSplitIntoTokens(istr);
 
         if (row.empty() || row.size() == 1)
         {
             break;
         }
 
-        TouchClassification trueClass      = static_cast<TouchClassification::TouchClassificationEnum>(std::atoi(row[indexTrue].c_str()));
-        if(trueClasses.size() > 0)
+        TouchClassification trueClass = static_cast<TouchClassification::TouchClassificationEnum>(std::atoi(row[indexTrue].c_str()));
+        if (trueClasses.size() > 0)
         {
             trueClass = trueClasses[index];
         }
@@ -122,8 +127,9 @@ int PerformanceReport::TotalTouchCount()
 {
     int count = 0;
     TouchClassification type;
-    BOOST_FOREACH(tie(type, ignore), _counts)
+    for (const auto  & pair : _counts)
     {
+        tie(type, ignore) = pair;
         count += TrueCountForType(type);
     }
 
@@ -136,8 +142,9 @@ float PerformanceReport::OverallScore()
     float totalScore = 0.0f;
 
     TouchClassification type;
-    BOOST_FOREACH(tie(type, ignore), _counts)
+    for (const auto  & pair : _counts)
     {
+        tie(type, ignore) = pair;
         float score      = ScoreForType(type);
         float trueCount  = TrueCountForType(type);
 
@@ -155,7 +162,7 @@ int PerformanceReport::TrueCountForType(TouchClassification probeType)
 
     typedef std::pair<TouchClassification, int> TypeIntPair;
 
-    BOOST_FOREACH(TypeIntPair pair, _counts[probeType])
+    for (TypeIntPair pair :  _counts[probeType])
     {
         total += pair.second;
     }
