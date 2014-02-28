@@ -106,16 +106,16 @@ public:
 
     //  IsolatedStrokes::IsTap uses these.
     // values from Amit's work
-    float _maxTapArcLengthAtMaxDuration  = 85;
-    float _maxTapArcLengthAtMinDuration  = 55;
+    float _maxTapArcLengthAtMaxDuration = 85;
+    float _maxTapArcLengthAtMinDuration = 55;
     // values from Matt.
-    float _minTapDuration   =  0.02f;
-    float _maxTapDuration   =  0.2f;
+    float _minTapDuration = 0.02f;
+    float _maxTapDuration = 0.2f;
     // Existing values.
-    float _maxPenEventWaitTime  = .3f;
-    float _longPenLength        = 250.0f;
-    float _longFingerLength     = 66.0f;
-    float _longDuration         = 1.2f;
+    float _maxPenEventWaitTime = .3f;
+    float _longPenLength = 250.0f;
+    float _longFingerLength = 66.0f;
+    float _longDuration = 1.2f;
     float _fingerTapIsolationSeconds = 0.0929603f;
 
     // we remove bogus up-down pairs.  sometimes this removes the wrong things.
@@ -123,16 +123,16 @@ public:
     // end.  the minPenDownDt is a sanity check on the pen-down event for that particular touch, we don't
     // want the workaround to fire when the best pen event arrived long before the touch began since this
     // is very unlikely.
-    bool  _debounceWorkaroundEnabled       = true;
-    float _debounceWorkaroundMinPenDownDt  = 0.0f;
+    bool  _debounceWorkaroundEnabled = true;
+    float _debounceWorkaroundMinPenDownDt = 0.0f;
 
-    bool  _trustHandednessOnceLocked       = true;
+    bool  _trustHandednessOnceLocked = true;
 
-    bool  _handednessRequirePenDown        = false;
-    bool  _handednessNoPenDownMinLength    = 11.0f;
-    float _handednessRecentPenEventDt      = .3f;
-    float _handednessMinPenDownDt          = -.0167;
-    float _handednessMaxPenDownDt          = .5f;
+    bool  _handednessRequirePenDown = false;
+    bool  _handednessNoPenDownMinLength = 11.0f;
+    float _handednessRecentPenEventDt = .3f;
+    float _handednessMinPenDownDt = -.0167;
+    float _handednessMaxPenDownDt = .5f;
 
     // required predelay for a finger smudge sequence.  once a sequence begins,
     // subsequent touches don't need any temporal isolation from each other
@@ -140,13 +140,13 @@ public:
 
     // the smudge isolation above is used to control the predelay before a smudge sequence.
     // this controls temporal isolation for taps within a sequence.
-    float _smudgeTapIsolationSeconds    = .0929603f;
+    float _smudgeTapIsolationSeconds = .0929603f;
 
     // really fast tapping can violate the isolation time _smudgeTapIsolationSeconds if it's larger than .9 or so.
     // so if we see (_smudgeCommitCount) fingers in the current cluster event, don't apply
     // the isolation rule anymore.  assume they're just tapping really fast.
     // we still apply the other rules for declaring finger, so this should be pretty safe
-    int   _smudgeCommitCount         = 2;
+    int   _smudgeCommitCount = 2;
 
     float _minFingerIsolatedStrokeTravel = 5.0f; // Was 44, see IsolatedStrokes TestPalmVFinger.
     // number of cycles we're allowing pen events to arrive before touches.
@@ -170,18 +170,17 @@ public:
     float _pairwisePanPalmCentroidTime = 0.756863;
     float _pairwisePanPalmCentroidThreshold = 108.221474;
 
-    float _maxTapGestureTapArcLengthAtMaxDuration  = 22;
-    float _maxTapGestureTapArcLengthAtMinDuration  = 13;
+    float _maxTapGestureTapArcLengthAtMaxDuration = 22;
+    float _maxTapGestureTapArcLengthAtMinDuration = 13;
     // values from Matt.
-    float _minTapGestureTapDuration   =  0.0f;
-    float _maxTapGestureTapDuration   =  0.32;
+    float _minTapGestureTapDuration =  0.0f;
+    float _maxTapGestureTapDuration =  0.32;
 
     // only debounce the really insane ones.  if we debounce everything, we end up eliminating valid
     // data which has lousy timing data.
-    float _debounceInterval           = .005f;
+    float _debounceInterval = .005f;
 
     static Classifier::Ptr New();
 };
-
 }
 }
