@@ -7,24 +7,17 @@
 
 #pragma once
 
-#include <Eigen/Dense>
-#include <sstream>
-
 #include "Core/Enum.h"
 #include "Core/Memory.h"
 #include "FiftyThreeSdk/Classification/CommonDeclarations.h"
 #include "FiftyThreeSdk/Classification/DataStream.hpp"
+#include "FiftyThreeSdk/Classification/Eigen.h"
 #include "FiftyThreeSdk/Classification/Screen.h"
-
-// this line doesn't need to be here -- but sometimes LLVM gets confused and shows errors
-// all over the place about the Ptr typedef.  it compiles fine though.  odd.
-#include <boost/smart_ptr/shared_ptr.hpp>
 
 namespace fiftythree
 {
 namespace sdk
 {
-
 struct StrokeStatistics
 {
 
@@ -79,86 +72,53 @@ struct StrokeStatistics
     {
     }
 
-    // Handy for debugging. Not performant at all.
-    std::string ToString() const
-    {
-
-        std::stringstream ss;
-// Odd spacing to allow easy additions.
-ss
-<< " arcLength: " << _arcLength
-<< " totalD2InSpace: " << _totalD2InSpace
-<< " totalAbsoluteD2InSpace: " << _totalAbsoluteD2InSpace
-<< " totalSquaredD2InSpace: " << _totalSquaredD2InSpace
-<< " dtVariance: " << _dtVariance
-<< " dtMean: " << _dtMean
-<< " dtSumSquaredVariation: " << _dtSumSquaredVariation
-<< " smoothLength: " << _smoothLength
-<< " sampleTimingSquaredError: " << _sampleTimingSquaredError
-<< " sampleTimingMeanSquaredError: " << _sampleTimingMeanSquaredError
-<< " firstDeltaT: " << _firstDeltaT
-<< " normalD2: " << _normalD2
-<< " tangentialD2: " << _tangentialD2
-<< " totalD2: " << _totalD2
-<< " normalD3: " << _normalD3
-<< " normalD4: " << _normalD4
-<< " tangentialD3: " << _tangentialD3
-<< " tangentialD4: " << _tangentialD4
-<< " maxDeltaT: " << _maxDeltaT
-<< " maxTravel: " << _maxTravel
-<< " minStepSize: " << _minStepSize
-<< std::endl;
-
-        return ss.str();
-    }
-
     // D2InSpace means we just take second differences of the sample points
     // without taking arrival times into account.
     Eigen::Vector2f _totalD2InSpace;
-    float           _totalAbsoluteD2InSpace;
-    float           _totalSquaredD2InSpace;
+    float _totalAbsoluteD2InSpace;
+    float _totalSquaredD2InSpace;
 
-    float           _arcLength;
-    float           _strokeTime;
-    float           _dtVariance;
-    float           _dtMean;
-    float           _dtSumSquaredVariation;
+    float _arcLength;
+    float _strokeTime;
+    float _dtVariance;
+    float _dtMean;
+    float _dtSumSquaredVariation;
 
     Eigen::VectorXf _arclengthParameter;
 
-    float           _normalD2;
-    float           _tangentialD2;
-    float           _totalD2;
+    float _normalD2;
+    float _tangentialD2;
+    float _totalD2;
 
-    float           _normalD3;
-    float           _tangentialD3;
+    float _normalD3;
+    float _tangentialD3;
 
-    float           _normalD4;
-    float           _tangentialD4;
+    float _normalD4;
+    float _tangentialD4;
 
     // integral of speed divided by curvature.  like length, but prefers straight lines
     // and not wiggly curves.
-    float           _smoothLength;
+    float _smoothLength;
 
     std::vector<float> _totalD2AtScale;
 
     // deviation of sample timings from the expected sampling rate.  palms have irregular timing.
     // this does not include the very first dt.  that's considered special, since people sometimes
     // rest the pen and pause.  if you want that, look at _firstDeltaT as well.
-    float           _sampleTimingSquaredError;
-    float           _sampleTimingMeanSquaredError;
+    float _sampleTimingSquaredError;
+    float _sampleTimingMeanSquaredError;
 
     // length of time between the first and second samples to arrive.
-    float           _firstDeltaT;
+    float _firstDeltaT;
 
     // largest delta T after the first
-    float           _maxDeltaT;
+    float _maxDeltaT;
 
     // a poor-man's diameter.  maximum distance traveled from the initial point
-    float           _maxTravel;
+    float _maxTravel;
 
     // shortest distance between 2 adjacent points
-    float           _minStepSize;
+    float _minStepSize;
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
@@ -172,8 +132,7 @@ public:
 
     DEFINE_ENUM(SamplingType,
                 UniformInTime,
-                UniformInSpace
-                );
+                UniformInSpace);
 
 protected:
 
@@ -187,7 +146,6 @@ protected:
     // which implicitly assumes equal time increments and ignores any time when they are not moving.
     std::vector<Eigen::Vector2f>  _velocity;
     std::vector<Vector1f>         _pressure;
-    std::vector<Vector7f>         _pressure7D;
 
     std::vector<Vector1f>         _touchRadius;
 
@@ -218,7 +176,7 @@ public:
 
     float NormalizedSmoothLength()
     {
-        if(_computeStatistics && Size() >= 5)
+        if (_computeStatistics && Size() >= 5)
         {
             return _statistics->_smoothLength;
         }
@@ -254,7 +212,7 @@ public:
     _XYSamplesPerSecond(60),
     _computeStatistics(true)
     {
-        if(_computeStatistics)
+        if (_computeStatistics)
         {
             _statistics = StrokeStatistics::New();
         }
@@ -361,9 +319,7 @@ public:
     Eigen::Vector2f XY(int idx) const;
 
     Vector1f  Pressure(int idx) const;
-    Vector7f  Pressure7D(int idx) const;
 
-    std::vector<Vector7f>&  Pressure7D()  { return _pressure7D; }
     std::vector<Vector1f>&  Pressure()    { return _pressure; }
 
     Eigen::Vector2f ReverseXY(int idx) const;
@@ -390,7 +346,7 @@ public:
 
     Eigen::Vector2f SmoothTrailingVelocity(int radius);
     Eigen::Vector2f VelocityForPointAtIndex(int index);
-    float           SpeedForPointAtIndex(int idx);
+    float SpeedForPointAtIndex(int idx);
     std::vector<Eigen::Vector2f>& Velocity() { return _velocity; }
 
     // rather than use a separate stream for acceleration data, this gives a simple finite difference
@@ -401,7 +357,7 @@ public:
 
     double LastAbsoluteTimestamp() const
     {
-        if(IsEmpty())
+        if (IsEmpty())
         {
             return 0.0;
         }
@@ -409,40 +365,42 @@ public:
         return AbsoluteTimestamp(LastValidIndex());
     }
 
-    float            TimestampRelativeToTime(int idx, double referenceTime);
+    float TimestampRelativeToTime(int idx, double referenceTime);
 
-    double           AbsoluteTimestamp(int idx) const
+    double AbsoluteTimestamp(int idx) const
     {
         //return _t0 + double(RelativeTimestamp(idx));
         return _XYDataStream.AbsoluteTimestamp(idx);
     }
 
-    std::vector<double> TimeStamps() {
+    std::vector<double> TimeStamps()
+    {
 
         int start = 0;
         // TODO: WTF
-        if (_XYDataStream.AbsoluteTimestamp(0) < 000.0f) {
+        if (_XYDataStream.AbsoluteTimestamp(0) < 000.0f)
+        {
             start = 1;
         }
 
         std::vector<double> times(_XYDataStream.Size()-start);
-        for (int i=0; i < _XYDataStream.Size()-start; ++i) {
+        for (int i=0; i < _XYDataStream.Size()-start; ++i)
+        {
             times[i] = _XYDataStream.AbsoluteTimestamp(ClampedIndex(i+start));
         }
 
         return times;
     }
 
-    int              IndexClosestToTime(double time);
+    int IndexClosestToTime(double time);
 
-    bool             IsEmpty() const { return _XYDataStream.IsEmpty(); }
+    bool IsEmpty() const { return _XYDataStream.IsEmpty(); }
 
-    float            RelativeTimestamp(int idx) const;
-    float            LastRelativeTimestamp() const;
-
-    float            Lifetime() const
+    float RelativeTimestamp(int idx) const;
+    float LastRelativeTimestamp() const;
+    float Lifetime() const
     {
-        if(IsEmpty())
+        if (IsEmpty())
         {
             return 0.0f;
         }
@@ -452,10 +410,9 @@ public:
         }
     }
 
-    size_t           Size() const { return _XYDataStream.Size(); }
+    size_t Size() const { return _XYDataStream.Size(); }
 
     Eigen::Vector2f  WeightedCenterOfMass();
-
 };
 }
 }

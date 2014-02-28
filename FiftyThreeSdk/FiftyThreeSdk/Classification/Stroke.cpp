@@ -27,7 +27,7 @@ float Stroke::ArcLength() const
 
         int N = (int) Size();
 
-        if(N <= 1)
+        if (N <= 1)
         {
             return 0.0f;
         }
@@ -53,10 +53,11 @@ float Stroke::ArcLength(int endIndex) const
     {
         return _statistics->_arclengthParameter(ClampedIndex(endIndex));
     }
-    else {
+    else
+    {
         int N = ClampedIndex(endIndex) + 1;
 
-        if(N <= 1)
+        if (N <= 1)
         {
             return 0.0f;
         }
@@ -69,7 +70,7 @@ float Stroke::ArcLength(int endIndex) const
 
         VectorXf ds  = (d1x.array().square() + d1y.array().square()).sqrt();
 
-        float L      = ds.sum();
+        float L = ds.sum();
 
         return L;
     }
@@ -88,7 +89,8 @@ float Stroke::StrokeTime()
     }
 }
 
-float Stroke::StrokeTime(int lastIndex) {
+float Stroke::StrokeTime(int lastIndex)
+{
     return RelativeTimestamp(ClampedIndex(lastIndex));
 }
 
@@ -136,7 +138,7 @@ void Stroke::UpdateSummaryStatistics()
         _statistics->_dtSumSquaredVariation = M2Old + (dt - muOld) * (dt - muNew);
         _statistics->_dtVariance = _statistics->_dtSumSquaredVariation / std::max(1.0f, Ndt - 1.0f);
 
-        if(Size() > 2)
+        if (Size() > 2)
         {
             float dtErr = std::max(0.0f, std::abs(dt - _statistics->_expectedSamplingRate) - _statistics->_samplingRateErrorShrinkage);
             _statistics->_sampleTimingSquaredError += dtErr * dtErr;
@@ -161,7 +163,7 @@ void Stroke::UpdateSummaryStatistics()
         _statistics->_arclengthParameter = Eigen::VectorXf::Zero(1);
     }
 
-    if(N > 2)
+    if (N > 2)
     {
         Vector2f p = _XYDataStream.ReverseData(2);
         Vector2f q = _XYDataStream.ReverseData(1);
@@ -171,7 +173,7 @@ void Stroke::UpdateSummaryStatistics()
         Vector2f d2   = p + r - (q * 2.0f);
 
         float d2norm = d2.norm();
-        if(d2norm > 0.0f)
+        if (d2norm > 0.0f)
         {
             // shrinkage denoising to eliminate pixelation noise from accumulating.
             // this particularly helps with very slow motion, where there's lots of spurious
@@ -197,16 +199,16 @@ void Stroke::UpdateSummaryStatistics()
         // dividing by norm gives us the orthogonal component
         // dividing by normSquared gives us a scale-invariant quantity
 
-        if(d1.squaredNorm() > 0.0f)
+        if (d1.squaredNorm() > 0.0f)
         {
             //_statistics->_normalD2                  += cross / d1.norm();
             _statistics->_tangentialD2              += dot   / d1.norm();
             _statistics->_totalD2                   += d2.norm();
         }
 
-        for(int r = 1; r<44; r++)
+        for (int r = 1; r<44; r++)
         {
-            if(Size() > 2*r)
+            if (Size() > 2*r)
             {
                 Vector2f a = _XYDataStream.ReverseData(2*r);
                 Vector2f b = _XYDataStream.ReverseData(r);
@@ -232,7 +234,7 @@ void Stroke::UpdateSummaryStatistics()
 
     }
 
-    if(Size() > 4 && Size() <= 11)
+    if (Size() > 4 && Size() <= 11)
     {
         Eigen::MatrixX2f xy  = XYMatrixMap();
         Eigen::VectorXf t    = RelativeTimestampMap();
@@ -260,7 +262,7 @@ void Stroke::UpdateSummaryStatistics()
 
     }
 
-    if(Size() >= 6)
+    if (Size() >= 6)
     {
 
         Vector2f zm2 = _XYDataStream.ReverseData(4);
@@ -290,9 +292,9 @@ void Stroke::UpdateSummaryStatistics()
 
     }
 
-    if(Size() <= 11)
+    if (Size() <= 11)
     {
-        if(! _earlyStatistics)
+        if (! _earlyStatistics)
         {
             _earlyStatistics  = StrokeStatistics::New();
         }
@@ -301,25 +303,17 @@ void Stroke::UpdateSummaryStatistics()
 
 }
 
-void Stroke::AddPoint(Eigen::Vector2f const & xy, Vector7f const & pressure, double timestamp)
-{
-
-    AddPoint(xy, timestamp);
-    _pressure7D.push_back(pressure);
-
-}
-
 void Stroke::AddPoint(Eigen::Vector2f const & xy, double timestamp)
 {
 
-    if((! IsEmpty()) && timestamp < (LastAbsoluteTimestamp() + .0001))
+    if ((! IsEmpty()) && timestamp < (LastAbsoluteTimestamp() + .0001))
     {
         DebugAssert(false);
     }
 
     _XYDataStream.AddPoint(xy, timestamp);
 
-    if(_computeStatistics)
+    if (_computeStatistics)
     {
         UpdateSummaryStatistics();
     }
@@ -426,19 +420,23 @@ float Stroke::TimestampRelativeToTime(int idx, double referenceTime)
     return AbsoluteTimestamp(idx) - referenceTime;
 }
 
-int Stroke::IndexClosestToTime(double time) {
+int Stroke::IndexClosestToTime(double time)
+{
 
     int idx = 0;
     double currentDiff = std::abs(time - FirstAbsoluteTimestamp());
 
-    for (int i = 0; i < Size(); ++i) {
+    for (int i = 0; i < Size(); ++i)
+    {
         double newDiff = std::abs(time - AbsoluteTimestamp(i));
 
-        if ( newDiff < currentDiff) {
+        if ( newDiff < currentDiff)
+        {
             idx = i;
             currentDiff = newDiff;
         }
-        else { // We're getting farther away, so just return
+        else
+        { // We're getting farther away, so just return
             break;
         }
     }
@@ -520,11 +518,6 @@ Eigen::Vector2f Stroke::ReverseXY(int idx) const
     return XY(LastValidIndex() - idx);
 }
 
-Vector7f Stroke::Pressure7D(int idx) const
-{
-    return _pressure7D[ClampedIndex(idx)];
-}
-
 Vector1f     Stroke::Pressure(int idx) const
 {
     return _pressure[ClampedIndex(idx)];
@@ -587,11 +580,11 @@ Eigen::Vector2f  Stroke::WeightedCenterOfMass()
 
     size_t N = Size();
 
-    if(N == 0)
+    if (N == 0)
     {
         return Vector2f::Zero();
     }
-    else if(N == 1)
+    else if (N == 1)
     {
         return FirstPoint();
     }
@@ -614,12 +607,10 @@ Eigen::Vector2f  Stroke::WeightedCenterOfMass()
     float wTotal = mapDs.sum();
 
     return Vector2f(muX, muY) / wTotal;
-
 }
 
 Eigen::Vector2f Stroke::LastPoint() const
 {
-
     if (IsEmpty())
     {
         return Vector2f(0,0);
@@ -628,7 +619,6 @@ Eigen::Vector2f Stroke::LastPoint() const
     {
         return _XYDataStream.Data((int)Size()-1l);
     }
-
 }
 
 Eigen::Map<Eigen::VectorXf> Stroke::XYMap(Interval const & I)
@@ -638,22 +628,26 @@ Eigen::Map<Eigen::VectorXf> Stroke::XYMap(Interval const & I)
     return Eigen::Map<VectorXf>(data + 2 * I._index, 2*I._count);
 }
 
-Eigen::Map<Eigen::MatrixX2f, 0, Eigen::Stride<1,2> > Stroke::XYMatrixMap() {
+Eigen::Map<Eigen::MatrixX2f, 0, Eigen::Stride<1,2> > Stroke::XYMatrixMap()
+{
     return XYMatrixMap((int)Size()-1l);
 }
 
-Eigen::Map<Eigen::MatrixX2f, 0, Eigen::Stride<1,2> > Stroke::XYMatrixMap(int endIndex) {
+Eigen::Map<Eigen::MatrixX2f, 0, Eigen::Stride<1,2> > Stroke::XYMatrixMap(int endIndex)
+{
     float *data = XYPointer();
     endIndex = ClampedIndex(endIndex);
 
     return Eigen::Map<Eigen::MatrixX2f, 0, Eigen::Stride<1,2> >(data, endIndex + 1, 2);
 }
 
-Eigen::Map<Eigen::VectorXf> Stroke::RelativeTimestampMap() {
+Eigen::Map<Eigen::VectorXf> Stroke::RelativeTimestampMap()
+{
     return RelativeTimestampMap((int)Size()-1l);
 }
 
-Eigen::Map<Eigen::VectorXf> Stroke::RelativeTimestampMap(int endIndex) {
+Eigen::Map<Eigen::VectorXf> Stroke::RelativeTimestampMap(int endIndex)
+{
 
     float *timestamp = RelativeTPointer();
     endIndex = ClampedIndex(endIndex);
@@ -661,16 +655,19 @@ Eigen::Map<Eigen::VectorXf> Stroke::RelativeTimestampMap(int endIndex) {
     return Eigen::Map<Eigen::VectorXf>(timestamp, endIndex + 1);
 }
 
-Eigen::Map<Eigen::VectorXf> Stroke::ArclengthParameterMap(int endIndex) {
+Eigen::Map<Eigen::VectorXf> Stroke::ArclengthParameterMap(int endIndex)
+{
     float *arclength;
     size_t samples;
 
-    if (_computeStatistics) {
+    if (_computeStatistics)
+    {
         arclength = ArclengthParameterPointer();
         samples = _statistics->_arclengthParameter.rows();
 
     }
-    else {
+    else
+    {
         // We have to compute the arclength parameterization on-the-fly .... todo
         assert(false);
     }
@@ -679,7 +676,8 @@ Eigen::Map<Eigen::VectorXf> Stroke::ArclengthParameterMap(int endIndex) {
     return Eigen::Map<Eigen::VectorXf>(arclength, samples);
 }
 
-Eigen::Map<Eigen::VectorXf> Stroke::ArclengthParameterMap() {
+Eigen::Map<Eigen::VectorXf> Stroke::ArclengthParameterMap()
+{
     return ArclengthParameterMap((int)_statistics->_arclengthParameter.rows());
 }
 
@@ -688,14 +686,12 @@ Stride2Map Stroke::VelocityXMap(Interval const & I)
 
   float * data = (float*) &(_velocity[0]);
   return Stride2Map(data + 2 * I._index, I._count);
-
 }
 
 Stride2Map Stroke::VelocityYMap(Interval const & I)
 {
   float * data = (float*) &(_velocity[0]);
   return Stride2Map(data + 2 * I._index + 1, I._count);
-
 }
 
 Stride2Map Stroke::XMap(Interval const & I) const
@@ -765,29 +761,36 @@ Stroke Stroke::SubStroke(Interval subInterval) const
     return subStroke;
 }
 
-int Stroke::SecondValidIndex() const {
+int Stroke::SecondValidIndex() const
+{
     int idx = -1;
-    for (int i=0; i < _XYDataStream.Size(); ++i) {
-        if (i==0) {
+    for (int i=0; i < _XYDataStream.Size(); ++i)
+    {
+        if (i==0)
+        {
             continue;
         }
-        if ((AbsoluteTimestamp(i) - AbsoluteTimestamp(0)) > 0) {
+        if ((AbsoluteTimestamp(i) - AbsoluteTimestamp(0)) > 0)
+        {
             idx = i;
             break;
         }
     }
-
     return idx;
 }
 
-int Stroke::PenultimateValidIndex() const {
+int Stroke::PenultimateValidIndex() const
+{
     int idx = -1;
     int lastIdx = LastValidIndex();
-    for (int i=lastIdx; i >=0 ; --i) {
-        if (i==lastIdx) {
+    for (int i=lastIdx; i >=0 ; --i)
+    {
+        if (i==lastIdx)
+        {
             continue;
         }
-        if ((AbsoluteTimestamp(lastIdx) - AbsoluteTimestamp(i) > 0)) {
+        if ((AbsoluteTimestamp(lastIdx) - AbsoluteTimestamp(i) > 0))
+        {
             idx = i;
             break;
         }
@@ -795,6 +798,5 @@ int Stroke::PenultimateValidIndex() const {
 
     return idx;
 }
-
 }
 }
