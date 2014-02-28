@@ -33,11 +33,7 @@ static const NSTimeInterval kTrialSeparationInitializeTime = 1.0;
                                                  selector:@selector(penIsTipPressedDidChange:)
                                                      name:kFTPenIsTipPressedDidChangeNotificationName
                                                    object:nil];
-        [[NSNotificationCenter defaultCenter] addObserver:self
-                                                 selector:@selector(penIsEraserPressedDidChange:)
-                                                     name:kFTPenIsEraserPressedDidChangeNotificationName
-                                                   object:nil];
-
+ 
         self.touchAdapter = PropertyToObjCAdapter<int>::Bind(TouchTracker::Instance()->LiveTouchCount(),
                                                              self,
                                                              @selector(touchTrackerLiveTouchCountDidChange:newValue:));
@@ -78,7 +74,8 @@ static const NSTimeInterval kTrialSeparationInitializeTime = 1.0;
 }
 - (void)tipWasPressed
 {
-    if (TouchTracker::Instance()->LiveTouchCount() == 0)
+    bool haveRecentlySeenATouch = std::abs([[NSProcessInfo processInfo] systemUptime] - TouchTracker::Instance()->LastProcessedTimestamp()) < 0.25;
+    if (!haveRecentlySeenATouch && TouchTracker::Instance()->LiveTouchCount() == 0)
     {
         [self clearTimer];
         self.timer = [NSTimer scheduledTimerWithTimeInterval:kTrialSeparationInitializeTime
@@ -99,19 +96,6 @@ static const NSTimeInterval kTrialSeparationInitializeTime = 1.0;
 {
     FTPen *pen = (FTPen*)notification.object;
     if (pen && pen.isTipPressed)
-    {
-        [self tipWasPressed];
-    }
-    else
-    {
-        [self tipWasReleased];
-    }
-}
-
-- (void)penIsEraserPressedDidChange:(NSNotification *)notification
-{
-    FTPen *pen = (FTPen*)notification.object;
-    if (pen && pen.isEraserPressed)
     {
         [self tipWasPressed];
     }
