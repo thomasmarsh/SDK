@@ -1,8 +1,8 @@
 //
 //  Screen.h
-//  Curves
+//  FiftyThreeSdk
 //
-//  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
+//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
 
 #pragma once
@@ -24,7 +24,8 @@ private:
 public:
 
     // DEFINE_ENUM doesn't apply to bitmask usage
-    enum {
+    enum
+    {
         kEdgeNone    = 0,
         kEdgeLeft    = 1,
         kEdgeRight   = 1 << 1,
@@ -60,17 +61,16 @@ public:
 
     float DistanceToNearestEdge(Eigen::Vector2f const & p);
 
-    bool IsEdgePoint(Eigen::Vector2f const &p);
+    bool IsEdgePoint(Eigen::Vector2f const & p);
 
-    bool IsEdgePoint(Vector1f const &p) { return false; }
+    bool IsEdgePoint(Vector1f const & p) { return false; }
 
-    bool IsUnreliablePoint(Eigen::Vector2f const &p);
+    bool IsUnreliablePoint(Eigen::Vector2f const & p);
 
     Eigen::Vector2f FirstOnscreenPoint(Stroke const & stroke);
 
     Eigen::Vector2f DirectionToNearestEdge(Eigen::Vector2f const & p);
 
 };
-
 }
 }

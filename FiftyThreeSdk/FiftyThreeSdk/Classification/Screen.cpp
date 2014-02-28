@@ -1,8 +1,8 @@
 //
 //  Screen.cpp
-//  Curves
+//  FiftyThreeSdk
 //
-//  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
+//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
 
 #include "FiftyThreeSdk/Classification/Screen.h"
@@ -22,14 +22,12 @@ Screen & Screen::MainScreen()
 
 float Screen::DistanceToNearestEdge(Eigen::Vector2f const & p)
 {
-
     float dLeft    = std::abs(p.x());
     float dRight   = std::abs(p.x() - _widthInPoints);
     float dTop     = std::abs(p.y());
     float dBottom  = std::abs(p.y() - _heightInPoints);
 
     return std::min(std::min(dLeft, dRight), std::min(dTop, dBottom));
-
 }
 
 Eigen::Vector2f Screen::FirstOnscreenPoint(Stroke const & stroke)
