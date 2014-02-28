@@ -24,7 +24,6 @@
 		0416CACB18A42B51004EAC00 /* Screen.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0416CAB218A42B51004EAC00 /* Screen.cpp */; };
 		0416CACC18A42B51004EAC00 /* Stroke.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0416CAB418A42B51004EAC00 /* Stroke.cpp */; };
 		0416CACD18A42B51004EAC00 /* TouchLogger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0416CAB618A42B51004EAC00 /* TouchLogger.cpp */; };
-		0416CACE18A42B51004EAC00 /* UIDeviceHardware.m in Sources */ = {isa = PBXBuildFile; fileRef = 0416CAB918A42B51004EAC00 /* UIDeviceHardware.m */; };
 		04E99BEC18BFE53500BC4DCB /* FTTrialSeparationMonitor.mm in Sources */ = {isa = PBXBuildFile; fileRef = 04E99BEB18BFE53500BC4DCB /* FTTrialSeparationMonitor.mm */; };
 		04E99C5418BFF12400BC4DCB /* TouchClassifier.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04E99C5218BFF12400BC4DCB /* TouchClassifier.cpp */; };
 		3C02E084183698E100420B95 /* FTLog.m in Sources */ = {isa = PBXBuildFile; fileRef = 3C02E083183698E100420B95 /* FTLog.m */; };
@@ -91,8 +90,6 @@
 		0416CAB518A42B51004EAC00 /* Stroke.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Stroke.h; sourceTree = "<group>"; };
 		0416CAB618A42B51004EAC00 /* TouchLogger.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TouchLogger.cpp; sourceTree = "<group>"; };
 		0416CAB718A42B51004EAC00 /* TouchLogger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TouchLogger.h; sourceTree = "<group>"; };
-		0416CAB818A42B51004EAC00 /* UIDeviceHardware.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UIDeviceHardware.h; sourceTree = "<group>"; };
-		0416CAB918A42B51004EAC00 /* UIDeviceHardware.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UIDeviceHardware.m; sourceTree = "<group>"; };
 		0493D9DC18B6957B0049FEFC /* Eigen.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Eigen.h; sourceTree = "<group>"; };
 		04E99BEA18BFE53500BC4DCB /* FTTrialSeparationMonitor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FTTrialSeparationMonitor.h; path = FiftyThreeSdk/FTTrialSeparationMonitor.h; sourceTree = "<group>"; };
 		04E99BEB18BFE53500BC4DCB /* FTTrialSeparationMonitor.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = FTTrialSeparationMonitor.mm; path = FiftyThreeSdk/FTTrialSeparationMonitor.mm; sourceTree = "<group>"; };
@@ -208,8 +205,6 @@
 				0416CAB518A42B51004EAC00 /* Stroke.h */,
 				0416CAB618A42B51004EAC00 /* TouchLogger.cpp */,
 				0416CAB718A42B51004EAC00 /* TouchLogger.h */,
-				0416CAB818A42B51004EAC00 /* UIDeviceHardware.h */,
-				0416CAB918A42B51004EAC00 /* UIDeviceHardware.m */,
 				0493D9DC18B6957B0049FEFC /* Eigen.h */,
 			);
 			name = Classification;
@@ -434,7 +429,6 @@
 				0416CACC18A42B51004EAC00 /* Stroke.cpp in Sources */,
 				0416CACD18A42B51004EAC00 /* TouchLogger.cpp in Sources */,
 				0416CAC618A42B51004EAC00 /* PenDirection.cpp in Sources */,
-				0416CACE18A42B51004EAC00 /* UIDeviceHardware.m in Sources */,
 				3CF2306F177E13910049A9EF /* FTServiceUUIDs.m in Sources */,
 				3C2F9C3A1780758300A5FFBC /* FTPeripheralDelegate.m in Sources */,
 				04E99C5418BFF12400BC4DCB /* TouchClassifier.cpp in Sources */,
