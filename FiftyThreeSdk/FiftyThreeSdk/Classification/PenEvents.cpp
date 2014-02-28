@@ -202,8 +202,8 @@ float PenEventClassifier::PenUpProbabilityForTouchGivenPenEvent(core::TouchId pr
 // make it into a helper.
 float PenEventClassifier::DurationTimeErrorProbabilityForTouch(core::TouchId probeId,
                                                                float switchOnDuration,
-                                                               TouchIdVector concurrentTouches,
-                                                               VectorXf prior)
+                                                               const TouchIdVector & concurrentTouches,
+                                                               const VectorXf & prior)
 {
 
     if (concurrentTouches.empty())

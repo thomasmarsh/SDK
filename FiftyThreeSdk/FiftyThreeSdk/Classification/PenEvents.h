@@ -107,8 +107,8 @@ public:
 
     float DurationTimeErrorProbabilityForTouch(core::TouchId probeId,
                                                float switchOnDuration,
-                                               TouchIdVector concurrentTouches,
-                                               Eigen::VectorXf prior);
+                                               const TouchIdVector & concurrentTouches,
+                                               const Eigen::VectorXf & prior);
 
     float SwitchOnDurationInTimeInterval(double t0, double t1);
 
