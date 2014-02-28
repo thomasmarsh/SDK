@@ -7,9 +7,11 @@
 #include <map>
 #include <vector>
 
+#include "FiftyThreeSdk/Classification/Eigen.h"
 #include "FiftyThreeSdk/Classification/ClassificationProxy.h"
 #include "FiftyThreeSdk/Classification/DumbStylus.h"
 
+using namespace Eigen;
 using namespace fiftythree::sdk;
 using fiftythree::core::TouchClassification;
 using std::map;

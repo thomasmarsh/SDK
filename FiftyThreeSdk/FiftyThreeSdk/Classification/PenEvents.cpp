@@ -20,9 +20,9 @@
 using namespace Eigen;
 using fiftythree::core::TouchClassification;
 
-namespace fiftythree 
+namespace fiftythree
 {
-namespace sdk 
+namespace sdk
 {
 
 IdLikelihoodPair PenEventClassifier::BestPenDownEventForTouch(core::TouchId touchId, PenEventIdSet const &penDownEvents)
@@ -763,32 +763,32 @@ float PenEventClassifier::SwitchUpLikelihoodForDeltaT(float deltaT)
 
 }
 
-void PenEventClassifier::MarkTouchTypes(IdTypeMap* touches, core::TouchId id, TouchClassification type) 
+void PenEventClassifier::MarkTouchTypes(IdTypeMap* touches, core::TouchId id, TouchClassification type)
 {
-    if (touches->count(id) > 0) 
+    if (touches->count(id) > 0)
     {
         touches->at(id) = type;
     }
-    else 
+    else
     {
         touches->insert(IdTypePair(id, type));
     }
 }
 
-void PenEventClassifier::MarkTouchTypes(IdTypeMap* touches, TouchIdVector ids, TouchClassification type) 
+void PenEventClassifier::MarkTouchTypes(IdTypeMap* touches, TouchIdVector ids, TouchClassification type)
 {
-    for (core::TouchId id :  ids) 
+    for (core::TouchId id :  ids)
     {
         MarkTouchTypes(touches, id, type);
     }
 }
 
-void PenEventClassifier::FoundPenEventTouch(PenEventId id) 
+void PenEventClassifier::FoundPenEventTouch(PenEventId id)
 {
      _penDownCleared.push_back(id);
 }
 
-bool PenEventClassifier::IsPenEventTouchFound(PenEventId id) 
+bool PenEventClassifier::IsPenEventTouchFound(PenEventId id)
 {
     return (std::find(_penDownCleared.begin(), _penDownCleared.end(), id) != _penDownCleared.end());
 }

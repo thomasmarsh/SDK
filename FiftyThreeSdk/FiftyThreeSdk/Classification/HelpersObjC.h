@@ -1,10 +1,11 @@
 //
-//  Helpers.h
-//  Classification
+//  HelpersObjC.h
+//  FiftyThreeSdk
 //
-//  Created by matt on 10/10/13.
-//  Copyright (c) 2013 Peter Sibley. All rights reserved.
+//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
+
+#pragma once
 
 #import <Foundation/Foundation.h>
 
@@ -13,9 +14,3 @@
 +(double) NSProcessInfoSystemUptime;
 
 @end
-
-
-
-
-
-

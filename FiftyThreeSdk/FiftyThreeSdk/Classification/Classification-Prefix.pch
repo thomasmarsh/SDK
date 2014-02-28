@@ -1,7 +1,11 @@
 //
-// Prefix header for all source files of the 'Classification' target in the 'Classification' project
+//  Classification-Prefix.pch
+//  FiftyThreeSdk
+//
+//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
 
 #ifdef __OBJC__
-    #import <Foundation/Foundation.h>
+#import <Foundation/Foundation.h>
+
 #endif

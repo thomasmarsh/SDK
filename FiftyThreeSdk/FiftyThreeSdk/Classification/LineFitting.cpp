@@ -1,9 +1,8 @@
 //
 //  LineFitting.cpp
-//  Classification
+//  FiftyThreeSdk
 //
-//  Created by Akil Narayan on 2013/12/12.
-//  Copyright (c) 2013 Peter Sibley. All rights reserved.
+//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
 
 #include "FiftyThreeSdk/Classification/LineFitting.h"
