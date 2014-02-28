@@ -14,9 +14,10 @@
 #include "FiftyThreeSdk/Classification/Stroke.h"
 #include "FiftyThreeSdk/Classification/TouchLogger.h"
 
-namespace fiftythree {
-namespace sdk {
-
+namespace fiftythree
+{
+namespace sdk
+{
 typedef std::pair<core::TouchClassification, bool> TypeBoolPair;
 
 class PolynomialModel
@@ -67,7 +68,6 @@ struct ScoreCalibration
     // The indices correspond to the chosen score index
     std::vector<PolynomialModel> _penLikelihoods;
     std::vector<PolynomialModel> _palmLikelihoods;
-
 };
 
 // Calibration for the Neyman-Pearson statistical tests
@@ -99,7 +99,6 @@ struct BayesCalibration
     PolynomialModel _penScore;
     PolynomialModel _palmScore;
     PolynomialModel _logLikelihoodThreshold;
-
 };
 
 // Calibration for Adaptive Boosting calibration
@@ -134,7 +133,8 @@ struct StrokeChunkLog
     Eigen::MatrixX2f _logLikelihoods;
 };
 
-class IsolatedStrokesClassifier {
+class IsolatedStrokesClassifier
+{
 protected:
     ClusterTracker::Ptr      _clusterTracker;
     const CommonData*        _commonData;
@@ -195,8 +195,8 @@ public:
     float Score(Stroke  & stroke);
 
     EdgeThumbState TestEdgeThumb(core::TouchId touchId);
-    void           MarkEdgeThumbs();
-    bool           IsEdgeThumb(core::TouchId touchId);
+    void MarkEdgeThumbs();
+    bool IsEdgeThumb(core::TouchId touchId);
 
     // this gives a number in [0,1] where larger values indicate "badness"
     // (i.e. likelihood of being a palm), since that's the way most of the weak
@@ -204,7 +204,7 @@ public:
     float NormalizedScore(core::TouchId id);
 
     core::TouchClassification TestFingerVsPalm(Cluster::Ptr const & cluster);
-    bool      IsPalmCluster(Cluster::Ptr const & cluster);
+    bool IsPalmCluster(Cluster::Ptr const & cluster);
 
     void ScoreAssert(int scoreId, int chunkSize);
 
@@ -273,30 +273,28 @@ public:
     bool IsTap(core::TouchId touchId);
 
     void TouchIdNoLongerLogged(core::TouchId touchId);
-
 };
 
 // We take maxes + integrate vector norms so much here's a convenience method to do it
 // Actually it's L2 norm squared
 template<typename DerivedA, typename DerivedB, typename DerivedC>
-void MaxAndL2Norm(const Eigen::MatrixBase<DerivedA> &x, const Eigen::MatrixBase<DerivedB> &weights, Eigen::MatrixBase<DerivedC> &results, int startIndex) {
+void MaxAndL2Norm(const Eigen::MatrixBase<DerivedA> &x, const Eigen::MatrixBase<DerivedB> &weights, Eigen::MatrixBase<DerivedC> &results, int startIndex)
+{
     results(startIndex) = (typename DerivedC::Scalar) RowwiseMaxNorm(x);
     results(startIndex+1) = (typename DerivedC::Scalar) weights.dot(x.cwiseAbs2().rowwise().sum());
 }
 
 template<typename DerivedA, typename DerivedB>
-std::pair<typename DerivedA::Scalar, typename DerivedA::Scalar> MaxAndL2Norm(const Eigen::MatrixBase<DerivedA> &x, const Eigen::MatrixBase<DerivedB> &weights) {
-    return std::pair<typename DerivedA::Scalar, typename DerivedA::Scalar>(
-            RowwiseMaxNorm(x),
-            weights.dot(x.cwiseAbs2().rowwise().sum())
-            );
+std::pair<typename DerivedA::Scalar, typename DerivedA::Scalar> MaxAndL2Norm(const Eigen::MatrixBase<DerivedA> &x, const Eigen::MatrixBase<DerivedB> &weights)
+{
+    return std::make_pair(RowwiseMaxNorm(x), weights.dot(x.cwiseAbs2().rowwise().sum()));
 }
 
 template<typename DerivedA, typename DerivedB>
 typename DerivedA::Scalar ComputeL2Norm(const Eigen::MatrixBase<DerivedA> &x,
-                                        const Eigen::MatrixBase<DerivedB> &weights) {
+                                        const Eigen::MatrixBase<DerivedB> &weights)
+{
     return weights.dot(x.cwiseAbs2().rowwise().sum());
 }
-
 }
 }
