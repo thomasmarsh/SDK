@@ -7,10 +7,11 @@
 
 #pragma once
 
+#include <cmath>
+
 #include "FiftyThreeSdk/Classification/Cluster.h"
 #include "FiftyThreeSdk/Classification/CommonDeclarations.h"
 #include "FiftyThreeSdk/Classification/Debug.h"
-#include "FiftyThreeSdk/Classification/DumbStylus.h"
 #include "FiftyThreeSdk/Classification/EigenLAB.h"
 #include "FiftyThreeSdk/Classification/FiniteDifferences.h"
 #include "FiftyThreeSdk/Classification/IsolatedStrokes.h"
@@ -18,38 +19,29 @@
 #include "FiftyThreeSdk/Classification/PenEvents.h"
 #include "FiftyThreeSdk/Classification/Quadrature.h"
 #include "FiftyThreeSdk/Classification/TouchLogger.h"
-#include "math.h"
-
-using fiftythree::core::TouchClassification;
 
 // It's expected that the application routes touch and pen events
 // to the classifier.
 
 //
 
-/*
- The ClassificationProxy is what the app will deal with.  The proxy makes final decisions,
- and shields the app from the details of how and when the decision is made.  He's supposed
- to implement the application decision rules given what the classifier thinks.
- */
-
-/*
- _classificationProxy public methods: (all void-type)
-
- AllowNonPenEventTouches();         Allow non-PenEvent touches as TouchClassification::Pen (default, and current
- implementation)
- RejectNonPenEventTouches();        Reject all non-PenEvent touches as TouchClassification::Palm
- StylusConnected();                 Enables explicit PenEvent classification decision tree
- StylusDisconnected();              Uses implicit PenEvent classification decision tree (default, and current
- implementation)
-
-*/
-
+// The ClassificationProxy is what the app will deal with.  The proxy makes final decisions,
+// and shields the app from the details of how and when the decision is made.  He's supposed
+// to implement the application decision rules given what the classifier thinks.
+//
+// _classificationProxy public methods: (all void-type)
+//
+// AllowNonPenEventTouches();         Allow non-PenEvent touches as TouchClassification::Pen (default, and current
+// implementation)
+// RejectNonPenEventTouches();        Reject all non-PenEvent touches as TouchClassification::Palm
+// StylusConnected();                 Enables explicit PenEvent classification decision tree
+// StylusDisconnected();              Uses implicit PenEvent classification decision tree (default, and current
+// implementation)
+//
 namespace fiftythree
 {
 namespace sdk
 {
-
 struct TouchStatistics
 {
     float _penDownDeltaT;
@@ -76,7 +68,7 @@ struct TouchStatistics
     double _tBegan;
     double _tEnded;
 
-    int   _clusterId;
+    int _clusterId;
 
     // using 100.0f since max() is really annoying when you open the spreadsheet.
     // 100 is big enough and easy to identify as the default.
@@ -101,7 +93,6 @@ struct TouchStatistics
     _tBegan(-1.0f),
     _tEnded(-1.0f)
     {
-
     }
 
 };
@@ -124,7 +115,7 @@ public:
     // The caller can let the classifier know a touch has been marked
     void RemoveTouchFromClassification(core::TouchId touchId);
 
-    TouchClassification Classify(core::TouchId touchID);
+    core::TouchClassification Classify(core::TouchId touchID);
 
     void SetUsePrivateAPI(bool v);
 
@@ -166,24 +157,24 @@ protected:
 
     std::map<core::TouchId, core::TouchClassification> _currentTypes;
 
-    std::map<core::TouchId, bool>      _touchLocked;
+    std::map<core::TouchId, bool> _touchLocked;
 
     std::map<core::TouchId, TouchStatistics> _touchStatistics;
 
-    ClusterTracker::Ptr                  _clusterTracker;
+    ClusterTracker::Ptr _clusterTracker;
 
-    IsolatedStrokesClassifier            _isolatedStrokesClassifier;
-    PenEventClassifier                   _penEventClassifier;
-    PenTracker                           _penTracker;
+    IsolatedStrokesClassifier _isolatedStrokesClassifier;
+    PenEventClassifier _penEventClassifier;
+    PenTracker _penTracker;
 
-    std::deque<PenEvent>                 _debounceQueue;
+    std::deque<PenEvent> _debounceQueue;
 
     // True if everything not associated with a penEvent is rejected.
-    bool                                 _penEventsRequired;
+    bool _penEventsRequired;
     // True if stylus is connected and can deliver PenEvents
-    bool                                 _activeStylusConnected;
+    bool _activeStylusConnected;
     // True if we simply ignore penevents
-    bool                                 _ignorePenEvents;
+    bool _ignorePenEvents;
 
     void UpdateIsolationStatistics();
 
@@ -192,7 +183,7 @@ protected:
     std::vector<core::TouchId> _endedTouchesReclassified;
     std::vector<core::TouchId> _activeTouchesReclassified;
 
-    Eigen::Vector2f    _penDirection;
+    Eigen::Vector2f _penDirection;
 
     bool _usePrivateTouchSizeAPI;
 
@@ -206,9 +197,9 @@ protected:
 
     void ReclassifyClusters();
 
-    void FingerTapIsolationRule(IdTypeMap& newTypes);
+    void FingerTapIsolationRule(IdTypeMap & newTypes);
 
-    void SetClusterType(Cluster::Ptr const & cluster, TouchClassification newType, IdTypeMap &changedTypes);
+    void SetClusterType(Cluster::Ptr const & cluster, core::TouchClassification newType, IdTypeMap & changedTypes);
 
     IdTypeMap ReclassifyCurrentEvent();
 
@@ -220,7 +211,6 @@ protected:
 
     void ProcessDebounceQueue();
 
-    // Akil:
     bool _isolatedStrokesForClusterClassification;
 
 public:
@@ -241,30 +231,30 @@ public:
 
     typedef fiftythree::core::shared_ptr<TouchClassificationProxy> Ptr;
 
-    TouchClassification CurrentClass(core::TouchId touchId);
+    core::TouchClassification CurrentClass(core::TouchId touchId);
 
-    bool      PenActive();
+    bool PenActive();
 
     // this feels like it should be in PenDirection, but it shouldn't.  The decision crosses multiple
     // components.
-    bool      HandednessLocked();
+    bool HandednessLocked();
 
-    void      InitializeTouchTypes();
+    void InitializeTouchTypes();
 
-    void      LockTypeForTouch(core::TouchId touchId);
-    bool      IsLocked(core::TouchId touchId);
+    void LockTypeForTouch(core::TouchId touchId);
+    bool IsLocked(core::TouchId touchId);
 
-    float     MaximumPenEventWaitTime() const;
+    float MaximumPenEventWaitTime() const;
 
-    void      SetIsolatedStrokes(bool value);
+    void SetIsolatedStrokes(bool value);
 
-    void      SetNeedsClassification()
+    void SetNeedsClassification()
     {
         _needsClassification = true;
         _penEventClassifier.SetNeedsClassification();
     }
 
-    bool      ActiveStylusIsConnected()
+    bool ActiveStylusIsConnected()
     {
         return _activeStylusConnected;
     }
@@ -273,17 +263,17 @@ public:
     // return the minimum ratio of (cluster score) / (other cluster score).
     // if the worst ratio is larger than one, the probe is the best alive at the time.
     // if the worst ratio is very large, this guy dominates the others and should suppress them.
-    float     DominationScore(Cluster::Ptr const & probeCluster);
+    float DominationScore(Cluster::Ptr const & probeCluster);
 
-    bool      IsLongestConcurrentTouch(core::TouchId probeId);
+    bool IsLongestConcurrentTouch(core::TouchId probeId);
 
-    void      DebugPrintClusterStatus();
+    void DebugPrintClusterStatus();
 
-    void      AllowNonPenEventTouches();
-    void      RejectNonPenEventTouches();
+    void AllowNonPenEventTouches();
+    void RejectNonPenEventTouches();
 
-    void      IgnorePenEvents();
-    void      ListenForPenEvents();
+    void IgnorePenEvents();
+    void ListenForPenEvents();
 
     std::vector<core::TouchId> EndedTouchesReclassified();
     void ClearEndedTouchesReclassified();
@@ -291,7 +281,8 @@ public:
     std::vector<core::TouchId> ActiveTouchesReclassified();
     void ClearActiveTouchesReclassified();
 
-    bool UseIsolatedStrokes() {
+    bool UseIsolatedStrokes()
+    {
         return _isolatedStrokesForClusterClassification;
     }
 
@@ -329,31 +320,30 @@ public:
     // this is a backstop which makes sure they get assigned to something before the
     // cluster is marked stale. assigning them to palm right when they end might cause problems
     // if the pen events are just late.  (this is actually common with taps).
-    void SetOldUnknownTouchesToType(TouchClassification newType);
+    void SetOldUnknownTouchesToType(core::TouchClassification newType);
 
     void SetCurrentTime(double timestamp);
 
     std::vector<float> SizeDataForTouch(core::TouchId touchId);
 
-    TouchClassification       TouchTypeForNewCluster()
+    core::TouchClassification TouchTypeForNewCluster()
     {
-        if(_activeStylusConnected || _testingIsolated)
+        if (_activeStylusConnected || _testingIsolated)
         {
-            return TouchClassification::Unknown;
+            return core::TouchClassification::Unknown;
         }
         else
         {
-            return TouchClassification::UnknownDisconnected;
+            return core::TouchClassification::UnknownDisconnected;
         }
     }
 
     // callback from clustertracker when an event ends
-    void            OnClusterEventEnded();
+    void OnClusterEventEnded();
+    void RecomputeClusterPriors();
 
-    void            RecomputeClusterPriors();
-
-    Eigen::VectorXf PenPriorForTouches(TouchIdVector const &touchIds);
-    Eigen::VectorXf PenPriorForClusters(std::vector<Cluster::Ptr> const &clusters);
+    Eigen::VectorXf PenPriorForTouches(TouchIdVector const & touchIds);
+    Eigen::VectorXf PenPriorForClusters(std::vector<Cluster::Ptr> const & clusters);
 
     inline TouchClassificationProxy():
     _commonData(&_currentTypes, &_touchLocked, this),
@@ -369,14 +359,10 @@ public:
     _clearStaleStatistics(true),
     _activeStylusConnected(false)
     {
-
         ClearEndedTouchesReclassified();
         ClearActiveTouchesReclassified();
-
         ClearSessionStatistics();
     }
-
 };
-
 }
 }

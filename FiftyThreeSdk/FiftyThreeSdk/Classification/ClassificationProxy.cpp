@@ -21,6 +21,7 @@
 
 using namespace boost::assign;
 using Eigen::Vector2f;
+using fiftythree::core::TouchClassification;
 using std::tie;
 using std::vector;
 

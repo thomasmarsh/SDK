@@ -9,6 +9,7 @@
 #include "DumbStylus.h"
 
 using namespace fiftythree::sdk;
+using fiftythree::core::TouchClassification;
 
 TouchClassification DumbStylusClassifier::ClusterType(ClusterId clusterId)
 {

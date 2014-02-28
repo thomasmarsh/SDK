@@ -18,6 +18,7 @@
 #include "FiftyThreeSdk/Classification/TouchLogger.h"
 
 using namespace Eigen;
+using fiftythree::core::TouchClassification;
 
 namespace fiftythree {
 namespace sdk {

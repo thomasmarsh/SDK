@@ -17,6 +17,7 @@
 #include "FiftyThreeSdk/Classification/Screen.h"
 
 using namespace Eigen;
+using fiftythree::core::TouchClassification;
 
 namespace fiftythree {
 namespace sdk {
