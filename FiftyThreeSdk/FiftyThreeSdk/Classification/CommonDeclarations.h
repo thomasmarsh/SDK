@@ -7,20 +7,18 @@
 
 #pragma once
 
-#include <boost/assign.hpp>
 #include <boost/strong_typedef.hpp>
 #include <vector>
 
-#include "Classifier.h"
 #include "Core/Eigen.h"
 #include "Core/Enum.h"
 #include "Core/Touch/Touch.h"
+#include "FiftyThreeSdk/Classification/Classifier.h"
 
 namespace fiftythree
 {
 namespace sdk
 {
-
 typedef std::map<core::TouchId, float> IdFloatMap;
 typedef std::map<core::TouchId, core::TouchClassification> IdTypeMap;
 typedef std::pair<core::TouchId, core::TouchClassification> IdTypePair;
@@ -57,7 +55,8 @@ typedef std::vector<core::TouchClassification>::iterator TouchTypeIterator;
 // This is fairly arbitrary: we only update isolated stroke data when the number of samples reaches
 // one of the threshold values below.
 // The last threshold should always be Inf. Otherwise...*boom*
-static const int isolatedBatchThresholds[] = {
+static const int isolatedBatchThresholds[] =
+{
   4, 8, 12, 16, 20, 28, 36, 44, 52, 60, 70, 80, 90, 100, 150, 200, 250, 300, 350, 400, 500, 600, intInf
 };
 
@@ -67,13 +66,13 @@ class DataStream;
 typedef Eigen::Matrix<float,  1, 1> Vector1f;
 typedef Eigen::Matrix<double, 1, 1> Vector1d;
 
-typedef DataStream<Eigen::Vector2f>   DataStream2f;
-typedef DataStream<Vector1f>          DataStream1f;
+typedef DataStream<Eigen::Vector2f>  DataStream2f;
+typedef DataStream<Vector1f> DataStream1f;
 typedef Eigen::Matrix< float, 7, 1> Vector7f;
 
-typedef DataStream<Vector7f>          DataStream7f;
+typedef DataStream<Vector7f> DataStream7f;
 
-typedef std::vector< float > StdVectorFloat;
+typedef std::vector<float> StdVectorFloat;
 
 typedef Eigen::Map<Eigen::VectorXf> VectorXfMap;
 typedef Eigen::Map<Eigen::VectorXi> VectorXiMap;
