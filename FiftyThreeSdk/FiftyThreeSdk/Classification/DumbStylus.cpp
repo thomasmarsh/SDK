@@ -7,9 +7,9 @@
 #include <map>
 #include <vector>
 
-#include "FiftyThreeSdk/Classification/Eigen.h"
 #include "FiftyThreeSdk/Classification/ClassificationProxy.h"
 #include "FiftyThreeSdk/Classification/DumbStylus.h"
+#include "FiftyThreeSdk/Classification/Eigen.h"
 
 using namespace Eigen;
 using namespace fiftythree::sdk;
@@ -57,7 +57,6 @@ IdTypeMap DumbStylusClassifier::ReclassifyByHandedness()
 
     for (Cluster::Ptr const & cluster :  timeOrderedClusters)
     {
-
         bool wasAtPalmEnd = _commonData->proxy->PenTracker()->WasAtPalmEnd(cluster);
 
         if (cluster->IsPossibleEdgeThumb() ||

@@ -14,8 +14,10 @@
 #include "FiftyThreeSdk/Classification/CommonDeclarations.h"
 #include "FiftyThreeSdk/Classification/Stroke.h"
 
-namespace fiftythree {
-namespace sdk {
+namespace fiftythree
+{
+namespace sdk
+{
 
 typedef std::pair<core::TouchId, bool> IdBoolPair;
 typedef std::vector<core::TouchId> TouchIdVector;
@@ -29,7 +31,8 @@ typedef fiftythree::core::shared_ptr<Cluster> ClusterPtr;
 typedef fiftythree::core::shared_ptr<const Cluster> ClusterCPtr;
 
 // A container of data for each touch
-class TouchData {
+class TouchData
+{
 protected:
     core::TouchId     _touchId;
     core::TouchPhase  _phase;
@@ -75,10 +78,12 @@ public:
     void SetStroke(Stroke::Ptr stroke);
     void SetId(core::TouchId id);
 
-    void SetIsolatedIncrementalUpdateIndex(int index) {
+    void SetIsolatedIncrementalUpdateIndex(int index)
+    {
         _isolatedIncrementalUpdateIndex = index;
     }
-    int GetIsolatedIncrementalUpdateIndex() {
+    int GetIsolatedIncrementalUpdateIndex()
+    {
         return _isolatedIncrementalUpdateIndex;
     }
 
@@ -137,7 +142,8 @@ typedef std::pair<core::TouchId, TouchData::Ptr> IdDataPair;
 typedef std::pair<core::TouchId, TouchData::Ptr const &> IdDataRefPair;
 
 // A container of data for each PenEvent
-class PenEventData {
+class PenEventData
+{
 protected:
     // members
     double _eventTime;
@@ -195,13 +201,13 @@ public:
 
         }
     }
-
 };
 
 typedef std::pair<PenEventId, PenEventData::Ptr> IdPenEventDataPair;
 
 // Keeps all TouchData's, and does elementary processing for classifier queries
-class TouchLogger {
+class TouchLogger
+{
 protected:
 
     boost::container::flat_map<core::TouchId, TouchData::Ptr> _touchData;
@@ -220,19 +226,19 @@ protected:
     // this should be made aware of the clusterTracker's need for data as well
     // seems a good place for shared pointers.
     const double _trailingTouchTimeWindow = 20.0;
-    const int    _trailingTouchCount = 50;
+    const int _trailingTouchCount = 50;
 
     // Remove PenEvents that happened more than _trailingPenEventTimeWindow seconds ago
     const double _trailingPenEventTimeWindow = 20.0;
 
     // Keeps ordered logs of touch ended's, so we can figure out when to boot touch data
-    std::set<core::TouchId>      _activeTouches;  //
+    std::set<core::TouchId> _activeTouches;  //
     std::deque<core::TouchId>    _endedTouches;
 
-    std::vector<core::TouchId>   _cancelledTouches;  // Staging container for cancelled touches
-    std::vector<core::TouchId>   _endedTouchesStaged; // Staging container for ended touches
+    std::vector<core::TouchId> _cancelledTouches;  // Staging container for cancelled touches
+    std::vector<core::TouchId> _endedTouchesStaged; // Staging container for ended touches
 
-    std::set<core::TouchId>      _removedTouches; // touches which have been removed by the app
+    std::set<core::TouchId> _removedTouches; // touches which have been removed by the app
 
     // PenEvent logs
     boost::container::flat_map<PenEventId, PenEventData::Ptr> _penEventData;
@@ -304,8 +310,8 @@ public:
 
     void ClearAllData();
 
-    TouchIdVector   CancelledTouches();
-    void            ClearCancelledTouches();
+    TouchIdVector CancelledTouches();
+    void ClearCancelledTouches();
 
     void UpdateTime(double t);
     double Time();
@@ -315,36 +321,36 @@ public:
     TouchIdVector IntersectTouchIdVectors(TouchIdVector* v1, TouchIdSet* v2);
 
     // Accessors for Touch and PenEvent data
-    TouchData::Ptr    const &        Data(core::TouchId id);
-    std::vector<TouchData::Ptr>      Data(TouchIdVector ids);
+    TouchData::Ptr    const & Data(core::TouchId id);
+    std::vector<TouchData::Ptr> Data(TouchIdVector ids);
 
     // if/when TouchTracker gets modified to hold the ended touches the classifier needs
     // we can remove this call and replace it with the like-named TouchTracker call.
-    core::Touch::Ptr const &       TouchWithId(core::TouchId touchId);
-    bool                             ContainsTouchWithId(core::TouchId touchId);
+    core::Touch::Ptr const & TouchWithId(core::TouchId touchId);
+    bool ContainsTouchWithId(core::TouchId touchId);
 
-    Stroke::Ptr const &      Stroke(core::TouchId id);
+    Stroke::Ptr const & Stroke(core::TouchId id);
     std::vector<Stroke::Ptr> Stroke(TouchIdVector ids);
 
-    ClusterPtr                       Cluster(core::TouchId touchId);
+    ClusterPtr Cluster(core::TouchId touchId);
 
-    core::TouchPhase               Phase(core::TouchId id);
+    core::TouchPhase Phase(core::TouchId id);
     std::vector<core::TouchPhase>  Phase(TouchIdVector ids);
 
-    PenEventData::Ptr const &        PenData(PenEventId id);
-    std::vector<PenEventData::Ptr>   PenData(PenEventIdVector ids);
+    PenEventData::Ptr const & PenData(PenEventId id);
+    std::vector<PenEventData::Ptr> PenData(PenEventIdVector ids);
 
-    double                           PenTime(PenEventId id);
-    std::vector<double>              PenTime(PenEventIdVector ids);
+    double PenTime(PenEventId id);
+    std::vector<double> PenTime(PenEventIdVector ids);
 
-    PenEventType                     PenType(PenEventId id);
-    std::vector<PenEventType>        PenType(PenEventIdVector ids);
+    PenEventType PenType(PenEventId id);
+    std::vector<PenEventType> PenType(PenEventIdVector ids);
 
     // For debugging
-    void                            AssertIds(TouchIdVector ids);
-    void                            AssertIds(core::TouchId id);
-    void                            AssertPenEvents(PenEventIdVector ids);
-    void                            AssertPenEvents(PenEventId id);
+    void AssertIds(TouchIdVector ids);
+    void AssertIds(core::TouchId id);
+    void AssertPenEvents(PenEventIdVector ids);
+    void AssertPenEvents(PenEventId id);
 
     ///////////////////////////////
     //
@@ -358,55 +364,55 @@ public:
     //
     ////////////////////////////////////////////////////////
 
-    bool                            AllCancelledFlag()
+    bool AllCancelledFlag()
     {
         return _allCancelledFlag;
     }
 
-    TouchIdVector                   ActiveIds();
-    TouchIdVector                   ActiveNonEndedIds();
+    TouchIdVector ActiveIds();
+    TouchIdVector ActiveNonEndedIds();
 
     // Temporal Id filters
     // Ids begun within specified (absolute) time interval
-    TouchIdVector                   TouchIdsBeganInTimeInterval(double interval_start,
-                                                                double interval_end);
+    TouchIdVector TouchIdsBeganInTimeInterval(double interval_start,
+                                              double interval_end);
 
-    TouchIdVector                   TouchIdsEndedInTimeInterval(double interval_start,
-                                                                double interval_end);
+    TouchIdVector TouchIdsEndedInTimeInterval(double interval_start,
+                                              double interval_end);
 
     // Ids begun within specified (absolute) time interval
-    TouchIdSet                      TouchIdSetBeganInTimeInterval(double interval_start,
-                                                               double interval_end);
+    TouchIdSet TouchIdSetBeganInTimeInterval(double interval_start,
+                                            double interval_end);
 
-    TouchIdSet                      TouchIdSetEndedInTimeInterval(double interval_start,
-                                                               double interval_end);
+    TouchIdSet TouchIdSetEndedInTimeInterval(double interval_start,
+                                             double interval_end);
 
-    TouchIdVector                   ConcurrentTouches(core::TouchId probeId);
+    TouchIdVector ConcurrentTouches(core::TouchId probeId);
 
-    core::TouchId                 TouchPrecedingTouch(core::TouchId probeId);
+    core::TouchId TouchPrecedingTouch(core::TouchId probeId);
 
-    PenEventId                      MostRecentPenDownEvent();
-    PenEventId                      MostRecentPenUpEvent();
-    PenEventId                      MostRecentPenEvent();
-    void                            RemoveMostRecentPenEvent();
+    PenEventId MostRecentPenDownEvent();
+    PenEventId MostRecentPenUpEvent();
+    PenEventId MostRecentPenEvent();
+    void RemoveMostRecentPenEvent();
 
-    core::TouchId                 MostRecentTouch();
+    core::TouchId MostRecentTouch();
 
-    core::TouchId                 MostRecentEndedPen();
+    core::TouchId MostRecentEndedPen();
 
     core::TouchClassification MostRecentPenTipType();
 
-    PenEventIdVector                PenBeganEventsInTimeInterval(double t0, double t1);
-    PenEventIdVector                PenEndedEventsInTimeInterval(double t0, double t1);
+    PenEventIdVector PenBeganEventsInTimeInterval(double t0, double t1);
+    PenEventIdVector PenEndedEventsInTimeInterval(double t0, double t1);
 
-    PenEventIdSet                   PenBeganEventSetInTimeInterval(double t0, double t1);
-    PenEventIdSet                   PenEndedEventSetInTimeInterval(double t0, double t1);
+    PenEventIdSet PenBeganEventSetInTimeInterval(double t0, double t1);
+    PenEventIdSet PenEndedEventSetInTimeInterval(double t0, double t1);
 
-    PenEventIdSet                   PenEventSetInTimeInterval(double t0, double t1);
+    PenEventIdSet PenEventSetInTimeInterval(double t0, double t1);
 
-    PenEventIdVector                PenEventsInTimeInterval(double t0, double t1, bool includeEndpoints);
+    PenEventIdVector PenEventsInTimeInterval(double t0, double t1, bool includeEndpoints);
 
-    bool                            IsIdLogged(core::TouchId id);
+    bool IsIdLogged(core::TouchId id);
 
     ////////////////////////////////////////////////////
     //
@@ -420,30 +426,30 @@ public:
     //
     ////////////////////////////////////////////////////////
 
-    void                            InsertStroke(core::TouchId touchId,
-                                                 Eigen::VectorXd t,
-                                                 Eigen::VectorXf x,
-                                                 Eigen::VectorXf y);
-    void                            InsertStroke(core::TouchId touchId,
-                                                 Eigen::VectorXd t,
-                                                 Eigen::VectorXf x,
-                                                 Eigen::VectorXf y,
-                                                 int startIndex,
-                                                 int endIndex);
+    void InsertStroke(core::TouchId touchId,
+                      Eigen::VectorXd t,
+                      Eigen::VectorXf x,
+                      Eigen::VectorXf y);
+    void InsertStroke(core::TouchId touchId,
+                      Eigen::VectorXd t,
+                      Eigen::VectorXf x,
+                      Eigen::VectorXf y,
+                      int startIndex,
+                      int endIndex);
 
-    void                            DeleteTouchId(core::TouchId id);
+    void DeleteTouchId(core::TouchId id);
 
-    std::deque<core::TouchId>     EndedTouches()
+    std::deque<core::TouchId> EndedTouches()
     {
         return _endedTouches;
     }
 
-    TouchIdVector                   LiveTouches();
+    TouchIdVector LiveTouches();
 
-    TouchIdVector                   IdsInPhase(core::TouchPhase phase);
-    bool                            IsEnded(core::TouchId touchId);
-    int                             NumberOfTouches();
-    int                             LoggedPenEventCount();
+    TouchIdVector IdsInPhase(core::TouchPhase phase);
+    bool IsEnded(core::TouchId touchId);
+    int NumberOfTouches();
+    int LoggedPenEventCount();
 };
 
 core::TouchId InvalidTouchId();
