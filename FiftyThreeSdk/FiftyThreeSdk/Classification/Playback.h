@@ -7,10 +7,11 @@
 
 #pragma once
 
-#include <boost/foreach.hpp>
-#include <boost/smart_ptr.hpp>
+#include <boost/any.hpp>
+#include <tuple>
 
 #include "Core/Enum.h"
+#include "Core/Memory.h"
 #include "Core/Touch/Touch.h"
 #include "FiftyThreeSdk/Classification/CommonDeclarations.h"
 
@@ -18,11 +19,9 @@ namespace fiftythree
 {
 namespace sdk
 {
-
 DEFINE_ENUM(PlaybackEntryType,
             TouchesChanged,
-            PenEvent
-            );
+            PenEvent);
 
 struct PlaybackEntry
 {
@@ -36,15 +35,15 @@ struct PlaybackEntry
 
     PlaybackEntry(const std::set<core::Touch::Ptr> & touches) : _type(PlaybackEntryType::TouchesChanged)
     {
-
-        BOOST_FOREACH(const core::Touch::Ptr & touch, touches)
+        for (const core::Touch::Ptr & touch :  touches)
         {
             core::Touch::Ptr copyOfTouch = core::Touch::New(touch->Id(), touch->Phase(), touch->CurrentSample());
 
             std::string k; boost::any v;
 
-            BOOST_FOREACH(tie(k,v), touch->DynamicProperties())
+            for (const auto & pair : touch->DynamicProperties())
             {
+                std::tie(k,v) = pair;
                 copyOfTouch->DynamicProperties()[k] = v;
             }
 
@@ -57,7 +56,7 @@ struct PlaybackEntry
 
     double MostRecentTimestamp() const
     {
-        if(_type == PlaybackEntryType::PenEvent)
+        if (_type == PlaybackEntryType::PenEvent)
         {
             return _penEvent._timestamp;
         }
@@ -65,9 +64,9 @@ struct PlaybackEntry
         {
             double tMax = 0.0;
 
-            BOOST_FOREACH(const core::Touch::cPtr & touch, _touches)
+            for (const core::Touch::cPtr & touch :  _touches)
             {
-                if(touch->CurrentSample().TimestampSeconds() > tMax)
+                if (touch->CurrentSample().TimestampSeconds() > tMax)
                 {
                     tMax = touch->CurrentSample().TimestampSeconds();
                 }

@@ -6,7 +6,6 @@
 //
 
 #include <boost/algorithm/string.hpp>
-#include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
 
 #include "Core/Touch/Touch.h"
@@ -27,7 +26,7 @@ std::vector<std::string> CSVgetNextLineAndSplitIntoTokens(std::istream & str)
     std::vector<std::string> parts;
     boost::algorithm::split(parts, line, boost::is_any_of(","));
 
-    BOOST_FOREACH(std::string & part, parts)
+    for (std::string & part :  parts)
     {
         trim(part);
     }
@@ -55,13 +54,13 @@ PlaybackSequence::PlaybackSequence(std::istream & str)
             break;
         }
 
-        int    index       = lexical_cast<int>(row[0]);
-        double timestamp   = lexical_cast<double>(row[1]);
-        int    type        = lexical_cast<int>(row[2]);
+        int    index = lexical_cast<int>(row[0]);
+        double timestamp = lexical_cast<double>(row[1]);
+        int    type = lexical_cast<int>(row[2]);
 
-        if(index != previousIndex)
+        if (index != previousIndex)
         {
-            if(type == PlaybackEntryType::PenEvent)
+            if (type == PlaybackEntryType::PenEvent)
             {
                 int penEventType =lexical_cast<int>(row[3]);
                 PenEvent pe;
@@ -78,13 +77,13 @@ PlaybackSequence::PlaybackSequence(std::istream & str)
             }
         }
 
-        if(type == PlaybackEntryType::TouchesChanged)
+        if (type == PlaybackEntryType::TouchesChanged)
         {
             TouchId touchId  = static_cast<TouchId>(lexical_cast<int>(row[3]));
             TouchPhase phase = static_cast<TouchPhase::TouchPhaseEnum>(lexical_cast<int>(row[4]));
 
-            float      x     = lexical_cast<float>(row[5]);
-            float      y     = lexical_cast<float>(row[6]);
+            float x = lexical_cast<float>(row[5]);
+            float y = lexical_cast<float>(row[6]);
 
             Eigen::Vector2f z(x,y);
             core::InputSample sample(z, z, timestamp);
@@ -115,9 +114,9 @@ void PlaybackSequence::Write(std::ostream & str)
     str.precision(20);
 
     int counter = 0;
-    BOOST_FOREACH(const PlaybackEntry::Ptr & entry, _playbackEntries)
+    for (const PlaybackEntry::Ptr & entry :  _playbackEntries)
     {
-        if(entry->_type == PlaybackEntryType::PenEvent)
+        if (entry->_type == PlaybackEntryType::PenEvent)
         {
             str << counter << ", " << entry->_penEvent._timestamp <<  ", " << entry->_type << ", ";
             str << entry->_penEvent._type;
@@ -125,7 +124,7 @@ void PlaybackSequence::Write(std::ostream & str)
         }
         else
         {
-            BOOST_FOREACH(const core::Touch::cPtr & touch, entry->_touches)
+            for (const core::Touch::cPtr & touch :  entry->_touches)
             {
                 core::InputSample snapshotSample = touch->CurrentSample();
 
@@ -136,7 +135,7 @@ void PlaybackSequence::Write(std::ostream & str)
                 str << snapshotSample.Location().x() << ", ";
                 str << snapshotSample.Location().y() << ", ";
 
-                if(snapshotSample.TouchRadius())
+                if (snapshotSample.TouchRadius())
                 {
                     str << *(snapshotSample.TouchRadius());
                 }
