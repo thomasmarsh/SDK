@@ -8,25 +8,23 @@
 #pragma once
 
 #include <cmath>
-#include <Eigen/Dense>
-#include <Eigen/QR>
 
 #include "Core/Asserts.h"
 #include "FiftyThreeSdk/Classification/Eigen.h"
-#include "FiftyThreeSdk/Classification/EigenLAB.h" // For SquaredNorm
+#include "FiftyThreeSdk/Classification/EigenLAB.h"
 
-using namespace Eigen;
-
-namespace fiftythree {
-namespace sdk {
+namespace fiftythree
+{
+namespace sdk
+{
 
 // Solves A x = b, just does it without all the Eigen syntax overhead
 // Effectively, this method evaluates pinv(A)*b.
 template<typename DerivedA, typename DerivedB>
-Eigen::Matrix<typename DerivedA::Scalar, Dynamic, 1> LinearLeastSquaresSolve(const MatrixBase<DerivedA> &A,
-                                                         const MatrixBase<DerivedB> &b,
-                                                         typename DerivedB::Scalar &residual) {
-
+Eigen::Matrix<typename DerivedA::Scalar, Eigen::Dynamic, 1> LinearLeastSquaresSolve(const Eigen::MatrixBase<DerivedA> &A,
+                                                         const Eigen::MatrixBase<DerivedB> &b,
+                                                         typename DerivedB::Scalar &residual)
+{
     DebugAssert(b.cols() == 1);
     DebugAssert(A.rows() == b.rows());
 
@@ -41,7 +39,7 @@ Eigen::Matrix<typename DerivedA::Scalar, Dynamic, 1> LinearLeastSquaresSolve(con
     //
     //DerivedB output = A.jacobiSvd(ComputeThinU | ComputeThinV).solve(b);
 
-    ColPivHouseholderQR<DerivedA> QR = A.colPivHouseholderQr();
+    auto QR = A.colPivHouseholderQr();
 
     // I'd be happy to use something like
     //DerivedB output = QR.solve(b);
@@ -52,23 +50,15 @@ Eigen::Matrix<typename DerivedA::Scalar, Dynamic, 1> LinearLeastSquaresSolve(con
     //
     // So instead we'll do things the painful way:
     //DerivedA Q = ( (DerivedA) QR.householderQ() ).block(0, 0, A.rows(), QR.rank());
-    Eigen::Matrix<typename DerivedA::Scalar, Dynamic, Dynamic>  R = ( (DerivedA) QR.matrixQR().template triangularView<Upper>() ).block(0, 0, QR.rank(), QR.rank());
-    //DerivedA E = (DerivedA) QR.colsPermutation();
 
-    //std::cout << Q << std::endl;
-    //std::cout << R << std::endl;
-    //std::cout << E << std::endl;
-    //std::cout << E * ( R.lu().solve(Q.transpose()*b) ) << std::endl;
-
-    //DerivedB output = E * ( R.lu().solve(Q.transpose()*b) );
-    //DerivedB output = QR.colsPermutation() * ( R.lu().solve(Q.transpose()*b) );
+    auto  R = ( (DerivedA) QR.matrixQR().template triangularView<Eigen::Upper>() ).block(0, 0, QR.rank(), QR.rank());
 
     // *sigh*, attempt to pre-empt more template snafu's
-    Eigen::Matrix<typename DerivedA::Scalar, Dynamic, 1> bCopy = b.template cast<typename DerivedA::Scalar>();
+    auto bCopy = b.template cast<typename DerivedA::Scalar>();
     //bCopy.applyOnTheLeft(QR.householderQ().setLength(QR.rank()).adjoint());
     bCopy.applyOnTheLeft(QR.householderQ().adjoint());
 
-    Eigen::Matrix<typename DerivedA::Scalar, Dynamic, 1> output;
+    Eigen::Matrix<typename DerivedA::Scalar, Eigen::Dynamic, 1> output;
     output.setZero(A.cols(), 1);
 
     output.segment(0,QR.rank()) = ( R.lu().solve( bCopy.segment(0,QR.rank()) ) );
@@ -76,7 +66,8 @@ Eigen::Matrix<typename DerivedA::Scalar, Dynamic, 1> LinearLeastSquaresSolve(con
     output = QR.colsPermutation() * output;
 
     residual = 0; // implicit cast
-    if (QR.rank() < bCopy.rows()) {
+    if (QR.rank() < bCopy.rows())
+    {
         residual = std::sqrt(
                         SquaredNorm(
                             bCopy.segment(QR.rank(), bCopy.rows() - QR.rank())
@@ -89,8 +80,8 @@ Eigen::Matrix<typename DerivedA::Scalar, Dynamic, 1> LinearLeastSquaresSolve(con
 
 // Throw away residual
 template<typename DerivedA, typename DerivedB>
-DerivedB LinearLeastSquaresSolve(const MatrixBase<DerivedA> &A,
-                                 const MatrixBase<DerivedB> &b)
+DerivedB LinearLeastSquaresSolve(const Eigen::MatrixBase<DerivedA> &A,
+                                 const Eigen::MatrixBase<DerivedB> &b)
 {
 
     typename DerivedB::Scalar residual;
@@ -100,9 +91,10 @@ DerivedB LinearLeastSquaresSolve(const MatrixBase<DerivedA> &A,
 
 // Solves diag(sqrt(w))*A*x = diag(sqrt(w))*b, just does it without all the Eigen syntax overhead
 template<typename DerivedA, typename DerivedB>
-DerivedB LinearLeastSquaresSolve(const MatrixBase<DerivedA> &A,
-                                 const MatrixBase<DerivedB> &b,
-                                 const MatrixBase<DerivedB> &w) {
+DerivedB LinearLeastSquaresSolve(const Eigen::MatrixBase<DerivedA> &A,
+                                 const Eigen::MatrixBase<DerivedB> &b,
+                                 const Eigen::MatrixBase<DerivedB> &w)
+{
 
     DebugAssert(w.rows() == A.rows());
 
@@ -110,9 +102,8 @@ DerivedB LinearLeastSquaresSolve(const MatrixBase<DerivedA> &A,
     DerivedB tempB = w.cwiseSqrt().array()*b.array();
 
     // Hopefully the compiler optimizes this
-    DerivedB output = LinearLeastSquaresSolve<DerivedA, DerivedB>(tempA,tempB);
+    DerivedB output = LinearLeastSquaresSolve<DerivedA, DerivedB>(tempA, tempB);
     return output;
 }
-
 }
 }
