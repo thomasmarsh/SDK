@@ -6,24 +6,33 @@
 //
 
 #include <ctime>
+#include <ios>
 
-#include "FiftyThreeSdk/Classification//EigenLAB.h"
-#include "FiftyThreeSdk/Classification//Stroke.h"
+#include "Core/Asserts.h"
 #include "FiftyThreeSdk/Classification/Debug.h"
+#include "FiftyThreeSdk/Classification/EigenLAB.h"
 #include "FiftyThreeSdk/Classification/FiniteDifferences.h"
+#include "FiftyThreeSdk/Classification/Stroke.h"
 
 using fiftythree::core::TouchId;
+using std::cerr;
+using std::cout;
 
-namespace fiftythree {
-namespace sdk {
-namespace debug {
-
-Eigen::VectorXd StrokeT(int strokeId) {
+namespace fiftythree
+{
+namespace sdk
+{
+namespace debug
+{
+Eigen::VectorXd StrokeT(int strokeId)
+{
 
     Eigen::VectorXd output;
 
-    switch(strokeId) {
-        case 1: {
+    switch (strokeId)
+    {
+        case 1:
+        {
             output.resize(6);
             output << 902695.13605475,
                       902695.152537001,
@@ -33,8 +42,8 @@ Eigen::VectorXd StrokeT(int strokeId) {
                       902695.219172295;
             break;
         }
-
-        case 2: {
+        case 2:
+        {
             // Stroke data: q = 1, qq = 266
             output.resize(19);
             output << 92284.330490208,
@@ -58,8 +67,8 @@ Eigen::VectorXd StrokeT(int strokeId) {
                       92284.6464960042;
             break;
         }
-
-        case 3: {
+        case 3:
+        {
             output.resize(7);
             output << 605707.356568541,
                       605707.372637791,
@@ -73,16 +82,17 @@ Eigen::VectorXd StrokeT(int strokeId) {
         default:
             DebugAssert(false);
     }
-
     return output;
-
 }
 
-Eigen::VectorXf StrokeX(int strokeId) {
+Eigen::VectorXf StrokeX(int strokeId)
+{
     Eigen::VectorXf output;
 
-    switch(strokeId) {
-        case 1:  {
+    switch (strokeId)
+    {
+        case 1:
+        {
             output.resize(6);
             output <<
                            632,
@@ -94,7 +104,8 @@ Eigen::VectorXf StrokeX(int strokeId) {
             break;
         }
 
-        case 2:  {
+        case 2:
+        {
             output.resize(19);
             output <<
                            614,
@@ -119,7 +130,8 @@ Eigen::VectorXf StrokeX(int strokeId) {
             break;
          }
 
-        case 3: {
+        case 3:
+        {
             output.resize(7);
             output <<
                    463,
@@ -130,7 +142,7 @@ Eigen::VectorXf StrokeX(int strokeId) {
                    461,
                    463;
             break;
-                }
+        }
         default:
             DebugAssert(false);
     }
@@ -139,12 +151,15 @@ Eigen::VectorXf StrokeX(int strokeId) {
 
 }
 
-Eigen::VectorXf StrokeY(int strokeId) {
+Eigen::VectorXf StrokeY(int strokeId)
+{
 
     Eigen::VectorXf output;
 
-    switch(strokeId) {
-        case 1: {
+    switch (strokeId)
+    {
+        case 1:
+        {
             output.resize(6);
             output <<
                         383.5,
@@ -156,7 +171,8 @@ Eigen::VectorXf StrokeY(int strokeId) {
             break;
         }
 
-        case 2: {
+        case 2:
+        {
             output.resize(19);
             output <<
                            552,
@@ -181,7 +197,8 @@ Eigen::VectorXf StrokeY(int strokeId) {
             break;
         }
 
-        case 3: {
+        case 3:
+        {
             output.resize(7);
             output <<
                    226,
@@ -202,13 +219,15 @@ Eigen::VectorXf StrokeY(int strokeId) {
 
 }
 
-Eigen::VectorXf StrokeScores(int strokeId) {
-
+Eigen::VectorXf StrokeScores(int strokeId)
+{
     Eigen::VectorXf output;
     output.resize(10);
 
-    switch(strokeId) {
-        case 1: {
+    switch (strokeId)
+    {
+        case 1:
+        {
             output <<
                    17.9739,
                   -10.4239,
@@ -222,7 +241,8 @@ Eigen::VectorXf StrokeScores(int strokeId) {
                    -3.0518;
         }
 
-        case 2: {
+        case 2:
+        {
             output <<
                        19.8879,
                        -8.1278,
@@ -237,7 +257,8 @@ Eigen::VectorXf StrokeScores(int strokeId) {
             break;
         }
 
-        case 3: {
+        case 3:
+        {
             output <<
                    18.0270,
                   -12.3064,
@@ -254,15 +275,15 @@ Eigen::VectorXf StrokeScores(int strokeId) {
         default:
             DebugAssert(false);
     }
-
     return output;
-
 }
 
-void EtaModelTest(IsolatedStrokesClassifier* isolatedStrokesClassifier) {
+void EtaModelTest(IsolatedStrokesClassifier* isolatedStrokesClassifier)
+{
 
     float alpha = 0.02;
-    float etas[] = {
+    float etas[] =
+    {
            -2.608,
            -2.392,
            -2.332,
@@ -277,14 +298,16 @@ void EtaModelTest(IsolatedStrokesClassifier* isolatedStrokesClassifier) {
            -1.327
     };
 
-    std::cout << "The computed vs real etas are:\n";
-    for (int i = 0; i < 12; ++i) {
-        std::cout << isolatedStrokesClassifier->EtaEvaluation(alpha, i) << "        vs        " << etas[i] << std::endl;
+    cout << "The computed vs real etas are:\n";
+    for (int i = 0; i < 12; ++i)
+    {
+        cout << isolatedStrokesClassifier->EtaEvaluation(alpha, i) << "        vs        " << etas[i] << std::endl;
     }
 
 }
 
-void WeakScoreTest(TouchLogger* touchLog, IsolatedStrokesClassifier* isolatedStrokesClassifier) {
+void WeakScoreTest(TouchLogger* touchLog, IsolatedStrokesClassifier* isolatedStrokesClassifier)
+{
 
     TouchId touchId = static_cast<TouchId>(1);
     Eigen::VectorXd t = StrokeT(2);
@@ -297,16 +320,17 @@ void WeakScoreTest(TouchLogger* touchLog, IsolatedStrokesClassifier* isolatedStr
 
     Eigen::VectorXf scores = isolatedStrokesClassifier->ScoresForId(touchId);
 
-    std::cout << "The weak chosen scores are:\n";
-    for (int i =0; i < scores.size(); ++i) {
-        std::cout << scores(i) << std::endl;
+    cout << "The weak chosen scores are:\n";
+    for (int i =0; i < scores.size(); ++i)
+    {
+        cout << scores(i) << std::endl;
     }
 
     touchLog->DeleteTouchId(touchId);
 }
 
-void ChosenWeakScoreTest(TouchLogger* touchLog, IsolatedStrokesClassifier* isolatedStrokesClassifier) {
-
+void ChosenWeakScoreTest(TouchLogger* touchLog, IsolatedStrokesClassifier* isolatedStrokesClassifier)
+{
     TouchId touchId = static_cast<TouchId>(1);
     Eigen::VectorXd t = StrokeT(2);
     Eigen::VectorXf x = StrokeX(2);
@@ -319,19 +343,19 @@ void ChosenWeakScoreTest(TouchLogger* touchLog, IsolatedStrokesClassifier* isola
 
     Eigen::VectorXf exactScores = StrokeScores(2);
 
-    std::cout << "Chosen weak score, log-scaled and normalized test" << std::endl;
+    cout << "Chosen weak score, log-scaled and normalized test" << std::endl;
     VectorComparison(exactScores, scores);
 
     Eigen::VectorXf t2 = touchLog->Stroke(touchId)->RelativeTimestampMap();
-    std::cout << "Value of t(0) is " << t2(0) << std::endl;
+    cout << "Value of t(0) is " << t2(0) << std::endl;
     t2(0) = 35.0;
-    std::cout << "Value of t(0) is " << t2(0) << std::endl;
+    cout << "Value of t(0) is " << t2(0) << std::endl;
 
     touchLog->DeleteTouchId(touchId);
 }
 
-void LogLikelihoodsTest(TouchLogger* touchLog, IsolatedStrokesClassifier* isolatedStrokesClassifier) {
-
+void LogLikelihoodsTest(TouchLogger* touchLog, IsolatedStrokesClassifier* isolatedStrokesClassifier)
+{
     TouchId touchId = static_cast<TouchId>(1);
     Eigen::VectorXd t = StrokeT(2);
     Eigen::VectorXf x = StrokeX(2);
@@ -342,152 +366,22 @@ void LogLikelihoodsTest(TouchLogger* touchLog, IsolatedStrokesClassifier* isolat
 
     Eigen::MatrixXf ll = isolatedStrokesClassifier->StrokeLogLikelihoods(touchId);
     ll = isolatedStrokesClassifier->StrokeLogLikelihoods(touchId);
-    std::cout << "Log-likelihoods: " << ll << std::endl;
+    cout << "Log-likelihoods: " << ll << std::endl;
 
     touchLog->DeleteTouchId(touchId);
 }
 
-//void FDTest() {
-//    Eigen::VectorXd t = StrokeT(2);
-//    Eigen::VectorXf x = StrokeX(2);
-//    Eigen::VectorXf y = StrokeY(2);
-//
-//    Eigen::MatrixX2f xy;
-//    xy.resize(x.rows(), 2);
-//    xy.block(0,0,x.rows(),1) = x;
-//    xy.block(0,1,x.rows(),1) = y;
-//
-//    Eigen::MatrixX2f dxy;
-//    Eigen::MatrixX2f dxy2;
-//    Eigen::MatrixX2f oldDxy;
-//
-//    std::clock_t start;
-//    double duration;
-//    start = std::clock();
-//
-//    for (int i = 0; i < 500; ++i) {
-//        dxy = Eigen::MatrixXf::Zero(x.rows(), 2);
-//        dxy.resize(x.rows(), 2);
-//        Derivative(t, xy, dxy, 3);
-//    }
-//
-//    duration = ( std::clock() - start ) / (500 * (double) CLOCKS_PER_SEC);
-//
-//    std::clock_t start2;
-//    double duration2;
-//    start2 = std::clock();
-//
-//    for (int i = 0; i < 500; ++i) {
-//        dxy2 = xy;
-//        IncrementalDerivative(t, dxy2, 0, 1);
-//        IncrementalDerivative(t, dxy2, 1, 2);
-//        IncrementalDerivative(t, dxy2, 2, 3);
-//    }
-//
-//    duration2 = ( std::clock() - start2 ) / (500 * (double) CLOCKS_PER_SEC);
-//
-//
-//    std::clock_t startOld;
-//    double durationOld;
-//    startOld = std::clock();
-//
-//    for (int i = 0; i < 500; ++i) {
-//        oldDxy = NthDerivative(t, xy, 3);
-//    }
-//
-//    durationOld = ( std::clock() - startOld ) / (500 * (double) CLOCKS_PER_SEC);
-//
-//    std::cout << "Error is " << std::sqrt((oldDxy - dxy).array().square().sum())/std::sqrt(oldDxy.array().square().sum()) << std::endl;
-//    std::cout << "Error2 is " << std::sqrt((oldDxy - dxy2).array().square().sum())/std::sqrt(oldDxy.array().square().sum()) << std::endl;
-//
-//    std::cout << "Elapsed time is " << duration << " and elapsed time 2 is " << duration2 << " and elapsed old time is " << durationOld << std::endl;
-//}
-
-//void FDStencil() {
-//
-//    std::vector<int> stencil;
-//    stencil.push_back(-2);
-//    stencil.push_back(1);
-//    stencil.push_back(-1);
-//    stencil.push_back(0);
-//
-//    BoundaryStencil bdstencil = GhostPointStencils(stencil);
-//
-//    int location;
-//    std::vector<int> localStencil;
-//
-//    std::cout << "For stencil ";
-//    for (int i = 0; i < stencil.size(); ++i) {
-//        std::cout << stencil[i] << " ";
-//    }
-//    std::cout << std::endl;
-//
-//    for (int i = 0; i < bdstencil.size(); ++i) {
-//        location = bdstencil[i].first;
-//        localStencil = bdstencil[i].second;
-//
-//        std::cout << "At location " << location << " stencil is \n";
-//        for (int ii = 0; ii < localStencil.size(); ++ii){
-//            std::cout << localStencil[ii] << std::endl;
-//        }
-//    }
-//
-//    ////////// New stencil
-//
-//    stencil.pop_back();
-//    stencil[0] = 1;
-//    stencil[1] = -1;
-//    stencil[2] = 0;
-//
-//    bdstencil = GhostPointStencils(stencil);
-//
-//    std::cout << "For stencil ";
-//    for (int i = 0; i < stencil.size(); ++i) {
-//        std::cout << stencil[i] << " ";
-//    }
-//    std::cout << std::endl;
-//
-//    for (int i = 0; i < bdstencil.size(); ++i) {
-//        location = bdstencil[i].first;
-//        localStencil = bdstencil[i].second;
-//
-//        std::cout << "At location " << location << " stencil is \n";
-//        for (int ii = 0; ii < localStencil.size(); ++ii){
-//            std::cout << localStencil[ii] << std::endl;
-//        }
-//    }
-//
-//}
-
-void PrintVector(std::vector<int> vec) {
-    for (int i = 0; i < vec.size(); ++i) {
-        std::cout << vec[i] << ", ";
+void PrintVector(std::vector<int> vec)
+{
+    for (int i = 0; i < vec.size(); ++i)
+    {
+        cout << vec[i] << ", ";
     }
-    std::cout << std::endl;
+    cout << std::endl;
 }
 
-//void StencilStorage() {
-//
-//    InitializeDifferenceStencils();
-//
-//    std::vector<int> stencil = DividedDifferenceStencil(3);
-//    std::cout << "stencil for order 3:\n";
-//    PrintVector(stencil);
-//
-//    int location;
-//    std::vector<int> localStencil;
-//
-//    BoundaryStencil bdstencil = GhostPointStencils(stencil);
-//    for (int i = 0; i < bdstencil.size(); ++i) {
-//        location = bdstencil[i].first;
-//        localStencil = bdstencil[i].second;
-//
-//        std::cout << "At location " << location << " stencil is \n";
-//        PrintVector(localStencil);
-//    }
-//}
-
-void ScoreOutput(TouchLogger* touchLog, IsolatedStrokesClassifier* isolatedStrokesClassifier) {
+void ScoreOutput(TouchLogger* touchLog, IsolatedStrokesClassifier* isolatedStrokesClassifier)
+{
     TouchId touchId = static_cast<TouchId>(1);
     Eigen::VectorXd t = StrokeT(2);
     Eigen::VectorXf x = StrokeX(2);
@@ -505,24 +399,27 @@ void ScoreOutput(TouchLogger* touchLog, IsolatedStrokesClassifier* isolatedStrok
     float finalScore = isolatedStrokesClassifier->ConvexScore(touchId);
 
     //TouchType result = isolatedStrokesClassifier->NPLikelihoodTest(touchId);
-    std::cout << "The scores are " << scores << std::endl;
-    std::cout << "The likelihoods are " << ll << std::endl;
-    std::cout << "The NP score is " << NPScore << std::endl;
-    std::cout << "The Bayes score is " << BayesScore << std::endl;
-    std::cout << "The Adaboost score is " << AdaScore << std::endl;
-    std::cout << "The Final score is " << finalScore << std::endl;
+    cout << "The scores are " << scores << std::endl;
+    cout << "The likelihoods are " << ll << std::endl;
+    cout << "The NP score is " << NPScore << std::endl;
+    cout << "The Bayes score is " << BayesScore << std::endl;
+    cout << "The Adaboost score is " << AdaScore << std::endl;
+    cout << "The Final score is " << finalScore << std::endl;
 
     touchLog->DeleteTouchId(touchId);
 }
 
-Eigen::MatrixXf LeastSquaresMatrixData(int testId) {
+Eigen::MatrixXf LeastSquaresMatrixData(int testId)
+{
 
     assert(testId > 0);
 
     Eigen::MatrixXf output;
 
-    switch(testId) {
-        case 1: {
+    switch (testId)
+    {
+        case 1:
+        {
             output.resize(10,5);
             output <<   0.6715,    0.8884,   -0.1022,   -0.8637,   -1.0891,
                        -1.2075,   -1.1471,   -0.2414,    0.0774,    0.0326,
@@ -537,7 +434,8 @@ Eigen::MatrixXf LeastSquaresMatrixData(int testId) {
 
             break;
         }
-        default: {
+        default:
+        {
             assert(false);
         }
     }
@@ -545,14 +443,17 @@ Eigen::MatrixXf LeastSquaresMatrixData(int testId) {
     return output;
 }
 
-Eigen::VectorXf LeastSquaresRHSData(int testId) {
+Eigen::VectorXf LeastSquaresRHSData(int testId)
+{
 
     assert(testId > 0);
 
     Eigen::VectorXf output;
 
-    switch(testId) {
-        case 1: {
+    switch (testId)
+    {
+        case 1:
+        {
             output.resize(10);
             output << -1.4023,
                       -1.4224,
@@ -567,7 +468,8 @@ Eigen::VectorXf LeastSquaresRHSData(int testId) {
 
             break;
         }
-        default: {
+        default:
+        {
             assert(false);
         }
     }
@@ -576,14 +478,17 @@ Eigen::VectorXf LeastSquaresRHSData(int testId) {
 
 }
 
-Eigen::VectorXf LeastSquaresWeights(int testId) {
+Eigen::VectorXf LeastSquaresWeights(int testId)
+{
 
     assert(testId > 0);
 
     Eigen::VectorXf output;
 
-    switch(testId) {
-        case 1: {
+    switch (testId)
+    {
+        case 1:
+        {
             output.resize(10);
             output <<  0.7572,
                        0.7537,
@@ -598,7 +503,8 @@ Eigen::VectorXf LeastSquaresWeights(int testId) {
 
             break;
         }
-        default: {
+        default:
+        {
             assert(false);
         }
     }
@@ -607,14 +513,16 @@ Eigen::VectorXf LeastSquaresWeights(int testId) {
 
 }
 
-Eigen::VectorXf LeastSquaresSolution(int testId) {
-
+Eigen::VectorXf LeastSquaresSolution(int testId)
+{
     assert(testId > 0);
 
     Eigen::VectorXf output;
 
-    switch(testId) {
-        case 1: {
+    switch (testId)
+    {
+        case 1:
+        {
             output.resize(5);
             output <<  0.6665,
                        0.0359,
@@ -624,7 +532,8 @@ Eigen::VectorXf LeastSquaresSolution(int testId) {
 
             break;
         }
-        default: {
+        default:
+        {
             assert(false);
         }
     }
@@ -633,14 +542,15 @@ Eigen::VectorXf LeastSquaresSolution(int testId) {
 
 }
 
-Eigen::VectorXf WeightedLeastSquaresSolution(int testId) {
-
+Eigen::VectorXf WeightedLeastSquaresSolution(int testId)
+{
     assert(testId > 0);
-
     Eigen::VectorXf output;
 
-    switch(testId) {
-        case 1: {
+    switch (testId)
+    {
+        case 1:
+        {
             output.resize(5);
             output << 0.5968,
                       0.2220,
@@ -650,16 +560,17 @@ Eigen::VectorXf WeightedLeastSquaresSolution(int testId) {
 
             break;
         }
-        default: {
+        default:
+        {
             assert(false);
         }
     }
 
     return output;
-
 }
 
-void VectorComparison(Eigen::VectorXf v, Eigen::VectorXf w) {
+void VectorComparison(Eigen::VectorXf v, Eigen::VectorXf w)
+{
 
     assert(v.rows() == w.rows());
 
@@ -669,14 +580,14 @@ void VectorComparison(Eigen::VectorXf v, Eigen::VectorXf w) {
     vectors.block(0,0,N,1) = v;
     vectors.block(0,1,N,1) = w;
 
-    std::cout << "Exact: left. Computed: right" << std::endl;
-    std::cout << vectors << std::endl;
+    cout << "Exact: left. Computed: right" << std::endl;
+    cout << vectors << std::endl;
 
-    std::cout << "l2 Error is " << std::sqrt((v - w).squaredNorm()) << std::endl;
-
+    cout << "l2 Error is " << std::sqrt((v - w).squaredNorm()) << std::endl;
 }
 
-void LeastSquaresTest() {
+void LeastSquaresTest()
+{
 
     int testId = 1;
     Eigen::MatrixXf A = LeastSquaresMatrixData(testId);
@@ -687,11 +598,12 @@ void LeastSquaresTest() {
     // LinearLeastSquaresSolve<Atype,Btype>(A,b);
     Eigen::VectorXf computedX = LinearLeastSquaresSolve(A,b);
 
-    std::cout << "Standard least-squares test" << std::endl;
+    cout << "Standard least-squares test" << std::endl;
     VectorComparison(x, computedX);
 }
 
-void WeightedLeastSquaresTest() {
+void WeightedLeastSquaresTest()
+{
 
     int testId = 1;
     Eigen::MatrixXf A = LeastSquaresMatrixData(testId);
@@ -703,16 +615,19 @@ void WeightedLeastSquaresTest() {
     computedX.resize(5);
     computedX = LinearLeastSquaresSolve(A,b,w);
 
-    std::cout << "Weighted least-squares test" << std::endl;
+    cout << "Weighted least-squares test" << std::endl;
     VectorComparison(x, computedX);
 }
 
-Eigen::Matrix<float, 3, 1> GeometricLineFitSolution(int testId) {
+Eigen::Matrix<float, 3, 1> GeometricLineFitSolution(int testId)
+{
 
     Eigen::Matrix<float, 3, 1> output;
 
-    switch (testId) {
-        case 1: {
+    switch (testId)
+    {
+        case 1:
+        {
             output << -0.811342537990713,
                        0.58457102737545,
                        171.476109527494;
@@ -720,7 +635,8 @@ Eigen::Matrix<float, 3, 1> GeometricLineFitSolution(int testId) {
             break;
         }
 
-        case 2: {
+        case 2:
+        {
             output <<   0.278846389094017,
                         0.960335718011794,
                         -1.17270161561708;
@@ -733,13 +649,16 @@ Eigen::Matrix<float, 3, 1> GeometricLineFitSolution(int testId) {
     return output;
 }
 
-float GeometricLineFitResidual(int testId) {
+float GeometricLineFitResidual(int testId)
+{
 
     float output = 0.0f;
 
-    switch (testId) {
+    switch (testId)
+    {
 
-        case 2: {
+        case 2:
+        {
             output = 0.0439823534914935;
             break;
         }
@@ -748,15 +667,16 @@ float GeometricLineFitResidual(int testId) {
     }
 
     return output;
-
 }
 
-Eigen::Matrix<float, 3, 1> LinearParamLineFitSolution(int testId) {
-
+Eigen::Matrix<float, 3, 1> LinearParamLineFitSolution(int testId)
+{
     Eigen::Matrix<float, 3, 1> output;
 
-    switch (testId) {
-        case 2: {
+    switch (testId)
+    {
+        case 2:
+        {
             output <<   1.90993861054037,
                         4.2078795485272,
                         -0.000677265481327231;
@@ -770,13 +690,15 @@ Eigen::Matrix<float, 3, 1> LinearParamLineFitSolution(int testId) {
     return output;
 }
 
-float LinearParamLineFitResidual(int testId) {
+float LinearParamLineFitResidual(int testId)
+{
 
     float output = 0.0f;
 
-    switch (testId) {
-
-        case 2: {
+    switch (testId)
+    {
+        case 2:
+        {
             output = 0.0766383689681639;
             break;
         }
@@ -785,17 +707,16 @@ float LinearParamLineFitResidual(int testId) {
     }
 
     return output;
-
 }
 
 Eigen::MatrixX2f LineFitData(int testId)
 {
-
     Eigen::MatrixX2f output;
 
-    switch (testId) {
-        case 1: {
-
+    switch (testId)
+    {
+        case 1:
+        {
             Eigen::VectorXf X = StrokeX(2);
             output.resize(X.rows(), 2);
             output.block(0, 0, X.rows(), 1) = X;
@@ -805,8 +726,8 @@ Eigen::MatrixX2f LineFitData(int testId)
             break;
         }
 
-        case 2: {
-
+        case 2:
+        {
             output.resize(20, 2);
             output << 6.0437,   -0.5214,
                   5.8452,   -0.4762,
@@ -837,17 +758,17 @@ Eigen::MatrixX2f LineFitData(int testId)
     }
 
     return output;
-
 }
 
 Eigen::VectorXf LineFitParameterData(int testId)
 {
-
     Eigen::VectorXf t;
 
-    switch (testId) {
+    switch (testId)
+    {
 
-        case 2: {
+        case 2:
+        {
 
             t.resize(20, 1);
             t <<    -1.0000,
@@ -881,7 +802,8 @@ Eigen::VectorXf LineFitParameterData(int testId)
 
 }
 
-void GeometricLineFitTest() {
+void GeometricLineFitTest()
+{
 
     int testId = 1;
     Eigen::MatrixX2f XY = LineFitData(testId);
@@ -893,37 +815,36 @@ void GeometricLineFitTest() {
     abc(2) = line.OffsetParameter();
     Eigen::Matrix<float, 3, 1> exactAbc = GeometricLineFitSolution(testId);
 
-    std::cout << "Geometric line fitting test" << std::endl;
+    cout << "Geometric line fitting test" << std::endl;
     VectorComparison(exactAbc, abc);
 
-    std::cout << "Evaluating the line at x = 607.832 yields " << line.EvaluateAtX(607.832f) << std::endl;
-    std::cout << "Evaluating the line at y = 556.555 yields " << line.EvaluateAtY(556.555f) << std::endl;
+    cout << "Evaluating the line at x = 607.832 yields " << line.EvaluateAtX(607.832f) << std::endl;
+    cout << "Evaluating the line at y = 556.555 yields " << line.EvaluateAtY(556.555f) << std::endl;
 
 }
 
-void LinearParameterizationLineFitTest() {
+void LinearParameterizationLineFitTest()
+{
 
-    /*
-     * Matt: effectively do the following:
-     *
-     * Eigen::MatrixX2f XY = XY data
-     * Eigen::VectorXf  t  = time data
-     * float residual = 0.0f; // storage for residual
-     * LinearlyParameterized2DLine<float> paramLine = LeastSquaresLinearlyParameterizedLine(t, XY, residual);
-     *
-     * Now "residual" is the sqrt(sum-of-squares) error between the samples and
-     * points on the parametric line with the same time parameter
-     * and the object paramLine is a 2D line. Things like
-     * paramLine.Direction() give you a 1 x 2 unit vector
-     * paramLine.Speed() gives you a positive scalar that's the speed
-     * You can
-     * paramLine.Evaluate(time-float-or-VectorXf)
-     * which returns a MatrixX2f evaluation on the line.
-     *
-     * You have to hold the compiler's hand by forcing the template <float> for
-     * the line object. (Or whatever other data type.)
-     */
-
+//     Matt: effectively do the following:
+//
+//     Eigen::MatrixX2f XY = XY data
+//     Eigen::VectorXf  t  = time data
+//     float residual = 0.0f; // storage for residual
+//     LinearlyParameterized2DLine<float> paramLine = LeastSquaresLinearlyParameterizedLine(t, XY, residual);
+//
+//     Now "residual" is the sqrt(sum-of-squares) error between the samples and
+//     points on the parametric line with the same time parameter
+//     and the object paramLine is a 2D line. Things like
+//     paramLine.Direction() give you a 1 x 2 unit vector
+//     paramLine.Speed() gives you a positive scalar that's the speed
+//     You can
+//     paramLine.Evaluate(time-float-or-VectorXf)
+//     which returns a MatrixX2f evaluation on the line.
+//
+//     You have to hold the compiler's hand by forcing the template <float> for
+//     the line object. (Or whatever other data type.)
+//
     // Setting up data
     int testId = 2;
     Eigen::MatrixX2f XY = LineFitData(testId);
@@ -939,10 +860,10 @@ void LinearParameterizationLineFitTest() {
     abc(2) = line.OffsetParameter();
     Eigen::Matrix<float, 3, 1> exactAbc = GeometricLineFitSolution(testId);
 
-    std::cout << "Linear parameterization line fitting test" << std::endl;
-    std::cout << "Standard geometric fit" << std::endl;
+    cout << "Linear parameterization line fitting test" << std::endl;
+    cout << "Standard geometric fit" << std::endl;
     VectorComparison(exactAbc, abc);
-    std::cout << "Exact residual: " << exactResidual << std::endl << "Computed residual: " << residual << std::endl;
+    cout << "Exact residual: " << exactResidual << std::endl << "Computed residual: " << residual << std::endl;
 
     // This calls the method for parameterization fitting
     exactResidual = LinearParamLineFitResidual(testId);
@@ -956,11 +877,10 @@ void LinearParameterizationLineFitTest() {
 
     Eigen::Matrix<float, 3, 1> exactParamStuff = LinearParamLineFitSolution(testId);
 
-    std::cout << "Least squares linear parameterization fit" << std::endl;
+    cout << "Least squares linear parameterization fit" << std::endl;
     VectorComparison(exactParamStuff, paramStuff);
-    std::cout << "Exact residual: " << exactResidual << std::endl << "Computed residual: " << residual << std::endl;
+    cout << "Exact residual: " << exactResidual << std::endl << "Computed residual: " << residual << std::endl;
 }
-
 }
 }
 }

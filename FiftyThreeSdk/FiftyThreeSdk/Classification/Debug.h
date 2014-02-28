@@ -1,73 +1,63 @@
 //
 //  Debug.h
-//  Classification
+//  FiftyThreeSdk
 //
-//  Created by Akil Narayan on 2013/10/23.
-//  Copyright (c) 2013 Peter Sibley. All rights reserved.
+//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
-//  All the methods here are only invoked for debugging in the constructor for
-//  ClassificationProxy. This can be safely removed so long as those
-//  invocations are removed.
 
 #pragma once
 
-#include <iostream>
 #include "FiftyThreeSdk/Classification/IsolatedStrokes.h"
 #include "FiftyThreeSdk/Classification/LinAlgHelpers.h"
 #include "FiftyThreeSdk/Classification/LineFitting.h"
 
+namespace fiftythree
+{
+namespace sdk
+{
+namespace debug
+{
+Eigen::VectorXd StrokeT(int);
+Eigen::VectorXf StrokeX(int);
+Eigen::VectorXf StrokeY(int);
+Eigen::VectorXf StrokeScores(int);
 
-namespace fiftythree {
-namespace sdk {
-namespace debug {
+void PrintVector(std::vector<int>);
 
-    Eigen::VectorXd StrokeT(int);
-    Eigen::VectorXf StrokeX(int);
-    Eigen::VectorXf StrokeY(int);
-    Eigen::VectorXf StrokeScores(int);
+void EtaModelTest(IsolatedStrokesClassifier*);
+void WeakScoreTest(TouchLogger*, IsolatedStrokesClassifier*);
+void ChosenWeakScoreTest(TouchLogger*, IsolatedStrokesClassifier*);
+void LogLikelihoodsTest(TouchLogger*, IsolatedStrokesClassifier*);
+void ScoreOutput(TouchLogger*, IsolatedStrokesClassifier*);
 
-    //void FDTest();
+//
+//           Debugging for LinAlgHelpers                      //
+//
 
-    //void FDStencil();
-    //void StencilStorage();
+void VectorComparison(Eigen::VectorXf v, Eigen::VectorXf w);
 
-    void PrintVector(std::vector<int>);
+Eigen::MatrixXf LeastSquaresMatrixData(int testId);
+Eigen::VectorXf LeastSquaresRHSData(int testId);
+Eigen::VectorXf LeastSquaresWeights(int testId);
+Eigen::VectorXf LeastSquaresSolution(int testId);
+Eigen::VectorXf WeightedLeastSquaresSolution(int testId);
 
-    void EtaModelTest(IsolatedStrokesClassifier*);
-    void WeakScoreTest(TouchLogger*, IsolatedStrokesClassifier*);
-    void ChosenWeakScoreTest(TouchLogger*, IsolatedStrokesClassifier*);
-    void LogLikelihoodsTest(TouchLogger*, IsolatedStrokesClassifier*);
-    void ScoreOutput(TouchLogger*, IsolatedStrokesClassifier*);
+// Verifies LS solution of A*x = b
+void LeastSquaresTest();
+// Verifies weighted LS solution of A*x = b
+void WeightedLeastSquaresTest();
 
-    ////////////////////////////////////////////////////////////////
-    //           Debugging for LinAlgHelpers                      //
-    ////////////////////////////////////////////////////////////////
+Eigen::MatrixX2f LineFitData(int testId);
+Eigen::VectorXf LineFitParameterData(int testId);
 
-    void VectorComparison(Eigen::VectorXf v, Eigen::VectorXf w);
-    
-    Eigen::MatrixXf LeastSquaresMatrixData(int testId);
-    Eigen::VectorXf LeastSquaresRHSData(int testId);
-    Eigen::VectorXf LeastSquaresWeights(int testId);
-    Eigen::VectorXf LeastSquaresSolution(int testId);
-    Eigen::VectorXf WeightedLeastSquaresSolution(int testId);
-   
-    // Verifies LS solution of A*x = b
-    void LeastSquaresTest();
-    // Verifies weighted LS solution of A*x = b
-    void WeightedLeastSquaresTest();
+Eigen::Matrix<float, 3, 1> GeometricLineFitSolution(int testId);
+float                      GeometricLineFitResidual(int testId);
+Eigen::Matrix<float, 3, 1> LinearParamLineFitSolution(int testId);
+float                      LinearParamLineFitResidual(int testId);
 
-    Eigen::MatrixX2f LineFitData(int testId);
-    Eigen::VectorXf LineFitParameterData(int testId);
-
-    Eigen::Matrix<float, 3, 1> GeometricLineFitSolution(int testId);
-    float                      GeometricLineFitResidual(int testId);
-    Eigen::Matrix<float, 3, 1> LinearParamLineFitSolution(int testId);
-    float                      LinearParamLineFitResidual(int testId);
-
-    // Verifies line-fitting
-    void GeometricLineFitTest();
-    void LinearParameterizationLineFitTest();
-
+// Verifies line-fitting
+void GeometricLineFitTest();
+void LinearParameterizationLineFitTest();
 }
 }
 }
