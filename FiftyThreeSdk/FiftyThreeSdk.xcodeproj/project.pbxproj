@@ -177,6 +177,7 @@
 				0416CA9518A42B51004EAC00 /* Debug.h */,
 				0416CA9618A42B51004EAC00 /* DumbStylus.cpp */,
 				0416CA9718A42B51004EAC00 /* DumbStylus.h */,
+				0493D9DC18B6957B0049FEFC /* Eigen.h */,
 				0416CA9818A42B51004EAC00 /* EigenLAB.cpp */,
 				0416CA9918A42B51004EAC00 /* EigenLAB.h */,
 				0416CA9A18A42B51004EAC00 /* FiniteDifferences.cpp */,
@@ -205,7 +206,6 @@
 				0416CAB518A42B51004EAC00 /* Stroke.h */,
 				0416CAB618A42B51004EAC00 /* TouchLogger.cpp */,
 				0416CAB718A42B51004EAC00 /* TouchLogger.h */,
-				0493D9DC18B6957B0049FEFC /* Eigen.h */,
 			);
 			name = Classification;
 			path = FiftyThreeSdk/Classification;
