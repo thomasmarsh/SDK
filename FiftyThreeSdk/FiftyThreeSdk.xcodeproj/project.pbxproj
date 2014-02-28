@@ -16,7 +16,6 @@
 		0416CAC018A42B51004EAC00 /* Helpers.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0416CA9D18A42B51004EAC00 /* Helpers.mm */; };
 		0416CAC118A42B51004EAC00 /* IsolatedStrokes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0416CA9F18A42B51004EAC00 /* IsolatedStrokes.cpp */; };
 		0416CAC218A42B51004EAC00 /* IsolatedStrokesCalibration.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0416CAA118A42B51004EAC00 /* IsolatedStrokesCalibration.cpp */; };
-		0416CAC318A42B51004EAC00 /* LinAlgHelpers.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0416CAA218A42B51004EAC00 /* LinAlgHelpers.cpp */; };
 		0416CAC418A42B51004EAC00 /* LineFitting.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0416CAA418A42B51004EAC00 /* LineFitting.cpp */; };
 		0416CAC618A42B51004EAC00 /* PenDirection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0416CAA818A42B51004EAC00 /* PenDirection.cpp */; };
 		0416CAC718A42B51004EAC00 /* PenEvents.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0416CAAA18A42B51004EAC00 /* PenEvents.cpp */; };
@@ -75,7 +74,6 @@
 		0416CA9F18A42B51004EAC00 /* IsolatedStrokes.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = IsolatedStrokes.cpp; sourceTree = "<group>"; };
 		0416CAA018A42B51004EAC00 /* IsolatedStrokes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IsolatedStrokes.h; sourceTree = "<group>"; };
 		0416CAA118A42B51004EAC00 /* IsolatedStrokesCalibration.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = IsolatedStrokesCalibration.cpp; sourceTree = "<group>"; };
-		0416CAA218A42B51004EAC00 /* LinAlgHelpers.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LinAlgHelpers.cpp; sourceTree = "<group>"; };
 		0416CAA318A42B51004EAC00 /* LinAlgHelpers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LinAlgHelpers.h; sourceTree = "<group>"; };
 		0416CAA418A42B51004EAC00 /* LineFitting.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LineFitting.cpp; sourceTree = "<group>"; };
 		0416CAA518A42B51004EAC00 /* LineFitting.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LineFitting.h; sourceTree = "<group>"; };
@@ -194,7 +192,6 @@
 				0416CA9F18A42B51004EAC00 /* IsolatedStrokes.cpp */,
 				0416CAA018A42B51004EAC00 /* IsolatedStrokes.h */,
 				0416CAA118A42B51004EAC00 /* IsolatedStrokesCalibration.cpp */,
-				0416CAA218A42B51004EAC00 /* LinAlgHelpers.cpp */,
 				0416CAA318A42B51004EAC00 /* LinAlgHelpers.h */,
 				0416CAA418A42B51004EAC00 /* LineFitting.cpp */,
 				0416CAA518A42B51004EAC00 /* LineFitting.h */,
@@ -431,7 +428,6 @@
 				0416CAC918A42B51004EAC00 /* Playback.cpp in Sources */,
 				0416CAC118A42B51004EAC00 /* IsolatedStrokes.cpp in Sources */,
 				0416CABE18A42B51004EAC00 /* EigenLAB.cpp in Sources */,
-				0416CAC318A42B51004EAC00 /* LinAlgHelpers.cpp in Sources */,
 				66D779BC16E57461001C4F55 /* TIUpdateManager.mm in Sources */,
 				0416CABC18A42B51004EAC00 /* Debug.cpp in Sources */,
 				663AFED916FA6BD800681A90 /* PenEvent.cpp in Sources */,
