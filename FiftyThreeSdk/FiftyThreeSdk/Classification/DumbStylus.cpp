@@ -152,7 +152,7 @@ IdTypeMap DumbStylusClassifier::ReclassifyCurrentEvent()
 
             Cluster::Ptr otherCluster;
             TouchClassification    otherType;
-            for (Cluster::Ptr const & otherClusterr : _commonData->proxy->ClusterTracker()->ConcurrentClusters(cluster, false))
+            for (Cluster::Ptr const & otherCluster : _commonData->proxy->ClusterTracker()->ConcurrentClusters(cluster, false))
             {
                 if (cluster == otherCluster || otherCluster->_clusterTouchType != TouchClassification::Pen)
                 {
@@ -171,14 +171,6 @@ IdTypeMap DumbStylusClassifier::ReclassifyCurrentEvent()
                 {
                     newTypes[cluster] = TouchClassification::Palm;
                 }
-
-                /*
-                 if (otherStats->_arcLength > 88.0f &&
-                 stats->_arcLength < 44.0f )
-                 {
-                 newTypes[cluster] = TouchClassification::Palm;
-                 }
-                 */
             }
         }
     }
