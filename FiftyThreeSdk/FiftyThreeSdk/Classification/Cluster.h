@@ -9,9 +9,6 @@
 
 #include <boost/container/flat_map.hpp>
 #include <boost/container/flat_set.hpp>
-#include <boost/foreach.hpp>
-#include <boost/unordered_set.hpp>
-#include <tuple>
 
 #include "Core/Touch/Touch.h"
 #include "FiftyThreeSdk/Classification/CommonDeclarations.h"
@@ -19,34 +16,32 @@
 #include "FiftyThreeSdk/Classification/Stroke.h"
 #include "FiftyThreeSdk/Classification/TouchLogger.h"
 
-namespace fiftythree {
-namespace sdk {
+namespace fiftythree
+{
+namespace sdk
+{
 
-/*
- Cluster is the basic object we store.  _center is not actually the center of mass.
- it is a trailing average of the locations of all touches in the cluster.
-
- _score is not very useful -- it is simply the average score reported by the IsolatedStrokesClassifier
- over all times.
-
- _timestamp is the most recent timestamp.  this is set in UpdateClusters, which is invoked
- in every touchesChanged by the Proxy.  It also gets updated by the viewcontroller at the moment,
- so we can visualize staleness when a cluster loses all its touches.
-
- _count is the number of samples in the cluster.
-
- _touchIds contains the TouchId for every touch that was added to the cluster.
-
- _simultaneousTouches indicates whether or not two or more touches
- occur simultaneously over the life of the entire cluster.
-
- */
+// Cluster is the basic object we store.  _center is not actually the center of mass.
+// it is a trailing average of the locations of all touches in the cluster.
+//
+// _score is not very useful -- it is simply the average score reported by the IsolatedStrokesClassifier
+// over all times.
+//
+// _timestamp is the most recent timestamp.  this is set in UpdateClusters, which is invoked
+// in every touchesChanged by the Proxy.  It also gets updated by the viewcontroller at the moment,
+// so we can visualize staleness when a cluster loses all its touches.
+//
+// _count is the number of samples in the cluster.
+//
+// _touchIds contains the TouchId for every touch that was added to the cluster.
+//
+// _simultaneousTouches indicates whether or not two or more touches
+// occur simultaneously over the life of the entire cluster.
 
 BOOST_STRONG_TYPEDEF(int, ClusterId);
 
 struct ClusterEventStatistics
 {
-
     ClusterEventStatistics() :
     _endedPenCount(0),
     _endedPalmCount(0),
@@ -78,50 +73,47 @@ struct ClusterEventStatistics
 
 struct Cluster
 {
-
     TouchLogger::Ptr   _touchLog;
     const CommonData*  _commonData;
 
-    ClusterId         _id;
+    ClusterId _id;
 
     Eigen::Vector2f _center;
-    float           _score;
-    float           _count;
-    float           _totalLength;
+    float _score;
+    float _count;
+    float _totalLength;
 
-    float           _penPrior;
-    float           _directionPrior;
+    float _penPrior;
+    float _directionPrior;
 
-    double          _becameStaleTime;
+    double _becameStaleTime;
 
-    float           _meanTouchRadius;
+    float _meanTouchRadius;
 
-    bool            _simultaneousTouches;
-    bool            _wasInterior;
-    bool            _ignorable;
-    bool            _closedToNewTouches;
-    bool            _checkForFingerSequence;
-    bool            _wasAtPalmEnd;
+    bool  _simultaneousTouches;
+    bool  _wasInterior;
+    bool  _ignorable;
+    bool  _closedToNewTouches;
+    bool  _checkForFingerSequence;
+    bool  _wasAtPalmEnd;
 
     // the value of this cluster event statistic at the time the touch most recently ended or changed.
-    float           _endedPenDirectionScore;
+    float _endedPenDirectionScore;
 
     // stored by endpoint clusters to allow more accurate reclassification of endpoints at cold start.
     // i.e. initially, both endpoints are probably declared pen at cold start, but after a short while
     // we lock handedness and we can then figure it out.
     Eigen::Vector2f _vOtherEndpoint;
 
-    double          _firstTimestamp;
-    double          _lastTimestamp;
+    double _firstTimestamp;
+    double _lastTimestamp;
 
     // indicate that we're really, really confident about _clusterTouchType.
-    bool            _probabilityOneFlag;
+    bool _probabilityOneFlag;
 
     core::TouchClassification _clusterTouchType;
 
     EdgeThumbState  _edgeThumbState;
-
-    //std::set<core::TouchId> _touchIds;
 
     // While we do some set and map operations on these vectors, addition and removal of elements is uncommon.
     // The number of entries is so small that in every other circumstance it's a big win.
@@ -200,7 +192,7 @@ struct Cluster
     // you can get a pen on screen before the old pen cluster has expired, for example.
     bool InFinalExpirationWindowAtTime(double time) const
     {
-        if(! Stale())
+        if (!Stale())
         {
             return false;
         }
@@ -240,7 +232,6 @@ struct Cluster
     bool ContainsReclassifiableTouch() const;
 
     std::vector<core::TouchId> ReclassifiableTouches() const;
-
 };
 
 ClusterId InvalidClusterId();
@@ -250,23 +241,22 @@ typedef boost::container::flat_map<ClusterId, Cluster::Ptr>  IdClusterPtrMap;
 typedef std::pair<ClusterId, Cluster::Ptr> IdClusterPtrPair;
 typedef std::pair<ClusterId, Cluster::Ptr &> IdClusterPtrRefPair;
 
-/*
- ClusterTracker maintains a set of clusters using the following
- greedy method.
+// ClusterTracker maintains a set of clusters using the following
+// greedy method.
+//
+// Each cluster has a "center" which is really a trailing average location.
+//
+// When a touch begins:
+//   1. find the nearest cluster (using the distance to the center)
+//   2. if it is "near enough", or if there are already 4 clusters, add this touch to the cluster
+//   3. if it is not near and there are fewer than 4 clusters, create a new cluster for this touch
+//
+// When a cluster has no touches, it gradually becomes stale.  If its timestamp is older than
+// _staleInterval seconds, the cluster is removed from the system.
+//
 
- Each cluster has a "center" which is really a trailing average location.
-
- When a touch begins:
-   1. find the nearest cluster (using the distance to the center)
-   2. if it is "near enough", or if there are already 4 clusters, add this touch to the cluster
-   3. if it is not near and there are fewer than 4 clusters, create a new cluster for this touch
-
- When a cluster has no touches, it gradually becomes stale.  If its timestamp is older than
- _staleInterval seconds, the cluster is removed from the system.
-
- */
-
-class ClusterTracker {
+class ClusterTracker
+{
 
 public:
     typedef fiftythree::core::shared_ptr<ClusterTracker> Ptr;
@@ -274,8 +264,6 @@ public:
 protected:
 
     ClusterId         _counter;
-
-    //TouchLogger       _touchLog;
 
     TouchLogger::Ptr  _touchLog;
 
@@ -312,14 +300,13 @@ public:
     _commonData(dataPtr),
     _touchLog(TouchLogger::Ptr::make_shared(dataPtr))
     {
-        _staleInterval    = .275f;
+        _staleInterval = .275f;
 
         _counter = 0;
         _lastEventEndedTimestamp = 0.0;
         _needComputeClusterOrder = true;
 
         Reset();
-
     }
 
     Eigen::MatrixXf DistanceMatrix(std::set<Cluster::Ptr> const & clusters);
@@ -354,7 +341,7 @@ public:
 
     double CurrentEventBeganTime() const
     {
-        if(_clusters.empty())
+        if (_clusters.empty())
         {
             return std::numeric_limits<double>::max();
         }
@@ -388,10 +375,9 @@ public:
     std::vector<Cluster::Ptr> CurrentEventTimeOrderedClusters()
     {
         std::vector<Cluster::Ptr> all;
-        Cluster::Ptr ptr;
-        BOOST_FOREACH(std::tie(std::ignore, ptr), _clusters)
+        for (const auto & pair : _clusters)
         {
-            all.push_back(ptr);
+            all.push_back(pair.second);
         }
 
         return all;
@@ -448,148 +434,135 @@ public:
         return _touchLog->Data(id);
     }
 
-    //std::vector<TouchData::Ptr>      Data(TouchIdVector ids);
-
     // if/when TouchTracker gets modified to hold the ended touches the classifier needs
     // we can remove this call and replace it with the like-named TouchTracker call.
-    core::Touch::Ptr const &       TouchWithId(core::TouchId touchId)
+    core::Touch::Ptr const & TouchWithId(core::TouchId touchId)
     {
         return _touchLog->TouchWithId(touchId);
     }
 
-    //bool                             ContainsTouchWithId(core::TouchId touchId);
+    Stroke::Ptr const & Stroke(core::TouchId id);
 
-    Stroke::Ptr const &      Stroke(core::TouchId id);
-
-    //std::vector<curves::Stroke::Ptr> Stroke(TouchIdVector ids);
-
-    //ClusterPtr                       Cluster(core::TouchId touchId);
-
-    //core::TouchPhase               Phase(core::TouchId id);
-    //std::vector<core::TouchPhase>  Phase(TouchIdVector ids);
-
-    PenEventData::Ptr const &        PenData(PenEventId id)
+    PenEventData::Ptr const & PenData(PenEventId id)
     {
         return _touchLog->PenData(id);
     }
 
-    //std::vector<PenEventData::Ptr>   PenData(PenEventIdVector ids);
-
-    TouchIdVector                   TouchIdsBeganInTimeInterval(double interval_start,
-                                                                double interval_end)
+    TouchIdVector TouchIdsBeganInTimeInterval(double interval_start,
+                                              double interval_end)
     {
         return _touchLog->TouchIdsBeganInTimeInterval(interval_start, interval_end);
     }
 
-    TouchIdVector                   TouchIdsEndedInTimeInterval(double interval_start,
-                                                                double interval_end)
+    TouchIdVector TouchIdsEndedInTimeInterval(double interval_start,
+                                              double interval_end)
     {
         return _touchLog->TouchIdsEndedInTimeInterval(interval_start,
                                                       interval_end);
     }
 
     // Ids begun within specified (absolute) time interval
-    TouchIdSet                      TouchIdSetBeganInTimeInterval(double interval_start,
-                                                                  double interval_end)
+    TouchIdSet  TouchIdSetBeganInTimeInterval(double interval_start,
+                                              double interval_end)
     {
         return _touchLog->TouchIdSetBeganInTimeInterval(interval_start,
                                                         interval_end);
     }
 
-    TouchIdSet                      TouchIdSetEndedInTimeInterval(double interval_start,
-                                                                  double interval_end)
+    TouchIdSet  TouchIdSetEndedInTimeInterval(double interval_start,
+                                              double interval_end)
     {
         return _touchLog->TouchIdSetEndedInTimeInterval(interval_start,
                                                         interval_end);
     }
 
-    TouchIdVector                   ConcurrentTouches(core::TouchId probeId)
+    TouchIdVector ConcurrentTouches(core::TouchId probeId)
     {
         return _touchLog->ConcurrentTouches(probeId);
     }
 
-    core::TouchId                 TouchPrecedingTouch(core::TouchId probeId)
+    core::TouchId TouchPrecedingTouch(core::TouchId probeId)
     {
         return _touchLog->TouchPrecedingTouch(probeId);
     }
 
-    PenEventIdSet                   PenBeganEventSetInTimeInterval(double t0, double t1)
+    PenEventIdSet PenBeganEventSetInTimeInterval(double t0, double t1)
     {
         return _touchLog->PenBeganEventSetInTimeInterval(t0,t1);
     }
-    PenEventIdSet                   PenEndedEventSetInTimeInterval(double t0, double t1)
+    PenEventIdSet PenEndedEventSetInTimeInterval(double t0, double t1)
     {
         return _touchLog->PenEndedEventSetInTimeInterval(t0,t1);
     }
 
-    PenEventIdSet                   PenEventSetInTimeInterval(double t0, double t1)
+    PenEventIdSet PenEventSetInTimeInterval(double t0, double t1)
     {
         return _touchLog->PenEventSetInTimeInterval(t0, t1);
     }
 
-    PenEventIdVector                PenEventsInTimeInterval(double t0, double t1, bool includeEndpoints)
+    PenEventIdVector PenEventsInTimeInterval(double t0, double t1, bool includeEndpoints)
     {
         return _touchLog->PenEventsInTimeInterval(t0, t1, includeEndpoints);
     }
 
-    ClusterPtr                       Cluster(core::TouchId touchId)
+    ClusterPtr Cluster(core::TouchId touchId)
     {
         return _touchLog->Cluster(touchId);
     }
 
-    core::TouchPhase               Phase(core::TouchId id)
+    core::TouchPhase  Phase(core::TouchId id)
     {
         return _touchLog->Phase(id);
     }
 
-    TouchIdVector                   ActiveIds()
+    TouchIdVector ActiveIds()
     {
         return _touchLog->ActiveIds();
     }
 
-    PenEventId                      MostRecentPenEvent()
+    PenEventId MostRecentPenEvent()
     {
         return _touchLog->MostRecentPenEvent();
     }
 
-    bool                            IsIdLogged(core::TouchId id)
+    bool IsIdLogged(core::TouchId id)
     {
         return _touchLog->IsIdLogged(id);
     }
 
-    core::TouchClassification                       MostRecentPenTipType()
+    core::TouchClassification MostRecentPenTipType()
     {
         return _touchLog->MostRecentPenTipType();
     }
 
-    core::TouchId                 MostRecentTouch()
+    core::TouchId MostRecentTouch()
     {
         return _touchLog->MostRecentTouch();
     }
 
-    TouchIdVector                   LiveTouches()
+    TouchIdVector LiveTouches()
     {
         return _touchLog->LiveTouches();
     }
 
-    bool                            IsEnded(core::TouchId touchId)
+    bool IsEnded(core::TouchId touchId)
     {
         return _touchLog->IsEnded(touchId);
     }
 
     void TouchesChanged(const std::set<core::Touch::Ptr> & touches);
 
-    bool                            AllCancelledFlag()
+    bool AllCancelledFlag()
     {
         return _touchLog->AllCancelledFlag();
     }
 
-    double          Time()
+    double Time()
     {
         return _touchLog->Time();
     }
 
-    PenEventType                     PenType(PenEventId id)
+    PenEventType PenType(PenEventId id)
     {
         return _touchLog->PenType(id);
     }
@@ -599,7 +572,7 @@ public:
         return _touchLog->LogPenEvent(event);
     }
 
-    bool                             ContainsTouchWithId(core::TouchId touchId)
+    bool ContainsTouchWithId(core::TouchId touchId)
     {
         return _touchLog->ContainsTouchWithId(touchId);
     }
@@ -624,12 +597,10 @@ public:
         return _touchLog->ClearAllData();
     }
 
-    TouchIdVector                   IdsInPhase(core::TouchPhase phase)
+    TouchIdVector IdsInPhase(core::TouchPhase phase)
     {
         return _touchLog->IdsInPhase(phase);
     }
-
 };
-
 }
 }
