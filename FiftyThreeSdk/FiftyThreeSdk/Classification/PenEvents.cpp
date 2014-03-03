@@ -5,8 +5,6 @@
 //  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
 
-#include <boost/foreach.hpp>
-
 #include "Core/Eigen.h"
 #include "Core/Touch/Touch.h"
 #include "Core/Touch/TouchTracker.h"
