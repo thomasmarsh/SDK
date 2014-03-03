@@ -10,7 +10,7 @@
 #import "Common/DeviceInfo.h"
 #import "Common/NSData+Crypto.h"
 #import "Common/NSString+Helpers.h"
-#import "Common/UIView+Helpers.h"
+#import "Core/UIView+Helpers.h"
 #import "Core/Timer.h"
 #import "FiftyThreeSdk/FTFirmwareManager.h"
 #import "FiftyThreeSdk/FTFirmwareUpdateProgressView.h"
