@@ -109,14 +109,14 @@ public:
     float _maxTapArcLengthAtMaxDuration = 85;
     float _maxTapArcLengthAtMinDuration = 55;
     // values from Matt.
-    float _minTapDuration = 0.02f;
+    float _minTapDuration = 0.016f;
     float _maxTapDuration = 0.2f;
     // Existing values.
     float _maxPenEventWaitTime = .3f;
     float _longPenLength = 250.0f;
     float _longFingerLength = 66.0f;
     float _longDuration = 1.2f;
-    float _fingerTapIsolationSeconds = 0.0929603f;
+    float _fingerTapIsolationSeconds = 0.139206f;
 
     // we remove bogus up-down pairs.  sometimes this removes the wrong things.
     // we have a workaround which prevents pens from being reclassified as palms when they are at the pen
@@ -136,11 +136,11 @@ public:
 
     // required predelay for a finger smudge sequence.  once a sequence begins,
     // subsequent touches don't need any temporal isolation from each other
-    float _fingerSmudgeIsolationSeconds = .0929f;
+    float _fingerSmudgeIsolationSeconds = .135f;
 
     // the smudge isolation above is used to control the predelay before a smudge sequence.
     // this controls temporal isolation for taps within a sequence.
-    float _smudgeTapIsolationSeconds = .0929603f;
+    float _smudgeTapIsolationSeconds = .1429604f;
 
     // really fast tapping can violate the isolation time _smudgeTapIsolationSeconds if it's larger than .9 or so.
     // so if we see (_smudgeCommitCount) fingers in the current cluster event, don't apply
@@ -148,7 +148,7 @@ public:
     // we still apply the other rules for declaring finger, so this should be pretty safe
     int   _smudgeCommitCount = 2;
 
-    float _minFingerIsolatedStrokeTravel = 5.0f; // Was 44, see IsolatedStrokes TestPalmVFinger.
+    float _minFingerIsolatedStrokeTravel = 7.0f; // Was 44, see IsolatedStrokes TestPalmVFinger.
     // number of cycles we're allowing pen events to arrive before touches.
     float _penDownBeforeTouchCycleThreshold = 8.0f;
     float _penUpAfterTouchCycleThreshold = 8.0f;
@@ -173,7 +173,7 @@ public:
     float _maxTapGestureTapArcLengthAtMaxDuration = 22;
     float _maxTapGestureTapArcLengthAtMinDuration = 13;
     // values from Matt.
-    float _minTapGestureTapDuration =  0.0f;
+    float _minTapGestureTapDuration =  0.0145f;
     float _maxTapGestureTapDuration =  0.32;
 
     // only debounce the really insane ones.  if we debounce everything, we end up eliminating valid
