@@ -24,6 +24,7 @@
 		0416CACB18A42B51004EAC00 /* Screen.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0416CAB218A42B51004EAC00 /* Screen.cpp */; };
 		0416CACC18A42B51004EAC00 /* Stroke.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0416CAB418A42B51004EAC00 /* Stroke.cpp */; };
 		0416CACD18A42B51004EAC00 /* TouchLogger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0416CAB618A42B51004EAC00 /* TouchLogger.cpp */; };
+		04493DE518C545140003AFB8 /* TouchClassifierImpl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04493DE318C545140003AFB8 /* TouchClassifierImpl.cpp */; };
 		04E99BEC18BFE53500BC4DCB /* FTTrialSeparationMonitor.mm in Sources */ = {isa = PBXBuildFile; fileRef = 04E99BEB18BFE53500BC4DCB /* FTTrialSeparationMonitor.mm */; };
 		04E99C5418BFF12400BC4DCB /* TouchClassifier.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04E99C5218BFF12400BC4DCB /* TouchClassifier.cpp */; };
 		3C02E084183698E100420B95 /* FTLog.m in Sources */ = {isa = PBXBuildFile; fileRef = 3C02E083183698E100420B95 /* FTLog.m */; };
@@ -90,6 +91,8 @@
 		0416CAB518A42B51004EAC00 /* Stroke.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Stroke.h; sourceTree = "<group>"; };
 		0416CAB618A42B51004EAC00 /* TouchLogger.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TouchLogger.cpp; sourceTree = "<group>"; };
 		0416CAB718A42B51004EAC00 /* TouchLogger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TouchLogger.h; sourceTree = "<group>"; };
+		04493DE318C545140003AFB8 /* TouchClassifierImpl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TouchClassifierImpl.cpp; path = FiftyThreeSdk/TouchClassifierImpl.cpp; sourceTree = "<group>"; };
+		04493DE418C545140003AFB8 /* TouchClassifierImpl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TouchClassifierImpl.h; path = FiftyThreeSdk/TouchClassifierImpl.h; sourceTree = "<group>"; };
 		0493D9DC18B6957B0049FEFC /* Eigen.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Eigen.h; sourceTree = "<group>"; };
 		04E99BEA18BFE53500BC4DCB /* FTTrialSeparationMonitor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FTTrialSeparationMonitor.h; path = FiftyThreeSdk/FTTrialSeparationMonitor.h; sourceTree = "<group>"; };
 		04E99BEB18BFE53500BC4DCB /* FTTrialSeparationMonitor.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = FTTrialSeparationMonitor.mm; path = FiftyThreeSdk/FTTrialSeparationMonitor.mm; sourceTree = "<group>"; };
@@ -321,14 +324,16 @@
 		66A8387616E52D840048FFE4 /* FiftyThreeSdk */ = {
 			isa = PBXGroup;
 			children = (
-				04E99C5218BFF12400BC4DCB /* TouchClassifier.cpp */,
-				04E99C5318BFF12400BC4DCB /* TouchClassifier.h */,
-				0416CA8918A42B51004EAC00 /* Classification */,
 				666DC55B170CF31E00D6B3C2 /* AppSupport */,
+				0416CA8918A42B51004EAC00 /* Classification */,
 				66A8389C16E531E40048FFE4 /* export */,
 				6665F819170F8AC90027BAD1 /* PenManager */,
 				3C2F9C3E17807FCF00A5FFBC /* Services */,
 				66A8387716E52D840048FFE4 /* Supporting Files */,
+				04E99C5218BFF12400BC4DCB /* TouchClassifier.cpp */,
+				04E99C5318BFF12400BC4DCB /* TouchClassifier.h */,
+				04493DE318C545140003AFB8 /* TouchClassifierImpl.cpp */,
+				04493DE418C545140003AFB8 /* TouchClassifierImpl.h */,
 				66B6E3E316F9237800251B6A /* TouchClassifiers */,
 				3CC31DCB17933ABB002CD4FB /* TransitionKit */,
 			);
@@ -439,6 +444,7 @@
 				3C2F9C441780A7BA00A5FFBC /* FTPenUsageServiceClient.m in Sources */,
 				0416CABF18A42B51004EAC00 /* FiniteDifferences.cpp in Sources */,
 				04E99BEC18BFE53500BC4DCB /* FTTrialSeparationMonitor.mm in Sources */,
+				04493DE518C545140003AFB8 /* TouchClassifierImpl.cpp in Sources */,
 				3C404F7B1784C5A200EB7B9A /* FTError.m in Sources */,
 				3CC31DF417933C5F002CD4FB /* TKEvent.m in Sources */,
 				3CC31DF517933C5F002CD4FB /* TKState.m in Sources */,
