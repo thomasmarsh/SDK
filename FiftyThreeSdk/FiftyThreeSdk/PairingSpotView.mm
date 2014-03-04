@@ -234,7 +234,7 @@ NSString *FTPairingSpotCometStateName(FTPairingSpotCometState value)
 @property (nonatomic) FTPairingSpotIconAnimationState state;
 @property (nonatomic) Easing<float, 1> easing;
 @property (nonatomic) BOOL isDisconnected;
-@property (nonatomic) PairingSpotViewSettings visualSettings;
+@property (nonatomic) PairingSpotViewSettings viewSettings;
 @end
 
 #pragma mark -
@@ -254,8 +254,8 @@ NSString *FTPairingSpotCometStateName(FTPairingSpotCometState value)
 
 - (CGFloat)animationDurationSeconds
 {
-    return (self.visualSettings.IconTransitionAnimationDuration *
-            (self.visualSettings.SlowAnimations
+    return (self.viewSettings.IconTransitionAnimationDuration *
+            (self.viewSettings.SlowAnimations
              ? 10.f
              : 1.f));
 }
@@ -403,7 +403,7 @@ NSString *FTPairingSpotCometStateName(FTPairingSpotCometState value)
     PairingSpotIconAnimation *iconAnimation = [[PairingSpotIconAnimation alloc] init];
     iconAnimation.iconType = iconType;
     iconAnimation.isDisconnected = self.isDisconnected;
-    iconAnimation.visualSettings = self.visualSettings;
+    iconAnimation.viewSettings = self.viewSettings;
     [self.iconAnimations addObject:iconAnimation];
     [self.delegate pairingSpotViewAnimationWasEnqueued:self];
     [self setHasAnimation:YES];
@@ -412,8 +412,8 @@ NSString *FTPairingSpotCometStateName(FTPairingSpotCometState value)
 
 - (CGFloat)wellMarginEasingAnimationDuration
 {
-    return (self.visualSettings.WellEasingAnimationDuration *
-            (self.visualSettings.SlowAnimations
+    return (self.viewSettings.WellEasingAnimationDuration *
+            (self.viewSettings.SlowAnimations
              ? 10.f
              : 1.f));
 }
@@ -422,8 +422,8 @@ NSString *FTPairingSpotCometStateName(FTPairingSpotCometState value)
 {
     boost::optional<double> wellMarginEasingLastTimeSeconds = _wellMarginEasing.LastTimeSeconds();
     _wellMarginEasing.Begin(EasingFunction::OutBack,
-                            MakeArray1f(Clamped(_wellMarginEasing.GetCurrentValue().x(), 0.f, self.visualSettings.CometMaxThickness)),
-                            MakeArray1f(self.visualSettings.CometMaxThickness),
+                            MakeArray1f(Clamped(_wellMarginEasing.GetCurrentValue().x(), 0.f, self.viewSettings.CometMaxThickness)),
+                            MakeArray1f(self.viewSettings.CometMaxThickness),
                             [self wellMarginEasingAnimationDuration]);
     // Resume easing if necessary.
     if (wellMarginEasingLastTimeSeconds)
@@ -438,7 +438,7 @@ NSString *FTPairingSpotCometStateName(FTPairingSpotCometState value)
 
     boost::optional<double> wellMarginEasingLastTimeSeconds = _wellMarginEasing.LastTimeSeconds();
     _wellMarginEasing.Begin(EasingFunction::InBack,
-                            MakeArray1f(Clamped(_wellMarginEasing.GetCurrentValue().x(), 0.f, self.visualSettings.CometMaxThickness)),
+                            MakeArray1f(Clamped(_wellMarginEasing.GetCurrentValue().x(), 0.f, self.viewSettings.CometMaxThickness)),
                             MakeArray1f(0.f),
                             [self wellMarginEasingAnimationDuration]);
     // Resume easing if necessary.
@@ -568,7 +568,7 @@ NSString *FTPairingSpotCometStateName(FTPairingSpotCometState value)
     _flashIconOpacityEasing.Begin(EasingFunction::Linear,
                                   MakeArray1f(0.1),
                                   MakeArray1f(1.f),
-                                  self.visualSettings.FlashDurationSeconds,
+                                  self.viewSettings.FlashDurationSeconds,
                                   false);
 
     self.hasAnimation = YES;
@@ -659,7 +659,7 @@ NSString *FTPairingSpotCometStateName(FTPairingSpotCometState value)
 
 - (void)update:(double)frameTimeInSeconds
 {
-    if (self.visualSettings.DebugAnimations)
+    if (self.viewSettings.DebugAnimations)
     {
         NSArray *debugIconTypes = @[
                                     @(FTPairingSpotIconTypeUnpaired),
@@ -674,7 +674,7 @@ NSString *FTPairingSpotCometStateName(FTPairingSpotCometState value)
                                     @(FTPairingSpotIconTypeCriticallyLowBattery),
                                     ];
         static int count = 0;
-        int seedAnimationFrequency = (self.visualSettings.SlowAnimations ? 400 : 100);
+        int seedAnimationFrequency = (self.viewSettings.SlowAnimations ? 400 : 100);
         if (count++ % seedAnimationFrequency == 0)
         {
             PairingSpotIconAnimation *iconAnimation = [[PairingSpotIconAnimation alloc] init];
@@ -709,8 +709,8 @@ NSString *FTPairingSpotCometStateName(FTPairingSpotCometState value)
     }
 
     {
-        CGFloat cometRotationRadiansPerSecond = (self.visualSettings.CometRotationsPerSecond *
-                                                 (self.visualSettings.SlowAnimations
+        CGFloat cometRotationRadiansPerSecond = (self.viewSettings.CometRotationsPerSecond *
+                                                 (self.viewSettings.SlowAnimations
                                                   ? 0.02f
                                                   : 1.f)) * 2 * M_PI;
         double frameDurationSeconds = (self.lastAnimationFrameTimeInSeconds > 0
@@ -791,7 +791,7 @@ NSString *FTPairingSpotCometStateName(FTPairingSpotCometState value)
         }
         else if (shouldFlashIcon && !self.flashAnimationTimer)
         {
-            self.flashAnimationTimer = [NSTimer scheduledTimerWithTimeInterval:self.visualSettings.FlashFrequencySeconds
+            self.flashAnimationTimer = [NSTimer scheduledTimerWithTimeInterval:self.viewSettings.FlashFrequencySeconds
                                                                         target:self
                                                                       selector:@selector(flashTimerFired:)
                                                                       userInfo:nil
@@ -811,7 +811,7 @@ NSString *FTPairingSpotCometStateName(FTPairingSpotCometState value)
     isSettled &= _flashIconOpacityEasing.IsComplete();
 
     if (isSettled &&
-        !self.visualSettings.DebugAnimations)
+        !self.viewSettings.DebugAnimations)
     {
         self.hasAnimation = NO;
     }
@@ -913,7 +913,7 @@ NSString *FTPairingSpotCometStateName(FTPairingSpotCometState value)
         // Disconnected flash animation.
         if (iconAnimation.isStarted && iconAnimation.isDisconnected)
         {
-            iconOpacity *= Lerp(self.visualSettings.DisconnectedFlashOpacityFactor,
+            iconOpacity *= Lerp(self.viewSettings.DisconnectedFlashOpacityFactor,
                                 1.f,
                                 flashOpacityPhase);
         }
@@ -949,7 +949,7 @@ NSString *FTPairingSpotCometStateName(FTPairingSpotCometState value)
                     iconAnimation.iconType == FTPairingSpotIconTypeCriticallyLowBattery &&
                     !iconAnimation.isDisconnected)
                 {
-                    CGFloat batterySegmentOpacity = iconOpacity * Lerp(self.visualSettings.BatteryFlashOpacityFactor,
+                    CGFloat batterySegmentOpacity = iconOpacity * Lerp(self.viewSettings.BatteryFlashOpacityFactor,
                                                                        1.f,
                                                                        flashOpacityPhase);
                     Clamp<CGFloat>(batterySegmentOpacity, 0.f, 1.f);

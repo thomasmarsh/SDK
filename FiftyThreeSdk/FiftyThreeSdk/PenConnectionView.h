@@ -39,7 +39,6 @@ typedef NS_ENUM(NSInteger, VisibilityState)
 
 - (id)initWithCoder:(NSCoder *)aDecoder __unavailable;
 - (id)initWithFrame:(CGRect)frame __unavailable;
-
 @property (nonatomic, weak) id<PenConnectionViewDelegate> delegate;
 @property (nonatomic) FTPenManager *penManager;
 @property (nonatomic) VisibilityState debugControlsVisibility;
@@ -53,4 +52,8 @@ typedef NS_ENUM(NSInteger, VisibilityState)
 - (BOOL)isPenBatteryLow;
 - (BOOL)isPenUnpaired;
 
+@end
+
+@interface PenConnectionView (Paper)
+@property (nonatomic, readonly) PairingSpotView *pairingSpotView;
 @end

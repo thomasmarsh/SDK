@@ -111,7 +111,6 @@ static const NSInteger kCriticalBatteryWarningThreshold = 10;
 @interface PenConnectionView () <UIGestureRecognizerDelegate, PairingSpotViewDelegate>
 
 @property (nonatomic) __weak UITouch *pairingSpotTouch;
-
 @property (nonatomic) PairingSpotView *pairingSpotView;
 @property (nonatomic) UIView *tipPressedView;
 @property (nonatomic) UIView *eraserPressedView;

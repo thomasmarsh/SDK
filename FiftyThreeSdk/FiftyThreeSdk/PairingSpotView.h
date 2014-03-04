@@ -66,7 +66,7 @@ extern NSString * const kPairingSpotStateDidChangeNotificationName;
 
 @property (nonatomic) BOOL shouldSuspendNewAnimations;
 
-@property (nonatomic) PairingSpotViewSettings visualSettings;
+@property (nonatomic) PairingSpotViewSettings viewSettings;
 
 - (void)setConnectionState:(FTPairingSpotConnectionState)connectionState
             isDisconnected:(BOOL)isDisconnected;
