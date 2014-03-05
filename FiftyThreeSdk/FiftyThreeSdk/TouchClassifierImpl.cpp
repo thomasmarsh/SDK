@@ -126,7 +126,7 @@ void TouchClassifierImpl::UpdateClassifications()
     {
         TouchClassificationChangedEventArgs args;
         args.touch = touch;
-        args.oldValue = touch->CurrentClassification();
+        args.oldValue = touch->CurrentClassification()();
 
         bool shouldOverride = ShouldOverrideClassifications();
         if (shouldOverride)
