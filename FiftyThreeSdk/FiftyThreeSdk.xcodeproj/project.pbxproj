@@ -27,6 +27,7 @@
 		04493DE518C545140003AFB8 /* TouchClassifierImpl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04493DE318C545140003AFB8 /* TouchClassifierImpl.cpp */; };
 		04493E2F18C6223C0003AFB8 /* PairingSpotView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 04493E2E18C6223C0003AFB8 /* PairingSpotView.mm */; };
 		04493E3C18C628A00003AFB8 /* PenConnectionView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 04493E3B18C628A00003AFB8 /* PenConnectionView.mm */; };
+		0489D38B18CE2A7400B41E20 /* FTSDKVersionInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 0489D38A18CE2A7400B41E20 /* FTSDKVersionInfo.m */; };
 		04E99BEC18BFE53500BC4DCB /* FTTrialSeparationMonitor.mm in Sources */ = {isa = PBXBuildFile; fileRef = 04E99BEB18BFE53500BC4DCB /* FTTrialSeparationMonitor.mm */; };
 		04E99C5418BFF12400BC4DCB /* TouchClassifier.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04E99C5218BFF12400BC4DCB /* TouchClassifier.cpp */; };
 		3C02E084183698E100420B95 /* FTLog.m in Sources */ = {isa = PBXBuildFile; fileRef = 3C02E083183698E100420B95 /* FTLog.m */; };
@@ -100,6 +101,8 @@
 		04493E3A18C628A00003AFB8 /* PenConnectionView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PenConnectionView.h; path = FiftyThreeSdk/PenConnectionView.h; sourceTree = "<group>"; };
 		04493E3B18C628A00003AFB8 /* PenConnectionView.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = PenConnectionView.mm; path = FiftyThreeSdk/PenConnectionView.mm; sourceTree = "<group>"; };
 		0489D36E18CE13D800B41E20 /* FTApplication+Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "FTApplication+Private.h"; path = "FiftyThreeSdk/FTApplication+Private.h"; sourceTree = "<group>"; };
+		0489D38918CE2A7400B41E20 /* FTSDKVersionInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FTSDKVersionInfo.h; path = FiftyThreeSdk/FTSDKVersionInfo.h; sourceTree = "<group>"; };
+		0489D38A18CE2A7400B41E20 /* FTSDKVersionInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FTSDKVersionInfo.m; path = FiftyThreeSdk/FTSDKVersionInfo.m; sourceTree = "<group>"; };
 		0493D9DC18B6957B0049FEFC /* Eigen.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Eigen.h; sourceTree = "<group>"; };
 		04E99BEA18BFE53500BC4DCB /* FTTrialSeparationMonitor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FTTrialSeparationMonitor.h; path = FiftyThreeSdk/FTTrialSeparationMonitor.h; sourceTree = "<group>"; };
 		04E99BEB18BFE53500BC4DCB /* FTTrialSeparationMonitor.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = FTTrialSeparationMonitor.mm; path = FiftyThreeSdk/FTTrialSeparationMonitor.mm; sourceTree = "<group>"; };
@@ -348,6 +351,7 @@
 				66B6E3E316F9237800251B6A /* TouchClassifiers */,
 				3CC31DCB17933ABB002CD4FB /* TransitionKit */,
 				0489D36E18CE13D800B41E20 /* FTApplication+Private.h */,
+				0489D38A18CE2A7400B41E20 /* FTSDKVersionInfo.m */,
 			);
 			name = FiftyThreeSdk;
 			sourceTree = "<group>";
@@ -367,6 +371,7 @@
 				3C4E641818352A4500C0BB10 /* FTLog.h */,
 				66D779B116E57461001C4F55 /* FTPen.h */,
 				66D779B416E57461001C4F55 /* FTPenManager.h */,
+				0489D38918CE2A7400B41E20 /* FTSDKVersionInfo.h */,
 			);
 			name = export;
 			sourceTree = "<group>";
@@ -439,6 +444,7 @@
 				0416CABE18A42B51004EAC00 /* EigenLAB.cpp in Sources */,
 				66D779BC16E57461001C4F55 /* TIUpdateManager.mm in Sources */,
 				0416CABC18A42B51004EAC00 /* Debug.cpp in Sources */,
+				0489D38B18CE2A7400B41E20 /* FTSDKVersionInfo.m in Sources */,
 				663AFED916FA6BD800681A90 /* PenEvent.cpp in Sources */,
 				66BEC2861703B397009207F9 /* FTFirmwareManager.m in Sources */,
 				0416CAC818A42B51004EAC00 /* Performance.cpp in Sources */,
