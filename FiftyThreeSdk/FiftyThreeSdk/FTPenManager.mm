@@ -10,9 +10,13 @@
 
 #import "Common/NSString+Helpers.h"
 #import "Core/Asserts.h"
+#import "FiftyThreeSdk/PenConnectionView.h"
+#import "FiftyThreeSdk/TouchClassifier.h"
+#import "FTApplication+Private.h"
 #import "FTFirmwareManager.h"
 #import "FTLog.h"
 #import "FTPen+Private.h"
+#import "FTTouchClassifier+Private.h"
 #import "FTPen.h"
 #import "FTPenManager+Internal.h"
 #import "FTPenManager+Private.h"
@@ -21,6 +25,9 @@
 #import "FTTrialSeparationMonitor.h"
 #import "TIUpdateManager.h"
 #import "TransitionKit.h"
+#import "Core/AnimationPump.h"
+#import "FiftyThreeSdk/PenConnectionView.h"
+#import "FiftyThreeSdk/TouchClassifier.h"
 
 static NSString * const kCharcoalPeripheralName = @"Charcoal by 53";
 static NSString * const kPencilPeripheralName = @"Pencil";
@@ -112,7 +119,42 @@ static NSString *const kAttemptConnectionFromSeparatedEventName = @"AttemptConne
 static NSString *const kUpdateFirmwareEventName = @"UpdateFirmware";
 static NSString *const kAttemptConnectionFromUpdatingFirmwareEventName = @"AttemptConnectionFromUpdatingFirmware";
 
+namespace
+{
+    static FTPenManager *sharedInstance = nil;
+}
+
 #pragma mark -
+
+// TODO, should these live in Core?
+@interface NSString (Helpers2)
++ (NSString *)stringWithTimeInterval:(NSTimeInterval)timeInterval;
+@end
+
+@implementation NSString (Helpers2)
+
++ (NSString *)stringWithTimeInterval:(NSTimeInterval)timeInterval
+{
+    const unsigned long timeSec = abs((long)timeInterval);
+    const unsigned long timeDayField =  timeSec / 60 / 60 / 24;
+    const unsigned long timeHourField = (timeSec -
+                                         (timeDayField * 60 * 60 * 24)) / 60 / 60;
+    const unsigned long timeMinField = (timeSec -
+                                        (timeDayField * 60 * 60 * 24) -
+                                        (timeHourField * 60 * 60)) / 60;
+    const unsigned long timeSecField = (timeSec -
+                                        (timeDayField * 60 * 60 * 24) -
+                                        (timeHourField * 60 * 60) -
+                                        (timeMinField * 60));
+
+    return [NSString stringWithFormat:@"%@%lud %02lu:%02lu:%02lu",
+            timeInterval < 0.0 ? @"-" : @"",
+            timeDayField,
+            timeHourField,
+            timeMinField,
+            timeSecField];
+}
+@end
 
 typedef enum
 {
@@ -165,11 +207,12 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     }
 }
 
-@interface FTPenManager () <CBCentralManagerDelegate, TIUpdateManagerDelegate>
+@interface FTPenManager () <CBCentralManagerDelegate, TIUpdateManagerDelegate, PenConnectionViewDelegate>
 {
     BOOL _isPairingSpotPressed;
 }
-@property (nonatomic, readwrite) BOOL isPairingSpotPressed;
+@property (nonatomic) BOOL isPairingSpotPressed;
+
 @property (nonatomic) CBCentralManager *centralManager;
 
 @property (nonatomic, copy) NSString *firmwareImagePath;
@@ -205,6 +248,8 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 @property (nonatomic) FTPenInformation *info;
 
 @property (nonatomic) FTTouchClassifier *classifier;
+
+@property (nonatomic) NSMutableArray *pairingViews;
 
 @end
 
@@ -271,6 +316,8 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
         self.trialSeparationMonitor = [[FTTrialSeparationMonitor alloc] init];
         self.trialSeparationMonitor.penManager = self;
+
+        self.pairingViews = [@[] mutableCopy];
     }
 
     return self;
@@ -1814,17 +1861,40 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     }
 }
 
+
+
+#pragma mark - PenConnectionViewDelegate
+- (void)penConnectionViewAnimationWasEnqueued:(PenConnectionView *)penConnectionView
+{
+    [self.delegate shouldWakeDisplayLink];
+}
+
+- (BOOL)canPencilBeConnected
+{
+    //TODO:
+    return YES;
+}
+
+- (void)isPairingSpotPressedDidChange:(BOOL)isPairingSpotPressed
+{
+    [self.delegate shouldWakeDisplayLink];
+}
+
 #pragma mark - Public API
 
-+ (id)sharedInstance
++ (FTPenManager *)sharedInstance
 {
-    //  Static local predicate must be initialized to 0
-    static FTPenManager *sharedInstance = nil;
-    static dispatch_once_t onceToken = 0;
-    dispatch_once(&onceToken, ^{
+    NSAssert([NSThread isMainThread], @"sharedInstance be called on the UI thread");
+    if (!sharedInstance)
+    {
+        FTApplication * application = (FTApplication*)[UIApplication sharedApplication];
+        if (application)
+        {
+            application.classifier = fiftythree::sdk::TouchClassifier::New();
+        }
         sharedInstance = [[FTPenManager alloc] init];
-        // Do any other initialisation stuff here
-    });
+        sharedInstance.classifier = [[FTTouchClassifier alloc] init];
+    }
     return sharedInstance;
 }
 
@@ -1832,29 +1902,57 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
                      andTintColor:(UIColor *)color
                          andFrame:(CGRect)frame
 {
-    // TODO:
-    //
-    return [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 44.0f, 44.0f)];
+    NSAssert([NSThread isMainThread], @"Must be called on the UI thread");
+    PenConnectionView *penConnectionView = [[PenConnectionView alloc] init];
+    penConnectionView.penManager = self;
+    penConnectionView.isActive = true; //What is this parameter for?
+    penConnectionView.delegate = self;
+
+    [self.pairingViews addObject:penConnectionView];
+
+    return penConnectionView;
 }
 
 - (BOOL)update
 {
-    // TODO:
-    // - Call Classifier update.
-    // - Run Animation Pump for pairing dot.
-    return YES;
+    NSAssert([NSThread isMainThread], @"update must be called on the UI thread");
+    [self.classifier update];
+    
+    NSTimeInterval time = [[NSProcessInfo processInfo] systemUptime];
+    
+    AnimationPump::Instance()->UpdateAnimations(time);
+    
+    return AnimationPump::Instance()->HasActiveAnimations();
 }
 
 - (void)shutdown
 {
-    // TODO:
-    //    What's the best thing to do here.
+    NSAssert([NSThread isMainThread], @"shutdown must be called on the UI thread");
+    self.delegate = nil;
+    self.classifier.delegate = nil;
+
+    AnimationPump::Instance()->RemoveAllAnimatables();
+
+    for (UIView * view in self.pairingViews)
+    {
+        [view removeFromSuperview];
+    }
+
+    [self.pairingViews removeAllObjects];
+
     [self reset];
+
+    FTApplication * application = (FTApplication*)[UIApplication sharedApplication];
+    if (application)
+    {
+       [application clearClassifierAndPenState];
+    }
+
+    sharedInstance = nil;
 }
 
 // TODO:
 // - Invoke delegate on PenInformation changed.
 // - Invoke delegate when done reading all characterisitics
-// - Invoke delegate for classification changes.
 
 @end

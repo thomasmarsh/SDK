@@ -86,6 +86,7 @@ typedef NS_ENUM(NSInteger, FTPairingUIStyle) {
 
 @property (nonatomic, readonly) FTTouchClassifier *classifier;
 
+// Register to get connection information.
 @property (nonatomic, weak) id<FTPenManagerDelegate> delegate;
 
 // TODO: Parameters will depend on UI design.
@@ -93,8 +94,11 @@ typedef NS_ENUM(NSInteger, FTPairingUIStyle) {
                      andTintColor:(UIColor *)color
                          andFrame:(CGRect)frame;
 
+// Call this at the start of your render loop. Returns YES if we'd like to get called again (i.e., a
+// reclassification may happen.)
 - (BOOL)update;
 
+// Call this to tear down the API. This also shut down any CoreBluetooth activity.
 - (void)shutdown;
 
 @end

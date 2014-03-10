@@ -7,8 +7,8 @@
 
 #pragma once
 
-#include <FiftyThreeSdk/FTApplication.h>
-#include <FiftyThreeSdk/FTLog.h>
-#include <FiftyThreeSdk/FTPenManager.h>
-#include <FiftyThreeSdk/FTSDKVersionInfo.h>
-#include <FiftyThreeSdk/FTTouchClassifier.h>
+#import <FiftyThreeSdk/FTApplication.h>
+#import <FiftyThreeSdk/FTLog.h>
+#import <FiftyThreeSdk/FTPenManager.h>
+#import <FiftyThreeSdk/FTSDKVersionInfo.h>
+#import <FiftyThreeSdk/FTTouchClassifier.h>
