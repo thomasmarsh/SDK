@@ -8,6 +8,7 @@
 #import "Core/Touch/Touch.h"
 #import "Core/Touch/TouchTracker.h"
 #import "FTApplication.h"
+#import "FTApplication+Private.h"
 #import "FTPen.h"
 #import "FTPenManager.h"
 
