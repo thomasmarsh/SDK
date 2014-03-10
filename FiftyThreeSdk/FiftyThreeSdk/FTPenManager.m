@@ -1817,15 +1817,14 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
 + (id)sharedInstance
 {
-    static FTPenManager *instance = nil;
-    @synchronized(self)
-    {
-        if (instance == nil)
-        {
-            instance = [[self alloc] init];
-        }
-    }
-    return instance;
+    //  Static local predicate must be initialized to 0
+    static FTPenManager *sharedInstance = nil;
+    static dispatch_once_t onceToken = 0;
+    dispatch_once(&onceToken, ^{
+        sharedInstance = [[FTPenManager alloc] init];
+        // Do any other initialisation stuff here
+    });
+    return sharedInstance;
 }
 
 - (UIView *)pairingButtonWithStye:(FTPairingUIStyle)style

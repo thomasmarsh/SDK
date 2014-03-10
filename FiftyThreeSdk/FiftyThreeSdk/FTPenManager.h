@@ -9,7 +9,7 @@
 
 #import <Foundation/Foundation.h>
 
-#import "FTTouchClassifier.h"
+#import "FiftyThreeSdk/FTTouchClassifier.h"
 
 typedef NS_ENUM(NSInteger, FTPenManagerState)
 {

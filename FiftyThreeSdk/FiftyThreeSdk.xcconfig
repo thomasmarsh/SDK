@@ -15,5 +15,5 @@ DSTROOT = /tmp/$(USER_PRODUCT_NAME).dst
 
 FRAMEWORK_SEARCH_PATHS = "$(SDKROOT)/Developer/Library/Frameworks" "$(DEVELOPER_FRAMEWORKS_DIR)" "$(SRCROOT)/../../ThirdParty/boost/framework"
 
-HEADER_SEARCH_PATHS = "$(SRCROOT)/../../../ThirdParty"
+HEADER_SEARCH_PATHS = "$(SRCROOT)/../../../ThirdParty" "$(SRCROOT)"
 USER_HEADER_SEARCH_PATHS = "$(SRCROOT)" "$(SRCROOT)/../../ThirdParty" "$(SRCROOT)/../../../ThirdParty" "$(SRCROOT)/../../Core" "$(SRCROOT)/../../Common" "$(SRCROOT)/../GlobalSettings"

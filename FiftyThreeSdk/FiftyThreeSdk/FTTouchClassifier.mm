@@ -53,12 +53,12 @@ using namespace fiftythree::sdk;
                 break;
                 case TouchClassification::Pen:
                 {
-                    *result = FTTouchClassificationTip1;
+                    *result = FTTouchClassificationPen;
                 }
                 break;
                 case TouchClassification::Eraser:
                 {
-                    *result = FTTouchClassificationTip2;
+                    *result = FTTouchClassificationEraser;
                 }
                 break;
                 default:

@@ -106,8 +106,8 @@
 		0489D38A18CE2A7400B41E20 /* FTSDKVersionInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FTSDKVersionInfo.m; path = FiftyThreeSdk/FTSDKVersionInfo.m; sourceTree = "<group>"; };
 		0489D41E18CE382100B41E20 /* FTTouchClassifier.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FTTouchClassifier.h; path = FiftyThreeSdk/FTTouchClassifier.h; sourceTree = "<group>"; };
 		0489D41F18CE382100B41E20 /* FTTouchClassifier.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = FTTouchClassifier.mm; path = FiftyThreeSdk/FTTouchClassifier.mm; sourceTree = "<group>"; };
-		0489D42118CE3E3F00B41E20 /* FiftyThreeSdk.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FiftyThreeSdk.h; sourceTree = "<group>"; };
 		0489D42718CE43E900B41E20 /* FTPenManager+Internal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "FTPenManager+Internal.h"; path = "FiftyThreeSdk/FTPenManager+Internal.h"; sourceTree = "<group>"; };
+		0489D42818CE50A500B41E20 /* FiftyThreeSdk.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FiftyThreeSdk.h; path = FiftyThreeSdk/FiftyThreeSdk.h; sourceTree = "<group>"; };
 		0493D9DC18B6957B0049FEFC /* Eigen.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Eigen.h; sourceTree = "<group>"; };
 		04E99BEA18BFE53500BC4DCB /* FTTrialSeparationMonitor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FTTrialSeparationMonitor.h; path = FiftyThreeSdk/FTTrialSeparationMonitor.h; sourceTree = "<group>"; };
 		04E99BEB18BFE53500BC4DCB /* FTTrialSeparationMonitor.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = FTTrialSeparationMonitor.mm; path = FiftyThreeSdk/FTTrialSeparationMonitor.mm; sourceTree = "<group>"; };
@@ -375,12 +375,12 @@
 		66A8389C16E531E40048FFE4 /* export */ = {
 			isa = PBXGroup;
 			children = (
+				0489D42818CE50A500B41E20 /* FiftyThreeSdk.h */,
 				666DC55C170CF33C00D6B3C2 /* FTApplication.h */,
 				3C4E641818352A4500C0BB10 /* FTLog.h */,
 				66D779B416E57461001C4F55 /* FTPenManager.h */,
 				0489D38918CE2A7400B41E20 /* FTSDKVersionInfo.h */,
 				0489D41E18CE382100B41E20 /* FTTouchClassifier.h */,
-				0489D42118CE3E3F00B41E20 /* FiftyThreeSdk.h */,
 			);
 			name = export;
 			sourceTree = "<group>";

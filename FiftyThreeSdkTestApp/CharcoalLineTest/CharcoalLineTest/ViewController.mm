@@ -17,6 +17,7 @@
 #import "FiftyThreeSdk/FTLog.h"
 #import "FiftyThreeSdk/FTPen+Private.h"
 #import "FiftyThreeSdk/FTPenManager+Private.h"
+#import "FiftyThreeSdk/FTPenManager+Internal.h"
 #import "FiftyThreeSdk/FTPenManager.h"
 #import "KeychainItemWrapper/KeychainItemWrapper.h"
 #import "RscMgr.h"

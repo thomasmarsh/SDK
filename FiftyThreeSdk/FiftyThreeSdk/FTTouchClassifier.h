@@ -22,9 +22,9 @@ typedef NS_ENUM(NSInteger, FTTouchClassification) {
     // whenever we think the touch is a palm touch
     FTTouchClassificationPalm,
     // whenever we think the touch correspoinds to the pen tip.
-    FTTouchClassificationTip1,
+    FTTouchClassificationPen,
     // whenever we think the touch corresoponds to the eraser.
-    FTTouchClassificationTip2,
+    FTTouchClassificationEraser,
 };
 
 @interface FTTouchClassificationInfo : NSObject
