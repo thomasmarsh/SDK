@@ -76,7 +76,7 @@ typedef NS_ENUM(NSInteger, FTPairingUIStyle) {
 @interface FTPenManager : NSObject
 
 // Use this to get at the instance.
-+ (id)sharedInstance;
++ (FTPenManager *)sharedInstance;
 
 // Connection State.
 @property (nonatomic, readonly) FTPenManagerState state;

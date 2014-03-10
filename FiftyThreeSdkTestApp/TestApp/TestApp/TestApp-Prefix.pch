@@ -1,0 +1,18 @@
+//
+//  TestApp-Prefix.pch
+//  TestApp
+//
+//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
+//
+
+#import <Availability.h>
+
+#ifndef __IPHONE_7_0
+#warning "This project uses features only available in iOS SDK 5.0 and later."
+#endif
+
+#ifdef __OBJC__
+#import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
+
+#endif

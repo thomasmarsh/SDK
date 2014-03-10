@@ -1,0 +1,9 @@
+//
+//  TestAppProduction.xcconfig
+//  TestApp
+//
+//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
+//
+
+#include "../../../BuildConfigurations/ApplicationProduction.xcconfig"
+#include "TestApp.xcconfig"

@@ -1,5 +1,5 @@
 //
-//  FTPenManager.m
+//  FTPenManager.mm
 //  FiftyThreeSdk
 //
 //  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
@@ -9,6 +9,7 @@
 #import <UIKit/UIKit.h>
 
 #import "Common/NSString+Helpers.h"
+#import "Core/AnimationPump.h"
 #import "Core/Asserts.h"
 #import "FiftyThreeSdk/PenConnectionView.h"
 #import "FiftyThreeSdk/TouchClassifier.h"
@@ -16,18 +17,15 @@
 #import "FTFirmwareManager.h"
 #import "FTLog.h"
 #import "FTPen+Private.h"
-#import "FTTouchClassifier+Private.h"
 #import "FTPen.h"
 #import "FTPenManager+Internal.h"
 #import "FTPenManager+Private.h"
 #import "FTPenManager.h"
 #import "FTServiceUUIDs.h"
+#import "FTTouchClassifier+Private.h"
 #import "FTTrialSeparationMonitor.h"
 #import "TIUpdateManager.h"
 #import "TransitionKit.h"
-#import "Core/AnimationPump.h"
-#import "FiftyThreeSdk/PenConnectionView.h"
-#import "FiftyThreeSdk/TouchClassifier.h"
 
 static NSString * const kCharcoalPeripheralName = @"Charcoal by 53";
 static NSString * const kPencilPeripheralName = @"Pencil";
@@ -1861,8 +1859,6 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     }
 }
 
-
-
 #pragma mark - PenConnectionViewDelegate
 - (void)penConnectionViewAnimationWasEnqueued:(PenConnectionView *)penConnectionView
 {
@@ -1903,8 +1899,10 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
                          andFrame:(CGRect)frame
 {
     NSAssert([NSThread isMainThread], @"Must be called on the UI thread");
+
     PenConnectionView *penConnectionView = [[PenConnectionView alloc] init];
     penConnectionView.penManager = self;
+    penConnectionView.suppressDialogs = YES;
     penConnectionView.isActive = true; //What is this parameter for?
     penConnectionView.delegate = self;
 
@@ -1917,11 +1915,11 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 {
     NSAssert([NSThread isMainThread], @"update must be called on the UI thread");
     [self.classifier update];
-    
+
     NSTimeInterval time = [[NSProcessInfo processInfo] systemUptime];
-    
+
     AnimationPump::Instance()->UpdateAnimations(time);
-    
+
     return AnimationPump::Instance()->HasActiveAnimations();
 }
 

@@ -77,4 +77,7 @@
    <FileRef
       location = "group:../../ThirdParty/InAppSettingsKit/InAppSettingsKit.xcodeproj">
    </FileRef>
+   <FileRef
+      location = "group:TestApp/TestApp.xcodeproj">
+   </FileRef>
 </Workspace>
