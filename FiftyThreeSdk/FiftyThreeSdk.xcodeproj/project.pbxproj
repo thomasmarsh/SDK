@@ -106,6 +106,7 @@
 		0489D38A18CE2A7400B41E20 /* FTSDKVersionInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FTSDKVersionInfo.m; path = FiftyThreeSdk/FTSDKVersionInfo.m; sourceTree = "<group>"; };
 		0489D41E18CE382100B41E20 /* FTTouchClassifier.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FTTouchClassifier.h; path = FiftyThreeSdk/FTTouchClassifier.h; sourceTree = "<group>"; };
 		0489D41F18CE382100B41E20 /* FTTouchClassifier.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = FTTouchClassifier.mm; path = FiftyThreeSdk/FTTouchClassifier.mm; sourceTree = "<group>"; };
+		0489D42118CE3E3F00B41E20 /* FiftyThreeSdk.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FiftyThreeSdk.h; sourceTree = "<group>"; };
 		0493D9DC18B6957B0049FEFC /* Eigen.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Eigen.h; sourceTree = "<group>"; };
 		04E99BEA18BFE53500BC4DCB /* FTTrialSeparationMonitor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FTTrialSeparationMonitor.h; path = FiftyThreeSdk/FTTrialSeparationMonitor.h; sourceTree = "<group>"; };
 		04E99BEB18BFE53500BC4DCB /* FTTrialSeparationMonitor.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = FTTrialSeparationMonitor.mm; path = FiftyThreeSdk/FTTrialSeparationMonitor.mm; sourceTree = "<group>"; };
@@ -340,6 +341,9 @@
 				666DC55B170CF31E00D6B3C2 /* AppSupport */,
 				0416CA8918A42B51004EAC00 /* Classification */,
 				66A8389C16E531E40048FFE4 /* export */,
+				0489D36E18CE13D800B41E20 /* FTApplication+Private.h */,
+				0489D38A18CE2A7400B41E20 /* FTSDKVersionInfo.m */,
+				0489D41F18CE382100B41E20 /* FTTouchClassifier.mm */,
 				04493E2D18C6223C0003AFB8 /* PairingSpotView.h */,
 				04493E2E18C6223C0003AFB8 /* PairingSpotView.mm */,
 				04493E3A18C628A00003AFB8 /* PenConnectionView.h */,
@@ -353,9 +357,6 @@
 				04493DE418C545140003AFB8 /* TouchClassifierImpl.h */,
 				66B6E3E316F9237800251B6A /* TouchClassifiers */,
 				3CC31DCB17933ABB002CD4FB /* TransitionKit */,
-				0489D36E18CE13D800B41E20 /* FTApplication+Private.h */,
-				0489D41F18CE382100B41E20 /* FTTouchClassifier.mm */,
-				0489D38A18CE2A7400B41E20 /* FTSDKVersionInfo.m */,
 			);
 			name = FiftyThreeSdk;
 			sourceTree = "<group>";
@@ -377,6 +378,7 @@
 				66D779B416E57461001C4F55 /* FTPenManager.h */,
 				0489D38918CE2A7400B41E20 /* FTSDKVersionInfo.h */,
 				0489D41E18CE382100B41E20 /* FTTouchClassifier.h */,
+				0489D42118CE3E3F00B41E20 /* FiftyThreeSdk.h */,
 			);
 			name = export;
 			sourceTree = "<group>";
