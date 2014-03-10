@@ -7,8 +7,8 @@
 
 #pragma once
 
-// Main entry point of the FiftyThree SDK for your application.
 #include "FTApplication.h"
 #include "FTLog.h"
 #include "FTSDKVersionInfo.h"
 #include "FTTouchClassifier.h"
+#include "FTPenManager.h"
