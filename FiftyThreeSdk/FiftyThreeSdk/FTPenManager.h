@@ -2,7 +2,7 @@
 //  FTPenManager.h
 //  FiftyThreeSdk
 //
-//  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
+//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
 
 #pragma once
@@ -48,17 +48,8 @@ extern "C"
 }
 #endif
 
-extern NSString * const kFTPenManagerDidUpdateStateNotificationName;
-extern NSString * const kFTPenManagerDidFailToDiscoverPenNotificationName;
-
 @interface FTPenManager : NSObject
 
 @property (nonatomic, readonly) FTPenManagerState state;
-
-@property (nonatomic, readonly) FTPen *pen;
-
-@property (nonatomic) BOOL isPairingSpotPressed;
-
-- (void)disconnect;
 
 @end

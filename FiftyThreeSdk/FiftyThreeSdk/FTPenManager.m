@@ -14,6 +14,7 @@
 #import "FTLog.h"
 #import "FTPen+Private.h"
 #import "FTPen.h"
+#import "FTPenManager+Internal.h"
 #import "FTPenManager+Private.h"
 #import "FTPenManager.h"
 #import "FTServiceUUIDs.h"
@@ -165,7 +166,9 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 }
 
 @interface FTPenManager () <CBCentralManagerDelegate, TIUpdateManagerDelegate>
-
+{
+    BOOL _isPairingSpotPressed;
+}
 @property (nonatomic) CBCentralManager *centralManager;
 
 @property (nonatomic, copy) NSString *firmwareImagePath;

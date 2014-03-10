@@ -14,6 +14,7 @@
 #import "Core/Enum.h"
 #import "Core/Touch/TouchTracker.h"
 #import "Core/UIView+Helpers.h"
+#import "FiftyThreeSdk/FTPenManager+Internal.h"
 #import "FiftyThreeSdk/FTPenManager.h"
 #import "FiftyThreeSdk/PairingSpotView.h"
 #import "FiftyThreeSdk/PenConnectionView.h"

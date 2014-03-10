@@ -7,10 +7,10 @@
 
 #import "Core/Touch/Touch.h"
 #import "Core/Touch/TouchTracker.h"
-#import "FTApplication.h"
 #import "FTApplication+Private.h"
+#import "FTApplication.h"
 #import "FTPen.h"
-#import "FTPenManager.h"
+#import "FTPenManager+Internal.h"
 
 using namespace fiftythree::core;
 using namespace fiftythree::sdk;
