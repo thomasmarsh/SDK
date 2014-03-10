@@ -201,6 +201,10 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
 @property (nonatomic) FTTrialSeparationMonitor *trialSeparationMonitor;
 
+@property (nonatomic) FTPenInformation *info;
+
+@property (nonatomic) FTTouchClassifier *classifier;
+
 @end
 
 @implementation FTPenManager
@@ -1808,5 +1812,49 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
         }
     }
 }
+
+#pragma mark - Public API
+
++ (id)sharedInstance
+{
+    static FTPenManager *instance = nil;
+    @synchronized(self)
+    {
+        if (instance == nil)
+        {
+            instance = [[self alloc] init];
+        }
+    }
+    return instance;
+}
+
+- (UIView *)pairingButtonWithStye:(FTPairingUIStyle)style
+                     andTintColor:(UIColor *)color
+                         andFrame:(CGRect)frame
+{
+    // TODO:
+    //
+    return [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 44.0f, 44.0f)];
+}
+
+- (BOOL)update
+{
+    // TODO:
+    // - Call Classifier update.
+    // - Run Animation Pump for pairing dot.
+    return YES;
+}
+
+- (void)shutdown
+{
+    // TODO:
+    //    What's the best thing to do here.
+    [self reset];
+}
+
+// TODO:
+// - Invoke delegate on PenInformation changed.
+// - Invoke delegate when done reading all characterisitics
+// - Invoke delegate for classification changes.
 
 @end

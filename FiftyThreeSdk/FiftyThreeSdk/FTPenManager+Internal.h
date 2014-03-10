@@ -15,8 +15,6 @@ extern NSString * const kFTPenManagerDidFailToDiscoverPenNotificationName;
 
 @interface FTPenManager (Internal)
 
-@property (nonatomic, readonly) FTPenManagerState state;
-
 @property (nonatomic, readonly) FTPen *pen;
 
 @property (nonatomic) BOOL isPairingSpotPressed;
