@@ -57,10 +57,12 @@ protected:
 
     virtual boost::optional<core::TouchClassification> OverrideClassificationForTouch(const core::Touch::cPtr & touch);
 
+    void SetCopyGestureClassifications(bool b);
 private:
     Classifier::Ptr _Classifier;
     bool _ShowLog;
     bool _Connected;
+    bool _CopyGestureClassifications;
     Event<const std::vector<TouchClassificationChangedEventArgs> &> _TouchClassificationsDidChange;
 };
 

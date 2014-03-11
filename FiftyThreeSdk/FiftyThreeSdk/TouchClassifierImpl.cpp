@@ -27,7 +27,7 @@ namespace fiftythree
 {
 namespace sdk
 {
-TouchClassifierImpl::TouchClassifierImpl() : _Classifier(Classifier::New()), _Connected(false), _ShowLog(false)
+TouchClassifierImpl::TouchClassifierImpl() : _Classifier(Classifier::New()), _Connected(false), _ShowLog(false), _CopyGestureClassifications(false)
 {
     _Classifier->SetUsePrivateAPI(false);
     _Classifier->SetUseDebugLogging(_ShowLog);
@@ -139,8 +139,11 @@ void TouchClassifierImpl::UpdateClassifications()
         }
         else
         {
-            *const_cast<Property<TouchClassification> *>(&touch->SingleTapClassification()) = _Classifier->ClassifyForGesture(touch->Id(), fiftythree::sdk::SingleTouchGestureType::Tap);
-            *const_cast<Property<TouchClassification> *>(&touch->LongPressClassification()) = _Classifier->ClassifyForGesture(touch->Id(), fiftythree::sdk::SingleTouchGestureType::LongPress);
+            if (_CopyGestureClassifications)
+            {
+                *const_cast<Property<TouchClassification> *>(&touch->SingleTapClassification()) = _Classifier->ClassifyForGesture(touch->Id(), fiftythree::sdk::SingleTouchGestureType::Tap);
+                *const_cast<Property<TouchClassification> *>(&touch->LongPressClassification()) = _Classifier->ClassifyForGesture(touch->Id(), fiftythree::sdk::SingleTouchGestureType::LongPress);
+            }
 
             args.newValue = _Classifier->Classify(touch->Id());
         }
@@ -187,6 +190,11 @@ void TouchClassifierImpl::UpdateClassifications()
             }
         }
     }
+}
+
+void TouchClassifierImpl::SetCopyGestureClassifications(bool b)
+{
+    _CopyGestureClassifications = b;
 }
 
 Classifier::Ptr TouchClassifierImpl::Classifier()
