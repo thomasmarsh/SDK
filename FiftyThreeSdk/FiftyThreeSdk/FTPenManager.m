@@ -169,6 +169,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 {
     BOOL _isPairingSpotPressed;
 }
+@property (nonatomic, readwrite) BOOL isPairingSpotPressed;
 @property (nonatomic) CBCentralManager *centralManager;
 
 @property (nonatomic, copy) NSString *firmwareImagePath;
