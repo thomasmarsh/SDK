@@ -48,7 +48,6 @@ void PenTracker::UpdateLocations()
     }
     else if (N == 1)
     {
-
         medianPalm = allClusters[0]->_center;
     }
     else

@@ -295,6 +295,10 @@ EdgeThumbState IsolatedStrokesClassifier::TestEdgeThumb(core::TouchId touchId)
 
 void IsolatedStrokesClassifier::MarkEdgeThumbs()
 {
+    // TODO:
+    //      Perfomance pass.
+    //return;
+    
     vector<Cluster::Ptr> orderedClusters = _commonData->proxy->ClusterTracker()->FastOrderedClusters();
     vector<Cluster::Ptr> penToPalm       = _commonData->proxy->PenTracker()->CopyInPenToPalmOrder(orderedClusters);
 
@@ -304,7 +308,7 @@ void IsolatedStrokesClassifier::MarkEdgeThumbs()
         cluster->_edgeThumbState = EdgeThumbState::NotThumb;
     }
 
-    for (Cluster::Ptr const & cluster :  penToPalm)
+    for (const auto & cluster :  penToPalm)
     {
         if (!cluster->_touchIds.empty())
         {
@@ -355,7 +359,6 @@ bool IsolatedStrokesClassifier::IsEdgeThumb(core::TouchId touchId)
     }
 
     return cluster->_edgeThumbState == EdgeThumbState::Thumb;
-
 }
 
 IdTypeMap IsolatedStrokesClassifier::ReclassifyActiveTouches()
@@ -465,7 +468,6 @@ bool IsolatedStrokesClassifier::IsPalmCluster(Cluster::Ptr const & cluster)
     }
 
     return false;
-
 }
 
 float IsolatedStrokesClassifier::Score(Stroke  & stroke)

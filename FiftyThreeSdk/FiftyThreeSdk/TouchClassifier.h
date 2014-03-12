@@ -115,7 +115,7 @@ public:
 
     virtual void ClearSessionStatistics() = 0;
     virtual SessionStatistics::Ptr SessionStatistics() = 0;
-    
+
     static TouchClassifier::Ptr New();
 };
 

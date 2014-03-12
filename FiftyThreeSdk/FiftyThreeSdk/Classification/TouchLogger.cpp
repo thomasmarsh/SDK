@@ -1348,7 +1348,6 @@ void TouchLogger::InsertStroke(core::TouchId touchId, Eigen::VectorXd t, Eigen::
         touchData->Stroke()->AddPoint(xy, t(i));
         touchData->SetPhase(core::TouchPhase::Moved);
     }
-
 }
 
 void TouchLogger::InsertStroke(core::TouchId touchId, Eigen::VectorXd t, Eigen::VectorXf x, Eigen::VectorXf y)

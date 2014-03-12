@@ -843,7 +843,7 @@ Eigen::MatrixXf ClusterTracker::DistanceMatrix(std::set<Cluster::Ptr> const & cl
 {
     int nClusters = (int) clusters.size();
 
-    Eigen::MatrixXf D(nClusters,nClusters);
+    Eigen::MatrixXf D(nClusters, nClusters);
 
     int m = 0;
     int n = 0;
@@ -858,10 +858,10 @@ Eigen::MatrixXf ClusterTracker::DistanceMatrix(std::set<Cluster::Ptr> const & cl
             Vector2f p = row->_center;
             Vector2f q = col->_center;
 
-            D(m,n)     = (p-q).norm();
-            n++;
+            D(m,n) = (p-q).norm();
+            ++n;
         }
-        m++;
+        ++m;
     }
 
     return D;
@@ -872,7 +872,6 @@ vector<Cluster::Ptr> ClusterTracker::FastOrderedClusters()
 
     if (_needComputeClusterOrder)
     {
-
         int N = (int) _currentEventActiveClusters.size();
 
         vector<Cluster::Ptr> bestOrder;
@@ -883,25 +882,24 @@ vector<Cluster::Ptr> ClusterTracker::FastOrderedClusters()
         }
         else
         {
-
             // try each possible pair of endpoints and then run a greedy furthest-insertion algorithm
             // to produce a path.  this works pretty well even in nasty cases.
 
             Eigen::MatrixXf D = DistanceMatrix(_currentEventActiveClusters);
 
             list<int> bestPath;
-            float          bestPathLength = std::numeric_limits<float>::max();
+            float bestPathLength = std::numeric_limits<float>::max();
 
-            for (int start = 1; start<N; start++)
+            for (int start = 1; start < N; ++start)
             {
-                for (int finish = 0; finish<start; finish++)
+                for (int finish = 0; finish < start; ++finish)
                 {
                     // the int's in these lists represent active clusters in the order
                     // in which they appear in _currentEventActiveClusters
                     list<int> path;
                     list<int> freeList;
 
-                    for (int j=0; j<N; j++)
+                    for (int j = 0; j < N; ++j)
                     {
                         if (j != start && j != finish)
                         {
@@ -915,7 +913,7 @@ vector<Cluster::Ptr> ClusterTracker::FastOrderedClusters()
                     // we will construct a path from start to finish
                     // we have N-2 nodes to insert into the path.  at each iteration
                     // we find a faraway node to add into the path
-                    for (int k=0; k<N-2; k++)
+                    for (int k = 0; k < N-2; ++k)
                     {
                         float dFurthest = 0.0f;
                         list<int>::iterator furthestNode;
@@ -923,13 +921,13 @@ vector<Cluster::Ptr> ClusterTracker::FastOrderedClusters()
 
                         // first, find the guy in freeList whose nearest neighbor in path
                         // lies furthest away
-                        for (currentNode = freeList.begin(); currentNode != freeList.end(); currentNode++)
+                        for (currentNode = freeList.begin(); currentNode != freeList.end(); ++currentNode)
                         {
-                            for (list<int>::iterator it = path.begin(); it != path.end(); it++)
+                            for (auto it = path.begin(); it != path.end(); ++it)
                             {
                                 if (D(*it, *currentNode) > dFurthest)
                                 {
-                                    dFurthest    = D(*it, *currentNode);
+                                    dFurthest = D(*it, *currentNode);
                                     furthestNode = currentNode;
                                 }
                             }
@@ -940,18 +938,17 @@ vector<Cluster::Ptr> ClusterTracker::FastOrderedClusters()
 
                         // we'll try to insert him between node1 and node2 and compute the arc length
                         list<int>::iterator bestLocation;
-                        list<int>::iterator node1 = path.begin();
-                        list<int>::iterator node2 = path.begin();
-                        node2++;
+                        auto node1 = path.begin();
+                        auto node2 = path.begin();
+                        ++node2;
 
-                        for (; node2 != path.end(); node2++, node1++)
+                        for (; node2 != path.end(); ++node2, ++node1)
                         {
-
                             float d_total = D(*furthestNode, *node1) + D(*furthestNode, *node2);
                             if (d_total < dBest)
                             {
-                                dBest         = d_total;
-                                bestLocation  = node2;
+                                dBest = d_total;
+                                bestLocation = node2;
                             }
                         }
 
@@ -960,10 +957,10 @@ vector<Cluster::Ptr> ClusterTracker::FastOrderedClusters()
                     }
 
                     float pathLength = 0.0f;
-                    list<int>::iterator node1 = path.begin();
-                    list<int>::iterator node2 = path.begin();
+                    auto node1 = path.begin();
+                    auto node2 = path.begin();
 
-                    for (std::advance(node2,1); node2 != path.end(); node2++, node1++)
+                    for (std::advance(node2,1); node2 != path.end(); ++node2, ++node1)
                     {
                         pathLength += D(*node1, *node2);
                     }
@@ -979,15 +976,11 @@ vector<Cluster::Ptr> ClusterTracker::FastOrderedClusters()
                 }
             }  // END OUTER LOOP
 
-            vector<Cluster::Ptr> activeClusters;
-            for (Cluster::Ptr const & cluster:_currentEventActiveClusters)
-            {
-                activeClusters.push_back(cluster);
-            }
+            vector<Cluster::Ptr> activeClusters(_currentEventActiveClusters.begin(), _currentEventActiveClusters.end());
 
-            for (int index:bestPath)
+            for (const auto & index : bestPath)
             {
-                bestOrder.push_back(activeClusters[index]);
+                bestOrder.emplace_back(activeClusters[index]);
             }
 
         }
@@ -995,7 +988,7 @@ vector<Cluster::Ptr> ClusterTracker::FastOrderedClusters()
         MarkInteriorClusters();
 
         _needComputeClusterOrder = false;
-        _orderedClustersCache    = bestOrder;
+        _orderedClustersCache.swap(bestOrder);
     }
 
     return _orderedClustersCache;
@@ -1074,7 +1067,7 @@ vector<Cluster::Ptr> ClusterTracker::ExactOrderedClusters(std::set<Cluster::Ptr>
     {
         allClusters.push_back(cluster);
         positions.push_back(index);
-        index++;
+        ++index;
     }
 
     if (N <= 2)
@@ -1092,7 +1085,7 @@ vector<Cluster::Ptr> ClusterTracker::ExactOrderedClusters(std::set<Cluster::Ptr>
     {
 
         float d_curr = 0.0f;
-        for (int j=0; j<N-1; j++)
+        for (int j = 0; j < N-1; ++j)
         {
             d_curr += D(positions[j], positions[j+1]);
         }
@@ -1103,9 +1096,10 @@ vector<Cluster::Ptr> ClusterTracker::ExactOrderedClusters(std::set<Cluster::Ptr>
             d_best         = d_curr;
         }
 
-    } while ( std::next_permutation(positions.begin(), positions.end()));
+    }
+    while (std::next_permutation(positions.begin(), positions.end()));
 
-    for (int k=0; k<N; k++)
+    for (int k = 0; k < N; ++k)
     {
         bestPerm.push_back(allClusters[bestPositions[k]]);
     }
@@ -1120,21 +1114,18 @@ vector<core::TouchId> ClusterTracker::TouchesForCurrentClusters(bool activeClust
 
     for (IdClusterPtrPair const & pair:_clusters)
     {
-
         if (activeClustersOnly && pair.second->Stale())
         {
             continue;
         }
 
         touchIds.insert(touchIds.end(), pair.second->_touchIds.begin(), pair.second->_touchIds.end());
-
     }
 
     return touchIds;
-
 }
 
-Stroke::Ptr const &      ClusterTracker::Stroke(core::TouchId id)
+Stroke::Ptr const & ClusterTracker::Stroke(core::TouchId id)
 {
     return _touchLog->Stroke(id);
 }
@@ -1154,7 +1145,7 @@ Cluster::Ptr ClusterTracker::NewClusterForTouch(TouchId touchId)
 
     _touchLog->Data(touchId)->SetCluster(newCluster);
 
-    for (int j=0; j<stroke->Size(); j++)
+    for (int j = 0; j < stroke->Size(); ++j)
     {
         AddPointToCluster(stroke->XY(j), stroke->AbsoluteTimestamp(j), newCluster, touchId);
     }
@@ -1200,7 +1191,6 @@ void ClusterTracker::UpdateEventStatistics()
             }
         }
     }
-
 }
 
 float ClusterTracker::NearestEndedPenDistance(Eigen::Vector2f p)
