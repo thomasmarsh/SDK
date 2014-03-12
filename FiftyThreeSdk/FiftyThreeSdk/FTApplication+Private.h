@@ -2,29 +2,28 @@
 //  FTApplication+Private.h
 //  FiftyThreeSdk
 //
-//  Created by Peter Sibley on 3/10/14.
-//  Copyright (c) 2014 FiftyThree. All rights reserved.
+//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
+
 #pragma once
 
 #ifdef __cplusplus
-#import <boost/optional/optional.hpp>
 #import "FiftyThreeSdk/TouchClassifier.h"
+
 #endif
 
 #import "FiftythreeSdk/FTApplication.h"
 
 @interface FTApplication (Private)
 
+- (void)clearClassifierAndPenState;
+- (void)ensureClassifierConfigured;
+
 #ifdef __cplusplus
-
-@property (nonatomic, readonly) fiftythree::sdk::TouchClassifier::Ptr classifier;
-
+@property (nonatomic) fiftythree::sdk::TouchClassifier::Ptr classifier;
 // Optionally, let a subclass inject a classifier into the touch processing pipeline.
 - (fiftythree::sdk::TouchClassifier::Ptr)createClassifier;
 
 #endif
 
 @end
-
-

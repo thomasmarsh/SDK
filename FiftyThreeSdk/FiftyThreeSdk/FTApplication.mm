@@ -7,6 +7,7 @@
 
 #import "Core/Touch/Touch.h"
 #import "Core/Touch/TouchTracker.h"
+#import "FiftyThreeSdk/TouchClassifierImpl.h"
 #import "FTApplication+Private.h"
 #import "FTApplication.h"
 #import "FTPen.h"
@@ -18,7 +19,7 @@ using namespace fiftythree::sdk;
 using boost::optional;
 
 @interface FTApplication () {
-    optional<TouchClassifier::Ptr> _classifier;
+    TouchClassifier::Ptr _classifier;
 }
 
 @property (nonatomic) BOOL hasSeenFTPenManager;
@@ -58,10 +59,23 @@ using boost::optional;
 }
 
 #pragma mark - Touch Classification
-
 - (TouchClassifier::Ptr)createClassifier
 {
     return TouchClassifier::Ptr();
+}
+
+- (void)clearClassifierAndPenState
+{
+    _classifier = TouchClassifier::Ptr();
+    ActiveClassifier::Activate(TouchClassifier::Ptr());
+    self.hasSeenFTPenManager = NO;
+}
+
+- (void)setClassifier:(fiftythree::sdk::TouchClassifier::Ptr)classifier
+{
+    [self clearClassifierAndPenState];
+    _classifier = classifier;
+    ActiveClassifier::Activate(_classifier);
 }
 
 - (TouchClassifier::Ptr)classifier
@@ -69,14 +83,17 @@ using boost::optional;
     // Don't instantiate the classifier until we've seen an FTPenManager. That way classification doesn't
     // interfere with devices that don't support Pencil, and performance is not degraded if Pencil is not
     // used on devices that do support it but disable it (possibly).
-    if (self.hasSeenFTPenManager && !_classifier)
+    if (!_classifier && [self createClassifier])
     {
-        // Lazily create the classifier.
         _classifier = [self createClassifier];
-        ActiveClassifier::Activate(*_classifier);
     }
 
-    return _classifier ? * _classifier : TouchClassifier::Ptr();
+    if (self.hasSeenFTPenManager && _classifier)
+    {
+        ActiveClassifier::Activate(_classifier);
+    }
+
+    return _classifier;
 }
 
 #pragma mark - Event Dispatch
