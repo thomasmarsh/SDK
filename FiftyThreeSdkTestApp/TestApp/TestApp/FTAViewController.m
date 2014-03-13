@@ -5,19 +5,14 @@
 //  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
 
-
-
 #import "FiftyThreeSdk/FiftyThreeSdk.h"
-#import "FTAViewController.h"
 #import "FTAUtil.h"
+#import "FTAViewController.h"
 
 // This uses portions of shaders from Apple's GLPaint Sample & Apple's starter GLKit project.
 
-
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
 
-
-#define kBrushOpacity       (1.0 / 3.0)
 #define kBrushPixelStep     3
 
 // Shaders enums
@@ -44,7 +39,6 @@ enum
     NUM_ATTRIBS
 };
 
-
 GLint attributes[NUM_ATTRIBS];
 
 // Must match Shader.fsh/vsh.
@@ -57,22 +51,35 @@ static const GLchar *uniformName[NUM_UNIFORMS] =
     "MVP", "pointSize", "color", "texture"
 };
 
+@interface  Stroke : NSObject
+@property (nonatomic) NSTimeInterval lastAppended;
+@property (nonatomic) NSTimeInterval lastReclassified;
+@property (nonatomic) NSMutableArray *glGeometry;
+@property (nonatomic) UIColor *color;
+@property (nonatomic) NSInteger drawOrder;
+@end
+
+@implementation Stroke
+@end
 
 @interface FTAViewController () <FTTouchClassificationsChangedDelegate> {
-    
+
     // OpenGL resources.
     GLuint _program;
     GLuint _vertexBuffer;
     GLuint _texture;
-    
+
     int _textureWidth;
     int _textureHeight;
     GLuint _backingWidth;
     GLuint _backingHeight;
     BOOL _clear;
-    
-    // A list of points to render.
-    NSMutableArray *_pointsToRender;
+
+    // The scene is a dictionary of strokes indexed by
+    // FT touch id.
+    NSMutableDictionary *_scene;
+
+    NSDictionary *_strokeColors;
 }
 @property (nonatomic) EAGLContext *context;
 @property (nonatomic) GLKBaseEffect *effect;
@@ -90,7 +97,6 @@ static const GLchar *uniformName[NUM_UNIFORMS] =
 
 @implementation FTAViewController
 
-
 - (void)viewDidLoad
 {
     [super viewDidLoad];
@@ -104,8 +110,7 @@ static const GLchar *uniformName[NUM_UNIFORMS] =
     GLKView *view = (GLKView *)self.view;
     view.context = self.context;
     view.drawableDepthFormat = GLKViewDrawableDepthFormatNone;
-    
- 
+
     self.bar = [[UIToolbar alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, 44)];
     [self.bar setBarStyle:UIBarStyleBlack];
 
@@ -115,17 +120,31 @@ static const GLchar *uniformName[NUM_UNIFORMS] =
     UIBarButtonItem *button2 = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemPlay
                                                                              target:self
                                                                              action:@selector(initializeFTPenManager:)];
-    [self.bar setItems:@[button1, button2]];
+    UIBarButtonItem *button3 = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh
+                                                                             target:self
+                                                                             action:@selector(clearScene:)];
+    [self.bar setItems:@[button1, button2, button3]];
     [self.view addSubview:self.bar];
     self.isPencilEnabled = NO;
 
     self.preferredFramesPerSecond = 60;
-    
-    _pointsToRender = [@[] mutableCopy];
-    
+
+    _strokeColors =
+    @{
+      @(FTTouchClassificationUnknownDisconnected) : [UIColor colorWithRed:0.5 green:0.5 blue:0.5 alpha:0.3],
+      @(FTTouchClassificationUnknown) : [UIColor colorWithRed:0.1 green:0.1 blue:0.1 alpha:0.3],
+      @(FTTouchClassificationPen) : [UIColor colorWithRed:0.1 green:0.3 blue:0.9 alpha:0.5],
+      @(FTTouchClassificationEraser) : [UIColor colorWithRed:0.9 green:0.1 blue:0.0 alpha:0.5],
+      @(FTTouchClassificationFinger) : [UIColor colorWithRed:0.0 green:0.9 blue:0.0 alpha:0.5],
+      @(FTTouchClassificationPalm) : [UIColor colorWithRed:0.1 green:0.2 blue:0.1 alpha:0.1]
+    };
+
     [self setupGL];
 }
-
+- (void)clearScene:(id)sender
+{
+    [_scene removeAllObjects];
+}
 - (void)shutdownFTPenManager:(id)sender
 {
     [[FTPenManager sharedInstance] shutdown];
@@ -180,7 +199,7 @@ static const GLchar *uniformName[NUM_UNIFORMS] =
 
     // Create a Vertex Buffer Object to hold our data
     glGenBuffers(1, &_vertexBuffer);
-    
+
     // Load the brush texture
     _textureHeight = _textureWidth = 128;
     _texture = [FTAUtil loadDiscTextureWithSize:_textureWidth];
@@ -188,15 +207,14 @@ static const GLchar *uniformName[NUM_UNIFORMS] =
 
     // Load shaders.
     [self loadShaders];
-    
+
     // Disable depth testing.
     glDisable(GL_DEPTH_TEST);
-    
+
     // Enable blending and set a blending function appropriate for premultiplied alpha pixel data
     glEnable(GL_BLEND);
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-    
-    [self setBrushColorWithRed:0.0 green:0.9 blue:0.1];
+
     [self setPointSize];
 }
 
@@ -211,7 +229,7 @@ static const GLchar *uniformName[NUM_UNIFORMS] =
 
     glDeleteBuffers(1, &_vertexBuffer);
     glDeleteTextures(1, &_texture);
-    
+
     if (_program) {
         glDeleteProgram(_program);
         _program = 0;
@@ -224,6 +242,11 @@ static const GLchar *uniformName[NUM_UNIFORMS] =
     for(FTTouchClassificationInfo *info in touches)
     {
         NSLog(@"Touch %x was %d now %d", (unsigned int)info.touch, info.oldValue, info.newValue);
+        Stroke * s = _scene[@(info.touchId)];
+        if (s)
+        {
+            s.color = _strokeColors[@(info.newValue)];
+        }
     }
 }
 
@@ -237,7 +260,7 @@ static const GLchar *uniformName[NUM_UNIFORMS] =
     }
 }
 
-- (CGPoint)glPointFromEvent:(UIEvent*)event
+- (CGPoint)glPointFromEvent:(UIEvent *)event
 {
     CGRect   bounds = [self.view bounds];
     UITouch*    touch = [[event touchesForView:self.view] anyObject];
@@ -249,41 +272,99 @@ static const GLchar *uniformName[NUM_UNIFORMS] =
 
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
 {
-    [_pointsToRender removeAllObjects];
-    [_pointsToRender addObject:[NSValue valueWithCGPoint:[self glPointFromEvent:event]]];
+    if (_isPencilEnabled)
+    {
+        Stroke *s = [[Stroke alloc] init];
+        s.color = _strokeColors[@(FTTouchClassificationUnknownDisconnected)];
+        s.lastAppended = [[NSProcessInfo processInfo] systemUptime];
+        s.lastReclassified = [[NSProcessInfo processInfo] systemUptime];
+        s.glGeometry = [@[] mutableCopy];
+        [s.glGeometry addObject:[NSValue valueWithCGPoint:[self glPointFromEvent:event]]];
+
+        NSInteger k = [[FTPenManager sharedInstance].classifier idForTouch:[touches anyObject]];
+        s.drawOrder = k;
+
+        if (!_scene)
+        {
+            _scene = [@{} mutableCopy];
+        }
+
+        [_scene setObject:s forKey:[NSNumber numberWithInt:k]];
+    }
 }
 
 - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
 {
-    [_pointsToRender addObject:[NSValue valueWithCGPoint:[self glPointFromEvent:event]]];
+    if (_isPencilEnabled)
+    {
+        NSInteger k = [[FTPenManager sharedInstance].classifier idForTouch:[touches anyObject]];
+        Stroke *s = [_scene objectForKey:[NSNumber numberWithInt:k]];
+        s.lastAppended = [[NSProcessInfo processInfo] systemUptime];
+        [s.glGeometry  addObject:[NSValue valueWithCGPoint:[self glPointFromEvent:event]]];
+    }
 }
 
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
 {
-    [_pointsToRender addObject:[NSValue valueWithCGPoint:[self glPointFromEvent:event]]];
+    if (_isPencilEnabled)
+    {
+        NSInteger k = [[FTPenManager sharedInstance].classifier idForTouch:[touches anyObject]];
+        Stroke *s = [_scene objectForKey:[NSNumber numberWithInt:k]];
+        s.lastAppended = [[NSProcessInfo processInfo] systemUptime];
+        [s.glGeometry  addObject:[NSValue valueWithCGPoint:[self glPointFromEvent:event]]];
+    }
 }
 
 - (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event
 {
-    
+    if (_isPencilEnabled)
+    {
+        NSInteger k = [[FTPenManager sharedInstance].classifier idForTouch:[touches anyObject]];
+        [_scene removeObjectForKey:[NSNumber numberWithInt:k]];
+    }
 }
 
 #pragma mark - GLKView delegate
 - (void)glkView:(GLKView *)view drawInRect:(CGRect)rect
 {
-    
-    glClearColor(0.65f, 0.65f, 0.65f, 1.0f);
+    glClearColor(0.9f, 0.9f, 0.9f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
-    
+
     glUseProgram(_program);
-    
-    // Render a poly line.
-    if ([_pointsToRender count] >= 2)
+
+    // We sort the scene on draw order.
+    NSArray *scene = [_scene allValues];
+    NSArray *sortedScene = [scene sortedArrayUsingComparator:
+                            ^NSComparisonResult(id obj1, id obj2) {
+                                Stroke *lhs = obj1;
+                                Stroke *rhs = obj2;
+
+                                if (lhs.drawOrder < rhs.drawOrder)
+                                {
+                                    return  -1;
+                                }
+                                else if (rhs.drawOrder == lhs.drawOrder)
+                                {
+                                    return 0;
+                                }
+                                else
+                                {
+                                    return 1;
+                                }
+
+                            }];
+
+    for(Stroke *v in sortedScene)
     {
-        for(NSInteger i = 0; i < [_pointsToRender count]-1; ++i)
+        if ([v.glGeometry count] >= 2)
         {
-            [self renderLineFromPoint:[(NSValue*)_pointsToRender[i] CGPointValue]
-                              toPoint:[(NSValue*)_pointsToRender[i+1] CGPointValue]];
+            [self setBrushColor:v.color];
+
+            for(NSInteger i = 0; i < [v.glGeometry count]-1; ++i)
+            {
+                [self renderLineFromPoint:[(NSValue*)v.glGeometry[i] CGPointValue]
+                                  toPoint:[(NSValue*)v.glGeometry[i+1] CGPointValue]];
+            }
         }
     }
 }
@@ -297,62 +378,54 @@ static const GLchar *uniformName[NUM_UNIFORMS] =
     NSUInteger          vertexCount = 0,
     count,
     i;
-    
+
     // Convert locations from Points to Pixels
     CGFloat scale = self.view.contentScaleFactor;
-  
+
     start.x *= scale;
     start.y *= scale;
     end.x *= scale;
     end.y *= scale;
-    
+
     // Allocate vertex array buffer
-    if(vertexBuffer == NULL)
+    if (vertexBuffer == NULL)
     {
         vertexBuffer = malloc(vertexMax * 2 * sizeof(GLfloat));
     }
-    
+
     // Add points to the buffer so there are drawing points every X pixels
     count = MAX(ceilf(sqrtf((end.x - start.x) * (end.x - start.x) + (end.y - start.y) * (end.y - start.y)) / kBrushPixelStep), 1);
-    for(i = 0; i < count; ++i)
+    for (i = 0; i < count; ++i)
     {
         if(vertexCount == vertexMax)
         {
             vertexMax = 2 * vertexMax;
             vertexBuffer = realloc(vertexBuffer, vertexMax * 2 * sizeof(GLfloat));
         }
-        
+
         vertexBuffer[2 * vertexCount + 0] = start.x + (end.x - start.x) * ((GLfloat)i / (GLfloat)count);
         vertexBuffer[2 * vertexCount + 1] = start.y + (end.y - start.y) * ((GLfloat)i / (GLfloat)count);
         vertexCount += 1;
     }
-    
+
     // Load data to the Vertex Buffer Object
     glBindBuffer(GL_ARRAY_BUFFER, _vertexBuffer);
     glBufferData(GL_ARRAY_BUFFER, vertexCount*2*sizeof(GLfloat), vertexBuffer, GL_DYNAMIC_DRAW);
-    
+
     glEnableVertexAttribArray(ATTRIB_VERTEX);
     glVertexAttribPointer(ATTRIB_VERTEX, 2, GL_FLOAT, GL_FALSE, 0, 0);
-    
+
     // We don't need the use program as there's only ever 1 shader in use.
     glUseProgram(_program);
-    
+
     glDrawArrays(GL_POINTS, 0, vertexCount);
 }
 
-
 #pragma mark - OpenGL ES shader state changes
-- (void)setBrushColorWithRed:(CGFloat)red
-                       green:(CGFloat)green
-                        blue:(CGFloat)blue
+- (void)setBrushColor:(UIColor *)color
 {
-    // Update the brush color
     GLfloat brushColor[4];
-    brushColor[0] = red * kBrushOpacity;
-    brushColor[1] = green * kBrushOpacity;
-    brushColor[2] = blue * kBrushOpacity;
-    brushColor[3] = kBrushOpacity;
-    
+    [color getRed:brushColor green:brushColor+1 blue:brushColor+2 alpha:brushColor+3];
     glUseProgram(_program);
     glUniform4fv(uniforms[UNIFORM_VERTEX_COLOR], 1, brushColor);
 }
@@ -366,13 +439,13 @@ static const GLchar *uniformName[NUM_UNIFORMS] =
     // TODO what is up with GLKView's w/h
     _backingWidth = self.view.frame.size.height * self.view.contentScaleFactor;
     _backingHeight = self.view.frame.size.width * self.view.contentScaleFactor;
-    
+
     // Update projection matrix , the model is the identity.
     GLKMatrix4 projectionMatrix = GLKMatrix4MakeOrtho(0, _backingWidth, 0, _backingHeight, -1, 1);
-    
+
     glUseProgram(_program);
     glUniformMatrix4fv(uniforms[UNIFORM_MVP], 1, GL_FALSE, projectionMatrix.m);
-    
+
     // Update viewport
     glViewport(0, 0, _backingWidth, _backingHeight);
 }
@@ -413,7 +486,7 @@ static const GLchar *uniformName[NUM_UNIFORMS] =
     {
         glBindAttribLocation(_program, attributes[i], attribName[i]);
     }
-   
+
     // Link program.
     if (![self linkProgram:_program]) {
         NSLog(@"Failed to link program: %d", _program);
@@ -433,7 +506,7 @@ static const GLchar *uniformName[NUM_UNIFORMS] =
 
         return NO;
     }
-    
+
     // Get uniform locations.
     for(int i = 0; i < NUM_UNIFORMS; ++i)
     {

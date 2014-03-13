@@ -100,10 +100,26 @@ using namespace fiftythree::sdk;
         info.touch = static_pointer_cast<TouchTrackerObjC>(TouchTracker::Instance())->UITouchForTouch(t.touch);
         info.oldValue = [FTTouchClassifier classification:t.oldValue];
         info.newValue = [FTTouchClassifier classification:t.newValue];
+        info.touchId = (NSInteger)t.touch->Id();
         [updatedTouchClassifications addObject:info];
     }
 
     [self.delegate classificationsDidChangeForTouches:updatedTouchClassifications];
+}
+
+// Returns a unique id for the touch.
+- (NSInteger)idForTouch:(UITouch *)touch
+{
+    Touch::Ptr ftTouch = static_pointer_cast<TouchTrackerObjC>(TouchTracker::Instance())->TouchForUITouch(touch);
+
+    if (ftTouch)
+    {
+        return (NSInteger)ftTouch->Id();
+    }
+    else
+    {
+        return -1;
+    }
 }
 
 - (BOOL)classification:(FTTouchClassification *)result forTouch:(UITouch *)touch
