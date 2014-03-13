@@ -9,7 +9,6 @@
 
 #ifdef __cplusplus
 #import "FiftyThreeSdk/TouchClassifier.h"
-
 #endif
 
 #import "FiftythreeSdk/FTApplication.h"

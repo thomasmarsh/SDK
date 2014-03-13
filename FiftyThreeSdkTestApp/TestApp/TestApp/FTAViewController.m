@@ -5,84 +5,74 @@
 //  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
 
+
+
 #import "FiftyThreeSdk/FiftyThreeSdk.h"
 #import "FTAViewController.h"
+#import "FTAUtil.h"
+
+// This uses portions of shaders from Apple's GLPaint Sample & Apple's starter GLKit project.
+
 
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
 
-// Uniform index.
+
+#define kBrushOpacity       (1.0 / 3.0)
+#define kBrushPixelStep     3
+
+// Shaders enums
 enum
 {
-    UNIFORM_MODELVIEWPROJECTION_MATRIX,
-    UNIFORM_NORMAL_MATRIX,
+    PROGRAM_POINT,
+    NUM_PROGRAMS
+};
+
+enum
+{
+    UNIFORM_MVP,
+    UNIFORM_POINT_SIZE,
+    UNIFORM_VERTEX_COLOR,
+    UNIFORM_TEXTURE,
     NUM_UNIFORMS
 };
+
 GLint uniforms[NUM_UNIFORMS];
 
-// Attribute index.
 enum
 {
     ATTRIB_VERTEX,
-    ATTRIB_NORMAL,
-    NUM_ATTRIBUTES
+    NUM_ATTRIBS
 };
 
-GLfloat gCubeVertexData[216] =
+
+GLint attributes[NUM_ATTRIBS];
+
+// Must match Shader.fsh/vsh.
+static const GLchar *attribName[NUM_ATTRIBS] =
 {
-    // Data layout for each line below is:
-    // positionX, positionY, positionZ,     normalX, normalY, normalZ,
-    0.5f, -0.5f, -0.5f,        1.0f, 0.0f, 0.0f,
-    0.5f, 0.5f, -0.5f,         1.0f, 0.0f, 0.0f,
-    0.5f, -0.5f, 0.5f,         1.0f, 0.0f, 0.0f,
-    0.5f, -0.5f, 0.5f,         1.0f, 0.0f, 0.0f,
-    0.5f, 0.5f, -0.5f,          1.0f, 0.0f, 0.0f,
-    0.5f, 0.5f, 0.5f,         1.0f, 0.0f, 0.0f,
-
-    0.5f, 0.5f, -0.5f,         0.0f, 1.0f, 0.0f,
-    -0.5f, 0.5f, -0.5f,        0.0f, 1.0f, 0.0f,
-    0.5f, 0.5f, 0.5f,          0.0f, 1.0f, 0.0f,
-    0.5f, 0.5f, 0.5f,          0.0f, 1.0f, 0.0f,
-    -0.5f, 0.5f, -0.5f,        0.0f, 1.0f, 0.0f,
-    -0.5f, 0.5f, 0.5f,         0.0f, 1.0f, 0.0f,
-
-    -0.5f, 0.5f, -0.5f,        -1.0f, 0.0f, 0.0f,
-    -0.5f, -0.5f, -0.5f,       -1.0f, 0.0f, 0.0f,
-    -0.5f, 0.5f, 0.5f,         -1.0f, 0.0f, 0.0f,
-    -0.5f, 0.5f, 0.5f,         -1.0f, 0.0f, 0.0f,
-    -0.5f, -0.5f, -0.5f,       -1.0f, 0.0f, 0.0f,
-    -0.5f, -0.5f, 0.5f,        -1.0f, 0.0f, 0.0f,
-
-    -0.5f, -0.5f, -0.5f,       0.0f, -1.0f, 0.0f,
-    0.5f, -0.5f, -0.5f,        0.0f, -1.0f, 0.0f,
-    -0.5f, -0.5f, 0.5f,        0.0f, -1.0f, 0.0f,
-    -0.5f, -0.5f, 0.5f,        0.0f, -1.0f, 0.0f,
-    0.5f, -0.5f, -0.5f,        0.0f, -1.0f, 0.0f,
-    0.5f, -0.5f, 0.5f,         0.0f, -1.0f, 0.0f,
-
-    0.5f, 0.5f, 0.5f,          0.0f, 0.0f, 1.0f,
-    -0.5f, 0.5f, 0.5f,         0.0f, 0.0f, 1.0f,
-    0.5f, -0.5f, 0.5f,         0.0f, 0.0f, 1.0f,
-    0.5f, -0.5f, 0.5f,         0.0f, 0.0f, 1.0f,
-    -0.5f, 0.5f, 0.5f,         0.0f, 0.0f, 1.0f,
-    -0.5f, -0.5f, 0.5f,        0.0f, 0.0f, 1.0f,
-
-    0.5f, -0.5f, -0.5f,        0.0f, 0.0f, -1.0f,
-    -0.5f, -0.5f, -0.5f,       0.0f, 0.0f, -1.0f,
-    0.5f, 0.5f, -0.5f,         0.0f, 0.0f, -1.0f,
-    0.5f, 0.5f, -0.5f,         0.0f, 0.0f, -1.0f,
-    -0.5f, -0.5f, -0.5f,       0.0f, 0.0f, -1.0f,
-    -0.5f, 0.5f, -0.5f,        0.0f, 0.0f, -1.0f
+    "inVertex"
 };
+static const GLchar *uniformName[NUM_UNIFORMS] =
+{
+    "MVP", "pointSize", "color", "texture"
+};
+
 
 @interface FTAViewController () <FTTouchClassificationsChangedDelegate> {
+    
+    // OpenGL resources.
     GLuint _program;
-
-    GLKMatrix4 _modelViewProjectionMatrix;
-    GLKMatrix3 _normalMatrix;
-    float _rotation;
-
-    GLuint _vertexArray;
     GLuint _vertexBuffer;
+    GLuint _texture;
+    
+    int _textureWidth;
+    int _textureHeight;
+    GLuint _backingWidth;
+    GLuint _backingHeight;
+    BOOL _clear;
+    
+    // A list of points to render.
+    NSMutableArray *_pointsToRender;
 }
 @property (nonatomic) EAGLContext *context;
 @property (nonatomic) GLKBaseEffect *effect;
@@ -100,6 +90,7 @@ GLfloat gCubeVertexData[216] =
 
 @implementation FTAViewController
 
+
 - (void)viewDidLoad
 {
     [super viewDidLoad];
@@ -112,8 +103,9 @@ GLfloat gCubeVertexData[216] =
 
     GLKView *view = (GLKView *)self.view;
     view.context = self.context;
-    view.drawableDepthFormat = GLKViewDrawableDepthFormat24;
-
+    view.drawableDepthFormat = GLKViewDrawableDepthFormatNone;
+    
+ 
     self.bar = [[UIToolbar alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, 44)];
     [self.bar setBarStyle:UIBarStyleBlack];
 
@@ -128,6 +120,9 @@ GLfloat gCubeVertexData[216] =
     self.isPencilEnabled = NO;
 
     self.preferredFramesPerSecond = 60;
+    
+    _pointsToRender = [@[] mutableCopy];
+    
     [self setupGL];
 }
 
@@ -172,9 +167,8 @@ GLfloat gCubeVertexData[216] =
         }
         self.context = nil;
     }
-
-    // Dispose of any resources that can be recreated.
 }
+
 - (BOOL)prefersStatusBarHidden
 {
     return YES;
@@ -184,27 +178,31 @@ GLfloat gCubeVertexData[216] =
 {
     [EAGLContext setCurrentContext:self.context];
 
-    [self loadShaders];
-
-    self.effect = [[GLKBaseEffect alloc] init];
-    self.effect.light0.enabled = GL_TRUE;
-    self.effect.light0.diffuseColor = GLKVector4Make(1.0f, 0.4f, 0.4f, 1.0f);
-
-    glEnable(GL_DEPTH_TEST);
-
-    glGenVertexArraysOES(1, &_vertexArray);
-    glBindVertexArrayOES(_vertexArray);
-
+    // Create a Vertex Buffer Object to hold our data
     glGenBuffers(1, &_vertexBuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, _vertexBuffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(gCubeVertexData), gCubeVertexData, GL_STATIC_DRAW);
+    
+    // Load the brush texture
+    _textureHeight = _textureWidth = 128;
+    _texture = [FTAUtil loadDiscTextureWithSize:_textureWidth];
+    glBindTexture(GL_TEXTURE0, _texture);
 
-    glEnableVertexAttribArray(GLKVertexAttribPosition);
-    glVertexAttribPointer(GLKVertexAttribPosition, 3, GL_FLOAT, GL_FALSE, 24, BUFFER_OFFSET(0));
-    glEnableVertexAttribArray(GLKVertexAttribNormal);
-    glVertexAttribPointer(GLKVertexAttribNormal, 3, GL_FLOAT, GL_FALSE, 24, BUFFER_OFFSET(12));
+    // Load shaders.
+    [self loadShaders];
+    
+    // Disable depth testing.
+    glDisable(GL_DEPTH_TEST);
+    
+    // Enable blending and set a blending function appropriate for premultiplied alpha pixel data
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+    
+    [self setBrushColorWithRed:0.0 green:0.9 blue:0.1];
+    [self setPointSize];
+}
 
-    glBindVertexArrayOES(0);
+- (void)viewWillLayoutSubviews
+{
+    [self updateViewportAndTransforms];
 }
 
 - (void)tearDownGL
@@ -212,10 +210,8 @@ GLfloat gCubeVertexData[216] =
     [EAGLContext setCurrentContext:self.context];
 
     glDeleteBuffers(1, &_vertexBuffer);
-    glDeleteVertexArraysOES(1, &_vertexArray);
-
-    self.effect = nil;
-
+    glDeleteTextures(1, &_texture);
+    
     if (_program) {
         glDeleteProgram(_program);
         _program = 0;
@@ -239,53 +235,146 @@ GLfloat gCubeVertexData[216] =
     {
         [[FTPenManager sharedInstance] update];
     }
-
-    float aspect = fabsf(self.view.bounds.size.width / self.view.bounds.size.height);
-    GLKMatrix4 projectionMatrix = GLKMatrix4MakePerspective(GLKMathDegreesToRadians(65.0f), aspect, 0.1f, 100.0f);
-
-    self.effect.transform.projectionMatrix = projectionMatrix;
-
-    GLKMatrix4 baseModelViewMatrix = GLKMatrix4MakeTranslation(0.0f, 0.0f, -4.0f);
-    baseModelViewMatrix = GLKMatrix4Rotate(baseModelViewMatrix, _rotation, 0.0f, 1.0f, 0.0f);
-
-    // Compute the model view matrix for the object rendered with GLKit
-    GLKMatrix4 modelViewMatrix = GLKMatrix4MakeTranslation(0.0f, 0.0f, -1.5f);
-    modelViewMatrix = GLKMatrix4Rotate(modelViewMatrix, _rotation, 1.0f, 1.0f, 1.0f);
-    modelViewMatrix = GLKMatrix4Multiply(baseModelViewMatrix, modelViewMatrix);
-
-    self.effect.transform.modelviewMatrix = modelViewMatrix;
-
-    // Compute the model view matrix for the object rendered with ES2
-    modelViewMatrix = GLKMatrix4MakeTranslation(0.0f, 0.0f, 1.5f);
-    modelViewMatrix = GLKMatrix4Rotate(modelViewMatrix, _rotation, 1.0f, 1.0f, 1.0f);
-    modelViewMatrix = GLKMatrix4Multiply(baseModelViewMatrix, modelViewMatrix);
-
-    _normalMatrix = GLKMatrix3InvertAndTranspose(GLKMatrix4GetMatrix3(modelViewMatrix), NULL);
-
-    _modelViewProjectionMatrix = GLKMatrix4Multiply(projectionMatrix, modelViewMatrix);
-
-    _rotation += self.timeSinceLastUpdate * 0.5f;
 }
 
+- (CGPoint)glPointFromEvent:(UIEvent*)event
+{
+    CGRect   bounds = [self.view bounds];
+    UITouch*    touch = [[event touchesForView:self.view] anyObject];
+    // Convert touch point from UIView referential to OpenGL one (upside-down flip)
+    CGPoint location = [touch locationInView:self.view];
+    location.y = bounds.size.height - location.y;
+    return location;
+}
+
+- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
+{
+    [_pointsToRender removeAllObjects];
+    [_pointsToRender addObject:[NSValue valueWithCGPoint:[self glPointFromEvent:event]]];
+}
+
+- (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
+{
+    [_pointsToRender addObject:[NSValue valueWithCGPoint:[self glPointFromEvent:event]]];
+}
+
+- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
+{
+    [_pointsToRender addObject:[NSValue valueWithCGPoint:[self glPointFromEvent:event]]];
+}
+
+- (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event
+{
+    
+}
+
+#pragma mark - GLKView delegate
 - (void)glkView:(GLKView *)view drawInRect:(CGRect)rect
 {
+    
     glClearColor(0.65f, 0.65f, 0.65f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    glBindVertexArrayOES(_vertexArray);
-
-    // Render the object with GLKit
-    [self.effect prepareToDraw];
-
-    glDrawArrays(GL_TRIANGLES, 0, 36);
-
-    // Render the object again with ES2
+    glClear(GL_COLOR_BUFFER_BIT);
+    
     glUseProgram(_program);
+    
+    // Render a poly line.
+    if ([_pointsToRender count] >= 2)
+    {
+        for(NSInteger i = 0; i < [_pointsToRender count]-1; ++i)
+        {
+            [self renderLineFromPoint:[(NSValue*)_pointsToRender[i] CGPointValue]
+                              toPoint:[(NSValue*)_pointsToRender[i+1] CGPointValue]];
+        }
+    }
+}
 
-    glUniformMatrix4fv(uniforms[UNIFORM_MODELVIEWPROJECTION_MATRIX], 1, 0, _modelViewProjectionMatrix.m);
-    glUniformMatrix3fv(uniforms[UNIFORM_NORMAL_MATRIX], 1, 0, _normalMatrix.m);
+#pragma mark - OpenGL ES Drawing
+// Drawings a line onscreen based on where the user touches
+- (void)renderLineFromPoint:(CGPoint)start toPoint:(CGPoint)end
+{
+    static GLfloat*     vertexBuffer = NULL;
+    static NSUInteger   vertexMax = 64;
+    NSUInteger          vertexCount = 0,
+    count,
+    i;
+    
+    // Convert locations from Points to Pixels
+    CGFloat scale = self.view.contentScaleFactor;
+  
+    start.x *= scale;
+    start.y *= scale;
+    end.x *= scale;
+    end.y *= scale;
+    
+    // Allocate vertex array buffer
+    if(vertexBuffer == NULL)
+    {
+        vertexBuffer = malloc(vertexMax * 2 * sizeof(GLfloat));
+    }
+    
+    // Add points to the buffer so there are drawing points every X pixels
+    count = MAX(ceilf(sqrtf((end.x - start.x) * (end.x - start.x) + (end.y - start.y) * (end.y - start.y)) / kBrushPixelStep), 1);
+    for(i = 0; i < count; ++i)
+    {
+        if(vertexCount == vertexMax)
+        {
+            vertexMax = 2 * vertexMax;
+            vertexBuffer = realloc(vertexBuffer, vertexMax * 2 * sizeof(GLfloat));
+        }
+        
+        vertexBuffer[2 * vertexCount + 0] = start.x + (end.x - start.x) * ((GLfloat)i / (GLfloat)count);
+        vertexBuffer[2 * vertexCount + 1] = start.y + (end.y - start.y) * ((GLfloat)i / (GLfloat)count);
+        vertexCount += 1;
+    }
+    
+    // Load data to the Vertex Buffer Object
+    glBindBuffer(GL_ARRAY_BUFFER, _vertexBuffer);
+    glBufferData(GL_ARRAY_BUFFER, vertexCount*2*sizeof(GLfloat), vertexBuffer, GL_DYNAMIC_DRAW);
+    
+    glEnableVertexAttribArray(ATTRIB_VERTEX);
+    glVertexAttribPointer(ATTRIB_VERTEX, 2, GL_FLOAT, GL_FALSE, 0, 0);
+    
+    // We don't need the use program as there's only ever 1 shader in use.
+    glUseProgram(_program);
+    
+    glDrawArrays(GL_POINTS, 0, vertexCount);
+}
 
-    glDrawArrays(GL_TRIANGLES, 0, 36);
+
+#pragma mark - OpenGL ES shader state changes
+- (void)setBrushColorWithRed:(CGFloat)red
+                       green:(CGFloat)green
+                        blue:(CGFloat)blue
+{
+    // Update the brush color
+    GLfloat brushColor[4];
+    brushColor[0] = red * kBrushOpacity;
+    brushColor[1] = green * kBrushOpacity;
+    brushColor[2] = blue * kBrushOpacity;
+    brushColor[3] = kBrushOpacity;
+    
+    glUseProgram(_program);
+    glUniform4fv(uniforms[UNIFORM_VERTEX_COLOR], 1, brushColor);
+}
+- (void)setPointSize
+{
+    glUseProgram(_program);
+    glUniform1f(uniforms[UNIFORM_POINT_SIZE], 8.0f);
+}
+- (void)updateViewportAndTransforms
+{
+    // TODO what is up with GLKView's w/h
+    _backingWidth = self.view.frame.size.height * self.view.contentScaleFactor;
+    _backingHeight = self.view.frame.size.width * self.view.contentScaleFactor;
+    
+    // Update projection matrix , the model is the identity.
+    GLKMatrix4 projectionMatrix = GLKMatrix4MakeOrtho(0, _backingWidth, 0, _backingHeight, -1, 1);
+    
+    glUseProgram(_program);
+    glUniformMatrix4fv(uniforms[UNIFORM_MVP], 1, GL_FALSE, projectionMatrix.m);
+    
+    // Update viewport
+    glViewport(0, 0, _backingWidth, _backingHeight);
 }
 
 #pragma mark -  OpenGL ES 2 shader compilation
@@ -320,9 +409,11 @@ GLfloat gCubeVertexData[216] =
 
     // Bind attribute locations.
     // This needs to be done prior to linking.
-    glBindAttribLocation(_program, GLKVertexAttribPosition, "position");
-    glBindAttribLocation(_program, GLKVertexAttribNormal, "normal");
-
+    for(int i = 0; i < NUM_ATTRIBS; ++i)
+    {
+        glBindAttribLocation(_program, attributes[i], attribName[i]);
+    }
+   
     // Link program.
     if (![self linkProgram:_program]) {
         NSLog(@"Failed to link program: %d", _program);
@@ -342,10 +433,12 @@ GLfloat gCubeVertexData[216] =
 
         return NO;
     }
-
+    
     // Get uniform locations.
-    uniforms[UNIFORM_MODELVIEWPROJECTION_MATRIX] = glGetUniformLocation(_program, "modelViewProjectionMatrix");
-    uniforms[UNIFORM_NORMAL_MATRIX] = glGetUniformLocation(_program, "normalMatrix");
+    for(int i = 0; i < NUM_UNIFORMS; ++i)
+    {
+        uniforms[i] = glGetUniformLocation(_program, uniformName[i]);
+    }
 
     // Release vertex and fragment shaders.
     if (vertShader) {

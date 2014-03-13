@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		041785DD18D21FDC007B1301 /* FTAUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = 041785DC18D21FDC007B1301 /* FTAUtil.m */; };
 		0489D47518CE75D100B41E20 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0489D47418CE75D100B41E20 /* Foundation.framework */; };
 		0489D47718CE75D100B41E20 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0489D47618CE75D100B41E20 /* CoreGraphics.framework */; };
 		0489D47918CE75D100B41E20 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0489D47818CE75D100B41E20 /* UIKit.framework */; };
@@ -80,6 +81,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		041785DB18D21FDC007B1301 /* FTAUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FTAUtil.h; sourceTree = "<group>"; };
+		041785DC18D21FDC007B1301 /* FTAUtil.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FTAUtil.m; sourceTree = "<group>"; };
 		0489D47118CE75D100B41E20 /* TestApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TestApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		0489D47418CE75D100B41E20 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		0489D47618CE75D100B41E20 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -191,6 +194,8 @@
 				0489D49218CE75D100B41E20 /* FTAViewController.m */,
 				0489D49418CE75D100B41E20 /* Images.xcassets */,
 				0489D47F18CE75D100B41E20 /* Supporting Files */,
+				041785DB18D21FDC007B1301 /* FTAUtil.h */,
+				041785DC18D21FDC007B1301 /* FTAUtil.m */,
 			);
 			path = TestApp;
 			sourceTree = "<group>";
@@ -391,6 +396,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				0489D48918CE75D100B41E20 /* FTAAppDelegate.m in Sources */,
+				041785DD18D21FDC007B1301 /* FTAUtil.m in Sources */,
 				0489D49318CE75D100B41E20 /* FTAViewController.m in Sources */,
 				0489D48518CE75D100B41E20 /* main.m in Sources */,
 			);

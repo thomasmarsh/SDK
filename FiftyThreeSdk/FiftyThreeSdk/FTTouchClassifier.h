@@ -55,11 +55,11 @@ typedef NS_ENUM(NSInteger, FTTouchClassification)
 @end
 
 // This is the main interface for classification related parts of the FiftyThree SDK. The entry point
-// is by [FTPenManager sharedInstance].classifier.
+// is in [FTPenManager sharedInstance].classifier.
 @interface FTTouchClassifier : NSObject
 
 // Register for change notification via this delegate.
-@property (nonatomic, weak)   id <FTTouchClassificationsChangedDelegate>   delegate;
+@property (nonatomic, weak) id<FTTouchClassificationsChangedDelegate>   delegate;
 
 // Returns true if the touch is currently being tracked and the best classification.
 // If the touch isn't being tracked (for example it was cancelled or you've explicitly removed the touch from
