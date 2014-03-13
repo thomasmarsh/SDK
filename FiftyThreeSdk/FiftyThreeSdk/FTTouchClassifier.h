@@ -11,19 +11,31 @@
 
 @class UITouch;
 
-typedef NS_ENUM(NSInteger, FTTouchClassification) {
-    // whenever the Pen isn't connected we return this default state.
+// This enum lists all the classification states FTTouchClassifier exposes.
+//
+// Note - we use a place holder state 'UnknownDisconnected' which indicates that
+//        the touch was processed when the pen wasn't connected via BTLE.
+//
+typedef NS_ENUM(NSInteger, FTTouchClassification)
+{
+    // Whenever the Pen isn't connected we return this default state.
     FTTouchClassificationUnknownDisconnected,
-    // whenever we don't know what the touch is.
+    
+    // Whenever we don't know what the touch is. This can happen if we've not get
+    // gotten any signals from the pen.
     FTTouchClassificationUnknown,
-    // whenever we think the touch is a single finger. Note, this at
+    
+    // Whenever we think the touch is a single finger. This at
     // the moment only is triggered if there's 1 touch active on the screen.
     FTTouchClassificationFinger,
-    // whenever we think the touch is a palm touch
+    
+    // whenever we think the touch is a palm.
     FTTouchClassificationPalm,
+    
     // whenever we think the touch correspoinds to the pen tip.
     FTTouchClassificationPen,
-    // whenever we think the touch corresoponds to the eraser.
+    
+    // whenever we think the touch corresoponds to the eraser (flat side) of the pen.
     FTTouchClassificationEraser,
 };
 
@@ -42,12 +54,16 @@ typedef NS_ENUM(NSInteger, FTTouchClassification) {
 
 @end
 
+// This is the main interface for classification related parts of the FiftyThree SDK. The entry point
+// is by [FTPenManager sharedInstance].classifier.
 @interface FTTouchClassifier : NSObject
 
 // Register for change notification via this delegate.
 @property (nonatomic, weak)   id <FTTouchClassificationsChangedDelegate>   delegate;
 
-// Returns true if the touch is currently being tracked. Otherwise it returns false.
+// Returns true if the touch is currently being tracked and the best classification.
+// If the touch isn't being tracked (for example it was cancelled or you've explicitly removed the touch from
+// classification this will return false.
 - (BOOL)classification:(FTTouchClassification *)result forTouch:(UITouch *)touch;
 
 // Indiciates that a touch should no longer be considered a candidate for pen
