@@ -1899,8 +1899,6 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     self.delegate = nil;
     self.classifier.delegate = nil;
 
-    AnimationPump::Instance()->RemoveAllAnimatables();
-
     for (UIView *view in self.pairingViews)
     {
         [view removeFromSuperview];

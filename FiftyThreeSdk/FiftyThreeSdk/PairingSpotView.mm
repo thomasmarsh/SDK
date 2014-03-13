@@ -358,6 +358,10 @@ NSString *FTPairingSpotCometStateName(FTPairingSpotCometState value)
         _cometsBitmapContext = NULL;
     }
 
+    if (_animatable)
+    {
+        AnimationPumpObjC::Instance()->RemoveAnimatableObjC(_animatable);
+    }
     [_animatable invalidate];
     _animatable = nil;
 
@@ -624,6 +628,10 @@ NSString *FTPairingSpotCometStateName(FTPairingSpotCometState value)
 
 - (void)stopAnimation
 {
+    if (self.animatable)
+    {
+        AnimationPumpObjC::Instance()->RemoveAnimatableObjC(self.animatable);
+    }
     [_animatable invalidate];
     _animatable = nil;
     self.lastAnimationFrameTimeInSeconds = 0.f;
