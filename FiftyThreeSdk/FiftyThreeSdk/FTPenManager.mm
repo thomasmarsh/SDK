@@ -1850,10 +1850,10 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
 + (FTPenManager *)sharedInstance
 {
-    NSAssert([NSThread isMainThread], @"sharedInstance be called on the UI thread");
+    NSAssert([NSThread isMainThread], @"sharedInstance must be called on the UI thread.");
     if (!sharedInstance)
     {
-        FTApplication * application = (FTApplication*)[UIApplication sharedApplication];
+        FTApplication *application = (FTApplication*)[UIApplication sharedApplication];
         if (application)
         {
             application.classifier = fiftythree::sdk::TouchClassifier::New();
@@ -1868,7 +1868,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
                      andTintColor:(UIColor *)color
                          andFrame:(CGRect)frame
 {
-    NSAssert([NSThread isMainThread], @"Must be called on the UI thread");
+    NSAssert([NSThread isMainThread], @"This must be called on the UI thread.");
 
     PenConnectionView *penConnectionView = [[PenConnectionView alloc] init];
     penConnectionView.penManager = self;
@@ -1883,7 +1883,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
 - (BOOL)update
 {
-    NSAssert([NSThread isMainThread], @"update must be called on the UI thread");
+    NSAssert([NSThread isMainThread], @"update must be called on the UI thread.");
     [self.classifier update];
 
     NSTimeInterval time = [[NSProcessInfo processInfo] systemUptime];
@@ -1895,13 +1895,13 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
 - (void)shutdown
 {
-    NSAssert([NSThread isMainThread], @"shutdown must be called on the UI thread");
+    NSAssert([NSThread isMainThread], @"shutdown must be called on the UI thread.");
     self.delegate = nil;
     self.classifier.delegate = nil;
 
     AnimationPump::Instance()->RemoveAllAnimatables();
 
-    for (UIView * view in self.pairingViews)
+    for (UIView *view in self.pairingViews)
     {
         [view removeFromSuperview];
     }
@@ -1910,7 +1910,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
     [self reset];
 
-    FTApplication * application = (FTApplication*)[UIApplication sharedApplication];
+    FTApplication *application = (FTApplication*)[UIApplication sharedApplication];
     if (application)
     {
        [application clearClassifierAndPenState];
