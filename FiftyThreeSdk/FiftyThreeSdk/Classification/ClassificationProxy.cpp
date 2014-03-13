@@ -1724,6 +1724,10 @@ void TouchClassificationProxy::OnTouchesChanged(const std::set<core::Touch::Ptr>
     // then don't do any work.  cluster tracker will have cleared all clusters.
     if (!_clusterTracker->AllCancelledFlag())
     {
+        _isolatedStrokesClassifier.MarkEdgeThumbs();
+
+        _penTracker.UpdateLocations();
+
         // an empty touch set never happens at the moment.
         if (! touches.empty())
         {
@@ -1897,9 +1901,6 @@ bool TouchClassificationProxy::ReclassifyIfNeeded(double timestamp)
 {
     bool didSomething = false;
 
-    _isolatedStrokesClassifier.MarkEdgeThumbs();
-    _penTracker.UpdateLocations();
-    
     ProcessDebounceQueue();
     UpdateIsolationStatistics();
 
