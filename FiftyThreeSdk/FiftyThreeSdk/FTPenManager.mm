@@ -8,9 +8,9 @@
 #import <CoreBluetooth/CoreBluetooth.h>
 #import <UIKit/UIKit.h>
 
-#import "Common/NSString+Helpers.h"
 #import "Core/AnimationPump.h"
 #import "Core/Asserts.h"
+#import "Core/NSString+FTTimeWithInterval.h"
 #import "FiftyThreeSdk/PenConnectionView.h"
 #import "FiftyThreeSdk/TouchClassifier.h"
 #import "FTApplication+Private.h"
@@ -123,36 +123,6 @@ namespace
 }
 
 #pragma mark -
-
-// TODO, should these live in Core?
-@interface NSString (Helpers2)
-+ (NSString *)stringWithTimeInterval:(NSTimeInterval)timeInterval;
-@end
-
-@implementation NSString (Helpers2)
-
-+ (NSString *)stringWithTimeInterval:(NSTimeInterval)timeInterval
-{
-    const unsigned long timeSec = abs((long)timeInterval);
-    const unsigned long timeDayField =  timeSec / 60 / 60 / 24;
-    const unsigned long timeHourField = (timeSec -
-                                         (timeDayField * 60 * 60 * 24)) / 60 / 60;
-    const unsigned long timeMinField = (timeSec -
-                                        (timeDayField * 60 * 60 * 24) -
-                                        (timeHourField * 60 * 60)) / 60;
-    const unsigned long timeSecField = (timeSec -
-                                        (timeDayField * 60 * 60 * 24) -
-                                        (timeHourField * 60 * 60) -
-                                        (timeMinField * 60));
-
-    return [NSString stringWithFormat:@"%@%lud %02lu:%02lu:%02lu",
-            timeInterval < 0.0 ? @"-" : @"",
-            timeDayField,
-            timeHourField,
-            timeMinField,
-            timeSecField];
-}
-@end
 
 typedef enum
 {
