@@ -33,6 +33,10 @@
 		0489D4CC18CE780F00B41E20 /* TestAppProduction.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 0489D4C918CE780F00B41E20 /* TestAppProduction.xcconfig */; };
 		0489D4CE18CE78A900B41E20 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 0489D4CD18CE78A900B41E20 /* libc++.dylib */; };
 		0489D4D018CE78B400B41E20 /* CoreBluetooth.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0489D4CF18CE78B400B41E20 /* CoreBluetooth.framework */; };
+		04C3133218D3828C008097D1 /* TestAppInternal.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 04C3132F18D3828C008097D1 /* TestAppInternal.xcconfig */; };
+		04C3133318D3828C008097D1 /* TestAppPreview.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 04C3133018D3828C008097D1 /* TestAppPreview.xcconfig */; };
+		04C3133418D3828C008097D1 /* TestAppRelease.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 04C3133118D3828C008097D1 /* TestAppRelease.xcconfig */; };
+		04C3133C18D3841B008097D1 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 04C3133B18D3841B008097D1 /* QuartzCore.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -83,7 +87,7 @@
 /* Begin PBXFileReference section */
 		041785DB18D21FDC007B1301 /* FTAUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FTAUtil.h; sourceTree = "<group>"; };
 		041785DC18D21FDC007B1301 /* FTAUtil.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FTAUtil.m; sourceTree = "<group>"; };
-		0489D47118CE75D100B41E20 /* TestApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TestApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		0489D47118CE75D100B41E20 /* TestApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = TestApp.app; path = "Line Test.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		0489D47418CE75D100B41E20 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		0489D47618CE75D100B41E20 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		0489D47818CE75D100B41E20 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
@@ -101,7 +105,7 @@
 		0489D49118CE75D100B41E20 /* FTAViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FTAViewController.h; sourceTree = "<group>"; };
 		0489D49218CE75D100B41E20 /* FTAViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FTAViewController.m; sourceTree = "<group>"; };
 		0489D49418CE75D100B41E20 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
-		0489D49A18CE75D100B41E20 /* TestAppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TestAppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		0489D49A18CE75D100B41E20 /* TestAppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; name = TestAppTests.xctest; path = "Line Test.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		0489D49B18CE75D100B41E20 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		0489D4A318CE75D100B41E20 /* TestAppTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "TestAppTests-Info.plist"; sourceTree = "<group>"; };
 		0489D4A518CE75D100B41E20 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -113,6 +117,10 @@
 		0489D4C918CE780F00B41E20 /* TestAppProduction.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = TestAppProduction.xcconfig; sourceTree = "<group>"; };
 		0489D4CD18CE78A900B41E20 /* libc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libc++.dylib"; path = "usr/lib/libc++.dylib"; sourceTree = SDKROOT; };
 		0489D4CF18CE78B400B41E20 /* CoreBluetooth.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreBluetooth.framework; path = System/Library/Frameworks/CoreBluetooth.framework; sourceTree = SDKROOT; };
+		04C3132F18D3828C008097D1 /* TestAppInternal.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = TestAppInternal.xcconfig; sourceTree = "<group>"; };
+		04C3133018D3828C008097D1 /* TestAppPreview.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = TestAppPreview.xcconfig; sourceTree = "<group>"; };
+		04C3133118D3828C008097D1 /* TestAppRelease.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = TestAppRelease.xcconfig; sourceTree = "<group>"; };
+		04C3133B18D3841B008097D1 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -120,6 +128,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				04C3133C18D3841B008097D1 /* QuartzCore.framework in Frameworks */,
 				0489D4D018CE78B400B41E20 /* CoreBluetooth.framework in Frameworks */,
 				0489D4CE18CE78A900B41E20 /* libc++.dylib in Frameworks */,
 				0489D4C018CE767000B41E20 /* libCore.a in Frameworks */,
@@ -168,6 +177,7 @@
 		0489D47318CE75D100B41E20 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				04C3133B18D3841B008097D1 /* QuartzCore.framework */,
 				0489D4CF18CE78B400B41E20 /* CoreBluetooth.framework */,
 				0489D4CD18CE78A900B41E20 /* libc++.dylib */,
 				0489D4B718CE766200B41E20 /* Core.xcodeproj */,
@@ -249,6 +259,9 @@
 		0489D4C618CE77FA00B41E20 /* BuildConfigurations */ = {
 			isa = PBXGroup;
 			children = (
+				04C3132F18D3828C008097D1 /* TestAppInternal.xcconfig */,
+				04C3133018D3828C008097D1 /* TestAppPreview.xcconfig */,
+				04C3133118D3828C008097D1 /* TestAppRelease.xcconfig */,
 				0489D4C718CE780F00B41E20 /* TestApp.xcconfig */,
 				0489D4C818CE780F00B41E20 /* TestAppDebug.xcconfig */,
 				0489D4C918CE780F00B41E20 /* TestAppProduction.xcconfig */,
@@ -375,8 +388,11 @@
 				0489D49518CE75D100B41E20 /* Images.xcassets in Resources */,
 				0489D48E18CE75D100B41E20 /* Shader.fsh in Resources */,
 				0489D4CB18CE780F00B41E20 /* TestAppDebug.xcconfig in Resources */,
+				04C3133218D3828C008097D1 /* TestAppInternal.xcconfig in Resources */,
 				0489D48318CE75D100B41E20 /* InfoPlist.strings in Resources */,
+				04C3133418D3828C008097D1 /* TestAppRelease.xcconfig in Resources */,
 				0489D48C18CE75D100B41E20 /* Main.storyboard in Resources */,
+				04C3133318D3828C008097D1 /* TestAppPreview.xcconfig in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -462,75 +478,13 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 0489D4C818CE780F00B41E20 /* TestAppDebug.xcconfig */;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
-				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_ARC = YES;
-				CLANG_WARN_BOOL_CONVERSION = YES;
-				CLANG_WARN_CONSTANT_CONVERSION = YES;
-				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
-				CLANG_WARN_EMPTY_BODY = YES;
-				CLANG_WARN_ENUM_CONVERSION = YES;
-				CLANG_WARN_INT_CONVERSION = YES;
-				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				COPY_PHASE_STRIP = NO;
-				GCC_C_LANGUAGE_STANDARD = gnu99;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
-				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
-				GCC_WARN_UNDECLARED_SELECTOR = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES;
-				GCC_WARN_UNUSED_FUNCTION = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
-				ONLY_ACTIVE_ARCH = YES;
-				SDKROOT = iphoneos;
-				TARGETED_DEVICE_FAMILY = 2;
 			};
 			name = Debug;
 		};
 		0489D4AA18CE75D100B41E20 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 0489D4C918CE780F00B41E20 /* TestAppProduction.xcconfig */;
+			baseConfigurationReference = 04C3133118D3828C008097D1 /* TestAppRelease.xcconfig */;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
-				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_ARC = YES;
-				CLANG_WARN_BOOL_CONVERSION = YES;
-				CLANG_WARN_CONSTANT_CONVERSION = YES;
-				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
-				CLANG_WARN_EMPTY_BODY = YES;
-				CLANG_WARN_ENUM_CONVERSION = YES;
-				CLANG_WARN_INT_CONVERSION = YES;
-				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				COPY_PHASE_STRIP = YES;
-				ENABLE_NS_ASSERTIONS = NO;
-				GCC_C_LANGUAGE_STANDARD = gnu99;
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
-				GCC_WARN_UNDECLARED_SELECTOR = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES;
-				GCC_WARN_UNUSED_FUNCTION = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
-				SDKROOT = iphoneos;
-				TARGETED_DEVICE_FAMILY = 2;
-				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
 		};
@@ -538,72 +492,91 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 0489D4C818CE780F00B41E20 /* TestAppDebug.xcconfig */;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "TestApp/TestApp-Prefix.pch";
-				INFOPLIST_FILE = "TestApp/TestApp-Info.plist";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
 		};
 		0489D4AD18CE75D100B41E20 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 0489D4C918CE780F00B41E20 /* TestAppProduction.xcconfig */;
+			baseConfigurationReference = 04C3133118D3828C008097D1 /* TestAppRelease.xcconfig */;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "TestApp/TestApp-Prefix.pch";
-				INFOPLIST_FILE = "TestApp/TestApp-Info.plist";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
 		};
 		0489D4AF18CE75D100B41E20 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
-				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/TestApp.app/TestApp";
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SDKROOT)/Developer/Library/Frameworks",
-					"$(inherited)",
-					"$(DEVELOPER_FRAMEWORKS_DIR)",
-				);
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "TestApp/TestApp-Prefix.pch";
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
-				INFOPLIST_FILE = "TestAppTests/TestAppTests-Info.plist";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				TEST_HOST = "$(BUNDLE_LOADER)";
-				WRAPPER_EXTENSION = xctest;
 			};
 			name = Debug;
 		};
 		0489D4B018CE75D100B41E20 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 0489D4C918CE780F00B41E20 /* TestAppProduction.xcconfig */;
+			baseConfigurationReference = 04C3133118D3828C008097D1 /* TestAppRelease.xcconfig */;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
-				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/TestApp.app/TestApp";
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SDKROOT)/Developer/Library/Frameworks",
-					"$(inherited)",
-					"$(DEVELOPER_FRAMEWORKS_DIR)",
-				);
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "TestApp/TestApp-Prefix.pch";
-				INFOPLIST_FILE = "TestAppTests/TestAppTests-Info.plist";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				TEST_HOST = "$(BUNDLE_LOADER)";
-				WRAPPER_EXTENSION = xctest;
 			};
 			name = Release;
+		};
+		04C3132618D381A3008097D1 /* Internal */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 04C3132F18D3828C008097D1 /* TestAppInternal.xcconfig */;
+			buildSettings = {
+			};
+			name = Internal;
+		};
+		04C3132718D381A3008097D1 /* Internal */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 04C3132F18D3828C008097D1 /* TestAppInternal.xcconfig */;
+			buildSettings = {
+			};
+			name = Internal;
+		};
+		04C3132818D381A3008097D1 /* Internal */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 04C3132F18D3828C008097D1 /* TestAppInternal.xcconfig */;
+			buildSettings = {
+			};
+			name = Internal;
+		};
+		04C3132918D381B6008097D1 /* Production */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 0489D4C918CE780F00B41E20 /* TestAppProduction.xcconfig */;
+			buildSettings = {
+			};
+			name = Production;
+		};
+		04C3132A18D381B6008097D1 /* Production */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 0489D4C918CE780F00B41E20 /* TestAppProduction.xcconfig */;
+			buildSettings = {
+			};
+			name = Production;
+		};
+		04C3132B18D381B6008097D1 /* Production */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 0489D4C918CE780F00B41E20 /* TestAppProduction.xcconfig */;
+			buildSettings = {
+			};
+			name = Production;
+		};
+		04C3132C18D381C8008097D1 /* Preview */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 04C3133018D3828C008097D1 /* TestAppPreview.xcconfig */;
+			buildSettings = {
+			};
+			name = Preview;
+		};
+		04C3132D18D381C8008097D1 /* Preview */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 04C3133018D3828C008097D1 /* TestAppPreview.xcconfig */;
+			buildSettings = {
+			};
+			name = Preview;
+		};
+		04C3132E18D381C8008097D1 /* Preview */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 04C3133018D3828C008097D1 /* TestAppPreview.xcconfig */;
+			buildSettings = {
+			};
+			name = Preview;
 		};
 /* End XCBuildConfiguration section */
 
@@ -613,25 +586,36 @@
 			buildConfigurations = (
 				0489D4A918CE75D100B41E20 /* Debug */,
 				0489D4AA18CE75D100B41E20 /* Release */,
+				04C3132C18D381C8008097D1 /* Preview */,
+				04C3132918D381B6008097D1 /* Production */,
+				04C3132618D381A3008097D1 /* Internal */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = Production;
 		};
 		0489D4AB18CE75D100B41E20 /* Build configuration list for PBXNativeTarget "TestApp" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				0489D4AC18CE75D100B41E20 /* Debug */,
 				0489D4AD18CE75D100B41E20 /* Release */,
+				04C3132D18D381C8008097D1 /* Preview */,
+				04C3132A18D381B6008097D1 /* Production */,
+				04C3132718D381A3008097D1 /* Internal */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Production;
 		};
 		0489D4AE18CE75D100B41E20 /* Build configuration list for PBXNativeTarget "TestAppTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				0489D4AF18CE75D100B41E20 /* Debug */,
 				0489D4B018CE75D100B41E20 /* Release */,
+				04C3132E18D381C8008097D1 /* Preview */,
+				04C3132B18D381B6008097D1 /* Production */,
+				04C3132818D381A3008097D1 /* Internal */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Production;
 		};
 /* End XCConfigurationList section */
 	};
