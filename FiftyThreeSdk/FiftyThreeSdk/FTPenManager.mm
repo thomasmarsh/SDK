@@ -1875,6 +1875,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     penConnectionView.suppressDialogs = YES;
     penConnectionView.isActive = true; //What is this parameter for?
     penConnectionView.delegate = self;
+    penConnectionView.debugControlsVisibility = VisibilityStateVisible;
 
     [self.pairingViews addObject:penConnectionView];
 
