@@ -15,41 +15,11 @@
 
 #define kBrushPixelStep     3
 
-// Shaders enums
-enum
-{
-    PROGRAM_POINT,
-    NUM_PROGRAMS
-};
-
-enum
-{
-    UNIFORM_MVP,
-    UNIFORM_POINT_SIZE,
-    UNIFORM_VERTEX_COLOR,
-    UNIFORM_TEXTURE,
-    NUM_UNIFORMS
-};
-
-GLint uniforms[NUM_UNIFORMS];
-
-enum
-{
-    ATTRIB_VERTEX,
-    NUM_ATTRIBS
-};
-
-GLint attributes[NUM_ATTRIBS];
-
-// Must match Shader.fsh/vsh.
-static const GLchar *attribName[NUM_ATTRIBS] =
-{
-    "inVertex"
-};
-static const GLchar *uniformName[NUM_UNIFORMS] =
-{
-    "MVP", "pointSize", "color", "texture"
-};
+// see: http://www.khronos.org/registry/gles/extensions/EXT/EXT_debug_label.txt
+#define DebugGLLabelObject(type, object, label)\
+{\
+glLabelObjectEXT((type),(object), 0, (label));\
+}
 
 @interface  Stroke : NSObject
 @property (nonatomic) NSTimeInterval lastAppended;
@@ -65,15 +35,31 @@ static const GLchar *uniformName[NUM_UNIFORMS] =
 @interface FTAViewController () <FTTouchClassificationsChangedDelegate> {
 
     // OpenGL resources.
-    GLuint _program;
+    FTShaderInfo *_pointSpriteShader;
+    FTShaderInfo *_blitShader;
+
+    // Buffers & textures & fbo
     GLuint _vertexBuffer;
-    GLuint _texture;
+
+    GLuint _blitBuffer;
+    GLuint _blitVAO;
+
+    GLuint _pointSpriteTexture;
+    GLuint _fbo;
+    GLuint _fboTex;
+    bool _fboInit;
+
+    // We don't own this fbo.
+    GLint _defaultFBO;
 
     int _textureWidth;
     int _textureHeight;
     GLuint _backingWidth;
     GLuint _backingHeight;
     BOOL _clear;
+    BOOL _useBackgroundTexture;
+
+    bool _clearFBO;
 
     // The scene is a dictionary of strokes indexed by
     // FT touch id.
@@ -90,9 +76,6 @@ static const GLchar *uniformName[NUM_UNIFORMS] =
 - (void)tearDownGL;
 
 - (BOOL)loadShaders;
-- (BOOL)compileShader:(GLuint *)shader type:(GLenum)type file:(NSString *)file;
-- (BOOL)linkProgram:(GLuint)prog;
-- (BOOL)validateProgram:(GLuint)prog;
 @end
 
 @implementation FTAViewController
@@ -112,7 +95,6 @@ static const GLchar *uniformName[NUM_UNIFORMS] =
     view.drawableDepthFormat = GLKViewDrawableDepthFormatNone;
 
     self.bar = [[UIToolbar alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, 44)];
-    [self.bar setBarStyle:UIBarStyleBlack];
 
     UIBarButtonItem *button1 = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemStop
                                                                              target:self
@@ -127,6 +109,7 @@ static const GLchar *uniformName[NUM_UNIFORMS] =
     [self.view addSubview:self.bar];
     self.isPencilEnabled = NO;
 
+    // Defaults to 30, we ant to catch any performance problems so we crank it up.
     self.preferredFramesPerSecond = 60;
 
     _strokeColors =
@@ -143,6 +126,9 @@ static const GLchar *uniformName[NUM_UNIFORMS] =
 }
 - (void)clearScene:(id)sender
 {
+    _fboInit = NO;
+    _clearFBO = YES;
+    _useBackgroundTexture = NO;
     [_scene removeAllObjects];
 }
 - (void)shutdownFTPenManager:(id)sender
@@ -172,25 +158,24 @@ static const GLchar *uniformName[NUM_UNIFORMS] =
     }
 }
 
-- (void)didReceiveMemoryWarning
+- (void)setupPointSpriteShaderState
 {
-    [super didReceiveMemoryWarning];
+    glUseProgram(_pointSpriteShader.glProgram);
 
-    if ([self isViewLoaded] && ([[self view] window] == nil)) {
-        self.view = nil;
+    glActiveTexture(GL_TEXTURE0);
+    glUniform1i([_pointSpriteShader.uniform[@"texture"] intValue], 0);
+    glBindTexture(GL_TEXTURE_2D, _pointSpriteTexture);
+    DebugGLLabelObject(GL_TEXTURE, _pointSpriteTexture, "pointSpriteTexture");
 
-        [self tearDownGL];
+    // Disable depth testing.
+    glDisable(GL_DEPTH_TEST);
 
-        if ([EAGLContext currentContext] == self.context) {
-            [EAGLContext setCurrentContext:nil];
-        }
-        self.context = nil;
-    }
-}
+    // Enable blending and set a blending function appropriate for premultiplied alpha pixel data
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
-- (BOOL)prefersStatusBarHidden
-{
-    return YES;
+    [self setPointSize];
+    [self updateViewportAndTransforms];
 }
 
 - (void)setupGL
@@ -202,25 +187,17 @@ static const GLchar *uniformName[NUM_UNIFORMS] =
 
     // Load the brush texture
     _textureHeight = _textureWidth = 128;
-    _texture = [FTAUtil loadDiscTextureWithSize:_textureWidth];
-    glBindTexture(GL_TEXTURE0, _texture);
+    _pointSpriteTexture = [FTAUtil loadDiscTextureWithSize:_textureWidth];
 
     // Load shaders.
     [self loadShaders];
 
-    // Disable depth testing.
-    glDisable(GL_DEPTH_TEST);
-
-    // Enable blending and set a blending function appropriate for premultiplied alpha pixel data
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-
-    [self setPointSize];
+    [self setupPointSpriteShaderState];
 }
 
 - (void)viewWillLayoutSubviews
 {
-    [self updateViewportAndTransforms];
+    [self setupPointSpriteShaderState];
 }
 
 - (void)tearDownGL
@@ -228,11 +205,27 @@ static const GLchar *uniformName[NUM_UNIFORMS] =
     [EAGLContext setCurrentContext:self.context];
 
     glDeleteBuffers(1, &_vertexBuffer);
-    glDeleteTextures(1, &_texture);
+    glDeleteTextures(1, &_pointSpriteTexture);
+    glDeleteBuffers(1, &_blitBuffer);
+    glDeleteVertexArraysOES(1, &_blitVAO);
+    glDeleteTextures(1, &_fboTex);
+    glDeleteFramebuffers(1, &_fbo);
+    if (_pointSpriteShader)
+    {
+        if (_pointSpriteShader.glProgram)
+        {
+            glDeleteProgram(_pointSpriteShader.glProgram);
+        }
+        _pointSpriteShader = nil;
+    }
 
-    if (_program) {
-        glDeleteProgram(_program);
-        _program = 0;
+    if (_blitShader)
+    {
+        if (_blitShader.glProgram)
+        {
+            glDeleteProgram(_blitShader.glProgram);
+        }
+        _blitShader = nil;
     }
 }
 
@@ -241,7 +234,7 @@ static const GLchar *uniformName[NUM_UNIFORMS] =
 {
     for(FTTouchClassificationInfo *info in touches)
     {
-        NSLog(@"Touch %x was %d now %d", (unsigned int)info.touch, info.oldValue, info.newValue);
+        NSLog(@"Touch %x was %d now %d", (unsigned int)info.touchId, info.oldValue, info.newValue);
         Stroke * s = _scene[@(info.touchId)];
         if (s)
         {
@@ -269,6 +262,377 @@ static const GLchar *uniformName[NUM_UNIFORMS] =
     location.y = bounds.size.height - location.y;
     return location;
 }
+
+- (void)blit
+{
+    if (!_blitBuffer)
+    {
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+        glGenVertexArraysOES(1,&_blitVAO);
+        glBindVertexArrayOES(_blitVAO);
+
+        glGenBuffers(1, &_blitBuffer);
+        glBindBuffer(GL_ARRAY_BUFFER, _blitBuffer);
+
+        // Drawn as a CCW tri-strip hence the following
+        // ordering.
+        //
+        //  2 --4
+        //  | \ |
+        //  1-- 3
+        static const GLfloat squareVertices[4*4] =
+        {
+            0.0f, 0.0f,      0.0f, 0.0f, // x y u v
+            0.0f,  768.0,    0.0f, 1.0f,
+            1024.0f, 0.0f,   1.0f, 0.0f,
+            1024.0f, 768.0,  1.0f, 1.0f
+        };
+
+        // Load data to the Vertex Buffer Object
+        glBufferData(GL_ARRAY_BUFFER, 4*4*sizeof(GLfloat), squareVertices, GL_STATIC_DRAW);
+
+        glEnableVertexAttribArray([_blitShader.attribute[@"inVertex"] intValue]);
+        glVertexAttribPointer([_blitShader.attribute[@"inVertex"] intValue], 2, GL_FLOAT, GL_FALSE, 4*sizeof(GLfloat), 0);
+
+        glEnableVertexAttribArray([_blitShader.attribute[@"inTex"] intValue]);
+        glVertexAttribPointer([_blitShader.attribute[@"inTex"] intValue], 2, GL_FLOAT, GL_FALSE, 4*sizeof(GLfloat), (const void*) (2*sizeof(GLfloat)));
+
+        glBindVertexArrayOES(0);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+    }
+
+    glUseProgram(_blitShader.glProgram);
+
+    // Viewport stuff is setup in updateTransforms. For simplicity both the
+    // point sprite and blit shader use the same coordinate spaces for their geometry.
+    glDisable(GL_DEPTH_TEST);
+
+    // Enable blending and set a blending function appropriate for premultiplied alpha pixel data
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+
+    glActiveTexture(GL_TEXTURE0);
+    glUniform1i([_blitShader.uniform[@"texture"] intValue], 0);
+    glBindTexture(GL_TEXTURE_2D, _fboTex);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArrayOES(_blitVAO);
+
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+    glBindVertexArrayOES(0);
+
+    glDisableVertexAttribArray([_blitShader.attribute[@"inTex"] intValue]);
+    glDisableVertexAttribArray([_blitShader.attribute[@"inVertex"] intValue]);
+}
+
+#pragma mark - GLKView delegate
+- (void)glkView:(GLKView *)view drawInRect:(CGRect)rect
+{
+    [self setupFBO];
+
+    //
+    // The rendering proceeds as follows
+    //  (1) Clear
+    //  (2) Render any contents that we've got saved to a texture.
+    //  (3) Render any strokes that are "active" and either subject to
+    //      appending new geometry or are subject to re-classification.
+    //  (4) Update our saved texture with any strokes that are no-longer active.
+
+    glClearColor(0.9f, 0.9f, 0.9f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    // If we've rendered any contents into the fboTexture we render
+    // that first.
+    if (_useBackgroundTexture)
+    {
+        [self blit];
+    }
+
+    glUseProgram(_pointSpriteShader.glProgram);
+    [self setupPointSpriteShaderState];
+
+    // We sort the scene on draw order.
+    NSArray *scene = [_scene allValues];
+    NSArray *sortedScene = [scene sortedArrayUsingComparator:
+                            ^NSComparisonResult(id obj1, id obj2) {
+                                Stroke *lhs = obj1;
+                                Stroke *rhs = obj2;
+
+                                if (lhs.drawOrder < rhs.drawOrder)
+                                {
+                                    return  -1;
+                                }
+                                else if (rhs.drawOrder == lhs.drawOrder)
+                                {
+                                    return 0;
+                                }
+                                else
+                                {
+                                    return 1;
+                                }
+                            }];
+
+    for(Stroke *v in sortedScene)
+    {
+        if ([v.glGeometry count] >= 2)
+        {
+            [self setBrushColor:v.color];
+
+            // Since each of these issues a draw call, this is quite expensive. We could
+            // do a lot of optimization here but it would make the code
+            // much less readable.
+            for(NSInteger i = 0; i < [v.glGeometry count]-1; ++i)
+            {
+                [self renderLineFromPoint:[(NSValue*)v.glGeometry[i] CGPointValue]
+                                  toPoint:[(NSValue*)v.glGeometry[i+1] CGPointValue]];
+            }
+        }
+    }
+
+    // OK commit all strokes that are no longer "active"
+
+    NSTimeInterval now = [[NSProcessInfo processInfo] systemUptime];
+    NSMutableArray *oldScene = [@[] mutableCopy];
+    for (Stroke *v in sortedScene)
+    {
+        // Don't bother keeping older strokes we "commit" them to a texture
+        // if (a) they haven't been reclassified.
+        //    (b) they haven't been appended too recently.
+        BOOL old = (now - v.lastReclassified) > 0.6 && (now - v.lastAppended) > 0.60;
+        if (old)
+        {
+            [_scene removeObjectForKey:[NSNumber numberWithInt:v.drawOrder]];
+            [oldScene addObject:v];
+        }
+    }
+    if ([oldScene count] >= 1)
+    {
+        glBindFramebuffer(GL_FRAMEBUFFER, _fbo);
+
+        glViewport(0,0, _backingWidth, _backingHeight);
+
+        if (!_useBackgroundTexture)
+        {
+            if (_clearFBO)
+            {
+                glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+                glClear(GL_COLOR_BUFFER_BIT);
+                _clearFBO = NO;
+            }
+            _useBackgroundTexture = YES;
+        }
+
+        glUseProgram(_pointSpriteShader.glProgram);
+
+        [self setupPointSpriteShaderState];
+
+        for(Stroke *v in oldScene)
+        {
+            if ([v.glGeometry count] >= 2)
+            {
+                [self setBrushColor:v.color];
+
+                // Since each of these issues a draw call, this is quite expensive. We could
+                // do a lot of optimization here but it would make the code
+                // much less readable.
+                for(NSInteger i = 0; i < [v.glGeometry count]-1; ++i)
+                {
+                    [self renderLineFromPoint:[(NSValue*)v.glGeometry[i] CGPointValue]
+                                      toPoint:[(NSValue*)v.glGeometry[i+1] CGPointValue]];
+                }
+            }
+        }
+
+        glBindFramebuffer(GL_FRAMEBUFFER, _defaultFBO);
+        // reset to main framebuffer
+        [((GLKView *) self.view) bindDrawable];
+    }
+}
+#pragma mark - OpenGL ES Drawing
+// Drawings a line onscreen based on where the user touches
+- (void)renderLineFromPoint:(CGPoint)start toPoint:(CGPoint)end
+{
+    static GLfloat*     vertexBuffer = NULL;
+    static NSUInteger   vertexMax = 64;
+    NSUInteger          vertexCount = 0,
+    count,
+    i;
+
+    // Convert locations from Points to Pixels
+    CGFloat scale = self.view.contentScaleFactor;
+
+    start.x *= scale;
+    start.y *= scale;
+    end.x *= scale;
+    end.y *= scale;
+
+    // Allocate vertex array buffer
+    if (vertexBuffer == NULL)
+    {
+        vertexBuffer = malloc(vertexMax * 2 * sizeof(GLfloat));
+    }
+
+    // Add points to the buffer so there are drawing points every X pixels
+    count = MAX(ceilf(sqrtf((end.x - start.x) * (end.x - start.x) + (end.y - start.y) * (end.y - start.y)) / kBrushPixelStep), 1);
+    for (i = 0; i < count; ++i)
+    {
+        if(vertexCount == vertexMax)
+        {
+            vertexMax = 2 * vertexMax;
+            vertexBuffer = realloc(vertexBuffer, vertexMax * 2 * sizeof(GLfloat));
+        }
+
+        vertexBuffer[2 * vertexCount + 0] = start.x + (end.x - start.x) * ((GLfloat)i / (GLfloat)count);
+        vertexBuffer[2 * vertexCount + 1] = start.y + (end.y - start.y) * ((GLfloat)i / (GLfloat)count);
+        vertexCount += 1;
+    }
+
+    // Load data to the Vertex Buffer Object
+    glBindBuffer(GL_ARRAY_BUFFER, _vertexBuffer);
+    glBufferData(GL_ARRAY_BUFFER, vertexCount*2*sizeof(GLfloat), vertexBuffer, GL_DYNAMIC_DRAW);
+
+    glEnableVertexAttribArray([_pointSpriteShader.attribute[@"inVertex"] intValue]);
+    glVertexAttribPointer([_pointSpriteShader.attribute[@"inVertex"] intValue], 2, GL_FLOAT, GL_FALSE, 0, 0);
+
+    // We don't need the use program as there's only ever 1 shader in use.
+    glDrawArrays(GL_POINTS, 0, vertexCount);
+
+    glDisableVertexAttribArray([_pointSpriteShader.attribute[@"inVertex"] intValue]);
+}
+
+#pragma mark - OpenGL ES shader state changes
+- (void)setBrushColor:(UIColor *)color
+{
+    GLfloat brushColor[4];
+    [color getRed:brushColor green:brushColor+1 blue:brushColor+2 alpha:brushColor+3];
+    glUseProgram(_pointSpriteShader.glProgram);
+    glUniform4fv([_pointSpriteShader.uniform[@"color"] intValue], 1, brushColor);
+}
+- (void)setPointSize
+{
+    glUseProgram(_pointSpriteShader.glProgram);
+    glUniform1f([_pointSpriteShader.uniform[@"pointSize"] intValue], 8.0f);
+}
+- (void)updateViewportAndTransforms
+{
+    // TODO what is up with GLKView's w/h
+
+    CGRect rect = [UIScreen mainScreen].bounds;
+
+    float w = MAX(rect.size.height, rect.size.width);
+    float h = MIN(rect.size.height, rect.size.width);
+
+    _backingWidth = w * self.view.contentScaleFactor;
+    _backingHeight = h * self.view.contentScaleFactor;
+
+    // Update projection matrix , the model is the identity.
+    GLKMatrix4 projectionMatrix = GLKMatrix4MakeOrtho(0, _backingWidth, 0, _backingHeight, -1, 1);
+
+    glUseProgram(_blitShader.glProgram);
+    glUniformMatrix4fv([_blitShader.uniform[@"MVP"] intValue], 1, GL_FALSE, projectionMatrix.m);
+
+    glUseProgram(_pointSpriteShader.glProgram);
+    glUniformMatrix4fv([_pointSpriteShader.uniform[@"MVP"] intValue], 1, GL_FALSE, projectionMatrix.m);
+
+    // Update viewport
+    glViewport(0, 0, _backingWidth, _backingHeight);
+}
+
+#pragma mark - FBO setup
+// intialize FBO
+- (void)setupFBO
+{
+    if (!_fboInit)
+    {
+        _fboInit = YES;
+        _clearFBO = YES;
+        GLuint fbo_width = _backingWidth;
+        GLuint fbo_height = _backingHeight;
+        
+        if (_fboTex)
+        {
+            glDeleteTextures(1, &_fboTex);
+            _fboTex = 0;
+        }
+        if (_fbo)
+        {
+            glDeleteFramebuffers(1, &_fbo);
+            _fbo = 0;
+        }
+
+        glGetIntegerv(GL_FRAMEBUFFER_BINDING, &_defaultFBO);
+
+        glGenFramebuffers(1, &_fbo);
+        glGenTextures(1, &_fboTex);
+
+        glBindFramebuffer(GL_FRAMEBUFFER, _fbo);
+        DebugGLLabelObject(GL_FRAMEBUFFER, _fbo, "fbo");
+
+        glBindTexture(GL_TEXTURE_2D, _fboTex);
+        DebugGLLabelObject(GL_TEXTURE, _fboTex, "fboText");
+
+        glTexImage2D( GL_TEXTURE_2D,
+                     0,
+                     GL_RGBA,
+                     fbo_width, fbo_height,
+                     0,
+                     GL_RGBA,
+                     GL_UNSIGNED_BYTE,
+                     NULL);
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _fboTex, 0);
+
+        // FBO status check
+        GLenum status;
+        status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+        switch(status)
+        {
+            case GL_FRAMEBUFFER_COMPLETE:
+                NSLog(@"fbo complete");
+                break;
+
+            case GL_FRAMEBUFFER_UNSUPPORTED:
+                NSLog(@"fbo unsupported");
+                break;
+
+            default:
+                /* programming error; will fail on all hardware */
+                NSLog(@"Framebuffer Error");
+                break;
+        }
+
+        glBindTexture(GL_TEXTURE_2D, 0);
+        glBindFramebuffer(GL_FRAMEBUFFER, _defaultFBO);
+        [((GLKView *) self.view) bindDrawable];
+    }
+}
+
+#pragma mark -  OpenGL ES 2 shader configration.
+
+- (BOOL)loadShaders
+{
+    _pointSpriteShader = [[FTShaderInfo alloc] init];
+    _pointSpriteShader.shaderName = @"TrivialPointSprite";
+    _pointSpriteShader.uniformNames = [@[@"MVP", @"pointSize", @"color", @"texture"] mutableCopy];
+    _pointSpriteShader.attributeNames = [@[@"inVertex"] mutableCopy];
+    _pointSpriteShader = [FTAUtil loadShader:_pointSpriteShader];
+
+    _blitShader = [[FTShaderInfo alloc] init];
+    _blitShader.shaderName = @"TrivialBlit";
+    _blitShader.uniformNames = [@[@"texture"] mutableCopy];
+    _blitShader.attributeNames = [@[@"inVertex", @"inTex"] mutableCopy];
+    _blitShader = [FTAUtil loadShader:_blitShader];
+
+    return _blitShader && _pointSpriteShader;
+}
+
+#pragma mark - Touch Handling
 
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
 {
@@ -324,285 +688,27 @@ static const GLchar *uniformName[NUM_UNIFORMS] =
     }
 }
 
-#pragma mark - GLKView delegate
-- (void)glkView:(GLKView *)view drawInRect:(CGRect)rect
+#pragma mark - View Controller boiler plate.
+
+
+- (void)didReceiveMemoryWarning
 {
-    glClearColor(0.9f, 0.9f, 0.9f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
-
-    glUseProgram(_program);
-
-    // We sort the scene on draw order.
-    NSArray *scene = [_scene allValues];
-    NSArray *sortedScene = [scene sortedArrayUsingComparator:
-                            ^NSComparisonResult(id obj1, id obj2) {
-                                Stroke *lhs = obj1;
-                                Stroke *rhs = obj2;
-
-                                if (lhs.drawOrder < rhs.drawOrder)
-                                {
-                                    return  -1;
-                                }
-                                else if (rhs.drawOrder == lhs.drawOrder)
-                                {
-                                    return 0;
-                                }
-                                else
-                                {
-                                    return 1;
-                                }
-
-                            }];
-
-    for(Stroke *v in sortedScene)
-    {
-        if ([v.glGeometry count] >= 2)
-        {
-            [self setBrushColor:v.color];
-
-            for(NSInteger i = 0; i < [v.glGeometry count]-1; ++i)
-            {
-                [self renderLineFromPoint:[(NSValue*)v.glGeometry[i] CGPointValue]
-                                  toPoint:[(NSValue*)v.glGeometry[i+1] CGPointValue]];
-            }
+    [super didReceiveMemoryWarning];
+    
+    if ([self isViewLoaded] && ([[self view] window] == nil)) {
+        self.view = nil;
+        
+        [self tearDownGL];
+        
+        if ([EAGLContext currentContext] == self.context) {
+            [EAGLContext setCurrentContext:nil];
         }
+        self.context = nil;
     }
 }
 
-#pragma mark - OpenGL ES Drawing
-// Drawings a line onscreen based on where the user touches
-- (void)renderLineFromPoint:(CGPoint)start toPoint:(CGPoint)end
+- (BOOL)prefersStatusBarHidden
 {
-    static GLfloat*     vertexBuffer = NULL;
-    static NSUInteger   vertexMax = 64;
-    NSUInteger          vertexCount = 0,
-    count,
-    i;
-
-    // Convert locations from Points to Pixels
-    CGFloat scale = self.view.contentScaleFactor;
-
-    start.x *= scale;
-    start.y *= scale;
-    end.x *= scale;
-    end.y *= scale;
-
-    // Allocate vertex array buffer
-    if (vertexBuffer == NULL)
-    {
-        vertexBuffer = malloc(vertexMax * 2 * sizeof(GLfloat));
-    }
-
-    // Add points to the buffer so there are drawing points every X pixels
-    count = MAX(ceilf(sqrtf((end.x - start.x) * (end.x - start.x) + (end.y - start.y) * (end.y - start.y)) / kBrushPixelStep), 1);
-    for (i = 0; i < count; ++i)
-    {
-        if(vertexCount == vertexMax)
-        {
-            vertexMax = 2 * vertexMax;
-            vertexBuffer = realloc(vertexBuffer, vertexMax * 2 * sizeof(GLfloat));
-        }
-
-        vertexBuffer[2 * vertexCount + 0] = start.x + (end.x - start.x) * ((GLfloat)i / (GLfloat)count);
-        vertexBuffer[2 * vertexCount + 1] = start.y + (end.y - start.y) * ((GLfloat)i / (GLfloat)count);
-        vertexCount += 1;
-    }
-
-    // Load data to the Vertex Buffer Object
-    glBindBuffer(GL_ARRAY_BUFFER, _vertexBuffer);
-    glBufferData(GL_ARRAY_BUFFER, vertexCount*2*sizeof(GLfloat), vertexBuffer, GL_DYNAMIC_DRAW);
-
-    glEnableVertexAttribArray(ATTRIB_VERTEX);
-    glVertexAttribPointer(ATTRIB_VERTEX, 2, GL_FLOAT, GL_FALSE, 0, 0);
-
-    // We don't need the use program as there's only ever 1 shader in use.
-    glUseProgram(_program);
-
-    glDrawArrays(GL_POINTS, 0, vertexCount);
-}
-
-#pragma mark - OpenGL ES shader state changes
-- (void)setBrushColor:(UIColor *)color
-{
-    GLfloat brushColor[4];
-    [color getRed:brushColor green:brushColor+1 blue:brushColor+2 alpha:brushColor+3];
-    glUseProgram(_program);
-    glUniform4fv(uniforms[UNIFORM_VERTEX_COLOR], 1, brushColor);
-}
-- (void)setPointSize
-{
-    glUseProgram(_program);
-    glUniform1f(uniforms[UNIFORM_POINT_SIZE], 8.0f);
-}
-- (void)updateViewportAndTransforms
-{
-    // TODO what is up with GLKView's w/h
-    _backingWidth = self.view.frame.size.height * self.view.contentScaleFactor;
-    _backingHeight = self.view.frame.size.width * self.view.contentScaleFactor;
-
-    // Update projection matrix , the model is the identity.
-    GLKMatrix4 projectionMatrix = GLKMatrix4MakeOrtho(0, _backingWidth, 0, _backingHeight, -1, 1);
-
-    glUseProgram(_program);
-    glUniformMatrix4fv(uniforms[UNIFORM_MVP], 1, GL_FALSE, projectionMatrix.m);
-
-    // Update viewport
-    glViewport(0, 0, _backingWidth, _backingHeight);
-}
-
-#pragma mark -  OpenGL ES 2 shader compilation
-
-- (BOOL)loadShaders
-{
-    GLuint vertShader, fragShader;
-    NSString *vertShaderPathname, *fragShaderPathname;
-
-    // Create shader program.
-    _program = glCreateProgram();
-
-    // Create and compile vertex shader.
-    vertShaderPathname = [[NSBundle mainBundle] pathForResource:@"Shader" ofType:@"vsh"];
-    if (![self compileShader:&vertShader type:GL_VERTEX_SHADER file:vertShaderPathname]) {
-        NSLog(@"Failed to compile vertex shader");
-        return NO;
-    }
-
-    // Create and compile fragment shader.
-    fragShaderPathname = [[NSBundle mainBundle] pathForResource:@"Shader" ofType:@"fsh"];
-    if (![self compileShader:&fragShader type:GL_FRAGMENT_SHADER file:fragShaderPathname]) {
-        NSLog(@"Failed to compile fragment shader");
-        return NO;
-    }
-
-    // Attach vertex shader to program.
-    glAttachShader(_program, vertShader);
-
-    // Attach fragment shader to program.
-    glAttachShader(_program, fragShader);
-
-    // Bind attribute locations.
-    // This needs to be done prior to linking.
-    for(int i = 0; i < NUM_ATTRIBS; ++i)
-    {
-        glBindAttribLocation(_program, attributes[i], attribName[i]);
-    }
-
-    // Link program.
-    if (![self linkProgram:_program]) {
-        NSLog(@"Failed to link program: %d", _program);
-
-        if (vertShader) {
-            glDeleteShader(vertShader);
-            vertShader = 0;
-        }
-        if (fragShader) {
-            glDeleteShader(fragShader);
-            fragShader = 0;
-        }
-        if (_program) {
-            glDeleteProgram(_program);
-            _program = 0;
-        }
-
-        return NO;
-    }
-
-    // Get uniform locations.
-    for(int i = 0; i < NUM_UNIFORMS; ++i)
-    {
-        uniforms[i] = glGetUniformLocation(_program, uniformName[i]);
-    }
-
-    // Release vertex and fragment shaders.
-    if (vertShader) {
-        glDetachShader(_program, vertShader);
-        glDeleteShader(vertShader);
-    }
-    if (fragShader) {
-        glDetachShader(_program, fragShader);
-        glDeleteShader(fragShader);
-    }
-
-    return YES;
-}
-
-- (BOOL)compileShader:(GLuint *)shader type:(GLenum)type file:(NSString *)file
-{
-    GLint status;
-    const GLchar *source;
-
-    source = (GLchar *)[[NSString stringWithContentsOfFile:file encoding:NSUTF8StringEncoding error:nil] UTF8String];
-    if (!source) {
-        NSLog(@"Failed to load vertex shader");
-        return NO;
-    }
-
-    *shader = glCreateShader(type);
-    glShaderSource(*shader, 1, &source, NULL);
-    glCompileShader(*shader);
-
-#if defined(DEBUG)
-    GLint logLength;
-    glGetShaderiv(*shader, GL_INFO_LOG_LENGTH, &logLength);
-    if (logLength > 0) {
-        GLchar *log = (GLchar *)malloc(logLength);
-        glGetShaderInfoLog(*shader, logLength, &logLength, log);
-        NSLog(@"Shader compile log:\n%s", log);
-        free(log);
-    }
-#endif
-
-    glGetShaderiv(*shader, GL_COMPILE_STATUS, &status);
-    if (status == 0) {
-        glDeleteShader(*shader);
-        return NO;
-    }
-
-    return YES;
-}
-
-- (BOOL)linkProgram:(GLuint)prog
-{
-    GLint status;
-    glLinkProgram(prog);
-
-#if defined(DEBUG)
-    GLint logLength;
-    glGetProgramiv(prog, GL_INFO_LOG_LENGTH, &logLength);
-    if (logLength > 0) {
-        GLchar *log = (GLchar *)malloc(logLength);
-        glGetProgramInfoLog(prog, logLength, &logLength, log);
-        NSLog(@"Program link log:\n%s", log);
-        free(log);
-    }
-#endif
-
-    glGetProgramiv(prog, GL_LINK_STATUS, &status);
-    if (status == 0) {
-        return NO;
-    }
-
-    return YES;
-}
-
-- (BOOL)validateProgram:(GLuint)prog
-{
-    GLint logLength, status;
-
-    glValidateProgram(prog);
-    glGetProgramiv(prog, GL_INFO_LOG_LENGTH, &logLength);
-    if (logLength > 0) {
-        GLchar *log = (GLchar *)malloc(logLength);
-        glGetProgramInfoLog(prog, logLength, &logLength, log);
-        NSLog(@"Program validate log:\n%s", log);
-        free(log);
-    }
-
-    glGetProgramiv(prog, GL_VALIDATE_STATUS, &status);
-    if (status == 0) {
-        return NO;
-    }
-
     return YES;
 }
 
