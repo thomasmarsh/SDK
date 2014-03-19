@@ -8,7 +8,7 @@
 
 #import "FTAUtil.h"
 
-@interface FTShaderInfo ()
+@interface FTAUtil ()
 + (BOOL)compileShader:(GLuint *)shader type:(GLenum)type file:(NSString *)file;
 + (BOOL)linkProgram:(GLuint)prog;
 + (BOOL)validateProgram:(GLuint)prog;
