@@ -11,8 +11,8 @@
 
 #import "FiftyThreeSdk/FTTouchClassifier.h"
 
-//  This describes the potential connection states of the pen. Using the Pairing UI provided should
-//  insulate most apps from needing to know the details of this information.
+/// This describes the potential connection states of the pen. Using the Pairing UI provided should
+/// insulate most apps from needing to know the details of this information.
 typedef NS_ENUM(NSInteger, FTPenManagerState)
 {
     FTPenManagerStateUninitialized,
@@ -98,6 +98,10 @@ typedef NS_ENUM(NSInteger, FTPairingUIStyle) {
 // Use this to get at the instance. Note, this will initialize CoreBluetooth and
 // potentially trigger the system UIAlertView for enabling Bluetooth LE.
 + (FTPenManager *)sharedInstance;
+
+// Developers should obtain this from FiftyThree.
+// [FTPenManager sharedInstance].appToken = [NSUUID alloc] initWithString:"..."];
+@property (nonatomic) NSUUID *appToken;
 
 // Connection State.
 @property (nonatomic, readonly) FTPenManagerState state;
