@@ -23,10 +23,6 @@
 //                                   argv,
 //                                   NSStringFromClass([FTApplication class]),
 //                                   NSStringFromClass([FTAAppDelegate class]));
-//    }
-
+//     }
 @interface FTApplication : UIApplication
 @end
-
-
-

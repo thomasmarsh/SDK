@@ -139,7 +139,7 @@ glLabelObjectEXT((type),(object), 0, (label));\
 
 - (void)initializeFTPenManager:(id)sender
 {
-    UIView *v = [[FTPenManager sharedInstance] pairingButtonWithStye:FTPairingUIStyleDark
+    UIView *v = [[FTPenManager sharedInstance] pairingButtonWithStyle:FTPairingUIStyleDark
                                                         andTintColor:nil
                                                             andFrame:CGRectZero];
 
@@ -549,7 +549,7 @@ glLabelObjectEXT((type),(object), 0, (label));\
         _clearFBO = YES;
         GLuint fbo_width = _backingWidth;
         GLuint fbo_height = _backingHeight;
-        
+
         if (_fboTex)
         {
             glDeleteTextures(1, &_fboTex);
@@ -690,16 +690,15 @@ glLabelObjectEXT((type),(object), 0, (label));\
 
 #pragma mark - View Controller boiler plate.
 
-
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];
-    
+
     if ([self isViewLoaded] && ([[self view] window] == nil)) {
         self.view = nil;
-        
+
         [self tearDownGL];
-        
+
         if ([EAGLContext currentContext] == self.context) {
             [EAGLContext setCurrentContext:nil];
         }

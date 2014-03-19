@@ -26,19 +26,20 @@ typedef NS_ENUM(NSInteger, FTTouchClassification)
     FTTouchClassificationUnknown,
 
     // Whenever we think the touch is a single finger. This at
-    // the moment only is triggered if there's 1 touch active on the screen.
+    // the moment only is triggered if there's a single touch active on the screen.
     FTTouchClassificationFinger,
 
-    // whenever we think the touch is a palm.
+    // Whenever we think the touch is a palm.
     FTTouchClassificationPalm,
 
-    // whenever we think the touch correspoinds to the pen tip.
+    // Whenever we think the touch correspoinds to the pen tip.
     FTTouchClassificationPen,
 
-    // whenever we think the touch corresoponds to the eraser (flat side) of the pen.
+    // Whenever we think the touch corresoponds to the eraser (flat side) of the pen.
     FTTouchClassificationEraser,
 };
 
+//  This describes a Touch classification change.
 @interface FTTouchClassificationInfo : NSObject
 @property (nonatomic) UITouch *touch;
 @property (nonatomic) NSInteger touchId;
@@ -60,14 +61,15 @@ typedef NS_ENUM(NSInteger, FTTouchClassification)
 @interface FTTouchClassifier : NSObject
 
 // Register for change notification via this delegate.
-@property (nonatomic, weak) id<FTTouchClassificationsChangedDelegate>   delegate;
+@property (nonatomic, weak) id<FTTouchClassificationsChangedDelegate> delegate;
 
 // Returns true if the touch is currently being tracked and the best classification.
 // If the touch isn't being tracked (for example it was cancelled or you've explicitly removed the touch from
 // classification this will return false.
 - (BOOL)classification:(FTTouchClassification *)result forTouch:(UITouch *)touch;
 
-// Returns a unique id for the touch.
+// Returns a unique id for the touch. UIKit will reuse touch pointers, thus
+// it can be handy to have a stable id for touches.
 - (NSInteger)idForTouch:(UITouch *)touch;
 
 // Indiciates that a touch should no longer be considered a candidate for pen

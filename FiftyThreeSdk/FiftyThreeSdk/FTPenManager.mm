@@ -175,6 +175,22 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     }
 }
 
+// Placeholder implementation.
+@implementation FTPenInformation
+- (int)batteryLevel
+{
+    return 100;
+}
+- (NSString *)firmwareRevision
+{
+    return @"55";
+}
+- (NSURL *)learnMoreURL
+{
+    return [NSURL URLWithString:@"https://pencil.fiftythree.com"];
+}
+@end
+
 @interface FTPenManager () <CBCentralManagerDelegate, TIUpdateManagerDelegate, PenConnectionViewDelegate>
 {
     BOOL _isPairingSpotPressed;
@@ -1864,9 +1880,9 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     return sharedInstance;
 }
 
-- (UIView *)pairingButtonWithStye:(FTPairingUIStyle)style
-                     andTintColor:(UIColor *)color
-                         andFrame:(CGRect)frame
+- (UIView *)pairingButtonWithStyle:(FTPairingUIStyle)style
+                      andTintColor:(UIColor *)color
+                          andFrame:(CGRect)frame
 {
     NSAssert([NSThread isMainThread], @"This must be called on the UI thread.");
 
