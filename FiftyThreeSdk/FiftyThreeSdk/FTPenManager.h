@@ -11,8 +11,9 @@
 
 #import "FiftyThreeSdk/FTTouchClassifier.h"
 
-/// This describes the potential connection states of the pen. Using the Pairing UI provided should
-/// insulate most apps from needing to know the details of this information.
+// This describes the potential connection states of the pen. Using the Pairing UI provided should
+// insulate most apps from needing to know the details of this information.
+// See also: FTPenManagerStateIsConnected & FTPenManagerStateIsDisconnected.
 typedef NS_ENUM(NSInteger, FTPenManagerState)
 {
     FTPenManagerStateUninitialized,
@@ -76,7 +77,14 @@ extern "C"
 // Invoked when any of the BTLE information is read off the pen. See FTPenInformation.
 - (void)penInformationDidChange;
 // Invoked when all of the BTLE information is read off the pen. See FTPenInformation.
- - (void)penInformationDidFinishUpdating;
+- (void)penInformationDidFinishUpdating;
+// We only recommend using these events for diagnostics. For example showing a dot in the settings UI
+// to indicate the tip is pressed and show the user that the application is correctly communicating with
+// the pen.
+- (void)tipPressed;
+- (void)tipReleased;
+- (void)eraserPressed;
+- (void)eraserReleased;
 @end
 
 @class UIView;

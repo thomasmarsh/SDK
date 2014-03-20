@@ -32,7 +32,7 @@ glLabelObjectEXT((type),(object), 0, (label));\
 @implementation Stroke
 @end
 
-@interface FTAViewController () <FTTouchClassificationsChangedDelegate> {
+@interface FTAViewController () <FTTouchClassificationsChangedDelegate, FTPenManagerDelegate> {
 
     // OpenGL resources.
     FTShaderInfo *_pointSpriteShader;
@@ -147,6 +147,8 @@ glLabelObjectEXT((type),(object), 0, (label));\
     [self.view addSubview:v];
 
     [FTPenManager sharedInstance].classifier.delegate = self;
+    [FTPenManager sharedInstance].delegate = self;
+
     self.isPencilEnabled = YES;
 }
 - (void)dealloc
@@ -709,6 +711,47 @@ glLabelObjectEXT((type),(object), 0, (label));\
 - (BOOL)prefersStatusBarHidden
 {
     return YES;
+}
+
+#pragma mark - FTPenManagerDelegate
+// Invoked when the connection state is altered.
+- (void)connectionDidChange
+{
+
+}
+// Invoked if we get events that should trigger turning on the display link.
+- (void)shouldWakeDisplayLink
+{
+
+}
+// Invoked when any of the BTLE information is read off the pen. See FTPenInformation.
+- (void)penInformationDidChange
+{
+
+}
+// Invoked when all of the BTLE information is read off the pen. See FTPenInformation.
+- (void)penInformationDidFinishUpdating
+{
+
+}
+// We only recommend using these events for diagnostics. For example showing a dot in the settings UI
+// to indicate the tip is pressed and show the user that the application is correctly communicating with
+// the pen.
+- (void)tipPressed
+{
+    NSLog(@"tipPressed");
+}
+- (void)tipReleased
+{
+    NSLog(@"tipReleased");
+}
+- (void)eraserPressed
+{
+    NSLog(@"eraserPressed");
+}
+- (void)eraserReleased
+{
+    NSLog(@"eraserReleased");
 }
 
 @end

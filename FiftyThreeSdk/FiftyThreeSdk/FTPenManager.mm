@@ -502,6 +502,15 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
 - (void)penIsTipPressedDidChange:(NSNotification *)notification
 {
+    if (self.pen && self.pen.isTipPressed)
+    {
+        [self.delegate tipPressed];
+    }
+    else if(self.pen && !self.pen.isTipPressed)
+    {
+        [self.delegate tipReleased];
+    }
+
     if (!self.pen.isTipPressed && self.pen.lastTipReleaseTime)
     {
         if ([self currentStateHasName:kEngagedStateName])
@@ -519,6 +528,15 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
 - (void)penIsEraserPressedDidChange:(NSNotification *)notification
 {
+    if (self.pen && self.pen.isEraserPressed)
+    {
+        [self.delegate eraserPressed];
+    }
+    else if(self.pen && !self.pen.isEraserPressed)
+    {
+        [self.delegate eraserReleased];
+    }
+
     self.pairedPeripheralLastActivityTime = [NSDate date];
 }
 
