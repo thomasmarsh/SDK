@@ -180,6 +180,9 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 @property (nonatomic, readwrite) NSString *manufacturerName;
 @property (nonatomic, readwrite) NSNumber *batteryLevel;
 @property (nonatomic, readwrite) NSString *firmwareRevision;
+@property (nonatomic, readwrite) BOOL isTipPressed;
+@property (nonatomic, readwrite) BOOL isEraserPressed;
+
 @end
 
 // Placeholder implementation.
@@ -509,15 +512,6 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
 - (void)penIsTipPressedDidChange:(NSNotification *)notification
 {
-    if (self.pen && self.pen.isTipPressed)
-    {
-        [self.delegate tipPressed];
-    }
-    else if(self.pen && !self.pen.isTipPressed)
-    {
-        [self.delegate tipReleased];
-    }
-
     if (!self.pen.isTipPressed && self.pen.lastTipReleaseTime)
     {
         if ([self currentStateHasName:kEngagedStateName])
@@ -530,46 +524,46 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
         }
     }
 
+    [self updatePenInfoObjectAndInvokeDelegate];
+
     self.pairedPeripheralLastActivityTime = [NSDate date];
 }
 
 - (void)penIsEraserPressedDidChange:(NSNotification *)notification
 {
-    if (self.pen && self.pen.isEraserPressed)
-    {
-        [self.delegate eraserPressed];
-    }
-    else if(self.pen && !self.pen.isEraserPressed)
-    {
-        [self.delegate eraserReleased];
-    }
-
+    [self updatePenInfoObjectAndInvokeDelegate];
     self.pairedPeripheralLastActivityTime = [NSDate date];
 }
+
 - (void)updatePenInfoObjectAndInvokeDelegate
 {
     if (self.pen)
     {
-        FTPenInformation *info = [[FTPenInformation alloc] init];
+        if (!self.info)
+        {
+            self.info = [[FTPenInformation alloc] init];
+        }
 
-        info.batteryLevel = self.pen.batteryLevel;
+        self.info.batteryLevel = self.pen.batteryLevel;
 
         if (self.pen.firmwareRevision)
         {
-            info.firmwareRevision = self.pen.firmwareRevision;
+            self.info.firmwareRevision = self.pen.firmwareRevision;
         }
 
         if (self.pen.name)
         {
-            info.name = self.pen.name;
+            self.info.name = self.pen.name;
         }
 
         if (self.pen.manufacturerName)
         {
-            info.manufacturerName = self.pen.manufacturerName;
+            self.info.manufacturerName = self.pen.manufacturerName;
         }
 
-        self.info = info;
+        self.info.isEraserPressed = self.pen.isEraserPressed;
+        self.info.isTipPressed = self.pen.isTipPressed;
+
         [self.delegate penInformationDidChange];
     }
 }

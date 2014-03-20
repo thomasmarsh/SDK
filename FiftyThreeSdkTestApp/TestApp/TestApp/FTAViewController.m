@@ -94,7 +94,7 @@ glLabelObjectEXT((type),(object), 0, (label));\
     view.context = self.context;
     view.drawableDepthFormat = GLKViewDrawableDepthFormatNone;
 
-    self.bar = [[UIToolbar alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, 44)];
+    self.bar = [[UIToolbar alloc] initWithFrame:CGRectMake(0, 0, MAX(self.view.frame.size.width,self.view.frame.size.height), 44)];
 
     UIBarButtonItem *button1 = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemStop
                                                                              target:self
@@ -119,7 +119,7 @@ glLabelObjectEXT((type),(object), 0, (label));\
       @(FTTouchClassificationPen) : [UIColor colorWithRed:0.1 green:0.3 blue:0.9 alpha:0.5],
       @(FTTouchClassificationEraser) : [UIColor colorWithRed:0.9 green:0.1 blue:0.0 alpha:0.5],
       @(FTTouchClassificationFinger) : [UIColor colorWithRed:0.0 green:0.9 blue:0.0 alpha:0.5],
-      @(FTTouchClassificationPalm) : [UIColor colorWithRed:0.1 green:0.2 blue:0.1 alpha:0.1]
+      @(FTTouchClassificationPalm) : [UIColor colorWithRed:0.1 green:0.2 blue:0.1 alpha:0.3]
     };
 
     [self setupGL];
@@ -377,17 +377,26 @@ glLabelObjectEXT((type),(object), 0, (label));\
 
     for(Stroke *v in sortedScene)
     {
-        if ([v.glGeometry count] >= 2)
+        if ([v.glGeometry count] >= 1)
         {
             [self setBrushColor:v.color];
 
-            // Since each of these issues a draw call, this is quite expensive. We could
-            // do a lot of optimization here but it would make the code
-            // much less readable.
-            for(NSInteger i = 0; i < [v.glGeometry count]-1; ++i)
+            if ([v.glGeometry count] == 1)
             {
-                [self renderLineFromPoint:[(NSValue*)v.glGeometry[i] CGPointValue]
-                                  toPoint:[(NSValue*)v.glGeometry[i+1] CGPointValue]];
+                [self renderLineFromPoint:[(NSValue*)v.glGeometry[0] CGPointValue]
+                                  toPoint:[(NSValue*)v.glGeometry[0] CGPointValue]];
+
+            }
+            else
+            {
+                // Since each of these issues a draw call, this is quite expensive. We could
+                // do a lot of optimization here but it would make the code
+                // much less readable.
+                for(NSInteger i = 0; i < [v.glGeometry count]-1; ++i)
+                {
+                    [self renderLineFromPoint:[(NSValue*)v.glGeometry[i] CGPointValue]
+                                      toPoint:[(NSValue*)v.glGeometry[i+1] CGPointValue]];
+                }
             }
         }
     }
@@ -431,17 +440,26 @@ glLabelObjectEXT((type),(object), 0, (label));\
 
         for(Stroke *v in oldScene)
         {
-            if ([v.glGeometry count] >= 2)
+            if ([v.glGeometry count] >= 1)
             {
                 [self setBrushColor:v.color];
 
-                // Since each of these issues a draw call, this is quite expensive. We could
-                // do a lot of optimization here but it would make the code
-                // much less readable.
-                for(NSInteger i = 0; i < [v.glGeometry count]-1; ++i)
+                if ([v.glGeometry count] == 1)
                 {
-                    [self renderLineFromPoint:[(NSValue*)v.glGeometry[i] CGPointValue]
-                                      toPoint:[(NSValue*)v.glGeometry[i+1] CGPointValue]];
+                    [self renderLineFromPoint:[(NSValue*)v.glGeometry[0] CGPointValue]
+                                      toPoint:[(NSValue*)v.glGeometry[0] CGPointValue]];
+
+                }
+                else
+                {
+                    // Since each of these issues a draw call, this is quite expensive. We could
+                    // do a lot of optimization here but it would make the code
+                    // much less readable.
+                    for(NSInteger i = 0; i < [v.glGeometry count]-1; ++i)
+                    {
+                        [self renderLineFromPoint:[(NSValue*)v.glGeometry[i] CGPointValue]
+                                          toPoint:[(NSValue*)v.glGeometry[i+1] CGPointValue]];
+                    }
                 }
             }
         }
@@ -477,6 +495,7 @@ glLabelObjectEXT((type),(object), 0, (label));\
 
     // Add points to the buffer so there are drawing points every X pixels
     count = MAX(ceilf(sqrtf((end.x - start.x) * (end.x - start.x) + (end.y - start.y) * (end.y - start.y)) / kBrushPixelStep), 1);
+    count = 2;
     for (i = 0; i < count; ++i)
     {
         if(vertexCount == vertexMax)
@@ -728,27 +747,7 @@ glLabelObjectEXT((type),(object), 0, (label));\
 // Invoked when any of the BTLE information is read off the pen. See FTPenInformation.
 - (void)penInformationDidChange
 {
-    NSLog(@"Info Did change");
-}
-
-// We only recommend using these events for diagnostics. For example showing a dot in the settings UI
-// to indicate the tip is pressed and show the user that the application is correctly communicating with
-// the pen.
-- (void)tipPressed
-{
-    NSLog(@"tipPressed");
-}
-- (void)tipReleased
-{
-    NSLog(@"tipReleased");
-}
-- (void)eraserPressed
-{
-    NSLog(@"eraserPressed");
-}
-- (void)eraserReleased
-{
-    NSLog(@"eraserReleased");
+    NSLog(@"Info Did change %@", [FTPenManager sharedInstance].info);
 }
 
 @end

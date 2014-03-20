@@ -28,7 +28,6 @@ using namespace fiftythree::sdk;
 
 - (id)init
 {
-
     if (self = [super init])
     {
         TouchClassifier::Ptr classifier = ActiveClassifier::Instance();
@@ -94,7 +93,7 @@ using namespace fiftythree::sdk;
 {
     NSMutableSet *updatedTouchClassifications = [[NSMutableSet alloc] init];
 
-    for(const auto & t : args)
+    for (const auto & t : args)
     {
         FTTouchClassificationInfo *info = [[FTTouchClassificationInfo alloc] init];
         info.touch = static_pointer_cast<TouchTrackerObjC>(TouchTracker::Instance())->UITouchForTouch(t.touch);

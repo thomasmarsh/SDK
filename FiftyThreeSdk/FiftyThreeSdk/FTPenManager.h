@@ -68,6 +68,12 @@ extern "C"
 @property (nonatomic, readonly) NSNumber *batteryLevel;
 @property (nonatomic, readonly) NSString *firmwareRevision;
 @property (nonatomic, readonly) NSURL *learnMoreURL;
+// We only recommend using these properties for diagnostics. For example showing a dot in the settings UI
+// to indicate the tip is pressed and show the user that the application is correctly communicating with
+// the pen.
+@property (nonatomic, readonly) BOOL isTipPressed;
+@property (nonatomic, readonly) BOOL isEraserPressed;
+
 @end
 
 @protocol FTPenManagerDelegate <NSObject>
@@ -77,14 +83,8 @@ extern "C"
 // Invoked if we get events that should trigger turning on the display link.
 - (void)shouldWakeDisplayLink;
 // Invoked when any of the BTLE information is read off the pen. See FTPenInformation.
+// This is also invoted if tip or eraser state is changed.
 - (void)penInformationDidChange;
-// We only recommend using these events for diagnostics. For example showing a dot in the settings UI
-// to indicate the tip is pressed and show the user that the application is correctly communicating with
-// the pen.
-- (void)tipPressed;
-- (void)tipReleased;
-- (void)eraserPressed;
-- (void)eraserReleased;
 @end
 
 @class UIView;
