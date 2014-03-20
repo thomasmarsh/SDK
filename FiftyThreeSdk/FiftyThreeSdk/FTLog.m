@@ -7,7 +7,11 @@
 
 #import "FTLog.h"
 
-static FTLogLevel sLogLevel= FTLogLevelEnabled;
+#if defined(DEBUG) || defined(PREVIEW_BUILD) || defined(INTERNAL_BUILD)
+static FTLogLevel sLogLevel = FTLogLevelEnabled;
+#else
+static FTLogLevel sLogLevel = FTLogLevelDisabled;
+#endif
 
 @implementation FTLog
 
