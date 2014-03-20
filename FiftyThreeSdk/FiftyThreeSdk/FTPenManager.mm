@@ -175,16 +175,16 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     }
 }
 
+@interface FTPenInformation ()
+@property (nonatomic, readwrite) NSString *name;
+@property (nonatomic, readwrite) NSString *manufacturerName;
+@property (nonatomic, readwrite) NSNumber *batteryLevel;
+@property (nonatomic, readwrite) NSString *firmwareRevision;
+@end
+
 // Placeholder implementation.
 @implementation FTPenInformation
-- (int)batteryLevel
-{
-    return 100;
-}
-- (NSString *)firmwareRevision
-{
-    return @"55";
-}
+
 - (NSURL *)learnMoreURL
 {
     return [NSURL URLWithString:@"https://pencil.fiftythree.com"];
@@ -375,6 +375,8 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     [[NSNotificationCenter defaultCenter] removeObserver:kFTPenIsReadyDidChangeNotificationName];
     [[NSNotificationCenter defaultCenter] removeObserver:kFTPenIsTipPressedDidChangeNotificationName];
     [[NSNotificationCenter defaultCenter] removeObserver:kFTPenDidUpdatePropertiesNotificationName];
+    [[NSNotificationCenter defaultCenter] removeObserver:kFTPenBatteryLevelDidChangeNotificationName];
+    
 
     if (_pen)
     {
@@ -400,6 +402,14 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
                                                  selector:@selector(penDidUpdateProperties:)
                                                      name:kFTPenDidUpdatePropertiesNotificationName
                                                    object:_pen];
+        
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(penBatteryLevelDidChange:)
+                                                     name:kFTPenBatteryLevelDidChangeNotificationName
+                                                   object:_pen];
+        
+        
+        
     }
 }
 
@@ -539,7 +549,37 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
     self.pairedPeripheralLastActivityTime = [NSDate date];
 }
-
+- (void)updatePenInfoObjectAndInvokeDelegate
+{
+    if (self.pen)
+    {
+        FTPenInformation *info = [[FTPenInformation alloc] init];
+        
+        info.batteryLevel = self.pen.batteryLevel;
+        
+        if (self.pen.firmwareRevision)
+        {
+            info.firmwareRevision = self.pen.firmwareRevision;
+        }
+        
+        if (self.pen.name)
+        {
+            info.name = self.pen.name;
+        }
+        
+        if (self.pen.manufacturerName)
+        {
+            info.manufacturerName = self.pen.manufacturerName;
+        }
+        
+        self.info = info;
+        [self.delegate penInformationDidChange];
+    }
+}
+- (void)penBatteryLevelDidChange:(NSNotification *)notification
+{
+    [self updatePenInfoObjectAndInvokeDelegate];
+}
 - (void)penDidUpdateProperties:(NSNotification *)notification
 {
     // Firmware update can't proceed until we've refreshed the factory and upgrade firmware
@@ -569,6 +609,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
             }
         }
     }
+    [self updatePenInfoObjectAndInvokeDelegate];
 }
 
 #pragma mark - State machine
@@ -1951,9 +1992,5 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
     sharedInstance = nil;
 }
-
-// TODO:
-// - Invoke delegate on PenInformation changed.
-// - Invoke delegate when done reading all characterisitics
 
 @end

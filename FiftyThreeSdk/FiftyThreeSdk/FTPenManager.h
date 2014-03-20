@@ -60,10 +60,12 @@ extern "C"
 #endif
 
 // This contains some meta data you might show in a settings or details view.
-// Since this is read via BTLE, it will be populated asynchronously.
+// Since this is read via BTLE, it will be populated asynchronously. These values may be nil.
 // See FTPenManagerDelegate. The FTPenInformation object is on the FTPenManager singleton.
 @interface FTPenInformation : NSObject
-@property (nonatomic, readonly) int batteryLevel;
+@property (nonatomic, readonly) NSString *name;
+@property (nonatomic, readonly) NSString *manufacturerName;
+@property (nonatomic, readonly) NSNumber *batteryLevel;
 @property (nonatomic, readonly) NSString *firmwareRevision;
 @property (nonatomic, readonly) NSURL *learnMoreURL;
 @end
@@ -76,8 +78,6 @@ extern "C"
 - (void)shouldWakeDisplayLink;
 // Invoked when any of the BTLE information is read off the pen. See FTPenInformation.
 - (void)penInformationDidChange;
-// Invoked when all of the BTLE information is read off the pen. See FTPenInformation.
-- (void)penInformationDidFinishUpdating;
 // We only recommend using these events for diagnostics. For example showing a dot in the settings UI
 // to indicate the tip is pressed and show the user that the application is correctly communicating with
 // the pen.

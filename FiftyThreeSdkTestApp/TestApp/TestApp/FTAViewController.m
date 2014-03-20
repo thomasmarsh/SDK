@@ -717,6 +717,7 @@ glLabelObjectEXT((type),(object), 0, (label));\
 // Invoked when the connection state is altered.
 - (void)connectionDidChange
 {
+    NSLog(@"connection did change");
 
 }
 // Invoked if we get events that should trigger turning on the display link.
@@ -727,13 +728,9 @@ glLabelObjectEXT((type),(object), 0, (label));\
 // Invoked when any of the BTLE information is read off the pen. See FTPenInformation.
 - (void)penInformationDidChange
 {
-
+    NSLog(@"Info Did change");
 }
-// Invoked when all of the BTLE information is read off the pen. See FTPenInformation.
-- (void)penInformationDidFinishUpdating
-{
 
-}
 // We only recommend using these events for diagnostics. For example showing a dot in the settings UI
 // to indicate the tip is pressed and show the user that the application is correctly communicating with
 // the pen.
