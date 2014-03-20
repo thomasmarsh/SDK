@@ -1,5 +1,5 @@
 //
-//  FTApplication+Private.h
+//  FTEventDispatcher+Private.h
 //  FiftyThreeSdk
 //
 //  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
@@ -9,20 +9,18 @@
 
 #ifdef __cplusplus
 #import "FiftyThreeSdk/TouchClassifier.h"
+
 #endif
 
-#import "FiftythreeSdk/FTApplication.h"
+#import "FiftythreeSdk/FTEventDispatcher.h"
 
-@interface FTApplication (Private)
+@interface FTEventDispatcher (Private)
 
 - (void)clearClassifierAndPenState;
 - (void)ensureClassifierConfigured;
 
 #ifdef __cplusplus
 @property (nonatomic) fiftythree::sdk::TouchClassifier::Ptr classifier;
-// Optionally, let a subclass inject a classifier into the touch processing pipeline.
-- (fiftythree::sdk::TouchClassifier::Ptr)createClassifier;
-
 #endif
 
 @end

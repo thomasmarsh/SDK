@@ -13,7 +13,7 @@
 #import "Core/NSString+FTTimeWithInterval.h"
 #import "FiftyThreeSdk/PenConnectionView.h"
 #import "FiftyThreeSdk/TouchClassifier.h"
-#import "FTApplication+Private.h"
+#import "FTEventDispatcher+Private.h"
 #import "FTFirmwareManager.h"
 #import "FTLog.h"
 #import "FTPen+Private.h"
@@ -376,7 +376,6 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     [[NSNotificationCenter defaultCenter] removeObserver:kFTPenIsTipPressedDidChangeNotificationName];
     [[NSNotificationCenter defaultCenter] removeObserver:kFTPenDidUpdatePropertiesNotificationName];
     [[NSNotificationCenter defaultCenter] removeObserver:kFTPenBatteryLevelDidChangeNotificationName];
-    
 
     if (_pen)
     {
@@ -402,14 +401,12 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
                                                  selector:@selector(penDidUpdateProperties:)
                                                      name:kFTPenDidUpdatePropertiesNotificationName
                                                    object:_pen];
-        
+
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(penBatteryLevelDidChange:)
                                                      name:kFTPenBatteryLevelDidChangeNotificationName
                                                    object:_pen];
-        
-        
-        
+
     }
 }
 
@@ -554,24 +551,24 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     if (self.pen)
     {
         FTPenInformation *info = [[FTPenInformation alloc] init];
-        
+
         info.batteryLevel = self.pen.batteryLevel;
-        
+
         if (self.pen.firmwareRevision)
         {
             info.firmwareRevision = self.pen.firmwareRevision;
         }
-        
+
         if (self.pen.name)
         {
             info.name = self.pen.name;
         }
-        
+
         if (self.pen.manufacturerName)
         {
             info.manufacturerName = self.pen.manufacturerName;
         }
-        
+
         self.info = info;
         [self.delegate penInformationDidChange];
     }
@@ -1928,11 +1925,8 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     NSAssert([NSThread isMainThread], @"sharedInstance must be called on the UI thread.");
     if (!sharedInstance)
     {
-        FTApplication *application = (FTApplication*)[UIApplication sharedApplication];
-        if (application)
-        {
-            application.classifier = fiftythree::sdk::TouchClassifier::New();
-        }
+        [FTEventDispatcher sharedInstance].classifier = fiftythree::sdk::TouchClassifier::New();
+
         sharedInstance = [[FTPenManager alloc] init];
         sharedInstance.classifier = [[FTTouchClassifier alloc] init];
     }
@@ -1984,11 +1978,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
     [self reset];
 
-    FTApplication *application = (FTApplication*)[UIApplication sharedApplication];
-    if (application)
-    {
-       [application clearClassifierAndPenState];
-    }
+    [[FTEventDispatcher sharedInstance] clearClassifierAndPenState];
 
     sharedInstance = nil;
 }

@@ -8,6 +8,7 @@
 #pragma once
 
 #import <FiftyThreeSdk/FTApplication.h>
+#import <FiftyThreeSdk/FTEventDispatcher.h>
 #import <FiftyThreeSdk/FTLog.h>
 #import <FiftyThreeSdk/FTPenManager.h>
 #import <FiftyThreeSdk/FTSDKVersionInfo.h>
