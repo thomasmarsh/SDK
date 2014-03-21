@@ -299,7 +299,7 @@ void TouchLogger::TouchesChanged(const std::set<core::Touch::Ptr> & touches)
                 {
                     Stroke::Ptr stroke = Stroke::New();
                     double timestamp    = touch->CurrentSample().TimestampSeconds();
-                    Eigen::Vector2f xy  = touch->CurrentSample().ScreenLocation();
+                    Eigen::Vector2f xy  = touch->CurrentSample().Location();
 
                     stroke->AddPoint(xy, timestamp);
 
@@ -319,6 +319,7 @@ void TouchLogger::TouchesChanged(const std::set<core::Touch::Ptr> & touches)
                             stroke->AddTouchRadius(r);
                         }
                     }
+
                 }
 
                 break;
@@ -339,7 +340,7 @@ void TouchLogger::TouchesChanged(const std::set<core::Touch::Ptr> & touches)
                 }
 
                 double timestamp    = touch->CurrentSample().TimestampSeconds();
-                Eigen::Vector2f xy  = touch->CurrentSample().ScreenLocation();
+                Eigen::Vector2f xy  = touch->CurrentSample().Location();
 
                 if (timestamp > touchData->LastTimestamp() + .001 &&
                    touchData->Stroke()->LastPoint() != xy)
@@ -382,7 +383,7 @@ void TouchLogger::TouchesChanged(const std::set<core::Touch::Ptr> & touches)
                         if (touchData->Phase() != core::TouchPhase::Cancelled)
                         {
                             double timestamp    = touch->CurrentSample().TimestampSeconds();
-                            Eigen::Vector2f xy  = touch->CurrentSample().ScreenLocation();
+                            Eigen::Vector2f xy  = touch->CurrentSample().Location();
 
                             Stroke::Ptr stroke = touchData->Stroke();
 
@@ -451,7 +452,7 @@ void TouchLogger::TouchesChanged(const std::set<core::Touch::Ptr> & touches)
                 if (touchData->Phase() != core::TouchPhase::Ended)
                 {
                     double timestamp    = touch->CurrentSample().TimestampSeconds();
-                    Eigen::Vector2f xy  = touch->CurrentSample().ScreenLocation();
+                    Eigen::Vector2f xy  = touch->CurrentSample().Location();
 
                     Stroke::Ptr stroke = touchData->Stroke();
 

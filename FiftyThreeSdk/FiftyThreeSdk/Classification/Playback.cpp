@@ -132,8 +132,8 @@ void PlaybackSequence::Write(std::ostream & str)
 
                 str << touch->Id() << ", ";
                 str << touch->Phase() << ", ";
-                str << snapshotSample.ScreenLocation().x() << ", ";
-                str << snapshotSample.ScreenLocation().y() << ", ";
+                str << snapshotSample.Location().x() << ", ";
+                str << snapshotSample.Location().y() << ", ";
 
                 if (snapshotSample.TouchRadius())
                 {
