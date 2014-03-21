@@ -115,12 +115,22 @@ glLabelObjectEXT((type),(object), 0, (label));\
     _strokeColors =
     @{
       @(FTTouchClassificationUnknownDisconnected) : [UIColor colorWithRed:0.5 green:0.5 blue:0.5 alpha:0.3],
-      @(FTTouchClassificationUnknown) : [UIColor colorWithRed:0.1 green:0.1 blue:0.1 alpha:0.3],
+      @(FTTouchClassificationUnknown) : [UIColor colorWithRed:0.3 green:0.4 blue:0.1 alpha:0.5],
       @(FTTouchClassificationPen) : [UIColor colorWithRed:0.1 green:0.3 blue:0.9 alpha:0.5],
       @(FTTouchClassificationEraser) : [UIColor colorWithRed:0.9 green:0.1 blue:0.0 alpha:0.5],
       @(FTTouchClassificationFinger) : [UIColor colorWithRed:0.0 green:0.9 blue:0.0 alpha:0.5],
-      @(FTTouchClassificationPalm) : [UIColor colorWithRed:0.1 green:0.2 blue:0.1 alpha:0.3]
+      @(FTTouchClassificationPalm) : [UIColor colorWithRed:0.1 green:0.2 blue:0.1 alpha:0.5]
     };
+
+    UIView *v = self.view;
+    do
+    {
+        [v setMultipleTouchEnabled:YES];
+        [v setUserInteractionEnabled:YES];
+        [v setExclusiveTouch:NO];
+        v = [v superview];
+    }
+    while (v);
 
     [self setupGL];
 }
@@ -236,11 +246,15 @@ glLabelObjectEXT((type),(object), 0, (label));\
 {
     for(FTTouchClassificationInfo *info in touches)
     {
-        NSLog(@"Touch %x was %d now %d", (unsigned int)info.touchId, info.oldValue, info.newValue);
+        NSLog(@"Touch %d was %d now %d", info.touchId, info.oldValue, info.newValue);
         Stroke * s = _scene[@(info.touchId)];
         if (s)
         {
             s.color = _strokeColors[@(info.newValue)];
+        }
+        else
+        {
+            NSLog(@"Not Found!");
         }
     }
 }
@@ -255,10 +269,9 @@ glLabelObjectEXT((type),(object), 0, (label));\
     }
 }
 
-- (CGPoint)glPointFromEvent:(UIEvent *)event
+- (CGPoint)glPointFromEvent:(UIEvent *)event andTouch:(UITouch *)touch
 {
     CGRect   bounds = [self.view bounds];
-    UITouch*    touch = [[event touchesForView:self.view] anyObject];
     // Convert touch point from UIView referential to OpenGL one (upside-down flip)
     CGPoint location = [touch locationInView:self.view];
     location.y = bounds.size.height - location.y;
@@ -317,7 +330,6 @@ glLabelObjectEXT((type),(object), 0, (label));\
     glActiveTexture(GL_TEXTURE0);
     glUniform1i([_blitShader.uniform[@"texture"] intValue], 0);
     glBindTexture(GL_TEXTURE_2D, _fboTex);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArrayOES(_blitVAO);
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
@@ -377,17 +389,10 @@ glLabelObjectEXT((type),(object), 0, (label));\
 
     for(Stroke *v in sortedScene)
     {
-        if ([v.glGeometry count] >= 1)
+        if ([v.glGeometry count] >= 2)
         {
             [self setBrushColor:v.color];
 
-            if ([v.glGeometry count] == 1)
-            {
-                [self renderLineFromPoint:[(NSValue*)v.glGeometry[0] CGPointValue]
-                                  toPoint:[(NSValue*)v.glGeometry[0] CGPointValue]];
-
-            }
-            else
             {
                 // Since each of these issues a draw call, this is quite expensive. We could
                 // do a lot of optimization here but it would make the code
@@ -398,6 +403,10 @@ glLabelObjectEXT((type),(object), 0, (label));\
                                       toPoint:[(NSValue*)v.glGeometry[i+1] CGPointValue]];
                 }
             }
+        }
+        else
+        {
+            NSLog(@"Skipping!");
         }
     }
 
@@ -410,11 +419,15 @@ glLabelObjectEXT((type),(object), 0, (label));\
         // Don't bother keeping older strokes we "commit" them to a texture
         // if (a) they haven't been reclassified.
         //    (b) they haven't been appended too recently.
-        BOOL old = (now - v.lastReclassified) > 0.6 && (now - v.lastAppended) > 0.60;
+        BOOL old = (now - v.lastReclassified) > 0.5 && (now - v.lastAppended) > 0.5;
         if (old)
         {
-            [_scene removeObjectForKey:[NSNumber numberWithInt:v.drawOrder]];
+            [_scene removeObjectForKey:@(v.drawOrder)];
             [oldScene addObject:v];
+        }
+        else
+        {
+            break;
         }
     }
     if ([oldScene count] >= 1)
@@ -440,17 +453,9 @@ glLabelObjectEXT((type),(object), 0, (label));\
 
         for(Stroke *v in oldScene)
         {
-            if ([v.glGeometry count] >= 1)
+            if ([v.glGeometry count] >= 2)
             {
                 [self setBrushColor:v.color];
-
-                if ([v.glGeometry count] == 1)
-                {
-                    [self renderLineFromPoint:[(NSValue*)v.glGeometry[0] CGPointValue]
-                                      toPoint:[(NSValue*)v.glGeometry[0] CGPointValue]];
-
-                }
-                else
                 {
                     // Since each of these issues a draw call, this is quite expensive. We could
                     // do a lot of optimization here but it would make the code
@@ -495,7 +500,7 @@ glLabelObjectEXT((type),(object), 0, (label));\
 
     // Add points to the buffer so there are drawing points every X pixels
     count = MAX(ceilf(sqrtf((end.x - start.x) * (end.x - start.x) + (end.y - start.y) * (end.y - start.y)) / kBrushPixelStep), 1);
-    count = 2;
+
     for (i = 0; i < count; ++i)
     {
         if(vertexCount == vertexMax)
@@ -506,7 +511,7 @@ glLabelObjectEXT((type),(object), 0, (label));\
 
         vertexBuffer[2 * vertexCount + 0] = start.x + (end.x - start.x) * ((GLfloat)i / (GLfloat)count);
         vertexBuffer[2 * vertexCount + 1] = start.y + (end.y - start.y) * ((GLfloat)i / (GLfloat)count);
-        vertexCount += 1;
+        ++vertexCount;
     }
 
     // Load data to the Vertex Buffer Object
@@ -517,7 +522,7 @@ glLabelObjectEXT((type),(object), 0, (label));\
     glVertexAttribPointer([_pointSpriteShader.attribute[@"inVertex"] intValue], 2, GL_FLOAT, GL_FALSE, 0, 0);
 
     // We don't need the use program as there's only ever 1 shader in use.
-    glDrawArrays(GL_POINTS, 0, vertexCount);
+    glDrawArrays(GL_POINTS, 0, (int)vertexCount);
 
     glDisableVertexAttribArray([_pointSpriteShader.attribute[@"inVertex"] intValue]);
 }
@@ -655,58 +660,79 @@ glLabelObjectEXT((type),(object), 0, (label));\
 
 #pragma mark - Touch Handling
 
-- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
+// Since we've turned on multi touch we may get
+// more than one touch in Began/Moved/Ended. Most iOS samples show something like
+// UITouch * t = [touches anyObject];
+// This isn't correct if you can have multiple touches.
+- (void)handleTouches:(NSSet *)touches withEvent:(UIEvent *)event
 {
     if (_isPencilEnabled)
     {
-        Stroke *s = [[Stroke alloc] init];
-        s.color = _strokeColors[@(FTTouchClassificationUnknownDisconnected)];
-        s.lastAppended = [[NSProcessInfo processInfo] systemUptime];
-        s.lastReclassified = [[NSProcessInfo processInfo] systemUptime];
-        s.glGeometry = [@[] mutableCopy];
-        [s.glGeometry addObject:[NSValue valueWithCGPoint:[self glPointFromEvent:event]]];
-
-        NSInteger k = [[FTPenManager sharedInstance].classifier idForTouch:[touches anyObject]];
-        s.drawOrder = k;
-
-        if (!_scene)
+        for (UITouch* touch in touches)
         {
-            _scene = [@{} mutableCopy];
-        }
+            NSInteger k = [[FTPenManager sharedInstance].classifier idForTouch:touch];
 
-        [_scene setObject:s forKey:[NSNumber numberWithInt:k]];
+            if (touch.phase == UITouchPhaseBegan)
+            {
+                Stroke *s = [[Stroke alloc] init];
+                s.color = _strokeColors[@(FTTouchClassificationUnknownDisconnected)];
+                s.lastAppended = event.timestamp;
+                s.lastReclassified = event.timestamp;
+                s.glGeometry = [@[] mutableCopy];
+                [s.glGeometry addObject:[NSValue valueWithCGPoint:[self glPointFromEvent:event andTouch:touch]]];
+                s.drawOrder = k;
+
+                if (!_scene)
+                {
+                    _scene = [@{} mutableCopy];
+                }
+                NSLog(@"began %d", k);
+
+                [_scene setObject:s forKey:[NSNumber numberWithInt:k]];
+
+            }
+            else if(touch.phase == UITouchPhaseMoved)
+            {
+                NSLog(@"moved %d", k);
+                Stroke *s = _scene[@(k)];
+                s.lastAppended = event.timestamp;
+                [s.glGeometry  addObject:[NSValue valueWithCGPoint:[self glPointFromEvent:event andTouch:touch]]];
+
+            }
+            else if(touch.phase == UITouchPhaseEnded)
+            {
+                NSLog(@"ended %d", k);
+                Stroke *s = _scene[@(k)];
+                s.lastAppended = event.timestamp;
+                [s.glGeometry  addObject:[NSValue valueWithCGPoint:[self glPointFromEvent:event andTouch:touch]]];
+            }
+            else if (touch.phase == UITouchPhaseCancelled)
+            {
+                NSLog(@"cancelled %d", k);
+                [_scene removeObjectForKey:@(k)];
+            }
+        }
     }
+}
+
+- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
+{
+    [self handleTouches:touches withEvent:event];
 }
 
 - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
 {
-    if (_isPencilEnabled)
-    {
-        NSInteger k = [[FTPenManager sharedInstance].classifier idForTouch:[touches anyObject]];
-        Stroke *s = [_scene objectForKey:[NSNumber numberWithInt:k]];
-        s.lastAppended = [[NSProcessInfo processInfo] systemUptime];
-        [s.glGeometry  addObject:[NSValue valueWithCGPoint:[self glPointFromEvent:event]]];
-    }
+    [self handleTouches:touches withEvent:event];
 }
 
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
 {
-    if (_isPencilEnabled)
-    {
-        NSInteger k = [[FTPenManager sharedInstance].classifier idForTouch:[touches anyObject]];
-        Stroke *s = [_scene objectForKey:[NSNumber numberWithInt:k]];
-        s.lastAppended = [[NSProcessInfo processInfo] systemUptime];
-        [s.glGeometry  addObject:[NSValue valueWithCGPoint:[self glPointFromEvent:event]]];
-    }
+    [self handleTouches:touches withEvent:event];
 }
 
 - (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event
 {
-    if (_isPencilEnabled)
-    {
-        NSInteger k = [[FTPenManager sharedInstance].classifier idForTouch:[touches anyObject]];
-        [_scene removeObjectForKey:[NSNumber numberWithInt:k]];
-    }
+    [self handleTouches:touches withEvent:event];
 }
 
 #pragma mark - View Controller boiler plate.
@@ -747,7 +773,7 @@ glLabelObjectEXT((type),(object), 0, (label));\
 // Invoked when any of the BTLE information is read off the pen. See FTPenInformation.
 - (void)penInformationDidChange
 {
-    NSLog(@"Info Did change %@", [FTPenManager sharedInstance].info);
+  //  NSLog(@"Info Did change %@", [FTPenManager sharedInstance].info);
 }
 
 @end
