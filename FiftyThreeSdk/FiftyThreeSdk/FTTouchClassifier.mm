@@ -43,9 +43,16 @@ using namespace fiftythree::sdk;
     }
     return nil;
 }
++ (BOOL)shouldReportUpdate:(const TouchClassificationChangedEventArgs &)change
+{
+    return !(change.oldValue != TouchClassification::UnknownDisconnected &&
+             change.newValue == TouchClassification::UnknownDisconnected)
+            && change.newValue != TouchClassification::RemovedFromClassification &&
+               change.newValue != TouchClassification::UntrackedTouch;
+}
+
 - (void)dealloc
 {
-    // Unsub
 }
 + (FTTouchClassification)classification:(const fiftythree::core::TouchClassification &)c
 {
@@ -91,16 +98,29 @@ using namespace fiftythree::sdk;
 }
 - (void)touchClassificationsDidChange: (const vector<TouchClassificationChangedEventArgs> & )args
 {
+    TouchClassifier::Ptr classifier = ActiveClassifier::Instance();
+
     NSMutableSet *updatedTouchClassifications = [[NSMutableSet alloc] init];
 
     for (const auto & t : args)
     {
-        FTTouchClassificationInfo *info = [[FTTouchClassificationInfo alloc] init];
-        info.touch = static_pointer_cast<TouchTrackerObjC>(TouchTracker::Instance())->UITouchForTouch(t.touch);
-        info.oldValue = [FTTouchClassifier classification:t.oldValue];
-        info.newValue = [FTTouchClassifier classification:t.newValue];
-        info.touchId = (NSInteger)t.touch->Id();
-        [updatedTouchClassifications addObject:info];
+        if ([FTTouchClassifier shouldReportUpdate:t])
+        {
+            FTTouchClassificationInfo *info = [[FTTouchClassificationInfo alloc] init];
+            info.touch = static_pointer_cast<TouchTrackerObjC>(TouchTracker::Instance())->UITouchForTouch(t.touch);
+            if (t.oldValue == TouchClassification::UnknownDisconnected && classifier->IsPenConnected())
+            {
+                info.oldValue = FTTouchClassificationUnknown;
+            }
+            else
+            {
+                info.oldValue = [FTTouchClassifier classification:t.oldValue];
+            }
+
+            info.newValue = [FTTouchClassifier classification:t.newValue];
+            info.touchId = (NSInteger)t.touch->Id();
+            [updatedTouchClassifications addObject:info];
+        }
     }
 
     [self.delegate classificationsDidChangeForTouches:updatedTouchClassifications];
