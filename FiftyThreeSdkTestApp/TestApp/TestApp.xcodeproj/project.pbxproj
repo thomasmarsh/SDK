@@ -83,7 +83,7 @@
 /* Begin PBXFileReference section */
 		041785DB18D21FDC007B1301 /* FTAUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FTAUtil.h; sourceTree = "<group>"; };
 		041785DC18D21FDC007B1301 /* FTAUtil.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FTAUtil.m; sourceTree = "<group>"; };
-		0489D47118CE75D100B41E20 /* Line Test.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Line Test.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		0489D47118CE75D100B41E20 /* SDKTest.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SDKTest.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		0489D47418CE75D100B41E20 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		0489D47618CE75D100B41E20 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		0489D47818CE75D100B41E20 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
@@ -101,7 +101,7 @@
 		0489D49118CE75D100B41E20 /* FTAViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FTAViewController.h; sourceTree = "<group>"; };
 		0489D49218CE75D100B41E20 /* FTAViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FTAViewController.m; sourceTree = "<group>"; };
 		0489D49418CE75D100B41E20 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
-		0489D49A18CE75D100B41E20 /* Line Test.app */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Line Test.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		0489D49A18CE75D100B41E20 /* SDKTest.app */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SDKTest.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		0489D49B18CE75D100B41E20 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		0489D4A318CE75D100B41E20 /* TestAppTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "TestAppTests-Info.plist"; sourceTree = "<group>"; };
 		0489D4A518CE75D100B41E20 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -166,8 +166,8 @@
 		0489D47218CE75D100B41E20 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				0489D47118CE75D100B41E20 /* Line Test.app */,
-				0489D49A18CE75D100B41E20 /* Line Test.app */,
+				0489D47118CE75D100B41E20 /* SDKTest.app */,
+				0489D49A18CE75D100B41E20 /* SDKTest.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -288,7 +288,7 @@
 			);
 			name = TestApp;
 			productName = TestApp;
-			productReference = 0489D47118CE75D100B41E20 /* Line Test.app */;
+			productReference = 0489D47118CE75D100B41E20 /* SDKTest.app */;
 			productType = "com.apple.product-type.application";
 		};
 		0489D49918CE75D100B41E20 /* TestAppTests */ = {
@@ -306,7 +306,7 @@
 			);
 			name = TestAppTests;
 			productName = TestAppTests;
-			productReference = 0489D49A18CE75D100B41E20 /* Line Test.app */;
+			productReference = 0489D49A18CE75D100B41E20 /* SDKTest.app */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
@@ -500,6 +500,7 @@
 		};
 		0489D4AF18CE75D100B41E20 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 0489D4C818CE780F00B41E20 /* TestAppDebug.xcconfig */;
 			buildSettings = {
 			};
 			name = Debug;

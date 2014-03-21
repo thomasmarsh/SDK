@@ -8,8 +8,8 @@
 CURRENT_PROJECT_VERSION = 1.0.0
 BUNDLE_SHORT_VERSION_STRING = 1.0.0
 
-PRODUCT_NAME = Line Test
-BUNDLE_IDENTIFIER = com.fiftythree.Line-Test
+PRODUCT_NAME = SDKTest
+BUNDLE_IDENTIFIER = com.fiftythree.SDKTest
 
 GCC_PREFIX_HEADER = TestApp/TestApp-Prefix.pch
 INFOPLIST_FILE = TestApp/TestApp-Info.plist
@@ -22,7 +22,6 @@ HEADER_SEARCH_PATHS = $(inherited) "$(SRCROOT)/../../FiftyThreeSdk"
 
 USER_HEADER_SEARCH_PATHS = $(inherited) "$(SRCROOT)/../../FiftyThreeSdk" "$(SRCROOT)/../../../Core"
 
+ARCHS = $(ARCHS_STANDARD_INCLUDING_64_BIT)
 // TODO: Revert once we sort out the "only run Crashlytics on Jenkins" issue
 DEBUG_INFORMATION_FORMAT = dwarf-with-dsym
-
-ARCHS = $(ARCHS_STANDARD)
