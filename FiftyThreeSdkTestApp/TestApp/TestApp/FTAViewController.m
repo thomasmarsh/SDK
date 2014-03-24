@@ -6,6 +6,7 @@
 //
 
 #import "FiftyThreeSdk/FiftyThreeSdk.h"
+#import "FTASettingsViewController.h"
 #import "FTAUtil.h"
 #import "FTAViewController.h"
 
@@ -32,7 +33,9 @@ glLabelObjectEXT((type),(object), 0, (label));\
 @implementation Stroke
 @end
 
-@interface FTAViewController () <FTTouchClassificationsChangedDelegate, FTPenManagerDelegate> {
+@interface FTAViewController () <FTTouchClassificationsChangedDelegate,
+                                 FTPenManagerDelegate,
+                                 UIPopoverControllerDelegate> {
 
     // OpenGL resources.
     FTShaderInfo *_pointSpriteShader;
@@ -72,6 +75,9 @@ glLabelObjectEXT((type),(object), 0, (label));\
 @property (nonatomic) UIToolbar *bar;
 @property (nonatomic) BOOL isPencilEnabled;
 
+@property (nonatomic) UIPopoverController *popover;
+@property (nonatomic) FTASettingsViewController *popoverContents;
+
 - (void)setupGL;
 - (void)tearDownGL;
 
@@ -102,10 +108,20 @@ glLabelObjectEXT((type),(object), 0, (label));\
     UIBarButtonItem *button2 = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemPlay
                                                                              target:self
                                                                              action:@selector(initializeFTPenManager:)];
+
+    UIBarButtonItem *spacer1 = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace
+                                                                             target:nil
+                                                                             action:nil];
+
     UIBarButtonItem *button3 = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh
                                                                              target:self
                                                                              action:@selector(clearScene:)];
-    [self.bar setItems:@[button1, button2, button3]];
+
+    UIBarButtonItem *button4 = [[UIBarButtonItem alloc] initWithTitle:@"   Info   "
+                                                                style:UIBarButtonItemStylePlain
+                                                               target:self
+                                                               action:@selector(showInfo:)];
+    [self.bar setItems:@[button1, button2, spacer1, button3, button4]];
     [self.view addSubview:self.bar];
     self.isPencilEnabled = NO;
 
@@ -134,6 +150,32 @@ glLabelObjectEXT((type),(object), 0, (label));\
 
     [self setupGL];
 }
+- (void)dealloc
+{
+    [self tearDownGL];
+
+    if ([EAGLContext currentContext] == self.context) {
+        [EAGLContext setCurrentContext:nil];
+    }
+}
+#pragma mark - Bar Button handlers.
+- (void)showInfo:(id)sender
+{
+    UIBarButtonItem *barButton = (UIBarButtonItem*)sender;
+
+    self.popover = nil;
+    self.popoverContents = nil;
+
+    if (self.isPencilEnabled)
+    {
+        self.popoverContents = [[FTASettingsViewController alloc] init];
+        self.popoverContents.info = [FTPenManager sharedInstance].info;
+
+        self.popover = [[UIPopoverController alloc] initWithContentViewController:self.popoverContents];
+        self.popover.delegate = self;
+        [self.popover presentPopoverFromBarButtonItem:barButton permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
+    }
+}
 - (void)clearScene:(id)sender
 {
     _fboInit = NO;
@@ -145,6 +187,11 @@ glLabelObjectEXT((type),(object), 0, (label));\
 {
     [[FTPenManager sharedInstance] shutdown];
     self.isPencilEnabled = NO;
+    if (self.popover)
+    {
+        [self.popover dismissPopoverAnimated:NO];
+        self.popover = nil;
+    }
 }
 
 - (void)initializeFTPenManager:(id)sender
@@ -160,14 +207,6 @@ glLabelObjectEXT((type),(object), 0, (label));\
     [FTPenManager sharedInstance].delegate = self;
 
     self.isPencilEnabled = YES;
-}
-- (void)dealloc
-{
-    [self tearDownGL];
-
-    if ([EAGLContext currentContext] == self.context) {
-        [EAGLContext setCurrentContext:nil];
-    }
 }
 
 - (void)setupPointSpriteShaderState
@@ -773,7 +812,24 @@ glLabelObjectEXT((type),(object), 0, (label));\
 // Invoked when any of the BTLE information is read off the pen. See FTPenInformation.
 - (void)penInformationDidChange
 {
-  //  NSLog(@"Info Did change %@", [FTPenManager sharedInstance].info);
+    if (self.popoverContents)
+    {
+        self.popoverContents.info = [FTPenManager sharedInstance].info;
+        [self.popoverContents.tableView reloadData];
+    }
+}
+
+#pragma mark - UIPopoverViewControllerDelegate
+
+- (BOOL)popoverControllerShouldDismissPopover:(UIPopoverController *)popoverController
+{
+    return YES;
+}
+
+- (void)popoverControllerDidDismissPopover:(UIPopoverController *)popoverController
+{
+    self.popoverContents = nil;
+    self.popover = nil;
 }
 
 @end
