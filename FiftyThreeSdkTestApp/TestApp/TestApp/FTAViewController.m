@@ -122,6 +122,9 @@ glLabelObjectEXT((type),(object), 0, (label));\
                                                                target:self
                                                                action:@selector(showInfo:)];
     [self.bar setItems:@[button1, button2, spacer1, button3, button4]];
+    self.bar.barStyle = UIBarStyleBlack;
+    self.bar.translucent = NO;
+
     [self.view addSubview:self.bar];
     self.isPencilEnabled = NO;
 
@@ -702,7 +705,7 @@ glLabelObjectEXT((type),(object), 0, (label));\
 // Since we've turned on multi touch we may get
 // more than one touch in Began/Moved/Ended. Most iOS samples show something like
 // UITouch * t = [touches anyObject];
-// This isn't correct if you can have multiple touches.
+// This isn't correct if you can have multiple touches and multipleTouchEnabled set to true.
 - (void)handleTouches:(NSSet *)touches withEvent:(UIEvent *)event
 {
     if (_isPencilEnabled)
@@ -725,14 +728,14 @@ glLabelObjectEXT((type),(object), 0, (label));\
                 {
                     _scene = [@{} mutableCopy];
                 }
-                NSLog(@"began %d", k);
+               // NSLog(@"began %d", k);
 
                 [_scene setObject:s forKey:[NSNumber numberWithInt:k]];
 
             }
             else if(touch.phase == UITouchPhaseMoved)
             {
-                NSLog(@"moved %d", k);
+               // NSLog(@"moved %d", k);
                 Stroke *s = _scene[@(k)];
                 s.lastAppended = event.timestamp;
                 [s.glGeometry  addObject:[NSValue valueWithCGPoint:[self glPointFromEvent:event andTouch:touch]]];
@@ -740,14 +743,14 @@ glLabelObjectEXT((type),(object), 0, (label));\
             }
             else if(touch.phase == UITouchPhaseEnded)
             {
-                NSLog(@"ended %d", k);
+               // NSLog(@"ended %d", k);
                 Stroke *s = _scene[@(k)];
                 s.lastAppended = event.timestamp;
                 [s.glGeometry  addObject:[NSValue valueWithCGPoint:[self glPointFromEvent:event andTouch:touch]]];
             }
             else if (touch.phase == UITouchPhaseCancelled)
             {
-                NSLog(@"cancelled %d", k);
+               // NSLog(@"cancelled %d", k);
                 [_scene removeObjectForKey:@(k)];
             }
         }
@@ -807,8 +810,8 @@ glLabelObjectEXT((type),(object), 0, (label));\
 // Invoked if we get events that should trigger turning on the display link.
 - (void)shouldWakeDisplayLink
 {
-
 }
+
 // Invoked when any of the BTLE information is read off the pen. See FTPenInformation.
 - (void)penInformationDidChange
 {
