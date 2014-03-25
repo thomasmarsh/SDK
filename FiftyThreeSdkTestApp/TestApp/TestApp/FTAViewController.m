@@ -382,9 +382,10 @@ glLabelObjectEXT((type),(object), 0, (label));\
                 }
             }
         }
-        else
+        else if ([v.glGeometry count] == 1)
         {
-            NSLog(@"Skipping!");
+            [self renderLineFromPoint:[(NSValue*)v.glGeometry[0] CGPointValue]
+                              toPoint:[(NSValue*)v.glGeometry[0] CGPointValue]];
         }
     }
 
@@ -444,6 +445,11 @@ glLabelObjectEXT((type),(object), 0, (label));\
                                           toPoint:[(NSValue*)v.glGeometry[i+1] CGPointValue]];
                     }
                 }
+            }
+            else if ([v.glGeometry count] == 1)
+            {
+                [self renderLineFromPoint:[(NSValue*)v.glGeometry[0] CGPointValue]
+                                  toPoint:[(NSValue*)v.glGeometry[0] CGPointValue]];
             }
         }
 
