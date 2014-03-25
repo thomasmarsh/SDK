@@ -25,6 +25,7 @@ glLabelObjectEXT((type),(object), 0, (label));\
 @interface  Stroke : NSObject
 @property (nonatomic) NSTimeInterval lastAppended;
 @property (nonatomic) NSTimeInterval lastReclassified;
+// CG Points with inverted Y-axis to match our OpenGL coordinate system.
 @property (nonatomic) NSMutableArray *glGeometry;
 @property (nonatomic) UIColor *color;
 @property (nonatomic) NSInteger drawOrder;
@@ -90,6 +91,9 @@ glLabelObjectEXT((type),(object), 0, (label));\
 {
     [super viewDidLoad];
 
+    // We use a basic GL view for rendering some ink and showing
+    // touch classifications. Most of the GL related code is towards the buttom.
+    // the interesting bits are touch processing, and the classification changed events.
     self.context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
 
     if (!self.context) {
@@ -100,6 +104,12 @@ glLabelObjectEXT((type),(object), 0, (label));\
     view.context = self.context;
     view.drawableDepthFormat = GLKViewDrawableDepthFormatNone;
 
+    // We add a number of bar buttons for testing.
+    // (1) A button to tear down FTPenManager
+    // (2) A button to startup FTPenManager
+    // (3) A Button to clear page of ink.
+    // (4) A button to show a popover with Pen status. This uses the FTPenInformation API to
+    //     populate a table view. See FTASettingsViewController.
     self.bar = [[UIToolbar alloc] initWithFrame:CGRectMake(0, 0, MAX(self.view.frame.size.width,self.view.frame.size.height), 44)];
 
     UIBarButtonItem *button1 = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemStop
@@ -121,6 +131,7 @@ glLabelObjectEXT((type),(object), 0, (label));\
                                                                 style:UIBarButtonItemStylePlain
                                                                target:self
                                                                action:@selector(showInfo:)];
+
     [self.bar setItems:@[button1, button2, spacer1, button3, button4]];
     self.bar.barStyle = UIBarStyleBlack;
     self.bar.translucent = NO;
@@ -141,15 +152,11 @@ glLabelObjectEXT((type),(object), 0, (label));\
       @(FTTouchClassificationPalm) : [UIColor colorWithRed:0.1 green:0.2 blue:0.1 alpha:0.5]
     };
 
-    UIView *v = self.view;
-    do
-    {
-        [v setMultipleTouchEnabled:YES];
-        [v setUserInteractionEnabled:YES];
-        [v setExclusiveTouch:NO];
-        v = [v superview];
-    }
-    while (v);
+    // Multi touch is required for processing palm and pen touches.
+    // See handleTouches below.
+    [self.view setMultipleTouchEnabled:YES];
+    [self.view setUserInteractionEnabled:YES];
+    [self.view setExclusiveTouch:NO];
 
     [self setupGL];
 }
@@ -210,77 +217,6 @@ glLabelObjectEXT((type),(object), 0, (label));\
     [FTPenManager sharedInstance].delegate = self;
 
     self.isPencilEnabled = YES;
-}
-
-- (void)setupPointSpriteShaderState
-{
-    glUseProgram(_pointSpriteShader.glProgram);
-
-    glActiveTexture(GL_TEXTURE0);
-    glUniform1i([_pointSpriteShader.uniform[@"texture"] intValue], 0);
-    glBindTexture(GL_TEXTURE_2D, _pointSpriteTexture);
-    DebugGLLabelObject(GL_TEXTURE, _pointSpriteTexture, "pointSpriteTexture");
-
-    // Disable depth testing.
-    glDisable(GL_DEPTH_TEST);
-
-    // Enable blending and set a blending function appropriate for premultiplied alpha pixel data
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-
-    [self setPointSize];
-    [self updateViewportAndTransforms];
-}
-
-- (void)setupGL
-{
-    [EAGLContext setCurrentContext:self.context];
-
-    // Create a Vertex Buffer Object to hold our data
-    glGenBuffers(1, &_vertexBuffer);
-
-    // Load the brush texture
-    _textureHeight = _textureWidth = 128;
-    _pointSpriteTexture = [FTAUtil loadDiscTextureWithSize:_textureWidth];
-
-    // Load shaders.
-    [self loadShaders];
-
-    [self setupPointSpriteShaderState];
-}
-
-- (void)viewWillLayoutSubviews
-{
-    [self setupPointSpriteShaderState];
-}
-
-- (void)tearDownGL
-{
-    [EAGLContext setCurrentContext:self.context];
-
-    glDeleteBuffers(1, &_vertexBuffer);
-    glDeleteTextures(1, &_pointSpriteTexture);
-    glDeleteBuffers(1, &_blitBuffer);
-    glDeleteVertexArraysOES(1, &_blitVAO);
-    glDeleteTextures(1, &_fboTex);
-    glDeleteFramebuffers(1, &_fbo);
-    if (_pointSpriteShader)
-    {
-        if (_pointSpriteShader.glProgram)
-        {
-            glDeleteProgram(_pointSpriteShader.glProgram);
-        }
-        _pointSpriteShader = nil;
-    }
-
-    if (_blitShader)
-    {
-        if (_blitShader.glProgram)
-        {
-            glDeleteProgram(_blitShader.glProgram);
-        }
-        _blitShader = nil;
-    }
 }
 
 #pragma mark - FTTouchClassificationDelegate
@@ -682,6 +618,76 @@ glLabelObjectEXT((type),(object), 0, (label));\
 }
 
 #pragma mark -  OpenGL ES 2 shader configration.
+- (void)setupPointSpriteShaderState
+{
+    glUseProgram(_pointSpriteShader.glProgram);
+
+    glActiveTexture(GL_TEXTURE0);
+    glUniform1i([_pointSpriteShader.uniform[@"texture"] intValue], 0);
+    glBindTexture(GL_TEXTURE_2D, _pointSpriteTexture);
+    DebugGLLabelObject(GL_TEXTURE, _pointSpriteTexture, "pointSpriteTexture");
+
+    // Disable depth testing.
+    glDisable(GL_DEPTH_TEST);
+
+    // Enable blending and set a blending function appropriate for premultiplied alpha pixel data
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+
+    [self setPointSize];
+    [self updateViewportAndTransforms];
+}
+
+- (void)setupGL
+{
+    [EAGLContext setCurrentContext:self.context];
+
+    // Create a Vertex Buffer Object to hold our data
+    glGenBuffers(1, &_vertexBuffer);
+
+    // Load the brush texture
+    _textureHeight = _textureWidth = 128;
+    _pointSpriteTexture = [FTAUtil loadDiscTextureWithSize:_textureWidth];
+
+    // Load shaders.
+    [self loadShaders];
+
+    [self setupPointSpriteShaderState];
+}
+
+- (void)viewWillLayoutSubviews
+{
+    [self setupPointSpriteShaderState];
+}
+
+- (void)tearDownGL
+{
+    [EAGLContext setCurrentContext:self.context];
+
+    glDeleteBuffers(1, &_vertexBuffer);
+    glDeleteTextures(1, &_pointSpriteTexture);
+    glDeleteBuffers(1, &_blitBuffer);
+    glDeleteVertexArraysOES(1, &_blitVAO);
+    glDeleteTextures(1, &_fboTex);
+    glDeleteFramebuffers(1, &_fbo);
+    if (_pointSpriteShader)
+    {
+        if (_pointSpriteShader.glProgram)
+        {
+            glDeleteProgram(_pointSpriteShader.glProgram);
+        }
+        _pointSpriteShader = nil;
+    }
+
+    if (_blitShader)
+    {
+        if (_blitShader.glProgram)
+        {
+            glDeleteProgram(_blitShader.glProgram);
+        }
+        _blitShader = nil;
+    }
+}
 
 - (BOOL)loadShaders
 {
@@ -728,14 +734,12 @@ glLabelObjectEXT((type),(object), 0, (label));\
                 {
                     _scene = [@{} mutableCopy];
                 }
-               // NSLog(@"began %d", k);
 
                 [_scene setObject:s forKey:[NSNumber numberWithInt:k]];
 
             }
             else if(touch.phase == UITouchPhaseMoved)
             {
-               // NSLog(@"moved %d", k);
                 Stroke *s = _scene[@(k)];
                 s.lastAppended = event.timestamp;
                 [s.glGeometry  addObject:[NSValue valueWithCGPoint:[self glPointFromEvent:event andTouch:touch]]];
@@ -743,14 +747,12 @@ glLabelObjectEXT((type),(object), 0, (label));\
             }
             else if(touch.phase == UITouchPhaseEnded)
             {
-               // NSLog(@"ended %d", k);
                 Stroke *s = _scene[@(k)];
                 s.lastAppended = event.timestamp;
                 [s.glGeometry  addObject:[NSValue valueWithCGPoint:[self glPointFromEvent:event andTouch:touch]]];
             }
             else if (touch.phase == UITouchPhaseCancelled)
             {
-               // NSLog(@"cancelled %d", k);
                 [_scene removeObjectForKey:@(k)];
             }
         }

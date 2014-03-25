@@ -63,6 +63,9 @@
     static NSString *CellIdentifier = @"TextCellForSettings";
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier ];
 
+    // Note any property on FTPenInformation may be nil, you need to deal with that case
+    // gracefully.
+
     if (cell == nil)
     {
         cell = [[UITableViewCell alloc] initWithFrame:CGRectZero reuseIdentifier:CellIdentifier];

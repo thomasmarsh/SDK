@@ -43,13 +43,6 @@ using namespace fiftythree::sdk;
     }
     return nil;
 }
-+ (BOOL)shouldReportUpdate:(const TouchClassificationChangedEventArgs &)change
-{
-    return !(change.oldValue != TouchClassification::UnknownDisconnected &&
-             change.newValue == TouchClassification::UnknownDisconnected)
-            && change.newValue != TouchClassification::RemovedFromClassification &&
-               change.newValue != TouchClassification::UntrackedTouch;
-}
 
 - (void)dealloc
 {
@@ -96,6 +89,15 @@ using namespace fiftythree::sdk;
     }
     return FTTouchClassificationUnknownDisconnected;
 }
+
++ (BOOL)shouldReportClassificationChange:(const TouchClassificationChangedEventArgs &)change
+{
+    return !(change.oldValue != TouchClassification::UnknownDisconnected &&
+             change.newValue == TouchClassification::UnknownDisconnected)
+    && change.newValue != TouchClassification::RemovedFromClassification &&
+    change.newValue != TouchClassification::UntrackedTouch;
+}
+
 - (void)touchClassificationsDidChange: (const vector<TouchClassificationChangedEventArgs> & )args
 {
     TouchClassifier::Ptr classifier = ActiveClassifier::Instance();
@@ -104,7 +106,7 @@ using namespace fiftythree::sdk;
 
     for (const auto & t : args)
     {
-        if ([FTTouchClassifier shouldReportUpdate:t])
+        if ([FTTouchClassifier shouldReportClassificationChange:t])
         {
             FTTouchClassificationInfo *info = [[FTTouchClassificationInfo alloc] init];
             info.touch = static_pointer_cast<TouchTrackerObjC>(TouchTracker::Instance())->UITouchForTouch(t.touch);
