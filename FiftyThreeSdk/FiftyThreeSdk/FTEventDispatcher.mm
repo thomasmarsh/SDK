@@ -110,7 +110,7 @@ using namespace fiftythree::sdk;
 
             classifier->TouchesDidChanged(touches);
 
-            [[FTPenManager sharedInstanceWithoutInitialization].delegate shouldWakeDisplayLink];
+            [[[FTPenManager sharedInstanceWithoutInitialization] delegate] shouldWakeDisplayLink];
         }
     }
 }
