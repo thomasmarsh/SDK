@@ -564,6 +564,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
         self.info.isEraserPressed = self.pen.isEraserPressed;
         self.info.isTipPressed = self.pen.isTipPressed;
 
+        [self.delegate shouldWakeDisplayLink];
         [self.delegate penInformationDidChange];
     }
 }
@@ -1910,6 +1911,10 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 - (void)isPairingSpotPressedDidChange:(BOOL)isPairingSpotPressed
 {
     [self.delegate shouldWakeDisplayLink];
+}
++ (FTPenManager *)sharedInstanceWithoutInitialization
+{
+    return sharedInstance;
 }
 
 #pragma mark - Public API

@@ -818,6 +818,7 @@ glLabelObjectEXT((type),(object), 0, (label));\
 // Invoked if we get events that should trigger turning on the display link.
 - (void)shouldWakeDisplayLink
 {
+   // NSLog(@"ShouldWakeDisplayLink");
 }
 
 // Invoked when any of the BTLE information is read off the pen. See FTPenInformation.

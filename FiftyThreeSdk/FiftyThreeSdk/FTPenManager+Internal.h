@@ -15,6 +15,8 @@ extern NSString * const kFTPenManagerDidFailToDiscoverPenNotificationName;
 
 @interface FTPenManager (Internal)
 
++ (FTPenManager *)sharedInstanceWithoutInitialization;
+
 @property (nonatomic, readonly) FTPen *pen;
 
 @property (nonatomic) BOOL isPairingSpotPressed;
