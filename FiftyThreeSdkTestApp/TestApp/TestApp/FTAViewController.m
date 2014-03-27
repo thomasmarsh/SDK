@@ -810,9 +810,9 @@ glLabelObjectEXT((type),(object), 0, (label));\
 
 #pragma mark - FTPenManagerDelegate
 // Invoked when the connection state is altered.
-- (void)connectionDidChange
+- (void)penManagerStateDidChange:(FTPenManagerState)state
 {
-    NSLog(@"connection did change");
+    NSLog(@"connection did change %@", FTPenManagerStateToString(state));
 
 }
 // Invoked if we get events that should trigger turning on the display link.
