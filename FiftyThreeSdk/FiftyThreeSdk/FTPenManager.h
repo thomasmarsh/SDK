@@ -77,11 +77,12 @@ extern "C"
 @end
 
 @protocol FTPenManagerDelegate <NSObject>
-@optional
+@required
 // Invoked when the connection state is altered.
 - (void)connectionDidChange;
 // Invoked if we get events that should trigger turning on the display link.
 - (void)shouldWakeDisplayLink;
+@optional
 // Invoked when any of the BTLE information is read off the pen. See FTPenInformation.
 // This is also invoted if tip or eraser state is changed.
 - (void)penInformationDidChange;

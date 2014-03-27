@@ -48,7 +48,7 @@ typedef NS_ENUM(NSInteger, FTTouchClassification)
 @end
 
 @protocol FTTouchClassificationsChangedDelegate <NSObject>
-
+@required
 // touches is a NSSet of FTTouchClassificationInfo objects.
 // Touches may be reclassified after we've gotten more information about
 // the stylus.

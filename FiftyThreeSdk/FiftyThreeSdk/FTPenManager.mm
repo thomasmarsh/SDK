@@ -565,7 +565,11 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
         self.info.isTipPressed = self.pen.isTipPressed;
 
         [self.delegate shouldWakeDisplayLink];
-        [self.delegate penInformationDidChange];
+
+        if ([self.delegate respondsToSelector:@selector(penInformationDidChange)])
+        {
+            [self.delegate penInformationDidChange];
+        }
     }
 }
 - (void)penBatteryLevelDidChange:(NSNotification *)notification
