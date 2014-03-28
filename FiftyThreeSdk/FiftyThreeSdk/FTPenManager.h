@@ -81,9 +81,13 @@ extern "C"
 // Invoked when the connection state is altered.
 - (void)penManagerStateDidChange:(FTPenManagerState)state;
 
-// Invoked if we get events that should trigger turning on the display link.
-- (void)shouldWakeDisplayLink;
 @optional
+// See FTPenManager's automaticUpdates property.
+//
+// Invoked if we get events that should trigger turning on the display link. You should only need this
+// if you're running your own displayLink.
+- (void)penManagerNeedsUpdateDidChange;
+
 // Invoked when any of the BTLE information is read off the pen. See FTPenInformation.
 // This is also invoted if tip or eraser state is changed.
 - (void)penInformationDidChange;
@@ -113,6 +117,20 @@ typedef NS_ENUM(NSInteger, FTPairingUIStyle) {
 // [FTPenManager sharedInstance].appToken = [NSUUID alloc] initWithString:"..."];
 @property (nonatomic) NSUUID *appToken;
 
+// Defaults YES. We run a displayLink to drive animations and classifications.
+// this is paused when no touch or pen events have occured recently.
+//
+// You may want to drive the animations and classifications in your own CADisplayLink.
+// If that's the case, set this to FALSE and implement penManagerNeedsUpdateDidChange and
+// call [[FTPenManager sharedInstance] update]; at the start of your render loop.
+@property (nonatomic) BOOL automaticUpdatesEnabled;
+
+// Indicates that update should be called on FTPenManager. You'd only need to check this if
+// you've set automaticUpdateEnabled to NO.
+//
+// See also penManagerNeedsUpdateDidChange.
+@property (nonatomic) BOOL needsUpdate;
+
 // Connection State.
 @property (nonatomic, readonly) FTPenManagerState state;
 
@@ -137,12 +155,6 @@ typedef NS_ENUM(NSInteger, FTPairingUIStyle) {
                       andTintColor:(UIColor *)color
                           andFrame:(CGRect)frame;
 
-// Call this at the start of your render loop. Returns YES if we'd like to get called again (i.e., a
-// reclassification may happen.) See also FTPenManagerDelegate shouldWakeDisplayLink.
-//
-// This must be called on the UI thread.
-- (BOOL)update;
-
 // Call this to tear down the API. This also will shut down any CoreBluetooth activity.
 // You'll also need to release any views that FTPenManager has handed you. The next access to
 // [FTPenManager sharedInstance] will re-setup CoreBluetooth.
@@ -150,4 +162,10 @@ typedef NS_ENUM(NSInteger, FTPairingUIStyle) {
 // This must be called on the UI thread.
 - (void)shutdown;
 
+// Optional:
+//
+// Only use this if you are running your own displayLink Call this at the start of your render loop.
+// See  automaticUpdateEnabled
+// See  penManagerNeedsUpdateDidChange.
+- (void)update;
 @end

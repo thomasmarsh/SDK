@@ -216,6 +216,8 @@ glLabelObjectEXT((type),(object), 0, (label));\
     [FTPenManager sharedInstance].classifier.delegate = self;
     [FTPenManager sharedInstance].delegate = self;
 
+    //[FTPenManager sharedInstance].automaticUpdatesEnabled = NO;
+    
     self.isPencilEnabled = YES;
 }
 
@@ -241,10 +243,10 @@ glLabelObjectEXT((type),(object), 0, (label));\
 
 - (void)update
 {
-    if (self.isPencilEnabled)
-    {
-        [[FTPenManager sharedInstance] update];
-    }
+//    if (self.isPencilEnabled)
+//    {
+//        [[FTPenManager sharedInstance] update];
+//    }
 }
 
 - (CGPoint)glPointFromEvent:(UIEvent *)event andTouch:(UITouch *)touch
@@ -809,16 +811,14 @@ glLabelObjectEXT((type),(object), 0, (label));\
 }
 
 #pragma mark - FTPenManagerDelegate
+- (void)penManagerNeedsUpdateDidChange;
+{
+    NSLog(@"penManagerNeedsUpdateDidChange %@", [[FTPenManager sharedInstance] needsUpdate]? @"YES":@"NO");
+}
 // Invoked when the connection state is altered.
 - (void)penManagerStateDidChange:(FTPenManagerState)state
 {
     NSLog(@"connection did change %@", FTPenManagerStateToString(state));
-
-}
-// Invoked if we get events that should trigger turning on the display link.
-- (void)shouldWakeDisplayLink
-{
-   // NSLog(@"ShouldWakeDisplayLink");
 }
 
 // Invoked when any of the BTLE information is read off the pen. See FTPenInformation.

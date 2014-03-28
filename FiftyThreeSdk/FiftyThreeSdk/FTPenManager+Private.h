@@ -2,7 +2,7 @@
 //  FTPenManager+Private.h
 //  FiftyThreeSdk
 //
-//  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
+//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
 
 #pragma once
@@ -25,6 +25,8 @@ extern NSString * const kFTPenManagerFirmwareUpdateDidFail;
 extern NSString * const kFTPenManagerFirmwareUpdateWasCancelled;
 
 @interface FTPenManager ()
+
+- (void)ensureNeedsUpdate;
 
 // Returns a boolean value as a NSNumber, or nil if this cannot yet be determined.
 //

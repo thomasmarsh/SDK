@@ -182,7 +182,6 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 @property (nonatomic, readwrite) NSString *firmwareRevision;
 @property (nonatomic, readwrite) BOOL isTipPressed;
 @property (nonatomic, readwrite) BOOL isEraserPressed;
-
 @end
 
 // Placeholder implementation.
@@ -237,6 +236,8 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 @property (nonatomic) FTTouchClassifier *classifier;
 
 @property (nonatomic) NSMutableArray *pairingViews;
+
+@property (nonatomic) CADisplayLink *displayLink;
 
 @end
 
@@ -334,6 +335,9 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     _centralManager = nil;
 
     self.trialSeparationMonitor = nil;
+
+    [self.displayLink invalidate];
+    self.displayLink = nil;
 }
 
 #pragma mark - Properties
@@ -566,8 +570,12 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
         self.info.isEraserPressed = self.pen.isEraserPressed;
         self.info.isTipPressed = self.pen.isTipPressed;
 
-        [self.delegate shouldWakeDisplayLink];
+        self.displayLink.paused = NO;
 
+        if ([self.delegate respondsToSelector:@selector(penManagerNeedsUpdateDidChange)])
+        {
+            [self.delegate penManagerNeedsUpdateDidChange];
+        }
         if ([self.delegate respondsToSelector:@selector(penInformationDidChange)])
         {
             [self.delegate penInformationDidChange];
@@ -1903,10 +1911,21 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     }
 }
 
+- (void)ensureNeedsUpdate
+{
+    self.needsUpdate = YES;
+    self.displayLink.paused = NO;
+
+    if ([self.delegate respondsToSelector:@selector(penManagerNeedsUpdateDidChange)])
+    {
+        [self.delegate penManagerNeedsUpdateDidChange];
+    }
+}
+
 #pragma mark - PenConnectionViewDelegate
 - (void)penConnectionViewAnimationWasEnqueued:(PenConnectionView *)penConnectionView
 {
-    [self.delegate shouldWakeDisplayLink];
+    [self ensureNeedsUpdate];
 }
 
 - (BOOL)canPencilBeConnected
@@ -1917,7 +1936,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
 - (void)isPairingSpotPressedDidChange:(BOOL)isPairingSpotPressed
 {
-    [self.delegate shouldWakeDisplayLink];
+    [self ensureNeedsUpdate];
 }
 + (FTPenManager *)sharedInstanceWithoutInitialization
 {
@@ -1935,6 +1954,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
         sharedInstance = [[FTPenManager alloc] init];
         sharedInstance.classifier = [[FTTouchClassifier alloc] init];
+        sharedInstance.automaticUpdatesEnabled = YES;
     }
     return sharedInstance;
 }
@@ -1957,7 +1977,23 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     return penConnectionView;
 }
 
-- (BOOL)update
+- (void)setAutomaticUpdatesEnabled:(BOOL)useDisplayLink
+{
+    if (useDisplayLink)
+    {
+        self.displayLink = [CADisplayLink displayLinkWithTarget:sharedInstance selector:@selector(update)];
+        [self.displayLink addToRunLoop:[NSRunLoop mainRunLoop] forMode:NSDefaultRunLoopMode];
+    }
+    else
+    {
+        [self.displayLink invalidate];
+        self.displayLink = nil;
+
+    }
+    _automaticUpdatesEnabled = useDisplayLink;
+    [self ensureNeedsUpdate];
+}
+- (void)update
 {
     NSAssert([NSThread isMainThread], @"update must be called on the UI thread.");
     [self.classifier update];
@@ -1966,7 +2002,21 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
     AnimationPump::Instance()->UpdateAnimations(time);
 
-    return AnimationPump::Instance()->HasActiveAnimations();
+    bool oldValue = self.needsUpdate;
+    self.needsUpdate = AnimationPump::Instance()->HasActiveAnimations();
+
+    if (oldValue != self.needsUpdate)
+    {
+        if ([self.delegate respondsToSelector:@selector(penManagerNeedsUpdateDidChange)])
+        {
+            [self.delegate penManagerNeedsUpdateDidChange];
+        }
+    }
+
+    if (!self.needsUpdate)
+    {
+        self.displayLink.paused = YES;
+    }
 }
 
 - (void)shutdown
