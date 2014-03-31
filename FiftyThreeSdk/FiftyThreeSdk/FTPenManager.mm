@@ -372,7 +372,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
         [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenManagerDidUpdateStateNotificationName
                                                             object:self];
 
-        [self.delegate penManagerConnectionStateDidChange:state];
+        [self.delegate penManagerStateDidChange:state];
     }
 }
 
@@ -1242,7 +1242,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
     [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenManagerDidUpdateStateNotificationName
                                                         object:self];
-    [self.delegate penManagerConnectionStateDidChange:self.state];
+    [self.delegate penManagerStateDidChange:self.state];
 }
 
 - (void)stateMachineDidChangeState:(NSNotification *)notification

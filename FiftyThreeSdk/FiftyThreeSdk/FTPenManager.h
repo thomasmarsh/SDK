@@ -78,8 +78,12 @@ extern "C"
 
 @protocol FTPenManagerDelegate <NSObject>
 @required
-// Invoked when the connection state is altered.
-- (void)penManagerConnectionStateDidChange:(FTPenManagerState)state;
+// Invoked when the state property of PenManager is changed.
+// This typically occures during the connection flow however it
+// can also happen if the battery module is removed from the stylus or
+// Core Bluetooth drops the BTLE connection.
+// See also FTPenManagerStateIsDisconnected & FTPenManagerStateIsConnected
+- (void)penManagerStateDidChange:(FTPenManagerState)state;
 
 @optional
 // See FTPenManager's automaticUpdates property.

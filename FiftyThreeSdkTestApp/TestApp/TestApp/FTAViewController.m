@@ -104,7 +104,7 @@ glLabelObjectEXT((type),(object), 0, (label));\
     // We add a number of bar buttons for testing.
     // (1) A button to tear down FTPenManager
     // (2) A button to startup FTPenManager
-    // (3) A Button to clear page of ink.
+    // (3) A Button to clear the page of ink.
     // (4) A button to show a popover with Pen status. This uses the FTPenInformation API to
     //     populate a table view. See FTASettingsViewController.
     self.bar = [[UIToolbar alloc] initWithFrame:CGRectMake(0, 0, MAX(self.view.frame.size.width,self.view.frame.size.height), 44)];
@@ -819,7 +819,7 @@ glLabelObjectEXT((type),(object), 0, (label));\
     NSLog(@"penManagerNeedsUpdateDidChange %@", [[FTPenManager sharedInstance] needsUpdate]? @"YES":@"NO");
 }
 // Invoked when the connection state is altered.
-- (void)penManagerConnectionStateDidChange:(FTPenManagerState)state
+- (void)penManagerStateDidChange:(FTPenManagerState)state
 {
     NSLog(@"connection did change %@", FTPenManagerStateToString(state));
 }

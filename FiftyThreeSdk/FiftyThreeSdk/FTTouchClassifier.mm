@@ -11,7 +11,6 @@
 #import "FiftyThreeSdk/FTTouchClassifier.h"
 #import "FiftyThreeSdk/TouchClassifier.h"
 
-//  This describes a Touch classification change.
 @interface FTTouchClassificationInfo ()
 @property (nonatomic, readwrite) UITouch *touch;
 @property (nonatomic, readwrite) NSInteger touchId;
