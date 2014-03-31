@@ -217,7 +217,7 @@ glLabelObjectEXT((type),(object), 0, (label));\
     [FTPenManager sharedInstance].delegate = self;
 
     //[FTPenManager sharedInstance].automaticUpdatesEnabled = NO;
-    
+
     self.isPencilEnabled = YES;
 }
 
@@ -816,7 +816,7 @@ glLabelObjectEXT((type),(object), 0, (label));\
     NSLog(@"penManagerNeedsUpdateDidChange %@", [[FTPenManager sharedInstance] needsUpdate]? @"YES":@"NO");
 }
 // Invoked when the connection state is altered.
-- (void)penManagerStateDidChange:(FTPenManagerState)state
+- (void)penManagerConnectionStateDidChange:(FTPenManagerState)state
 {
     NSLog(@"connection did change %@", FTPenManagerStateToString(state));
 }

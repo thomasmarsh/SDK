@@ -79,7 +79,7 @@ extern "C"
 @protocol FTPenManagerDelegate <NSObject>
 @required
 // Invoked when the connection state is altered.
-- (void)penManagerStateDidChange:(FTPenManagerState)state;
+- (void)penManagerConnectionStateDidChange:(FTPenManagerState)state;
 
 @optional
 // See FTPenManager's automaticUpdates property.
