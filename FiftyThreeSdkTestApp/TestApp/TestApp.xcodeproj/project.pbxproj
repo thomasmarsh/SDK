@@ -34,6 +34,7 @@
 		04BD4AD418D74EC4003FCCCF /* TrivialBlit.fsh in Resources */ = {isa = PBXBuildFile; fileRef = 04C3135B18D74E85008097D1 /* TrivialBlit.fsh */; };
 		04BD4AD518D74EC4003FCCCF /* TrivialBlit.vsh in Resources */ = {isa = PBXBuildFile; fileRef = 04C3135C18D74E85008097D1 /* TrivialBlit.vsh */; };
 		04C3133C18D3841B008097D1 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 04C3133B18D3841B008097D1 /* QuartzCore.framework */; };
+		15BB4DD218E9F705007BE707 /* FTADrawer.m in Sources */ = {isa = PBXBuildFile; fileRef = 15BB4DD118E9F705007BE707 /* FTADrawer.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -122,6 +123,8 @@
 		04C3133B18D3841B008097D1 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		04C3135B18D74E85008097D1 /* TrivialBlit.fsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; name = TrivialBlit.fsh; path = Shaders/TrivialBlit.fsh; sourceTree = "<group>"; };
 		04C3135C18D74E85008097D1 /* TrivialBlit.vsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; name = TrivialBlit.vsh; path = Shaders/TrivialBlit.vsh; sourceTree = "<group>"; };
+		15BB4DD018E9F705007BE707 /* FTADrawer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FTADrawer.h; sourceTree = "<group>"; };
+		15BB4DD118E9F705007BE707 /* FTADrawer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FTADrawer.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -198,6 +201,8 @@
 			children = (
 				0489D48718CE75D100B41E20 /* FTAAppDelegate.h */,
 				0489D48818CE75D100B41E20 /* FTAAppDelegate.m */,
+				15BB4DD018E9F705007BE707 /* FTADrawer.h */,
+				15BB4DD118E9F705007BE707 /* FTADrawer.m */,
 				049A0CD318E0B6F2005311FA /* FTASettingsViewController.h */,
 				049A0CD418E0B6F2005311FA /* FTASettingsViewController.m */,
 				041785DB18D21FDC007B1301 /* FTAUtil.h */,
@@ -414,6 +419,7 @@
 			files = (
 				049A0CD518E0B6F2005311FA /* FTASettingsViewController.m in Sources */,
 				0489D48918CE75D100B41E20 /* FTAAppDelegate.m in Sources */,
+				15BB4DD218E9F705007BE707 /* FTADrawer.m in Sources */,
 				041785DD18D21FDC007B1301 /* FTAUtil.m in Sources */,
 				0489D49318CE75D100B41E20 /* FTAViewController.m in Sources */,
 				0489D48518CE75D100B41E20 /* main.m in Sources */,
