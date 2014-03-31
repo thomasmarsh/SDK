@@ -5,9 +5,9 @@
 //  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
 
+#import <FiftyThreeSdk/FiftyThreeSdk.h>
 #import <UIKit/UIKit.h>
 
-#import "FiftyThreeSdk/FTApplication.h"
 #import "FTAAppDelegate.h"
 
 int main(int argc, char * argv[])

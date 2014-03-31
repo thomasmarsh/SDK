@@ -15,14 +15,12 @@
 @end
 
 @implementation FTShaderInfo
-
 @end
 
 @implementation FTAUtil
 + (GLuint)loadDiscTextureWithSize:(NSUInteger)resolution
 {
     // make bitmap context
-
     CGColorSpaceRef space = CGColorSpaceCreateDeviceGray();
     CGContextRef context = CGBitmapContextCreate(NULL, resolution, resolution, 8, 1 * resolution, space, kCGImageAlphaOnly);
     CGContextSetInterpolationQuality(context, kCGInterpolationHigh);

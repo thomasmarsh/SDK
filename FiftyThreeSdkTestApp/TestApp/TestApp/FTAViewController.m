@@ -5,7 +5,8 @@
 //  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
 
-#import "FiftyThreeSdk/FiftyThreeSdk.h"
+#import <FiftyThreeSdk/FiftyThreeSdk.h>
+
 #import "FTADrawer.h"
 #import "FTASettingsViewController.h"
 #import "FTAUtil.h"
@@ -36,14 +37,14 @@
     // We use a basic GL view for rendering some ink and showing
     // touch classifications. The GL code is in FTADrawer. The details
     // aren't really relevant to using FiftyThree SDK.
-    
+
     self.drawer = [[FTADrawer alloc] init];
     self.drawer.scale = self.view.contentScaleFactor;
     GLKView *view = (GLKView *)self.view;
     view.context = self.drawer.context;
     view.drawableDepthFormat = GLKViewDrawableDepthFormatNone;
     self.drawer.view = view;
-    
+
     // We add a number of bar buttons for testing.
     // (1) A button to tear down FTPenManager
     // (2) A button to startup FTPenManager
@@ -99,7 +100,7 @@
     [self.view setExclusiveTouch:NO];
 }
 
-#pragma mark - Bar Button handlers.
+#pragma mark - Bar Button Press handlers.
 - (void)showInfo:(id)sender
 {
     UIBarButtonItem *barButton = (UIBarButtonItem*)sender;
@@ -242,7 +243,6 @@
     [self handleTouches:touches withEvent:event];
 }
 
-
 #pragma mark - GLKView and GLKViewController delegate methods
 
 - (void)update
@@ -276,7 +276,6 @@
     self.drawer.scale = self.view.contentScaleFactor;
     self.drawer.size = self.view.bounds.size;
 }
-
 
 #pragma mark - UIPopoverViewControllerDelegate
 
