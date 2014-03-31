@@ -10,8 +10,6 @@
 #import "FTAUtil.h"
 #import "FTAViewController.h"
 
-// This uses portions of shaders from Apple's GLPaint Sample & Apple's starter GLKit project.
-
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
 
 #define kBrushPixelStep     3
@@ -38,7 +36,6 @@ glLabelObjectEXT((type),(object), 0, (label));\
                                  FTPenManagerDelegate,
                                  UIPopoverControllerDelegate> {
 
-    // OpenGL resources.
     FTShaderInfo *_pointSpriteShader;
     FTShaderInfo *_blitShader;
 
@@ -195,6 +192,9 @@ glLabelObjectEXT((type),(object), 0, (label));\
 }
 - (void)shutdownFTPenManager:(id)sender
 {
+    // Make sure you don't retain any instances of FTPenManager
+    // as that will be dealloced to free up CoreBluetooth for other
+    // stylus SDKs.
     [[FTPenManager sharedInstance] shutdown];
     self.isPencilEnabled = NO;
     if (self.popover)
@@ -206,16 +206,18 @@ glLabelObjectEXT((type),(object), 0, (label));\
 
 - (void)initializeFTPenManager:(id)sender
 {
-    UIView *v = [[FTPenManager sharedInstance] pairingButtonWithStyle:FTPairingUIStyleDark
+    UIView *connectionView = [[FTPenManager sharedInstance] pairingButtonWithStyle:FTPairingUIStyleDark
                                                         andTintColor:nil
                                                             andFrame:CGRectZero];
 
-    v.frame = CGRectMake(0.0f, 768 - 100, v.frame.size.width, v.frame.size.height);
-    [self.view addSubview:v];
+    connectionView.frame = CGRectMake(0.0f, 768 - 100, connectionView.frame.size.width, connectionView.frame.size.height);
+    [self.view addSubview:connectionView];
 
     [FTPenManager sharedInstance].classifier.delegate = self;
     [FTPenManager sharedInstance].delegate = self;
 
+    // You would only uncomment this if you want to drive the animations & classification
+    // from your displayLink, see also the update method in this view controller.
     //[FTPenManager sharedInstance].automaticUpdatesEnabled = NO;
 
     self.isPencilEnabled = YES;
@@ -243,6 +245,7 @@ glLabelObjectEXT((type),(object), 0, (label));\
 
 - (void)update
 {
+// You'd only uncomment this if you've set FTPenManager's automaticUpdatesEnabled to NO.
 //    if (self.isPencilEnabled)
 //    {
 //        [[FTPenManager sharedInstance] update];
@@ -719,7 +722,7 @@ glLabelObjectEXT((type),(object), 0, (label));\
 // Since we've turned on multi touch we may get
 // more than one touch in Began/Moved/Ended. Most iOS samples show something like
 // UITouch * t = [touches anyObject];
-// This isn't correct if you can have multiple touches and multipleTouchEnabled set to true.
+// This isn't correct if you can have multiple touches and multipleTouchEnabled set to YES.
 - (void)handleTouches:(NSSet *)touches withEvent:(UIEvent *)event
 {
     if (_isPencilEnabled)
