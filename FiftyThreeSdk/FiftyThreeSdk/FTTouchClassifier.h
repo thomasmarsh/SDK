@@ -41,10 +41,10 @@ typedef NS_ENUM(NSInteger, FTTouchClassification)
 
 //  This describes a Touch classification change.
 @interface FTTouchClassificationInfo : NSObject
-@property (nonatomic) UITouch *touch;
-@property (nonatomic) NSInteger touchId;
-@property (nonatomic) FTTouchClassification oldValue;
-@property (nonatomic) FTTouchClassification newValue;
+@property (nonatomic, readonly) UITouch *touch;
+@property (nonatomic, readonly) NSInteger touchId;
+@property (nonatomic, readonly) FTTouchClassification oldValue;
+@property (nonatomic, readonly) FTTouchClassification newValue;
 @end
 
 @protocol FTTouchClassificationsChangedDelegate <NSObject>
