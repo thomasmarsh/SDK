@@ -163,13 +163,23 @@
         //  2 --4
         //  | \ |
         //  1-- 3
-        static const GLfloat squareVertices[4*4] =
+        static GLfloat squareVertices[4*4] =
         {
             0.0f, 0.0f,      0.0f, 0.0f, // x y u v
             0.0f,  768.0,    0.0f, 1.0f,
             1024.0f, 0.0f,   1.0f, 0.0f,
             1024.0f, 768.0,  1.0f, 1.0f
         };
+        static BOOL scaled = NO;
+        if (!scaled)
+        {
+            for(int i = 0; i < 4; ++i)
+            {
+                squareVertices[i*4 + 0] *= self.scale;
+                squareVertices[i*4 + 1] *= self.scale;
+            }
+            scaled = YES;
+        }
 
         // Load data to the Vertex Buffer Object
         glBufferData(GL_ARRAY_BUFFER, 4*4*sizeof(GLfloat), squareVertices, GL_STATIC_DRAW);
@@ -402,7 +412,15 @@
 - (void)setBrushColor:(UIColor *)color
 {
     GLfloat brushColor[4];
-    [color getRed:brushColor green:brushColor+1 blue:brushColor+2 alpha:brushColor+3];
+    CGFloat colors[4];
+
+    [color getRed:colors green:colors+1 blue:colors+2 alpha:colors+3];
+
+    brushColor[0] = colors[0]; // On 64 bit GLFloat != CGFloat.
+    brushColor[1] = colors[1];
+    brushColor[2] = colors[2];
+    brushColor[3] = colors[3];
+
     glUseProgram(_pointSpriteShader.glProgram);
     glUniform4fv([_pointSpriteShader.uniform[@"color"] intValue], 1, brushColor);
 }
