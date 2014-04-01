@@ -1988,7 +1988,6 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     {
         [self.displayLink invalidate];
         self.displayLink = nil;
-
     }
     _automaticUpdatesEnabled = useDisplayLink;
     [self ensureNeedsUpdate];

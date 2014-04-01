@@ -27,8 +27,8 @@
 
 @interface FTADrawer ()
 {
-    FTShaderInfo *_pointSpriteShader;
-    FTShaderInfo *_blitShader;
+    FTAShaderInfo *_pointSpriteShader;
+    FTAShaderInfo *_blitShader;
 
     // Buffers & textures & fbo
     GLuint _vertexBuffer;
@@ -110,7 +110,7 @@
             self.scene = [@{} mutableCopy];
         }
 
-        [self.scene setObject:s forKey:[NSNumber numberWithInt:strokeId]];
+        [self.scene setObject:s forKey:[NSNumber numberWithInteger:strokeId]];
     }
     else
     {
@@ -593,13 +593,13 @@
 
 - (BOOL)loadShaders
 {
-    _pointSpriteShader = [[FTShaderInfo alloc] init];
+    _pointSpriteShader = [[FTAShaderInfo alloc] init];
     _pointSpriteShader.shaderName = @"TrivialPointSprite";
     _pointSpriteShader.uniformNames = [@[@"MVP", @"pointSize", @"color", @"texture"] mutableCopy];
     _pointSpriteShader.attributeNames = [@[@"inVertex"] mutableCopy];
     _pointSpriteShader = [FTAUtil loadShader:_pointSpriteShader];
 
-    _blitShader = [[FTShaderInfo alloc] init];
+    _blitShader = [[FTAShaderInfo alloc] init];
     _blitShader.shaderName = @"TrivialBlit";
     _blitShader.uniformNames = [@[@"texture"] mutableCopy];
     _blitShader.attributeNames = [@[@"inVertex", @"inTex"] mutableCopy];

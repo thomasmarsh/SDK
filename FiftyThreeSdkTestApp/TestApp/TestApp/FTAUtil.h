@@ -18,7 +18,7 @@ glLabelObjectEXT((type),(object), 0, (label));\
 
 // This FTShaderInfo just holds some information about shaders that is populated via
 // FTAUtil loadShader.
-@interface FTShaderInfo : NSObject
+@interface FTAShaderInfo : NSObject
 {
 }
 // Name of files in bundle (fsh & vsh) required.
@@ -45,5 +45,5 @@ glLabelObjectEXT((type),(object), 0, (label));\
 // Loads a opengl texture that has a circle with 100% opacity in a square texture with
 // width = height = size.
 + (GLuint)loadDiscTextureWithSize:(NSUInteger)h;
-+ (FTShaderInfo *)loadShader:(FTShaderInfo *)shader;
++ (FTAShaderInfo *)loadShader:(FTAShaderInfo *)shader;
 @end

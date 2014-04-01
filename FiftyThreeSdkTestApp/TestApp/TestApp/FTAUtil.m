@@ -14,7 +14,7 @@
 + (BOOL)validateProgram:(GLuint)prog;
 @end
 
-@implementation FTShaderInfo
+@implementation FTAShaderInfo
 @end
 
 @implementation FTAUtil
@@ -138,7 +138,7 @@
     return YES;
 }
 
-+ (FTShaderInfo *)loadShader:(FTShaderInfo *)shader
++ (FTAShaderInfo *)loadShader:(FTAShaderInfo *)shader
 {
     GLuint vertShader, fragShader;
     NSString *vertShaderPathname, *fragShaderPathname;
