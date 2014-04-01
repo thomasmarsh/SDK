@@ -22,7 +22,7 @@
 {
     // make bitmap context
     CGColorSpaceRef space = CGColorSpaceCreateDeviceGray();
-    CGContextRef context = CGBitmapContextCreate(NULL, resolution, resolution, 8, 1 * resolution, space, kCGImageAlphaOnly);
+    CGContextRef context = CGBitmapContextCreate(NULL, resolution, resolution, 8, 1 * resolution, space, (CGBitmapInfo)kCGImageAlphaOnly);
     CGContextSetInterpolationQuality(context, kCGInterpolationHigh);
     CGColorSpaceRelease(space);
 

@@ -330,6 +330,7 @@ TouchClassification TouchClassificationProxy::ClassifyPair(TouchId touch0, Touch
             DebugAssert(false);
             break;
     }
+    return TouchClassification::Unknown;
 }
 
 TouchClassification TouchClassificationProxy::ClassifyForGesture(TouchId touch0, const SingleTouchGestureType & type)
@@ -1594,8 +1595,10 @@ float TouchClassificationProxy::DominationScore(Cluster::Ptr const & probe)
         Cluster::Ptr const & otherCluster = _clusterTracker->Cluster(otherId);
         float ratio = probePair.second / (.0001f + otherCluster->_penScore);
 
+#if USE_DEBUG_ASSERT
         float otherScore = _penEventClassifier.TypeAndScoreForCluster(*otherCluster).second;
         DebugAssert(otherCluster->_penScore == otherScore);
+#endif
 
         if (ratio < worstRatio)
         {

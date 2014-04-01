@@ -62,7 +62,7 @@
 
     if (cell == nil)
     {
-        cell = [[UITableViewCell alloc] initWithFrame:CGRectZero reuseIdentifier:CellIdentifier];
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
     }
 
     if (!self.info)
@@ -73,37 +73,37 @@
     {
         case 0:
         {
-            [cell setText:[NSString stringWithFormat:@"Name:%@", self.info.name]];
+            cell.textLabel.text = [NSString stringWithFormat:@"Name:%@", self.info.name];
             break;
         }
         case 1:
         {
-            [cell setText:[NSString stringWithFormat:@"Manufacturer:%@", self.info.manufacturerName]];
+            cell.textLabel.text = [NSString stringWithFormat:@"Manufacturer:%@", self.info.manufacturerName];
             break;
         }
         case 2:
         {
-            [cell setText:[NSString stringWithFormat:@"Battery:%@ %%", self.info.batteryLevel]];
+            cell.textLabel.text = [NSString stringWithFormat:@"Battery:%@ %%", self.info.batteryLevel];
             break;
         }
         case 3:
         {
-            [cell setText:[NSString stringWithFormat:@"Firmware:%@", self.info.firmwareRevision]];
+            cell.textLabel.text = [NSString stringWithFormat:@"Firmware:%@", self.info.firmwareRevision];
             break;
         }
         case 4:
         {
-            [cell setText:[NSString stringWithFormat:@"Learn:%@", self.info.learnMoreURL]];
+            cell.textLabel.text = [NSString stringWithFormat:@"Learn:%@", self.info.learnMoreURL];
             break;
         }
         case 5:
         {
-            [cell setText:[NSString stringWithFormat:@"Tip:%@", self.info.isTipPressed?@"YES":@"NO"]];
+            cell.textLabel.text = [NSString stringWithFormat:@"Tip:%@", self.info.isTipPressed?@"YES":@"NO"];
             break;
         }
         case 6:
         {
-            [cell setText:[NSString stringWithFormat:@"Eraser:%@", self.info.isEraserPressed?@"YES":@"NO"]];
+            cell.textLabel.text = [NSString stringWithFormat:@"Eraser:%@", self.info.isEraserPressed?@"YES":@"NO"];
             break;
         }
     }

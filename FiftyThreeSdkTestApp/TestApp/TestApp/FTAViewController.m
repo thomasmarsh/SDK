@@ -162,7 +162,7 @@
 {
     for(FTTouchClassificationInfo *info in touches)
     {
-        NSLog(@"Touch %d was %d now %d", info.touchId, info.oldValue, info.newValue);
+        NSLog(@"Touch %ld was %ld now %ld", (long)info.touchId, (long)info.oldValue, (long)info.newValue);
         [self.drawer setColor:_strokeColors[@(info.newValue)] forStroke:info.touchId];
     }
 }
