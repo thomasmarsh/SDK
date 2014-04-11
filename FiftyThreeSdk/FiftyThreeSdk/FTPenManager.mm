@@ -866,8 +866,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     }];
 
     // Separated
-    TKState *separatedState = [TKState stateWithName:kSeparatedStateName
-                                  andTimeoutDuration:kSeparatedStateTimeout];
+    TKState *separatedState = [TKState stateWithName:kSeparatedStateName];
     [separatedState setDidEnterStateBlock:^(TKState *state, TKStateMachine *stateMachine)
     {
         weakSelf.state = FTPenManagerStateDisconnected;
@@ -877,10 +876,6 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     [separatedState setDidExitStateBlock:^(TKState *state, TKStateMachine *stateMachine)
     {
         weakSelf.scanningState = ScanningStateDisabled;
-    }];
-    [separatedState setTimeoutExpiredBlock:^(TKState *state, TKStateMachine *stateMachine)
-    {
-        [weakSelf fireStateMachineEvent:kBecomeSingleEventName];
     }];
 
     // Separated - Retrieving Connceted Peripherals
