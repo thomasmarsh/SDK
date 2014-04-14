@@ -16,6 +16,8 @@
 #import "FTPenServiceClient.h"
 #import "FTServiceUUIDs.h"
 
+extern NSString  * const kFTPenCentralIdPropertyName;
+
 @interface FTPenServiceClient ()
 
 @property (nonatomic) CBPeripheral *peripheral;
@@ -34,6 +36,7 @@
 @property (nonatomic) CBCharacteristic *manufacturingIDCharacteristic;
 @property (nonatomic) CBCharacteristic *lastErrorCodeCharacteristic;
 @property (nonatomic) CBCharacteristic *authenticationCodeCharacteristic;
+@property (nonatomic) CBCharacteristic *centralIdCharacteristic;
 
 @property (nonatomic) BOOL isTipPressedDidSetNofifyValue;
 @property (nonatomic) BOOL isEraserPressedDidSetNofifyValue;
@@ -46,6 +49,7 @@
 @property (nonatomic) BOOL didInitialReadOfManufacturingID;
 @property (nonatomic) BOOL didInitialReadOfLastErrorCode;
 @property (nonatomic) BOOL didInitialReadOfAuthenticationCode;
+@property (nonatomic) BOOL didInitialReadOfCentralId;
 
 @property (nonatomic, readwrite) NSDate *lastTipReleaseTime;
 
@@ -207,6 +211,18 @@
     }
 }
 
+- (void)setCentralId:(UInt32)centralId
+{
+    if (self.centralIdCharacteristic)
+    {
+        NSData * data = [NSData dataWithBytes:&centralId length:4];
+        [self.peripheral writeValue:data
+                  forCharacteristic:self.centralIdCharacteristic
+                               type:CBCharacteristicWriteWithResponse];
+        _centralId = centralId;
+    }
+}
+
 - (BOOL)readManufacturingIDAndAuthCode
 {
     if (self.manufacturingIDCharacteristic && self.authenticationCodeCharacteristic)
@@ -265,6 +281,7 @@
         self.manufacturingIDCharacteristic = nil;
         self.lastErrorCodeCharacteristic = nil;
         self.authenticationCodeCharacteristic = nil;
+        self.centralIdCharacteristic = nil;
 
         self.isTipPressedDidSetNofifyValue = NO;
         self.isEraserPressedDidSetNofifyValue = NO;
@@ -278,6 +295,7 @@
         self.didInitialReadOfManufacturingID = NO;
         self.didInitialReadOfLastErrorCode = NO;
         self.didInitialReadOfAuthenticationCode = NO;
+        self.didInitialReadOfCentralId = NO;
 
         return nil;
     }
@@ -307,6 +325,7 @@
                                          [FTPenServiceUUIDs authenticationCode],
                                          [FTPenServiceUUIDs lastErrorCode],
                                          [FTPenServiceUUIDs pressureSetup],
+                                         [FTPenServiceUUIDs centralId],
                                          ];
 
             [peripheral discoverCharacteristics:characteristics forService:self.penService];
@@ -423,6 +442,13 @@
             [characteristic.UUID isEqual:[FTPenServiceUUIDs authenticationCode]])
         {
             self.authenticationCodeCharacteristic = characteristic;
+        }
+
+        // CentralId
+        if (!self.centralIdCharacteristic &&
+            [characteristic.UUID isEqual:[FTPenServiceUUIDs centralId]])
+        {
+            self.centralIdCharacteristic = characteristic;
         }
     }
 
@@ -581,6 +607,17 @@
             [updatedProperties addObject:kFTPenAuthenticationCodePropertyName];
         }
     }
+    else if ([characteristic.UUID isEqual:[FTPenServiceUUIDs centralId]])
+    {
+        if (self.centralIdCharacteristic)
+        {
+            FTAssert(characteristic == self.centralIdCharacteristic, @"characteristic is centralId characteristic");
+            _centralId = (unsigned char)[self.centralIdCharacteristic valueAsNSUInteger];
+            [self.delegate penServiceClient:self
+                  didReadCentralId:_centralId];
+            [updatedProperties addObject:kFTPenCentralIdPropertyName];
+        }
+    }
 
     if (updatedProperties.count > 0)
     {
@@ -635,6 +672,18 @@
             [self.delegate penServiceClientDidWriteAuthenticationCode:self];
         }
     }
+    else if (characteristic == self.centralIdCharacteristic)
+    {
+        if (error)
+        {
+            [self.delegate penServiceClientDidFailToWriteCentralId:self];
+        }
+        else
+        {
+            [self.delegate penServiceClientDidWriteCentralId:self];
+        }
+    }
+
     else if (characteristic == self.hasListenerCharacteristic)
     {
         [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenDidWriteHasListenerNotificationName
@@ -728,6 +777,12 @@
         {
             [self.peripheral readValueForCharacteristic:self.authenticationCodeCharacteristic];
             self.didInitialReadOfAuthenticationCode = YES;
+        }
+
+        if (self.centralIdCharacteristic && !self.didInitialReadOfCentralId)
+        {
+            [self.peripheral readValueForCharacteristic:self.centralIdCharacteristic];
+            self.didInitialReadOfCentralId = YES;
         }
     }
 }

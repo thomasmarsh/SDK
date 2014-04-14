@@ -31,6 +31,7 @@
 @property (nonatomic) NSString *manufacturingID;
 @property (nonatomic, readonly) FTPenLastErrorCode *lastErrorCode;
 @property (nonatomic) NSData *authenticationCode;
+@property (nonatomic) UInt32 centralId;
 
 @property (nonatomic, readonly) BOOL isReady;
 @property (nonatomic, readonly) BOOL isPoweringOff;
@@ -62,5 +63,7 @@
 - (void)penServiceClientDidWriteAuthenticationCode:(FTPenServiceClient *)serviceClient;
 - (void)penServiceClientDidFailToWriteAuthenticationCode:(FTPenServiceClient *)serviceClient;
 - (void)penServiceClient:(FTPenServiceClient *)serviceClient didReadAuthenticationCode:(NSData *)authenticationCode;
-
+- (void)penServiceClient:(FTPenServiceClient *)serviceClient didReadCentralId:(UInt32)centralId;
+- (void)penServiceClientDidWriteCentralId:(FTPenServiceClient *)serviceClient;
+- (void)penServiceClientDidFailToWriteCentralId:(FTPenServiceClient *)serviceClient;
 @end

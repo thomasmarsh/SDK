@@ -25,6 +25,7 @@
 + (CBUUID *)manufacturingID;
 + (CBUUID *)lastErrorCode;
 + (CBUUID *)authenticationCode;
++ (CBUUID *)centralId;
 
 + (NSString *)nameForUUID:(CBUUID *)UUID;
 

@@ -4,8 +4,8 @@
 //
 //  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
-
 #import <CoreBluetooth/CoreBluetooth.h>
+#import <UIKit/UIKit.h>
 
 #import "Core/Asserts.h"
 #import "FTDeviceInfoServiceClient.h"
@@ -39,7 +39,6 @@ NSString * const kFTPenSoftwareRevisionPropertyName = @"softwareRevision";
 NSString * const kFTPenSystemIDPropertyName = @"systemID";
 NSString * const kFTPenIEEECertificationDataPropertyName = @"IEEECertificationData";
 NSString * const kFTPenPnPIDCertificationDataPropertyName = @"PnpIDCertificationData";
-
 NSString * const kFTPenIsTipPressPropertyName = @"isTipPressed";
 NSString * const kFTPenIsEraserPressedPropertyName = @"isEraserPressed";
 NSString * const kFTPenBatteryLevelPropertyName = @"batteryLevel";
@@ -56,6 +55,7 @@ NSString * const kFTPenConnectedSecondsPropertyName = @"numDroppedNotifications"
 NSString * const kFTPenManufacturingIDPropertyName = @"manufacturingID";
 NSString * const kFTPenLastErrorCodePropertyName = @"lastErrorCode";
 NSString * const kFTPenAuthenticationCodePropertyName = @"authenticationCode";
+NSString * const kFTPenCentralIdPropertyName = @"centralId";
 
 @implementation FTPenPressureSetup
 
@@ -227,9 +227,14 @@ NSString * const kFTPenAuthenticationCodePropertyName = @"authenticationCode";
     self.penServiceClient.authenticationCode = authenticationCode;
 }
 
-- (BOOL)isReady
+- (UInt32)centralId
 {
-    return self.penServiceClient.isReady;
+    return self.penServiceClient.centralId;
+}
+
+- (void)setCentralId:(UInt32)centralId
+{
+    self.penServiceClient.centralId = centralId;
 }
 
 - (BOOL)isTipPressed
@@ -240,6 +245,11 @@ NSString * const kFTPenAuthenticationCodePropertyName = @"authenticationCode";
 - (BOOL)isEraserPressed
 {
     return self.penServiceClient.isEraserPressed;
+}
+
+- (BOOL)isReady
+{
+    return self.penServiceClient.isReady;
 }
 
 - (float)tipPressure
@@ -525,6 +535,21 @@ NSString * const kFTPenAuthenticationCodePropertyName = @"authenticationCode";
 - (void)penServiceClient:(FTPenServiceClient *)serviceClient didReadAuthenticationCode:(NSData *)authenticationCode
 {
     [self.privateDelegate didReadAuthenticationCode:authenticationCode];
+}
+
+- (void)penServiceClient:(FTPenServiceClient *)serviceClient didReadCentralId:(UInt32)centralId
+{
+    [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenDidUpdatePropertiesNotificationName
+                                                        object:self
+                                                      userInfo:@{ kFTPenNotificationPropertiesKey:[NSMutableSet setWithObject:kFTPenCentralIdPropertyName]}];
+
+}
+
+- (void)penServiceClientDidFailToWriteCentralId:(FTPenServiceClient *)serviceClient
+{
+}
+- (void)penServiceClientDidWriteCentralId:(FTPenServiceClient *)serviceClient
+{
 }
 
 #pragma mark - FTPenUsageServiceClientDelegate

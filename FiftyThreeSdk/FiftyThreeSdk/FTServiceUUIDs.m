@@ -51,6 +51,9 @@
 // 6041750F-F284-4125-BFB4-E912878614D7
 #define FT_PEN_SERVICE_AUTH_CODE_UUID CFUUIDGetConstantUUIDWithBytes(kCFAllocatorSystemDefault, 0x60, 0x41, 0x75, 0x0F, 0xF2, 0x84, 0x41, 0x25, 0xBF, 0xB4, 0xE9, 0x12, 0x87, 0x86, 0x14, 0xD7)
 
+// 0365CFC0-BE72-11E3-A496-0002A5D5C51B
+#define FT_PEN_SERVICE_CENTRAL_ID_UUID CFUUIDGetConstantUUIDWithBytes(kCFAllocatorSystemDefault, 0x03, 0x65, 0xCF, 0xC0, 0xBE, 0x72, 0x11, 0xE3, 0xA4, 0x96, 0x00, 0x02, 0xA5, 0xD5, 0xC5, 0x1B)
+
 @implementation FTPenServiceUUIDs
 
 + (CBUUID *)penService
@@ -123,6 +126,11 @@
     return [CBUUID UUIDWithCFUUID:FT_PEN_SERVICE_AUTH_CODE_UUID];
 }
 
++ (CBUUID *)centralId
+{
+    return [CBUUID UUIDWithCFUUID:FT_PEN_SERVICE_CENTRAL_ID_UUID];
+}
+
 + (NSString *)nameForUUID:(CBUUID *)UUID
 {
     NSDictionary *UUIDs = @{ [FTPenServiceUUIDs penService] : @"PenService",
@@ -139,6 +147,7 @@
                              [FTPenServiceUUIDs manufacturingID] : @"ManufacturingID",
                              [FTPenServiceUUIDs lastErrorCode] : @"LastErrorCode",
                              [FTPenServiceUUIDs authenticationCode] : @"AuthenticationCode",
+                             [FTPenServiceUUIDs centralId] : @"CentralId",
                              };
     return [UUIDs objectForKey:UUID];
 }
