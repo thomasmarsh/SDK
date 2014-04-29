@@ -2,7 +2,7 @@
 //  FTFirmwareManager.h
 //  FiftyThreeSdk
 //
-//  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
+//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
 
 #pragma once
@@ -16,10 +16,13 @@ typedef NS_ENUM(NSInteger, FTFirmwareImageType) {
     FTFirmwareImageTypeUpgrade
 };
 
+typedef void (^FirmwareCompletionBlock)(NSData *data);
+
 @interface FTFirmwareManager : NSObject
 
 + (NSString *)imagePath;
 + (NSString *)imagePathIncludingDocumentsDir;
++ (NSInteger)versionOfImage:(NSData *)image;
 + (NSInteger)versionOfImageAtPath:(NSString *)imagePath;
 
 // Returns a boolean value as a NSNumber, or nil if this cannot yet be determined.
@@ -34,4 +37,6 @@ typedef NS_ENUM(NSInteger, FTFirmwareImageType) {
 
 + (FTFirmwareImageType)imageTypeRunningOnPen:(FTPen *)pen;
 
+// nil if there's any errors or issues.
++ (void)fetchLatestFirmwareWithCompletionHandler:(FirmwareCompletionBlock)completionHandler;
 @end

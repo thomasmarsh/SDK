@@ -9,6 +9,7 @@
 
 #import "Common/Asserts.h"
 #import "FTFirmwareManager.h"
+#import "FTLog.h"
 #import "FTPen.h"
 
 NSString *applicationDocumentsDirectory()
@@ -17,6 +18,10 @@ NSString *applicationDocumentsDirectory()
     NSString *basePath = ([paths count] > 0) ? [paths objectAtIndex:0] : nil;
     return basePath;
 }
+
+@interface FTFirmwareManager ()
+
+@end
 
 @implementation FTFirmwareManager
 
@@ -52,6 +57,47 @@ NSString *applicationDocumentsDirectory()
     return bestImagePath ? bestImagePath : [self imagePath];
 }
 
++ (void)fetchLatestFirmwareWithCompletionHandler:(void (^)(NSData *))handler
+{
+    NSURLSessionConfiguration *defaultConfigObject = [NSURLSessionConfiguration defaultSessionConfiguration];
+    defaultConfigObject.allowsCellularAccess = NO;
+
+    NSURLSession *delegateFreeSession = [NSURLSession sessionWithConfiguration: defaultConfigObject
+                                                                      delegate: nil
+                                                                 delegateQueue: [NSOperationQueue mainQueue]];
+
+    // TODO: put in final end point.
+    NSString *endPoint =  @"https://www.dropbox.com/s/xo6002d7yoh3jb7/CharcoalUpgradeImage-v68.bin?dl=1";
+
+    [[delegateFreeSession dataTaskWithURL: [NSURL URLWithString:endPoint]
+                        completionHandler:^(NSData *data,
+                                            NSURLResponse *response,
+                                            NSError *error) {
+                            if (!error)
+                            {
+                                handler(data);
+                            }
+                            else
+                            {
+                                [FTLog logVerboseWithFormat:@"Got response %@ with error %@.\n", response, error];
+                                handler(nil);
+                            }
+                        }] resume];
+}
+
++ (NSInteger)versionOfImage:(NSData *)image
+{
+    uint16_t version = 0;
+
+    if (image.length > 4 + sizeof(version))
+    {
+        version = *((uint16_t *)(image.bytes + 4));
+        version >>= 1;
+        return version;
+    }
+
+    return -1;
+}
 + (NSInteger)versionOfImageAtPath:(NSString *)imagePath
 {
     FTAssert(imagePath, @"image path non-nil");
@@ -63,7 +109,9 @@ NSString *applicationDocumentsDirectory()
         FTAssert(fileHandle, @"firmware file exists at path");
 
         [fileHandle seekToFileOffset:4];
+
         NSData *data = [fileHandle readDataOfLength:sizeof(version)];
+
         if (data.length == sizeof(version))
         {
             version = *((uint16_t *)data.bytes);

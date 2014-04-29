@@ -2,7 +2,7 @@
 //  FTPenManager.m
 //  FiftyThreeSdk
 //
-//  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
+//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
 
 #import <CoreBluetooth/CoreBluetooth.h>
@@ -31,7 +31,7 @@ NSString * const kFTPenManagerDidFailToDiscoverPenNotificationName = @"com.fifty
 NSString * const kFTPenUnexpectedDisconnectNotificationName = @"com.fiftythree.penManager.unexpectedDisconnect";
 NSString * const kFTPenUnexpectedDisconnectWhileConnectingNotifcationName = @"com.fiftythree.penManager.unexpectedDisconnectWhileConnecting";
 NSString * const kFTPenUnexpectedDisconnectWhileUpdatingFirmwareNotificationName = @"com.fiftythre.penManager.unexpectedDisconnectWhileUpdatingFirmware";
-
+NSString * const kFTPenManagerFirmwareUpdateIsAvailable = @"com.fiftythree.penManager.firmwareUpdateIsAvailable";
 NSString * const kFTPenManagerFirmwareUpdateDidBegin = @"com.fiftythree.penManger.firmwareUpdateDidBegin";
 NSString * const kFTPenManagerFirmwareUpdateDidBeginSendingUpdate = @"com.fiftythree.penManger.firmwareUpdateDidBeginSendingUpdate";
 NSString * const kFTPenManagerFirmwareUpdateDidUpdatePercentComplete = @"com.fiftythree.penManger.firmwareUpdateDidUpdatePercentComplete";
@@ -196,6 +196,13 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 @property (nonatomic) UIBackgroundTaskIdentifier backgroundTaskId;
 
 @property (nonatomic) NSInteger originalInactiviteTimeout;
+
+@property (nonatomic) BOOL isFetchingLatestFirmware;
+@property (nonatomic) NSData *latestFirmware;
+@property (nonatomic) NSString *latestFirmwareCachePath;
+@property (nonatomic) NSInteger latestFirmwareVersion;
+@property (nonatomic) NSDate *lastFirmwareCheckTime;
+
 @end
 
 @implementation FTPenManager
@@ -1139,6 +1146,8 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
     [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenManagerDidUpdateStateNotificationName
                                                         object:self];
+
+    [self attemptLoadFirmwareFromNetwork];
 }
 
 - (void)stateMachineDidChangeState:(NSNotification *)notification
@@ -1649,18 +1658,158 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
 #pragma mark - Firmware
 
+- (NSString *)fileCachePath
+{
+    NSArray* cachePathArray = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
+    NSString* cachePath = [cachePathArray lastObject];
+    return cachePath;
+}
+
+- (NSString *)findFirmwareInFileCach
+{
+    NSArray *paths = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:[self fileCachePath] error:nil];
+    NSPredicate *hasBinSuffix = [NSPredicate predicateWithFormat:@"SELF EndsWith '.bin'"];
+    paths = [paths filteredArrayUsingPredicate:hasBinSuffix];
+    paths = [paths sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
+    NSString *mostRecentFirmwareImage = [paths lastObject];
+    if (mostRecentFirmwareImage)
+    {
+        mostRecentFirmwareImage = [[self fileCachePath] stringByAppendingPathComponent: mostRecentFirmwareImage];
+    }
+    return mostRecentFirmwareImage;
+}
+
+- (void)attempLoadFirmwareFromFileCache
+{
+    NSString *path = [self findFirmwareInFileCach];
+
+    if (path)
+    {
+        NSData *data = [NSData dataWithContentsOfFile:path];
+
+        if (data)
+        {
+            self.latestFirmware = data;
+            self.latestFirmwareVersion = [FTFirmwareManager versionOfImage:self.latestFirmware];
+            self.latestFirmwareCachePath = path;
+        }
+        else
+        {
+            [FTLog logVerboseWithFormat:@"Failed to load firmware from file cache"];
+        }
+    }
+}
+
+- (void)writeFirmwareToFileCache
+{
+    if (self.latestFirmware)
+    {
+        NSString *filename = [NSString stringWithFormat:@"PencilV1Firmware-%03d.bin",self.latestFirmwareVersion];
+        NSString *writePath = [[self fileCachePath] stringByAppendingPathComponent:filename];
+        [self.latestFirmware writeToFile:writePath atomically:YES];
+        self.latestFirmwareCachePath = writePath;
+    }
+}
+
+- (void)attemptLoadFirmwareFromNetwork
+{
+    BOOL checkedRecently = self.lastFirmwareCheckTime && fabs([self.lastFirmwareCheckTime timeIntervalSinceNow]) > 60.0 * 5; // 5 minutes.
+
+    if (!self.isFetchingLatestFirmware && !checkedRecently)
+    {
+        self.isFetchingLatestFirmware = YES;
+
+        [FTFirmwareManager fetchLatestFirmwareWithCompletionHandler:^(NSData *data)
+         {
+             self.isFetchingLatestFirmware = NO;
+             if (data)
+             {
+                 NSInteger version = [FTFirmwareManager versionOfImage:data];
+                 if (version > self.latestFirmwareVersion)
+                 {
+                     self.latestFirmware = data;
+                     self.latestFirmwareVersion = version;
+                     self.lastFirmwareCheckTime = [NSDate date];
+                     [self writeFirmwareToFileCache];
+
+                     NSInteger cur, up;
+
+                     [FTFirmwareManager isVersionAtPath:[FTFirmwareManager imagePath]
+                                  newerThanVersionOnPen:self.pen
+                                         currentVersion:&cur
+                                          updateVersion:&up];
+
+                     if (cur != -1 && self.latestFirmwareVersion > cur)
+                     {
+                         // Post an update.
+                         [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenManagerFirmwareUpdateIsAvailable object:self];
+                     }
+                 }
+             }
+         }];
+    }
+}
+
+- (void)attemptLoadFirmwareFromBundle
+{
+    NSString *path = [FTFirmwareManager imagePath];
+    if (path)
+    {
+        NSData *data = [NSData dataWithContentsOfFile:path];
+        if (data)
+        {
+            self.latestFirmware = data;
+            self.latestFirmwareVersion = [FTFirmwareManager versionOfImage:self.latestFirmware];
+            [self writeFirmwareToFileCache];
+        }
+        else
+        {
+            [FTLog logVerboseWithFormat:@"Failed to load firmware from bundle"];
+        }
+    }
+}
+
 - (NSNumber *)isFirmwareUpdateAvailable:(NSInteger *)currentVersion
                           updateVersion:(NSInteger *)updateVersion
 {
-    return [FTFirmwareManager isVersionAtPath:[FTFirmwareManager imagePath]
-                        newerThanVersionOnPen:self.pen
-                               currentVersion:currentVersion
-                                updateVersion:updateVersion];
+    // We're expecting Network Version >= In Memory >= FileCache >= Bundle version.
+
+    if (!self.latestFirmware)
+    {
+        [self attempLoadFirmwareFromFileCache];
+    }
+
+    if (!self.latestFirmware)
+    {
+        [self attemptLoadFirmwareFromBundle];
+    }
+
+    // Always attempt a network FW check.
+    [self attemptLoadFirmwareFromNetwork];
+
+    [FTFirmwareManager isVersionAtPath:[FTFirmwareManager imagePath]
+                 newerThanVersionOnPen:self.pen
+                        currentVersion:currentVersion
+                         updateVersion:updateVersion];
+
+    if (*currentVersion != -1 && self.latestFirmware)
+    {
+        *updateVersion = self.latestFirmwareVersion;
+        return @(*updateVersion > *currentVersion);
+    }
+    return @NO;
 }
 
 - (BOOL)updateFirmware
 {
-    return [self updateFirmware:[FTFirmwareManager imagePath]];
+    if (self.latestFirmware)
+    {
+        // Ensure it is written out.
+        [self writeFirmwareToFileCache];
+        // Update.
+        return [self updateFirmware:self.latestFirmwareCachePath];
+    }
+    return NO;
 }
 
 - (BOOL)updateFirmware:(NSString *)firmwareImagePath;
