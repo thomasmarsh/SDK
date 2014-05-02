@@ -100,14 +100,11 @@ extern "C"
 @class UIView;
 @class UIColor;
 
-//  TBD on final UI design.
 typedef NS_ENUM(NSInteger, FTPairingUIStyle) {
-    //  TBD final UI design.
-    FTPairingUIStyleLight,
-    //  TBD final UI design.
-    FTPairingUIStyleDark,
-    //  TBD final UI design. Shows additional two indicator dots for tip up/down events.
-    FTPairingUIStyleDebug,
+    // You should use this in release builds.
+    FTPairingUIStyleDefault,
+    // This turns on two additional views that show if the tip or eraser are pressed.
+    FTPairingUIStyleDebug
 };
 
 //  This singleton deals with connection functions of the pen.
@@ -147,17 +144,10 @@ typedef NS_ENUM(NSInteger, FTPairingUIStyle) {
 // Register to get connection related notifications.
 @property (nonatomic, weak) id<FTPenManagerDelegate> delegate;
 
-// TBD.
-// TODO: Parameters will depend on UI design.
-// This provides a view that implements our BTLE pairing UI.
-//
-// Depending on design this may change from a single view to a viewcontroller we have
-// the client present in a UIPopover - still under discussion.
+// This provides a view that implements our BTLE pairing UI. The control is 81x101 points.
 //
 // This must be called on the UI thread.
-- (UIView *)pairingButtonWithStyle:(FTPairingUIStyle)style
-                      andTintColor:(UIColor *)color
-                          andFrame:(CGRect)frame;
+- (UIView *)pairingButtonWithStyle:(FTPairingUIStyle)style;
 
 // Call this to tear down the API. This also will shut down any CoreBluetooth activity.
 // You'll also need to release any views that FTPenManager has handed you. The next access to

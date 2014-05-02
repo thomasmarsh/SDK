@@ -1960,17 +1960,22 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 }
 
 - (UIView *)pairingButtonWithStyle:(FTPairingUIStyle)style
-                      andTintColor:(UIColor *)color
-                          andFrame:(CGRect)frame
 {
     NSAssert([NSThread isMainThread], @"This must be called on the UI thread.");
 
     PenConnectionView *penConnectionView = [[PenConnectionView alloc] init];
     penConnectionView.penManager = self;
     penConnectionView.suppressDialogs = YES;
-    penConnectionView.isActive = true; //What is this parameter for?
+    penConnectionView.isActive = true;
     penConnectionView.delegate = self;
-    penConnectionView.debugControlsVisibility = VisibilityStateVisible;
+    if (FTPairingUIStyleDebug == style)
+    {
+        penConnectionView.debugControlsVisibility = VisibilityStateVisible;
+    }
+    else
+    {
+        penConnectionView.debugControlsVisibility = VisibilityStateHidden;
+    }
 
     [self.pairingViews addObject:penConnectionView];
 

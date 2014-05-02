@@ -140,9 +140,7 @@
 
 - (void)initializeFTPenManager:(id)sender
 {
-    UIView *connectionView = [[FTPenManager sharedInstance] pairingButtonWithStyle:FTPairingUIStyleDark
-                                                        andTintColor:nil
-                                                            andFrame:CGRectZero];
+    UIView *connectionView = [[FTPenManager sharedInstance] pairingButtonWithStyle:FTPairingUIStyleDefault];
 
     connectionView.frame = CGRectMake(0.0f, 768 - 100, connectionView.frame.size.width, connectionView.frame.size.height);
     [self.view addSubview:connectionView];
