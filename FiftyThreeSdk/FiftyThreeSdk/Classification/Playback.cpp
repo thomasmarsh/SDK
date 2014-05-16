@@ -60,7 +60,7 @@ PlaybackSequence::PlaybackSequence(std::istream & str)
 
         if (index != previousIndex)
         {
-            if (type == (int) PlaybackEntryType::PenEvent)
+            if (type == (size_t) PlaybackEntryType::PenEvent)
             {
                 int penEventType =lexical_cast<int>(row[3]);
                 PenEvent pe;
