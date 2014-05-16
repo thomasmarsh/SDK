@@ -77,7 +77,7 @@ PlaybackSequence::PlaybackSequence(std::istream & str)
             }
         }
 
-        if (type == (int)PlaybackEntryType::TouchesChanged)
+        if (type == (size_t) PlaybackEntryType::TouchesChanged)
         {
             TouchId touchId  = static_cast<TouchId>(lexical_cast<int>(row[3]));
             TouchPhase phase = static_cast<TouchPhase>(lexical_cast<int>(row[4]));
@@ -118,8 +118,8 @@ void PlaybackSequence::Write(std::ostream & str)
     {
         if (entry->_type == PlaybackEntryType::PenEvent)
         {
-            str << counter << ", " << entry->_penEvent._timestamp <<  ", " << (int) entry->_type << ", ";
-            str << (int) entry->_penEvent._type;
+            str << counter << ", " << entry->_penEvent._timestamp <<  ", " << (size_t) entry->_type << ", ";
+            str << (size_t) entry->_penEvent._type;
             str << std::endl;
         }
         else
@@ -128,10 +128,10 @@ void PlaybackSequence::Write(std::ostream & str)
             {
                 core::InputSample snapshotSample = touch->CurrentSample();
 
-                str << counter << ", " << snapshotSample.TimestampSeconds() <<  ", " << (int) entry->_type << ", ";
+                str << counter << ", " << snapshotSample.TimestampSeconds() <<  ", " << (size_t) entry->_type << ", ";
 
                 str << touch->Id() << ", ";
-                str << (int) touch->Phase() << ", ";
+                str << (size_t) touch->Phase() << ", ";
                 str << snapshotSample.Location().x() << ", ";
                 str << snapshotSample.Location().y() << ", ";
 
