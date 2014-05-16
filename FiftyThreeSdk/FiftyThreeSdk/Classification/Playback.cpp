@@ -60,12 +60,12 @@ PlaybackSequence::PlaybackSequence(std::istream & str)
 
         if (index != previousIndex)
         {
-            if (type == PlaybackEntryType::PenEvent)
+            if (type == (int) PlaybackEntryType::PenEvent)
             {
                 int penEventType =lexical_cast<int>(row[3]);
                 PenEvent pe;
 
-                pe._type      = static_cast<PenEventType::PenEventTypeEnum>(penEventType);
+                pe._type      = static_cast<PenEventType>(penEventType);
                 pe._timestamp = timestamp;
 
                 _playbackEntries.push_back(make_shared<PlaybackEntry>(pe));
@@ -77,10 +77,10 @@ PlaybackSequence::PlaybackSequence(std::istream & str)
             }
         }
 
-        if (type == PlaybackEntryType::TouchesChanged)
+        if (type == (int)PlaybackEntryType::TouchesChanged)
         {
             TouchId touchId  = static_cast<TouchId>(lexical_cast<int>(row[3]));
-            TouchPhase phase = static_cast<TouchPhase::TouchPhaseEnum>(lexical_cast<int>(row[4]));
+            TouchPhase phase = static_cast<TouchPhase>(lexical_cast<int>(row[4]));
 
             float x = lexical_cast<float>(row[5]);
             float y = lexical_cast<float>(row[6]);
@@ -118,8 +118,8 @@ void PlaybackSequence::Write(std::ostream & str)
     {
         if (entry->_type == PlaybackEntryType::PenEvent)
         {
-            str << counter << ", " << entry->_penEvent._timestamp <<  ", " << entry->_type << ", ";
-            str << entry->_penEvent._type;
+            str << counter << ", " << entry->_penEvent._timestamp <<  ", " << (int) entry->_type << ", ";
+            str << (int) entry->_penEvent._type;
             str << std::endl;
         }
         else
@@ -128,10 +128,10 @@ void PlaybackSequence::Write(std::ostream & str)
             {
                 core::InputSample snapshotSample = touch->CurrentSample();
 
-                str << counter << ", " << snapshotSample.TimestampSeconds() <<  ", " << entry->_type << ", ";
+                str << counter << ", " << snapshotSample.TimestampSeconds() <<  ", " << (int) entry->_type << ", ";
 
                 str << touch->Id() << ", ";
-                str << touch->Phase() << ", ";
+                str << (int) touch->Phase() << ", ";
                 str << snapshotSample.Location().x() << ", ";
                 str << snapshotSample.Location().y() << ", ";
 

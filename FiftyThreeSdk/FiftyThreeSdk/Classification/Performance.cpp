@@ -92,7 +92,7 @@ void PerformanceReport::init(string const & csvReport, vector<TouchClassificatio
             break;
         }
 
-        TouchClassification trueClass = static_cast<TouchClassification::TouchClassificationEnum>(std::atoi(row[indexTrue].c_str()));
+        TouchClassification trueClass = static_cast<TouchClassification>(std::atoi(row[indexTrue].c_str()));
         if (trueClasses.size() > 0)
         {
             trueClass = trueClasses[index];
@@ -100,7 +100,7 @@ void PerformanceReport::init(string const & csvReport, vector<TouchClassificatio
 
         _trueClasses.push_back(trueClass);
 
-        TouchClassification inferredClass  = static_cast<TouchClassification::TouchClassificationEnum>(std::atoi(row[indexInferred].c_str()));
+        TouchClassification inferredClass  = static_cast<TouchClassification>(std::atoi(row[indexInferred].c_str()));
 
         _counts[trueClass][inferredClass]++;
 
