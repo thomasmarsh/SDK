@@ -1,18 +1,18 @@
 //
-//  main.m
+//  main.mm
 //  CharcoalLineTest
 //
-//  Created by Adam on 5/9/13.
-//  Copyright (c) 2013 FiftyThree. All rights reserved.
+//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>
 
 #import "AppDelegate.h"
+#import "FiftyThreeSdk/FTApplication.h"
 
 int main(int argc, char *argv[])
 {
     @autoreleasepool {
-        return UIApplicationMain(argc, argv, nil, NSStringFromClass([AppDelegate class]));
+        return UIApplicationMain(argc, argv, NSStringFromClass([FTApplication class]), NSStringFromClass([AppDelegate class]));
     }
 }
