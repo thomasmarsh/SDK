@@ -1844,16 +1844,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
                 if ([self currentStateHasName:kMarriedStateName] ||
                     [self currentStateHasName:kMarriedWaitingForLongPressToUnpairStateName])
                 {
-                    // If the peripheral disconnected due to inactivity timeout, it won't go to separated,
-                    // and therefore won't be available to reconnect. Therefore, go to single, not separated.
-                    if (didDisconnectDueToInactivityTimeout)
-                    {
-                        [self fireStateMachineEvent:kDisconnectAndBecomeSingleEventName];
-                    }
-                    else
-                    {
-                        [self fireStateMachineEvent:kBecomeSeparatedEventName];
-                    }
+                    [self fireStateMachineEvent:kBecomeSeparatedEventName];
                 }
                 else if ([self currentStateHasName:kEngagedStateName] ||
                          [self currentStateHasName:kEngagedWaitingForPairingSpotReleaseStateName] ||
