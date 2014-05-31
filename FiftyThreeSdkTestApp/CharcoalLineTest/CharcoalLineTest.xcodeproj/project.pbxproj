@@ -857,10 +857,6 @@
 		3CC736DA18637A7E005BD0C7 /* Production */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/FiftyThreeSdkTestApp-ezkstecwlummvceywtjefdfsyibu/Build/Products/Debug-iphoneos",
-				);
 			};
 			name = Production;
 		};
@@ -891,10 +887,6 @@
 		6669D031173C008D00BB15C3 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/FiftyThreeSdkTestApp-ezkstecwlummvceywtjefdfsyibu/Build/Products/Debug-iphoneos",
-				);
 			};
 			name = Debug;
 		};
