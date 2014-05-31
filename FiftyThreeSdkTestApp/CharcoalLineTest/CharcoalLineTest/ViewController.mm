@@ -21,7 +21,6 @@
 #import "FiftyThreeSdk/FTPenManager.h"
 #import "KeychainItemWrapper/KeychainItemWrapper.h"
 #import "RscMgr.h"
-#import "UIALertView-Blocks/UIAlertView+Blocks.h"
 #import "ViewController.h"
 
 NSString *applicationDocumentsDirectory()
@@ -59,6 +58,9 @@ FTPenPrivateDelegate>
 @property (nonatomic) int numUnexpectedDisconnectsConnecting;
 @property (nonatomic) int numUnexpectedDisconnectsFirmware;
 
+typedef void (^QueryForPasswordCompletionBlock)(NSString *);
+@property (nonatomic) UIAlertView *queryForPasswordAlertView;
+@property (nonatomic, copy) QueryForPasswordCompletionBlock queryForPasswordCompletionBlock;
 @property (nonatomic) KeychainItemWrapper *PKCS12PasswordKeychainItem;
 @property (nonatomic) SecIdentityRef authenticationCodeSigningIdentity;
 @property (nonatomic) SecKeyRef authenticationCodeSigningPublicKey;
@@ -223,6 +225,16 @@ FTPenPrivateDelegate>
     {
         self.firmwareUpdateProgressView = nil;
         [self.penManager cancelFirmwareUpdate];
+    }
+    else if (alertView == self.queryForPasswordAlertView)
+    {
+        self.queryForPasswordAlertView = nil;
+
+        if (self.queryForPasswordCompletionBlock)
+        {
+            self.queryForPasswordCompletionBlock([self.queryForPasswordAlertView textFieldAtIndex:0].text);
+            self.queryForPasswordCompletionBlock = NULL;
+        }
     }
 }
 
@@ -1113,24 +1125,15 @@ FTPenPrivateDelegate>
 // Pops an alert that allows the user to enter a password. Returns the result asynchronously.
 - (void)queryForPassword:(void (^)(NSString *password))completion
 {
-    RIButtonItem *buttonItem = [RIButtonItem itemWithLabel:@"OK"];
-    UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Enter Passcode"
-                                                        message:nil
-                                               cancelButtonItem:buttonItem
-                                               otherButtonItems:nil];
-    alertView.alertViewStyle = UIAlertViewStyleSecureTextInput;
+    self.queryForPasswordAlertView = [[UIAlertView alloc] initWithTitle:@"Enter Passcode"
+                                                                message:nil
+                                                               delegate:self
+                                                      cancelButtonTitle:@"OK"
+                                                      otherButtonTitles:nil];
+    self.queryForPasswordAlertView.alertViewStyle = UIAlertViewStyleSecureTextInput;
+    self.queryForPasswordCompletionBlock = completion;
 
-    __weak UIAlertView *weakAlertView = alertView;
-    buttonItem.action =
-    ^{
-        if (completion)
-        {
-            completion([weakAlertView textFieldAtIndex:0].text);
-        }
-    };
-
-    [alertView show];
-
+    [self.queryForPasswordAlertView show];
 }
 
 - (void)authenticationCodeForManufacturingID:(NSString *)manufacturingID
