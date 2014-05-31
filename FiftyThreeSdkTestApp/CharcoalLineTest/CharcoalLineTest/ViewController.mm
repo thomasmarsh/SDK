@@ -7,9 +7,8 @@
 
 #import <Security/Security.h>
 
-#import "Common/DeviceInfo.h"
-#import "Common/NSString+Helpers.h"
 #import "Core/NSData+Crypto.h"
+#import "Core/NSString+FTTimeWithInterval.h"
 #import "Core/Timer.h"
 #import "Core/UIView+Helpers.h"
 #import "FiftyThreeSdk/FTFirmwareManager.h"
@@ -30,7 +29,6 @@ NSString *applicationDocumentsDirectory()
     return basePath;
 }
 
-using namespace fiftythree::common;
 using fiftythree::core::Timer;
 
 @interface ViewController () <UIAlertViewDelegate,

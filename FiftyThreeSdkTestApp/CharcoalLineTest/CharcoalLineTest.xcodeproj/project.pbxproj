@@ -11,9 +11,6 @@
 		048127E318BFBA0700D424D5 /* icon144.png in Resources */ = {isa = PBXBuildFile; fileRef = 048127E118BFBA0700D424D5 /* icon144.png */; };
 		155C183218BE468500537529 /* libCore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 155C182F18BE467700537529 /* libCore.a */; };
 		34986FD0174FAC8300A3088E /* libFiftyThreeSdk.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 34986FCD174FAC6400A3088E /* libFiftyThreeSdk.a */; };
-		34986FDF174FAF8800A3088E /* libCommon.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 34986FDA174FAF7C00A3088E /* libCommon.a */; };
-		3C093CE517CF90F2003B4A0D /* libAFNetworking.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3C093CDA17CF90CC003B4A0D /* libAFNetworking.a */; };
-		3C093CE617CF90F2003B4A0D /* libGlobalSettings.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3C093CE017CF90DE003B4A0D /* libGlobalSettings.a */; };
 		3C23828217B3174000161277 /* Crashlytics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3C23828117B3174000161277 /* Crashlytics.framework */; };
 		3C2FE9641819EF0C00FE7190 /* CoreTelephony.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3C2FE9631819EF0C00FE7190 /* CoreTelephony.framework */; };
 		3C2FE9691819EF1900FE7190 /* AdSupport.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3C2FE9681819EF1900FE7190 /* AdSupport.framework */; };
@@ -56,7 +53,6 @@
 		6669D05A173C038B00BB15C3 /* ExternalAccessory.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6669D059173C038B00BB15C3 /* ExternalAccessory.framework */; };
 		6669D05C173C066800BB15C3 /* ViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6669D05B173C066800BB15C3 /* ViewController.xib */; };
 		6669D060173C0D3900BB15C3 /* CoreBluetooth.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6669D05F173C0D3900BB15C3 /* CoreBluetooth.framework */; };
-		92FCDD9F188051920028CCC7 /* libInAppSettingsKit.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 92FCDD9E188051760028CCC7 /* libInAppSettingsKit.a */; };
 		92FCDDA3188052350028CCC7 /* MessageUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 92FCDDA2188052350028CCC7 /* MessageUI.framework */; };
 /* End PBXBuildFile section */
 
@@ -103,13 +99,6 @@
 			remoteGlobalIDString = B96AD1DF13949F8F0036028E;
 			remoteInfo = CommonTests;
 		};
-		34986FDD174FAF8300A3088E /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 34986FD4174FAF7B00A3088E /* Common.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = B96AD1D113949F8F0036028E;
-			remoteInfo = Common;
-		};
 		3C093CD917CF90CC003B4A0D /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 3C093CD517CF90CC003B4A0D /* AFNetworking.xcodeproj */;
@@ -124,19 +113,12 @@
 			remoteGlobalIDString = 34576CFB1608CBB800825F06;
 			remoteInfo = GlobalSettings;
 		};
-		3C093CE117CF90EE003B4A0D /* PBXContainerItemProxy */ = {
+		3CC02D19193A5B9A00F38A13 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 3C093CD517CF90CC003B4A0D /* AFNetworking.xcodeproj */;
+			containerPortal = 155C182918BE467700537529 /* Core.xcodeproj */;
 			proxyType = 1;
-			remoteGlobalIDString = 3CE2FE68164AE1AF008DD18E;
-			remoteInfo = AFNetworking;
-		};
-		3C093CE317CF90EE003B4A0D /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 3C093CDB17CF90DE003B4A0D /* GlobalSettings.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = 34576CFA1608CBB800825F06;
-			remoteInfo = GlobalSettings;
+			remoteGlobalIDString = 04EDB34F18BCFBD900E35A40;
+			remoteInfo = Core;
 		};
 		3CD6FA4317DE3056001E5F82 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -171,13 +153,6 @@
 			containerPortal = 92FCDD96188051760028CCC7 /* InAppSettingsKit.xcodeproj */;
 			proxyType = 2;
 			remoteGlobalIDString = B9CF307D13A91A3700ED443E;
-			remoteInfo = InAppSettingsKit;
-		};
-		92FCDDA0188051990028CCC7 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 92FCDD96188051760028CCC7 /* InAppSettingsKit.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = B9CF307C13A91A3700ED443E;
 			remoteInfo = InAppSettingsKit;
 		};
 /* End PBXContainerItemProxy section */
@@ -257,12 +232,9 @@
 			files = (
 				155C183218BE468500537529 /* libCore.a in Frameworks */,
 				92FCDDA3188052350028CCC7 /* MessageUI.framework in Frameworks */,
-				92FCDD9F188051920028CCC7 /* libInAppSettingsKit.a in Frameworks */,
 				3CC736AB1863754A005BD0C7 /* libT1PogoManager.a in Frameworks */,
 				3C8173971815CAAC000C4FFD /* boost.framework in Frameworks */,
 				3CD6FA4717DE3063001E5F82 /* libAppBlade.a in Frameworks */,
-				3C093CE517CF90F2003B4A0D /* libAFNetworking.a in Frameworks */,
-				3C093CE617CF90F2003B4A0D /* libGlobalSettings.a in Frameworks */,
 				3C2FE9691819EF1900FE7190 /* AdSupport.framework in Frameworks */,
 				3CE80C0C17CE7CBB00AA73A0 /* AVFoundation.framework in Frameworks */,
 				3CE80C0817CE7BE900AA73A0 /* MobileCoreServices.framework in Frameworks */,
@@ -282,7 +254,6 @@
 				3CE80BF117CE79BD00AA73A0 /* CFNetwork.framework in Frameworks */,
 				3CE80BF217CE79BD00AA73A0 /* GLKit.framework in Frameworks */,
 				6669D060173C0D3900BB15C3 /* CoreBluetooth.framework in Frameworks */,
-				34986FDF174FAF8800A3088E /* libCommon.a in Frameworks */,
 				34986FD0174FAC8300A3088E /* libFiftyThreeSdk.a in Frameworks */,
 				6669D05A173C038B00BB15C3 /* ExternalAccessory.framework in Frameworks */,
 				6669CFFE173C008C00BB15C3 /* Foundation.framework in Frameworks */,
@@ -545,11 +516,8 @@
 			buildRules = (
 			);
 			dependencies = (
-				92FCDDA1188051990028CCC7 /* PBXTargetDependency */,
+				3CC02D1A193A5B9A00F38A13 /* PBXTargetDependency */,
 				3CD6FA4917DE3068001E5F82 /* PBXTargetDependency */,
-				3C093CE217CF90EE003B4A0D /* PBXTargetDependency */,
-				3C093CE417CF90EE003B4A0D /* PBXTargetDependency */,
-				34986FDE174FAF8300A3088E /* PBXTargetDependency */,
 				34986FCF174FAC7E00A3088E /* PBXTargetDependency */,
 			);
 			name = CharcoalLineTest;
@@ -795,20 +763,10 @@
 			name = FiftyThreeSdk;
 			targetProxy = 34986FCE174FAC7E00A3088E /* PBXContainerItemProxy */;
 		};
-		34986FDE174FAF8300A3088E /* PBXTargetDependency */ = {
+		3CC02D1A193A5B9A00F38A13 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			name = Common;
-			targetProxy = 34986FDD174FAF8300A3088E /* PBXContainerItemProxy */;
-		};
-		3C093CE217CF90EE003B4A0D /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = AFNetworking;
-			targetProxy = 3C093CE117CF90EE003B4A0D /* PBXContainerItemProxy */;
-		};
-		3C093CE417CF90EE003B4A0D /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = GlobalSettings;
-			targetProxy = 3C093CE317CF90EE003B4A0D /* PBXContainerItemProxy */;
+			name = Core;
+			targetProxy = 3CC02D19193A5B9A00F38A13 /* PBXContainerItemProxy */;
 		};
 		3CD6FA4917DE3068001E5F82 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -819,11 +777,6 @@
 			isa = PBXTargetDependency;
 			target = 6669CFF7173C008C00BB15C3 /* CharcoalLineTest */;
 			targetProxy = 6669D023173C008D00BB15C3 /* PBXContainerItemProxy */;
-		};
-		92FCDDA1188051990028CCC7 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = InAppSettingsKit;
-			targetProxy = 92FCDDA0188051990028CCC7 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
