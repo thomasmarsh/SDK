@@ -8,16 +8,16 @@
 #import <Security/Security.h>
 
 #import "Common/DeviceInfo.h"
-#import "Common/NSData+Crypto.h"
 #import "Common/NSString+Helpers.h"
-#import "Core/UIView+Helpers.h"
+#import "Core/NSData+Crypto.h"
 #import "Core/Timer.h"
+#import "Core/UIView+Helpers.h"
 #import "FiftyThreeSdk/FTFirmwareManager.h"
 #import "FiftyThreeSdk/FTFirmwareUpdateProgressView.h"
 #import "FiftyThreeSdk/FTLog.h"
 #import "FiftyThreeSdk/FTPen+Private.h"
-#import "FiftyThreeSdk/FTPenManager+Private.h"
 #import "FiftyThreeSdk/FTPenManager+Internal.h"
+#import "FiftyThreeSdk/FTPenManager+Private.h"
 #import "FiftyThreeSdk/FTPenManager.h"
 #import "KeychainItemWrapper/KeychainItemWrapper.h"
 #import "RscMgr.h"
@@ -31,8 +31,8 @@ NSString *applicationDocumentsDirectory()
     return basePath;
 }
 
-using fiftythree::core::Timer;
 using namespace fiftythree::common;
+using fiftythree::core::Timer;
 
 @interface ViewController () <UIAlertViewDelegate,
 RscMgrDelegate,
