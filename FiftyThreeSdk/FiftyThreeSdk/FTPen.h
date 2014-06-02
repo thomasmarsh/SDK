@@ -56,6 +56,7 @@ extern NSString * const kFTPenBatteryLevelPropertyName;
 @property (nonatomic, readonly) NSString *systemID;
 @property (nonatomic, readonly) NSString *IEEECertificationData;
 @property (nonatomic, readonly) PnPID PnPID;
+
 // Pen Client
 @property (nonatomic, readonly) BOOL isTipPressed;
 @property (nonatomic, readonly) BOOL isEraserPressed;
@@ -63,7 +64,6 @@ extern NSString * const kFTPenBatteryLevelPropertyName;
 @property (nonatomic, readonly) float eraserPressure;
 @property (nonatomic, readonly) NSDate *lastTipReleaseTime;
 @property (nonatomic, readonly) NSNumber *batteryLevel;
-@property (nonatomic)  UInt32 centralId;
 
 @end
 

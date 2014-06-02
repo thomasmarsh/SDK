@@ -28,7 +28,6 @@
 #import "TIUpdateManager.h"
 #import "TransitionKit.h"
 
-extern NSString * const kFTPenCentralIdPropertyName;
 static NSString * const kCharcoalPeripheralName = @"Charcoal by 53";
 static NSString * const kPencilPeripheralName = @"Pencil";
 

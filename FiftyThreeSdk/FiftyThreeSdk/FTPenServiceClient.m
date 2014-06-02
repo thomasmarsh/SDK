@@ -16,8 +16,6 @@
 #import "FTPenServiceClient.h"
 #import "FTServiceUUIDs.h"
 
-extern NSString  * const kFTPenCentralIdPropertyName;
-
 @interface FTPenServiceClient ()
 
 @property (nonatomic) CBPeripheral *peripheral;

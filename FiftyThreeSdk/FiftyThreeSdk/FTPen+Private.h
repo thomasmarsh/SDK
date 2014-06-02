@@ -20,6 +20,7 @@ extern NSString * const kFTPenNumResetsPropertyName;
 extern NSString * const kFTPenNumLinkTerminationsPropertyName;
 extern NSString * const kFTPenNumDroppedNotificationsPropertyName;
 extern NSString * const kFTPenConnectedSecondsPropertyName;
+extern NSString * const kFTPenCentralIdPropertyName;
 
 extern NSString * const kFTPenInactivityTimeoutPropertyName;
 extern NSString * const kFTPenPressureSetupPropertyName;
@@ -101,6 +102,8 @@ extern NSString * const kFTPenAuthenticationCodePropertyName;
 
 @property (nonatomic, weak) id<FTPenPrivateDelegate> privateDelegate;
 @property (nonatomic, readonly) CBPeripheral *peripheral;
+
+@property (nonatomic) UInt32 centralId;
 
 @property (nonatomic) BOOL hasListener;
 @property (nonatomic) FTPenPressureSetup *pressureSetup;
