@@ -238,13 +238,13 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
 @property (nonatomic) CADisplayLink *displayLink;
 
-@property (nonatomic) BOOL connectedViaWarmStart;
+@property (nonatomic) BOOL didConnectViaWarmStart;
 
 @property (nonatomic) UInt32 centralId;
 
 @property (nonatomic) UInt32 potentialCentralId;
 
-@property (nonatomic) NSInteger originalInactiviteTimeout;
+@property (nonatomic) NSInteger originalInactivityTimeout;
 @end
 
 @implementation FTPenManager
@@ -344,7 +344,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
     [self.displayLink invalidate];
     self.displayLink = nil;
-    self.originalInactiviteTimeout = 0;
+    self.originalInactivityTimeout = 0;
 }
 
 #pragma mark - Properties
@@ -709,7 +709,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
             if ([peripheral.name isEqualToString:kPencilPeripheralName] ||
                 [peripheral.name isEqualToString:kCharcoalPeripheralName])
             {
-                self.connectedViaWarmStart = YES;
+                self.didConnectViaWarmStart = YES;
                 FTAssert(!weakSelf.pen, @"pen is nil");
                 weakSelf.pen = [[FTPen alloc] initWithPeripheral:peripheral];
 
@@ -799,7 +799,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
         weakSelf.centralId = weakSelf.potentialCentralId;
         weakSelf.state = FTPenManagerStateConnected;
-        weakSelf.connectedViaWarmStart = NO;
+        weakSelf.didConnectViaWarmStart = NO;
     }];
 
     // Married - Waiting for Long Press to Disconnect
@@ -1032,7 +1032,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
         [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenManagerFirmwareUpdateDidBegin
                                                             object:self];
 
-        weakSelf.originalInactiviteTimeout = weakSelf.pen.inactivityTimeout;
+        weakSelf.originalInactivityTimeout = weakSelf.pen.inactivityTimeout;
         weakSelf.pen.inactivityTimeout = 0;
         weakSelf.pen.hasListener = NO;
 
@@ -1050,10 +1050,10 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
         [weakSelf.updateManager cancelUpdate];
         weakSelf.updateManager = nil;
 
-        weakSelf.pen.inactivityTimeout = weakSelf.originalInactiviteTimeout;
+        weakSelf.pen.inactivityTimeout = weakSelf.originalInactivityTimeout;
         weakSelf.pen.hasListener = YES;
 
-        // RestZore the idle timer disable flag to its original state.
+        // Restore the idle timer disable flag to its original state.
         [UIApplication sharedApplication].idleTimerDisabled = NO;
     }];
 

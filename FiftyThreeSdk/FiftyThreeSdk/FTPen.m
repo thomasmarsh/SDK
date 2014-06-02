@@ -539,9 +539,9 @@ NSString * const kFTPenCentralIdPropertyName = @"centralId";
 
 - (void)penServiceClient:(FTPenServiceClient *)serviceClient didReadCentralId:(UInt32)centralId
 {
-    [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenDidUpdatePropertiesNotificationName
+    [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenDidUpdatePrivatePropertiesNotificationName
                                                         object:self
-                                                      userInfo:@{ kFTPenNotificationPropertiesKey:[NSMutableSet setWithObject:kFTPenCentralIdPropertyName]}];
+                                                      userInfo:@{ kFTPenNotificationPropertiesKey:[NSSet setWithObject:kFTPenCentralIdPropertyName] }];
 
 }
 
