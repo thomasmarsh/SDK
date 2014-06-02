@@ -35,7 +35,6 @@
 		04BD4AD518D74EC4003FCCCF /* TrivialBlit.vsh in Resources */ = {isa = PBXBuildFile; fileRef = 04C3135C18D74E85008097D1 /* TrivialBlit.vsh */; };
 		04C3133C18D3841B008097D1 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 04C3133B18D3841B008097D1 /* QuartzCore.framework */; };
 		15BB4DD218E9F705007BE707 /* FTADrawer.m in Sources */ = {isa = PBXBuildFile; fileRef = 15BB4DD118E9F705007BE707 /* FTADrawer.m */; };
-		3CC02D36193BEE7700F38A13 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3CC02D35193BEE7700F38A13 /* Security.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -126,7 +125,6 @@
 		04C3135C18D74E85008097D1 /* TrivialBlit.vsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; name = TrivialBlit.vsh; path = Shaders/TrivialBlit.vsh; sourceTree = "<group>"; };
 		15BB4DD018E9F705007BE707 /* FTADrawer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FTADrawer.h; sourceTree = "<group>"; };
 		15BB4DD118E9F705007BE707 /* FTADrawer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FTADrawer.m; sourceTree = "<group>"; };
-		3CC02D35193BEE7700F38A13 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -134,7 +132,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3CC02D36193BEE7700F38A13 /* Security.framework in Frameworks */,
 				04C3133C18D3841B008097D1 /* QuartzCore.framework in Frameworks */,
 				0489D4D018CE78B400B41E20 /* CoreBluetooth.framework in Frameworks */,
 				0489D4CE18CE78A900B41E20 /* libc++.dylib in Frameworks */,
@@ -184,7 +181,6 @@
 		0489D47318CE75D100B41E20 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				3CC02D35193BEE7700F38A13 /* Security.framework */,
 				04C3133B18D3841B008097D1 /* QuartzCore.framework */,
 				0489D4CF18CE78B400B41E20 /* CoreBluetooth.framework */,
 				0489D4CD18CE78A900B41E20 /* libc++.dylib */,
