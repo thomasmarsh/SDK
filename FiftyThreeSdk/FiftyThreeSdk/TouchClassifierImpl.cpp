@@ -7,13 +7,11 @@
 #include <ios>
 #include <vector>
 
-#include "Common/Touch/PenManager.h"
 #include "Core/Touch/Touch.h"
 #include "Core/Touch/TouchTracker.h"
 #include "FiftyThreeSdk/Classification//Classifier.h"
 #include "FiftyThreeSdk/TouchClassifierImpl.h"
 
-using namespace fiftythree::common;
 using namespace fiftythree::core;
 using namespace fiftythree::sdk;
 using fiftythree::core::make_shared;

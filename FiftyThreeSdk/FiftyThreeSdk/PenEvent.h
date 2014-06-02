@@ -7,10 +7,10 @@
 
 #pragma once
 
-#include "Common/Touch/PenManager.h"
 #include "Core/Enum.h"
 #include "Core/Memory.h"
 #include "Core/NoCopy.h"
+#include "Core/Touch/InputSample.h"
 
 namespace fiftythree
 {
