@@ -60,9 +60,6 @@
       location = "group:../../ThirdParty/AppBlade/iOS/Framework/AppBlade.xcodeproj">
    </FileRef>
    <FileRef
-      location = "group:CharcoalLineTest/CharcoalLineTest.xcodeproj">
-   </FileRef>
-   <FileRef
       location = "group:../../Core/Core.xcodeproj">
    </FileRef>
    <FileRef
