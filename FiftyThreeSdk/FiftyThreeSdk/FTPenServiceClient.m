@@ -48,6 +48,7 @@
 @property (nonatomic) BOOL didInitialReadOfLastErrorCode;
 @property (nonatomic) BOOL didInitialReadOfAuthenticationCode;
 @property (nonatomic) BOOL didInitialReadOfCentralId;
+@property (nonatomic) BOOL isCentralIdDirty;
 
 @property (nonatomic, readwrite) NSDate *lastTipReleaseTime;
 
@@ -211,13 +212,21 @@
 
 - (void)setCentralId:(UInt32)centralId
 {
-    if (self.centralIdCharacteristic)
+    _centralId = centralId;
+    self.isCentralIdDirty = YES;
+
+    [self ensureCentralIdCharacteristicWrite];
+}
+
+- (void)ensureCentralIdCharacteristicWrite
+{
+    if (self.isCentralIdDirty && self.centralIdCharacteristic)
     {
-        NSData * data = [NSData dataWithBytes:&centralId length:4];
+        NSData * data = [NSData dataWithBytes:&_centralId length:4];
         [self.peripheral writeValue:data
                   forCharacteristic:self.centralIdCharacteristic
                                type:CBCharacteristicWriteWithResponse];
-        _centralId = centralId;
+        self.isCentralIdDirty = NO;
     }
 }
 
@@ -447,6 +456,7 @@
             [characteristic.UUID isEqual:[FTPenServiceUUIDs centralId]])
         {
             self.centralIdCharacteristic = characteristic;
+            [self ensureCentralIdCharacteristicWrite];
         }
     }
 
@@ -779,7 +789,14 @@
 
         if (self.centralIdCharacteristic && !self.didInitialReadOfCentralId)
         {
-            [self.peripheral readValueForCharacteristic:self.centralIdCharacteristic];
+            if (self.isCentralIdDirty)
+            {
+                [self ensureCentralIdCharacteristicWrite];
+            }
+            else
+            {
+                [self.peripheral readValueForCharacteristic:self.centralIdCharacteristic];
+            }
             self.didInitialReadOfCentralId = YES;
         }
     }
