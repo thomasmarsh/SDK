@@ -54,7 +54,6 @@ static const NSTimeInterval kDatingScanningTimeout = 4.f;
 static const NSTimeInterval kEngagedStateTimeout = 0.1;
 static const NSTimeInterval kIsScanningForPeripheralsToggleTimerInterval = 0.1;
 static const NSTimeInterval kSwingingStateTimeout = 4.0;
-static const NSTimeInterval kSeparatedStateTimeout = kInactivityTimeout;
 static const NSTimeInterval kMarriedWaitingForLongPressToUnpairTimeout = 1.5;
 static const NSTimeInterval kSeparatedWaitingForLongPressToUnpairTimeout = 1.5;
 static const NSTimeInterval kAttemptingConnectionStateTimeout = 15.0;
