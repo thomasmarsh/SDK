@@ -152,7 +152,6 @@ IdTypeMap DumbStylusClassifier::ReclassifyCurrentEvent()
             StrokeStatistics::cPtr stats = _touchLog->Stroke(cluster->_touchIds.back())->Statistics();
 
             Cluster::Ptr otherCluster;
-            TouchClassification    otherType;
             for (Cluster::Ptr const & otherCluster : _commonData->proxy->ClusterTracker()->ConcurrentClusters(cluster, false))
             {
                 if (cluster == otherCluster || otherCluster->_clusterTouchType != TouchClassification::Pen)

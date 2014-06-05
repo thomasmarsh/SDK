@@ -48,8 +48,6 @@ NSString * const kFTPenManagerFirmwareUpdateDidCompleteSuccessfully = @"com.fift
 NSString * const kFTPenManagerFirmwareUpdateDidFail = @"com.fiftythree.penManger.firmwareUpdateDidFail";
 NSString * const kFTPenManagerFirmwareUpdateWasCancelled = @"com.fiftythree.penManger.firmwareUpdateWasCancelled";
 
-static const int kInterruptedUpdateDelayMax = 30;
-
 static const NSTimeInterval kInactivityTimeout = 10.0 * 60.0;
 static const NSTimeInterval kDatingScanningTimeout = 4.f;
 static const NSTimeInterval kEngagedStateTimeout = 0.1;
