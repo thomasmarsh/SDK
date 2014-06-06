@@ -195,6 +195,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
 @property (nonatomic) UIBackgroundTaskIdentifier backgroundTaskId;
 
+@property (nonatomic) NSInteger originalInactiviteTimeout;
 @end
 
 @implementation FTPenManager
@@ -284,6 +285,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
     _centralManager.delegate = nil;
     _centralManager = nil;
+    self.originalInactiviteTimeout = 0;
 }
 
 #pragma mark - Properties
@@ -906,6 +908,10 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
         [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenManagerFirmwareUpdateDidBegin
                                                             object:self];
 
+        weakSelf.originalInactiviteTimeout = weakSelf.pen.inactivityTimeout;
+        weakSelf.pen.inactivityTimeout = 0;
+        weakSelf.pen.hasListener = NO;
+
         // Discourage the device from going to sleep while the firmware is updating.
         [UIApplication sharedApplication].idleTimerDisabled = YES;
 
@@ -920,7 +926,10 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
         [weakSelf.updateManager cancelUpdate];
         weakSelf.updateManager = nil;
 
-        // Restore the idle timer disable flag to its original state.
+        weakSelf.pen.inactivityTimeout = weakSelf.originalInactiviteTimeout;
+        weakSelf.pen.hasListener = YES;
+
+        // RestZore the idle timer disable flag to its original state.
         [UIApplication sharedApplication].idleTimerDisabled = NO;
     }];
 
