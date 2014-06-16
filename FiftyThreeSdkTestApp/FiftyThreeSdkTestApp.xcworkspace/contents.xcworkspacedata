@@ -54,25 +54,10 @@
       </FileRef>
    </Group>
    <FileRef
-      location = "group:../../AFNetworking/AFNetworking.xcodeproj">
-   </FileRef>
-   <FileRef
-      location = "group:../../ThirdParty/AppBlade/iOS/Framework/AppBlade.xcodeproj">
-   </FileRef>
-   <FileRef
       location = "group:../../Core/Core.xcodeproj">
    </FileRef>
    <FileRef
-      location = "group:../../Common/Common.xcodeproj">
-   </FileRef>
-   <FileRef
       location = "group:../FiftyThreeSdk/FiftyThreeSdk.xcodeproj">
-   </FileRef>
-   <FileRef
-      location = "group:../../GlobalSettings/GlobalSettings.xcodeproj">
-   </FileRef>
-   <FileRef
-      location = "group:../../ThirdParty/InAppSettingsKit/InAppSettingsKit.xcodeproj">
    </FileRef>
    <FileRef
       location = "group:TestApp/TestApp.xcodeproj">
