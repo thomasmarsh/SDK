@@ -9,6 +9,7 @@
 
 #import "FTPen.h"
 #import "FTPenManager.h"
+#import "FTXCallbackURL.h"
 
 extern NSString * const kFTPenManagerDidUpdateStateNotificationName;
 extern NSString * const kFTPenManagerDidFailToDiscoverPenNotificationName;
@@ -20,6 +21,8 @@ extern NSString * const kFTPenManagerDidFailToDiscoverPenNotificationName;
 @property (nonatomic, readonly) FTPen *pen;
 
 @property (nonatomic) BOOL isPairingSpotPressed;
+
+@property (nonatomic, readonly) FTXCallbackURL *pencilFirmwareUpgradeURL;
 
 - (void)disconnect;
 

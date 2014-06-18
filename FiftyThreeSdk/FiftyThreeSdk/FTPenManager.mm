@@ -192,9 +192,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 @end
 
 @interface FTPenManager () <CBCentralManagerDelegate, TIUpdateManagerDelegate, PenConnectionViewDelegate>
-{
-    BOOL _isPairingSpotPressed;
-}
+
 @property (nonatomic) BOOL isPairingSpotPressed;
 
 @property (nonatomic) CBCentralManager *centralManager;
@@ -244,10 +242,25 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 @property (nonatomic) UInt32 potentialCentralId;
 
 @property (nonatomic) NSInteger originalInactivityTimeout;
+
+@property (nonatomic) BOOL isFetchingLatestFirmware;
+
+@property (nonatomic) NSInteger latestFirmwareVersion;
+
+@property (nonatomic) NSDate *lastFirmwareCheckTime;
+
+@property (nonatomic, readwrite) BOOL firmwareUpdateIsAvailble;
+
+@property (nonatomic, readwrite) NSURL *firmwareUpdateReleaseNotesLink;
+
+@property (nonatomic, readwrite) NSURL *firmwareUpdateSupportLink;
+
 @end
 
 @implementation FTPenManager
-
+{
+    BOOL _automaticUpdatesEnabled;
+}
 - (id)init
 {
     self = [super init];
@@ -311,6 +324,11 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
         self.trialSeparationMonitor.penManager = self;
 
         self.pairingViews = [@[] mutableCopy];
+
+        self.shouldCheckForFirmwareUpdates = NO;
+        self.firmwareUpdateIsAvailble = NO;
+        self.firmwareUpdateReleaseNotesLink = [NSURL URLWithString:@"https://www.fiftythree.com/link/support/pencil-firmware-release-notes"];
+        self.firmwareUpdateSupportLink = [NSURL URLWithString:@"http://www.fiftythree.com/link/support/pencil-firmware-upgrade"];
     }
 
     return self;
@@ -566,7 +584,9 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
         if (self.pen.firmwareRevision)
         {
-            self.info.firmwareRevision = self.pen.firmwareRevision;
+            NSInteger currentVersion = [FTFirmwareManager currentRunningFirmwareVersion:self.pen];
+            self.info.firmwareRevision = [@(currentVersion) stringValue];
+            [self attemptLoadFirmwareFromNetworkForVersionChecking];
         }
 
         if (self.pen.name)
@@ -1866,6 +1886,48 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
 #pragma mark - Firmware
 
+// This is used by the SDK during connection to see if we should notify SDK users that a firmware update
+// is availble.
+- (void)attemptLoadFirmwareFromNetworkForVersionChecking
+{
+    if (FTPenManagerStateIsConnected(self.state) && self.pen.firmwareRevision != nil)
+    {
+        BOOL checkedRecently = self.lastFirmwareCheckTime && fabs([self.lastFirmwareCheckTime timeIntervalSinceNow]) > 60.0 * 5; // 5 minutes.
+
+        if (self.shouldCheckForFirmwareUpdates && !self.isFetchingLatestFirmware && !checkedRecently)
+        {
+            self.isFetchingLatestFirmware = YES;
+
+            [FTFirmwareManager fetchLatestFirmwareWithCompletionHandler:^(NSData *data)
+             {
+                 self.isFetchingLatestFirmware = NO;
+                 BOOL connected = FTPenManagerStateIsConnected(self.state);
+                 if (data && connected && self.pen.firmwareRevision)
+                 {
+                     NSInteger version = [FTFirmwareManager versionOfImage:data];
+                     NSInteger currentVersion = [FTFirmwareManager currentRunningFirmwareVersion:self.pen];
+                     if (version > currentVersion)
+                     {
+                         self.latestFirmwareVersion = version;
+                         self.lastFirmwareCheckTime = [NSDate date];
+                         self.firmwareUpdateIsAvailble = YES;
+
+                         // OK let the outside world know
+                         if ([self.delegate respondsToSelector:@selector(penManagerFirmwareUpdateIsAvailbleDidChange)])
+                         {
+                             [self.delegate penManagerFirmwareUpdateIsAvailbleDidChange];
+                         }
+                     }
+                     else
+                     {
+                         self.firmwareUpdateIsAvailble = NO;
+                     }
+                 }
+             }];
+        }
+    }
+}
+
 - (NSNumber *)isFirmwareUpdateAvailable:(NSInteger *)currentVersion
                           updateVersion:(NSInteger *)updateVersion
 {
@@ -2110,6 +2172,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     _automaticUpdatesEnabled = useDisplayLink;
     [self ensureNeedsUpdate];
 }
+
 - (void)update
 {
     NSAssert([NSThread isMainThread], @"update must be called on the UI thread.");
@@ -2156,4 +2219,45 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     sharedInstance = nil;
 }
 
+#pragma mark - Firmware Upgrade Inter app Communication
+// Internal. TODO: once hotfix is RI-ed back to develop move PaperAppDelegate to use this for scheme tests.
+- (FTXCallbackURL *)pencilFirmwareUpgradeURL
+{
+    return [FTXCallbackURL URLWithScheme:@"PencilByFiftyThree"
+                                    host:@"x-callback-url"
+                                  action:@"firmwareupgrade"
+                                  source:nil
+                              successUrl:nil
+                                errorUrl:nil
+                               cancelUrl:nil];
+}
+
+// Returns NO if you're on an iphone or a device with out Paper installed. (Or an older build of Paper that
+// doesn't support the firmware upgrades of Pencil.
+- (BOOL)canInvokePaperToUpdatePencilFirmware
+{
+    return  [[UIApplication sharedApplication] canOpenURL:self.pencilFirmwareUpgradeURL];
+}
+
+- (BOOL)invokePaperToUpdatePencilFirmware:(NSString *)source
+                                  success:(NSURL *)successCallbackUrl
+                                    error:(NSURL *)errorCallbackUrl
+                                   cancel:(NSURL *)cancelCallbackUrl
+{
+    FTXCallbackURL *baseUrl = self.pencilFirmwareUpgradeURL;
+    if ([[UIApplication sharedApplication] canOpenURL:baseUrl])
+    {
+        FTXCallbackURL *urlWithCallbacks = [FTXCallbackURL URLWithScheme:baseUrl.scheme
+                                                                    host:baseUrl.host
+                                                                  action:baseUrl.action
+                                                                  source:source
+                                                              successUrl:successCallbackUrl
+                                                                errorUrl:errorCallbackUrl
+                                                               cancelUrl:cancelCallbackUrl];
+
+        BOOL result = [[UIApplication sharedApplication] openURL:urlWithCallbacks];
+        return result;
+    }
+    return NO;
+}
 @end

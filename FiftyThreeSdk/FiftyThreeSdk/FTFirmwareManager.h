@@ -2,7 +2,7 @@
 //  FTFirmwareManager.h
 //  FiftyThreeSdk
 //
-//  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
+//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
 
 #pragma once
@@ -34,4 +34,9 @@ typedef NS_ENUM(NSInteger, FTFirmwareImageType) {
 
 + (FTFirmwareImageType)imageTypeRunningOnPen:(FTPen *)pen;
 
++ (void)fetchLatestFirmwareWithCompletionHandler:(void (^)(NSData *))handler;
+
++ (NSInteger)versionOfImage:(NSData *)image;
+
++ (NSInteger)currentRunningFirmwareVersion:(FTPen *)pen;
 @end
