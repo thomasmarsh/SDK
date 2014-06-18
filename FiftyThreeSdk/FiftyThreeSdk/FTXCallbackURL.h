@@ -14,7 +14,7 @@
 {
 }
 // Create a XCallbackUrl with named parameters. This sets up query parameters & url encodes the bits.
-+ (FTXCallbackURL *)UrlWithScheme:(NSString *)scheme
++ (FTXCallbackURL *)URLWithScheme:(NSString *)scheme
                              host:(NSString *)host
                            action:(NSString *)action
                            source:(NSString *)source
@@ -23,7 +23,7 @@
                         cancelUrl:(NSURL *)cancel;
 
 // Parse components etc.. out of an vanilla NSURL.
-+ (FTXCallbackURL *)UrlWithNSURL:(NSURL *)other;
++ (FTXCallbackURL *)URLWithNSURL:(NSURL *)other;
 
 @property (nonatomic, readonly) NSString *source;
 @property (nonatomic, readonly) NSURL *successUrl;

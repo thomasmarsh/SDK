@@ -23,7 +23,7 @@ NSString * const kFTXCallbackUrlSuccessKey = @"x-error";
 
 @implementation FTXCallbackURL
 // Create a XCallbackUrl with named parameters. This sets up query parameters & url encodes the bits.
-+ (FTXCallbackURL *)UrlWithScheme:(NSString *)scheme
++ (FTXCallbackURL *)URLWithScheme:(NSString *)scheme
                              host:(NSString *)host
                            action:(NSString *)action
                            source:(NSString *)source
@@ -66,7 +66,7 @@ NSString * const kFTXCallbackUrlSuccessKey = @"x-error";
             NSMutableString *component = [@"" mutableCopy];
             [component appendString:kFTXCallbackUrlErrorKey];
             [component appendString:@"="];
-            [component appendString:[[success absoluteString] urlEncodeUsingEncoding:NSUTF8StringEncoding]];
+            [component appendString:[[error absoluteString] urlEncodeUsingEncoding:NSUTF8StringEncoding]];
             [queryComponents addObject:component];
 
         }
@@ -76,7 +76,7 @@ NSString * const kFTXCallbackUrlSuccessKey = @"x-error";
             NSMutableString *component = [@"" mutableCopy];
             [component appendString:kFTXCallbackUrlCancelKey];
             [component appendString:@"="];
-            [component appendString:[[success absoluteString] urlEncodeUsingEncoding:NSUTF8StringEncoding]];
+            [component appendString:[[cancel absoluteString] urlEncodeUsingEncoding:NSUTF8StringEncoding]];
             [queryComponents addObject:component];
 
         }
@@ -110,8 +110,10 @@ NSString * const kFTXCallbackUrlSuccessKey = @"x-error";
 
         if (range.location != NSNotFound)
         {
-            [parameters setValue:[[parameter substringFromIndex:range.location+range.length] urlDecodeUsingEncoding:NSUTF8StringEncoding]
-                          forKey:[[parameter substringToIndex:range.location] urlDecodeUsingEncoding:NSUTF8StringEncoding]];
+            NSString * value = [parameter substringFromIndex:range.location+range.length];
+            NSString * urlDecodedValue = [value urlDecodeUsingEncoding:NSUTF8StringEncoding];
+            [parameters setValue:urlDecodedValue
+                          forKey:[parameter substringToIndex:range.location]];
         }
         else
         {
@@ -121,7 +123,7 @@ NSString * const kFTXCallbackUrlSuccessKey = @"x-error";
     return parameters;
 }
 
-+ (FTXCallbackURL *)UrlWithNSURL:(NSURL *)other
++ (FTXCallbackURL *)URLWithNSURL:(NSURL *)other
 {
     FTXCallbackURL *url = [[FTXCallbackURL alloc] initWithString:[other absoluteString]];
     NSDictionary *queryParameters = [FTXCallbackURL parseQueryString:other.query];
@@ -148,8 +150,9 @@ NSString * const kFTXCallbackUrlSuccessKey = @"x-error";
 
     if (other.path)
     {
-        url.action = url.path;
+        url.action = ([url.path characterAtIndex:0] == '/')? [url.path substringFromIndex:1] : url.path;
     }
+    return url;
 }
 
 @end
