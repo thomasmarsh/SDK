@@ -187,7 +187,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
 - (NSURL *)learnMoreURL
 {
-    return [NSURL URLWithString:@"https://pencil.fiftythree.com"];
+    return [NSURL URLWithString:@"https://www.fiftythree.com/pencil"];
 }
 @end
 
