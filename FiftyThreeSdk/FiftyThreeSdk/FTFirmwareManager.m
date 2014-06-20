@@ -66,8 +66,7 @@ NSString *applicationDocumentsDirectory()
                                                                       delegate: nil
                                                                  delegateQueue: [NSOperationQueue mainQueue]];
 
-    // TODO: put in final end point.
-    NSString *endPoint =  @"https://www.dropbox.com/s/xo6002d7yoh3jb7/CharcoalUpgradeImage-v68.bin?dl=1";
+    NSString *endPoint =  @"https://www.fiftythree.com/downloads/pencilv1upgradeimage.bin";
 
     [[delegateFreeSession dataTaskWithURL: [NSURL URLWithString:endPoint]
                         completionHandler:^(NSData *data,
