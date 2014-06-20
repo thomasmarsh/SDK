@@ -33,7 +33,8 @@ typedef NS_ENUM(NSInteger, FTPenBatteryLevel)
     FTPenBatteryLevelHigh,
     FTPenBatteryLevelMediumHigh,
     FTPenBatteryLevelMediumLow,
-    FTPenBatteryLevelLow
+    FTPenBatteryLevelLow,
+    FTPenBatteryLevelCriticallyLow,
 };
 
 #ifdef __cplusplus

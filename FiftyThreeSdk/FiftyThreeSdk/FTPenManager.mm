@@ -571,7 +571,11 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
         {
             int batteryLevel = [self.pen.batteryLevel intValue];
 
-            if (batteryLevel <= 25)
+            if (batteryLevel <= 10)
+            {
+                self.info.batteryLevel = FTPenBatteryLevelCriticallyLow;
+            }
+            else if (batteryLevel <= 25)
             {
                 self.info.batteryLevel = FTPenBatteryLevelLow;
             }
@@ -2279,21 +2283,21 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     return NO;
 }
 
-- (NSURL*)firmwareUpdateReleaseNotesLink
+- (NSURL *)firmwareUpdateReleaseNotesLink
 {
     return [NSURL URLWithString:@"https://www.fiftythree.com/link/support/pencil-firmware-release-notes"];
 }
 
-- (NSURL*)firmwareUpdateSupportLink
+- (NSURL *)firmwareUpdateSupportLink
 {
     return [NSURL URLWithString:@"http://www.fiftythree.com/link/support/pencil-firmware-upgrade"];
 }
 
-- (NSURL*)learnMoreURL
+- (NSURL *)learnMoreURL
 {
     return [NSURL URLWithString:@"https://www.fiftythree.com/pencil/via/sdk"];
 }
-- (NSURL*)pencilSupportURL
+- (NSURL *)pencilSupportURL
 {
     return [NSURL URLWithString:@"https://www.fiftythree.com/link/support/pencil-via-sdk"];
 }
