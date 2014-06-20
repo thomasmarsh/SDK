@@ -244,18 +244,12 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
 @property (nonatomic) NSDate *lastFirmwareCheckTime;
 
-@property (nonatomic, readwrite) BOOL firmwareUpdateIsAvailble;
-
-@property (nonatomic, readwrite) NSURL *firmwareUpdateReleaseNotesLink;
-
-@property (nonatomic, readwrite) NSURL *firmwareUpdateSupportLink;
+@property (nonatomic, readwrite) NSNumber *firmwareUpdateIsAvailble;
 
 @end
 
 @implementation FTPenManager
-{
-    BOOL _automaticUpdatesEnabled;
-}
+
 - (id)init
 {
     self = [super init];
@@ -321,9 +315,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
         self.pairingViews = [@[] mutableCopy];
 
         self.shouldCheckForFirmwareUpdates = NO;
-        self.firmwareUpdateIsAvailble = NO;
-        self.firmwareUpdateReleaseNotesLink = [NSURL URLWithString:@"https://www.fiftythree.com/link/support/pencil-firmware-release-notes"];
-        self.firmwareUpdateSupportLink = [NSURL URLWithString:@"http://www.fiftythree.com/link/support/pencil-firmware-upgrade"];
+        self.firmwareUpdateIsAvailble = nil;
     }
 
     return self;
@@ -1905,6 +1897,19 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
 #pragma mark - Firmware
 
+-(void)setFirmwareUpdateIsAvailble:(NSNumber *)firmwareUpdateIsAvailble
+{
+    if (_firmwareUpdateIsAvailble != firmwareUpdateIsAvailble)
+    {
+        // OK let the outside world know
+        if ([self.delegate respondsToSelector:@selector(penManagerFirmwareUpdateIsAvailbleDidChange)])
+        {
+            [self.delegate penManagerFirmwareUpdateIsAvailbleDidChange];
+        }
+    }
+    _firmwareUpdateIsAvailble = firmwareUpdateIsAvailble;
+}
+
 // This is used by the SDK during connection to see if we should notify SDK users that a firmware update
 // is availble.
 - (void)attemptLoadFirmwareFromNetworkForVersionChecking
@@ -1929,17 +1934,11 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
                      {
                          self.latestFirmwareVersion = version;
                          self.lastFirmwareCheckTime = [NSDate date];
-                         self.firmwareUpdateIsAvailble = YES;
-
-                         // OK let the outside world know
-                         if ([self.delegate respondsToSelector:@selector(penManagerFirmwareUpdateIsAvailbleDidChange)])
-                         {
-                             [self.delegate penManagerFirmwareUpdateIsAvailbleDidChange];
-                         }
+                         self.firmwareUpdateIsAvailble = @(YES);
                      }
                      else
                      {
-                         self.firmwareUpdateIsAvailble = NO;
+                         self.firmwareUpdateIsAvailble = @(NO);
                      }
                  }
              }];
@@ -2280,11 +2279,21 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     return NO;
 }
 
-- (NSURL *)learnMoreURL
+- (NSURL*)firmwareUpdateReleaseNotesLink
+{
+    return [NSURL URLWithString:@"https://www.fiftythree.com/link/support/pencil-firmware-release-notes"];
+}
+
+- (NSURL*)firmwareUpdateSupportLink
+{
+    return [NSURL URLWithString:@"http://www.fiftythree.com/link/support/pencil-firmware-upgrade"];
+}
+
+- (NSURL*)learnMoreURL
 {
     return [NSURL URLWithString:@"https://www.fiftythree.com/pencil/via/sdk"];
 }
-- (NSURL *)pencilSupportURL
+- (NSURL*)pencilSupportURL
 {
     return [NSURL URLWithString:@"https://www.fiftythree.com/link/support/pencil-via-sdk"];
 }

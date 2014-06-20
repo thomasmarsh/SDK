@@ -154,14 +154,14 @@ typedef NS_ENUM(NSInteger, FTPairingUIStyle) {
 // This must be called on the UI thread.
 - (void)shutdown;
 
-#pragma mark -  FTPenManager (Support & Marketing URLs)
+#pragma mark -  FTPenManager - Support & Marketing URLs
 
 // This provides a link the FiftyThree's marketing page about Pencil.
 @property (nonatomic, readonly) NSURL *learnMoreURL;
 // This provides a link the FiftyThree's general support page about Pencil.
 @property (nonatomic, readonly) NSURL *pencilSupportURL;
 
-#pragma mark -  FTPenManager (AdvancedDisplayLinkSupprt)
+#pragma mark -  FTPenManager  - Advanced DisplayLink Support
 
 // Defaults YES. We run a displayLink to drive animations and classifications.
 // this is paused when no touch or pen events have occured recently.
@@ -180,18 +180,18 @@ typedef NS_ENUM(NSInteger, FTPairingUIStyle) {
 // Only use this if you are running your own displayLink Call this at the start of your render loop.
 - (void)update;
 
-#pragma mark -  FTPenManager (FirmwareUpdateSupport)
+#pragma mark -  FTPenManager - FirmwareUpdateSupport
 
 // Defaults to NO. If YES the SDK will notify via the delegate if a firmware update for Pencil
 // is available. This *does* use WiFi to make a webservice request periodically.
 @property (nonatomic) BOOL shouldCheckForFirmwareUpdates;
 
 // Indicates if a firmware update can be installed on the connected Pencil. This is done
-// via Paper by FiftyThree.
+// via Paper by FiftyThree. This is either YES, NO or nil (if it's unknown.)
 //
 // See also shouldCheckForFirmwareUpdates
 // See also penManagerFirmwareUpdateIsAvailbleDidChange
-@property (nonatomic, readonly) BOOL firmwareUpdateIsAvailble;
+@property (nonatomic, readonly) NSNumber *firmwareUpdateIsAvailble;
 
 // Provides an link to offer some information from our support page about the firmware release notes.
 @property (nonatomic, readonly) NSURL *firmwareUpdateReleaseNotesLink;
@@ -199,7 +199,7 @@ typedef NS_ENUM(NSInteger, FTPairingUIStyle) {
 // Provides an link to offer some information from our support page about the firmware upgrade.
 @property (nonatomic, readonly) NSURL *firmwareUpdateSupportLink;
 
-// Returns NO if you're on an iphone or a device with out Paper installed. (Or an older build of Paper that
+// Returns NO if you're on an iphone or a device without Paper installed. (Or an older build of Paper that
 // doesn't support the firmware upgrades of Pencil.)
 @property (nonatomic, readonly) BOOL canInvokePaperToUpdatePencilFirmware;
 

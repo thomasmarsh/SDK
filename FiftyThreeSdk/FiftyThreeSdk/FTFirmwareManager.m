@@ -53,22 +53,27 @@ NSString *applicationDocumentsDirectory()
     return bestImagePath ? bestImagePath : [self imagePath];
 }
 
++ (NSURL*)firmwareURL
+{
+    // TODO: put in final end point.
+    NSString *endPoint =  @"https://www.dropbox.com/s/xo6002d7yoh3jb7/CharcoalUpgradeImage-v68.bin?dl=1";
+    return [NSURL URLWithString:endPoint];
+}
+
 + (void)fetchLatestFirmwareWithCompletionHandler:(void (^)(NSData *))handler
 {
     NSURLSessionConfiguration *defaultConfigObject = [NSURLSessionConfiguration defaultSessionConfiguration];
     defaultConfigObject.allowsCellularAccess = NO;
 
-    NSURLSession *delegateFreeSession = [NSURLSession sessionWithConfiguration: defaultConfigObject
-                                                                      delegate: nil
-                                                                 delegateQueue: [NSOperationQueue mainQueue]];
+    NSURLSession *delegateFreeSession = [NSURLSession sessionWithConfiguration:defaultConfigObject
+                                                                      delegate:nil
+                                                                 delegateQueue:[NSOperationQueue mainQueue]];
 
-    // TODO: put in final end point.
-    NSString *endPoint =  @"https://www.dropbox.com/s/xo6002d7yoh3jb7/CharcoalUpgradeImage-v68.bin?dl=1";
-
-    [[delegateFreeSession dataTaskWithURL: [NSURL URLWithString:endPoint]
+    [[delegateFreeSession dataTaskWithURL:[FTFirmwareManager firmwareURL]
                         completionHandler:^(NSData *data,
                                             NSURLResponse *response,
                                             NSError *error) {
+                            dispatch_async(dispatch_get_main_queue(), ^() {
                             if (!error)
                             {
                                 handler(data);
@@ -78,6 +83,7 @@ NSString *applicationDocumentsDirectory()
                                 [FTLog logVerboseWithFormat:@"Got response %@ with error %@.\n", response, error];
                                 handler(nil);
                             }
+                            });
                         }] resume];
 }
 
