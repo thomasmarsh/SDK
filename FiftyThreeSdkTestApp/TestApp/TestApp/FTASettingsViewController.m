@@ -44,7 +44,7 @@
 {
     if (section == 0)
     {
-        return 7;
+        return 6;
     }
     else
     {
@@ -83,7 +83,7 @@
         }
         case 2:
         {
-            cell.textLabel.text = [NSString stringWithFormat:@"Battery:%@ %%", self.info.batteryLevel];
+            cell.textLabel.text = [NSString stringWithFormat:@"Battery:%ld", (long)self.info.batteryLevel];
             break;
         }
         case 3:
@@ -93,15 +93,10 @@
         }
         case 4:
         {
-            cell.textLabel.text = [NSString stringWithFormat:@"Learn:%@", self.info.learnMoreURL];
-            break;
-        }
-        case 5:
-        {
             cell.textLabel.text = [NSString stringWithFormat:@"Tip:%@", self.info.isTipPressed?@"YES":@"NO"];
             break;
         }
-        case 6:
+        case 5:
         {
             cell.textLabel.text = [NSString stringWithFormat:@"Eraser:%@", self.info.isEraserPressed?@"YES":@"NO"];
             break;

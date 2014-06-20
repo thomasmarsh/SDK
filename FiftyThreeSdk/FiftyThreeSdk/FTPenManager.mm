@@ -184,11 +184,6 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
 // Placeholder implementation.
 @implementation FTPenInformation
-
-- (NSURL *)learnMoreURL
-{
-    return [NSURL URLWithString:@"https://www.fiftythree.com/pencil/via/sdk"];
-}
 @end
 
 @interface FTPenManager () <CBCentralManagerDelegate, TIUpdateManagerDelegate, PenConnectionViewDelegate>
@@ -583,7 +578,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
         if (self.pen.batteryLevel)
         {
             int batteryLevel = [self.pen.batteryLevel intValue];
-            
+
             if (batteryLevel <= 25)
             {
                 self.info.batteryLevel = FTPenBatteryLevelLow;
@@ -605,7 +600,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
         {
             self.info.batteryLevel = FTPenBatteryLevelHigh;
         }
-        
+
         if (self.pen.firmwareRevision)
         {
             NSInteger currentVersion = [FTFirmwareManager currentRunningFirmwareVersion:self.pen];
@@ -2283,5 +2278,14 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
         return result;
     }
     return NO;
+}
+
+- (NSURL *)learnMoreURL
+{
+    return [NSURL URLWithString:@"https://www.fiftythree.com/pencil/via/sdk"];
+}
+- (NSURL *)pencilSupportURL
+{
+    return [NSURL URLWithString:@"https://www.fiftythree.com/link/support/pencil"];
 }
 @end

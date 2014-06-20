@@ -36,8 +36,6 @@ typedef NS_ENUM(NSInteger, FTPenBatteryLevel)
     FTPenBatteryLevelLow
 };
 
-
-
 #ifdef __cplusplus
 extern "C"
 {
@@ -77,8 +75,6 @@ extern "C"
 @property (nonatomic, readonly) NSString *manufacturerName;
 @property (nonatomic, readonly) FTPenBatteryLevel batteryLevel;
 @property (nonatomic, readonly) NSString *firmwareRevision;
-// This provides a link the FiftyThree's support page about Pencil.
-@property (nonatomic, readonly) NSURL *learnMoreURL;
 // We only recommend using these properties for diagnostics. For example showing a dot in the settings UI
 // to indicate the tip is pressed and show the user that the application is correctly communicating with
 // the pen.
@@ -157,6 +153,13 @@ typedef NS_ENUM(NSInteger, FTPairingUIStyle) {
 //
 // This must be called on the UI thread.
 - (void)shutdown;
+
+#pragma mark -  FTPenManager (Support & Marketing URLs)
+
+// This provides a link the FiftyThree's marketing page about Pencil.
+@property (nonatomic, readonly) NSURL *learnMoreURL;
+// This provides a link the FiftyThree's general support page about Pencil.
+@property (nonatomic, readonly) NSURL *pencilSupportURL;
 
 #pragma mark -  FTPenManager (AdvancedDisplayLinkSupprt)
 
