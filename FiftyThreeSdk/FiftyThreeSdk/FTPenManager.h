@@ -28,6 +28,16 @@ typedef NS_ENUM(NSInteger, FTPenManagerState)
     FTPenManagerStateUpdatingFirmware
 };
 
+typedef NS_ENUM(NSInteger, FTPenBatteryLevel)
+{
+    FTPenBatteryLevelHigh,
+    FTPenBatteryLevelMediumHigh,
+    FTPenBatteryLevelMediumLow,
+    FTPenBatteryLevelLow
+};
+
+
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -65,7 +75,7 @@ extern "C"
 @interface FTPenInformation : NSObject
 @property (nonatomic, readonly) NSString *name;
 @property (nonatomic, readonly) NSString *manufacturerName;
-@property (nonatomic, readonly) NSNumber *batteryLevel;
+@property (nonatomic, readonly) FTPenBatteryLevel batteryLevel;
 @property (nonatomic, readonly) NSString *firmwareRevision;
 // This provides a link the FiftyThree's support page about Pencil.
 @property (nonatomic, readonly) NSURL *learnMoreURL;

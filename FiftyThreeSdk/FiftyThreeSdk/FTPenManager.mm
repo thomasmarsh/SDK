@@ -176,7 +176,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 @interface FTPenInformation ()
 @property (nonatomic, readwrite) NSString *name;
 @property (nonatomic, readwrite) NSString *manufacturerName;
-@property (nonatomic, readwrite) NSNumber *batteryLevel;
+@property (nonatomic, readwrite) FTPenBatteryLevel batteryLevel;
 @property (nonatomic, readwrite) NSString *firmwareRevision;
 @property (nonatomic, readwrite) BOOL isTipPressed;
 @property (nonatomic, readwrite) BOOL isEraserPressed;
@@ -580,8 +580,32 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
             self.info = [[FTPenInformation alloc] init];
         }
 
-        self.info.batteryLevel = self.pen.batteryLevel;
-
+        if (self.pen.batteryLevel)
+        {
+            int batteryLevel = [self.pen.batteryLevel intValue];
+            
+            if (batteryLevel <= 25)
+            {
+                self.info.batteryLevel = FTPenBatteryLevelLow;
+            }
+            else if (batteryLevel <= 50)
+            {
+                self.info.batteryLevel = FTPenBatteryLevelMediumLow;
+            }
+            else if (batteryLevel <= 75)
+            {
+                self.info.batteryLevel = FTPenBatteryLevelMediumHigh;
+            }
+            else
+            {
+                self.info.batteryLevel = FTPenBatteryLevelHigh;
+            }
+        }
+        else
+        {
+            self.info.batteryLevel = FTPenBatteryLevelHigh;
+        }
+        
         if (self.pen.firmwareRevision)
         {
             NSInteger currentVersion = [FTFirmwareManager currentRunningFirmwareVersion:self.pen];
