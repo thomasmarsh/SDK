@@ -53,10 +53,9 @@ NSString *applicationDocumentsDirectory()
     return bestImagePath ? bestImagePath : [self imagePath];
 }
 
-+ (NSURL*)firmwareURL
++ (NSURL *)firmwareURL
 {
-    // TODO: put in final end point.
-    NSString *endPoint =  @"https://www.dropbox.com/s/xo6002d7yoh3jb7/CharcoalUpgradeImage-v68.bin?dl=1";
+    NSString *endPoint =  @"https://www.fiftythree.com/downloads/pencilv1upgradeimage.bin";
     return [NSURL URLWithString:endPoint];
 }
 
