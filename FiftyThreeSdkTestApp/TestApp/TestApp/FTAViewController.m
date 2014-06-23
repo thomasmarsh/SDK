@@ -19,6 +19,8 @@
     NSDictionary *_strokeColors;
 }
 @property (nonatomic) UIToolbar *bar;
+@property (nonatomic) UIBarButtonItem *infoButton;
+@property (nonatomic) UIBarButtonItem *updateFirmwareButton;
 @property (nonatomic) BOOL isPencilEnabled;
 
 @property (nonatomic) UIPopoverController *popover;
@@ -37,7 +39,6 @@
     // We use a basic GL view for rendering some ink and showing
     // touch classifications. The GL code is in FTADrawer. The details
     // aren't really relevant to using FiftyThree SDK.
-
     self.drawer = [[FTADrawer alloc] init];
     self.drawer.scale = self.view.contentScaleFactor;
     GLKView *view = (GLKView *)self.view;
@@ -49,31 +50,42 @@
     // (1) A button to tear down FTPenManager
     // (2) A button to startup FTPenManager
     // (3) A Button to clear the page of ink.
-    // (4) A button to show a popover with Pen status. This uses the FTPenInformation API to
+    // (4) A button to trigger firmware update if needed.
+    // (5) A button to show a popover with Pen status. This uses the FTPenInformation API to
     //     populate a table view. See FTASettingsViewController.
+
     self.bar = [[UIToolbar alloc] initWithFrame:CGRectMake(0, 0, MAX(self.view.frame.size.width,self.view.frame.size.height), 44)];
 
-    UIBarButtonItem *button1 = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemStop
+    UIBarButtonItem *shutdownButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemStop
                                                                              target:self
                                                                              action:@selector(shutdownFTPenManager:)];
-    UIBarButtonItem *button2 = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemPlay
+    UIBarButtonItem *startupButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemPlay
                                                                              target:self
                                                                              action:@selector(initializeFTPenManager:)];
 
-    UIBarButtonItem *spacer1 = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace
+    UIBarButtonItem *spacer = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace
                                                                              target:nil
                                                                              action:nil];
 
-    UIBarButtonItem *button3 = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh
+    UIBarButtonItem *clearButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh
                                                                              target:self
                                                                              action:@selector(clearScene:)];
 
-    UIBarButtonItem *button4 = [[UIBarButtonItem alloc] initWithTitle:@"   Info   "
+    self.infoButton = [[UIBarButtonItem alloc] initWithTitle:@"   Info   "
                                                                 style:UIBarButtonItemStylePlain
                                                                target:self
                                                                action:@selector(showInfo:)];
 
-    [self.bar setItems:@[button1, button2, spacer1, button3, button4]];
+    self.infoButton.enabled = NO;
+
+    self.updateFirmwareButton = [[UIBarButtonItem alloc] initWithTitle:@"FW Update"
+                                     style:UIBarButtonItemStylePlain
+                                    target:self
+                                    action:@selector(updateFirmware:)];
+
+    self.updateFirmwareButton.enabled = NO;
+
+    [self.bar setItems:@[shutdownButton, startupButton, spacer, clearButton, self.updateFirmwareButton, self.infoButton]];
     self.bar.barStyle = UIBarStyleBlack;
     self.bar.translucent = NO;
 
@@ -101,6 +113,37 @@
 }
 
 #pragma mark - Bar Button Press handlers.
+- (void)updateFirmware:(id)sender
+{
+    NSNumber *firmwareUpdateIsAvailble = [FTPenManager sharedInstance].firmwareUpdateIsAvailble;
+
+    if (firmwareUpdateIsAvailble != nil && [firmwareUpdateIsAvailble boolValue])
+    {
+        BOOL isPaperInstalled = [FTPenManager sharedInstance].canInvokePaperToUpdatePencilFirmware;
+        if (isPaperInstalled)
+        {
+            // We invoke Paper via url handlers. You can optionally specify urls so that
+            // Paper can return to your app. The application name is shown in a button labelled:
+            // Back To {Application Name}
+            NSString *applicationName = @"SDK Test App";
+            // In the plist we register sdktestapp as an url type. See The app delegate.
+            NSURL *successUrl = [NSURL URLWithString:@"sdktestapp://x-callback-url/success"];
+            NSURL *cancelUrl = [NSURL URLWithString:@"sdktestapp://x-callback-url/cancel"];
+            NSURL *errorUrl = [NSURL URLWithString:@"sdktestapp://x-callback-url/error"];
+
+            BOOL result = [[FTPenManager  sharedInstance] invokePaperToUpdatePencilFirmware:applicationName
+                                                                                    success:successUrl
+                                                                                      error:errorUrl
+                                                                                     cancel:cancelUrl];
+
+            if (!result)
+            {
+                // If we for some reason couldn't open the url. We might alert to user.
+            }
+
+        }
+    }
+}
 - (void)showInfo:(id)sender
 {
     UIBarButtonItem *barButton = (UIBarButtonItem*)sender;
@@ -152,6 +195,11 @@
     // from your displayLink, see also the update method in this view controller.
     //[FTPenManager sharedInstance].automaticUpdatesEnabled = NO;
 
+    // By default the FiftyThree SDK doesn't check for firmware updates.
+    // Turn on this check by setting this property. You'll be notified on
+    // penManagerFirmwareUpdateIsAvailbleDidChange
+    [FTPenManager sharedInstance].shouldCheckForFirmwareUpdates = YES;
+
     self.isPencilEnabled = YES;
 }
 
@@ -166,14 +214,10 @@
 }
 
 #pragma mark - FTPenManagerDelegate
-- (void)penManagerNeedsUpdateDidChange;
-{
-    NSLog(@"penManagerNeedsUpdateDidChange %@", [[FTPenManager sharedInstance] needsUpdate]? @"YES":@"NO");
-}
 // Invoked when the connection state is altered.
 - (void)penManagerStateDidChange:(FTPenManagerState)state
 {
-    NSLog(@"connection did change %@", FTPenManagerStateToString(state));
+    self.infoButton.enabled = FTPenManagerStateIsConnected(state);
 }
 
 // Invoked when any of the BTLE information is read off the pen. See FTPenInformation.
@@ -184,6 +228,32 @@
         self.popoverContents.info = [FTPenManager sharedInstance].info;
         [self.popoverContents.tableView reloadData];
     }
+}
+
+// This is optional.
+- (void)penManagerFirmwareUpdateIsAvailbleDidChange
+{
+    NSNumber *firmwareUpdateIsAvailble = [FTPenManager sharedInstance].firmwareUpdateIsAvailble;
+
+    if (firmwareUpdateIsAvailble != nil && [firmwareUpdateIsAvailble boolValue])
+    {
+        BOOL isPaperInstalled = [FTPenManager sharedInstance].canInvokePaperToUpdatePencilFirmware;
+        if (isPaperInstalled)
+        {
+            self.updateFirmwareButton.enabled = YES;
+        }
+        else
+        {
+            self.updateFirmwareButton.enabled = NO;
+        }
+        // You might show a link to the FiftyThree support page.
+        // e.g., [FTPenManager sharedInstance].firmwareUpdateSupportLink
+    }
+    else
+    {
+        self.updateFirmwareButton.enabled = NO;
+    }
+
 }
 
 #pragma mark - Touch Handling

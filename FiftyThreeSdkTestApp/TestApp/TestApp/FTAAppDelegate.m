@@ -14,6 +14,31 @@
     return YES;
 }
 
+- (BOOL)application:(UIApplication *)application
+            openURL:(NSURL *)url
+  sourceApplication:(NSString *)sourceApplication
+         annotation:(id)annotation
+{
+    // See FTAViewControntroller updateFirmware:
+    if ([[url absoluteString] hasSuffix:@"success"])
+    {
+        NSLog(@"Success url");
+    }
+    else if ([[url absoluteString] hasSuffix:@"error"])
+    {
+        NSLog(@"Error url");
+    }
+    else if ([[url absoluteString] hasSuffix:@"cancel"])
+    {
+        NSLog(@"Cancel url");
+    }
+    else
+    {
+        // Unknown.
+        NSLog(@"Unexpected url");
+    }
+}
+
 - (void)applicationWillResignActive:(UIApplication *)application
 {
 }
