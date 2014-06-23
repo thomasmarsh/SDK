@@ -1903,7 +1903,9 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
 -(void)setFirmwareUpdateIsAvailble:(NSNumber *)firmwareUpdateIsAvailble
 {
-    if (_firmwareUpdateIsAvailble != firmwareUpdateIsAvailble)
+    NSNumber *oldValue = self.firmwareUpdateIsAvailble;
+    _firmwareUpdateIsAvailble = firmwareUpdateIsAvailble;
+    if (oldValue != firmwareUpdateIsAvailble)
     {
         // OK let the outside world know
         if ([self.delegate respondsToSelector:@selector(penManagerFirmwareUpdateIsAvailbleDidChange)])
@@ -1911,7 +1913,6 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
             [self.delegate penManagerFirmwareUpdateIsAvailbleDidChange];
         }
     }
-    _firmwareUpdateIsAvailble = firmwareUpdateIsAvailble;
 }
 
 // This is used by the SDK during connection to see if we should notify SDK users that a firmware update
