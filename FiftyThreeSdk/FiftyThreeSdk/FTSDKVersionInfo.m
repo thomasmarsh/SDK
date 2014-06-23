@@ -11,7 +11,7 @@
 @implementation FTSDKVersionInfo
 - (NSString *) version
 {
-    return @"0.0.0.0";
+    return [NSString stringWithFormat:@"%ld.%ld",(long)self.majorVersion,(long)self.minorVersion];
 }
 - (NSInteger) majorVersion
 {
@@ -19,7 +19,7 @@
 }
 - (NSInteger) minorVersion
 {
-    return 0;
+    return 5;
 }
 - (NSString *) commit
 {
