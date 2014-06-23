@@ -34,8 +34,6 @@ using namespace fiftythree::core;
 
 static const CGFloat kPairingSpotTouchRadius_Began = 35.f;
 static const CGFloat kPairingSpotTouchRadius_Moved = 150.f;
-static const NSInteger kLowBatteryWarningThreshold = 30;
-static const NSInteger kCriticalBatteryWarningThreshold = 10;
 
 // The GreedyGestureRecognizer recognizes every touch, immediately and indiscriminately.
 //
@@ -389,13 +387,13 @@ static const NSInteger kCriticalBatteryWarningThreshold = 10;
         case FTPenManagerStateConnectedLongPressToUnpair:
         case FTPenManagerStateUpdatingFirmware:
         {
-            BOOL hasLowBattery = (self.penManager &&
+            BOOL hasLowBattery =  self.penManager &&
                                   self.penManager.pen &&
                                   self.penManager.pen.batteryLevel &&
-                                  self.penManager.pen.batteryLevel >= 0 &&
-                                  self.penManager.pen.batteryLevel.integerValue <= kLowBatteryWarningThreshold);
-            BOOL hasCriticallyLowBattery = (hasLowBattery &&
-                                            self.penManager.pen.batteryLevel.integerValue <= kCriticalBatteryWarningThreshold);
+                                  (self.penManager.info.batteryLevel == FTPenBatteryLevelLow
+                                   || self.penManager.info.batteryLevel == FTPenBatteryLevelCriticallyLow);
+
+            BOOL hasCriticallyLowBattery = (hasLowBattery && self.penManager.info.batteryLevel == FTPenBatteryLevelCriticallyLow);
 
             self.hadLowBatteryWhenLastConnected = nil;
             self.hadCriticallyLowBatteryWhenLastConnected = nil;
