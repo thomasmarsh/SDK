@@ -37,6 +37,7 @@
         // Unknown.
         NSLog(@"Unexpected url");
     }
+    return YES;
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application
