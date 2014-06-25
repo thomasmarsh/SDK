@@ -37,8 +37,7 @@ namespace sdk
 //
 // _simultaneousTouches indicates whether or not two or more touches
 // occur simultaneously over the life of the entire cluster.
-
-BOOST_STRONG_TYPEDEF(int, ClusterId);
+STRONG_TYPEDEF(int, ClusterId);
 
 struct ClusterEventStatistics
 {
@@ -302,7 +301,7 @@ public:
     {
         _staleInterval = .275f;
 
-        _counter = 0;
+        _counter = ClusterId(0);
         _lastEventEndedTimestamp = 0.0;
         _needComputeClusterOrder = true;
 

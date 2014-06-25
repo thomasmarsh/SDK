@@ -510,8 +510,7 @@ void TouchLogger::LogPenEvent(PenEvent event)
                                                    event._type,
                                                    event._timestamp);
 
-    PenEventId eventId;
-    eventId = _penEventCounter;
+    PenEventId eventId(_penEventCounter);
 
     _penEventData.insert(std::pair<PenEventId, PenEventData::Ptr>(eventId, newEvent));
     _penEventOrder.push_back(eventId);
@@ -1273,8 +1272,7 @@ TouchClassification TouchLogger::MostRecentPenTipType()
 
 PenEventId TouchLogger::MostRecentPenUpEvent()
 {
-    PenEventId id;
-    id = -1;
+    PenEventId id(-1);
 
     for (auto it = _penEventOrder.rbegin();
          it < _penEventOrder.rend();
@@ -1293,8 +1291,7 @@ PenEventId TouchLogger::MostRecentPenUpEvent()
 
 PenEventId TouchLogger::MostRecentPenDownEvent()
 {
-    PenEventId id;
-    id = -1;
+    PenEventId id(-1);
 
     for (auto it=_penEventOrder.rbegin();
          it < _penEventOrder.rend();

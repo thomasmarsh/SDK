@@ -7,11 +7,11 @@
 
 #pragma once
 
-#include <boost/strong_typedef.hpp>
 #include <vector>
 
 #include "Core/Eigen.h"
 #include "Core/Enum.h"
+#include "Core/StrongTypedef.h"
 #include "Core/Touch/Touch.h"
 #include "FiftyThreeSdk/Classification/Classifier.h"
 
@@ -28,7 +28,7 @@ static const int intInf = std::numeric_limits<int>::max() -3 ; // -3 because of 
 
 // Like TouchId, valid ids are non-negative
 //typedef int PenEventId;
-BOOST_STRONG_TYPEDEF(int, PenEventId);
+STRONG_TYPEDEF(int, PenEventId);
 
 class TouchClassificationProxy;
 
