@@ -25,4 +25,4 @@ USER_HEADER_SEARCH_PATHS = $(inherited) "$(SRCROOT)/../../FiftyThreeSdk" "$(SRCR
 // TODO: Revert once we sort out the "only run Crashlytics on Jenkins" issue
 DEBUG_INFORMATION_FORMAT = dwarf-with-dsym
 
-ARCHS = $(ARCHS_STANDARD_32_BIT)
+ARCHS = $(ARCHS_STANDARD)
