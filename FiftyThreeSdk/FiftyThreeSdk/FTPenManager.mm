@@ -377,7 +377,23 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
         if ([UIApplication sharedApplication].applicationState == UIApplicationStateActive)
         {
-            self.pen.hasListener = YES;
+            if (self.pen)
+            {
+                [FTLog logVerboseWithFormat:@"hasListener = %x", self.pen.hasListener];
+                if (self.pen.hasListener)
+                {
+                    // TODO testing to see if this needs a kick...
+                    self.pen.hasListener = NO;
+                    self.pen.hasListener = YES;
+                    DebugAssert(self.pen.hasListener);
+                    
+                }
+                self.pen.hasListener = YES;
+            }
+            else
+            {
+                [FTLog log:@"Could not set hasListener=YES!"];
+            }
         }
 
         [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenManagerDidUpdateStateNotificationName
@@ -431,7 +447,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 }
 - (void)setCentralId:(UInt32)centralId
 {
-   // NSLog(@"Setting central Id %x  %d (dec)", (unsigned int)centralId, (unsigned int)centralId);
+    [FTLog logVerboseWithFormat:@"Setting central Id %x  %d (dec)", (unsigned int)centralId, (unsigned int)centralId];
     _centralId = centralId;
     self.pen.centralId = centralId;
 }
@@ -597,7 +613,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
             self.info.batteryLevel = FTPenBatteryLevelHigh;
         }
 
-        if (self.pen.firmwareRevision)
+        if (self.pen)
         {
             NSInteger currentVersion = [FTFirmwareManager currentRunningFirmwareVersion:self.pen];
             self.info.firmwareRevision = [@(currentVersion) stringValue];
@@ -746,7 +762,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
                 self.didConnectViaWarmStart = YES;
                 FTAssert(!weakSelf.pen, @"pen is nil");
                 weakSelf.pen = [[FTPen alloc] initWithPeripheral:peripheral];
-
+                self.potentialCentralId =  [self centralIdFromPeripheralId:peripheral.identifier];
                 [weakSelf fireStateMachineEvent:kAttemptConnectionFromDatingEventName];
                 return;
             }
@@ -825,15 +841,16 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     TKState *marriedState = [TKState stateWithName:kMarriedStateName];
     [marriedState setDidEnterStateBlock:^(TKState *state, TKStateMachine *stateMachine)
     {
+        FTAssert(weakSelf.pen != nil, @"pen can't be nil");
         FTAssert(weakSelf.pen.peripheral.state == CBPeripheralStateConnected, @"pen peripheral is connected");
         FTAssert(weakSelf.pen.peripheral.identifier != nil, @"pen peripheral UUID is non-nil");
 
         weakSelf.pairedPeripheralUUID = weakSelf.pen.peripheral.identifier;
-       // NSLog(@"potentialApplication Id = %d", weakSelf.potentialCentralId);
-
+        [FTLog logVerboseWithFormat:@"potential centrial Id (dec) = %ld", (long)self.potentialCentralId];
         weakSelf.centralId = weakSelf.potentialCentralId;
         weakSelf.state = FTPenManagerStateConnected;
         weakSelf.didConnectViaWarmStart = NO;
+        [self updateFirmwareUpdateIsAvailble];
     }];
 
     // Married - Waiting for Long Press to Disconnect
@@ -931,6 +948,8 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     [separatedState setDidExitStateBlock:^(TKState *state, TKStateMachine *stateMachine)
     {
         weakSelf.scanningState = ScanningStateDisabled;
+        
+        [self clearFirmwareVersionCheck];
     }];
 
     // Separated - Retrieving Connceted Peripherals
@@ -947,8 +966,10 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
             if ([peripheral.name isEqualToString:kPencilPeripheralName] &&
                 [weakSelf isPairedPeripheral:peripheral])
             {
+                [FTLog log:@"Found! Separated - Retrieving Connceted Peripherals"];
                 FTAssert(!weakSelf.pen, @"pen is nil");
                 weakSelf.pen = [[FTPen alloc] initWithPeripheral:peripheral];
+                self.potentialCentralId =  [self centralIdFromPeripheralId:peripheral.identifier];
                 [weakSelf fireStateMachineEvent:kAttemptConnectionFromSeparatedEventName];
                 return;
             }
@@ -1021,6 +1042,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
             if (!weakSelf.pen.isPoweringOff)
             {
                 [weakSelf.centralManager cancelPeripheralConnection:weakSelf.pen.peripheral];
+                weakSelf.pen = nil;
             }
         }
         else
@@ -1339,15 +1361,21 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     {
         [self fireStateMachineEvent:kRetrieveConnectedPeripheralsFromSeparatedEventName];
     }
+    else
+    {
+        [FTLog log:@"Skipped retrieve connected peripherals"];
+    }
 
     self.pen.hasListener = YES;
     [self resetBackgroundTask];
+    [self updateFirmwareUpdateIsAvailble];
+    [self updatePenInfoObjectAndInvokeDelegate];
 }
 
 - (void)applicationDidEnterBackground:(NSNotification *)notificaton
 {
     [FTLog log:@"FTPenManager did enter background"];
-
+ 
     // Reset the background task (if it has not yet been ended) prior to starting a new one. One would think
     // that we wouldn't need to do this if there were a strict pairing of applicationDidBecomeActive and
     // applicationDidEnterBackground, but in practice that does not appear to be the case.
@@ -1599,6 +1627,8 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
     UInt32 peripheralCentralId = [self centralIdFromPeripheralId:peripheral.identifier];
 
+    [FTLog logVerboseWithFormat:@"advertisedCentralId %ld  peripheralCentralId %ld", (long)advertisedCentralId, (long)peripheralCentralId];
+    
     // There are two cases here.
     // We're looking at an older v55 firmware that only has 1 byte of advertising data, or newer firmware.
     // We assume it's reconciling with us if the advertising data is 1 byte.
@@ -1633,6 +1663,8 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     BOOL isPeripheralReconciling = [self isPeripheralReconciling:advertisementData];
     BOOL isPeripheralReconcilingWithUs = [self isPeripheralReconcilingWithUs:peripheral withAdvertisementData:advertisementData];
 
+    [FTLog logWithFormat:@"IsReconciling: %d IsReconcilingWithUs: %d", isPeripheralReconciling, isPeripheralReconcilingWithUs];
+    
     if ([self peripheralAdvertisementCentralId:advertisementData] == 0x1)
     {
         self.potentialCentralId = 0x1;
@@ -1688,13 +1720,13 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
                     // it may be trying to connect to another iPad. This is because if the pen wakes up it's
                     // in the reconciling state but may need to pair with a new device instead of us.
 
-                    // NSLog(@"Pencil is swinging");
+                    // [FTLog logVerboseWithFormat:@"Pencil is swinging"];
                     self.pen = pen;
                     [self fireStateMachineEvent:kSwingEventName];
                 }
                 else
                 {
-                    // NSLog(@"Pencil kAttemptConnectionFromSeparatedEventName");
+                    // [FTLog logVerboseWithFormat:@"Pencil kAttemptConnectionFromSeparatedEventName"];
                     self.pen = pen;
                     [self fireStateMachineEvent:kAttemptConnectionFromSeparatedEventName];
                 }
@@ -1702,7 +1734,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
             else if ([self isPairedPeripheral:peripheral] &&
                      !isPeripheralReconcilingWithUs)
             {
-                // NSLog(@"Explict Single");
+                // [FTLog logVerboseWithFormat:@"Explict Single"];
                 [self fireStateMachineEvent:kBecomeSingleEventName];
             }
         }
@@ -1771,7 +1803,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
             if ([error.localizedDescription isEqualToString: @"The connection has timed out unexpectedly."])
             {
-                //NSLog(@"timed out--<");
+                //[FTLog logVerboseWithFormat:@"timed out--<"];
             }
         }
 
@@ -1883,8 +1915,12 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
                                                                         object:pen];
                 }
 
-                if ([self currentStateHasName:kMarriedStateName] ||
-                    [self currentStateHasName:kMarriedWaitingForLongPressToUnpairStateName])
+                if ([self currentStateHasName:kMarriedStateName])
+                {
+                    [self fireStateMachineEvent:kBecomeSeparatedEventName];
+                    [self fireStateMachineEvent:kRetrieveConnectedPeripheralsFromSeparatedEventName];
+                }
+                else if ([self currentStateHasName:kMarriedWaitingForLongPressToUnpairStateName])
                 {
                     [self fireStateMachineEvent:kBecomeSeparatedEventName];
                 }
@@ -1915,11 +1951,35 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     }
 }
 
+// Although we don't want to do network checks constantly, we do want to update our firmware state if we've
+// updated and returned to a partner application.
+- (void)updateFirmwareUpdateIsAvailble
+{
+    BOOL connected = FTPenManagerStateIsConnected(self.state);
+    if (connected)
+    {
+        if (self.pen && self.firmwareUpdateIsAvailble != nil)
+        {
+            NSInteger currentVersion = [FTFirmwareManager currentRunningFirmwareVersion:self.pen];
+            self.firmwareUpdateIsAvailble = @(self.latestFirmwareVersion > currentVersion);
+        }
+
+        [self updatePenInfoObjectAndInvokeDelegate];
+    }
+}
+
+- (void)clearFirmwareVersionCheck
+{
+    self.lastFirmwareCheckTime = nil;
+    self.isFetchingLatestFirmware = NO;
+    self.firmwareUpdateIsAvailble = nil;
+}
+
 // This is used by the SDK during connection to see if we should notify SDK users that a firmware update
 // is availble.
 - (void)attemptLoadFirmwareFromNetworkForVersionChecking
 {
-    if (FTPenManagerStateIsConnected(self.state) && self.pen.firmwareRevision != nil)
+    if (FTPenManagerStateIsConnected(self.state) && self.pen)
     {
         BOOL checkedRecently = self.lastFirmwareCheckTime && fabs([self.lastFirmwareCheckTime timeIntervalSinceNow]) > 60.0 * 5; // 5 minutes.
 
