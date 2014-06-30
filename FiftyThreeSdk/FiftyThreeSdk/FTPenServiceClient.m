@@ -85,6 +85,9 @@
 - (void)dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
+
+    [_batteryLevelReadTimer invalidate];
+    _batteryLevelReadTimer = nil;
 }
 
 - (BOOL)isTipPressed
@@ -804,8 +807,13 @@
 
 - (void)applicationDidEnterBackground:(NSNotification *)notification
 {
-    [self.batteryLevelReadTimer invalidate];
-    self.batteryLevelReadTimer = nil;
+    // Capture a strong reference to the current instance as invalidating the timer may
+    // otherwise dealloc this instance.
+    FTPenServiceClient *instance = self;
+    DebugAssert(instance);
+
+    [instance.batteryLevelReadTimer invalidate];
+    instance.batteryLevelReadTimer = nil;
 }
 
 - (void)applicationWillEnterForeground:(NSNotification *)notification
