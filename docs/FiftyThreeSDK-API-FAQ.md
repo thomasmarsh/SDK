@@ -20,7 +20,7 @@ Most of this is pretty straightforward and it is similiar to the other stylus AP
 
 ### FAQ ###
 
-#####Why do I need to call update from the displayLink callback e.g.,```[[FTPenManager sharedInstance] update];```?
+#####Why do I need to call update from the displayLink callback e.g.,```[[FTPenManager sharedInstance] update]```?
 
 Note that you don't need to leave the displayLink running at all times. Update returns a bool, and there's a ```shouldWakeDisplayLink``` method on ```FTPenManagerDelegate```.
 
