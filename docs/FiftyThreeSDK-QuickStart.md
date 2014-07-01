@@ -13,7 +13,7 @@ This SDK requires the following:
 ### Quick Start ###
 1)	Add FiftyThreeSdk.framework to your xcode project, ensure you're linking against libc++, CoreBluetooth, CoreGraphics, and QuartzCore. Add ```-ObjC``` flag to "Other Linker Flags" build settings.
 
-2)	First ```#include <FiftyThreeSdk/FiftyThreeSdk.h>```. Update your main.m to use FTApplication, via the third parameter of  UIApplicationMain e.g.:
+2)	First ```#include <FiftyThreeSdk/FiftyThreeSdk.h>```. Update your main.m to use FTApplication, via the third parameter of UIApplicationMain, e.g.:
 ``` 
 @autoreleasepool {
           return UIApplicationMain(argc,
