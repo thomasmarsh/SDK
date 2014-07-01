@@ -23,7 +23,8 @@ This SDK requires the following:
                                    NSStringFromClass([YourAppDelegate class]));
      }
 ```
-   Alternatively, your custom application can subclass ```FTApplication``` or you can use ```FTEventDispatcher```. Note: the FiftyThree SDK only uses touch events, not keyboard events.
+   Alternatively, your custom application can subclass ```FTApplication``` or you can use ```FTEventDispatcher```. 
+   Note: the FiftyThree SDK only uses touch events, not keyboard events.
 
 3) You will probably want multi-touch enabled for your primary view. In the [viewDidLoad:] method of your root UIViewController you’ll need to add:
 
