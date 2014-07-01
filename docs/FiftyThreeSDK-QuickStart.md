@@ -2,12 +2,10 @@ FiftyThree, Inc. Confidential.
 
 ##FiftyThree SDK Quick Start Guide.##
 
-This is beta software at its best. All of the APIs are subject to change. You will probably only want to use one vendor's stylus SDK at a time; use ```[FTPenManager shutdown]``` to ensure the FiftyThree SDK isn't using any CoreBluetooth resources. 
-
 ### Requirements ###
 1) This SDK requires iOS7 or above. We use a number of newer CoreBluetooth APIs. You can check at run time and not use ```FTPenManager``` if you're on iOS6.1 or below.
 
-2) Bluetooth Low Energy (BTLE) Compatible hardware. BTLE isn't supported on the iPad2 or iphone4 and earlier.
+2) Bluetooth Low Energy (BTLE) Compatible hardware. BTLE isn't supported on the iPad 2 or iPhone 4 and earlier.
 
 ### Quick Start ###
 1)	Add FiftyThreeSdk.framework to your xcode project, ensure you're linking against libc++, CoreBluetooth, CoreGraphics, and QuartzCore. Add ```-ObjC``` flag to "Other Linker Flags" build settings.
@@ -88,7 +86,9 @@ Once per frame, you will receive a collection of all the touches whose classific
 
 You can use these classifications to alter how strokes are rendered and to implement flip-to-erase functionality.
 
-7) (Optional) Add support for status. 
+7) You will probably only want to use one vendor's stylus SDK at a time; use ```[FTPenManager shutdown]``` to ensure the FiftyThree SDK isn't using any CoreBluetooth resources. 
+
+8) (Optional) Add support for status. 
 In the implementation of ```penInformationDidChange``` you can use 
 ``` [FTPenManager sharedInstance].info``` to populate a tableview of settings. See ```FTASettingsViewController``` for an example.
 
