@@ -1,6 +1,6 @@
 FiftyThree, Inc. Confidential.
 
-##FiftyThree SDK Quick Start Guide.##
+##FiftyThree SDK Quick Start Guide##
 
 ### Requirements ###
 1) This SDK requires iOS7 or above. We use a number of newer CoreBluetooth APIs. You can check at run time and not use ```FTPenManager``` if you're on iOS6.1 or below.
