@@ -4,7 +4,7 @@ Most of this is pretty straightforward and it is similiar to the other stylus AP
 
 ### Overview of the major API objects ###
 
-```FTPenManager``` - deals with connection, corebluetooth coordination, and SDK object lifetime. 
+```FTPenManager``` - deals with connection, CoreBluetooth coordination, and SDK object lifetime. 
 
 ```FTTouchClassifier``` - provides information about what we think a touch is. 
 
