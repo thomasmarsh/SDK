@@ -20,7 +20,7 @@ Most of this is pretty straightforward and it is similiar to the other stylus AP
 
 ### FAQ ###
 
-Why do I need to call update from the displayLink callback e.g.,?
+#####Why do I need to call update from the displayLink callback e.g.,?
 
 ```
 [[FTPenManager sharedInstance] update];
@@ -36,7 +36,7 @@ one displayLink for the app, we'd use that instead. Since every performant app
 will use the displayLink anyway as part of their render loop it seemed like an
 OK trade off.
 
-What is this ```FTApplication``` object? Why do I need to use it?
+#####What is this ```FTApplication``` object? Why do I need to use it?
 
 Design Rationale:
 
@@ -47,13 +47,13 @@ way. We also provide a ```FTEventDispatcher```, which is a singleton, and you ca
 invoke sendEvent on that if for some reason you're adverse to using FTApplication.
 
 
-Why is ```FTPenManagerState``` so complicated? Isn't this just a boolean? Every other stylus is.
+#####Why is ```FTPenManagerState``` so complicated? Isn't this just a boolean? Every other stylus is.
 
 Design Rationale:
 
 Our pairing model doesn't use the BTLE bonded/encrypted pair. Instead we allow the device to repair with other ipads. This provides what we (FiftyThree) think is a better pairing UX model which is more transparent to the user. However it means that our connection flow has more states. Most of this should be opaque to the API user as we're providing the pairing animation UI. 
 
-What is the ```[FTPenManager sharedInstance].appToken``` for? 
+#####What is the ```[FTPenManager sharedInstance].appToken``` for? 
 
 Design Rationale:
 This is partly for future proofing ourselves, and to provide a hook for usage tracking.
