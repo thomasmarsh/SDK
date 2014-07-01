@@ -11,6 +11,7 @@ Most of this is pretty straightforward and it is similiar to the other stylus AP
 ```FTApplication``` - provides a hook for getting events for touch classification. When the SDK is disabled, this just invokes ```[super sendEvent];```.
 
 ```FTPenInformation``` - a collection of readonly properties that can be shown in a settings or details view.
+
 ```FTEventDispatcher```- *Optional*  If you don't want to subclass or use FTApplication. You'll need to forward UIEvents to FiftyThree's classifier via ```[[FTEventDispatcher sharedInstance] sendEvent:]```.
 
 ### Open Isssues ###
