@@ -3,9 +3,12 @@ FiftyThree, Inc. Confidential.
 ##FiftyThree SDK Quick Start Guide##
 
 ### Requirements ###
-1) This SDK requires iOS7 or above. We use a number of newer CoreBluetooth APIs. You can check at run time and not use ```FTPenManager``` if you're on iOS6.1 or below.
 
-2) Bluetooth Low Energy (BTLE) Compatible hardware. BTLE isn't supported on the iPad 2 or iPhone 4 and earlier.
+This SDK requires the following:
+
+1) iOS7 or above. We use a number of newer CoreBluetooth APIs. You can check at run time and not use ```FTPenManager``` if you're on iOS6.1 or below.
+
+2) Bluetooth Low Energy (BTLE) Compatible hardware. BTLE isn't supported on the iPad 2, iPhone 4 and earlier.
 
 ### Quick Start ###
 1)	Add FiftyThreeSdk.framework to your xcode project, ensure you're linking against libc++, CoreBluetooth, CoreGraphics, and QuartzCore. Add ```-ObjC``` flag to "Other Linker Flags" build settings.
