@@ -86,8 +86,7 @@
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 
-    [_batteryLevelReadTimer invalidate];
-    _batteryLevelReadTimer = nil;
+    [self resetBatteryLevelReadTimer];
 }
 
 - (BOOL)isTipPressed
@@ -555,8 +554,7 @@
                              nil);
             [self.delegate penServiceClient:self batteryLevelDidChange:self.batteryLevel];
 
-            [self.batteryLevelReadTimer invalidate];
-            self.batteryLevelReadTimer = nil;
+            [self resetBatteryLevelReadTimer];
 
             //NSLog(@"BatteryLevel did update value: %@", self.batteryLevel);
         }
@@ -807,13 +805,7 @@
 
 - (void)applicationDidEnterBackground:(NSNotification *)notification
 {
-    // Capture a strong reference to the current instance as invalidating the timer may
-    // otherwise dealloc this instance.
-    FTPenServiceClient *instance = self;
-    DebugAssert(instance);
-
-    [instance.batteryLevelReadTimer invalidate];
-    instance.batteryLevelReadTimer = nil;
+    [self resetBatteryLevelReadTimer];
 }
 
 - (void)applicationWillEnterForeground:(NSNotification *)notification
@@ -830,6 +822,17 @@
     {
         [self.peripheral readValueForCharacteristic:self.batteryLevelCharacteristic];
     }
+}
+
+- (void)resetBatteryLevelReadTimer
+{
+    // Capture a strong reference to the current instance as invalidating the timer may
+    // otherwise dealloc this instance.
+    FTPenServiceClient *instance = self;
+    DebugAssert(instance);
+
+    [instance.batteryLevelReadTimer invalidate];
+    instance.batteryLevelReadTimer = nil;
 }
 
 @end
