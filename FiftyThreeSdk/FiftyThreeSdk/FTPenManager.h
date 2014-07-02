@@ -123,10 +123,6 @@ typedef NS_ENUM(NSInteger, FTPairingUIStyle) {
 //  This singleton deals with connection functions of the pen.
 @interface FTPenManager : NSObject
 
-// Developers should obtain this from FiftyThree.
-// [FTPenManager sharedInstance].appToken = [NSUUID alloc] initWithString:"..."];
-@property (nonatomic) NSUUID *appToken;
-
 // Connection State.
 @property (nonatomic, readonly) FTPenManagerState state;
 
