@@ -14,10 +14,6 @@ Most of this is pretty straightforward and it is similiar to the other stylus AP
 
 ```FTEventDispatcher```  - *Optional.*  If you don't want to subclass or use FTApplication. You'll need to forward UIEvents to FiftyThree's classifier via ```[[FTEventDispatcher sharedInstance] sendEvent:]```.
 
-### Open Isssues ###
-
-- Pairing view API still slightly up in the air. We may provide a view controller to put in a popover instead of the view. Still TBD. 
-
 ### FAQ ###
 
 #####Why do I need to call update from the displayLink callback, e.g.,```[[FTPenManager sharedInstance] update]```?
