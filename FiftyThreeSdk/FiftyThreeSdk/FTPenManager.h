@@ -205,9 +205,9 @@ typedef NS_ENUM(NSInteger, FTPairingUIStyle) {
 // You can provide error, success, and cancel URLs so that Paper
 // can return to your application after the Firmware upgrade is complete.
 // Returns NO if Paper can't be invoked.
-- (BOOL)invokePaperToUpdatePencilFirmware:(NSString *)source          // This should be human readable Application name.
-                                   success:(NSURL*)successCallbackUrl  // e.g., YourApp://x-callback-url/success
-                                     error:(NSURL*)errorCallbackUrl    // e.g., YourApp://x-callback-url/error
-                                    cancel:(NSURL*)cancelCallbackUrl;  // e.g., YourApp://x-callback-url/cancel
+- (BOOL)invokePaperToUpdatePencilFirmware:(NSString*)source           // This should be a human readable application name.
+                                   success:(NSURL*)successCallbackUrl // e.g., YourApp://x-callback-url/success
+                                     error:(NSURL*)errorCallbackUrl   // e.g., YourApp://x-callback-url/error
+                                    cancel:(NSURL*)cancelCallbackUrl; // e.g., YourApp://x-callback-url/cancel
 
 @end
