@@ -1692,7 +1692,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     {
         if ([self isPairedPeripheral:peripheral])
         {
-            if (isPeripheralReconciling)
+            if (isPeripheralReconciling && isPeripheralReconcilingWithUs)
             {
                 FTAssert(!self.pen, @"pen is nil");
                 self.pen = [[FTPen alloc] initWithPeripheral:peripheral];
