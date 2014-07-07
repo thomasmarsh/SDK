@@ -465,17 +465,40 @@ static const CGFloat kPairingSpotTouchRadius_Moved = 150.f;
 
 #pragma mark - Notifications
 
+- (BOOL)isVisibleAndInViewHierarchy:(UIView *)view
+{
+    // Traverse the view hierarchy and ensure that the view parameter is attached to a visible part of the
+    // hierarchy.
+    UIResponder *responder = view;
+    while (responder)
+    {
+        if ([responder isKindOfClass:[UIWindow class]])
+        {
+            return YES;
+        }
+        else if ([responder isKindOfClass:[UIView class]] &&
+                 ((UIView *)responder).hidden)
+        {
+            return NO;
+        }
+        responder = [responder nextResponder];
+    }
+    return NO;
+}
+
 - (void)pencilConnectionStatusChangedWithPenConnectionView:(NSNotification *)notification
 {
-    // If there is more than one PenConnectionView in play and the user has connected or disconnected using a
-    // one PenConnectionView, the others snap to their new state and not animate the transition.
+    // If there is more than one PenConnectionView in play and the pencil connection status has changed,
+    // instances of the PenConnectionView which are hidden or not attached to the view hierarchy should snap
+    // to their new state and not animate the transition.
     //
     // There's no guarantee about what order NSNotifications are received in, so we perform the snap later on
     // the main queue.  By posting to the main queue, we ensure that all instances of the PenConnectionView
     // (especially this one) have updated their pairing spot view's state before we snap them to their current
     // state.
     PenConnectionView *sender = notification.object;
-    if (sender != self)
+    if (sender != self &&
+        ![self isVisibleAndInViewHierarchy:self])
     {
         __weak PairingSpotView *weakPairingSpotView = self.pairingSpotView;
         dispatch_async(dispatch_get_main_queue(), ^{
