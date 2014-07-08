@@ -618,6 +618,10 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
             NSInteger currentVersion = [FTFirmwareManager currentRunningFirmwareVersion:self.pen];
             self.info.firmwareRevision = [@(currentVersion) stringValue];
             [self attemptLoadFirmwareFromNetworkForVersionChecking];
+            if (currentVersion != -1)
+            {
+                [self updateFirmwareUpdateIsAvailble];
+            }
         }
 
         if (self.pen.name)
@@ -850,7 +854,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
         weakSelf.centralId = weakSelf.potentialCentralId;
         weakSelf.state = FTPenManagerStateConnected;
         weakSelf.didConnectViaWarmStart = NO;
-        [self updateFirmwareUpdateIsAvailble];
+        [self updatePenInfoObjectAndInvokeDelegate];
     }];
 
     // Married - Waiting for Long Press to Disconnect
@@ -1368,7 +1372,6 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
     self.pen.hasListener = YES;
     [self resetBackgroundTask];
-    [self updateFirmwareUpdateIsAvailble];
     [self updatePenInfoObjectAndInvokeDelegate];
 }
 
@@ -1956,15 +1959,13 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 - (void)updateFirmwareUpdateIsAvailble
 {
     BOOL connected = FTPenManagerStateIsConnected(self.state);
-    if (connected)
+    if (connected && self.pen && self.latestFirmwareVersion > 0)
     {
-        if (self.pen && self.firmwareUpdateIsAvailble != nil)
+        NSInteger currentVersion = [FTFirmwareManager currentRunningFirmwareVersion:self.pen];
+        if (currentVersion > 0)
         {
-            NSInteger currentVersion = [FTFirmwareManager currentRunningFirmwareVersion:self.pen];
             self.firmwareUpdateIsAvailble = @(self.latestFirmwareVersion > currentVersion);
         }
-
-        [self updatePenInfoObjectAndInvokeDelegate];
     }
 }
 
@@ -1991,10 +1992,18 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
              {
                  self.isFetchingLatestFirmware = NO;
                  BOOL connected = FTPenManagerStateIsConnected(self.state);
-                 if (data && connected && self.pen.firmwareRevision)
+                 if (data && connected && self.pen)
                  {
                      NSInteger version = [FTFirmwareManager versionOfImage:data];
                      NSInteger currentVersion = [FTFirmwareManager currentRunningFirmwareVersion:self.pen];
+                     
+                     if (currentVersion == -1)
+                     {
+                         self.latestFirmwareVersion = version;
+                         self.firmwareUpdateIsAvailble = nil;
+                         return;
+                     }
+                     
                      if (version > currentVersion)
                      {
                          self.latestFirmwareVersion = version;
