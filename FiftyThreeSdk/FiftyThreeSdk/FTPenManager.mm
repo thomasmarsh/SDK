@@ -703,7 +703,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     void (^attemptingConnectionCommon)() = ^()
     {
         FTAssert(weakSelf.pen, @"pen is non-nil");
-
+        
         [weakSelf.centralManager connectPeripheral:weakSelf.pen.peripheral options:nil];
     };
 
@@ -765,12 +765,15 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
             {
                 self.didConnectViaWarmStart = YES;
                 FTAssert(!weakSelf.pen, @"pen is nil");
+                [FTLog logVerboseWithFormat:@"Found Peripheral in DatingRetrievingConnectedPeripherals!"];
                 weakSelf.pen = [[FTPen alloc] initWithPeripheral:peripheral];
                 self.potentialCentralId =  [self centralIdFromPeripheralId:peripheral.identifier];
                 [weakSelf fireStateMachineEvent:kAttemptConnectionFromDatingEventName];
                 return;
             }
         }
+
+        [FTLog logVerboseWithFormat:@"None - DatingRetrievingConnectedPeripherals!"];
 
         [weakSelf fireStateMachineEvent:kBeginDatingScanningEventName];
     }];
@@ -1407,6 +1410,18 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
 - (void)penDidWriteHasListener:(NSNotification *)notification
 {
+    [FTLog logVerboseWithFormat:@"penDidWriteHasListener"];
+    if (self.pen)
+    {
+        [FTLog logVerboseWithFormat:@"self.pen.hasListener %x", self.pen.hasListener];
+        if (self.pen.lastErrorCode)
+        {
+            NSLog(@"self.pen.lastError id %d value %d",
+                  self.pen.lastErrorCode.lastErrorID,
+                  self.pen.lastErrorCode.lastErrorValue);
+        }
+    }
+    
     [self resetBackgroundTask];
 }
 
@@ -1850,6 +1865,8 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
             [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenUnexpectedDisconnectWhileConnectingNotifcationName
                                                                 object:self.pen];
 
+
+            [FTLog logVerboseWithFormat:@"Trying connectPeripheral again..."];
             // Try again. Eventually the state will timeout.
             [self.centralManager connectPeripheral:self.pen.peripheral options:nil];
         }
@@ -2208,6 +2225,11 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 + (FTPenManager *)sharedInstanceWithoutInitialization
 {
     return sharedInstance;
+}
+
+- (void)pen:(FTPen *)pen tipPressureDidChange:(float)tipPressure
+{
+    [FTLog logVerboseWithFormat:@"tipPressureDid Chage %f", tipPressure];
 }
 
 #pragma mark - Public API
