@@ -719,7 +719,28 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
         }
     }
 
+    [self ensureCentralId];
+
     [self updatePenInfoObjectAndInvokeDelegate];
+}
+
+- (void)ensureCentralId
+{
+    if ([self currentStateHasName:kMarriedStateName])
+    {
+        FTAssert(self.pen, @"pen is non-nil");
+
+        if (self.pen.softwareRevision)
+        {
+            self.centralId = ([FTFirmwareManager currentRunningFirmwareVersion:self.pen] > 55 ?
+                              [self centralIdFromPeripheralId:self.pen.peripheral.identifier] :
+                              0x1);
+        }
+        else
+        {
+            self.centralId = 0x0;
+        }
+    }
 }
 
 #pragma mark - State machine
@@ -803,7 +824,6 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
                 FTAssert(!weakSelf.pen, @"pen is nil");
                 [FTLog logVerboseWithFormat:@"Found Peripheral in DatingRetrievingConnectedPeripherals!"];
                 weakSelf.pen = [[FTPen alloc] initWithPeripheral:peripheral];
-                weakSelf.pen.potentialCentralId =  [self centralIdFromPeripheralId:peripheral.identifier];
                 [weakSelf fireStateMachineEvent:kAttemptConnectionFromDatingEventName];
                 return;
             }
@@ -889,8 +909,6 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
         FTAssert(weakSelf.pen.peripheral.identifier != nil, @"pen peripheral UUID is non-nil");
 
         weakSelf.pairedPeripheralUUID = weakSelf.pen.peripheral.identifier;
-        [FTLog logVerboseWithFormat:@"potential centrial Id (dec) = %ld", (long)weakSelf.pen.potentialCentralId];
-        weakSelf.centralId = weakSelf.pen.potentialCentralId;
         weakSelf.state = FTPenManagerStateConnected;
         weakSelf.didConnectViaWarmStart = NO;
 
@@ -901,6 +919,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
         }
 
         [self updatePenInfoObjectAndInvokeDelegate];
+        [self ensureCentralId];
     }];
 
     // Married - Waiting for Long Press to Disconnect
@@ -1019,7 +1038,6 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
                 [FTLog log:@"Found! Separated - Retrieving Connceted Peripherals"];
                 FTAssert(!weakSelf.pen, @"pen is nil");
                 weakSelf.pen = [[FTPen alloc] initWithPeripheral:peripheral];
-                weakSelf.pen.potentialCentralId =  [self centralIdFromPeripheralId:peripheral.identifier];
                 [weakSelf fireStateMachineEvent:kAttemptConnectionFromSeparatedEventName];
                 return;
             }
@@ -1713,17 +1731,6 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
     [FTLog logWithFormat:@"IsReconciling: %d IsReconcilingWithUs: %d", isPeripheralReconciling, isPeripheralReconcilingWithUs];
 
-    NSUInteger potentialCentralId;
-
-    if ([self peripheralAdvertisementCentralId:advertisementData] == 0x1)
-    {
-        potentialCentralId = 0x1;
-    }
-    else
-    {
-        potentialCentralId =  [self centralIdFromPeripheralId:peripheral.identifier];
-    }
-
     if ([self currentStateHasName:kDatingScanningStateName])
     {
         FTAssert(!self.pen, @"pen is nil");
@@ -1731,7 +1738,6 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
         if (!isPeripheralReconciling)
         {
             self.pen = [[FTPen alloc] initWithPeripheral:peripheral];
-            self.pen.potentialCentralId = potentialCentralId;
             [self fireStateMachineEvent:kAttemptConnectionFromDatingEventName];
         }
         else
@@ -1747,7 +1753,6 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
             {
                 FTAssert(!self.pen, @"pen is nil");
                 self.pen = [[FTPen alloc] initWithPeripheral:peripheral];
-                self.pen.potentialCentralId = potentialCentralId;
                 [self fireStateMachineEvent:kAttemptConnectionFromSwingingEventName];
             }
             else
@@ -1774,14 +1779,12 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
                     // [FTLog logVerboseWithFormat:@"Pencil is swinging"];
                     self.pen = pen;
-                    self.pen.potentialCentralId = potentialCentralId;
                     [self fireStateMachineEvent:kSwingEventName];
                 }
                 else
                 {
                     // [FTLog logVerboseWithFormat:@"Pencil kAttemptConnectionFromSeparatedEventName"];
                     self.pen = pen;
-                    self.pen.potentialCentralId = potentialCentralId;
                     [self fireStateMachineEvent:kAttemptConnectionFromSeparatedEventName];
                 }
             }
