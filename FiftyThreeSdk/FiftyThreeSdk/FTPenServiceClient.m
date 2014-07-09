@@ -814,7 +814,9 @@
             self.didInitialReadOfCentralId = YES;
         }
 
-        if (self.hasListenerCharacteristic && !self.hasListenerDidSetNofifyValue)
+        // Version 55 and older firmware did not mark the HasListener characteristic as notifying,
+        // so only request notificatons if they're available.
+        if (self.hasListenerCharacteristic.isNotifying && !self.hasListenerDidSetNofifyValue)
         {
             [self.peripheral setNotifyValue:YES
                           forCharacteristic:self.hasListenerCharacteristic];
