@@ -4,6 +4,12 @@
 //
 //  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
+  //
+//  FTPenManager.mm
+//  FiftyThreeSdk
+//
+//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
+//
 
 #import <CoreBluetooth/CoreBluetooth.h>
 #import <UIKit/UIKit.h>
@@ -671,6 +677,16 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     {
         self.pen.hasListener = _hasListener;
     }
+
+    BOOL hasInactivityTimeoutUpdated = [notfication.userInfo[kFTPenNotificationPropertiesKey] containsObject:kFTPenInactivityTimeoutPropertyName];
+    if (hasInactivityTimeoutUpdated)
+    {
+        if (self.state != FTPenManagerStateUpdatingFirmware && self.pen.inactivityTimeout < 1)
+        {
+            // Make sure inactivity time out is sane except when we're doing FW upgrades.
+            self.pen.inactivityTimeout = 10;
+        }
+    }
 }
 
 - (void)penDidUpdateProperties:(NSNotification *)notification
@@ -877,6 +893,13 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
         weakSelf.centralId = weakSelf.pen.potentialCentralId;
         weakSelf.state = FTPenManagerStateConnected;
         weakSelf.didConnectViaWarmStart = NO;
+
+        // If for what ever reason we've set turned off inactivity time out make sure it's sane here.
+        if (weakSelf.pen.inactivityTimeout < 1)
+        {
+            weakSelf.pen.inactivityTimeout = 10;
+        }
+
         [self updatePenInfoObjectAndInvokeDelegate];
     }];
 
