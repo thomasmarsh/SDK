@@ -246,9 +246,24 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
 @property (nonatomic, readwrite) NSNumber *firmwareUpdateIsAvailble;
 
+@property (nonatomic) BOOL hasListener;
+
 @end
 
 @implementation FTPenManager
+
+- (void)setHasListener:(BOOL)hasListener
+{
+    if (self.pen)
+    {
+        self.pen.hasListener = hasListener;
+    }
+    else
+    {
+        [FTLog logVerboseWithFormat:@"Couldn't setHashListener to %x on self.pen", hasListener];
+    }
+    _hasListener = hasListener;
+}
 
 - (id)init
 {
@@ -277,7 +292,6 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
                                                  selector:@selector(applicationDidEnterBackground:)
                                                      name:UIApplicationDidEnterBackgroundNotification
                                                    object:nil];
-
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(penDidWriteHasListener:)
                                                      name:kFTPenDidWriteHasListenerNotificationName
@@ -377,23 +391,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
         if ([UIApplication sharedApplication].applicationState == UIApplicationStateActive)
         {
-            if (self.pen)
-            {
-                [FTLog logVerboseWithFormat:@"hasListener = %x", self.pen.hasListener];
-                if (self.pen.hasListener)
-                {
-                    // TODO testing to see if this needs a kick...
-                    self.pen.hasListener = NO;
-                    self.pen.hasListener = YES;
-                    DebugAssert(self.pen.hasListener);
-                    
-                }
-                self.pen.hasListener = YES;
-            }
-            else
-            {
-                [FTLog log:@"Could not set hasListener=YES!"];
-            }
+            self.hasListener = YES;
         }
 
         [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenManagerDidUpdateStateNotificationName
@@ -412,6 +410,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     [[NSNotificationCenter defaultCenter] removeObserver:kFTPenIsTipPressedDidChangeNotificationName];
     [[NSNotificationCenter defaultCenter] removeObserver:kFTPenDidUpdatePropertiesNotificationName];
     [[NSNotificationCenter defaultCenter] removeObserver:kFTPenBatteryLevelDidChangeNotificationName];
+    [[NSNotificationCenter defaultCenter] removeObserver:kFTPenDidUpdatePrivatePropertiesNotificationName];
 
     if (_pen)
     {
@@ -436,6 +435,11 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(penDidUpdateProperties:)
                                                      name:kFTPenDidUpdatePropertiesNotificationName
+                                                   object:_pen];
+
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(penDidUpdatePrivateProperties:)
+                                                     name:kFTPenDidUpdatePrivatePropertiesNotificationName
                                                    object:_pen];
 
         [[NSNotificationCenter defaultCenter] addObserver:self
@@ -653,6 +657,24 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 {
     [self updatePenInfoObjectAndInvokeDelegate];
 }
+
+- (void)penDidUpdatePrivateProperties:(NSNotification *)notfication
+{
+    // This odd bit of code is here for good reason. When apps switch on iOS they are not
+    // guarenteed to resign & activate in lock step order. So you can get the foreground message
+    // on the other apps' delegate *before* the current running application gets background message.
+    // If the pen think's hasListener has been set to zero but *we* are in the foreground, we need to
+    // ensure it is written.
+    // As if firmware 71, hasListener is a notifying characteristic.
+    BOOL hasListenerHasUpdated = [notfication.userInfo[kFTPenNotificationPropertiesKey] containsObject:kFTPenHasListenerPropertyName];
+    BOOL hasListenerSetIncorrectly = _hasListener && self.pen.hasListener == 0;
+
+    if (hasListenerHasUpdated && hasListenerSetIncorrectly)
+    {
+        self.pen.hasListener = _hasListener;
+    }
+}
+
 - (void)penDidUpdateProperties:(NSNotification *)notification
 {
     // Firmware update can't proceed until we've refreshed the factory and upgrade firmware
@@ -1097,7 +1119,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
         weakSelf.originalInactivityTimeout = weakSelf.pen.inactivityTimeout;
         weakSelf.pen.inactivityTimeout = 0;
-        weakSelf.pen.hasListener = NO;
+        weakSelf.hasListener = NO;
 
         // Discourage the device from going to sleep while the firmware is updating.
         [UIApplication sharedApplication].idleTimerDisabled = YES;
@@ -1114,7 +1136,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
         weakSelf.updateManager = nil;
 
         weakSelf.pen.inactivityTimeout = weakSelf.originalInactivityTimeout;
-        weakSelf.pen.hasListener = YES;
+        weakSelf.hasListener = YES;
 
         // Restore the idle timer disable flag to its original state.
         [UIApplication sharedApplication].idleTimerDisabled = NO;
@@ -1373,7 +1395,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
         [FTLog log:@"Skipped retrieve connected peripherals"];
     }
 
-    self.pen.hasListener = YES;
+    self.hasListener = YES;
     [self resetBackgroundTask];
     [self updatePenInfoObjectAndInvokeDelegate];
 }
@@ -1392,7 +1414,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
         [weakSelf resetBackgroundTask];
     }];
 
-    self.pen.hasListener = NO;
+    self.hasListener = NO;
 }
 
 - (void)resetBackgroundTask
@@ -1410,15 +1432,18 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
 - (void)penDidWriteHasListener:(NSNotification *)notification
 {
-    [FTLog logVerboseWithFormat:@"penDidWriteHasListener"];
     if (self.pen)
     {
-        [FTLog logVerboseWithFormat:@"self.pen.hasListener %x", self.pen.hasListener];
         if (self.pen.lastErrorCode)
         {
-            NSLog(@"self.pen.lastError id %d value %d",
+             [FTLog logVerboseWithFormat:@"self.pen.lastError id %d value %d",
                   self.pen.lastErrorCode.lastErrorID,
-                  self.pen.lastErrorCode.lastErrorValue);
+                  self.pen.lastErrorCode.lastErrorValue];
+
+                if (self.pen.lastErrorCode.lastErrorID > 0)
+                {
+                    [self.pen clearLastErrorCode];
+                }
         }
     }
     

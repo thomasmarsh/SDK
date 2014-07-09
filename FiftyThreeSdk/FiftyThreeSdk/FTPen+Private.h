@@ -2,7 +2,7 @@
 //  FTPen+Private.h
 //  FiftyThreeSdk
 //
-//  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
+//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
 
 #pragma once
@@ -27,6 +27,7 @@ extern NSString * const kFTPenPressureSetupPropertyName;
 extern NSString * const kFTPenManufacturingIDPropertyName;
 extern NSString * const kFTPenLastErrorCodePropertyName;
 extern NSString * const kFTPenAuthenticationCodePropertyName;
+extern NSString * const kFTPenHasListenerPropertyName;
 
 @class CBCentralManager;
 @class CBPeripheral;

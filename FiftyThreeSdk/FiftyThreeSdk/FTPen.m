@@ -56,6 +56,7 @@ NSString * const kFTPenManufacturingIDPropertyName = @"manufacturingID";
 NSString * const kFTPenLastErrorCodePropertyName = @"lastErrorCode";
 NSString * const kFTPenAuthenticationCodePropertyName = @"authenticationCode";
 NSString * const kFTPenCentralIdPropertyName = @"centralId";
+NSString * const kFTPenHasListenerPropertyName = @"hasListener";
 
 @implementation FTPenPressureSetup
 

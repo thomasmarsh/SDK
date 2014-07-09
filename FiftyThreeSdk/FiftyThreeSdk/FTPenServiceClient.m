@@ -42,12 +42,14 @@
 @property (nonatomic) BOOL eraserPressureDidSetNofifyValue;
 @property (nonatomic) BOOL batteryLevelDidSetNofifyValue;
 @property (nonatomic) BOOL batteryLevelDidReceiveFirstUpdate;
+@property (nonatomic) BOOL hasListenerDidSetNofifyValue;
 @property (nonatomic) BOOL didInitialReadOfInactivityTimeout;
 @property (nonatomic) BOOL didInitialReadOfPressureSetup;
 @property (nonatomic) BOOL didInitialReadOfManufacturingID;
 @property (nonatomic) BOOL didInitialReadOfLastErrorCode;
 @property (nonatomic) BOOL didInitialReadOfAuthenticationCode;
 @property (nonatomic) BOOL didInitialReadOfCentralId;
+@property (nonatomic) BOOL didInitialReadOfHasListener;
 @property (nonatomic) BOOL isCentralIdDirty;
 
 @property (nonatomic, readwrite) NSDate *lastTipReleaseTime;
@@ -296,6 +298,7 @@
         self.isEraserPressedDidSetNofifyValue = NO;
         self.tipPressureDidSetNofifyValue = NO;
         self.eraserPressureDidSetNofifyValue = NO;
+        self.hasListenerDidSetNofifyValue = NO;
         self.batteryLevelDidSetNofifyValue = NO;
         self.batteryLevelDidReceiveFirstUpdate = NO;
 
@@ -305,6 +308,7 @@
         self.didInitialReadOfLastErrorCode = NO;
         self.didInitialReadOfAuthenticationCode = NO;
         self.didInitialReadOfCentralId = NO;
+        self.didInitialReadOfHasListener = NO;
 
         return nil;
     }
@@ -627,6 +631,15 @@
             [updatedProperties addObject:kFTPenCentralIdPropertyName];
         }
     }
+    else if ([characteristic.UUID isEqual:[FTPenServiceUUIDs hasListener]])
+    {
+        if (self.hasListenerCharacteristic)
+        {
+            FTAssert(characteristic == self.hasListenerCharacteristic, @"characteristic is hasListener characteristic");
+            _hasListener = [self.hasListenerCharacteristic valueAsBOOL];
+            [updatedProperties addObject:kFTPenHasListenerPropertyName];
+        }
+    }
 
     if (updatedProperties.count > 0)
     {
@@ -799,6 +812,19 @@
                 [self.peripheral readValueForCharacteristic:self.centralIdCharacteristic];
             }
             self.didInitialReadOfCentralId = YES;
+        }
+
+        if (self.hasListenerCharacteristic && !self.hasListenerDidSetNofifyValue)
+        {
+            [self.peripheral setNotifyValue:YES
+                          forCharacteristic:self.hasListenerCharacteristic];
+            self.hasListenerDidSetNofifyValue = YES;
+        }
+
+        if (self.hasListenerCharacteristic && !self.didInitialReadOfHasListener)
+        {
+            [self.peripheral readValueForCharacteristic:self.hasListenerCharacteristic];
+            self.didInitialReadOfHasListener = YES;
         }
     }
 }
