@@ -234,8 +234,6 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
 @property (nonatomic) UInt32 centralId;
 
-@property (nonatomic) UInt32 potentialCentralId;
-
 @property (nonatomic) NSInteger originalInactivityTimeout;
 
 @property (nonatomic) BOOL isFetchingLatestFirmware;
@@ -725,7 +723,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     void (^attemptingConnectionCommon)() = ^()
     {
         FTAssert(weakSelf.pen, @"pen is non-nil");
-        
+
         [weakSelf.centralManager connectPeripheral:weakSelf.pen.peripheral options:nil];
     };
 
@@ -789,7 +787,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
                 FTAssert(!weakSelf.pen, @"pen is nil");
                 [FTLog logVerboseWithFormat:@"Found Peripheral in DatingRetrievingConnectedPeripherals!"];
                 weakSelf.pen = [[FTPen alloc] initWithPeripheral:peripheral];
-                self.potentialCentralId =  [self centralIdFromPeripheralId:peripheral.identifier];
+                weakSelf.pen.potentialCentralId =  [self centralIdFromPeripheralId:peripheral.identifier];
                 [weakSelf fireStateMachineEvent:kAttemptConnectionFromDatingEventName];
                 return;
             }
@@ -875,8 +873,8 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
         FTAssert(weakSelf.pen.peripheral.identifier != nil, @"pen peripheral UUID is non-nil");
 
         weakSelf.pairedPeripheralUUID = weakSelf.pen.peripheral.identifier;
-        [FTLog logVerboseWithFormat:@"potential centrial Id (dec) = %ld", (long)self.potentialCentralId];
-        weakSelf.centralId = weakSelf.potentialCentralId;
+        [FTLog logVerboseWithFormat:@"potential centrial Id (dec) = %ld", (long)weakSelf.pen.potentialCentralId];
+        weakSelf.centralId = weakSelf.pen.potentialCentralId;
         weakSelf.state = FTPenManagerStateConnected;
         weakSelf.didConnectViaWarmStart = NO;
         [self updatePenInfoObjectAndInvokeDelegate];
@@ -977,7 +975,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     [separatedState setDidExitStateBlock:^(TKState *state, TKStateMachine *stateMachine)
     {
         weakSelf.scanningState = ScanningStateDisabled;
-        
+
         [self clearFirmwareVersionCheck];
     }];
 
@@ -998,7 +996,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
                 [FTLog log:@"Found! Separated - Retrieving Connceted Peripherals"];
                 FTAssert(!weakSelf.pen, @"pen is nil");
                 weakSelf.pen = [[FTPen alloc] initWithPeripheral:peripheral];
-                self.potentialCentralId =  [self centralIdFromPeripheralId:peripheral.identifier];
+                weakSelf.pen.potentialCentralId =  [self centralIdFromPeripheralId:peripheral.identifier];
                 [weakSelf fireStateMachineEvent:kAttemptConnectionFromSeparatedEventName];
                 return;
             }
@@ -1403,7 +1401,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 - (void)applicationDidEnterBackground:(NSNotification *)notificaton
 {
     [FTLog log:@"FTPenManager did enter background"];
- 
+
     // Reset the background task (if it has not yet been ended) prior to starting a new one. One would think
     // that we wouldn't need to do this if there were a strict pairing of applicationDidBecomeActive and
     // applicationDidEnterBackground, but in practice that does not appear to be the case.
@@ -1446,7 +1444,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
                 }
         }
     }
-    
+
     [self resetBackgroundTask];
 }
 
@@ -1671,7 +1669,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     UInt32 peripheralCentralId = [self centralIdFromPeripheralId:peripheral.identifier];
 
     [FTLog logVerboseWithFormat:@"advertisedCentralId %ld  peripheralCentralId %ld", (long)advertisedCentralId, (long)peripheralCentralId];
-    
+
     // There are two cases here.
     // We're looking at an older v55 firmware that only has 1 byte of advertising data, or newer firmware.
     // We assume it's reconciling with us if the advertising data is 1 byte.
@@ -1707,15 +1705,18 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     BOOL isPeripheralReconcilingWithUs = [self isPeripheralReconcilingWithUs:peripheral withAdvertisementData:advertisementData];
 
     [FTLog logWithFormat:@"IsReconciling: %d IsReconcilingWithUs: %d", isPeripheralReconciling, isPeripheralReconcilingWithUs];
-    
+
+    NSUInteger potentialCentralId;
+
     if ([self peripheralAdvertisementCentralId:advertisementData] == 0x1)
     {
-        self.potentialCentralId = 0x1;
+        potentialCentralId = 0x1;
     }
     else
     {
-        self.potentialCentralId =  [self centralIdFromPeripheralId:peripheral.identifier];
+        potentialCentralId =  [self centralIdFromPeripheralId:peripheral.identifier];
     }
+
     if ([self currentStateHasName:kDatingScanningStateName])
     {
         FTAssert(!self.pen, @"pen is nil");
@@ -1723,7 +1724,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
         if (!isPeripheralReconciling)
         {
             self.pen = [[FTPen alloc] initWithPeripheral:peripheral];
-
+            self.pen.potentialCentralId = potentialCentralId;
             [self fireStateMachineEvent:kAttemptConnectionFromDatingEventName];
         }
         else
@@ -1739,6 +1740,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
             {
                 FTAssert(!self.pen, @"pen is nil");
                 self.pen = [[FTPen alloc] initWithPeripheral:peripheral];
+                self.pen.potentialCentralId = potentialCentralId;
                 [self fireStateMachineEvent:kAttemptConnectionFromSwingingEventName];
             }
             else
@@ -1765,12 +1767,14 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
                     // [FTLog logVerboseWithFormat:@"Pencil is swinging"];
                     self.pen = pen;
+                    self.pen.potentialCentralId = potentialCentralId;
                     [self fireStateMachineEvent:kSwingEventName];
                 }
                 else
                 {
                     // [FTLog logVerboseWithFormat:@"Pencil kAttemptConnectionFromSeparatedEventName"];
                     self.pen = pen;
+                    self.pen.potentialCentralId = potentialCentralId;
                     [self fireStateMachineEvent:kAttemptConnectionFromSeparatedEventName];
                 }
             }
@@ -1889,7 +1893,6 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
         {
             [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenUnexpectedDisconnectWhileConnectingNotifcationName
                                                                 object:self.pen];
-
 
             [FTLog logVerboseWithFormat:@"Trying connectPeripheral again..."];
             // Try again. Eventually the state will timeout.
@@ -2038,14 +2041,14 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
                  {
                      NSInteger version = [FTFirmwareManager versionOfImage:data];
                      NSInteger currentVersion = [FTFirmwareManager currentRunningFirmwareVersion:self.pen];
-                     
+
                      if (currentVersion == -1)
                      {
                          self.latestFirmwareVersion = version;
                          self.firmwareUpdateIsAvailble = nil;
                          return;
                      }
-                     
+
                      if (version > currentVersion)
                      {
                          self.latestFirmwareVersion = version;

@@ -116,6 +116,8 @@ extern NSString * const kFTPenHasListenerPropertyName;
 @property (nonatomic) NSInteger inactivityTimeout;
 @property (nonatomic, readonly) FTPenLastErrorCode *lastErrorCode;
 
+@property (nonatomic) UInt32 potentialCentralId;
+
 @property (nonatomic, readonly) BOOL isReady;
 @property (nonatomic, readonly) BOOL isPoweringOff;
 @property (nonatomic) BOOL requiresTipBePressedToBecomeReady;
