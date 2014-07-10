@@ -671,9 +671,8 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     // ensure it is written.
     // As if firmware 71, hasListener is a notifying characteristic.
     BOOL hasListenerWasUpdated = [notfication.userInfo[kFTPenNotificationPropertiesKey] containsObject:kFTPenHasListenerPropertyName];
-    BOOL hasListenerIsSetIncorrectly = self.penHasListener && self.pen.hasListener == 0;
 
-    if (hasListenerWasUpdated && hasListenerIsSetIncorrectly)
+    if (hasListenerWasUpdated && self.penHasListener)
     {
         self.pen.hasListener = self.penHasListener;
     }
