@@ -19,7 +19,7 @@
 NSString * const kFTXCallbackUrlSourceKey = @"x-source";
 NSString * const kFTXCallbackUrlErrorKey = @"x-error";
 NSString * const kFTXCallbackUrlCancelKey = @"x-cancel";
-NSString * const kFTXCallbackUrlSuccessKey = @"x-error";
+NSString * const kFTXCallbackUrlSuccessKey = @"x-success";
 
 @implementation FTXCallbackURL
 // Create a XCallbackUrl with named parameters. This sets up query parameters & url encodes the bits.
