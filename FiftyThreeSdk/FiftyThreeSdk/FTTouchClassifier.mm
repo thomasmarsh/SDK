@@ -116,7 +116,7 @@ using namespace fiftythree::sdk;
         if ([FTTouchClassifier shouldReportClassificationChange:t])
         {
             FTTouchClassificationInfo *info = [[FTTouchClassificationInfo alloc] init];
-            info.touch = static_pointer_cast<TouchTrackerObjC>(TouchTracker::Instance())->UITouchForTouch(t.touch);
+            info.touch = spc<TouchTrackerObjC>(TouchTracker::Instance())->UITouchForTouch(t.touch);
             if (t.oldValue == TouchClassification::UnknownDisconnected && classifier->IsPenConnected())
             {
                 info.oldValue = FTTouchClassificationUnknown;
@@ -138,7 +138,7 @@ using namespace fiftythree::sdk;
 // Returns a unique id for the touch.
 - (NSInteger)idForTouch:(UITouch *)touch
 {
-    Touch::Ptr ftTouch = static_pointer_cast<TouchTrackerObjC>(TouchTracker::Instance())->TouchForUITouch(touch);
+    Touch::Ptr ftTouch = spc<TouchTrackerObjC>(TouchTracker::Instance())->TouchForUITouch(touch);
 
     if (ftTouch)
     {
@@ -152,7 +152,7 @@ using namespace fiftythree::sdk;
 
 - (BOOL)classification:(FTTouchClassification *)result forTouch:(UITouch *)touch
 {
-    Touch::Ptr ftTouch = static_pointer_cast<TouchTrackerObjC>(TouchTracker::Instance())->TouchForUITouch(touch);
+    Touch::Ptr ftTouch = spc<TouchTrackerObjC>(TouchTracker::Instance())->TouchForUITouch(touch);
 
     if (ftTouch)
     {
@@ -224,7 +224,7 @@ using namespace fiftythree::sdk;
     auto classifier = ActiveClassifier::Instance();
     if (classifier)
     {
-        auto ftTouch = static_pointer_cast<TouchTrackerObjC>(TouchTracker::Instance())->TouchForUITouch(touch);
+        auto ftTouch = spc<TouchTrackerObjC>(TouchTracker::Instance())->TouchForUITouch(touch);
         classifier->RemoveTouchFromClassification(ftTouch);
     }
 }

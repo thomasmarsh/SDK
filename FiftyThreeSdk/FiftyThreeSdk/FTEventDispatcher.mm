@@ -95,7 +95,7 @@ using namespace fiftythree::sdk;
     // dispatch at this level allows TouchTracker to observe all touches in the system.
     if (event.type == UIEventTypeTouches)
     {
-        static_pointer_cast<TouchTrackerObjC>(TouchTracker::Instance())->ProcessTouchesEvent(event);
+        spc<TouchTrackerObjC>(TouchTracker::Instance())->ProcessTouchesEvent(event);
 
         TouchClassifier::Ptr classifier = self.classifier;
         if (classifier)
@@ -104,7 +104,7 @@ using namespace fiftythree::sdk;
 
             for (UITouch *t in [event allTouches])
             {
-                auto touch = static_pointer_cast<TouchTrackerObjC>(TouchTracker::Instance())->TouchForUITouch(t);
+                auto touch = spc<TouchTrackerObjC>(TouchTracker::Instance())->TouchForUITouch(t);
                 touches.insert(touch);
             }
 

@@ -620,7 +620,7 @@ static const CGFloat kPairingSpotTouchRadius_Moved = 150.f;
 
 - (PairingSpotTouchState)evaludatePairingSpotTouch:(UITouch *)uiTouch
 {
-    Touch::Ptr touch = static_pointer_cast<TouchTrackerObjC>(TouchTracker::Instance())->TouchForUITouch(uiTouch);
+    Touch::Ptr touch = spc<TouchTrackerObjC>(TouchTracker::Instance())->TouchForUITouch(uiTouch);
     DebugAssert(touch);
 
     if ([uiTouch.gestureRecognizers count] < 1 ||
@@ -667,7 +667,7 @@ static const CGFloat kPairingSpotTouchRadius_Moved = 150.f;
     BOOL shouldIgnore = NO;
 
     // Determine if there's a valid pairing spot touch.
-    NSArray *allUITouches = static_pointer_cast<TouchTrackerObjC>(TouchTracker::Instance())->AllUITouches();
+    NSArray *allUITouches = spc<TouchTrackerObjC>(TouchTracker::Instance())->AllUITouches();
     NSMutableArray *validPairingSpotTouches = [NSMutableArray array];
     if (allUITouches.count == 1)
     {

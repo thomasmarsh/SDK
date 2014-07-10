@@ -19,7 +19,7 @@ using std::cout;
 using std::vector;
 
 typedef fiftythree::sdk::Classifier Classifier;
-using fiftythree::core::const_pointer_cast;
+using fiftythree::core::cpc;
 
 namespace fiftythree
 {
@@ -36,7 +36,7 @@ void TouchClassifierImpl::TouchesDidChanged(const std::set<Touch::cPtr> & touche
     std::set<Touch::Ptr> nonConstTouches;
     for (const Touch::cPtr & t : touches)
     {
-        nonConstTouches.insert(const_pointer_cast<Touch>(t));
+        nonConstTouches.insert(cpc<Touch>(t));
     }
     _Classifier->OnTouchesChanged(nonConstTouches);
 }
