@@ -1689,9 +1689,14 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
         if (data)
         {
-            self.latestFirmware = data;
-            self.latestFirmwareVersion = [FTFirmwareManager versionOfImage:self.latestFirmware];
-            self.latestFirmwareCachePath = path;
+            NSInteger version =  [FTFirmwareManager versionOfImage:data];
+
+            if (version > self.latestFirmwareVersion)
+            {
+                self.latestFirmware = data;
+                self.latestFirmwareVersion = version;
+                self.latestFirmwareCachePath = path;
+            }
         }
         else
         {
@@ -1758,9 +1763,14 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
         NSData *data = [NSData dataWithContentsOfFile:path];
         if (data)
         {
-            self.latestFirmware = data;
-            self.latestFirmwareVersion = [FTFirmwareManager versionOfImage:self.latestFirmware];
-            [self writeFirmwareToFileCache];
+            NSInteger version =  [FTFirmwareManager versionOfImage:data];
+
+            if (version > self.latestFirmwareVersion)
+            {
+                self.latestFirmware = data;
+                self.latestFirmwareVersion = version;
+                [self writeFirmwareToFileCache];
+            }
         }
         else
         {
@@ -1772,19 +1782,9 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 - (NSNumber *)isFirmwareUpdateAvailable:(NSInteger *)currentVersion
                           updateVersion:(NSInteger *)updateVersion
 {
-    // We're expecting Network Version >= In Memory >= FileCache >= Bundle version.
 
-    if (!self.latestFirmware)
-    {
-        [self attempLoadFirmwareFromFileCache];
-    }
-
-    if (!self.latestFirmware)
-    {
-        [self attemptLoadFirmwareFromBundle];
-    }
-
-    // Always attempt a network FW check.
+    [self attempLoadFirmwareFromFileCache];
+    [self attemptLoadFirmwareFromBundle];
     [self attemptLoadFirmwareFromNetwork];
 
     [FTFirmwareManager isVersionAtPath:[FTFirmwareManager imagePath]
