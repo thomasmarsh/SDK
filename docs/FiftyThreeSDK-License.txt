@@ -2,65 +2,155 @@ FiftyThree® SDK License Agreement
 
 
 
-This is a legally binding agreement (“agreement”) between FiftyThree, Inc. (“FiftyThree” or “we”) and you that applies to the FiftyThree Software Development Kit (“SDK”).  This agreement applies to all components and materials we provide as part of the SDK, and any updates for the SDK that we may provide.  
+This is a legally binding agreement (“agreement”) between FiftyThree, Inc.
+(“FiftyThree” or “we”) and you that applies to the FiftyThree Software
+Development Kit (“SDK”).  This agreement applies to all components and
+materials we provide as part of the SDK, and any updates for the SDK that we
+may provide.  
 
-“You” or “you” means the person who downloads, installs, accesses, or uses the SDK (and, if you represent a legal entity, it also means that entity, and you represent and warrant that you are authorized to enter into this agreement for that entity).
+“You” or “you” means the person who downloads, installs, accesses, or uses the
+SDK (and, if you represent a legal entity, it also means that entity, and you
+represent and warrant that you are authorized to enter into this agreement for
+that entity).
 
-In order to use the SDK, you must first agree to this agreement. You may not use the SDK if you do not accept this agreement. 
+In order to use the SDK, you must first agree to this agreement. You may not
+use the SDK if you do not accept this agreement. 
 
 
 
 1. LICENSE.
 
-a. Development License. You may make a reasonable number of copies of all of the materials provided as part of the SDK and design, develop, and test applications that use the components provided as part of the SDK solely to enable Pencil by FiftyThree and not any other stylus or other input device (“Applications”). 
+a. Development License. You may make a reasonable number of copies of all of
+the materials provided as part of the SDK and design, develop, and test
+applications that use the components provided as part of the SDK solely to
+enable Pencil by FiftyThree and not any other stylus or other input device
+(“Applications”). 
 
-b. Distribution License.  The SDK includes numerous software components in object code and source code format.  You may modify files that we provide in source code form, but not files that we provide in object code form.  You may incorporate into your Application the source code components (unmodified, or as modified by you) and the object code components (unmodified) into your Application and distribute them as part of your Application, subject to the terms of this agreement.
+b. Distribution License.  The SDK includes numerous software components in
+object code and source code format.  You may modify files that we provide in
+source code form, but not files that we provide in object code form.  You may
+incorporate into your Application the source code components (unmodified, or as
+modified by you) and the object code components (unmodified) into your
+Application and distribute them as part of your Application, subject to the
+terms of this agreement.
 
-c. Distribution Requirements.  Your Applications are licensed only if you include warranty disclaimers and limitations of liability benefitting us (as your supplier) that are at least as protective as those set forth in Sections 10 and 11 of this agreement.  
+c. Distribution Requirements.  Your Applications are licensed only if you
+include warranty disclaimers and limitations of liability benefitting us (as
+your supplier) that are at least as protective as those set forth in Sections
+10 and 11 of this agreement.  
 
-2. LICENSE LIMITATIONS. The SDK is licensed, not sold.  You may use the SDK only as expressly permitted in this agreement, and we reserve all other rights.  Any patent rights granted to you in this agreement apply only to the SDK in the form in which we provide it to you, and not to any derivative works you may make of, or combinations you may make with, the SDK. You must not (and are not licensed to):
+2. LICENSE LIMITATIONS. The SDK is licensed, not sold.  You may use the SDK
+only as expressly permitted in this agreement, and we reserve all other rights.
+Any patent rights granted to you in this agreement apply only to the SDK in the
+form in which we provide it to you, and not to any derivative works you may
+make of, or combinations you may make with, the SDK. You must not (and are not
+licensed to):
 
-a. create Applications that use any portion of the SDK to enable the use of the palm cancellation or touch classification functionality of the SDK in connection with any stylus, device, or other input mode (such as fingers) other than Pencil by FiftyThree; 
+a. create Applications that use any portion of the SDK to enable the use of the
+palm cancellation or touch classification functionality of the SDK in
+connection with any stylus, device, or other input mode (such as fingers) other
+than Pencil by FiftyThree; 
 
 b. transfer the SDK or this agreement to any third party;
 
-c. reverse engineer, decompile, or disassemble any part of the SDK not provided in source code form (To the extent that applicable law expressly permits you to decompile the SDK in order to obtain information necessary to render the object code libraries interoperable with other software, you must first ask us in writing to provide the necessary information); 
+c. reverse engineer, decompile, or disassemble any part of the SDK not provided
+in source code form (To the extent that applicable law expressly permits you to
+decompile the SDK in order to obtain information necessary to render the object
+code libraries interoperable with other software, you must first ask us in
+writing to provide the necessary information); 
 
 d. alter any copyright, trademark, or patent notices in the SDK; 
 
-e. use any of our trademarks, including but not limited to Pencil™, Paper™, FiftyThree®, and the 53 circle logo in your Applications’ names, or in any other way not permitted in the Trademark section below;
+e. use any of our trademarks, including but not limited to Pencil™, Paper™,
+FiftyThree®, and the 53 circle logo in your Applications’ names, or in any
+other way not permitted in the Trademark section below;
 
 f. distribute malicious, deceptive, obscene, or unlawful Applications; 
 
-g. use the SDK or any Application in any hazardous situation, or design any Application for use in any hazardous situation; or
+g. use the SDK or any Application in any hazardous situation, or design any
+Application for use in any hazardous situation; or
 
-h. modify or distribute any portion of the SDK, or distribute any Application, in any way that would subject any portion of the SDK to an Excluded License.  An Excluded License is a license that requires, as a condition of use, modification, or distribution of code subject to that license, that:
+h. modify or distribute any portion of the SDK, or distribute any Application,
+in any way that would subject any portion of the SDK to an Excluded License.
+An Excluded License is a license that requires, as a condition of use,
+modification, or distribution of code subject to that license, that:
 
 i. the code be disclosed or distributed in source code form; or
 
 ii. others have the right to modify the code. 
 
-3. TRADEMARKS.  We grant to you a worldwide, non-exclusive, non-transferable, royalty-free, personal license to use certain of our logos and phrases, solely as described in the FiftyThree SDK Trademark Guidelines, as they may be updated from time to time, in physical and electronic materials in order to indicate that your Application supports the active stylus functionality of Pencil by FiftyThree. 
+3. TRADEMARKS.  We grant to you a worldwide, non-exclusive, non-transferable,
+royalty-free, personal license to use certain of our logos and phrases, solely
+as described in the FiftyThree SDK Trademark Guidelines, as they may be updated
+from time to time, in physical and electronic materials in order to indicate
+that your Application supports the active stylus functionality of Pencil by
+FiftyThree. 
 
-4. SUPPORT SERVICES.  Because the SDK is provided “as is,” we may not provide support services for it.  If we elect to provide any support services, we may stop (or change how we are) doing so at any time, for any reason or no reason, without notice.
+4. SUPPORT SERVICES.  Because the SDK is provided “as is,” we may not provide
+support services for it.  If we elect to provide any support services, we may
+stop (or change how we are) doing so at any time, for any reason or no reason,
+without notice.
 
-5. FEEDBACK. If you provide feedback, input, or suggestions (“Feedback”) to us, you grant to us the right to make, use, sell, import, distribute, and commercialize your Feedback in any way and for any purpose, without charge.  These rights survive this agreement. 
+5. FEEDBACK. If you provide feedback, input, or suggestions (“Feedback”) to us,
+you grant to us the right to make, use, sell, import, distribute, and
+commercialize your Feedback in any way and for any purpose, without charge.
+These rights survive this agreement. 
 
-6. EXPORT RESTRICTIONS. The SDK is subject to United States export laws and regulations. You must comply with all domestic and international export laws and regulations that apply to the SDK. These laws may include restrictions on destinations, end users, and end use. 
+6. EXPORT RESTRICTIONS. The SDK is subject to United States export laws and
+regulations. You must comply with all domestic and international export laws
+and regulations that apply to the SDK. These laws may include restrictions on
+destinations, end users, and end use. 
 
-7. ENTIRE AGREEMENT. This agreement is the entire agreement for the SDK and any support services that we may provide, and supersedes all previous discussions between the parties.  If any provision of this agreement is held by a court of competent jurisdiction to be illegal, invalid, or unenforceable, the remaining provisions will remain in full force and effect.  This agreement does not and is not intended to confer any rights or remedies upon any person other than the parties.   
+7. ENTIRE AGREEMENT. This agreement is the entire agreement for the SDK and any
+support services that we may provide, and supersedes all previous discussions
+between the parties.  If any provision of this agreement is held by a court of
+competent jurisdiction to be illegal, invalid, or unenforceable, the remaining
+provisions will remain in full force and effect.  This agreement does not and
+is not intended to confer any rights or remedies upon any person other than the
+parties.   
 
-8. NO WAIVER.  The failure of either party to enforce its rights under this agreement at any time for any period will not be construed as a waiver of such rights.  Unless expressly provided otherwise, each right and remedy in this agreement is in addition to any other right or remedy, at law or in equity, and the exercise of one right or remedy will not be deemed a waiver of any other right or remedy.  
+8. NO WAIVER.  The failure of either party to enforce its rights under this
+agreement at any time for any period will not be construed as a waiver of such
+rights.  Unless expressly provided otherwise, each right and remedy in this
+agreement is in addition to any other right or remedy, at law or in equity, and
+the exercise of one right or remedy will not be deemed a waiver of any other
+right or remedy.  
 
-9. APPLICABLE LAW.  This agreement will be governed by and construed in accordance with the laws of the State of New York, without regard to the conflicts of laws provisions thereof. For any action arising under this agreement, you consent to exclusive jurisdiction and venue in the federal and state courts located in New York City.  
+9. APPLICABLE LAW.  This agreement will be governed by and construed in
+accordance with the laws of the State of New York, without regard to the
+conflicts of laws provisions thereof. For any action arising under this
+agreement, you consent to exclusive jurisdiction and venue in the federal and
+state courts located in New York City.  
 
-10. DISCLAIMER OF WARRANTY.  THE SDK IS LICENSED “AS-IS”, WITH NO WARRANTIES, AND YOU ACKNOWLEDGE THAT YOUR USE OF THE SDK IS AT YOUR SOLE RISK. YOU BEAR ALL RISK OF USING IT.  WE GIVE NO EXPRESS WARRANTIES OR GUARANTEES REGARDING THE SDK OR ANY RELATED PRODUCTS, SERVICES, OR TECHNOLOGIES.  WE DISCLAIM ALL WARRANTIES OF ANY KIND, INCLUDING BUT NOT LIMITED TO ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT.
+10. DISCLAIMER OF WARRANTY.  THE SDK IS LICENSED “AS-IS”, WITH NO WARRANTIES,
+AND YOU ACKNOWLEDGE THAT YOUR USE OF THE SDK IS AT YOUR SOLE RISK. YOU BEAR ALL
+RISK OF USING IT.  WE GIVE NO EXPRESS WARRANTIES OR GUARANTEES REGARDING THE
+SDK OR ANY RELATED PRODUCTS, SERVICES, OR TECHNOLOGIES.  WE DISCLAIM ALL
+WARRANTIES OF ANY KIND, INCLUDING BUT NOT LIMITED TO ALL IMPLIED WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT.
 
-11. LIMITATION OF REMEDIES AND DAMAGES.  THE MAXIMUM YOU MAY RECOVER FROM US AND OUR SUPPLIERS FOR DIRECT DAMAGES IS U.S. $10.00.  YOU CANNOT RECOVER ANY OTHER DAMAGES, INCLUDING CONSEQUENTIAL, LOST PROFITS, SPECIAL, INDIRECT, PUNITIVE, OR INCIDENTAL DAMAGES.  YOU ALSO CANNOT RECOVER FOR ANY LOSS OF DATA, PRIVACY, CONFIDENTIALITY, OR PROFITS; OR ANY INABILITY TO USE THE SDK.  THIS LIMITATION APPLIES TO: (A) ANYTHING RELATED TO THE SDK, SERVICES, CONTENT (INCLUDING CODE) ON THIRD PARTY INTERNET SITES, OR THIRD PARTY PROGRAMS; AND (B) CLAIMS FOR BREACH OF CONTRACT; BREACH OF WARRANTY, GUARANTEE, OR CONDITION; STRICT LIABILITY, NEGLIGENCE, OR OTHER TORT, TO THE EXTENT PERMITTED BY APPLICABLE LAW.  IT APPLIES EVEN IF WE KNEW OR SHOULD HAVE KNOWN ABOUT THE POSSIBILITY OF THE DAMAGES. 
+11. LIMITATION OF REMEDIES AND DAMAGES.  THE MAXIMUM YOU MAY RECOVER FROM US
+AND OUR SUPPLIERS FOR DIRECT DAMAGES IS U.S. $10.00.  YOU CANNOT RECOVER ANY
+OTHER DAMAGES, INCLUDING CONSEQUENTIAL, LOST PROFITS, SPECIAL, INDIRECT,
+PUNITIVE, OR INCIDENTAL DAMAGES.  YOU ALSO CANNOT RECOVER FOR ANY LOSS OF DATA,
+PRIVACY, CONFIDENTIALITY, OR PROFITS; OR ANY INABILITY TO USE THE SDK.  THIS
+LIMITATION APPLIES TO: (A) ANYTHING RELATED TO THE SDK, SERVICES, CONTENT
+(INCLUDING CODE) ON THIRD PARTY INTERNET SITES, OR THIRD PARTY PROGRAMS; AND
+(B) CLAIMS FOR BREACH OF CONTRACT; BREACH OF WARRANTY, GUARANTEE, OR CONDITION;
+STRICT LIABILITY, NEGLIGENCE, OR OTHER TORT, TO THE EXTENT PERMITTED BY
+APPLICABLE LAW.  IT APPLIES EVEN IF WE KNEW OR SHOULD HAVE KNOWN ABOUT THE
+POSSIBILITY OF THE DAMAGES. 
 
 12. TERM.
 
-a. This agreement will remain in effect until: (i) you breach the terms of this agreement and we give you written notice of the breach; or (ii) you sue us or our distributors or customers on any intellectual property claim related to the SDK or any other FiftyThree product or service, or challenge the validity of any FiftyThree intellectual property associated with any of these. 
+a. This agreement will remain in effect until: (i) you breach the terms of this
+agreement and we give you written notice of the breach; or (ii) you sue us or
+our distributors or customers on any intellectual property claim related to the
+SDK or any other FiftyThree product or service, or challenge the validity of
+any FiftyThree intellectual property associated with any of these. 
 
-b. The terms of this agreement that require performance (or applying to events that may occur) after termination or expiration will survive termination or expiration, including all disclaimers of warranties and all limitations on and exclusions of remedies and damages.
+b. The terms of this agreement that require performance (or applying to events
+that may occur) after termination or expiration will survive termination or
+expiration, including all disclaimers of warranties and all limitations on and
+exclusions of remedies and damages.
 
