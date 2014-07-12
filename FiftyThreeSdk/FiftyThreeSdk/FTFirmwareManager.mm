@@ -15,14 +15,11 @@
 
 using namespace fiftythree::core;
 
-namespace
+static NSString *applicationDocumentsDirectory()
 {
-    NSString *applicationDocumentsDirectory()
-    {
-        NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-        NSString *basePath = ([paths count] > 0) ? [paths objectAtIndex:0] : nil;
-        return basePath;
-    }
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *basePath = ([paths count] > 0) ? [paths objectAtIndex:0] : nil;
+    return basePath;
 }
 
 @implementation FTFirmwareManager
