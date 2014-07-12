@@ -5,12 +5,15 @@
 //  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
 
+#import "FiftyThreeSdk/FTLog.h"
 #import "FTAAppDelegate.h"
 
 @implementation FTAAppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+    [FTLog setLogLevel:FTLogLevelEnabled];
+
     return YES;
 }
 

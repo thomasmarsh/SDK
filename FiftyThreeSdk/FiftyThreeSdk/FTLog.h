@@ -21,8 +21,5 @@ typedef NS_ENUM(NSInteger, FTLogLevel)
 // This defaults to FTLogLevelDisabled
 + (FTLogLevel)logLevel;
 + (void)setLogLevel:(FTLogLevel)logLevel;
-+ (void)log:(NSString *)string;
-+ (void)logWithFormat:(NSString *)format, ... NS_FORMAT_FUNCTION(1,2);
-+ (void)logVerboseWithFormat:(NSString *)format, ... NS_FORMAT_FUNCTION(1,2);
 
 @end

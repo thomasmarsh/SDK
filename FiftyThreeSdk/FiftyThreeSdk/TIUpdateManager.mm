@@ -10,9 +10,12 @@
 #import <CoreBluetooth/CoreBluetooth.h>
 
 #import "Core/Asserts.h"
+#import "Core/Log.h"
 #import "FTError.h"
-#import "FTLog.h"
+#import "FTLogPrivate.h"
 #import "TIUpdateManager.h"
+
+using namespace fiftythree::core;
 
 static NSString *const kOADServiceUUID = @"F000FFC0-0451-4000-B000-000000000000";
 static NSString *const kImageIdentifyUUID = @"F000FFC1-0451-4000-B000-000000000000";
@@ -96,7 +99,7 @@ static NSString *const kImageBlockTransferUUID = @"F000FFC2-0451-4000-B000-00000
     self.imageHandle = [NSFileHandle fileHandleForReadingAtPath:self.imagePath];
     if (!self.imageHandle)
     {
-        [FTLog logWithFormat:@"Firmware: invalid file path: %@", self.imagePath];
+        MLOG_ERROR(FTLogSDK, "Firmware: invalid file path: %s", DESC(self.imagePath));
 
         [self doneWithError:[self errorAborted]];
     }
@@ -114,7 +117,7 @@ static NSString *const kImageBlockTransferUUID = @"F000FFC2-0451-4000-B000-00000
 {
     if (self.state == TIUpdateManagerStateInProgress)
     {
-        [FTLog log:@"Firmware: update cancelled"];
+        MLOG_INFO(FTLogSDK, "Firmware: update cancelled");
 
         self.state = TIUpdateManagerStateCancelled;
         [self cleanup];
@@ -128,7 +131,7 @@ static NSString *const kImageBlockTransferUUID = @"F000FFC2-0451-4000-B000-00000
         error = [self errorAborted];
     }
 
-    [FTLog logWithFormat:@"Firmware: update done with error: %@", error.localizedDescription];
+    MLOG_INFO(FTLogSDK, "Firmware: update done with error: %s", DESC(error.localizedDescription));
 
     self.state = TIUpdateManagerStateFailed;
 
@@ -139,7 +142,7 @@ static NSString *const kImageBlockTransferUUID = @"F000FFC2-0451-4000-B000-00000
 
 - (void)done
 {
-    [FTLog log:@"Firmware: update done"];
+    MLOG_INFO(FTLogSDK, "Firmware: update done");
 
     self.state = TIUpdateManagerStateSucceeded;
 
@@ -154,8 +157,8 @@ static NSString *const kImageBlockTransferUUID = @"F000FFC2-0451-4000-B000-00000
 {
     if (error || !peripheral.services || peripheral.services.count == 0)
     {
-        [FTLog logWithFormat:@"Firmware: error discovering device info service: %@",
-         error.localizedDescription];
+        MLOG_ERROR(FTLogSDK, "Firmware: error discovering device info service: %s",
+                  DESC(error.localizedDescription));
 
         [self doneWithError:error];
         return;
@@ -176,8 +179,8 @@ static NSString *const kImageBlockTransferUUID = @"F000FFC2-0451-4000-B000-00000
 {
     if (error)
     {
-        [FTLog logWithFormat:@"Firmware: error discovering device info characteristics: %@",
-         error.localizedDescription];
+        MLOG_ERROR(FTLogSDK, "Firmware: error discovering device info characteristics: %s",
+                   DESC(error.localizedDescription));
 
         [self doneWithError:error];
         return;
@@ -203,8 +206,8 @@ static NSString *const kImageBlockTransferUUID = @"F000FFC2-0451-4000-B000-00000
 {
     if (error)
     {
-        [FTLog logWithFormat:@"Firmware: error updating value for descriptor: %@",
-         error.localizedDescription];
+        MLOG_ERROR(FTLogSDK, "Firmware: error updating value for descriptor: %s",
+                   DESC(error.localizedDescription));
 
         [self doneWithError:error];
         return;
@@ -216,8 +219,8 @@ static NSString *const kImageBlockTransferUUID = @"F000FFC2-0451-4000-B000-00000
 {
     if (error)
     {
-        [FTLog logWithFormat:@"Firmware: error writing value for characteristic: %@",
-         error.localizedDescription];
+        MLOG_ERROR(FTLogSDK, "Firmware: error writing value for characteristic: %s",
+                   DESC(error.localizedDescription));
 
         [self doneWithError:error];
         return;
@@ -229,8 +232,8 @@ static NSString *const kImageBlockTransferUUID = @"F000FFC2-0451-4000-B000-00000
 {
     if (error)
     {
-        [FTLog logWithFormat:@"Firmware: error writing value for descriptor: %@",
-         error.localizedDescription];
+        MLOG_ERROR(FTLogSDK, "Firmware: error writing value for descriptor: %s",
+                   DESC(error.localizedDescription));
 
         [self doneWithError:error];
         return;
@@ -242,8 +245,8 @@ static NSString *const kImageBlockTransferUUID = @"F000FFC2-0451-4000-B000-00000
 {
     if (error)
     {
-        [FTLog logWithFormat:@"Firmware: error updating value for descriptor: %@",
-         error.localizedDescription];
+        MLOG_ERROR(FTLogSDK, "Firmware: error updating value for descriptor: %s",
+                   DESC(error.localizedDescription));
 
         [self doneWithError:error];
         return;
@@ -263,7 +266,7 @@ static NSString *const kImageBlockTransferUUID = @"F000FFC2-0451-4000-B000-00000
 
 - (void)startImageBlockWrite
 {
-    [FTLog log:@"Firmware: sending image header"];
+    MLOG_INFO(FTLogSDK, "Firmware: sending image header");
 
     [self.imageHandle seekToFileOffset:4]; // skip CRC + shadow CRC
 

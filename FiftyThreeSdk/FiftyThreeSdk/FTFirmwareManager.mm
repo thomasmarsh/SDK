@@ -1,5 +1,5 @@
 //
-//  FTFirmwareManager.m
+//  FTFirmwareManager.mm
 //  FiftyThreeSdk
 //
 //  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
@@ -8,15 +8,21 @@
 #import <UIKit/UIKit.h>
 
 #import "Core/Asserts.h"
+#import "Core/Log.h"
 #import "FTFirmwareManager.h"
-#import "FTLog.h"
+#import "FTLogPrivate.h"
 #import "FTPen.h"
 
-NSString *applicationDocumentsDirectory()
+using namespace fiftythree::core;
+
+namespace
 {
-    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *basePath = ([paths count] > 0) ? [paths objectAtIndex:0] : nil;
-    return basePath;
+    NSString *applicationDocumentsDirectory()
+    {
+        NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+        NSString *basePath = ([paths count] > 0) ? [paths objectAtIndex:0] : nil;
+        return basePath;
+    }
 }
 
 @implementation FTFirmwareManager
@@ -79,7 +85,9 @@ NSString *applicationDocumentsDirectory()
                             }
                             else
                             {
-                                [FTLog logVerboseWithFormat:@"Got response %@ with error %@.\n", response, error];
+                                MLOG_INFO(FTLogSDKVerbose, "Got response %s with error %s.\n",
+                                          response.description.UTF8String,
+                                          error.description.UTF8String);
                                 handler(nil);
                             }
                             });
@@ -92,7 +100,7 @@ NSString *applicationDocumentsDirectory()
 
     if (image.length > 4 + sizeof(version))
     {
-        version = *((uint16_t *)(image.bytes + 4));
+        version = *((uint16_t *)((uint8_t *)image.bytes + 4));
         version >>= 1;
         return version;
     }

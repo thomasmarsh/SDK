@@ -1,16 +1,19 @@
 //
-//  FTDeviceInfoServiceClient.m
+//  FTDeviceInfoServiceClient.mm
 //  FiftyThreeSdk
 //
-//  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
+//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
 
 #import <CoreBluetooth/CoreBluetooth.h>
 
 #import "CBCharacteristic+Helpers.h"
+#import "Core/Log.h"
 #import "FTDeviceInfoServiceClient.h"
-#import "FTLog.h"
+#import "FTLogPrivate.h"
 #import "FTServiceUUIDs.h"
+
+using namespace fiftythree::core;
 
 @interface FTDeviceInfoServiceClient ()
 
@@ -209,9 +212,9 @@
     {
         if ([FTDeviceInfoServiceUUIDs nameForUUID:characteristic.UUID])
         {
-            [FTLog logWithFormat:@"Error updating value for characteristic: %@ error: %@.",
-             [FTPenServiceUUIDs nameForUUID:characteristic.UUID],
-             error.localizedDescription];
+            MLOG_ERROR(FTLogSDK, "Error updating value for characteristic: %s error: %s.",
+                       DESC([FTPenServiceUUIDs nameForUUID:characteristic.UUID]),
+                       DESC(error.localizedDescription));
             // TODO: Report failed state
         }
         return;

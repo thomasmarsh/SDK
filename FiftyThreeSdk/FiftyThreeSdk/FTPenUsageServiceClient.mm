@@ -1,15 +1,18 @@
 //
-//  FTPenUsageServiceClient.m
+//  FTPenUsageServiceClient.mm
 //  FiftyThreeSdk
 //
-//  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
+//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
 
 #import "CBCharacteristic+Helpers.h"
 #import "CBPeripheral+Helpers.h"
-#import "FTLog.h"
+#import "Core/Log.h"
+#import "FTLogPrivate.h"
 #import "FTPenUsageServiceClient.h"
 #import "FTServiceUUIDs.h"
+
+using namespace fiftythree::core;
 
 @interface FTPenUsageServiceClient ()
 
@@ -91,7 +94,8 @@
 {
     if (error)
     {
-        [FTLog logWithFormat:@"Error discovering services: %@", [error localizedDescription]];
+        MLOG_ERROR(FTLogSDK, "Error discovering services: %s",
+                   DESC(error.localizedDescription));
 
         // TODO: Report failed state
         return;
@@ -123,7 +127,8 @@
 {
     if (error || service.characteristics.count == 0)
     {
-        [FTLog logWithFormat:@"Error discovering characteristics: %@", [error localizedDescription]];
+        MLOG_ERROR(FTLogSDK, "Error discovering characteristics: %s",
+                   DESC(error.localizedDescription));
 
         // TODO: Report failed state
         return;
@@ -194,9 +199,9 @@
     {
         if ([FTPenUsageServiceUUIDs nameForUUID:characteristic.UUID])
         {
-            [FTLog logWithFormat:@"Error updating value for characteristic: %@ error: %@.",
-             [FTPenServiceUUIDs nameForUUID:characteristic.UUID],
-             [error localizedDescription]];
+            MLOG_ERROR(FTLogSDK, "Error updating value for characteristic: %s error: %s.",
+                       DESC([FTPenServiceUUIDs nameForUUID:characteristic.UUID]),
+                       DESC(error.localizedDescription));
 
             // TODO: Report failed state
         }
@@ -257,7 +262,7 @@
 {
     if (error)
     {
-        [FTLog logWithFormat:@"Error changing notification state: %@.", error.localizedDescription];
+        MLOG_ERROR(FTLogSDK, "Error changing notification state: %s.", DESC(error.localizedDescription));
 
         // TODO: Report failed state
         return;

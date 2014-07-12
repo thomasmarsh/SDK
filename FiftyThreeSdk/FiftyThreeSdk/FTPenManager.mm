@@ -16,13 +16,14 @@
 
 #import "Core/AnimationPump.h"
 #import "Core/Asserts.h"
+#import "Core/Log.h"
 #import "Core/NSString+FTTimeWithInterval.h"
 #import "Core/Touch/TouchTracker.h"
 #import "FiftyThreeSdk/PenConnectionView.h"
 #import "FiftyThreeSdk/TouchClassifier.h"
 #import "FTEventDispatcher+Private.h"
 #import "FTFirmwareManager.h"
-#import "FTLog.h"
+#import "FTLogPrivate.h"
 #import "FTPen+Private.h"
 #import "FTPen.h"
 #import "FTPenManager+Internal.h"
@@ -264,7 +265,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     }
     else
     {
-        [FTLog logVerboseWithFormat:@"Couldn't setHashListener to %x on self.pen", penHasListener];
+        MLOG_ERROR(FTLogSDK, "Couldn't set hasListener to %x on self.pen", penHasListener);
     }
     _penHasListener = penHasListener;
 }
@@ -312,15 +313,15 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
             if (self.pairedPeripheralLastActivityTime)
             {
-                [FTLog logWithFormat:@"Time since last paired peripheral activity: %@",
-                 [NSString stringWithTimeInterval:timeSinceLastActivity]];
+                MLOG_INFO(FTLogSDK, "Time since last paired peripheral activity: %s",
+                          DESC([NSString stringWithTimeInterval:timeSinceLastActivity]));
             }
 
             if (!self.pairedPeripheralLastActivityTime ||
                 timeSinceLastActivity <= 0.0 ||
                 timeSinceLastActivity > kInactivityTimeout)
             {
-                [FTLog log:@"Last activity time exceeds timeout. Severing pairing."];
+                MLOG_INFO(FTLogSDK, "Last activity time exceeds timeout. Severing pairing.");
                 self.pairedPeripheralUUID = NULL;
             }
         }
@@ -455,7 +456,9 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 }
 - (void)setCentralId:(UInt32)centralId
 {
-    [FTLog logVerboseWithFormat:@"Setting central Id %x  %d (dec)", (unsigned int)centralId, (unsigned int)centralId];
+    MLOG_INFO(FTLogSDKVerbose, "Setting central Id %x  %d (dec)",
+              (unsigned int)centralId,
+              (unsigned int)centralId);
     _centralId = centralId;
     self.pen.centralId = centralId;
 }
@@ -516,7 +519,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
 - (void)handleError
 {
-    [FTLog log:@"Pen did encounter error. Disconnecting."];
+    MLOG_INFO(FTLogSDK, "Pen did encounter error. Disconnecting.");
 
     // Make sure that we favor transitions that go through disconnect over going straight
     // to single. Some states may support both, but if we're connected we need to disconnect
@@ -539,7 +542,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 {
     if (self.pen.isReady)
     {
-        [FTLog log:@"Pen is ready"];
+        MLOG_INFO(FTLogSDK, "Pen is ready");
 
         if ([self currentStateHasName:kDatingAttemptingConnectiongStateName])
         {
@@ -700,8 +703,8 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
             self.pen.softwareRevision &&
             !self.updateManager)
         {
-            [FTLog logWithFormat:@"Factory firmware version: %@", self.pen.firmwareRevision];
-            [FTLog logWithFormat:@"Upgrade firmware version: %@", self.pen.softwareRevision];
+            MLOG_INFO(FTLogSDK, "Factory firmware version: %s", DESC(self.pen.firmwareRevision));
+            MLOG_INFO(FTLogSDK, "Upgrade firmware version: %s", DESC(self.pen.softwareRevision));
 
             self.updateManager = [[TIUpdateManager alloc] initWithPeripheral:self.pen.peripheral
                                                                     delegate:self];
@@ -821,14 +824,14 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
             {
                 self.didConnectViaWarmStart = YES;
                 FTAssert(!weakSelf.pen, @"pen is nil");
-                [FTLog logVerboseWithFormat:@"Found Peripheral in DatingRetrievingConnectedPeripherals!"];
+                MLOG_INFO(FTLogSDKVerbose, "Found Peripheral in DatingRetrievingConnectedPeripherals!");
                 weakSelf.pen = [[FTPen alloc] initWithPeripheral:peripheral];
                 [weakSelf fireStateMachineEvent:kAttemptConnectionFromDatingEventName];
                 return;
             }
         }
 
-        [FTLog logVerboseWithFormat:@"None - DatingRetrievingConnectedPeripherals!"];
+        MLOG_INFO(FTLogSDKVerbose, "None - DatingRetrievingConnectedPeripherals!");
 
         [weakSelf fireStateMachineEvent:kBeginDatingScanningEventName];
     }];
@@ -1034,7 +1037,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
             if ([peripheral.name isEqualToString:kPencilPeripheralName] &&
                 [weakSelf isPairedPeripheral:peripheral])
             {
-                [FTLog log:@"Found! Separated - Retrieving Connceted Peripherals"];
+                MLOG_INFO(FTLogSDK, "Found! Separated - Retrieving Connceted Peripherals");
                 FTAssert(!weakSelf.pen, @"pen is nil");
                 weakSelf.pen = [[FTPen alloc] initWithPeripheral:peripheral];
                 [weakSelf fireStateMachineEvent:kAttemptConnectionFromSeparatedEventName];
@@ -1379,8 +1382,8 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
     self.stateMachine.initialState = waitingForCentralManagerToPowerOnState;
 
-    [FTLog logWithFormat:@"Activating state machine with initial state: %@",
-     self.stateMachine.initialState.name];
+    MLOG_INFO(FTLogSDK, "Activating state machine with initial state: %s",
+              DESC(self.stateMachine.initialState.name));
     [self.stateMachine activate];
 
     [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenManagerDidUpdateStateNotificationName
@@ -1390,14 +1393,12 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
 - (void)stateMachineDidChangeState:(NSNotification *)notification
 {
-    [FTLog log:@" "];
-    [FTLog logWithFormat:@"State changed: %@", self.stateMachine.currentState.name];
+    MLOG_INFO(FTLogSDK, "STATE CHANGED: %s", DESC(self.stateMachine.currentState.name));
 }
 
 - (void)stateMachineStateTimeoutDidExpire:(NSNotificationCenter *)notification
 {
-    [FTLog log:@" "];
-    [FTLog logWithFormat:@"State timeout expired: %@", self.stateMachine.currentState.name];
+    MLOG_INFO(FTLogSDK, "STATE TIMEOUT EXPIRED: %s", DESC(self.stateMachine.currentState.name));
 }
 
 - (void)fireStateMachineEvent:(NSString *)eventName
@@ -1405,9 +1406,9 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     NSError *error = nil;
     if (![self.stateMachine fireEvent:eventName error:&error])
     {
-        [FTLog logWithFormat:@"Failed to fire state machine event (%@): %@",
-         eventName,
-         error.localizedDescription];
+        MLOG_ERROR(FTLogSDK, "Failed to fire state machine event (%s): %s",
+                   DESC(eventName),
+                   DESC(error.localizedDescription));
     }
 }
 
@@ -1429,7 +1430,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     }
     else
     {
-        [FTLog log:@"Skipped retrieve connected peripherals"];
+        MLOG_INFO(FTLogSDK, "Skipped retrieve connected peripherals");
     }
 
     self.penHasListener = YES;
@@ -1439,7 +1440,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
 - (void)applicationDidEnterBackground:(NSNotification *)notificaton
 {
-    [FTLog log:@"FTPenManager did enter background"];
+    MLOG_INFO(FTLogSDK, "FTPenManager did enter background");
 
     // Reset the background task (if it has not yet been ended) prior to starting a new one. One would think
     // that we wouldn't need to do this if there were a strict pairing of applicationDidBecomeActive and
@@ -1458,7 +1459,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 {
     if (self.backgroundTaskId != UIBackgroundTaskInvalid)
     {
-        [FTLog log:@"FTPenManger did end background task"];
+        MLOG_INFO(FTLogSDK, "FTPenManger did end background task");
 
         [[UIApplication sharedApplication] endBackgroundTask:self.backgroundTaskId];
         self.backgroundTaskId = UIBackgroundTaskInvalid;
@@ -1490,7 +1491,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
 - (void)pairingSpotWasPressed
 {
-    [FTLog log:@"Pairing spot was pressed."];
+    MLOG_INFO(FTLogSDK, "Pairing spot was pressed.");
 
     // When the user presses the pairing spot is often the first time we'll create the CBCentralManager and
     // possibly provoke the system Bluetooth alert if Bluetooth is not enabled.
@@ -1517,7 +1518,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
 - (void)pairingSpotWasReleased
 {
-    [FTLog log:@"Pairing spot was released."];
+    MLOG_INFO(FTLogSDK, "Pairing spot was released.");
 
     self.lastPairingSpotReleaseTime = [NSDate date];
 
@@ -1561,8 +1562,8 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     NSDate *t1 = self.pen.lastTipReleaseTime;
     NSTimeInterval tipAndPairingSpoteReleaseTimeDifference = fabs([t0 timeIntervalSinceDate:t1]);
 
-    [FTLog logWithFormat:@"Difference in pairing spot and tip press release times (ms): %f",
-     tipAndPairingSpoteReleaseTimeDifference * 1000.0];
+    MLOG_INFO(FTLogSDK, "Difference in pairing spot and tip press release times (ms): %f",
+              tipAndPairingSpoteReleaseTimeDifference * 1000.0);
 
     if (tipAndPairingSpoteReleaseTimeDifference < kEngagedStateTimeout)
     {
@@ -1692,7 +1693,9 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
     UInt32 peripheralCentralId = [self centralIdFromPeripheralId:peripheral.identifier];
 
-    [FTLog logVerboseWithFormat:@"advertisedCentralId %ld  peripheralCentralId %ld", (long)advertisedCentralId, (long)peripheralCentralId];
+    MLOG_INFO(FTLogSDKVerbose, "advertisedCentralId %ld  peripheralCentralId %ld",
+              (long)advertisedCentralId,
+              (long)peripheralCentralId);
 
     // There are two cases here.
     // We're looking at an older v55 firmware that only has 1 byte of advertising data, or newer firmware.
@@ -1718,17 +1721,18 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
      advertisementData:(NSDictionary *)advertisementData
                   RSSI:(NSNumber *)RSSI
 {
-    [FTLog logWithFormat:@"Discovered peripheral with name: \"%@\" IsReconciling: %d RSSI: %ld potentialId:%x",
-     peripheral.name,
-     [self isPeripheralReconciling:advertisementData],
-     (long)[RSSI integerValue],
-     (unsigned int)[self peripheralAdvertisementCentralId:advertisementData]
-     ];
+    MLOG_INFO(FTLogSDK, "Discovered peripheral with name: \"%s\" IsReconciling: %d RSSI: %ld potentialId:%x",
+              DESC(peripheral.name),
+              [self isPeripheralReconciling:advertisementData],
+              (long)[RSSI integerValue],
+              (unsigned int)[self peripheralAdvertisementCentralId:advertisementData]);
 
     BOOL isPeripheralReconciling = [self isPeripheralReconciling:advertisementData];
     BOOL isPeripheralReconcilingWithUs = [self isPeripheralReconcilingWithUs:peripheral withAdvertisementData:advertisementData];
 
-    [FTLog logWithFormat:@"IsReconciling: %d IsReconcilingWithUs: %d", isPeripheralReconciling, isPeripheralReconcilingWithUs];
+    MLOG_INFO(FTLogSDK,
+              "IsReconciling: %d IsReconcilingWithUs: %d",
+              isPeripheralReconciling, isPeripheralReconcilingWithUs);
 
     if ([self currentStateHasName:kDatingScanningStateName])
     {
@@ -1819,9 +1823,9 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 - (void)centralManager:(CBCentralManager *)central didFailToConnectPeripheral:(CBPeripheral *)peripheral
                  error:(NSError *)error
 {
-    [FTLog logWithFormat:@"Failed to connect to peripheral: %@. (%@).",
-     peripheral,
-     error.localizedDescription];
+    MLOG_ERROR(FTLogSDK, "Failed to connect to peripheral: %s. (%s).",
+               DESC(peripheral),
+               DESC(error.localizedDescription));
 
     [self handleError];
 }
@@ -1855,7 +1859,8 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     {
         if (error)
         {
-            [FTLog logWithFormat:@"Disconnected peripheral with error: %@", error.localizedDescription];
+            MLOG_INFO(FTLogSDK, "Disconnected peripheral with error: %s",
+                      DESC(error.localizedDescription));
 
             if ([error.localizedDescription isEqualToString: @"The connection has timed out unexpectedly."])
             {
@@ -1879,7 +1884,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
             }
             else
             {
-                [FTLog log:@"Peripheral did disconnect while updating firmware. Reconnecting."];
+                MLOG_INFO(FTLogSDK, "Peripheral did disconnect while updating firmware. Reconnecting.");
 
                 if ([FTFirmwareManager imageTypeRunningOnPen:self.pen] == FTFirmwareImageTypeFactory)
                 {
@@ -1903,7 +1908,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
             [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenUnexpectedDisconnectWhileConnectingNotifcationName
                                                                 object:self.pen];
 
-            [FTLog logVerboseWithFormat:@"Trying connectPeripheral again..."];
+            MLOG_INFO(FTLogSDKVerbose, "Trying connectPeripheral again...");
             // Try again. Eventually the state will timeout.
             [self.centralManager connectPeripheral:self.pen.peripheral options:nil];
         }
@@ -1946,7 +1951,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
                 {
                     static const NSTimeInterval kInactivityTimeoutMargin = 20.0;
                     NSTimeInterval timeSinceLastActivity = -[self.pairedPeripheralLastActivityTime timeIntervalSinceNow];
-                    [FTLog logWithFormat:@"Did disconnect, time since last activity: %f", timeSinceLastActivity];
+                    MLOG_INFO(FTLogSDK, "Did disconnect, time since last activity: %f", timeSinceLastActivity);
 
                     const NSTimeInterval inactivityTimeout = (pen.inactivityTimeout == -1 ?
                                                               kInactivityTimeout :
@@ -1955,7 +1960,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
                     if (timeSinceLastActivity - inactivityTimeout >= -kInactivityTimeoutMargin)
                     {
                         didDisconnectDueToInactivityTimeout = YES;
-                        [FTLog log:@"Did disconnect due to peripheral inactivity timeout."];
+                        MLOG_INFO(FTLogSDK, "Did disconnect due to peripheral inactivity timeout.");
                     }
                 }
 
@@ -2217,7 +2222,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
         if (_isScanningForPeripherals)
         {
-            [FTLog log:@"Begin scan for peripherals."];
+            MLOG_INFO(FTLogSDK, "Begin scan for peripherals.");
 
             NSDictionary *options = @{ CBCentralManagerScanOptionAllowDuplicatesKey : @NO };
             [self.centralManager scanForPeripheralsWithServices:@[[FTPenServiceUUIDs penService]]
@@ -2225,7 +2230,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
         }
         else
         {
-            [FTLog log:@"End scan for peripherals."];
+            MLOG_INFO(FTLogSDK, "End scan for peripherals.");
 
             [self.centralManager stopScan];
         }
@@ -2266,7 +2271,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
 - (void)pen:(FTPen *)pen tipPressureDidChange:(float)tipPressure
 {
-    [FTLog logVerboseWithFormat:@"tipPressureDid Chage %f", tipPressure];
+    MLOG_INFO(FTLogSDKVerbose, "tipPressureDid Chage %f", tipPressure);
 }
 
 #pragma mark - Public API

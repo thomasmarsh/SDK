@@ -1,5 +1,5 @@
 //
-//  FTPen.m
+//  FTPen.mm
 //  FiftyThreeSdk
 //
 //  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
@@ -8,8 +8,9 @@
 #import <UIKit/UIKit.h>
 
 #import "Core/Asserts.h"
+#import "Core/Log.h"
 #import "FTDeviceInfoServiceClient.h"
-#import "FTLog.h"
+#import "FTLogPrivate.h"
 #import "FTPen+Private.h"
 #import "FTPen.h"
 #import "FTPenServiceClient.h"
@@ -392,11 +393,11 @@ NSString * const kFTPenHasListenerPropertyName = @"hasListener";
         FTAssert(self.peripheral.delegate == self.peripheralDelegate,
                  @"peripheral delegate is installed");
 
-        [FTLog log:@"Peripheral is connected."];
+        MLOG_INFO(FTLogSDK, "Peripheral is connected.");
     }
     else
     {
-        [FTLog log:@"Peripheral was disconnected."];
+        MLOG_INFO(FTLogSDK, "Peripheral was disconnected.");
     }
 
     [self ensureServicesDiscovered];
@@ -433,7 +434,7 @@ NSString * const kFTPenHasListenerPropertyName = @"hasListener";
 
 - (void)penServiceClient:(FTPenServiceClient *)penServiceClient didEncounterError:(NSError *)error
 {
-    [FTLog logWithFormat:@"Pen did encounter error: \"%@\"", error.localizedDescription];
+    MLOG_ERROR(FTLogSDK, "Pen did encounter error: \"%s\"", DESC(error.localizedDescription));
 
     [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenDidEncounterErrorNotificationName
                                                         object:self];
