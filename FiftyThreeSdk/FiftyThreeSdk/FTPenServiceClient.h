@@ -2,7 +2,7 @@
 //  FTPenServiceClient.h
 //  FiftyThreeSdk
 //
-//  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
+//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
 
 #pragma once
@@ -31,6 +31,7 @@
 @property (nonatomic) NSString *manufacturingID;
 @property (nonatomic, readonly) FTPenLastErrorCode *lastErrorCode;
 @property (nonatomic) NSData *authenticationCode;
+@property (nonatomic, readonly) BOOL canWriteCentralId;
 @property (nonatomic) UInt32 centralId;
 
 @property (nonatomic, readonly) BOOL isReady;
@@ -63,7 +64,6 @@
 - (void)penServiceClientDidWriteAuthenticationCode:(FTPenServiceClient *)serviceClient;
 - (void)penServiceClientDidFailToWriteAuthenticationCode:(FTPenServiceClient *)serviceClient;
 - (void)penServiceClient:(FTPenServiceClient *)serviceClient didReadAuthenticationCode:(NSData *)authenticationCode;
-- (void)penServiceClient:(FTPenServiceClient *)serviceClient didReadCentralId:(UInt32)centralId;
 - (void)penServiceClientDidWriteCentralId:(FTPenServiceClient *)serviceClient;
 - (void)penServiceClientDidFailToWriteCentralId:(FTPenServiceClient *)serviceClient;
 @end

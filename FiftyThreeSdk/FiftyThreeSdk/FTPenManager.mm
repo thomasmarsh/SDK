@@ -239,8 +239,6 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
 @property (nonatomic) BOOL didConnectViaWarmStart;
 
-@property (nonatomic) UInt32 centralId;
-
 @property (nonatomic) NSInteger originalInactivityTimeout;
 
 @property (nonatomic) BOOL isFetchingLatestFirmware;
@@ -325,6 +323,9 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
                 self.pairedPeripheralUUID = NULL;
             }
         }
+
+        MLOG_INFO(FTLogSDK, "Paired peripheral CentralId: %x",
+                  (unsigned int)[self centralIdFromPeripheralId:self.pairedPeripheralUUID]);
 
         [self initializeStateMachine];
 
@@ -454,12 +455,10 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
     }
 }
-- (void)setCentralId:(UInt32)centralId
+
+- (void)setPenCentralId:(UInt32)centralId
 {
-    MLOG_INFO(FTLogSDKVerbose, "Setting central Id %x  %d (dec)",
-              (unsigned int)centralId,
-              (unsigned int)centralId);
-    _centralId = centralId;
+    FTAssert(self.pen, @"Pen is non-nil");
     self.pen.centralId = centralId;
 }
 
@@ -732,15 +731,15 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     {
         FTAssert(self.pen, @"pen is non-nil");
 
-        if (self.pen.softwareRevision)
+        // We have to wait until we both know the current firmware version and we can write the central ID
+        // before actually writing it. Also, don't write it more than once.
+        if (self.pen.centralId == 0x0 &&
+            self.pen.canWriteCentralId &&
+            self.pen.softwareRevision != nil)
         {
-            self.centralId = ([FTFirmwareManager currentRunningFirmwareVersion:self.pen] > 55 ?
-                              [self centralIdFromPeripheralId:self.pen.peripheral.identifier] :
-                              0x1);
-        }
-        else
-        {
-            self.centralId = 0x0;
+            self.pen.centralId = ([FTFirmwareManager currentRunningFirmwareVersion:self.pen] > 55 ?
+                                  [self centralIdFromPeripheralId:self.pen.peripheral.identifier] :
+                                  0x1);
         }
     }
 }
@@ -1721,18 +1720,14 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
      advertisementData:(NSDictionary *)advertisementData
                   RSSI:(NSNumber *)RSSI
 {
-    MLOG_INFO(FTLogSDK, "Discovered peripheral with name: \"%s\" IsReconciling: %d RSSI: %ld potentialId:%x",
-              DESC(peripheral.name),
-              [self isPeripheralReconciling:advertisementData],
-              (long)[RSSI integerValue],
-              (unsigned int)[self peripheralAdvertisementCentralId:advertisementData]);
-
     BOOL isPeripheralReconciling = [self isPeripheralReconciling:advertisementData];
-    BOOL isPeripheralReconcilingWithUs = [self isPeripheralReconcilingWithUs:peripheral withAdvertisementData:advertisementData];
+    BOOL isPeripheralReconcilingWithUs = [self isPeripheralReconcilingWithUs:peripheral
+                                                       withAdvertisementData:advertisementData];
 
-    MLOG_INFO(FTLogSDK,
-              "IsReconciling: %d IsReconcilingWithUs: %d",
-              isPeripheralReconciling, isPeripheralReconcilingWithUs);
+    MLOG_INFO(FTLogSDK, "Discovered peripheral with name: \"%s\" PotentialCentralId: %x CentralId: %x",
+              DESC(peripheral.name),
+              (unsigned int)[self centralIdFromPeripheralId:peripheral.identifier],
+              (unsigned int)[self peripheralAdvertisementCentralId:advertisementData]);
 
     if ([self currentStateHasName:kDatingScanningStateName])
     {

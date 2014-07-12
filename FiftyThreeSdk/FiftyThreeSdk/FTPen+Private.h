@@ -104,6 +104,7 @@ extern NSString * const kFTPenHasListenerPropertyName;
 @property (nonatomic, weak) id<FTPenPrivateDelegate> privateDelegate;
 @property (nonatomic, readonly) CBPeripheral *peripheral;
 
+@property (nonatomic) BOOL canWriteCentralId;
 @property (nonatomic) UInt32 centralId;
 
 @property (nonatomic) BOOL hasListener;

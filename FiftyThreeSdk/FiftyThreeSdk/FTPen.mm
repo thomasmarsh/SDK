@@ -56,7 +56,6 @@ NSString * const kFTPenConnectedSecondsPropertyName = @"numDroppedNotifications"
 NSString * const kFTPenManufacturingIDPropertyName = @"manufacturingID";
 NSString * const kFTPenLastErrorCodePropertyName = @"lastErrorCode";
 NSString * const kFTPenAuthenticationCodePropertyName = @"authenticationCode";
-NSString * const kFTPenCentralIdPropertyName = @"centralId";
 NSString * const kFTPenHasListenerPropertyName = @"hasListener";
 
 @implementation FTPenPressureSetup
@@ -227,6 +226,11 @@ NSString * const kFTPenHasListenerPropertyName = @"hasListener";
 - (void)setAuthenticationCode:(NSData *)authenticationCode
 {
     self.penServiceClient.authenticationCode = authenticationCode;
+}
+
+- (BOOL)canWriteCentralId
+{
+    return self.penServiceClient.canWriteCentralId;
 }
 
 - (UInt32)centralId
@@ -537,14 +541,6 @@ NSString * const kFTPenHasListenerPropertyName = @"hasListener";
 - (void)penServiceClient:(FTPenServiceClient *)serviceClient didReadAuthenticationCode:(NSData *)authenticationCode
 {
     [self.privateDelegate didReadAuthenticationCode:authenticationCode];
-}
-
-- (void)penServiceClient:(FTPenServiceClient *)serviceClient didReadCentralId:(UInt32)centralId
-{
-    [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenDidUpdatePrivatePropertiesNotificationName
-                                                        object:self
-                                                      userInfo:@{ kFTPenNotificationPropertiesKey:[NSSet setWithObject:kFTPenCentralIdPropertyName] }];
-
 }
 
 - (void)penServiceClientDidFailToWriteCentralId:(FTPenServiceClient *)serviceClient

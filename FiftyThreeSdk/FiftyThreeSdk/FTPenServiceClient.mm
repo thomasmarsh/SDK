@@ -51,9 +51,7 @@ using namespace fiftythree::core;
 @property (nonatomic) BOOL didInitialReadOfManufacturingID;
 @property (nonatomic) BOOL didInitialReadOfLastErrorCode;
 @property (nonatomic) BOOL didInitialReadOfAuthenticationCode;
-@property (nonatomic) BOOL didInitialReadOfCentralId;
 @property (nonatomic) BOOL didInitialReadOfHasListener;
-@property (nonatomic) BOOL isCentralIdDirty;
 
 @property (nonatomic, readwrite) NSDate *lastTipReleaseTime;
 
@@ -114,6 +112,8 @@ using namespace fiftythree::core;
 {
     if (self.hasListenerCharacteristic)
     {
+        MLOG_INFO(FTLogSDK, "Set HasListener: %d", self.hasListener);
+
         const uint8_t hasListenerByte = (self.hasListener ? 1 : 0);
         [self.peripheral writeValue:[NSData dataWithBytes:&hasListenerByte length:1]
                   forCharacteristic:self.hasListenerCharacteristic
@@ -217,23 +217,27 @@ using namespace fiftythree::core;
     }
 }
 
-- (void)setCentralId:(UInt32)centralId
+- (BOOL)canWriteCentralId
 {
-    _centralId = centralId;
-    self.isCentralIdDirty = YES;
-
-    [self ensureCentralIdCharacteristicWrite];
+    return self.centralIdCharacteristic != nil;
 }
 
-- (void)ensureCentralIdCharacteristicWrite
+- (void)setCentralId:(UInt32)centralId
 {
-    if (self.isCentralIdDirty && self.centralIdCharacteristic)
+    if (self.centralIdCharacteristic)
     {
+        _centralId = centralId;
+
         NSData * data = [NSData dataWithBytes:&_centralId length:4];
         [self.peripheral writeValue:data
                   forCharacteristic:self.centralIdCharacteristic
                                type:CBCharacteristicWriteWithResponse];
-        self.isCentralIdDirty = NO;
+
+        MLOG_INFO(FTLogSDK, "Set CentralId: %x", (unsigned int)self.centralId);
+    }
+    else
+    {
+        MLOG_ERROR(FTLogSDK, "Attempted to write CentralId before possible.");
     }
 }
 
@@ -310,7 +314,6 @@ using namespace fiftythree::core;
         self.didInitialReadOfManufacturingID = NO;
         self.didInitialReadOfLastErrorCode = NO;
         self.didInitialReadOfAuthenticationCode = NO;
-        self.didInitialReadOfCentralId = NO;
         self.didInitialReadOfHasListener = NO;
 
         return nil;
@@ -465,7 +468,6 @@ using namespace fiftythree::core;
             [characteristic.UUID isEqual:[FTPenServiceUUIDs centralId]])
         {
             self.centralIdCharacteristic = characteristic;
-            [self ensureCentralIdCharacteristicWrite];
         }
     }
 
@@ -623,17 +625,6 @@ using namespace fiftythree::core;
             [updatedProperties addObject:kFTPenAuthenticationCodePropertyName];
         }
     }
-    else if ([characteristic.UUID isEqual:[FTPenServiceUUIDs centralId]])
-    {
-        if (self.centralIdCharacteristic)
-        {
-            FTAssert(characteristic == self.centralIdCharacteristic, @"characteristic is centralId characteristic");
-            _centralId = (unsigned char)[self.centralIdCharacteristic valueAsNSUInteger];
-            [self.delegate penServiceClient:self
-                  didReadCentralId:_centralId];
-            [updatedProperties addObject:kFTPenCentralIdPropertyName];
-        }
-    }
     else if ([characteristic.UUID isEqual:[FTPenServiceUUIDs hasListener]])
     {
         if (self.hasListenerCharacteristic)
@@ -701,18 +692,29 @@ using namespace fiftythree::core;
     {
         if (error)
         {
+            MLOG_ERROR(FTLogSDK, "Failed to write CentralId characteristic: %s",
+                       DESC(error.localizedDescription));
             [self.delegate penServiceClientDidFailToWriteCentralId:self];
         }
         else
         {
+            MLOG_INFO(FTLogSDK, "Confirmed CentralId characterisitic write.");
             [self.delegate penServiceClientDidWriteCentralId:self];
         }
     }
-
     else if (characteristic == self.hasListenerCharacteristic)
     {
-        [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenDidWriteHasListenerNotificationName
-                                                            object:nil];
+        if (error)
+        {
+            MLOG_ERROR(FTLogSDK, "Failed to write HasListener characteristic: %s",
+                       DESC(error.localizedDescription));
+        }
+        else
+        {
+            MLOG_INFO(FTLogSDK, "Confirmed HasListener characteristic write.");
+            [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenDidWriteHasListenerNotificationName
+                                                                object:nil];
+        }
     }
 }
 
@@ -802,19 +804,6 @@ using namespace fiftythree::core;
         {
             [self.peripheral readValueForCharacteristic:self.authenticationCodeCharacteristic];
             self.didInitialReadOfAuthenticationCode = YES;
-        }
-
-        if (self.centralIdCharacteristic && !self.didInitialReadOfCentralId)
-        {
-            if (self.isCentralIdDirty)
-            {
-                [self ensureCentralIdCharacteristicWrite];
-            }
-            else
-            {
-                [self.peripheral readValueForCharacteristic:self.centralIdCharacteristic];
-            }
-            self.didInitialReadOfCentralId = YES;
         }
 
         // Version 55 and older firmware did not mark the HasListener characteristic as notifying,
