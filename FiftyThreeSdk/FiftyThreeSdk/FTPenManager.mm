@@ -300,30 +300,6 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
                                                      name:kFTPenDidWriteHasListenerNotificationName
                                                    object:nil];
 
-        // If we're currently paired with a peripheral, verify that the time since we lost saw acitivity
-        // from this peripheral does not exceed the inactivity timeout of the peripheral. This can happen if,
-        // for example, the app was shutdown while paired with the peripheral, then remained closed for
-        // longer than the timeout. We don't want to enter the separated state if there's no prior indication
-        // that the pen will be attempting to reconcile with us.
-        if (self.pairedPeripheralUUID)
-        {
-            NSTimeInterval timeSinceLastActivity = -[self.pairedPeripheralLastActivityTime timeIntervalSinceNow];
-
-            if (self.pairedPeripheralLastActivityTime)
-            {
-                MLOG_INFO(FTLogSDK, "Time since last paired peripheral activity: %s",
-                          DESC([NSString stringWithTimeInterval:timeSinceLastActivity]));
-            }
-
-            if (!self.pairedPeripheralLastActivityTime ||
-                timeSinceLastActivity <= 0.0 ||
-                timeSinceLastActivity > kInactivityTimeout)
-            {
-                MLOG_INFO(FTLogSDK, "Last activity time exceeds timeout. Severing pairing.");
-                self.pairedPeripheralUUID = NULL;
-            }
-        }
-
         MLOG_INFO(FTLogSDK, "Paired peripheral CentralId: %x",
                   (unsigned int)[self centralIdFromPeripheralId:self.pairedPeripheralUUID]);
 
@@ -1426,10 +1402,6 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     if ([self currentStateHasName:kSeparatedStateName])
     {
         [self fireStateMachineEvent:kRetrieveConnectedPeripheralsFromSeparatedEventName];
-    }
-    else
-    {
-        MLOG_INFO(FTLogSDK, "Skipped retrieve connected peripherals");
     }
 
     self.penHasListener = YES;
