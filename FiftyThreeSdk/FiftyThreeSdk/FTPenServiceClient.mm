@@ -102,6 +102,17 @@ using namespace fiftythree::core;
     return [self.isEraserPressedCharacteristic valueAsBOOL];
 }
 
+- (BOOL)canWriteHasListener
+{
+    return self.hasListenerCharacteristic != nil;
+}
+
+- (BOOL)hasListenerSupportsNotifications
+{
+    FTAssert(self.canWriteHasListener, @"Must be able to write HasListener");
+    return self.hasListenerCharacteristic.properties & CBCharacteristicPropertyNotify;
+}
+
 - (void)setHasListener:(BOOL)hasListener
 {
     _hasListener = hasListener;
@@ -632,6 +643,8 @@ using namespace fiftythree::core;
             FTAssert(characteristic == self.hasListenerCharacteristic, @"characteristic is hasListener characteristic");
             _hasListener = [self.hasListenerCharacteristic valueAsBOOL];
             [updatedProperties addObject:kFTPenHasListenerPropertyName];
+
+            MLOG_INFO(FTLogSDK, "Updated HasListener characteristic: %d", _hasListener);
         }
     }
 
@@ -698,7 +711,6 @@ using namespace fiftythree::core;
         }
         else
         {
-            MLOG_INFO(FTLogSDK, "Confirmed CentralId characterisitic write.");
             [self.delegate penServiceClientDidWriteCentralId:self];
         }
     }
@@ -711,7 +723,6 @@ using namespace fiftythree::core;
         }
         else
         {
-            MLOG_INFO(FTLogSDK, "Confirmed HasListener characteristic write.");
             [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenDidWriteHasListenerNotificationName
                                                                 object:nil];
         }
@@ -808,7 +819,8 @@ using namespace fiftythree::core;
 
         // Version 55 and older firmware did not mark the HasListener characteristic as notifying,
         // so only request notificatons if they're available.
-        if (self.hasListenerCharacteristic.isNotifying && !self.hasListenerDidSetNofifyValue)
+        if (self.hasListenerCharacteristic && self.hasListenerSupportsNotifications &&
+            !self.hasListenerDidSetNofifyValue)
         {
             [self.peripheral setNotifyValue:YES
                           forCharacteristic:self.hasListenerCharacteristic];

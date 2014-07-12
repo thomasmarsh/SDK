@@ -25,6 +25,8 @@
 @property (nonatomic, readonly) float eraserPressure;
 @property (nonatomic, readonly) float tipPressure;
 @property (nonatomic, readonly) NSNumber *batteryLevel;
+@property (nonatomic, readonly) BOOL canWriteHasListener;
+@property (nonatomic, readonly) BOOL hasListenerSupportsNotifications;
 @property (nonatomic) BOOL hasListener;
 @property (nonatomic) NSInteger inactivityTimeout;
 @property (nonatomic) FTPenPressureSetup *pressureSetup;

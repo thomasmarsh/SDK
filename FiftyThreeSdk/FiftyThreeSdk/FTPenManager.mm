@@ -213,6 +213,9 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 @property (nonatomic) BOOL isScanningForPeripherals;
 @property (nonatomic) NSTimer *isScanningForPeripheralsToggleTimer;
 
+@property (nonatomic) NSTimer *ensureHasListenerTimer;
+@property (nonatomic) NSDate *ensureHasListenerTimerStartTime;
+
 @property (nonatomic) NSDate *lastPairingSpotReleaseTime;
 
 // The UUID of the peripheral with which we are currently paired.
@@ -257,15 +260,12 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
 - (void)setPenHasListener:(BOOL)penHasListener
 {
-    if (self.pen)
-    {
-        self.pen.hasListener = penHasListener;
-    }
-    else
-    {
-        MLOG_ERROR(FTLogSDK, "Couldn't set hasListener to %x on self.pen", penHasListener);
-    }
     _penHasListener = penHasListener;
+
+    if (self.pen.hasListener != _penHasListener)
+    {
+        self.pen.hasListener = _penHasListener;
+    }
 }
 
 - (id)init
@@ -642,15 +642,12 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
 - (void)penDidUpdatePrivateProperties:(NSNotification *)notfication
 {
-    // This odd bit of code is here for good reason. When apps switch on iOS they are not
-    // guarenteed to resign & activate in lock step order. So you can get the foreground message
-    // on the other apps' delegate *before* the current running application gets background message.
-    // If the pen think's hasListener has been set to zero but *we* are in the foreground, we need to
-    // ensure it is written.
-    // As if firmware 71, hasListener is a notifying characteristic.
-    BOOL hasListenerWasUpdated = [notfication.userInfo[kFTPenNotificationPropertiesKey] containsObject:kFTPenHasListenerPropertyName];
-
-    if (hasListenerWasUpdated && self.penHasListener)
+    // This odd bit of code is here for good reason. When apps switch on iOS they are not guarenteed to resign
+    // enter background and become active in lock-step order. So, you can get the foreground message on the other
+    // apps' delegate *before* the current running application gets background message. If the pen think's
+    // hasListener has been set to zero but this app is in the foreground, we need to ensure the hasListener
+    // comes into line with the value we expect it to be.
+    if (self.pen.hasListener != self.penHasListener)
     {
         self.pen.hasListener = self.penHasListener;
     }
@@ -897,6 +894,12 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
         [self updatePenInfoObjectAndInvokeDelegate];
         [self ensureCentralId];
+
+        [self possiblyStartEnsureHasListenerTimer];
+    }];
+    [marriedState setDidExitStateBlock:^(TKState *state, TKStateMachine *stateMachine) {
+
+        [self resetEnsureHasListenerTimer];
     }];
 
     // Married - Waiting for Long Press to Disconnect
@@ -1405,6 +1408,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     }
 
     self.penHasListener = YES;
+    [self possiblyStartEnsureHasListenerTimer];
     [self resetBackgroundTask];
     [self updatePenInfoObjectAndInvokeDelegate];
 }
@@ -2215,7 +2219,48 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     }
 }
 
+#pragma mark - Ensure HasListener Timer
+
+// This odd bit of code is here for good reason. When apps switch on iOS they are not guarenteed to resign
+// enter background and become active in lock-step order. So, you can get the foreground message on the other
+// apps' delegate *before* the current running application gets background message. If the pen think's
+// hasListener has been set to zero but this app is in the foreground, we need to ensure the hasListener
+// comes into line with the value we expect it to be.
+- (void)ensureHasListenerTimerDidFire:(NSTimer *)timer
+{
+    if (-[self.ensureHasListenerTimerStartTime timeIntervalSinceNow] > 2.0)
+    {
+        [self resetEnsureHasListenerTimer];
+    }
+    self.pen.hasListener = self.penHasListener;
+}
+
+- (void)possiblyStartEnsureHasListenerTimer
+{
+    // We only need to use the timer on firmware that does not support notifications on the
+    // HasListener characteristic.
+    if (!self.pen.canWriteHasListener || !self.pen.hasListenerSupportsNotifications)
+    {
+        [self resetEnsureHasListenerTimer];
+
+        self.ensureHasListenerTimer = [NSTimer scheduledTimerWithTimeInterval:0.2f
+                                                                       target:self
+                                                                     selector:@selector(ensureHasListenerTimerDidFire:)
+                                                                     userInfo:nil
+                                                                      repeats:YES];
+        self.ensureHasListenerTimerStartTime = [NSDate date];
+    }
+}
+
+- (void)resetEnsureHasListenerTimer
+{
+    self.ensureHasListenerTimerStartTime = nil;
+    [self.ensureHasListenerTimer invalidate];
+    self.ensureHasListenerTimer = nil;
+}
+
 #pragma mark - PenConnectionViewDelegate
+
 - (void)penConnectionViewAnimationWasEnqueued:(PenConnectionView *)penConnectionView
 {
     [self ensureNeedsUpdate];

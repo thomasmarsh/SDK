@@ -107,6 +107,8 @@ extern NSString * const kFTPenHasListenerPropertyName;
 @property (nonatomic) BOOL canWriteCentralId;
 @property (nonatomic) UInt32 centralId;
 
+@property (nonatomic) BOOL canWriteHasListener;
+@property (nonatomic) BOOL hasListenerSupportsNotifications;
 @property (nonatomic) BOOL hasListener;
 @property (nonatomic) FTPenPressureSetup *pressureSetup;
 

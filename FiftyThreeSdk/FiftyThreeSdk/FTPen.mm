@@ -308,6 +308,16 @@ NSString * const kFTPenHasListenerPropertyName = @"hasListener";
     return self.penServiceClient.manufacturingID;
 }
 
+- (BOOL)canWriteHasListener
+{
+    return self.penServiceClient.canWriteHasListener;
+}
+
+- (BOOL)hasListenerSupportsNotifications
+{
+    return self.penServiceClient.hasListenerSupportsNotifications;
+}
+
 - (BOOL)hasListener
 {
     return self.penServiceClient.hasListener;
