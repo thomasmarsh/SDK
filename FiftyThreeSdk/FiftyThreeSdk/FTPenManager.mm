@@ -655,7 +655,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     BOOL hasInactivityTimeoutUpdated = [notfication.userInfo[kFTPenNotificationPropertiesKey] containsObject:kFTPenInactivityTimeoutPropertyName];
     if (hasInactivityTimeoutUpdated)
     {
-        if (self.state != FTPenManagerStateUpdatingFirmware && self.pen.inactivityTimeout < 1)
+        if (self.state != FTPenManagerStateUpdatingFirmware && self.pen.inactivityTimeout == 0)
         {
             // Make sure inactivity time out is sane except when we're doing FW upgrades.
             self.pen.inactivityTimeout = 10;
@@ -887,7 +887,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
         weakSelf.didConnectViaWarmStart = NO;
 
         // If for what ever reason we've set turned off inactivity time out make sure it's sane here.
-        if (weakSelf.pen.inactivityTimeout < 1)
+        if (weakSelf.pen.inactivityTimeout == 0)
         {
             weakSelf.pen.inactivityTimeout = 10;
         }
