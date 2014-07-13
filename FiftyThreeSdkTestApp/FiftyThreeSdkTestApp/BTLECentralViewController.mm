@@ -13,7 +13,6 @@
 #include "Common/Touch/InputSample.h"
 #include "Common/Touch/TouchManager.h"
 #include "Common/Touch/TouchTracker.h"
-#include "FiftyThreeSdk/FTPenAndTouchManager.h"
 
 #import <CoreBluetooth/CoreBluetooth.h>
 #import <MessageUI/MessageUI.h>
@@ -24,11 +23,11 @@
 #import "FiftyThreeSdk/FTPen+Private.h"
 #import "FiftyThreeSdk/FTPenManager+Private.h"
 #import "FiftyThreeSdk/FTPenManager.h"
+#import "FiftyThreeSdk/FTPenManager+Internal.h"
 #import "FTConnectLatencyTester.h"
 
 using namespace fiftythree::common;
 using namespace fiftythree::canvas;
-using namespace fiftythree::sdk;
 using fiftythree::common::static_pointer_cast;
 using fiftythree::common::dynamic_pointer_cast;
 using fiftythree::common::shared_ptr;
@@ -39,7 +38,6 @@ class TouchObserver;
 
 @interface BTLECentralViewController () <FTPenDelegate, UIAlertViewDelegate, MFMailComposeViewControllerDelegate>
 {
-    FTPenAndTouchManager::Ptr _PenAndTouchManager;
     Touch::cPtr _SelectedTouch;
     BOOL _SelectedTouchHighlighted; // the state the stroke was in before touched
     std::vector<Touch::cPtr> _HighlightedTouches;
@@ -142,13 +140,6 @@ public:
 
     self.view.multipleTouchEnabled = YES;
 
-    _PenAndTouchManager = FTPenAndTouchManager::New();
-    _PenAndTouchManager->RegisterForEvents();
-  
-    _TouchObserver = make_shared<TouchObserver>(self);
-    _PenAndTouchManager->TouchTypeChanged().AddListener(_TouchObserver, &TouchObserver::TouchTypeChanged);
-    _PenAndTouchManager->ShouldStartTrialSeparation().AddListener(_TouchObserver, &TouchObserver::ShouldStartTrialSeparation);
-
     _penManager = [[FTPenManager alloc] init];
 }
 
@@ -210,11 +201,9 @@ public:
     FTPenManager *penManager = notification.object;
     if (penManager.state == FTPenManagerStateUnpaired)
     {
-        _PenAndTouchManager->SetPalmRejectionEnabled(false);
     }
     else if (penManager.state == FTPenManagerStateDisconnected)
     {
-        _PenAndTouchManager->SetPalmRejectionEnabled(false);
     }
     else if (penManager.state == FTPenManagerStateConnecting ||
              penManager.state == FTPenManagerStateReconnecting)
@@ -232,8 +221,6 @@ public:
             self.firstConnectDate = [NSDate date];
         }
         self.lastConnectDate = [NSDate date];
-
-        _PenAndTouchManager->SetPalmRejectionEnabled(true);
 
         if (_ConnectTimer)
         {
@@ -311,12 +298,6 @@ public:
     self.lastTipDate = [NSDate date];
 
     [self.tipStateButton setHighlighted:isTipPressed];
-
-    PenEvent::Ptr event = PenEvent::New([NSProcessInfo processInfo].systemUptime,
-                                        isTipPressed ? FTPenEventType::PenDown : FTPenEventType::PenUp,
-                                        FTPenTip::Tip1);
-
-    _PenAndTouchManager->HandlePenEvent(event);
 }
 
 - (void)pen:(FTPen *)pen isEraserPressedDidChange:(BOOL)isEraserPressed
@@ -331,10 +312,6 @@ public:
 
     [self.eraserStateButton setHighlighted:isEraserPressed];
 
-    PenEvent::Ptr event = PenEvent::New([NSProcessInfo processInfo].systemUptime,
-                                        isEraserPressed ? FTPenEventType::PenDown : FTPenEventType::PenUp,
-                                        FTPenTip::Tip2);
-    _PenAndTouchManager->HandlePenEvent(event);
 }
 
 - (void)pen:(FTPen *)pen batteryLevelDidChange:(NSNumber *)batteryLevel
@@ -541,7 +518,6 @@ public:
     {
         if (buttonIndex == 1)
         {
-            _PenAndTouchManager->Clear();
             _HighlightedTouches.clear();
             [self.canvasController clearCanvas];
             self.clearAlertView = nil;
@@ -648,9 +624,7 @@ public:
 {
     if (self.penManager.pen)
     {
-        FTTouchType type = _PenAndTouchManager->GetTouchType(touch);
-
-        return type != FTTouchType::Finger;
+        return YES;
     }
     else
     {

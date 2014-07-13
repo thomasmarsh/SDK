@@ -1,18 +1,18 @@
 //
 //  TouchLogger.h
-//  Classification
+//  FiftyThreeSdk
 //
-//  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
+//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
 
 #pragma once
 
 #include <boost/container/flat_map.hpp>
-#include "Common/Memory.h"
 #include <iostream>
 
-#include "FiftyThreeSdk/Classification/CommonDeclarations.h"
+#include "Common/Memory.h"
 #include "Common/Touch/Touch.h"
+#include "FiftyThreeSdk/Classification/CommonDeclarations.h"
 #include "FiftyThreeSdk/Classification/Stroke.h"
 
 namespace fiftythree {
@@ -39,7 +39,7 @@ protected:
     common::Touch::Ptr  _touch;
 
     ClusterPtr          _cluster;
-    
+
     // In theory, this should have the same size as the stroke
     std::vector<common::TouchPhase> _phaseHistory;
 
@@ -51,7 +51,7 @@ protected:
     double              _terminalTime;
 
     int                 _isolatedIncrementalUpdateIndex;  // Index determining incremental updates
-    
+
 public:
     typedef fiftythree::common::shared_ptr<TouchData> Ptr;
 
@@ -92,23 +92,22 @@ public:
     {
         _touch = touch;
     }
-    
-   
+
     void SetCluster(ClusterPtr cluster)
     {
         _cluster = cluster;
     }
-    
+
     ClusterCPtr Cluster() const
     {
         return _cluster;
     }
-    
+
     ClusterPtr Cluster()
     {
         return _cluster;
     }
-    
+
     void TouchEnded();
 
     double LastTimestamp();
@@ -144,7 +143,7 @@ protected:
     // members
     double _eventTime;
     PenEventId _eventId;
-    PenEventType _eventType;
+    common::PenEventType _eventType;
 
 public:
     typedef fiftythree::common::shared_ptr<PenEventData> Ptr;
@@ -155,39 +154,39 @@ protected:
 public:
     PenEventData();
     PenEventData(int          eventId,
-                 PenEventType eventType,
+                 common::PenEventType eventType,
                  double       eventTime);
 
     static PenEventData::Ptr New(int          eventId,
-                                 PenEventType event,
+                                 common::PenEventType event,
                                  double time);
     static PenEventData::Ptr New();
 
     double          Time();
     PenEventId      Id();
-    PenEventType    Type();
+    common::PenEventType    Type();
 
     bool TipDownEvent()
     {
-        return _eventType == PenEventType::Tip1Down || _eventType == PenEventType::Tip2Down;
+        return _eventType == common::PenEventType::Tip1Down || _eventType == common::PenEventType::Tip2Down;
     }
 
     bool TipUpEvent()
     {
-        return _eventType == PenEventType::Tip1Up || _eventType == PenEventType::Tip2Up;
+        return _eventType == common::PenEventType::Tip1Up || _eventType == common::PenEventType::Tip2Up;
     }
 
     TouchType       TouchType()
     {
         switch (_eventType)
         {
-            case PenEventType::Tip1Down:
-            case PenEventType::Tip1Up:
+            case common::PenEventType::Tip1Down:
+            case common::PenEventType::Tip1Up:
                 return TouchType::PenTip1;
                 break;
 
-            case PenEventType::Tip2Down:
-            case PenEventType::Tip2Up:
+            case common::PenEventType::Tip2Down:
+            case common::PenEventType::Tip2Up:
                 return TouchType::PenTip2;
                 break;
 
@@ -217,7 +216,6 @@ protected:
     double _startTime;     // Start time for first recorded touch
     double _relativeTime;  // Just _currenttime - _startTime
 
-    
     // Only remove touches if *both* ended more than _trailingTouchTimeWindow seconds in the past,
     // *and* have currently stored more than _trailingTouchCount touches.
     // this should be made aware of the clusterTracker's need for data as well
@@ -236,7 +234,7 @@ protected:
     std::vector<common::TouchId>   _endedTouchesStaged; // Staging container for ended touches
 
     std::set<common::TouchId>      _removedTouches; // touches which have been removed by the app
-    
+
     // PenEvent logs
     boost::container::flat_map<PenEventId, PenEventData::Ptr> _penEventData;
     std::vector<PenEventId> _penEventOrder;
@@ -268,7 +266,6 @@ public:
     {
     };
 
-    
     /////////////////////////////////
     //
     // BEGIN convenience accessors and misc.
@@ -283,7 +280,7 @@ public:
     {
         return _endedTouchesStaged;
     }
-    
+
     double CurrentTime()
     {
         return _currentTime;
@@ -291,12 +288,12 @@ public:
 
     // remove the touch and ignore and subsequent events for it.
     void RemoveTouch(common::TouchId touchId);
-    
+
     bool Removed(common::TouchId touchId)
     {
         return _removedTouches.count(touchId);
     }
-    
+
     common::TouchId OldestReclassifiableTouch();
 
     // Logging methods
@@ -307,7 +304,7 @@ public:
     void ClearStalePenEvents();
 
     void ClearAllData();
-    
+
     TouchIdVector   CancelledTouches();
     void            ClearCancelledTouches();
 
@@ -329,7 +326,7 @@ public:
 
     Stroke::Ptr const &      Stroke(common::TouchId id);
     std::vector<Stroke::Ptr> Stroke(TouchIdVector ids);
-    
+
     ClusterPtr                       Cluster(common::TouchId touchId);
 
     common::TouchPhase               Phase(common::TouchId id);
@@ -341,8 +338,8 @@ public:
     double                           PenTime(PenEventId id);
     std::vector<double>              PenTime(PenEventIdVector ids);
 
-    PenEventType                     PenType(PenEventId id);
-    std::vector<PenEventType>        PenType(PenEventIdVector ids);
+    common::PenEventType                     PenType(PenEventId id);
+    std::vector<common::PenEventType>        PenType(PenEventIdVector ids);
 
     // For debugging
     void                            AssertIds(TouchIdVector ids);
@@ -388,14 +385,14 @@ public:
     TouchIdVector                   ConcurrentTouches(common::TouchId probeId);
 
     common::TouchId                 TouchPrecedingTouch(common::TouchId probeId);
-    
+
     PenEventId                      MostRecentPenDownEvent();
     PenEventId                      MostRecentPenUpEvent();
     PenEventId                      MostRecentPenEvent();
     void                            RemoveMostRecentPenEvent();
-    
+
     common::TouchId                 MostRecentTouch();
-    
+
     common::TouchId                 MostRecentEndedPen();
 
     TouchType                       MostRecentPenTipType();
@@ -424,15 +421,15 @@ public:
     //
     ////////////////////////////////////////////////////////
 
-    void                            InsertStroke(common::TouchId touchId, 
-                                                 Eigen::VectorXd t, 
+    void                            InsertStroke(common::TouchId touchId,
+                                                 Eigen::VectorXd t,
                                                  Eigen::VectorXf x,
                                                  Eigen::VectorXf y);
-    void                            InsertStroke(common::TouchId touchId, 
-                                                 Eigen::VectorXd t, 
+    void                            InsertStroke(common::TouchId touchId,
+                                                 Eigen::VectorXd t,
                                                  Eigen::VectorXf x,
                                                  Eigen::VectorXf y,
-                                                 int startIndex, 
+                                                 int startIndex,
                                                  int endIndex);
 
     void                            DeleteTouchId(common::TouchId id);
@@ -459,11 +456,10 @@ public:
     TouchIdVector                   LiveTouchesOfTypeInPhase(TouchType type,
                                                              common::TouchPhase phase);
     TouchIdVector                   TouchesOfTypeInPhase(TouchType type, common::TouchPhase phase);
-    
+
     // Lists of Id's, and testing for existence of Id
     int                             NumberOfTouches();
     TouchIdVector                   LoggedIds();
-
 
     bool                            IsEnded(common::TouchId touchId);
 
@@ -473,7 +469,6 @@ public:
     TouchIdVector                   TouchIdsActiveAtTime(TouchIdVector ids, double time);
 
     common::TouchId                 LastEndedTouch(TouchIdVector ids);
-
 
 };
 

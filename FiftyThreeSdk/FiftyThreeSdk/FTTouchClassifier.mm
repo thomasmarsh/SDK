@@ -1,0 +1,230 @@
+//
+//  FTTouchClassifier.mm
+//  FiftyThreeSdk
+//
+//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
+//
+
+#import "Common/Memory.h"
+#import "Common/Touch/TouchClassifier.h"
+#import "Common/Touch/TouchTracker.h"
+#import "FiftyThreeSdk/FTTouchClassifier+Private.h"
+#import "FiftyThreeSdk/FTTouchClassifier.h"
+
+@interface FTTouchClassificationInfo ()
+@property (nonatomic, readwrite) UITouch *touch;
+@property (nonatomic, readwrite) NSInteger touchId;
+@property (nonatomic, readwrite) FTTouchClassification oldValue;
+@property (nonatomic, readwrite) FTTouchClassification newValue;
+@end
+
+@implementation  FTTouchClassificationInfo
+@end
+
+using namespace fiftythree::common;
+using std::vector;
+
+@interface FTTouchClassifier ()
+@property (nonatomic) EventToObjCAdapter<const vector<TouchClassificationChangedEventArgs> & >::Ptr touchClassificationsDidChangeAdapter;
+@end
+
+using namespace fiftythree::common;
+@implementation FTTouchClassifier
+
+- (id)init
+{
+    if (self = [super init])
+    {
+        TouchClassifier::Ptr classifier = ActiveClassifier::Instance();
+
+        if (classifier)
+        {
+            self.touchClassificationsDidChangeAdapter = EventToObjCAdapter<const std::vector<TouchClassificationChangedEventArgs> & >::Bind(classifier->TouchClassificationsDidChange(),
+                                                                                                                                        self,
+                                                                                                                                        @selector(touchClassificationsDidChange:));
+        }
+
+        return self;
+    }
+    return nil;
+}
+
+- (void)dealloc
+{
+}
++ (FTTouchClassification)classification:(const fiftythree::common::TouchClassification &)c
+{
+    switch (c)
+    {
+        case TouchClassification::UnknownDisconnected:
+        {
+            return FTTouchClassificationUnknownDisconnected;
+        }
+        break;
+        case TouchClassification::Unknown:
+        {
+            return FTTouchClassificationUnknown;
+        }
+        break;
+        case TouchClassification::Finger:
+        {
+            return FTTouchClassificationFinger;
+        }
+        break;
+        case TouchClassification::Palm:
+        {
+            return  FTTouchClassificationPalm;
+        }
+        break;
+        case TouchClassification::Pen:
+        {
+            return FTTouchClassificationPen;
+        }
+        break;
+        case TouchClassification::Eraser:
+        {
+            return FTTouchClassificationEraser;
+        }
+        break;
+        default:
+        {
+            return FTTouchClassificationUnknownDisconnected;
+        }
+        break;
+    }
+    return FTTouchClassificationUnknownDisconnected;
+}
+
++ (BOOL)shouldReportClassificationChange:(const TouchClassificationChangedEventArgs &)change
+{
+    return !(change.oldValue != TouchClassification::UnknownDisconnected &&
+             change.newValue == TouchClassification::UnknownDisconnected)
+    && change.newValue != TouchClassification::RemovedFromClassification &&
+    change.newValue != TouchClassification::UntrackedTouch;
+}
+
+- (void)touchClassificationsDidChange: (const vector<TouchClassificationChangedEventArgs> & )args
+{
+    TouchClassifier::Ptr classifier = ActiveClassifier::Instance();
+
+    NSMutableSet *updatedTouchClassifications = [[NSMutableSet alloc] init];
+
+    for (const auto & t : args)
+    {
+        if ([FTTouchClassifier shouldReportClassificationChange:t])
+        {
+            FTTouchClassificationInfo *info = [[FTTouchClassificationInfo alloc] init];
+            info.touch = static_pointer_cast<TouchTrackerObjC>(TouchTracker::Instance())->UITouchForTouch(t.touch);
+            if (t.oldValue == TouchClassification::UnknownDisconnected && classifier->IsPenConnected())
+            {
+                info.oldValue = FTTouchClassificationUnknown;
+            }
+            else
+            {
+                info.oldValue = [FTTouchClassifier classification:t.oldValue];
+            }
+
+            info.newValue = [FTTouchClassifier classification:t.newValue];
+            info.touchId = (NSInteger)t.touch->Id();
+            [updatedTouchClassifications addObject:info];
+        }
+    }
+
+    [self.delegate classificationsDidChangeForTouches:updatedTouchClassifications];
+}
+
+// Returns a unique id for the touch.
+- (NSInteger)idForTouch:(UITouch *)touch
+{
+    Touch::Ptr ftTouch = static_pointer_cast<TouchTrackerObjC>(TouchTracker::Instance())->TouchForUITouch(touch);
+
+    if (ftTouch)
+    {
+        return (NSInteger)ftTouch->Id();
+    }
+    else
+    {
+        return -1;
+    }
+}
+
+- (BOOL)classification:(FTTouchClassification *)result forTouch:(UITouch *)touch
+{
+    Touch::Ptr ftTouch = static_pointer_cast<TouchTrackerObjC>(TouchTracker::Instance())->TouchForUITouch(touch);
+
+    if (ftTouch)
+    {
+        if (ftTouch->CurrentClassification() == TouchClassification::UntrackedTouch ||
+            ftTouch->CurrentClassification() == TouchClassification::RemovedFromClassification ||
+            ftTouch->CurrentClassification() == TouchClassification::Cancelled)
+
+        {
+            return NO;
+        }
+        else
+        {
+            switch (ftTouch->CurrentClassification()())
+            {
+                case TouchClassification::UnknownDisconnected:
+                {
+                    *result = FTTouchClassificationUnknownDisconnected;
+                }
+                break;
+                case TouchClassification::Unknown:
+                {
+                    *result = FTTouchClassificationUnknown;
+                }
+                break;
+                case TouchClassification::Finger:
+                {
+                    *result = FTTouchClassificationFinger;
+                }
+                break;
+                case TouchClassification::Palm:
+                {
+                    *result = FTTouchClassificationPalm;
+                }
+                break;
+                case TouchClassification::Pen:
+                {
+                    *result = FTTouchClassificationPen;
+                }
+                break;
+                case TouchClassification::Eraser:
+                {
+                    *result = FTTouchClassificationEraser;
+                }
+                break;
+                default:
+                {
+                    DebugAssert(false);
+                }
+                break;
+            }
+            return YES;
+        }
+    }
+    return NO;
+}
+
+- (void)update
+{
+    auto classifier = ActiveClassifier::Instance();
+
+    if (classifier)
+    {
+        classifier->UpdateClassifications();
+    }
+}
+
+- (void)removeTouchFromClassification:(UITouch *)touch
+{
+    auto classifier = ActiveClassifier::Instance();
+    if (classifier)
+    {
+        auto ftTouch = static_pointer_cast<TouchTrackerObjC>(TouchTracker::Instance())->TouchForUITouch(touch);
+        classifier->RemoveTouchFromClassification(ftTouch);
+    }
+}
+
+@end

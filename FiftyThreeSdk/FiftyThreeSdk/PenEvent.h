@@ -10,7 +10,7 @@
 #include "Common/Enum.h"
 #include "Common/Memory.h"
 #include "Common/NoCopy.h"
-#include "Common/Touch/PenManager.h"
+#include "Common/Touch/InputSample.h"
 
 namespace fiftythree
 {

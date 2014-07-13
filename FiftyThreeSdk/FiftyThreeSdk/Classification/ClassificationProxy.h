@@ -137,9 +137,9 @@ public:
 
     void ClearTouchesReclassified();
 
-    TouchType ClassifyPair(common::TouchId touch0, common::TouchId touch1, const TwoTouchPairType & type);
+    TouchType ClassifyPair(common::TouchId touch0, common::TouchId touch1, const common::TwoTouchPairType & type);
 
-    TouchType ClassifyForGesture(common::TouchId touch0, const SingleTouchGesture & type);
+    TouchType ClassifyForGesture(common::TouchId touch0, const common::SingleTouchGesture & type);
 
     Eigen::VectorXf GeometricStatistics(common::TouchId  touch0);
 

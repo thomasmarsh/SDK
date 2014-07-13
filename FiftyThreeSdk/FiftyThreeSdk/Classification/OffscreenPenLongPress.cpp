@@ -1,15 +1,14 @@
 //
 //  OffscreenPenLongPress.cpp
-//  Classification
+//  FiftyThreeSdk
 //
-//  Created by matt on 10/10/13.
-//  Copyright (c) 2013 Peter Sibley. All rights reserved.
+//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
 
-#include "FiftyThreeSdk/Classification/OffscreenPenLongPress.h"
-#include "FiftyThreeSdk/Classification/Helpers.h"
 #include "FiftyThreeSdk/Classification/ClassificationProxy.h"
 #include "FiftyThreeSdk/Classification/Cluster.h"
+#include "FiftyThreeSdk/Classification/Helpers.h"
+#include "FiftyThreeSdk/Classification/OffscreenPenLongPress.h"
 
 // from Apple
 dispatch_source_t CreateDispatchTimer(uint64_t interval,
@@ -28,21 +27,17 @@ dispatch_source_t CreateDispatchTimer(uint64_t interval,
     return timer;
 }
 
-
-
-
 namespace fiftythree
 {
 namespace sdk
 {
-    
+
 OffscreenPenLongPressGestureRecognizer::~OffscreenPenLongPressGestureRecognizer()
 {
     // this will cancel and release the timer.
     SetPaused(true);
 }
 
-    
 // Rules for detecting offscreen long press:
 // 1. Most recent pen event was Tip1Down
 // 2. Elapsed time since most recent pen event is > _minPressDuration
@@ -56,29 +51,28 @@ OffscreenPenLongPressGestureRecognizer::~OffscreenPenLongPressGestureRecognizer(
 void OffscreenPenLongPressGestureRecognizer::CheckForLongPress()
 {
     PenEventId penEvent = _clusterTracker->MostRecentPenEvent();
-    
+
     if(penEvent < 0 || penEvent == _mostRecentLongPressPenEvent)
     {
         return;
     }
-    
-    
+
     double systemUptime = NSProcessInfoSystemUptime();
     float dt            = systemUptime - _clusterTracker->PenData(penEvent)->Time();
-    
-    if (_clusterTracker->PenData(penEvent)->Type() == PenEventType::Tip2Down && dt > _minPressDuration)
+
+    if (_clusterTracker->PenData(penEvent)->Type() == common::PenEventType::Tip2Down && dt > _minPressDuration)
     {
         Cluster::Ptr matchingPenCluster = _commonData->proxy->ClusterTracker()->ClusterOfTypeForPenDownEvent(TouchType::PenTip2, penEvent);
 
         bool noGoodMatch             = ! matchingPenCluster;
-        
+
         // if the cluster ended as a pen, it may still be one due to "don't reclassify" logic.
         // so we'll check for ended here.
         // if the touch ended more than one second ago, it is not a good match.
         if(matchingPenCluster)
         {
             //Cluster& cluster      = _commonData->proxy->ClusterTracker()->Cluster(matchingPenCluster);
-            
+
             if(matchingPenCluster->AllTouchesEnded())
             {
                 float dtEnded         = systemUptime - matchingPenCluster->LastTimestamp();
@@ -87,26 +81,26 @@ void OffscreenPenLongPressGestureRecognizer::CheckForLongPress()
                     noGoodMatch = true;
                 }
             }
-        
+
         }
-        
+
         if(noGoodMatch)
         {
             _mostRecentLongPressPenEvent = penEvent;
             _commonData->proxy->LongPressWithPencilTip().Fire(Unit());
         }
     }
-    
+
 }
 
 void OffscreenPenLongPressGestureRecognizer::SetPaused(bool paused)
 {
-    
+
     if(_paused == paused)
     {
         return;
     }
-    
+
     if(paused)
     {
         if(_timer)
@@ -119,7 +113,7 @@ void OffscreenPenLongPressGestureRecognizer::SetPaused(bool paused)
     }
     else
     {
-        
+
         if(! _timer)
         {
             _timer = CreateDispatchTimer(_timerInterval * NSEC_PER_SEC,
@@ -130,41 +124,11 @@ void OffscreenPenLongPressGestureRecognizer::SetPaused(bool paused)
                                          });
         }
 
-        
     }
-    
+
     _paused = paused;
 
-    
-    
 }
-
 
 }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -1,13 +1,16 @@
 //
-//  FTPeripheralDelegate.m
+//  FTPeripheralDelegate.mm
 //  FiftyThreeSdk
 //
-//  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
+//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
 
-#import "FTLog.h"
+#import "Common/Log.h"
+#import "FTLogPrivate.h"
 #import "FTPeripheralDelegate.h"
 #import "FTServiceUUIDs.h"
+
+using namespace fiftythree::common;
 
 @interface FTPeripheralDelegate ()
 
@@ -53,7 +56,7 @@
 
 - (void)peripheralDidUpdateName:(CBPeripheral *)peripheral
 {
-    [FTLog logWithFormat:@"Peripheral did update name: %@", peripheral.name];
+    MLOG_INFO(FTLogSDK, "Peripheral did update name: %s", DESC(peripheral.name));
 
     for (FTServiceClient *serviceClient in self.serviceClients)
     {
@@ -63,7 +66,7 @@
 
 - (void)peripheralDidInvalidateServices:(CBPeripheral *)peripheral
 {
-    [FTLog log:@"Peripheral did invalidate services."];
+    MLOG_INFO(FTLogSDK, "Peripheral did invalidate services.");
 
     for (FTServiceClient *serviceClient in self.serviceClients)
     {
@@ -102,7 +105,7 @@
             }
         }
 
-        [FTLog logVerboseWithFormat:@"Peripheral did discover service(s): %@.", serviceNames];
+        MLOG_INFO(FTLogSDKVerbose, "Peripheral did discover service(s): %s.", serviceNames.UTF8String);
     }
 
     for (FTServiceClient *serviceClient in self.serviceClients)
@@ -114,8 +117,8 @@
 - (void)peripheral:(CBPeripheral *)peripheral didDiscoverIncludedServicesForService:(CBService *)service
              error:(NSError *)error
 {
-    [FTLog logWithFormat:@"Peripheral did discover included services for service: %@",
-     FTNameForServiceUUID(service.UUID)];
+    MLOG_INFO(FTLogSDK, "Peripheral did discover included services for service: %s",
+              DESC(FTNameForServiceUUID(service.UUID)));
 
     for (FTServiceClient *serviceClient in self.serviceClients)
     {
@@ -126,8 +129,8 @@
 - (void)peripheral:(CBPeripheral *)peripheral didDiscoverCharacteristicsForService:(CBService *)service
              error:(NSError *)error
 {
-    [FTLog logVerboseWithFormat:@"Peripheral did discover characterisitics for service: %@",
-     FTNameForServiceUUID(service.UUID)];
+    MLOG_INFO(FTLogSDKVerbose, "Peripheral did discover characterisitics for service: %s",
+              FTNameForServiceUUID(service.UUID).UTF8String);
 
     for (FTServiceClient *serviceClient in self.serviceClients)
     {
@@ -138,8 +141,8 @@
 - (void)peripheral:(CBPeripheral *)peripheral didUpdateValueForCharacteristic:(CBCharacteristic *)characteristic
              error:(NSError *)error
 {
-    [FTLog logVerboseWithFormat:@"Peripheral did update value for characteristic: %@",
-     FTNameForServiceUUID(characteristic.UUID)];
+    MLOG_INFO(FTLogSDKVerbose, "Peripheral did update value for characteristic: %s",
+              FTNameForServiceUUID(characteristic.UUID).UTF8String);
 
     for (FTServiceClient *serviceClient in self.serviceClients)
     {
@@ -150,9 +153,9 @@
 - (void)peripheral:(CBPeripheral *)peripheral didWriteValueForCharacteristic:(CBCharacteristic *)characteristic
              error:(NSError *)error
 {
-    [FTLog logVerboseWithFormat:@"Peripheral did write value: %@ for characteristic: %@",
-     characteristic.value,
-     FTNameForServiceUUID(characteristic.UUID)];
+    MLOG_INFO(FTLogSDKVerbose, "Peripheral did write value: %s for characteristic: %s",
+              characteristic.value.description.UTF8String,
+              FTNameForServiceUUID(characteristic.UUID).UTF8String);
 
     for (FTServiceClient *serviceClient in self.serviceClients)
     {
@@ -165,13 +168,13 @@
 {
     if (characteristic.isNotifying)
     {
-        [FTLog logVerboseWithFormat:@"Peripheral notification began on charateristic: %@",
-         FTNameForServiceUUID(characteristic.UUID)];
+        MLOG_INFO(FTLogSDKVerbose, "Peripheral notification began on charateristic: %s",
+                  FTNameForServiceUUID(characteristic.UUID).UTF8String);
     }
     else
     {
-        [FTLog logVerboseWithFormat:@"Peripheral notification stopped on characteristic: %@",
-         FTNameForServiceUUID(characteristic.UUID)];
+        MLOG_INFO(FTLogSDKVerbose, "Peripheral notification stopped on characteristic: %s",
+                  FTNameForServiceUUID(characteristic.UUID).UTF8String);
     }
 
     for (FTServiceClient *serviceClient in self.serviceClients)
@@ -183,8 +186,8 @@
 - (void)peripheral:(CBPeripheral *)peripheral didDiscoverDescriptorsForCharacteristic:(CBCharacteristic *)characteristic
              error:(NSError *)error
 {
-    [FTLog logWithFormat:@"Peripheral did discover descriptors for characteristic: %@",
-     FTNameForServiceUUID(characteristic.UUID)];
+    MLOG_INFO(FTLogSDK, "Peripheral did discover descriptors for characteristic: %s",
+              DESC(FTNameForServiceUUID(characteristic.UUID)));
 
     for (FTServiceClient *serviceClient in self.serviceClients)
     {
@@ -195,7 +198,7 @@
 - (void)peripheral:(CBPeripheral *)peripheral didUpdateValueForDescriptor:(CBDescriptor *)descriptor
              error:(NSError *)error
 {
-    [FTLog log:@"Peripheral did update value for descriptor"];
+    MLOG_INFO(FTLogSDK, "Peripheral did update value for descriptor");
 
     for (FTServiceClient *serviceClient in self.serviceClients)
     {
@@ -206,7 +209,7 @@
 - (void)peripheral:(CBPeripheral *)peripheral didWriteValueForDescriptor:(CBDescriptor *)descriptor
              error:(NSError *)error
 {
-    [FTLog logWithFormat:@"Peripheral did write value for descriptor."];
+    MLOG_INFO(FTLogSDK, "Peripheral did write value for descriptor.");
 
     for (FTServiceClient *serviceClient in self.serviceClients)
     {

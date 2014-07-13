@@ -2,7 +2,7 @@
 //  FTPen+Private.h
 //  FiftyThreeSdk
 //
-//  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
+//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
 
 #pragma once
@@ -20,12 +20,14 @@ extern NSString * const kFTPenNumResetsPropertyName;
 extern NSString * const kFTPenNumLinkTerminationsPropertyName;
 extern NSString * const kFTPenNumDroppedNotificationsPropertyName;
 extern NSString * const kFTPenConnectedSecondsPropertyName;
+extern NSString * const kFTPenCentralIdPropertyName;
 
 extern NSString * const kFTPenInactivityTimeoutPropertyName;
 extern NSString * const kFTPenPressureSetupPropertyName;
 extern NSString * const kFTPenManufacturingIDPropertyName;
 extern NSString * const kFTPenLastErrorCodePropertyName;
 extern NSString * const kFTPenAuthenticationCodePropertyName;
+extern NSString * const kFTPenHasListenerPropertyName;
 
 @class CBCentralManager;
 @class CBPeripheral;
@@ -102,6 +104,11 @@ extern NSString * const kFTPenAuthenticationCodePropertyName;
 @property (nonatomic, weak) id<FTPenPrivateDelegate> privateDelegate;
 @property (nonatomic, readonly) CBPeripheral *peripheral;
 
+@property (nonatomic) BOOL canWriteCentralId;
+@property (nonatomic) UInt32 centralId;
+
+@property (nonatomic) BOOL canWriteHasListener;
+@property (nonatomic) BOOL hasListenerSupportsNotifications;
 @property (nonatomic) BOOL hasListener;
 @property (nonatomic) FTPenPressureSetup *pressureSetup;
 

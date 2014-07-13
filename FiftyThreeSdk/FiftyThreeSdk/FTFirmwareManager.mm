@@ -1,5 +1,5 @@
 //
-//  FTFirmwareManager.m
+//  FTFirmwareManager.mm
 //  FiftyThreeSdk
 //
 //  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
@@ -8,20 +8,19 @@
 #import <UIKit/UIKit.h>
 
 #import "Common/Asserts.h"
+#import "Common/Log.h"
 #import "FTFirmwareManager.h"
-#import "FTLog.h"
+#import "FTLogPrivate.h"
 #import "FTPen.h"
 
-NSString *applicationDocumentsDirectory()
+using namespace fiftythree::common;
+
+static NSString *applicationDocumentsDirectory()
 {
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *basePath = ([paths count] > 0) ? [paths objectAtIndex:0] : nil;
     return basePath;
 }
-
-@interface FTFirmwareManager ()
-
-@end
 
 @implementation FTFirmwareManager
 
@@ -57,30 +56,55 @@ NSString *applicationDocumentsDirectory()
     return bestImagePath ? bestImagePath : [self imagePath];
 }
 
+// Returns true IFF statusCode is in 2xx or 3xx range.
+//
+// Although many service endpoints narrowly define what response codes they will return on
+// success, we usually want to future-proof the client and accept any normal success code.
++ (BOOL)isSuccessStatusCode:(int)statusCode
+{
+    int statusCodeBlock = statusCode - statusCode % 100;
+    return (statusCodeBlock == 200 || statusCodeBlock == 300);
+}
+
++ (NSURL *)firmwareURL
+{
+    NSString *endPoint =  @"https://www.fiftythree.com/downloads/pencilv1upgradeimage.bin";
+    return [NSURL URLWithString:endPoint];
+}
+
 + (void)fetchLatestFirmwareWithCompletionHandler:(void (^)(NSData *))handler
 {
     NSURLSessionConfiguration *defaultConfigObject = [NSURLSessionConfiguration defaultSessionConfiguration];
     defaultConfigObject.allowsCellularAccess = NO;
 
-    NSURLSession *delegateFreeSession = [NSURLSession sessionWithConfiguration: defaultConfigObject
-                                                                      delegate: nil
-                                                                 delegateQueue: [NSOperationQueue mainQueue]];
+    NSURLSession *delegateFreeSession = [NSURLSession sessionWithConfiguration:defaultConfigObject
+                                                                      delegate:nil
+                                                                 delegateQueue:[NSOperationQueue mainQueue]];
 
-    NSString *endPoint =  @"https://www.fiftythree.com/downloads/pencilv1upgradeimage.bin";
-
-    [[delegateFreeSession dataTaskWithURL: [NSURL URLWithString:endPoint]
+    [[delegateFreeSession dataTaskWithURL:[FTFirmwareManager firmwareURL]
                         completionHandler:^(NSData *data,
                                             NSURLResponse *response,
                                             NSError *error) {
-                            if (!error)
-                            {
-                                handler(data);
-                            }
-                            else
-                            {
-                                [FTLog logVerboseWithFormat:@"Got response %@ with error %@.\n", response, error];
-                                handler(nil);
-                            }
+                            dispatch_async(dispatch_get_main_queue(), ^() {
+
+                                NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse*)response;
+
+                                if (data &&
+                                    !error &&
+                                    httpResponse &&
+                                    [self isSuccessStatusCode:httpResponse.statusCode])
+                                {
+                                    handler(data);
+                                }
+                                else
+                                {
+                                    MLOG_INFO(FTLogSDKVerbose, "Got response %s status %ld with error %s.\n",
+                                              DESC(response),
+                                              (long)httpResponse.statusCode,
+                                              DESC(error));
+                                    handler(nil);
+                                }
+                            });
                         }] resume];
 }
 
@@ -90,7 +114,7 @@ NSString *applicationDocumentsDirectory()
 
     if (image.length > 4 + sizeof(version))
     {
-        version = *((uint16_t *)(image.bytes + 4));
+        version = *((uint16_t *)((uint8_t *)image.bytes + 4));
         version >>= 1;
         return version;
     }
@@ -108,9 +132,7 @@ NSString *applicationDocumentsDirectory()
         FTAssert(fileHandle, @"firmware file exists at path");
 
         [fileHandle seekToFileOffset:4];
-
         NSData *data = [fileHandle readDataOfLength:sizeof(version)];
-
         if (data.length == sizeof(version))
         {
             version = *((uint16_t *)data.bytes);
@@ -163,14 +185,9 @@ NSString *applicationDocumentsDirectory()
     return NO;
 }
 
-+ (NSNumber *)isVersionAtPath:(NSString *)imagePath
-        newerThanVersionOnPen:(FTPen *)pen
-               currentVersion:(NSInteger *)currentVersion
-                updateVersion:(NSInteger *)updateVersion
++ (NSInteger)currentRunningFirmwareVersion:(FTPen *)pen
 {
-    *currentVersion = -1;
-    *updateVersion = -1;
-
+    NSInteger currentVersion = -1;
     NSInteger factoryVersion, upgradeVersion;
     BOOL factoryIsCurrentlyRunning, upgradeIsCurrentlyRunning;
     if ([FTFirmwareManager firmwareVersionOnPen:pen
@@ -180,7 +197,7 @@ NSString *applicationDocumentsDirectory()
     {
         if (factoryIsCurrentlyRunning)
         {
-            *currentVersion = factoryVersion;
+            currentVersion = factoryVersion;
         }
     }
 
@@ -191,9 +208,19 @@ NSString *applicationDocumentsDirectory()
     {
         if (upgradeIsCurrentlyRunning)
         {
-            *currentVersion = upgradeVersion;
+            currentVersion = upgradeVersion;
         }
     }
+    return currentVersion;
+}
+
++ (NSNumber *)isVersionAtPath:(NSString *)imagePath
+        newerThanVersionOnPen:(FTPen *)pen
+               currentVersion:(NSInteger *)currentVersion
+                updateVersion:(NSInteger *)updateVersion
+{
+    *currentVersion = [FTFirmwareManager currentRunningFirmwareVersion:pen];
+    *updateVersion = -1;
 
     NSInteger version = [FTFirmwareManager versionOfImageAtPath:imagePath];
     if (version != -1 &&

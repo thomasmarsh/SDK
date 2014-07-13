@@ -1,15 +1,16 @@
 //
-//  FTPen.m
+//  FTPen.mm
 //  FiftyThreeSdk
 //
-//  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
+//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
 
 #import <CoreBluetooth/CoreBluetooth.h>
 
 #import "Common/Asserts.h"
+#import "Common/Log.h"
 #import "FTDeviceInfoServiceClient.h"
-#import "FTLog.h"
+#import "FTLogPrivate.h"
 #import "FTPen+Private.h"
 #import "FTPen.h"
 #import "FTPenServiceClient.h"
@@ -56,6 +57,7 @@ NSString * const kFTPenConnectedSecondsPropertyName = @"numDroppedNotifications"
 NSString * const kFTPenManufacturingIDPropertyName = @"manufacturingID";
 NSString * const kFTPenLastErrorCodePropertyName = @"lastErrorCode";
 NSString * const kFTPenAuthenticationCodePropertyName = @"authenticationCode";
+NSString * const kFTPenHasListenerPropertyName = @"hasListener";
 
 @implementation FTPenPressureSetup
 
@@ -114,7 +116,7 @@ NSString * const kFTPenAuthenticationCodePropertyName = @"authenticationCode";
     FTAssert(data.length == 10, @"PressureSetup data is 10 bytes long");
 
     uint8_t *bytes = (uint8_t *)data.bytes;
-    bytes[0] = _samplePeriodMilliseconds;;
+    bytes[0] = _samplePeriodMilliseconds;
     bytes[1] = _notificatinPeriodMilliseconds;
     bytes[2] = _tipFloorThreshold;
     bytes[3] = _tipMinThreshold;
@@ -227,9 +229,19 @@ NSString * const kFTPenAuthenticationCodePropertyName = @"authenticationCode";
     self.penServiceClient.authenticationCode = authenticationCode;
 }
 
-- (BOOL)isReady
+- (BOOL)canWriteCentralId
 {
-    return self.penServiceClient.isReady;
+    return self.penServiceClient.canWriteCentralId;
+}
+
+- (UInt32)centralId
+{
+    return self.penServiceClient.centralId;
+}
+
+- (void)setCentralId:(UInt32)centralId
+{
+    self.penServiceClient.centralId = centralId;
 }
 
 - (BOOL)isTipPressed
@@ -240,6 +252,11 @@ NSString * const kFTPenAuthenticationCodePropertyName = @"authenticationCode";
 - (BOOL)isEraserPressed
 {
     return self.penServiceClient.isEraserPressed;
+}
+
+- (BOOL)isReady
+{
+    return self.penServiceClient.isReady;
 }
 
 - (float)tipPressure
@@ -290,6 +307,16 @@ NSString * const kFTPenAuthenticationCodePropertyName = @"authenticationCode";
 - (NSString *)manufacturingID
 {
     return self.penServiceClient.manufacturingID;
+}
+
+- (BOOL)canWriteHasListener
+{
+    return self.penServiceClient.canWriteHasListener;
+}
+
+- (BOOL)hasListenerSupportsNotifications
+{
+    return self.penServiceClient.hasListenerSupportsNotifications;
 }
 
 - (BOOL)hasListener
@@ -381,11 +408,11 @@ NSString * const kFTPenAuthenticationCodePropertyName = @"authenticationCode";
         FTAssert(self.peripheral.delegate == self.peripheralDelegate,
                  @"peripheral delegate is installed");
 
-        [FTLog log:@"Peripheral is connected."];
+        MLOG_INFO(FTLogSDK, "Peripheral is connected.");
     }
     else
     {
-        [FTLog log:@"Peripheral was disconnected."];
+        MLOG_INFO(FTLogSDK, "Peripheral was disconnected.");
     }
 
     [self ensureServicesDiscovered];
@@ -422,7 +449,7 @@ NSString * const kFTPenAuthenticationCodePropertyName = @"authenticationCode";
 
 - (void)penServiceClient:(FTPenServiceClient *)penServiceClient didEncounterError:(NSError *)error
 {
-    [FTLog logWithFormat:@"Pen did encounter error: \"%@\"", error.localizedDescription];
+    MLOG_ERROR(FTLogSDK, "Pen did encounter error: \"%s\"", DESC(error.localizedDescription));
 
     [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenDidEncounterErrorNotificationName
                                                         object:self];
@@ -525,6 +552,13 @@ NSString * const kFTPenAuthenticationCodePropertyName = @"authenticationCode";
 - (void)penServiceClient:(FTPenServiceClient *)serviceClient didReadAuthenticationCode:(NSData *)authenticationCode
 {
     [self.privateDelegate didReadAuthenticationCode:authenticationCode];
+}
+
+- (void)penServiceClientDidFailToWriteCentralId:(FTPenServiceClient *)serviceClient
+{
+}
+- (void)penServiceClientDidWriteCentralId:(FTPenServiceClient *)serviceClient
+{
 }
 
 #pragma mark - FTPenUsageServiceClientDelegate

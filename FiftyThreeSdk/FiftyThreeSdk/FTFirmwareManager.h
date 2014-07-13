@@ -16,13 +16,10 @@ typedef NS_ENUM(NSInteger, FTFirmwareImageType) {
     FTFirmwareImageTypeUpgrade
 };
 
-typedef void (^FirmwareCompletionBlock)(NSData *data);
-
 @interface FTFirmwareManager : NSObject
 
 + (NSString *)imagePath;
 + (NSString *)imagePathIncludingDocumentsDir;
-+ (NSInteger)versionOfImage:(NSData *)image;
 + (NSInteger)versionOfImageAtPath:(NSString *)imagePath;
 
 // Returns a boolean value as a NSNumber, or nil if this cannot yet be determined.
@@ -37,6 +34,9 @@ typedef void (^FirmwareCompletionBlock)(NSData *data);
 
 + (FTFirmwareImageType)imageTypeRunningOnPen:(FTPen *)pen;
 
-// nil if there's any errors or issues.
-+ (void)fetchLatestFirmwareWithCompletionHandler:(FirmwareCompletionBlock)completionHandler;
++ (void)fetchLatestFirmwareWithCompletionHandler:(void (^)(NSData *))handler;
+
++ (NSInteger)versionOfImage:(NSData *)image;
+
++ (NSInteger)currentRunningFirmwareVersion:(FTPen *)pen;
 @end

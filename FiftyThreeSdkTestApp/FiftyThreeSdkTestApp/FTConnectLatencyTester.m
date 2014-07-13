@@ -9,7 +9,9 @@
 #import <mach/mach_time.h>
 #import <sys/time.h>
 
+#import "FiftyThreeSdk/FTPen.h"
 #import "FiftyThreeSdk/FTPenManager.h"
+#import "FiftyThreeSdk/FTPenManager+Internal.h"
 #import "FTConnectLatencyTester.h"
 
 #define CONNECT_REPS 100

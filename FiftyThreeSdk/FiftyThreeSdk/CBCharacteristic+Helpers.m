@@ -2,7 +2,7 @@
 //  CBCharacteristic+Helpers.m
 //  FiftyThreeSdk
 //
-//  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
+//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
 
 #import "CBCharacteristic+Helpers.h"
@@ -12,7 +12,7 @@
 - (NSData *)removeTrailingZeros:(NSData *)data
 {
     NSData *value = self.value;
-    int length = value.length;
+    NSUInteger length = value.length;
     for (; length > 0; length--)
     {
         if (((uint8_t *)value.bytes)[length - 1] != '\0')

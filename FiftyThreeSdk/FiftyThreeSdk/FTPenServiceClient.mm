@@ -1,8 +1,8 @@
 //
-//  FTPenServiceClient.m
+//  FTPenServiceClient.mm
 //  FiftyThreeSdk
 //
-//  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
+//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>
@@ -10,11 +10,14 @@
 #import "CBCharacteristic+Helpers.h"
 #import "CBPeripheral+Helpers.h"
 #import "Common/Asserts.h"
+#import "Common/Log.h"
 #import "FTError.h"
-#import "FTLog.h"
+#import "FTLogPrivate.h"
 #import "FTPenManager.h"
 #import "FTPenServiceClient.h"
 #import "FTServiceUUIDs.h"
+
+using namespace fiftythree::common;
 
 @interface FTPenServiceClient ()
 
@@ -34,6 +37,7 @@
 @property (nonatomic) CBCharacteristic *manufacturingIDCharacteristic;
 @property (nonatomic) CBCharacteristic *lastErrorCodeCharacteristic;
 @property (nonatomic) CBCharacteristic *authenticationCodeCharacteristic;
+@property (nonatomic) CBCharacteristic *centralIdCharacteristic;
 
 @property (nonatomic) BOOL isTipPressedDidSetNofifyValue;
 @property (nonatomic) BOOL isEraserPressedDidSetNofifyValue;
@@ -41,11 +45,13 @@
 @property (nonatomic) BOOL eraserPressureDidSetNofifyValue;
 @property (nonatomic) BOOL batteryLevelDidSetNofifyValue;
 @property (nonatomic) BOOL batteryLevelDidReceiveFirstUpdate;
+@property (nonatomic) BOOL hasListenerDidSetNofifyValue;
 @property (nonatomic) BOOL didInitialReadOfInactivityTimeout;
 @property (nonatomic) BOOL didInitialReadOfPressureSetup;
 @property (nonatomic) BOOL didInitialReadOfManufacturingID;
 @property (nonatomic) BOOL didInitialReadOfLastErrorCode;
 @property (nonatomic) BOOL didInitialReadOfAuthenticationCode;
+@property (nonatomic) BOOL didInitialReadOfHasListener;
 
 @property (nonatomic, readwrite) NSDate *lastTipReleaseTime;
 
@@ -82,6 +88,8 @@
 - (void)dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
+
+    [self resetBatteryLevelReadTimer];
 }
 
 - (BOOL)isTipPressed
@@ -94,6 +102,17 @@
     return [self.isEraserPressedCharacteristic valueAsBOOL];
 }
 
+- (BOOL)canWriteHasListener
+{
+    return self.hasListenerCharacteristic != nil;
+}
+
+- (BOOL)hasListenerSupportsNotifications
+{
+    FTAssert(self.canWriteHasListener, @"Must be able to write HasListener");
+    return self.hasListenerCharacteristic.properties & CBCharacteristicPropertyNotify;
+}
+
 - (void)setHasListener:(BOOL)hasListener
 {
     _hasListener = hasListener;
@@ -104,6 +123,8 @@
 {
     if (self.hasListenerCharacteristic)
     {
+        MLOG_INFO(FTLogSDK, "Set HasListener: %d", self.hasListener);
+
         const uint8_t hasListenerByte = (self.hasListener ? 1 : 0);
         [self.peripheral writeValue:[NSData dataWithBytes:&hasListenerByte length:1]
                   forCharacteristic:self.hasListenerCharacteristic
@@ -207,6 +228,30 @@
     }
 }
 
+- (BOOL)canWriteCentralId
+{
+    return self.centralIdCharacteristic != nil;
+}
+
+- (void)setCentralId:(UInt32)centralId
+{
+    if (self.centralIdCharacteristic)
+    {
+        _centralId = centralId;
+
+        NSData * data = [NSData dataWithBytes:&_centralId length:4];
+        [self.peripheral writeValue:data
+                  forCharacteristic:self.centralIdCharacteristic
+                               type:CBCharacteristicWriteWithResponse];
+
+        MLOG_INFO(FTLogSDK, "Set CentralId: %x", (unsigned int)self.centralId);
+    }
+    else
+    {
+        MLOG_ERROR(FTLogSDK, "Attempted to write CentralId before possible.");
+    }
+}
+
 - (BOOL)readManufacturingIDAndAuthCode
 {
     if (self.manufacturingIDCharacteristic && self.authenticationCodeCharacteristic)
@@ -265,11 +310,13 @@
         self.manufacturingIDCharacteristic = nil;
         self.lastErrorCodeCharacteristic = nil;
         self.authenticationCodeCharacteristic = nil;
+        self.centralIdCharacteristic = nil;
 
         self.isTipPressedDidSetNofifyValue = NO;
         self.isEraserPressedDidSetNofifyValue = NO;
         self.tipPressureDidSetNofifyValue = NO;
         self.eraserPressureDidSetNofifyValue = NO;
+        self.hasListenerDidSetNofifyValue = NO;
         self.batteryLevelDidSetNofifyValue = NO;
         self.batteryLevelDidReceiveFirstUpdate = NO;
 
@@ -278,6 +325,7 @@
         self.didInitialReadOfManufacturingID = NO;
         self.didInitialReadOfLastErrorCode = NO;
         self.didInitialReadOfAuthenticationCode = NO;
+        self.didInitialReadOfHasListener = NO;
 
         return nil;
     }
@@ -307,6 +355,7 @@
                                          [FTPenServiceUUIDs authenticationCode],
                                          [FTPenServiceUUIDs lastErrorCode],
                                          [FTPenServiceUUIDs pressureSetup],
+                                         [FTPenServiceUUIDs centralId],
                                          ];
 
             [peripheral discoverCharacteristics:characteristics forService:self.penService];
@@ -319,7 +368,7 @@
 {
     if (error || service.characteristics.count == 0)
     {
-        [FTLog logWithFormat:@"Error discovering characteristics: %@", [error localizedDescription]];
+        MLOG_ERROR(FTLogSDK, "Error discovering characteristics: %s", DESC(error.localizedDescription));
 
         // TODO: Report failed state
         return;
@@ -424,6 +473,13 @@
         {
             self.authenticationCodeCharacteristic = characteristic;
         }
+
+        // CentralId
+        if (!self.centralIdCharacteristic &&
+            [characteristic.UUID isEqual:[FTPenServiceUUIDs centralId]])
+        {
+            self.centralIdCharacteristic = characteristic;
+        }
     }
 
     [self ensureCharacteristicNotificationsAndInitialization];
@@ -436,9 +492,9 @@
     {
         if ([FTPenServiceUUIDs nameForUUID:characteristic.UUID])
         {
-            [FTLog logWithFormat:@"Error updating value for characteristic: %@ error: %@.",
-             [FTPenServiceUUIDs nameForUUID:characteristic.UUID],
-             [error localizedDescription]];
+            MLOG_ERROR(FTLogSDK, "Error updating value for characteristic: %s error: %s.",
+                       DESC([FTPenServiceUUIDs nameForUUID:characteristic.UUID]),
+                       DESC(error.localizedDescription));
 
             // TODO: Report failed state
         }
@@ -518,8 +574,7 @@
                              nil);
             [self.delegate penServiceClient:self batteryLevelDidChange:self.batteryLevel];
 
-            [self.batteryLevelReadTimer invalidate];
-            self.batteryLevelReadTimer = nil;
+            [self resetBatteryLevelReadTimer];
 
             //NSLog(@"BatteryLevel did update value: %@", self.batteryLevel);
         }
@@ -581,6 +636,17 @@
             [updatedProperties addObject:kFTPenAuthenticationCodePropertyName];
         }
     }
+    else if ([characteristic.UUID isEqual:[FTPenServiceUUIDs hasListener]])
+    {
+        if (self.hasListenerCharacteristic)
+        {
+            FTAssert(characteristic == self.hasListenerCharacteristic, @"characteristic is hasListener characteristic");
+            _hasListener = [self.hasListenerCharacteristic valueAsBOOL];
+            [updatedProperties addObject:kFTPenHasListenerPropertyName];
+
+            MLOG_INFO(FTLogSDK, "Updated HasListener characteristic: %d", _hasListener);
+        }
+    }
 
     if (updatedProperties.count > 0)
     {
@@ -593,7 +659,7 @@
 {
     if (error)
     {
-        [FTLog logWithFormat:@"Error changing notification state: %@", error.localizedDescription];
+        MLOG_ERROR(FTLogSDK, "Error changing notification state: %s", DESC(error.localizedDescription));
 
         // TODO: Report failed state
         return;
@@ -635,10 +701,31 @@
             [self.delegate penServiceClientDidWriteAuthenticationCode:self];
         }
     }
+    else if (characteristic == self.centralIdCharacteristic)
+    {
+        if (error)
+        {
+            MLOG_ERROR(FTLogSDK, "Failed to write CentralId characteristic: %s",
+                       DESC(error.localizedDescription));
+            [self.delegate penServiceClientDidFailToWriteCentralId:self];
+        }
+        else
+        {
+            [self.delegate penServiceClientDidWriteCentralId:self];
+        }
+    }
     else if (characteristic == self.hasListenerCharacteristic)
     {
-        [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenDidWriteHasListenerNotificationName
-                                                            object:nil];
+        if (error)
+        {
+            MLOG_ERROR(FTLogSDK, "Failed to write HasListener characteristic: %s",
+                       DESC(error.localizedDescription));
+        }
+        else
+        {
+            [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenDidWriteHasListenerNotificationName
+                                                                object:nil];
+        }
     }
 }
 
@@ -729,13 +816,28 @@
             [self.peripheral readValueForCharacteristic:self.authenticationCodeCharacteristic];
             self.didInitialReadOfAuthenticationCode = YES;
         }
+
+        // Version 55 and older firmware did not mark the HasListener characteristic as notifying,
+        // so only request notificatons if they're available.
+        if (self.hasListenerCharacteristic && self.hasListenerSupportsNotifications &&
+            !self.hasListenerDidSetNofifyValue)
+        {
+            [self.peripheral setNotifyValue:YES
+                          forCharacteristic:self.hasListenerCharacteristic];
+            self.hasListenerDidSetNofifyValue = YES;
+        }
+
+        if (self.hasListenerCharacteristic && !self.didInitialReadOfHasListener)
+        {
+            [self.peripheral readValueForCharacteristic:self.hasListenerCharacteristic];
+            self.didInitialReadOfHasListener = YES;
+        }
     }
 }
 
 - (void)applicationDidEnterBackground:(NSNotification *)notification
 {
-    [self.batteryLevelReadTimer invalidate];
-    self.batteryLevelReadTimer = nil;
+    [self resetBatteryLevelReadTimer];
 }
 
 - (void)applicationWillEnterForeground:(NSNotification *)notification
@@ -752,6 +854,17 @@
     {
         [self.peripheral readValueForCharacteristic:self.batteryLevelCharacteristic];
     }
+}
+
+- (void)resetBatteryLevelReadTimer
+{
+    // Capture a strong reference to the current instance as invalidating the timer may
+    // otherwise dealloc this instance.
+    FTPenServiceClient *instance = self;
+    DebugAssert(instance);
+
+    [instance.batteryLevelReadTimer invalidate];
+    instance.batteryLevelReadTimer = nil;
 }
 
 @end

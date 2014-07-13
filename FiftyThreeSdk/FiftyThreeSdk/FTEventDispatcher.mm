@@ -1,28 +1,29 @@
 //
-//  FTApplication.mm
+//  FTEventDispatcher.mm
 //  FiftyThreeSdk
 //
 //  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
+#import <dispatch/dispatch.h>
+#import <UIKit/UIKit.h>
 
-#import "Common/Touch/TouchTracker.h"
-#import "FTApplication.h"
-#import "FTPen.h"
-#import "FTPenManager.h"
+#import "Common/Touch/TouchClassifier.h"
+#import "common/Touch/TouchTracker.h"
+#import "FiftyThreeSdk/FTEventDispatcher.h"
+#import "FiftyThreeSdk/FTPenManager+Internal.h"
+#import "FiftyThreeSdk/FTPenManager+Private.h"
+#import "FiftyThreeSdk/FTPenManager.h"
 
 using namespace fiftythree::common;
-using boost::optional;
 
-@interface FTApplication () {
-    optional<TouchClassifier::Ptr> _classifier;
+@interface FTEventDispatcher ()
+{
+    TouchClassifier::Ptr _classifier;
 }
-
 @property (nonatomic) BOOL hasSeenFTPenManager;
-
 @end
 
-@implementation FTApplication
-
+@implementation FTEventDispatcher
 - (id)init
 {
     if (self = [super init])
@@ -40,12 +41,6 @@ using boost::optional;
                                                      name:kFTPenManagerDidUpdateStateNotificationName
                                                    object:nil];
     }
-    
-    
-    // Initialize the classifier here, as early as possible, since other components may try to consume it
-    // in their initialization.
-    [self classifier];
-
     return self;
 }
 
@@ -54,32 +49,47 @@ using boost::optional;
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
++ (FTEventDispatcher *)sharedInstance
+{
+    NSAssert([NSThread isMainThread], @"sharedInstance must be called on the UI thread.");
+    static dispatch_once_t once;
+    static FTEventDispatcher *instance;
+    dispatch_once(&once, ^{
+        instance = [[FTEventDispatcher alloc] init];
+    });
+    return instance;
+}
+
 #pragma mark - Touch Classification
 
-- (TouchClassifier::Ptr)createClassifier
+- (void)clearClassifierAndPenState
 {
-    return TouchClassifier::Ptr();
+    _classifier = TouchClassifier::Ptr();
+    ActiveClassifier::Activate(TouchClassifier::Ptr());
+    self.hasSeenFTPenManager = NO;
+}
+
+- (void)setClassifier:(fiftythree::common::TouchClassifier::Ptr)classifier
+{
+    [self clearClassifierAndPenState];
+    _classifier = classifier;
 }
 
 - (TouchClassifier::Ptr)classifier
 {
-    // Don't instantiate the classifier until we've seen an FTPenManager. That way classification doesn't
-    // interfere with devices that don't support Pencil, and performance is not degraded if Pencil is not
-    // used on devices that do support it but disable it (possibly).
-    if (self.hasSeenFTPenManager && !_classifier)
+    if (self.hasSeenFTPenManager && _classifier)
     {
-        // Lazily create the classifier.
-        _classifier = [self createClassifier];
-        ActiveClassifier::Activate(*_classifier);
+        ActiveClassifier::Activate(_classifier);
     }
 
-    return _classifier ? * _classifier : TouchClassifier::Ptr();
+    return _classifier;
 }
 
-#pragma mark - Event Dispatch
-
+#pragma mark - sendEvent
 - (void)sendEvent:(UIEvent *)event
 {
+    NSAssert([NSThread isMainThread], @"sendEvent must be called on the UI thread.");
+
     // If this event is a "touches" event, then send it to the TouchTracker for processing. Hooking into touch
     // dispatch at this level allows TouchTracker to observe all touches in the system.
     if (event.type == UIEventTypeTouches)
@@ -89,20 +99,19 @@ using boost::optional;
         TouchClassifier::Ptr classifier = self.classifier;
         if (classifier)
         {
-            std::set<Touch::cPtr> touches;
+            std::set<fiftythree::common::Touch::cPtr> touches;
 
             for (UITouch *t in [event allTouches])
             {
-
-                Touch::cPtr touch = static_pointer_cast<TouchTrackerObjC>(TouchTracker::Instance())->TouchForUITouch(t);
+                auto touch = static_pointer_cast<TouchTrackerObjC>(TouchTracker::Instance())->TouchForUITouch(t);
                 touches.insert(touch);
             }
 
             classifier->TouchesDidChanged(touches);
+
+            [[FTPenManager sharedInstanceWithoutInitialization] ensureNeedsUpdate];
         }
     }
-
-    [super sendEvent:event];
 }
 
 #pragma mark - Pencil
@@ -147,26 +156,8 @@ using boost::optional;
     if (classifier)
     {
         FTPenManager *manager = (FTPenManager *)notification.object;
-
-        switch (manager.state)
-        {
-            case FTPenManagerStateUninitialized:
-            case FTPenManagerStateUpdatingFirmware:
-            case FTPenManagerStateUnpaired:
-            case FTPenManagerStateConnecting:
-            case FTPenManagerStateReconnecting:
-            case FTPenManagerStateDisconnected:
-            case FTPenManagerStateDisconnectedLongPressToUnpair:
-            case FTPenManagerStateSeeking:
-                classifier->SetPenConnected(false);
-                break;
-            case FTPenManagerStateConnected:
-            case FTPenManagerStateConnectedLongPressToUnpair:
-                classifier->SetPenConnected(true);
-                break;
-            default:
-                DebugAssert(false);
-        }
+        BOOL connected = FTPenManagerStateIsConnected(manager.state);
+        classifier->SetPenConnected(connected);
     }
 }
 

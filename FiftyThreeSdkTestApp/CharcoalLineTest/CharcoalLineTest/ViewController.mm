@@ -2,7 +2,7 @@
 //  ViewController.mm
 //  CharcoalLineTest
 //
-//  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
+//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
 
 #import <Security/Security.h>
@@ -16,6 +16,7 @@
 #import "FiftyThreeSdk/FTFirmwareUpdateProgressView.h"
 #import "FiftyThreeSdk/FTLog.h"
 #import "FiftyThreeSdk/FTPen+Private.h"
+#import "FiftyThreeSdk/FTPenManager+Internal.h"
 #import "FiftyThreeSdk/FTPenManager+Private.h"
 #import "FiftyThreeSdk/FTPenManager.h"
 #import "KeychainItemWrapper/KeychainItemWrapper.h"
@@ -408,7 +409,7 @@ FTPenPrivateDelegate>
     NSString *outputID = (manufacturingID ?
                           manufacturingID :
                           @"000000000000000");
-    
+
     [self sendString:[NSString stringWithFormat:@"Retrieved Manufacturing ID: \"%@\"",
                       outputID]];
 }
