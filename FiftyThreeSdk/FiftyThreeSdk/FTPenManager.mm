@@ -886,12 +886,6 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
         weakSelf.state = FTPenManagerStateConnected;
         weakSelf.didConnectViaWarmStart = NO;
 
-        // If for what ever reason we've set turned off inactivity time out make sure it's sane here.
-        if (weakSelf.pen.inactivityTimeout == 0)
-        {
-            weakSelf.pen.inactivityTimeout = 10;
-        }
-
         [self updatePenInfoObjectAndInvokeDelegate];
         [self ensureCentralId];
 
