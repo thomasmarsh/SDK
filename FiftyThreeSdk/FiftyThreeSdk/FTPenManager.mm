@@ -1228,12 +1228,13 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
                                                        toState:datingScanningState];
     TKEvent *becomeSingleEvent = [TKEvent eventWithName:kBecomeSingleEventName
                                 transitioningFromStates:@[
-                                  waitingForCentralManagerToPowerOnState,
-                                  datingScanningState,
-                                  datingRetrievingConnectedPeripheralsState,
-                                  separatedState,
-                                  separatedWaitingForLongPressToUnpairState,
-                                  swingingState]
+                                                          waitingForCentralManagerToPowerOnState,
+                                                          datingScanningState,
+                                                          datingRetrievingConnectedPeripheralsState,
+                                                          separatedState,
+                                                          separatedWaitingForLongPressToUnpairState,
+                                                          swingingState,
+                                                          updatingFirmwareState]
                                                 toState:singleState];
     TKEvent *attemptConnectionFromDatingEvent = [TKEvent eventWithName:kAttemptConnectionFromDatingEventName
                                                transitioningFromStates:@[datingScanningState,
@@ -1302,8 +1303,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
                                      marriedState,
                                      separatedRetrievingConnectedPeripheralsState,
                                      separatedAttemptingConnectionState,
-                                     separatedWaitingForLongPressToUnpairState,
-                                     updatingFirmwareState
+                                     separatedWaitingForLongPressToUnpairState
                                      ]
                                                    toState:separatedState];
     TKEvent *retrieveConnectedPeripheralsFromSeparatedEvent = [TKEvent eventWithName:kRetrieveConnectedPeripheralsFromSeparatedEventName
@@ -1845,7 +1845,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
                 [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenManagerFirmwareUpdateDidCompleteSuccessfully
                                                                     object:self];
 
-                [self fireStateMachineEvent:kBecomeSeparatedEventName];
+                [self fireStateMachineEvent:kBecomeSingleEventName];
             }
             else
             {
