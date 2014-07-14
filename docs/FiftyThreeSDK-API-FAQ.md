@@ -28,10 +28,3 @@ invoke sendEvent on that if for some reason you're adverse to using FTApplicatio
 
 Our pairing model doesn't use the BTLE bonded/encrypted pair. Instead we allow the device to repair with other ipads. This provides what we (FiftyThree) think is a better pairing UX model which is more transparent to the user. However it means that our connection flow has more states. Most of this should be opaque to the API user as we're providing the pairing animation UI. 
 
-
-### Feedback ###
-
-Please send me feedback. Both naming/style sugguestions as well as any other
-ideas that come to mind.
-
-peter@fiftythree.com
