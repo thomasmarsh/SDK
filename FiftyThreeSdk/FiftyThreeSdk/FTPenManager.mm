@@ -193,7 +193,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 @implementation FTPenInformation
 @end
 
-@interface FTPenManager () <CBCentralManagerDelegate, TIUpdateManagerDelegate, PenConnectionViewDelegate>
+@interface FTPenManager () <CBCentralManagerDelegate, TIUpdateManagerDelegate, PenConnectionViewDelegate, AnimationPumpDelegate>
 
 @property (nonatomic) BOOL isPairingSpotPressed;
 
@@ -631,7 +631,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
         self.info.isEraserPressed = self.pen.isEraserPressed;
         self.info.isTipPressed = self.pen.isTipPressed;
 
-        self.displayLink.paused = NO;
+        [self ensureNeedsUpdate];
 
         if ([self.delegate respondsToSelector:@selector(penManagerNeedsUpdateDidChange)])
         {
@@ -2274,6 +2274,12 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     self.ensureHasListenerTimer = nil;
 }
 
+#pragma mark - AnimationPumpDelegate
+- (void)animationPumpActivated
+{
+    [self ensureNeedsUpdate];
+}
+
 #pragma mark - PenConnectionViewDelegate
 
 - (void)penConnectionViewAnimationWasEnqueued:(PenConnectionView *)penConnectionView
@@ -2335,6 +2341,9 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
         penConnectionView.debugControlsVisibility = VisibilityStateHidden;
     }
 
+    auto instance = fiftythree::core::spc<AnimationPumpObjC>(AnimationPump::Instance());
+    instance->SetDelegate(self);
+
     [self.pairingViews addObject:penConnectionView];
 
     return penConnectionView;
@@ -2366,7 +2375,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     AnimationPump::Instance()->UpdateAnimations(time);
 
     bool oldValue = self.needsUpdate;
-    self.needsUpdate = AnimationPump::Instance()->HasActiveAnimations();
+    self.needsUpdate =  AnimationPump::Instance()->HasActiveAnimations();
 
     if (oldValue != self.needsUpdate)
     {
