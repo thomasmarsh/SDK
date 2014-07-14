@@ -1565,6 +1565,8 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
 - (void)startTrialSeparation
 {
+    MLOG_INFO(FTLogSDK, "Start Trial Separation");
+
     if ([self.stateMachine canFireEvent:kPrepareToSwingEventName])
     {
         [self fireStateMachineEvent:kPrepareToSwingEventName];
@@ -1754,9 +1756,8 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
                     // it may be trying to connect to another iPad. This is because if the pen wakes up it's
                     // in the reconciling state but may need to pair with a new device instead of us.
 
-                    // [FTLog logVerboseWithFormat:@"Pencil is swinging"];
                     self.pen = pen;
-                    [self fireStateMachineEvent:kSwingEventName];
+                    [self startTrialSeparation];
                 }
                 else
                 {
