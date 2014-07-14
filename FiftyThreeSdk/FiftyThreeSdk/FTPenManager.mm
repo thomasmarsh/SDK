@@ -1418,6 +1418,8 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 {
     MLOG_INFO(FTLogSDK, "FTPenManager did enter background");
 
+    [self resetEnsureHasListenerTimer];
+
     // Reset the background task (if it has not yet been ended) prior to starting a new one. One would think
     // that we wouldn't need to do this if there were a strict pairing of applicationDidBecomeActive and
     // applicationDidEnterBackground, but in practice that does not appear to be the case.
@@ -2240,7 +2242,8 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 {
     // We only need to use the timer on firmware that does not support notifications on the
     // HasListener characteristic.
-    if (!self.pen.canWriteHasListener || !self.pen.hasListenerSupportsNotifications)
+    if ([self currentStateHasName:kMarriedStateName] &&
+        (!self.pen.canWriteHasListener || !self.pen.hasListenerSupportsNotifications))
     {
         [self resetEnsureHasListenerTimer];
 
