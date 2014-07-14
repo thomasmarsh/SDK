@@ -2342,6 +2342,8 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     }
 
     auto instance = fiftythree::core::spc<AnimationPumpObjC>(AnimationPump::Instance());
+    DebugAssert(instance->GetDelegate() == nil || instance->GetDelegate() == self);
+
     instance->SetDelegate(self);
 
     [self.pairingViews addObject:penConnectionView];
@@ -2375,7 +2377,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     AnimationPump::Instance()->UpdateAnimations(time);
 
     bool oldValue = self.needsUpdate;
-    self.needsUpdate =  AnimationPump::Instance()->HasActiveAnimations();
+    self.needsUpdate = AnimationPump::Instance()->HasActiveAnimations();
 
     if (oldValue != self.needsUpdate)
     {
