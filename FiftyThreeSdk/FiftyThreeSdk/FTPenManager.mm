@@ -292,11 +292,11 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
                                                      name:UIApplicationDidBecomeActiveNotification
                                                    object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self
-                                                 selector:@selector(applicationDidEnterBackground:)
-                                                     name:UIApplicationDidEnterBackgroundNotification
+                                                 selector:@selector(applicationWillResignActive:)
+                                                     name:UIApplicationWillResignActiveNotification
                                                    object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self
-                                                 selector:@selector(penDidWriteHasListener:)
+                                             selector:@selector(penDidWriteHasListener:)
                                                      name:kFTPenDidWriteHasListenerNotificationName
                                                    object:nil];
 
@@ -326,6 +326,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
 - (void)reset
 {
+    [self resetEnsureHasListenerTimer];
     [self resetBackgroundTask];
 
     self.firmwareImagePath = nil;
@@ -1414,7 +1415,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     [self updatePenInfoObjectAndInvokeDelegate];
 }
 
-- (void)applicationDidEnterBackground:(NSNotification *)notificaton
+- (void)applicationWillResignActive:(NSNotification *)notificaton
 {
     MLOG_INFO(FTLogSDK, "FTPenManager did enter background");
 
@@ -1430,7 +1431,16 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
         [weakSelf resetBackgroundTask];
     }];
 
-    self.penHasListener = NO;
+    // Set HasListener NO regardless of whatever the current state of penHasListener is. We depend on the
+    // write notification to end the background task.
+    if (self.penHasListener)
+    {
+        self.penHasListener = NO;
+    }
+    else
+    {
+        self.pen.hasListener = NO;
+    }
 }
 
 - (void)resetBackgroundTask
