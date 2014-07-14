@@ -21,6 +21,7 @@ static const NSTimeInterval kTrialSeparationInitializeTime = 1.0;
 @interface FTTrialSeparationMonitor ()
 @property (nonatomic) NSTimer *timer;
 @property (nonatomic) PropertyToObjCAdapter<int>::Ptr touchAdapter;
+@property (nonatomic) NSDate *lastApplicationDidBecomeActiveTime;
 @end
 
 @implementation FTTrialSeparationMonitor
@@ -29,6 +30,12 @@ static const NSTimeInterval kTrialSeparationInitializeTime = 1.0;
 {
     if (self = [super init])
     {
+        self.lastApplicationDidBecomeActiveTime = [NSDate date];
+
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(applicationDidBecomeActive:)
+                                                     name:UIApplicationDidBecomeActiveNotification
+                                                   object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(applicationWillResignActive:)
                                                      name:UIApplicationWillResignActiveNotification
@@ -45,6 +52,11 @@ static const NSTimeInterval kTrialSeparationInitializeTime = 1.0;
 
     }
     return self;
+}
+
+- (void)applicationDidBecomeActive:(NSNotification *)notification
+{
+    self.lastApplicationDidBecomeActiveTime = [NSDate date];
 }
 
 - (void)applicationWillResignActive:(NSNotification *)notification
@@ -85,7 +97,13 @@ static const NSTimeInterval kTrialSeparationInitializeTime = 1.0;
 
 - (void)tipWasPressed
 {
-    if ([UIApplication sharedApplication].applicationState == UIApplicationStateActive)
+    NSTimeInterval timeSinceLastAppDidBecomeActive = -[self.lastApplicationDidBecomeActiveTime timeIntervalSinceNow];
+
+    // Only consider a trial separation if the app is active and it's been at least a little while since the
+    // app became action. If you don't wait a little bit, it's possible to get tip pressed w/out a touch,
+    // thereby causing a trial separation.
+    if ([UIApplication sharedApplication].applicationState == UIApplicationStateActive &&
+        timeSinceLastAppDidBecomeActive > 3.0)
     {
         bool haveRecentlySeenATouch = std::abs([[NSProcessInfo processInfo] systemUptime] - TouchTracker::Instance()->LastProcessedTimestamp()) < 0.25;
         if (!haveRecentlySeenATouch && TouchTracker::Instance()->LiveTouchCount() == 0)
