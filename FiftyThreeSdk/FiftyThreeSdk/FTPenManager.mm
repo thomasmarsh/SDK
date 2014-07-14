@@ -321,6 +321,12 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 {
     [self reset];
 
+    auto instance = fiftythree::core::spc<AnimationPumpObjC>(AnimationPump::Instance());
+    if (instance->GetDelegate() == self)
+    {
+        instance->SetDelegate(nil);
+    }
+
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
@@ -2407,6 +2413,12 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     [self.pairingViews removeAllObjects];
 
     [self reset];
+
+    auto instance = fiftythree::core::spc<AnimationPumpObjC>(AnimationPump::Instance());
+    if (instance->GetDelegate() == self)
+    {
+        instance->SetDelegate(nil);
+    }
 
     [[FTEventDispatcher sharedInstance] clearClassifierAndPenState];
 
