@@ -30,16 +30,26 @@ static const NSTimeInterval kTrialSeparationInitializeTime = 1.0;
     if (self = [super init])
     {
         [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(applicationWillResignActive:)
+                                                     name:UIApplicationWillResignActiveNotification
+                                                   object:nil];
+
+        [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(penIsTipPressedDidChange:)
                                                      name:kFTPenIsTipPressedDidChangeNotificationName
                                                    object:nil];
- 
+
         self.touchAdapter = PropertyToObjCAdapter<int>::Bind(TouchTracker::Instance()->LiveTouchCount(),
                                                              self,
                                                              @selector(touchTrackerLiveTouchCountDidChange:newValue:));
 
     }
     return self;
+}
+
+- (void)applicationWillResignActive:(NSNotification *)notification
+{
+    [self clearTimer];
 }
 
 - (void)touchTrackerLiveTouchCountDidChange:(const int &)oldValue
@@ -72,18 +82,22 @@ static const NSTimeInterval kTrialSeparationInitializeTime = 1.0;
     [self.penManager startTrialSeparation];
     [self clearTimer];
 }
+
 - (void)tipWasPressed
 {
-    bool haveRecentlySeenATouch = std::abs([[NSProcessInfo processInfo] systemUptime] - TouchTracker::Instance()->LastProcessedTimestamp()) < 0.25;
-    if (!haveRecentlySeenATouch && TouchTracker::Instance()->LiveTouchCount() == 0)
+    if ([UIApplication sharedApplication].applicationState == UIApplicationStateActive)
     {
-        [self clearTimer];
-        self.timer = [NSTimer scheduledTimerWithTimeInterval:kTrialSeparationInitializeTime
-                                             target:self
-                                           selector:@selector(timerFired:)
-                                           userInfo:nil
-                                            repeats:NO];
+        bool haveRecentlySeenATouch = std::abs([[NSProcessInfo processInfo] systemUptime] - TouchTracker::Instance()->LastProcessedTimestamp()) < 0.25;
+        if (!haveRecentlySeenATouch && TouchTracker::Instance()->LiveTouchCount() == 0)
+        {
+            [self clearTimer];
+            self.timer = [NSTimer scheduledTimerWithTimeInterval:kTrialSeparationInitializeTime
+                                                 target:self
+                                               selector:@selector(timerFired:)
+                                               userInfo:nil
+                                                repeats:NO];
 
+        }
     }
 }
 
