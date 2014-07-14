@@ -602,7 +602,14 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
         if (self.pen)
         {
             NSInteger currentVersion = [FTFirmwareManager currentRunningFirmwareVersion:self.pen];
-            self.info.firmwareRevision = [@(currentVersion) stringValue];
+            if (currentVersion > 0)
+            {
+                self.info.firmwareRevision = [@(currentVersion) stringValue];
+            }
+            else
+            {
+                self.info.firmwareRevision = nil;
+            }
             [self attemptLoadFirmwareFromNetworkForVersionChecking];
             if (currentVersion != -1)
             {
