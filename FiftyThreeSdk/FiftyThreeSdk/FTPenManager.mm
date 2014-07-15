@@ -247,9 +247,8 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
 @property (nonatomic) BOOL isFetchingLatestFirmware;
 @property (nonatomic) NSData *latestFirmware;
-@property (nonatomic) NSString *latestFirmwareCachePath;
 @property (nonatomic) NSInteger latestFirmwareVersion;
-@property (nonatomic) NSDate *lastFirmwareCheckTime;
+@property (nonatomic) NSDate *lastFirmwareNetworkCheckTime;
 
 @property (nonatomic, readwrite) NSNumber *firmwareUpdateIsAvailble;
 
@@ -1006,8 +1005,6 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     [separatedState setDidExitStateBlock:^(TKState *state, TKStateMachine *stateMachine)
     {
         weakSelf.scanningState = ScanningStateDisabled;
-
-        [self clearFirmwareVersionCheck];
     }];
 
     // Separated - Retrieving Connceted Peripherals
@@ -2025,50 +2022,49 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     }
 }
 
-- (void)clearFirmwareVersionCheck
-{
-    self.lastFirmwareCheckTime = nil;
-    self.isFetchingLatestFirmware = NO;
-    self.firmwareUpdateIsAvailble = nil;
-}
-
 // This is used by the SDK during connection to see if we should notify SDK users that a firmware update
 // is availble.
 - (void)attemptLoadFirmwareFromNetworkForVersionChecking
 {
     if (FTPenManagerStateIsConnected(self.state) && self.pen)
     {
-        BOOL checkedRecently = self.lastFirmwareCheckTime && fabs([self.lastFirmwareCheckTime timeIntervalSinceNow]) > 60.0 * 5; // 5 minutes.
+        BOOL checkedRecently = self.lastFirmwareNetworkCheckTime && fabs([self.lastFirmwareNetworkCheckTime timeIntervalSinceNow]) > 60.0 * 5; // 5 minutes.
 
         if (self.shouldCheckForFirmwareUpdates && !self.isFetchingLatestFirmware && !checkedRecently)
         {
             self.isFetchingLatestFirmware = YES;
 
+            __weak FTPenManager *weakSelf = self;
+
             [FTFirmwareManager fetchLatestFirmwareWithCompletionHandler:^(NSData *data)
              {
-                 self.isFetchingLatestFirmware = NO;
-                 BOOL connected = FTPenManagerStateIsConnected(self.state);
-                 if (data && connected && self.pen)
+                 FTPenManager *strongSelf = weakSelf;
+                 if (strongSelf)
                  {
-                     NSInteger version = [FTFirmwareManager versionOfImage:data];
-                     NSInteger currentVersion = [FTFirmwareManager currentRunningFirmwareVersion:self.pen];
+                     strongSelf.isFetchingLatestFirmware = NO;
+                     BOOL connected = FTPenManagerStateIsConnected(strongSelf.state);
+                     if (data && connected && strongSelf.pen)
+                     {
+                         NSInteger version = [FTFirmwareManager versionOfImage:data];
+                         NSInteger currentVersion = [FTFirmwareManager currentRunningFirmwareVersion:strongSelf.pen];
 
-                     if (currentVersion == -1)
-                     {
-                         self.latestFirmwareVersion = version;
-                         self.firmwareUpdateIsAvailble = nil;
-                         return;
-                     }
+                         if (currentVersion == -1)
+                         {
+                             strongSelf.latestFirmwareVersion = version;
+                             strongSelf.firmwareUpdateIsAvailble = nil;
+                             return;
+                         }
 
-                     if (version > currentVersion)
-                     {
-                         self.latestFirmwareVersion = version;
-                         self.lastFirmwareCheckTime = [NSDate date];
-                         self.firmwareUpdateIsAvailble = @(YES);
-                     }
-                     else
-                     {
-                         self.firmwareUpdateIsAvailble = @(NO);
+                         if (version > currentVersion)
+                         {
+                             strongSelf.latestFirmwareVersion = version;
+                             strongSelf.lastFirmwareNetworkCheckTime = [NSDate date];
+                             strongSelf.firmwareUpdateIsAvailble = @(YES);
+                         }
+                         else
+                         {
+                             strongSelf.firmwareUpdateIsAvailble = @(NO);
+                         }
                      }
                  }
              }];
@@ -2076,95 +2072,49 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     }
 }
 
-- (NSString *)fileCachePath
+- (void)ensureRecentInMemoryFirmware
 {
-    NSArray* cachePathArray = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
-    NSString* cachePath = [cachePathArray lastObject];
-    return cachePath;
-}
+    BOOL isOlderThanADay = self.lastFirmwareNetworkCheckTime && fabs([self.lastFirmwareNetworkCheckTime timeIntervalSinceNow]) > 60.0 * 60.0 * 24.0; // 1 day.
 
-- (NSString *)findFirmwareInFileCach
-{
-    NSArray *paths = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:[self fileCachePath] error:nil];
-    NSPredicate *hasBinSuffix = [NSPredicate predicateWithFormat:@"SELF EndsWith '.bin'"];
-    paths = [paths filteredArrayUsingPredicate:hasBinSuffix];
-    paths = [paths sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
-    NSString *mostRecentFirmwareImage = [paths lastObject];
-    if (mostRecentFirmwareImage)
+    if (isOlderThanADay)
     {
-        mostRecentFirmwareImage = [[self fileCachePath] stringByAppendingPathComponent: mostRecentFirmwareImage];
-    }
-    return mostRecentFirmwareImage;
-}
-
-- (void)attempLoadFirmwareFromFileCache
-{
-    NSString *path = [self findFirmwareInFileCach];
-
-    if (path)
-    {
-        NSData *data = [NSData dataWithContentsOfFile:path];
-
-        if (data)
-        {
-            NSInteger version =  [FTFirmwareManager versionOfImage:data];
-
-            if (version > self.latestFirmwareVersion)
-            {
-                self.latestFirmware = data;
-                self.latestFirmwareVersion = version;
-                self.latestFirmwareCachePath = path;
-            }
-        }
-        else
-        {
-            MLOG_INFO(FTLogSDK, "Failed to load firmware from file cache");
-        }
-    }
-}
-
-- (void)writeFirmwareToFileCache
-{
-    if (self.latestFirmware)
-    {
-        NSString *filename = [NSString stringWithFormat:@"PencilV1Firmware-%03d.bin",self.latestFirmwareVersion];
-        NSString *writePath = [[self fileCachePath] stringByAppendingPathComponent:filename];
-        [self.latestFirmware writeToFile:writePath atomically:YES];
-        self.latestFirmwareCachePath = writePath;
+        self.lastFirmwareNetworkCheckTime = nil;
+        self.latestFirmware  = nil;
+        self.latestFirmwareVersion = -1;
     }
 }
 
 - (void)attemptLoadFirmwareFromNetwork
 {
-    BOOL checkedRecently = self.lastFirmwareCheckTime && fabs([self.lastFirmwareCheckTime timeIntervalSinceNow]) > 60.0 * 5; // 5 minutes.
+    BOOL checkedRecently = self.lastFirmwareNetworkCheckTime && fabs([self.lastFirmwareNetworkCheckTime timeIntervalSinceNow]) > 60.0 * 5; // 5 minutes.
 
     if (!self.isFetchingLatestFirmware && !checkedRecently)
     {
         self.isFetchingLatestFirmware = YES;
 
+        __weak FTPenManager * weakSelf = self;
+
         [FTFirmwareManager fetchLatestFirmwareWithCompletionHandler:^(NSData *data)
          {
-             self.isFetchingLatestFirmware = NO;
-             if (data)
+             FTPenManager *strongSelf = weakSelf;
+             if (strongSelf)
              {
-                 NSInteger version = [FTFirmwareManager versionOfImage:data];
-                 if (version > self.latestFirmwareVersion)
+                 strongSelf.isFetchingLatestFirmware = NO;
+                 if (data)
                  {
-                     self.latestFirmware = data;
-                     self.latestFirmwareVersion = version;
-                     self.lastFirmwareCheckTime = [NSDate date];
-                     [self writeFirmwareToFileCache];
+                     NSInteger version = [FTFirmwareManager versionOfImage:data];
+                     NSInteger currentVersion = [FTFirmwareManager currentRunningFirmwareVersion:self.pen];
 
-                     NSInteger cur, up;
-
-                     [FTFirmwareManager isVersionAtPath:[FTFirmwareManager imagePath]
-                                  newerThanVersionOnPen:self.pen
-                                         currentVersion:&cur
-                                          updateVersion:&up];
-
-                     if (cur != -1 && self.latestFirmwareVersion > cur)
+                     if (version > strongSelf.latestFirmwareVersion)
                      {
-                         self.firmwareUpdateIsAvailble = @(YES);
+                         strongSelf.latestFirmware = data;
+                         strongSelf.latestFirmwareVersion = version;
+                         strongSelf.lastFirmwareNetworkCheckTime = [NSDate date];
+
+                         if (currentVersion != -1 && version != -1 && currentVersion != version)
+                         {
+                             strongSelf.firmwareUpdateIsAvailble = @(YES);
+                         }
                      }
                  }
              }
@@ -2172,42 +2122,13 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     }
 }
 
-- (void)attemptLoadFirmwareFromBundle
-{
-    NSString *path = [FTFirmwareManager imagePath];
-    if (path)
-    {
-        NSData *data = [NSData dataWithContentsOfFile:path];
-        if (data)
-        {
-            NSInteger version =  [FTFirmwareManager versionOfImage:data];
-
-            if (version > self.latestFirmwareVersion)
-            {
-                self.latestFirmware = data;
-                self.latestFirmwareVersion = version;
-                [self writeFirmwareToFileCache];
-            }
-        }
-        else
-        {
-            MLOG_INFO(FTLogSDKVerbose, "Failed to load firmware from bundle");
-        }
-    }
-}
-
 - (NSNumber *)isFirmwareUpdateAvailable:(NSInteger *)currentVersion
                           updateVersion:(NSInteger *)updateVersion
 {
-
-    [self attempLoadFirmwareFromFileCache];
-    [self attemptLoadFirmwareFromBundle];
+    [self ensureRecentInMemoryFirmware];
     [self attemptLoadFirmwareFromNetwork];
 
-    [FTFirmwareManager isVersionAtPath:[FTFirmwareManager imagePath]
-                 newerThanVersionOnPen:self.pen
-                        currentVersion:currentVersion
-                         updateVersion:updateVersion];
+    *currentVersion = [FTFirmwareManager currentRunningFirmwareVersion:self.pen];
 
     if (*currentVersion != -1 && self.latestFirmware)
     {
@@ -2221,10 +2142,11 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 {
     if (self.latestFirmware)
     {
-        // Ensure it is written out.
-        [self writeFirmwareToFileCache];
+        // Write it.
+        NSString *tempFilePath = [NSTemporaryDirectory() stringByAppendingPathComponent:[[NSUUID UUID] UUIDString]];
+        [self.latestFirmware writeToFile:tempFilePath atomically:YES];
         // Update.
-        return [self updateFirmware:self.latestFirmwareCachePath];
+        return [self updateFirmware:tempFilePath];
     }
     return NO;
 }
