@@ -1407,6 +1407,8 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
 - (void)applicationDidBecomeActive:(NSNotificationCenter *)notification
 {
+    MLOG_INFO(FTLogSDK, "FTPenManager: APP DID BECOME ACTIVE");
+
     // If we're currently separated, then it's possible that the paired pen was connected in
     // another app on this device. Therefore, do a quick check to see if the paired pen
     // shows up in the connected peripherals.
@@ -1423,7 +1425,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
 - (void)applicationWillResignActive:(NSNotification *)notificaton
 {
-    MLOG_INFO(FTLogSDK, "FTPenManager did enter background");
+    MLOG_INFO(FTLogSDK, "FTPenManager: APP WILL RESIGN ACTIVE");
 
     [self resetEnsureHasListenerTimer];
 
