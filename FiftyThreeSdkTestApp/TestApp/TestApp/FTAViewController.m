@@ -191,10 +191,6 @@
     [FTPenManager sharedInstance].classifier.delegate = self;
     [FTPenManager sharedInstance].delegate = self;
 
-    // You would only uncomment this if you want to drive the animations & classification
-    // from your displayLink, see also the update method in this view controller.
-    //[FTPenManager sharedInstance].automaticUpdatesEnabled = NO;
-
     // By default the FiftyThree SDK doesn't check for firmware updates.
     // Turn on this check by setting this property. You'll be notified on
     // penManagerFirmwareUpdateIsAvailbleDidChange
@@ -208,7 +204,6 @@
 {
     for(FTTouchClassificationInfo *info in touches)
     {
-        NSLog(@"Touch %ld was %ld now %ld", (long)info.touchId, (long)info.oldValue, (long)info.newValue);
         [self.drawer setColor:_strokeColors[@(info.newValue)] forStroke:info.touchId];
     }
 }
@@ -315,11 +310,6 @@
 
 - (void)update
 {
-    // You'd only uncomment this if you've set FTPenManager's automaticUpdatesEnabled to NO.
-    //    if (self.isPencilEnabled)
-    //    {
-    //        [[FTPenManager sharedInstance] update];
-    //    }
 }
 
 - (void)glkView:(GLKView *)view drawInRect:(CGRect)rect

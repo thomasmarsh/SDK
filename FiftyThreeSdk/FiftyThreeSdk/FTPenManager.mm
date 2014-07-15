@@ -189,6 +189,16 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 @property (nonatomic, readwrite) BOOL isEraserPressed;
 @end
 
+@protocol FTPenManagerDelegatePrivate<FTPenManagerDelegate>
+@optional
+// See FTPenManager's automaticUpdates property.
+//
+// Invoked if we get events that should trigger turning on the display link. You should only need this
+// if you're running your own displayLink.
+- (void)penManagerNeedsUpdateDidChange;
+
+@end
+
 // Placeholder implementation.
 @implementation FTPenInformation
 @end
@@ -254,6 +264,9 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
 @property (nonatomic) BOOL penHasListener;
 
+@property (nonatomic) BOOL automaticUpdatesEnabled;
+
+@property (nonatomic) BOOL needsUpdate;
 @end
 
 @implementation FTPenManager
@@ -641,11 +654,11 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
         if ([self.delegate respondsToSelector:@selector(penManagerNeedsUpdateDidChange)])
         {
-            [self.delegate penManagerNeedsUpdateDidChange];
+            [((id<FTPenManagerDelegatePrivate>)self.delegate) penManagerNeedsUpdateDidChange];
         }
         if ([self.delegate respondsToSelector:@selector(penInformationDidChange)])
         {
-            [self.delegate penInformationDidChange];
+            [((id<FTPenManagerDelegatePrivate>)self.delegate) penInformationDidChange];
         }
     }
 }
@@ -2237,7 +2250,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
     if ([self.delegate respondsToSelector:@selector(penManagerNeedsUpdateDidChange)])
     {
-        [self.delegate penManagerNeedsUpdateDidChange];
+        [((id<FTPenManagerDelegatePrivate>)self.delegate) penManagerNeedsUpdateDidChange];
     }
 }
 
@@ -2391,7 +2404,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     {
         if ([self.delegate respondsToSelector:@selector(penManagerNeedsUpdateDidChange)])
         {
-            [self.delegate penManagerNeedsUpdateDidChange];
+            [((id<FTPenManagerDelegatePrivate>)self.delegate) penManagerNeedsUpdateDidChange];
         }
     }
 

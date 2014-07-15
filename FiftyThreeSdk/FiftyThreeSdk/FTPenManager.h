@@ -75,6 +75,7 @@ extern "C"
 @property (nonatomic, readonly) NSString *name;
 @property (nonatomic, readonly) NSString *manufacturerName;
 @property (nonatomic, readonly) FTPenBatteryLevel batteryLevel;
+// This is nil if we've not yet read the firmware revision.
 @property (nonatomic, readonly) NSString *firmwareRevision;
 // We only recommend using these properties for diagnostics. For example showing a dot in the settings UI
 // to indicate the tip is pressed and show the user that the application is correctly communicating with
@@ -94,12 +95,6 @@ extern "C"
 - (void)penManagerStateDidChange:(FTPenManagerState)state;
 
 @optional
-// See FTPenManager's automaticUpdates property.
-//
-// Invoked if we get events that should trigger turning on the display link. You should only need this
-// if you're running your own displayLink.
-- (void)penManagerNeedsUpdateDidChange;
-
 // Invoked when any of the BTLE information is read off the pen. See FTPenInformation.
 // This is also invoted if tip or eraser state is changed.
 - (void)penInformationDidChange;
@@ -158,25 +153,6 @@ typedef NS_ENUM(NSInteger, FTPairingUIStyle) {
 // This provides a link the FiftyThree's general support page about Pencil.
 @property (nonatomic, readonly) NSURL *pencilSupportURL;
 
-#pragma mark -  FTPenManager  - Advanced DisplayLink Support
-
-// Defaults YES. We run a displayLink to drive animations and classifications.
-// this is paused when no touch or pen events have occured recently.
-//
-// You may want to drive the animations and classifications in your own CADisplayLink.
-// If that's the case, set this to FALSE and implement penManagerNeedsUpdateDidChange and
-// call [[FTPenManager sharedInstance] update]; at the start of your render loop.
-@property (nonatomic) BOOL automaticUpdatesEnabled;
-
-// Indicates that update should be called on FTPenManager. You'd only need to check this if
-// you've set automaticUpdateEnabled to NO.
-//
-// See also penManagerNeedsUpdateDidChange.
-@property (nonatomic) BOOL needsUpdate;
-
-// Only use this if you are running your own displayLink Call this at the start of your render loop.
-- (void)update;
-
 #pragma mark -  FTPenManager - FirmwareUpdateSupport
 
 // Defaults to NO. If YES the SDK will notify via the delegate if a firmware update for Pencil
@@ -205,7 +181,7 @@ typedef NS_ENUM(NSInteger, FTPairingUIStyle) {
 // You can provide error, success, and cancel URLs so that Paper
 // can return to your application after the Firmware upgrade is complete.
 // Returns NO if Paper can't be invoked.
-- (BOOL)invokePaperToUpdatePencilFirmware:(NSString*)source           // This should be a human readable application name.
+- (BOOL)invokePaperToUpdatePencilFirmware:(NSString *)source           // This should be a human readable application name.
                                    success:(NSURL*)successCallbackUrl // e.g., YourApp://x-callback-url/success
                                      error:(NSURL*)errorCallbackUrl   // e.g., YourApp://x-callback-url/error
                                     cancel:(NSURL*)cancelCallbackUrl; // e.g., YourApp://x-callback-url/cancel
