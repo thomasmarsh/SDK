@@ -76,15 +76,19 @@ static NSString *applicationDocumentsDirectory()
                                             NSURLResponse *response,
                                             NSError *error) {
                             dispatch_async(dispatch_get_main_queue(), ^() {
-                            if (!error)
+
+                            NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse*)response;
+
+                            if (!error && httpResponse && httpResponse.statusCode == 200)
                             {
                                 handler(data);
                             }
                             else
                             {
-                                MLOG_INFO(FTLogSDKVerbose, "Got response %s with error %s.\n",
-                                          response.description.UTF8String,
-                                          error.description.UTF8String);
+                                MLOG_INFO(FTLogSDKVerbose, "Got response %s status %ld with error %s.\n",
+                                          DESC(response),
+                                          (long)httpResponse.statusCode,
+                                          DESC(error));
                                 handler(nil);
                             }
                             });
