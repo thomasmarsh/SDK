@@ -56,6 +56,16 @@ static NSString *applicationDocumentsDirectory()
     return bestImagePath ? bestImagePath : [self imagePath];
 }
 
+// Returns true IFF statusCode is in 2xx or 3xx range.
+//
+// Although many service endpoints narrowly define what response codes they will return on
+// success, we usually want to future-proof the client and accept any normal success code.
++ (BOOL)isSuccessStatusCode:(int)statusCode
+{
+    int statusCodeBlock = statusCode - statusCode % 100;
+    return (statusCodeBlock == 200 || statusCodeBlock == 300);
+}
+
 + (NSURL *)firmwareURL
 {
     NSString *endPoint =  @"https://www.fiftythree.com/downloads/pencilv1upgradeimage.bin";
@@ -77,20 +87,23 @@ static NSString *applicationDocumentsDirectory()
                                             NSError *error) {
                             dispatch_async(dispatch_get_main_queue(), ^() {
 
-                            NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse*)response;
+                                NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse*)response;
 
-                            if (!error && httpResponse && httpResponse.statusCode == 200)
-                            {
-                                handler(data);
-                            }
-                            else
-                            {
-                                MLOG_INFO(FTLogSDKVerbose, "Got response %s status %ld with error %s.\n",
-                                          DESC(response),
-                                          (long)httpResponse.statusCode,
-                                          DESC(error));
-                                handler(nil);
-                            }
+                                if (data &&
+                                    !error &&
+                                    httpResponse &&
+                                    [self isSuccessStatusCode:httpResponse.statusCode])
+                                {
+                                    handler(data);
+                                }
+                                else
+                                {
+                                    MLOG_INFO(FTLogSDKVerbose, "Got response %s status %ld with error %s.\n",
+                                              DESC(response),
+                                              (long)httpResponse.statusCode,
+                                              DESC(error));
+                                    handler(nil);
+                                }
                             });
                         }] resume];
 }
