@@ -100,7 +100,7 @@ extern "C"
 - (void)penInformationDidChange;
 
 // See FTPenManager (FirmwareUpdateSupport)
-- (void)penManagerFirmwareUpdateIsAvailbleDidChange;
+- (void)penManagerFirmwareUpdateIsAvailableDidChange;
 @end
 
 @class UIView;
@@ -163,8 +163,8 @@ typedef NS_ENUM(NSInteger, FTPairingUIStyle) {
 // via Paper by FiftyThree. This is either YES, NO or nil (if it's unknown.)
 //
 // See also shouldCheckForFirmwareUpdates
-// See also penManagerFirmwareUpdateIsAvailbleDidChange
-@property (nonatomic, readonly) NSNumber *firmwareUpdateIsAvailble;
+// See also penManagerFirmwareUpdateIsAvailableDidChange
+@property (nonatomic, readonly) NSNumber *firmwareUpdateIsAvailable;
 
 // Provides an link to offer some information from our support page about the firmware release notes.
 @property (nonatomic, readonly) NSURL *firmwareUpdateReleaseNotesLink;

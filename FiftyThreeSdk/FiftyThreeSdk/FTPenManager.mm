@@ -260,7 +260,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
 @property (nonatomic) NSDate *lastFirmwareCheckTime;
 
-@property (nonatomic, readwrite) NSNumber *firmwareUpdateIsAvailble;
+@property (nonatomic, readwrite) NSNumber *firmwareUpdateIsAvailable;
 
 @property (nonatomic) BOOL penHasListener;
 
@@ -324,7 +324,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
         self.pairingViews = [@[] mutableCopy];
 
         self.shouldCheckForFirmwareUpdates = NO;
-        self.firmwareUpdateIsAvailble = nil;
+        self.firmwareUpdateIsAvailable = nil;
     }
 
     return self;
@@ -2005,16 +2005,16 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
 #pragma mark - Firmware
 
--(void)setFirmwareUpdateIsAvailble:(NSNumber *)firmwareUpdateIsAvailble
+-(void)setFirmwareUpdateIsAvailble:(NSNumber *)firmwareUpdateIsAvailable
 {
-    NSNumber *oldValue = self.firmwareUpdateIsAvailble;
-    _firmwareUpdateIsAvailble = firmwareUpdateIsAvailble;
-    if (oldValue != firmwareUpdateIsAvailble)
+    NSNumber *oldValue = self.firmwareUpdateIsAvailable;
+    _firmwareUpdateIsAvailable = firmwareUpdateIsAvailable;
+    if (oldValue != firmwareUpdateIsAvailable)
     {
         // OK let the outside world know
-        if ([self.delegate respondsToSelector:@selector(penManagerFirmwareUpdateIsAvailbleDidChange)])
+        if ([self.delegate respondsToSelector:@selector(penManagerFirmwareUpdateIsAvailableDidChange)])
         {
-            [self.delegate penManagerFirmwareUpdateIsAvailbleDidChange];
+            [self.delegate penManagerFirmwareUpdateIsAvailableDidChange];
         }
     }
 }
@@ -2029,7 +2029,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
         NSInteger currentVersion = [FTFirmwareManager currentRunningFirmwareVersion:self.pen];
         if (currentVersion > 0)
         {
-            self.firmwareUpdateIsAvailble = @(self.latestFirmwareVersion > currentVersion);
+            self.firmwareUpdateIsAvailable = @(self.latestFirmwareVersion > currentVersion);
         }
     }
 }
@@ -2038,7 +2038,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 {
     self.lastFirmwareCheckTime = nil;
     self.isFetchingLatestFirmware = NO;
-    self.firmwareUpdateIsAvailble = nil;
+    self.firmwareUpdateIsAvailable = nil;
 }
 
 // This is used by the SDK during connection to see if we should notify SDK users that a firmware update
@@ -2065,7 +2065,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
                      if (currentVersion == -1)
                      {
                          self.latestFirmwareVersion = version;
-                         self.firmwareUpdateIsAvailble = nil;
+                         self.firmwareUpdateIsAvailable = nil;
                          return;
                      }
 
@@ -2073,11 +2073,11 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
                      {
                          self.latestFirmwareVersion = version;
                          self.lastFirmwareCheckTime = [NSDate date];
-                         self.firmwareUpdateIsAvailble = @(YES);
+                         self.firmwareUpdateIsAvailable = @(YES);
                      }
                      else
                      {
-                         self.firmwareUpdateIsAvailble = @(NO);
+                         self.firmwareUpdateIsAvailable = @(NO);
                      }
                  }
              }];

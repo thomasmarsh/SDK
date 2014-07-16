@@ -115,9 +115,9 @@
 #pragma mark - Bar Button Press handlers.
 - (void)updateFirmware:(id)sender
 {
-    NSNumber *firmwareUpdateIsAvailble = [FTPenManager sharedInstance].firmwareUpdateIsAvailble;
+    NSNumber *firmwareUpdateIsAvailable = [FTPenManager sharedInstance].firmwareUpdateIsAvailable;
 
-    if (firmwareUpdateIsAvailble != nil && [firmwareUpdateIsAvailble boolValue])
+    if (firmwareUpdateIsAvailable != nil && [firmwareUpdateIsAvailable boolValue])
     {
         BOOL isPaperInstalled = [FTPenManager sharedInstance].canInvokePaperToUpdatePencilFirmware;
         if (isPaperInstalled)
@@ -193,7 +193,7 @@
 
     // By default the FiftyThree SDK doesn't check for firmware updates.
     // Turn on this check by setting this property. You'll be notified on
-    // penManagerFirmwareUpdateIsAvailbleDidChange
+    // penManagerFirmwareUpdateIsAvailableDidChange
     [FTPenManager sharedInstance].shouldCheckForFirmwareUpdates = YES;
 
     self.isPencilEnabled = YES;
@@ -226,11 +226,11 @@
 }
 
 // This is optional.
-- (void)penManagerFirmwareUpdateIsAvailbleDidChange
+- (void)penManagerFirmwareUpdateIsAvailableDidChange
 {
-    NSNumber *firmwareUpdateIsAvailble = [FTPenManager sharedInstance].firmwareUpdateIsAvailble;
+    NSNumber *firmwareUpdateIsAvailable = [FTPenManager sharedInstance].firmwareUpdateIsAvailable;
 
-    if (firmwareUpdateIsAvailble != nil && [firmwareUpdateIsAvailble boolValue])
+    if (firmwareUpdateIsAvailable != nil && [firmwareUpdateIsAvailable boolValue])
     {
         BOOL isPaperInstalled = [FTPenManager sharedInstance].canInvokePaperToUpdatePencilFirmware;
         if (isPaperInstalled)
