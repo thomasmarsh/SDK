@@ -616,7 +616,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
         }
         else
         {
-            self.info.batteryLevel = FTPenBatteryLevelHigh;
+            self.info.batteryLevel = FTPenBatteryLevelUnknown;
         }
 
         if (self.pen)
