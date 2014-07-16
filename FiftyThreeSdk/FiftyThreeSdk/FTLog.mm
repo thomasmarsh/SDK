@@ -42,6 +42,7 @@ std::string DescriptionString(NSObject *object)
 {
     sLogLevel = logLevel;
 
+#ifdef USE_LOGGING
     LogService::Instance()->RemoveFilter(FTLogSDK);
     LogService::Instance()->RemoveFilter(FTLogSDKVerbose);
 
@@ -58,6 +59,7 @@ std::string DescriptionString(NSObject *object)
             LogService::Instance()->AddFilter(FTLogSDKVerbose);
             break;
     }
+#endif
 }
 
 @end
