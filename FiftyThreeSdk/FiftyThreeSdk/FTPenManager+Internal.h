@@ -25,5 +25,6 @@ extern NSString * const kFTPenManagerDidFailToDiscoverPenNotificationName;
 @property (nonatomic, readonly) FTXCallbackURL *pencilFirmwareUpgradeURL;
 
 - (void)disconnect;
+- (void)discconnectOrBecomeSingle;
 
 @end

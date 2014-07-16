@@ -772,8 +772,6 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     [waitingForCentralManagerToPowerOnState setDidExitStateBlock:^(TKState *state,
                                                                      TKStateMachine *stateMachine)
     {
-        FTAssert(weakSelf.centralManager, @"CentralManager non-nil");
-        FTAssert(weakSelf.centralManager.state == CBCentralManagerStatePoweredOn, @"State is PoweredOn");
     }];
 
     // Single
@@ -1573,6 +1571,16 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 }
 
 #pragma mark -
+
+-(void)discconnectOrBecomeSingle
+{
+    [self disconnect];
+
+    if ([self.stateMachine canFireEvent:kBecomeSingleEventName])
+    {
+        [self fireStateMachineEvent:kBecomeSingleEventName];
+    }
+}
 
 - (void)disconnect
 {
