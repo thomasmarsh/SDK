@@ -1136,12 +1136,13 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
         weakSelf.state = FTPenManagerStateUpdatingFirmware;
 
+        [self possiblyStartEnsureHasListenerTimer];
+
         [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenManagerFirmwareUpdateDidBegin
                                                             object:self];
 
         weakSelf.originalInactivityTimeout = weakSelf.pen.inactivityTimeout;
         weakSelf.pen.inactivityTimeout = 0;
-        weakSelf.penHasListener = NO;
 
         // Discourage the device from going to sleep while the firmware is updating.
         [UIApplication sharedApplication].idleTimerDisabled = YES;
@@ -1158,10 +1159,11 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
         weakSelf.updateManager = nil;
 
         weakSelf.pen.inactivityTimeout = weakSelf.originalInactivityTimeout;
-        weakSelf.penHasListener = YES;
 
         // Restore the idle timer disable flag to its original state.
         [UIApplication sharedApplication].idleTimerDisabled = NO;
+
+        [self resetEnsureHasListenerTimer];
     }];
 
     // Updating Firmware - Attempting Connection
@@ -2334,7 +2336,8 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 {
     // We only need to use the timer on firmware that does not support notifications on the
     // HasListener characteristic.
-    if ([self currentStateHasName:kMarriedStateName] &&
+    if (([self currentStateHasName:kMarriedStateName] ||
+         [self currentStateHasName:kUpdatingFirmwareStateName]) &&
         (!self.pen.canWriteHasListener || !self.pen.hasListenerSupportsNotifications))
     {
         [self resetEnsureHasListenerTimer];
