@@ -233,7 +233,7 @@ static NSString *applicationDocumentsDirectory()
     return nil;
 }
 
-+ (FTFirmwareImageType)imageTypeRunningOnPen:(FTPen *)pen;
++ (BOOL)imageTypeRunningOnPen:(FTPen *)pen andType:(FTFirmwareImageType *)type
 {
     NSInteger factoryVersion;
     BOOL factoryIsCurrentlyRunning;
@@ -242,19 +242,16 @@ static NSString *applicationDocumentsDirectory()
                                    forImageType:FTFirmwareImageTypeFactory
                                         version:&factoryVersion
                          isCurrentlyRunning:&factoryIsCurrentlyRunning];
-    if (!result)
-    {
-        FTAssert(result, @"Must be able to fetch factory version");
-    }
 
     if (factoryIsCurrentlyRunning)
     {
-        return FTFirmwareImageTypeFactory;
+        *type = FTFirmwareImageTypeFactory;
     }
     else
     {
-        return FTFirmwareImageTypeUpgrade;
+        *type = FTFirmwareImageTypeUpgrade;
     }
+    return result;
 }
 
 @end

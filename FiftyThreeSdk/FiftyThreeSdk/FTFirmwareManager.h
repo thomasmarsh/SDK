@@ -32,7 +32,7 @@ typedef NS_ENUM(NSInteger, FTFirmwareImageType) {
                currentVersion:(NSInteger *)currentVersion
                 updateVersion:(NSInteger *)updateVersion;
 
-+ (FTFirmwareImageType)imageTypeRunningOnPen:(FTPen *)pen;
++ (BOOL)imageTypeRunningOnPen:(FTPen *)pen andType:(FTFirmwareImageType *)type;
 
 + (void)fetchLatestFirmwareWithCompletionHandler:(void (^)(NSData *))handler;
 

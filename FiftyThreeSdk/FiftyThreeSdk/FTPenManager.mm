@@ -699,7 +699,9 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
             // If the pen is currently running the upgrade firmware, it needs to reset. We
             // don't want to indicate that the update has started until we initate another
             // update *after* the reset has happened.
-            if ([FTFirmwareManager imageTypeRunningOnPen:self.pen] == FTFirmwareImageTypeFactory)
+            FTFirmwareImageType type;
+            BOOL result = [FTFirmwareManager imageTypeRunningOnPen:self.pen andType:&type];
+            if (result && type == FTFirmwareImageTypeFactory)
             {
                 [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenManagerFirmwareUpdateDidBeginSendingUpdate
                                                                     object:self];
@@ -1894,8 +1896,9 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
             else
             {
                 MLOG_INFO(FTLogSDK, "Peripheral did disconnect while updating firmware. Reconnecting.");
-
-                if ([FTFirmwareManager imageTypeRunningOnPen:self.pen] == FTFirmwareImageTypeFactory)
+                FTFirmwareImageType type;
+                BOOL result = [FTFirmwareManager imageTypeRunningOnPen:self.pen andType:&type];
+                if (result && type == FTFirmwareImageTypeFactory)
                 {
                     [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenUnexpectedDisconnectWhileUpdatingFirmwareNotificationName
                                                                         object:self.pen];
@@ -2225,7 +2228,9 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 {
     FTAssert(manager, nil);
 
-    if ([FTFirmwareManager imageTypeRunningOnPen:self.pen] == FTFirmwareImageTypeFactory)
+    FTFirmwareImageType type;
+    BOOL result = [FTFirmwareManager imageTypeRunningOnPen:self.pen andType:&type];
+    if (result && type == FTFirmwareImageTypeFactory)
     {
         [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenManagerFirmwareUpdateDidUpdatePercentComplete
                                                             object:self
