@@ -1695,22 +1695,20 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     }
 }
 
-- (BOOL)isPeripheralReconcilingWithUs:(CBPeripheral *)peripheral withAdvertisementData:(NSDictionary *)advertisementData
+- (BOOL)isPeripheralReconcilingWithUs:(CBPeripheral *)peripheral
+                withAdvertisementData:(NSDictionary *)advertisementData
+                  forceCentralIdMatch:(BOOL)forceCentralIdMatch
 {
 
     UInt32 advertisedCentralId = [self peripheralAdvertisementCentralId:advertisementData];
 
     UInt32 peripheralCentralId = [self centralIdFromPeripheralId:peripheral.identifier];
 
-    MLOG_INFO(FTLogSDKVerbose, "advertisedCentralId %ld  peripheralCentralId %ld",
-              (long)advertisedCentralId,
-              (long)peripheralCentralId);
-
     // There are two cases here.
     // We're looking at an older v55 firmware that only has 1 byte of advertising data, or newer firmware.
     // We assume it's reconciling with us if the advertising data is 1 byte.
 
-    if (advertisedCentralId == 0x1)
+    if (advertisedCentralId == 0x1 && !forceCentralIdMatch)
     {
         return YES;
     }
@@ -1732,7 +1730,11 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 {
     BOOL isPeripheralReconciling = [self isPeripheralReconciling:advertisementData];
     BOOL isPeripheralReconcilingWithUs = [self isPeripheralReconcilingWithUs:peripheral
-                                                       withAdvertisementData:advertisementData];
+                                                       withAdvertisementData:advertisementData
+                                                         forceCentralIdMatch:NO];
+    BOOL isPeripheralReconcilingSpecificallyWithUs = [self isPeripheralReconcilingWithUs:peripheral
+                                                                   withAdvertisementData:advertisementData
+                                                                     forceCentralIdMatch:YES];
 
     MLOG_INFO(FTLogSDK, "Discovered peripheral with name: \"%s\" PotentialCentralId: %x CentralId: %x",
               DESC(peripheral.name),
@@ -1743,7 +1745,11 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     {
         FTAssert(!self.pen, @"pen is nil");
 
-        if (!isPeripheralReconciling)
+        // When single, we only connect with Pencil's that are not currently reconciling, since they may
+        // be reconciling with another central. We make an exception for Pencil's that are specifically trying
+        // to reconcile with us. This shouldn't generally happen, since we would typically be in Separated
+        // in that case. However, this makes us robust to edge cases.
+        if (!isPeripheralReconciling || isPeripheralReconcilingSpecificallyWithUs)
         {
             self.pen = [[FTPen alloc] initWithPeripheral:peripheral];
             [self fireStateMachineEvent:kAttemptConnectionFromDatingEventName];
@@ -1807,8 +1813,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     {
         // Reject the paired peripheral. We don't want to reconnect to the peripheral we may be using
         // to press the pairing spot to sever the pairing right now.
-        if (![self isPairedPeripheral:peripheral] &&
-            !isPeripheralReconciling)
+        if (![self isPairedPeripheral:peripheral] && !isPeripheralReconciling)
         {
             [self.peripheralsDiscoveredDuringLongPress addObject:peripheral];
         }
