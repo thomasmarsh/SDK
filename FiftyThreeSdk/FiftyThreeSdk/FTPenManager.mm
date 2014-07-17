@@ -1697,7 +1697,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
 - (BOOL)isPeripheralReconcilingWithUs:(CBPeripheral *)peripheral
                 withAdvertisementData:(NSDictionary *)advertisementData
-                  forceCentralIdMatch:(BOOL)forceCentralIdMatch
+                requireCentralIdMatch:(BOOL)requireCentralIdMatch
 {
 
     UInt32 advertisedCentralId = [self peripheralAdvertisementCentralId:advertisementData];
@@ -1708,7 +1708,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     // We're looking at an older v55 firmware that only has 1 byte of advertising data, or newer firmware.
     // We assume it's reconciling with us if the advertising data is 1 byte.
 
-    if (advertisedCentralId == 0x1 && !forceCentralIdMatch)
+    if (advertisedCentralId == 0x1 && !requireCentralIdMatch)
     {
         return YES;
     }
@@ -1731,10 +1731,10 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     BOOL isPeripheralReconciling = [self isPeripheralReconciling:advertisementData];
     BOOL isPeripheralReconcilingWithUs = [self isPeripheralReconcilingWithUs:peripheral
                                                        withAdvertisementData:advertisementData
-                                                         forceCentralIdMatch:NO];
+                                                       requireCentralIdMatch:NO];
     BOOL isPeripheralReconcilingSpecificallyWithUs = [self isPeripheralReconcilingWithUs:peripheral
                                                                    withAdvertisementData:advertisementData
-                                                                     forceCentralIdMatch:YES];
+                                                                   requireCentralIdMatch:YES];
 
     MLOG_INFO(FTLogSDK, "Discovered peripheral with name: \"%s\" PotentialCentralId: %x CentralId: %x",
               DESC(peripheral.name),
