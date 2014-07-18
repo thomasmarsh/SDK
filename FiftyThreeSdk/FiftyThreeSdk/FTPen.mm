@@ -4,8 +4,8 @@
 //
 //  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
+
 #import <CoreBluetooth/CoreBluetooth.h>
-#import <UIKit/UIKit.h>
 
 #import "Core/Asserts.h"
 #import "Core/Log.h"

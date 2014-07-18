@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include "Core/Log.h"
 #include "FTLog.h"
 
 typedef NS_ENUM(NSInteger, FTLogModule) {

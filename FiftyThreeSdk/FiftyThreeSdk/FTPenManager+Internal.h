@@ -44,5 +44,6 @@ extern NSString * const kFTPenManagerDidFailToDiscoverPenNotificationName;
 - (void)update;
 
 - (void)disconnect;
+- (void)discconnectOrBecomeSingle;
 
 @end

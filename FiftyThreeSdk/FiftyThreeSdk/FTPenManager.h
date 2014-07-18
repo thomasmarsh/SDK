@@ -188,5 +188,4 @@ typedef NS_ENUM(NSInteger, FTPairingUIStyle) {
                                    success:(NSURL*)successCallbackUrl // e.g., YourApp://x-callback-url/success
                                      error:(NSURL*)errorCallbackUrl   // e.g., YourApp://x-callback-url/error
                                     cancel:(NSURL*)cancelCallbackUrl; // e.g., YourApp://x-callback-url/cancel
-
 @end

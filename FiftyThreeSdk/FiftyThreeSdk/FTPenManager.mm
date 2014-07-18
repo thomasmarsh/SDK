@@ -255,10 +255,9 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 @property (nonatomic) NSInteger originalInactivityTimeout;
 
 @property (nonatomic) BOOL isFetchingLatestFirmware;
-
+@property (nonatomic) NSData *latestFirmware;
 @property (nonatomic) NSInteger latestFirmwareVersion;
-
-@property (nonatomic) NSDate *lastFirmwareCheckTime;
+@property (nonatomic) NSDate *lastFirmwareNetworkCheckTime;
 
 @property (nonatomic, readwrite) NSNumber *firmwareUpdateIsAvailable;
 
@@ -712,7 +711,9 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
             // If the pen is currently running the upgrade firmware, it needs to reset. We
             // don't want to indicate that the update has started until we initate another
             // update *after* the reset has happened.
-            if ([FTFirmwareManager imageTypeRunningOnPen:self.pen] == FTFirmwareImageTypeFactory)
+            FTFirmwareImageType type;
+            BOOL result = [FTFirmwareManager imageTypeRunningOnPen:self.pen andType:&type];
+            if (result && type == FTFirmwareImageTypeFactory)
             {
                 [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenManagerFirmwareUpdateDidBeginSendingUpdate
                                                                     object:self];
@@ -785,8 +786,6 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     [waitingForCentralManagerToPowerOnState setDidExitStateBlock:^(TKState *state,
                                                                      TKStateMachine *stateMachine)
     {
-        FTAssert(weakSelf.centralManager, @"CentralManager non-nil");
-        FTAssert(weakSelf.centralManager.state == CBCentralManagerStatePoweredOn, @"State is PoweredOn");
     }];
 
     // Single
@@ -1018,8 +1017,6 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     [separatedState setDidExitStateBlock:^(TKState *state, TKStateMachine *stateMachine)
     {
         weakSelf.scanningState = ScanningStateDisabled;
-
-        [self clearFirmwareVersionCheck];
     }];
 
     // Separated - Retrieving Connceted Peripherals
@@ -1153,12 +1150,13 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
         weakSelf.state = FTPenManagerStateUpdatingFirmware;
 
+        [self possiblyStartEnsureHasListenerTimer];
+
         [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenManagerFirmwareUpdateDidBegin
                                                             object:self];
 
         weakSelf.originalInactivityTimeout = weakSelf.pen.inactivityTimeout;
         weakSelf.pen.inactivityTimeout = 0;
-        weakSelf.penHasListener = NO;
 
         // Discourage the device from going to sleep while the firmware is updating.
         [UIApplication sharedApplication].idleTimerDisabled = YES;
@@ -1175,10 +1173,11 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
         weakSelf.updateManager = nil;
 
         weakSelf.pen.inactivityTimeout = weakSelf.originalInactivityTimeout;
-        weakSelf.penHasListener = YES;
 
         // Restore the idle timer disable flag to its original state.
         [UIApplication sharedApplication].idleTimerDisabled = NO;
+
+        [self resetEnsureHasListenerTimer];
     }];
 
     // Updating Firmware - Attempting Connection
@@ -1387,7 +1386,10 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
     [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenManagerDidUpdateStateNotificationName
                                                         object:self];
+
     [self.delegate penManagerStateDidChange:self.state];
+
+    [self attemptLoadFirmwareFromNetwork];
 }
 
 - (void)stateMachineDidChangeState:(NSNotification *)notification
@@ -1586,6 +1588,16 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
 #pragma mark -
 
+-(void)discconnectOrBecomeSingle
+{
+    [self disconnect];
+
+    if ([self.stateMachine canFireEvent:kBecomeSingleEventName])
+    {
+        [self fireStateMachineEvent:kBecomeSingleEventName];
+    }
+}
+
 - (void)disconnect
 {
     if ([self.stateMachine canFireEvent:kDisconnectAndBecomeSingleEventName])
@@ -1697,7 +1709,9 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     }
 }
 
-- (BOOL)isPeripheralReconcilingWithUs:(CBPeripheral *)peripheral withAdvertisementData:(NSDictionary *)advertisementData
+- (BOOL)isPeripheralReconcilingWithUs:(CBPeripheral *)peripheral
+                withAdvertisementData:(NSDictionary *)advertisementData
+                requireCentralIdMatch:(BOOL)requireCentralIdMatch
 {
 
     UInt32 advertisedCentralId = [self peripheralAdvertisementCentralId:advertisementData];
@@ -1712,7 +1726,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     // We're looking at an older v55 firmware that only has 1 byte of advertising data, or newer firmware.
     // We assume it's reconciling with us if the advertising data is 1 byte.
 
-    if (advertisedCentralId == 0x1)
+    if (advertisedCentralId == 0x1 && !requireCentralIdMatch)
     {
         return YES;
     }
@@ -1734,7 +1748,11 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 {
     BOOL isPeripheralReconciling = [self isPeripheralReconciling:advertisementData];
     BOOL isPeripheralReconcilingWithUs = [self isPeripheralReconcilingWithUs:peripheral
-                                                       withAdvertisementData:advertisementData];
+                                                       withAdvertisementData:advertisementData
+                                                       requireCentralIdMatch:NO];
+    BOOL isPeripheralReconcilingSpecificallyWithUs = [self isPeripheralReconcilingWithUs:peripheral
+                                                                   withAdvertisementData:advertisementData
+                                                                   requireCentralIdMatch:YES];
 
     MLOG_INFO(FTLogSDK, "Discovered peripheral with name: \"%s\" PotentialCentralId: %x CentralId: %x",
               DESC(peripheral.name),
@@ -1745,7 +1763,11 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     {
         FTAssert(!self.pen, @"pen is nil");
 
-        if (!isPeripheralReconciling)
+        // When single, we only connect with Pencil's that are not currently reconciling, since they may
+        // be reconciling with another central. We make an exception for Pencil's that are specifically trying
+        // to reconcile with us. This shouldn't generally happen, since we would typically be in Separated
+        // in that case. However, this makes us robust to edge cases.
+        if (!isPeripheralReconciling || isPeripheralReconcilingSpecificallyWithUs)
         {
             self.pen = [[FTPen alloc] initWithPeripheral:peripheral];
             [self fireStateMachineEvent:kAttemptConnectionFromDatingEventName];
@@ -1809,8 +1831,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     {
         // Reject the paired peripheral. We don't want to reconnect to the peripheral we may be using
         // to press the pairing spot to sever the pairing right now.
-        if (![self isPairedPeripheral:peripheral] &&
-            !isPeripheralReconciling)
+        if (![self isPairedPeripheral:peripheral] && !isPeripheralReconciling)
         {
             [self.peripheralsDiscoveredDuringLongPress addObject:peripheral];
         }
@@ -1891,8 +1912,9 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
             else
             {
                 MLOG_INFO(FTLogSDK, "Peripheral did disconnect while updating firmware. Reconnecting.");
-
-                if ([FTFirmwareManager imageTypeRunningOnPen:self.pen] == FTFirmwareImageTypeFactory)
+                FTFirmwareImageType type;
+                BOOL result = [FTFirmwareManager imageTypeRunningOnPen:self.pen andType:&type];
+                if (result && type == FTFirmwareImageTypeFactory)
                 {
                     [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenUnexpectedDisconnectWhileUpdatingFirmwareNotificationName
                                                                         object:self.pen];
@@ -2034,50 +2056,50 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     }
 }
 
-- (void)clearFirmwareVersionCheck
-{
-    self.lastFirmwareCheckTime = nil;
-    self.isFetchingLatestFirmware = NO;
-    self.firmwareUpdateIsAvailable = nil;
-}
-
 // This is used by the SDK during connection to see if we should notify SDK users that a firmware update
 // is availble.
 - (void)attemptLoadFirmwareFromNetworkForVersionChecking
 {
     if (FTPenManagerStateIsConnected(self.state) && self.pen)
     {
-        BOOL checkedRecently = self.lastFirmwareCheckTime && fabs([self.lastFirmwareCheckTime timeIntervalSinceNow]) > 60.0 * 5; // 5 minutes.
+        BOOL checkedRecently = (self.lastFirmwareNetworkCheckTime &&
+                                fabs([self.lastFirmwareNetworkCheckTime timeIntervalSinceNow]) > 60.0 * 5); // 5 minutes.
 
         if (self.shouldCheckForFirmwareUpdates && !self.isFetchingLatestFirmware && !checkedRecently)
         {
             self.isFetchingLatestFirmware = YES;
 
+            __weak FTPenManager *weakSelf = self;
+
             [FTFirmwareManager fetchLatestFirmwareWithCompletionHandler:^(NSData *data)
              {
-                 self.isFetchingLatestFirmware = NO;
-                 BOOL connected = FTPenManagerStateIsConnected(self.state);
-                 if (data && connected && self.pen)
+                 FTPenManager *strongSelf = weakSelf;
+                 if (strongSelf)
                  {
-                     NSInteger version = [FTFirmwareManager versionOfImage:data];
-                     NSInteger currentVersion = [FTFirmwareManager currentRunningFirmwareVersion:self.pen];
+                     strongSelf.isFetchingLatestFirmware = NO;
+                     BOOL connected = FTPenManagerStateIsConnected(strongSelf.state);
+                     if (data && connected && strongSelf.pen)
+                     {
+                         NSInteger version = [FTFirmwareManager versionOfImage:data];
+                         NSInteger currentVersion = [FTFirmwareManager currentRunningFirmwareVersion:strongSelf.pen];
 
-                     if (currentVersion == -1)
-                     {
-                         self.latestFirmwareVersion = version;
-                         self.firmwareUpdateIsAvailable = nil;
-                         return;
-                     }
+                         if (currentVersion == -1)
+                         {
+                             strongSelf.latestFirmwareVersion = version;
+                             strongSelf.firmwareUpdateIsAvailable = nil;
+                             return;
+                         }
 
-                     if (version > currentVersion)
-                     {
-                         self.latestFirmwareVersion = version;
-                         self.lastFirmwareCheckTime = [NSDate date];
-                         self.firmwareUpdateIsAvailable = @(YES);
-                     }
-                     else
-                     {
-                         self.firmwareUpdateIsAvailable = @(NO);
+                         if (version > currentVersion)
+                         {
+                             strongSelf.latestFirmwareVersion = version;
+                             strongSelf.lastFirmwareNetworkCheckTime = [NSDate date];
+                             strongSelf.firmwareUpdateIsAvailable = @(YES);
+                         }
+                         else
+                         {
+                             strongSelf.firmwareUpdateIsAvailable = @(NO);
+                         }
                      }
                  }
              }];
@@ -2085,18 +2107,83 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     }
 }
 
+- (void)ensureRecentInMemoryFirmware
+{
+    BOOL isOlderThanADay = self.lastFirmwareNetworkCheckTime && fabs([self.lastFirmwareNetworkCheckTime timeIntervalSinceNow]) > 60.0 * 60.0 * 24.0; // 1 day.
+
+    if (isOlderThanADay)
+    {
+        self.lastFirmwareNetworkCheckTime = nil;
+        self.latestFirmware  = nil;
+        self.latestFirmwareVersion = -1;
+    }
+}
+
+- (void)attemptLoadFirmwareFromNetwork
+{
+    BOOL checkedRecently = self.lastFirmwareNetworkCheckTime && fabs([self.lastFirmwareNetworkCheckTime timeIntervalSinceNow]) > 60.0 * 5; // 5 minutes.
+
+    if (!self.isFetchingLatestFirmware && !checkedRecently)
+    {
+        self.isFetchingLatestFirmware = YES;
+
+        __weak FTPenManager * weakSelf = self;
+
+        [FTFirmwareManager fetchLatestFirmwareWithCompletionHandler:^(NSData *data)
+         {
+             FTPenManager *strongSelf = weakSelf;
+             if (strongSelf)
+             {
+                 strongSelf.isFetchingLatestFirmware = NO;
+                 if (data)
+                 {
+                     NSInteger version = [FTFirmwareManager versionOfImage:data];
+                     NSInteger currentVersion = [FTFirmwareManager currentRunningFirmwareVersion:self.pen];
+
+                     if (version > strongSelf.latestFirmwareVersion)
+                     {
+                         strongSelf.latestFirmware = data;
+                         strongSelf.latestFirmwareVersion = version;
+                         strongSelf.lastFirmwareNetworkCheckTime = [NSDate date];
+
+                         if (currentVersion != -1 && version != -1 && currentVersion != version)
+                         {
+                             strongSelf.firmwareUpdateIsAvailable = @(YES);
+                         }
+                     }
+                 }
+             }
+         }];
+    }
+}
+
 - (NSNumber *)isFirmwareUpdateAvailable:(NSInteger *)currentVersion
                           updateVersion:(NSInteger *)updateVersion
 {
-    return [FTFirmwareManager isVersionAtPath:[FTFirmwareManager imagePath]
-                        newerThanVersionOnPen:self.pen
-                               currentVersion:currentVersion
-                                updateVersion:updateVersion];
+    [self ensureRecentInMemoryFirmware];
+    [self attemptLoadFirmwareFromNetwork];
+
+    *currentVersion = [FTFirmwareManager currentRunningFirmwareVersion:self.pen];
+
+    if (*currentVersion != -1 && self.latestFirmware)
+    {
+        *updateVersion = self.latestFirmwareVersion;
+        return @(*updateVersion > *currentVersion);
+    }
+    return @NO;
 }
 
 - (BOOL)updateFirmware
 {
-    return [self updateFirmware:[FTFirmwareManager imagePath]];
+    if (self.latestFirmware)
+    {
+        // Write it.
+        NSString *tempFilePath = [NSTemporaryDirectory() stringByAppendingPathComponent:[[NSUUID UUID] UUIDString]];
+        [self.latestFirmware writeToFile:tempFilePath atomically:YES];
+        // Update.
+        return [self updateFirmware:tempFilePath];
+    }
+    return NO;
 }
 
 - (BOOL)updateFirmware:(NSString *)firmwareImagePath;
@@ -2158,7 +2245,9 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 {
     FTAssert(manager, nil);
 
-    if ([FTFirmwareManager imageTypeRunningOnPen:self.pen] == FTFirmwareImageTypeFactory)
+    FTFirmwareImageType type;
+    BOOL result = [FTFirmwareManager imageTypeRunningOnPen:self.pen andType:&type];
+    if (result && type == FTFirmwareImageTypeFactory)
     {
         [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenManagerFirmwareUpdateDidUpdatePercentComplete
                                                             object:self
@@ -2274,7 +2363,8 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 {
     // We only need to use the timer on firmware that does not support notifications on the
     // HasListener characteristic.
-    if ([self currentStateHasName:kMarriedStateName] &&
+    if (([self currentStateHasName:kMarriedStateName] ||
+         [self currentStateHasName:kUpdatingFirmwareStateName]) &&
         (!self.pen.canWriteHasListener || !self.pen.hasListenerSupportsNotifications))
     {
         [self resetEnsureHasListenerTimer];
