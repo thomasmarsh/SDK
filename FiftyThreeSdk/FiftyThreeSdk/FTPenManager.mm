@@ -1470,7 +1470,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 {
     if (self.backgroundTaskId != UIBackgroundTaskInvalid)
     {
-        MLOG_INFO(FTLogSDK, "FTPenManger did end background task");
+        MLOG_INFO(FTLogSDK, "FTPenManager did end background task");
 
         [[UIApplication sharedApplication] endBackgroundTask:self.backgroundTaskId];
         self.backgroundTaskId = UIBackgroundTaskInvalid;
