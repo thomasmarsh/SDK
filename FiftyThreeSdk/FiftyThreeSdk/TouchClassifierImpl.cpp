@@ -129,7 +129,7 @@ void TouchClassifierImpl::UpdateClassifications()
         bool shouldOverride = ShouldOverrideClassifications();
         if (shouldOverride)
         {
-            boost::optional<TouchClassification> touchClassification = OverrideClassificationForTouch(touch);
+            fiftythree::core::optional<TouchClassification> touchClassification = OverrideClassificationForTouch(touch);
             args.newValue = touchClassification ? *touchClassification : args.oldValue;
 
             *const_cast<Property<TouchClassification> *>(&touch->SingleTapClassification()) = args.newValue;
@@ -205,9 +205,9 @@ bool TouchClassifierImpl::ShouldOverrideClassifications()
     return false;
 }
 
-boost::optional<TouchClassification> TouchClassifierImpl::OverrideClassificationForTouch(const Touch::cPtr & touch)
+fiftythree::core::optional<TouchClassification> TouchClassifierImpl::OverrideClassificationForTouch(const Touch::cPtr & touch)
 {
-    return boost::none;
+    return fiftythree::core::none;
 }
 
 Eigen::VectorXf TouchClassifierImpl::GeometricStatistics(const Touch::cPtr & t0)

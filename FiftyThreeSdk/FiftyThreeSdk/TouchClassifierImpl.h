@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <boost/optional.hpp>
+#include "Core/Optional.h"
 #include <vector>
 
 #include "Core/Enum.h"
@@ -55,7 +55,7 @@ protected:
     // Default implementation returns false
     virtual bool ShouldOverrideClassifications();
 
-    virtual boost::optional<core::TouchClassification> OverrideClassificationForTouch(const core::Touch::cPtr & touch);
+    virtual fiftythree::core::optional<core::TouchClassification> OverrideClassificationForTouch(const core::Touch::cPtr & touch);
 
     void SetCopyGestureClassifications(bool b);
 private:

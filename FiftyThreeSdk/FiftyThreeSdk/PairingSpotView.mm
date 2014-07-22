@@ -424,7 +424,7 @@ NSString *FTPairingSpotCometStateName(FTPairingSpotCometState value)
 
 - (void)startCometAnimation
 {
-    boost::optional<double> wellMarginEasingLastTimeSeconds = _wellMarginEasing.LastTimeSeconds();
+    fiftythree::core::optional<double> wellMarginEasingLastTimeSeconds = _wellMarginEasing.LastTimeSeconds();
     _wellMarginEasing.Begin(EasingFunction::OutBack,
                             MakeArray1f(Clamped(_wellMarginEasing.GetCurrentValue().x(), 0.f, self.viewSettings.CometMaxThickness)),
                             MakeArray1f(self.viewSettings.CometMaxThickness),
@@ -440,7 +440,7 @@ NSString *FTPairingSpotCometStateName(FTPairingSpotCometState value)
 - (void)endCometAnimation
 {
 
-    boost::optional<double> wellMarginEasingLastTimeSeconds = _wellMarginEasing.LastTimeSeconds();
+    fiftythree::core::optional<double> wellMarginEasingLastTimeSeconds = _wellMarginEasing.LastTimeSeconds();
     _wellMarginEasing.Begin(EasingFunction::InBack,
                             MakeArray1f(Clamped(_wellMarginEasing.GetCurrentValue().x(), 0.f, self.viewSettings.CometMaxThickness)),
                             MakeArray1f(0.f),
