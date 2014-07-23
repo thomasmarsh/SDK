@@ -144,7 +144,7 @@ void PlaybackSequence::Write(std::ostream & str)
                 }
 
                 // optional...
-                boost::unordered_map<std::string, fiftythree::core::any>::const_iterator it = touch->DynamicProperties().find("prviewControllerGestureTouches");
+                std::unordered_map<std::string, fiftythree::core::any>::const_iterator it = touch->DynamicProperties().find("prviewControllerGestureTouches");
                 if (it != touch->DynamicProperties().end())
                 {
                     str << ", " << to_string(fiftythree::core::any_cast<int>(it->second));
