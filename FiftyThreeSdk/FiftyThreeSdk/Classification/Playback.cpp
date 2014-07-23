@@ -6,15 +6,14 @@
 //
 
 #include <boost/algorithm/string.hpp>
-#include <boost/lexical_cast.hpp>
 
 #include "Core/Touch/Touch.h"
 #include "FiftyThreeSdk/Classification/Playback.h"
 
 using namespace boost::algorithm;
 using namespace fiftythree::core;
-using boost::lexical_cast;
 using fiftythree::core::make_shared;
+using std::to_string;
 
 namespace
 {
@@ -54,15 +53,15 @@ PlaybackSequence::PlaybackSequence(std::istream & str)
             break;
         }
 
-        int    index = lexical_cast<int>(row[0]);
-        double timestamp = lexical_cast<double>(row[1]);
-        int    type = lexical_cast<int>(row[2]);
+        int    index = std::stoi(row[0]);
+        double timestamp = std::stod(row[1]);
+        int    type = std::stoi(row[2]);
 
         if (index != previousIndex)
         {
             if (type == (size_t) PlaybackEntryType::PenEvent)
             {
-                int penEventType =lexical_cast<int>(row[3]);
+                int penEventType =std::stoi(row[3]);
                 PenEvent pe;
 
                 pe._type      = static_cast<PenEventType>(penEventType);
@@ -79,11 +78,11 @@ PlaybackSequence::PlaybackSequence(std::istream & str)
 
         if (type == (size_t) PlaybackEntryType::TouchesChanged)
         {
-            TouchId touchId  = static_cast<TouchId>(lexical_cast<int>(row[3]));
-            TouchPhase phase = static_cast<TouchPhase>(lexical_cast<int>(row[4]));
+            TouchId touchId  = static_cast<TouchId>(std::stoi(row[3]));
+            TouchPhase phase = static_cast<TouchPhase>(std::stoi(row[4]));
 
-            float x = lexical_cast<float>(row[5]);
-            float y = lexical_cast<float>(row[6]);
+            float x = std::stof(row[5]);
+            float y = std::stof(row[6]);
 
             Eigen::Vector2f z(x,y);
             core::InputSample sample(z, z, timestamp);
@@ -92,14 +91,14 @@ PlaybackSequence::PlaybackSequence(std::istream & str)
 
             if (row.size() >= 8)
             {
-                float r = lexical_cast<float>(row[7]);
+                float r = std::stof(row[7]);
                 sample.SetTouchRadius(r);
             }
 
             // optional...
             if (row.size() >= 9)
             {
-                int v = lexical_cast<int>(row[8]);
+                int v = std::stoi(row[8]);
                 touch->DynamicProperties()["prviewControllerGestureTouches"] = fiftythree::core::any(v);
             }
 
@@ -148,7 +147,7 @@ void PlaybackSequence::Write(std::ostream & str)
                 boost::unordered_map<std::string, fiftythree::core::any>::const_iterator it = touch->DynamicProperties().find("prviewControllerGestureTouches");
                 if (it != touch->DynamicProperties().end())
                 {
-                    str << ", " << boost::lexical_cast<std::string>(fiftythree::core::any_cast<int>(it->second));
+                    str << ", " << to_string(fiftythree::core::any_cast<int>(it->second));
                 }
 
                 str << std::endl;
