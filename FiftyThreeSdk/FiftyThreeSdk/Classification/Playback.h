@@ -7,9 +7,9 @@
 
 #pragma once
 
-#include <boost/any.hpp>
 #include <tuple>
 
+#include "Core/Any.h"
 #include "Core/Enum.h"
 #include "Core/Memory.h"
 #include "Core/Touch/Touch.h"
@@ -39,7 +39,7 @@ struct PlaybackEntry
         {
             core::Touch::Ptr copyOfTouch = core::Touch::New(touch->Id(), touch->Phase(), touch->CurrentSample());
 
-            std::string k; boost::any v;
+            std::string k; fiftythree::core::any v;
 
             for (const auto & pair : touch->DynamicProperties())
             {

@@ -5,9 +5,9 @@
 //  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
 
-#include <boost/any.hpp>
 #include <vector>
 
+#include "Core/Any.h"
 #include "Core/Memory.h"
 #include "Core/Touch/Touch.h"
 #include "Core/Touch/TouchTracker.h"
@@ -399,11 +399,11 @@ void TouchLogger::TouchesChanged(const std::set<core::Touch::Ptr> & touches)
 
                             if (_allCancelledFlag)
                             {
-                                touch->DynamicProperties()[kClassifierUseCancelledTouch] = boost::any(false);
+                                touch->DynamicProperties()[kClassifierUseCancelledTouch] = fiftythree::core::any(false);
                             }
                             else
                             {
-                                touch->DynamicProperties()[kClassifierUseCancelledTouch] = boost::any(true);
+                                touch->DynamicProperties()[kClassifierUseCancelledTouch] = fiftythree::core::any(true);
                             }
 
                             LogEndedTouch(touch->Id());

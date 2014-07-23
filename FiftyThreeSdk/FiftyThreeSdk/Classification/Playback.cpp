@@ -100,7 +100,7 @@ PlaybackSequence::PlaybackSequence(std::istream & str)
             if (row.size() >= 9)
             {
                 int v = lexical_cast<int>(row[8]);
-                touch->DynamicProperties()["prviewControllerGestureTouches"] = boost::any(v);
+                touch->DynamicProperties()["prviewControllerGestureTouches"] = fiftythree::core::any(v);
             }
 
             _playbackEntries.back()->_touches.insert(touch);
@@ -145,10 +145,10 @@ void PlaybackSequence::Write(std::ostream & str)
                 }
 
                 // optional...
-                boost::unordered_map<std::string, boost::any>::const_iterator it = touch->DynamicProperties().find("prviewControllerGestureTouches");
+                boost::unordered_map<std::string, fiftythree::core::any>::const_iterator it = touch->DynamicProperties().find("prviewControllerGestureTouches");
                 if (it != touch->DynamicProperties().end())
                 {
-                    str << ", " << boost::lexical_cast<std::string>(boost::any_cast<int>(it->second));
+                    str << ", " << boost::lexical_cast<std::string>(fiftythree::core::any_cast<int>(it->second));
                 }
 
                 str << std::endl;
