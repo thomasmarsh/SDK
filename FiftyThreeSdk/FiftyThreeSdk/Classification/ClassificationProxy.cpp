@@ -442,7 +442,7 @@ TouchClassification TouchClassificationProxy::ClassifyForGesture(TouchId touch0,
                     bool t6 = dt > 0.05 && L > 9.0 && maxTravelOverL > 0.95 && numSamples >= 3;
                     bool t7 = dt > 0.04 && L > 11.0 && maxTravelOverL > 0.95 && numSamples >= 4;
 
-                    return  (t0 || t1 || t2 || t3 || t4 || t5 || t6 || t7) ?TouchClassification::Finger : TouchClassification::Unknown;
+                    return (t0 || t1 || t2 || t3 || t4 || t5 || t6 || t7) ?TouchClassification::Finger : TouchClassification::Unknown;
 
                     break;
                 }

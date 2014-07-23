@@ -75,7 +75,7 @@ using namespace fiftythree::sdk;
         break;
         case TouchClassification::Palm:
         {
-            return  FTTouchClassificationPalm;
+            return FTTouchClassificationPalm;
         }
         break;
         case TouchClassification::Pen:

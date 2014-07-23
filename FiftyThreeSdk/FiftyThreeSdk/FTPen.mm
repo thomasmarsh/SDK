@@ -649,7 +649,7 @@ NSString * const kFTPenHasListenerPropertyName = @"hasListener";
     // Example modelNumber: 53PA02
     NSString *modelNumber = self.modelNumber;
     NSString *metalModelNumberPrefix = @"53PA";
-    return  @([modelNumber hasPrefix:metalModelNumberPrefix]);
+    return @([modelNumber hasPrefix:metalModelNumberPrefix]);
 }
 
 @end

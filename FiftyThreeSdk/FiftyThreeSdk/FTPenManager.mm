@@ -1701,7 +1701,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
     if (bytes[0] == 0x0 && bytes[1] == 0x0 && bytes[2] == 0x0 && bytes[3] == 0x0)
     {
-        return  0x2;
+        return 0x2;
     }
     else
     {
@@ -2547,7 +2547,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 // doesn't support the firmware upgrades of Pencil.
 - (BOOL)canInvokePaperToUpdatePencilFirmware
 {
-    return  [[UIApplication sharedApplication] canOpenURL:self.pencilFirmwareUpgradeURL];
+    return [[UIApplication sharedApplication] canOpenURL:self.pencilFirmwareUpgradeURL];
 }
 
 - (BOOL)invokePaperToUpdatePencilFirmware:(NSString *)source

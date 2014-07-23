@@ -53,7 +53,7 @@ public:
 
     T ValueAt(float t) const
     {
-        return  _a * (t * t * t)    +
+        return _a * (t * t * t)    +
         _b * (t * t) +
         _c * t +
         _d;
@@ -61,7 +61,7 @@ public:
 
     T FirstDerivativeAt(float t) const
     {
-        return  3.0f * _a * t * t +
+        return 3.0f * _a * t * t +
                 2.0f * _b * t +
                 1.0f * _c;
     }
@@ -69,7 +69,7 @@ public:
     T SecondDerivativeAt(float t) const
     {
 
-        return  6.0f * _a * t +
+        return 6.0f * _a * t +
                 2.0f * _b;
     }
 
