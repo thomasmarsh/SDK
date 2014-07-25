@@ -25,12 +25,6 @@ namespace
     static LogLevelInitializer sInitializer;
 }
 
-std::string DescriptionString(NSObject *object)
-{
-    NSString *description = object.description;
-    return description ? std::string(description.UTF8String).c_str() : "";
-}
-
 @implementation FTLog
 
 + (FTLogLevel)logLevel
