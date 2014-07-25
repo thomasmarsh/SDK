@@ -56,7 +56,7 @@ using namespace fiftythree::core;
 
 - (void)peripheralDidUpdateName:(CBPeripheral *)peripheral
 {
-    MLOG_INFO(FTLogSDK, "Peripheral did update name: %s", DESC(peripheral.name));
+    MLOG_INFO(FTLogSDK, "Peripheral did update name: %s", ObjcDescription(peripheral.name));
 
     for (FTServiceClient *serviceClient in self.serviceClients)
     {
@@ -118,7 +118,7 @@ using namespace fiftythree::core;
              error:(NSError *)error
 {
     MLOG_INFO(FTLogSDK, "Peripheral did discover included services for service: %s",
-              DESC(FTNameForServiceUUID(service.UUID)));
+              ObjcDescription(FTNameForServiceUUID(service.UUID)));
 
     for (FTServiceClient *serviceClient in self.serviceClients)
     {
@@ -187,7 +187,7 @@ using namespace fiftythree::core;
              error:(NSError *)error
 {
     MLOG_INFO(FTLogSDK, "Peripheral did discover descriptors for characteristic: %s",
-              DESC(FTNameForServiceUUID(characteristic.UUID)));
+              ObjcDescription(FTNameForServiceUUID(characteristic.UUID)));
 
     for (FTServiceClient *serviceClient in self.serviceClients)
     {

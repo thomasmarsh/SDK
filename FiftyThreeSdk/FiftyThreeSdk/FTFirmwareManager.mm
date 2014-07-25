@@ -99,9 +99,9 @@ static NSString *applicationDocumentsDirectory()
                                 else
                                 {
                                     MLOG_INFO(FTLogSDKVerbose, "Got response %s status %ld with error %s.\n",
-                                              DESC(response),
+                                              ObjcDescription(response),
                                               (long)httpResponse.statusCode,
-                                              DESC(error));
+                                              ObjcDescription(error));
                                     handler(nil);
                                 }
                             });

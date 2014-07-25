@@ -448,7 +448,7 @@ NSString * const kFTPenHasListenerPropertyName = @"hasListener";
 
 - (void)penServiceClient:(FTPenServiceClient *)penServiceClient didEncounterError:(NSError *)error
 {
-    MLOG_ERROR(FTLogSDK, "Pen did encounter error: \"%s\"", DESC(error.localizedDescription));
+    MLOG_ERROR(FTLogSDK, "Pen did encounter error: \"%s\"", ObjcDescription(error.localizedDescription));
 
     [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenDidEncounterErrorNotificationName
                                                         object:self];

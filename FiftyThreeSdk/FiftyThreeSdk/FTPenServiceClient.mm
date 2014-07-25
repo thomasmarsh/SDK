@@ -368,7 +368,7 @@ using namespace fiftythree::core;
 {
     if (error || service.characteristics.count == 0)
     {
-        MLOG_ERROR(FTLogSDK, "Error discovering characteristics: %s", DESC(error.localizedDescription));
+        MLOG_ERROR(FTLogSDK, "Error discovering characteristics: %s", ObjcDescription(error.localizedDescription));
 
         // TODO: Report failed state
         return;
@@ -493,8 +493,8 @@ using namespace fiftythree::core;
         if ([FTPenServiceUUIDs nameForUUID:characteristic.UUID])
         {
             MLOG_ERROR(FTLogSDK, "Error updating value for characteristic: %s error: %s.",
-                       DESC([FTPenServiceUUIDs nameForUUID:characteristic.UUID]),
-                       DESC(error.localizedDescription));
+                       ObjcDescription([FTPenServiceUUIDs nameForUUID:characteristic.UUID]),
+                       ObjcDescription(error.localizedDescription));
 
             // TODO: Report failed state
         }
@@ -659,7 +659,7 @@ using namespace fiftythree::core;
 {
     if (error)
     {
-        MLOG_ERROR(FTLogSDK, "Error changing notification state: %s", DESC(error.localizedDescription));
+        MLOG_ERROR(FTLogSDK, "Error changing notification state: %s", ObjcDescription(error.localizedDescription));
 
         // TODO: Report failed state
         return;
@@ -706,7 +706,7 @@ using namespace fiftythree::core;
         if (error)
         {
             MLOG_ERROR(FTLogSDK, "Failed to write CentralId characteristic: %s",
-                       DESC(error.localizedDescription));
+                       ObjcDescription(error.localizedDescription));
             [self.delegate penServiceClientDidFailToWriteCentralId:self];
         }
         else
@@ -719,7 +719,7 @@ using namespace fiftythree::core;
         if (error)
         {
             MLOG_ERROR(FTLogSDK, "Failed to write HasListener characteristic: %s",
-                       DESC(error.localizedDescription));
+                       ObjcDescription(error.localizedDescription));
         }
         else
         {

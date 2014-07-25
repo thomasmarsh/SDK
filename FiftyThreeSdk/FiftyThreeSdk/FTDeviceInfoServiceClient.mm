@@ -213,8 +213,8 @@ using namespace fiftythree::core;
         if ([FTDeviceInfoServiceUUIDs nameForUUID:characteristic.UUID])
         {
             MLOG_ERROR(FTLogSDK, "Error updating value for characteristic: %s error: %s.",
-                       DESC([FTPenServiceUUIDs nameForUUID:characteristic.UUID]),
-                       DESC(error.localizedDescription));
+                       ObjcDescription([FTPenServiceUUIDs nameForUUID:characteristic.UUID]),
+                       ObjcDescription(error.localizedDescription));
             // TODO: Report failed state
         }
         return;

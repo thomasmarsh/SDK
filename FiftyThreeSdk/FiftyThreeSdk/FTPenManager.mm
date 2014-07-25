@@ -701,8 +701,8 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
             self.pen.softwareRevision &&
             !self.updateManager)
         {
-            MLOG_INFO(FTLogSDK, "Factory firmware version: %s", DESC(self.pen.firmwareRevision));
-            MLOG_INFO(FTLogSDK, "Upgrade firmware version: %s", DESC(self.pen.softwareRevision));
+            MLOG_INFO(FTLogSDK, "Factory firmware version: %s", ObjcDescription(self.pen.firmwareRevision));
+            MLOG_INFO(FTLogSDK, "Upgrade firmware version: %s", ObjcDescription(self.pen.softwareRevision));
 
             self.updateManager = [[TIUpdateManager alloc] initWithPeripheral:self.pen.peripheral
                                                                     delegate:self];
@@ -1381,7 +1381,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     self.stateMachine.initialState = waitingForCentralManagerToPowerOnState;
 
     MLOG_INFO(FTLogSDK, "Activating state machine with initial state: %s",
-              DESC(self.stateMachine.initialState.name));
+              ObjcDescription(self.stateMachine.initialState.name));
     [self.stateMachine activate];
 
     [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenManagerDidUpdateStateNotificationName
@@ -1394,12 +1394,12 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
 - (void)stateMachineDidChangeState:(NSNotification *)notification
 {
-    MLOG_INFO(FTLogSDK, "STATE CHANGED: %s", DESC(self.stateMachine.currentState.name));
+    MLOG_INFO(FTLogSDK, "STATE CHANGED: %s", ObjcDescription(self.stateMachine.currentState.name));
 }
 
 - (void)stateMachineStateTimeoutDidExpire:(NSNotificationCenter *)notification
 {
-    MLOG_INFO(FTLogSDK, "STATE TIMEOUT EXPIRED: %s", DESC(self.stateMachine.currentState.name));
+    MLOG_INFO(FTLogSDK, "STATE TIMEOUT EXPIRED: %s", ObjcDescription(self.stateMachine.currentState.name));
 }
 
 - (void)fireStateMachineEvent:(NSString *)eventName
@@ -1408,8 +1408,8 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     if (![self.stateMachine fireEvent:eventName error:&error])
     {
         MLOG_ERROR(FTLogSDK, "Failed to fire state machine event (%s): %s",
-                   DESC(eventName),
-                   DESC(error.localizedDescription));
+                   ObjcDescription(eventName),
+                   ObjcDescription(error.localizedDescription));
     }
 }
 
@@ -1755,7 +1755,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
                                                                    requireCentralIdMatch:YES];
 
     MLOG_INFO(FTLogSDK, "Discovered peripheral with name: \"%s\" PotentialCentralId: %x CentralId: %x",
-              DESC(peripheral.name),
+              ObjcDescription(peripheral.name),
               (unsigned int)[self centralIdFromPeripheralId:peripheral.identifier],
               (unsigned int)[self peripheralAdvertisementCentralId:advertisementData]);
 
@@ -1851,8 +1851,8 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
                  error:(NSError *)error
 {
     MLOG_ERROR(FTLogSDK, "Failed to connect to peripheral: %s. (%s).",
-               DESC(peripheral),
-               DESC(error.localizedDescription));
+               ObjcDescription(peripheral),
+               ObjcDescription(error.localizedDescription));
 
     [self handleError];
 }
@@ -1887,7 +1887,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
         if (error)
         {
             MLOG_INFO(FTLogSDK, "Disconnected peripheral with error: %s",
-                      DESC(error.localizedDescription));
+                      ObjcDescription(error.localizedDescription));
 
             if ([error.localizedDescription isEqualToString: @"The connection has timed out unexpectedly."])
             {
