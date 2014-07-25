@@ -68,7 +68,7 @@ The pairing UI should now appear in your view.  Pressing the control with your P
 Once per frame, you will receive a collection of all the touches whose classification has changed that you'll need to process e.g.,
 
 ```
-- (void)classificationsDidChangeForTouches:(NSSet *)touches;
+- (void)classificationsDidChangeForTouches:(NSSet *)touches
 {
     for (FTTouchClassificationInfo *info in touches)
     {
