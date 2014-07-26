@@ -5,12 +5,17 @@
 //  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
 
-#include <boost/algorithm/string.hpp>
+//
+//  Playback.cpp
+//  FiftyThreeSdk
+//
+//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
+//
 
+#include "Core/StringUtils.h"
 #include "Core/Touch/Touch.h"
 #include "FiftyThreeSdk/Classification/Playback.h"
 
-using namespace boost::algorithm;
 using namespace fiftythree::core;
 using fiftythree::core::make_shared;
 using std::to_string;
@@ -22,12 +27,11 @@ std::vector<std::string> CSVgetNextLineAndSplitIntoTokens(std::istream & str)
     std::string line;
     std::getline(str,line);
 
-    std::vector<std::string> parts;
-    boost::algorithm::split(parts, line, boost::is_any_of(","));
+    auto parts = Split(line, ',');
 
-    for (std::string & part :  parts)
+    for (auto & part :  parts)
     {
-        trim(part);
+        part = Trim(part);
     }
     return parts;
 }

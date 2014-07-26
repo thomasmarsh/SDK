@@ -5,14 +5,13 @@
 //  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
 
-#include <boost/algorithm/string.hpp>
 #include <iostream>
 #include <string>
 #include <tuple>
 
+#include "Core/StringUtils.h"
 #include "FiftyThreeSdk/Classification/Performance.h"
 
-using namespace boost::algorithm;
 using fiftythree::core::TouchClassification;
 using std::ignore;
 using std::string;
@@ -25,12 +24,11 @@ vector<string> CSVgetNextLineAndSplitIntoTokens(std::istream & str)
     string line;
     std::getline(str,line);
 
-    vector<string> parts;
-    boost::algorithm::split(parts, line, boost::is_any_of(","));
+    auto parts = fiftythree::core::Split(line, ',');
 
-    for (string & part :  parts)
+    for (auto & part :  parts)
     {
-        trim(part);
+        part = fiftythree::core::Trim(part);
     }
     return parts;
 }
