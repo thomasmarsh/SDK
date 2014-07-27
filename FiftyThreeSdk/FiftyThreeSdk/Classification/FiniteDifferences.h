@@ -7,10 +7,6 @@
 
 #pragma once
 
-// Including this makes LLVM *very* angry.
-// All we need is a floating-point factorial, so just implement in here
-//#include <boost/math/special_functions/factorials.hpp>
-
 #include <type_traits>
 
 #include "Core/Eigen.h"
