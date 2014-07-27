@@ -7,9 +7,7 @@
 
 #pragma once
 
-#include <boost/container/flat_map.hpp>
-#include <boost/container/flat_set.hpp>
-
+#include "Core/FlatContainers.h"
 #include "Core/Touch/Touch.h"
 #include "FiftyThreeSdk/Classification/CommonDeclarations.h"
 #include "FiftyThreeSdk/Classification/EigenLAB.h"
