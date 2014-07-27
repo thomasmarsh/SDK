@@ -1,3 +1,9 @@
+//
+//  TrivialPointSprite.fsh
+//  TestApp
+//
+//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
+//
 /*
 File: color.fsh
 Abstract: A fragment shader that draws points with assigned color and

@@ -2,7 +2,7 @@
 //  FTServiceClient.m
 //  FiftyThreeSdk
 //
-//  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
+//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
 
 #import "FTServiceClient.h"

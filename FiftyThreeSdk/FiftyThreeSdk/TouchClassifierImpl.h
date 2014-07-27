@@ -7,12 +7,12 @@
 
 #pragma once
 
-#include "Core/Optional.h"
 #include <vector>
 
 #include "Core/Enum.h"
 #include "Core/Event.hpp"
 #include "Core/Memory.h"
+#include "Core/Optional.h"
 #include "Core/Touch/Touch.h"
 #include "FiftyThreeSdk/Classification/Classifier.h"
 #include "FiftyThreeSdk/TouchClassifier.h"

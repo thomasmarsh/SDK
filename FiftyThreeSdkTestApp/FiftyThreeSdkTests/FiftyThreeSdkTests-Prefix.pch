@@ -1,10 +1,14 @@
 //
-// Prefix header for all source files of the 'FiftyThreeSdkTests' target in the 'FiftyThreeSdkTests' project
+//  FiftyThreeSdkTests-Prefix.pch
+//  FiftyThreeSdkTestApp
+//
+//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
 
 #ifdef __OBJC__
-    #import <UIKit/UIKit.h>
-    #import <Foundation/Foundation.h>
+#import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
+
 #endif
 
 #ifndef BEGIN_COMMON_NAMESPACE

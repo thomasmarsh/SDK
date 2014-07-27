@@ -58,7 +58,7 @@ class Analyzer:
         self.event_count = 0
         self.last_pen = None
         self.missing_count = 0
-        
+
     def log_delta(self, pen):
         if pen.state == self.last_pen.state:
             self.missing_count += 1
@@ -87,7 +87,7 @@ class Analyzer:
                 self.process_pen(pen)
 
         self.print_summary()
-        
+
     def plot(self, x):
         import matplotlib.pyplot as plt
         import numpy as np
@@ -97,7 +97,7 @@ class Analyzer:
         center = (bins[:-1]+bins[1:])/2
         plt.bar(center, hist, align = 'center', width = width)
         plt.show()
-        
+
     def print_summary(self):
         print "\nSUMMARY"
         print "========================="
@@ -114,13 +114,13 @@ class Analyzer:
             if len(self.deltas[i]) != 0:
                 print "delta min = %f" % (numpy.min(self.deltas[i]))
                 print "delta max = %f" % (numpy.max(self.deltas[i]))
-                
+
                 print "delta average = %f" % (numpy.average(self.deltas[i]))
                 print "delta stddev = %f" % (numpy.std(self.deltas[i]))
                 print "delta var = %f" % (numpy.var(self.deltas[i]))
-                
+
             self.plot(self.deltas[i])
-        
+
 def main():
     parser = argparse.ArgumentParser(description='Process pen and touch logs.')
     parser.add_argument('file',

@@ -1,9 +1,8 @@
 //
 //  FiftyThreeSimpleSampleAppTests.m
-//  FiftyThreeSimpleSampleAppTests
+//  FiftyThreeSimpleSampleApp
 //
-//  Created by Peter Sibley on 3/31/14.
-//  Copyright (c) 2014 Peter Sibley. All rights reserved.
+//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
 
 #import <XCTest/XCTest.h>

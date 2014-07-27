@@ -2,13 +2,14 @@
 //  FTTouchTests.mm
 //  FiftyThreeSdkTestApp
 //
-//  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
+//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
 
-#import "FTTouchTests.h"
-#include "Common/TouchManager.h"
 #include "Common/RandomNumberGenerator.h"
+#include "Common/TouchManager.h"
 #include "FiftyThreeSdk/PenEvent.h"
+
+#import "FTTouchTests.h"
 
 using namespace fiftythree::common;
 using namespace fiftythree::sdk;

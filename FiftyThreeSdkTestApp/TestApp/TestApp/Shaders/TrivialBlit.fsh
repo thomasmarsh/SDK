@@ -1,3 +1,9 @@
+//
+//  TrivialBlit.fsh
+//  TestApp
+//
+//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
+//
 
 uniform sampler2D texture;
 varying highp vec2 tex0;

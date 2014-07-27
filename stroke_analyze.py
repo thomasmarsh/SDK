@@ -57,13 +57,13 @@ class TouchEvent:
         values = data.split(',')
         self.id = int(values[0])
         self.phase = int(values[1])
-        
+
         self.window_x = float(values[2])
         self.window_y = float(values[3])
         self.x = float(values[4])
         self.y = float(values[5])
         self.timestamp = float(values[6])
-        
+
     def __repr__(self):
         if self.phase == TOUCH_BEGAN:
             phase = "BEGAN"
@@ -77,7 +77,7 @@ class TouchEvent:
             phase = "CANCELLED"
         else:
             phase = "UNKNOWN"
-            
+
         return "touch phase=%s id=%d time=%f" % (phase, self.id, self.timestamp)
 
 class Analyzer:
@@ -89,14 +89,14 @@ class Analyzer:
         self.missing_down = 0
         self.last_pen = None
         self.last_touch = None
-        
+
     def log_delta(self):
         assert((self.last_pen.state == PEN_UP and self.last_touch.phase == TOUCH_ENDED)
                or (self.last_pen.state == PEN_DOWN and self.last_touch.phase == TOUCH_BEGAN))
-        
+
         delta = self.last_pen.timestamp - self.last_touch.timestamp
         self.deltas[self.last_pen.state].append(delta)
-            
+
         if log_deltas:
             print "pen_delta (%s, %s) %f" % (self.last_pen.tip_str(), self.last_pen.state_str(), delta)
 
@@ -109,7 +109,7 @@ class Analyzer:
             self.missing_down += 1
             self.missing_up += 1
             return
-        
+
         if (self.last_pen.state == PEN_DOWN
             and (self.last_touch is None
                  or self.last_pen.timestamp > self.last_touch.timestamp)):
@@ -121,7 +121,7 @@ class Analyzer:
 
     def touch_ended(self, touch):
         self.stroke_count += 1
-            
+
         if (self.last_pen is not None):
             if (self.last_pen.state == PEN_UP):
                 self.last_touch = touch
@@ -138,13 +138,13 @@ class Analyzer:
             self.touch_began(touch)
         elif touch.phase == TOUCH_ENDED or touch.phase == TOUCH_CANCELLED:
             self.touch_ended(touch)
-            
+
         self.last_touch = touch
 
     def process_pen(self, pen):
         if log_events:
             print pen
-    
+
         if (self.last_pen is not None and pen.state == self.last_pen.state):
             if pen.state == PEN_UP:
                 self.missing_down += 1
@@ -179,7 +179,7 @@ class Analyzer:
             print "WARNING: pen did not end UP"
 
         self.print_summary()
-        
+
     def plot(self, x):
         import matplotlib.pyplot as plt
         import numpy as np
@@ -189,7 +189,7 @@ class Analyzer:
         center = (bins[:-1]+bins[1:])/2
         plt.bar(center, hist, align = 'center', width = width)
         plt.show()
-        
+
     def print_summary(self):
         print "\nSUMMARY"
         print "========================="
@@ -198,7 +198,7 @@ class Analyzer:
         print "missing up = %d" % (self.missing_up)
 
         print "percent missing = %f" % (float(self.missing_down) / self.stroke_count * 100)
-    
+
         for i in [ PEN_DOWN, PEN_UP ]:
             print
             if i == PEN_UP:
@@ -209,18 +209,18 @@ class Analyzer:
             if len(self.deltas[i]) != 0:
                 print "delta min = %f" % (numpy.min(self.deltas[i]))
                 print "delta max = %f" % (numpy.max(self.deltas[i]))
-        
+
                 count_over = len([x for x in self.deltas[i] if x > 0])
                 count_under = len(self.deltas[i]) - count_over
-        
+
                 print "delta %% under 0 = %f (%d/%d)" % (float(count_under) / len(self.deltas[i]) * 100, count_under, len(self.deltas[i]))
                 print "delta %% over 0 = %f (%d/%d)" % (float(count_over) / len(self.deltas[i]) * 100, count_over, len(self.deltas[i]))
                 print "delta average = %f" % (numpy.average(self.deltas[i]))
                 print "delta stddev = %f" % (numpy.std(self.deltas[i]))
                 print "delta var = %f" % (numpy.var(self.deltas[i]))
-                
+
                 self.plot(self.deltas[i])
-        
+
 def main():
     parser = argparse.ArgumentParser(description='Process pen and touch logs.')
     parser.add_argument('file',

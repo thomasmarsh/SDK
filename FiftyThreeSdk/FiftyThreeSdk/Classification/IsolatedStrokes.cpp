@@ -298,7 +298,7 @@ void IsolatedStrokesClassifier::MarkEdgeThumbs()
     // TODO:
     //      Perfomance pass.
     //return;
-    
+
     vector<Cluster::Ptr> orderedClusters = _commonData->proxy->ClusterTracker()->FastOrderedClusters();
     vector<Cluster::Ptr> penToPalm       = _commonData->proxy->PenTracker()->CopyInPenToPalmOrder(orderedClusters);
 

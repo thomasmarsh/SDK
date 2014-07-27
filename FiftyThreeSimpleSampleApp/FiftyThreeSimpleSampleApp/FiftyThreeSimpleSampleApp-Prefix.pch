@@ -1,7 +1,8 @@
 //
-//  Prefix header
+//  FiftyThreeSimpleSampleApp-Prefix.pch
+//  FiftyThreeSimpleSampleApp
 //
-//  The contents of this file are implicitly included at the beginning of every source file.
+//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
 
 #import <Availability.h>
@@ -11,6 +12,7 @@
 #endif
 
 #ifdef __OBJC__
-    #import <UIKit/UIKit.h>
-    #import <Foundation/Foundation.h>
+#import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
+
 #endif

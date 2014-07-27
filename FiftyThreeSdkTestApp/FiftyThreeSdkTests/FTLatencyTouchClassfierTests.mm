@@ -2,17 +2,17 @@
 //  FTLatencyTouchClassfierTests.mm
 //  FiftyThreeSdkTestApp
 //
-//  Copyright (c) 2013 FiftyThree, Inc. All rights reserved.
+//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
-
-#import "FTLatencyTouchClassfierTests.h"
-#import "NSFileHandle+readLine.h"
 
 #include "Common/Touch.h"
 #include "FiftyThreeSdk/PenEvent.h"
 
-using namespace fiftythree::sdk;
+#import "FTLatencyTouchClassfierTests.h"
+#import "NSFileHandle+readLine.h"
+
 using namespace fiftythree::common;
+using namespace fiftythree::sdk;
 using std::string;
 
 @implementation FTLatencyTouchClassfierTests

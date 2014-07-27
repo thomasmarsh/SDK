@@ -1,0 +1,10 @@
+1.1
+- Added FTPenBatteryLevelUnknown to FTPenBatteryLevel. FTPenInfo reports FTPenBatteryLevelUnknown until the real status is read off the Pencil.
+- Removed FTPenManager update & penManagerNeedsUpdateDidChange & automaticUpdatesEnabled.
+- Fixed API typo, renamed penManagerFirmwareUpdateIsAvailbleDidChange to penManagerFirmwareUpdateIsAvailableDidChange
+- Update header file notices to refer to FiftyThreeSDK-License.txt
+- Fixed error in FiftyThreeSDK-QuickStart.md
+- Connection improvements
+
+1.0
+Initial release.
