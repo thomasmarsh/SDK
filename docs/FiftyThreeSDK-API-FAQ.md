@@ -73,7 +73,7 @@ If you want to add support for this in your app you'll need to do the following:
 }
 ```
 
-* If your user taps the firmware update button you've show above, you'll need to invoke firmware update. The API we provide allows you to provide callback URLs to your app. You'd need to add these urls to your application's URL Types in your Info.plist. Shown below is the sample code to invoke firmware upgrade.
+* If your user taps the firmware update button you've shown above, you'll need to invoke firmware update. The API we provide allows you to provide callback URLs to your app. You'd need to add these URLs to your application's URL Types in your Info.plist. Shown below is the sample code to invoke firmware upgrade.
 
 ```
 - (void)updateFirmware:(id)sender
