@@ -11,17 +11,17 @@
 
 @class UIEvent;
 
-//  This singleton deals handles event dispatch for
+//  This singleton handles event dispatch for
 //  FiftyThree's classification system. It is used internally by FTApplication
-//  This *does not* touch any blue tooth related functionality it's role is to
-//  process touch data for gesture & classification purposes.
+//  This *does not* touch any Bluetooth-related functionality.  
+//  Its role is to process touch data for gesture & classification purposes.
 //
 @interface FTEventDispatcher : NSObject
 
 //   Only use this from the main thread.
 + (FTEventDispatcher *)sharedInstance;
 
-//  Invoke this pass events to FiftyThree's classification system.
+//  Invoke this to pass events to FiftyThree's classification system.
 //  For example:
 //  [[FTEventDispatcher sharedInstance] sendEvent:event];
 //
