@@ -94,9 +94,9 @@ If you want to add support for this in your app you'll need to do the following:
         }
         else
         {
-            // If Paper isn't installed or is too old to support firmware update we'll direct the user
-            // to FiftyThree's support site. This site walks them through installing Paper and doing
-            // firmware update.
+            // If Paper isn't installed or is too old to support firmware update,
+            // we'll direct the user to FiftyThree's support site. 
+            // This site walks them through installing Paper and doing firmware update.
             NSURL *firmwareUpdateSupportUrl = [FTPenManager sharedInstance].firmwareUpdateSupportLink;
             BOOL result = [[UIApplication sharedApplication] openURL:firmwareUpdateSupportUrl];
             if (!result)
