@@ -13,7 +13,7 @@
 
 // This enum lists all the classification states FTTouchClassifier exposes.
 //
-// Note - we use a place holder state 'UnknownDisconnected' which indicates that
+// Note - we use a placeholder state 'UnknownDisconnected' which indicates that
 //        the touch was processed when the pen wasn't connected via BTLE.
 //
 typedef NS_ENUM(NSInteger, FTTouchClassification)
@@ -21,8 +21,8 @@ typedef NS_ENUM(NSInteger, FTTouchClassification)
     // Whenever the Pen isn't connected we return this default state.
     FTTouchClassificationUnknownDisconnected,
 
-    // Whenever we don't know what the touch is. This can happen if we've not get
-    // gotten any signals from the pen.
+    // Whenever we don't know what the touch is. This can happen if we haven't received
+    // any signals from the pen.
     FTTouchClassificationUnknown,
 
     // Whenever we think the touch is a single finger. This at
@@ -50,13 +50,13 @@ typedef NS_ENUM(NSInteger, FTTouchClassification)
 @protocol FTTouchClassificationsChangedDelegate <NSObject>
 @required
 // touches is a NSSet of FTTouchClassificationInfo objects.
-// Touches may be reclassified after we've gotten more information about
+// touches may be reclassified after we've gotten more information from
 // the stylus.
 - (void)classificationsDidChangeForTouches:(NSSet *)touches;
 
 @end
 
-// This is the main interface for classification related parts of the FiftyThree SDK. The entry point
+// This is the main interface for classification-related parts of the FiftyThree SDK. The entry point
 // is in [FTPenManager sharedInstance].classifier.
 @interface FTTouchClassifier : NSObject
 
@@ -65,7 +65,7 @@ typedef NS_ENUM(NSInteger, FTTouchClassification)
 
 // Returns true if the touch is currently being tracked and the best classification.
 // If the touch isn't being tracked (for example it was cancelled or you've explicitly removed the touch from
-// classification this will return false.
+// classification) this will return false.
 - (BOOL)classification:(FTTouchClassification *)result forTouch:(UITouch *)touch;
 
 // Returns a unique id for the touch. UIKit will reuse touch pointers, thus
@@ -73,9 +73,9 @@ typedef NS_ENUM(NSInteger, FTTouchClassification)
 - (NSInteger)idForTouch:(UITouch *)touch;
 
 // Indiciates that a touch should no longer be considered a candidate for pen
-// classification. This case be useful if you're implementing custom GRs.
+// classification. This can be useful if you're implementing custom GRs.
 // For example Paper's loupe control uses this to allow manipulation of the loupe and
-// smudging with one finger.
+// blending with one finger.
 - (void)removeTouchFromClassification:(UITouch *)touch;
 
 @end
