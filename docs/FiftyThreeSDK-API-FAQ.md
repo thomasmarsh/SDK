@@ -31,7 +31,7 @@ Our pairing model doesn't use the BTLE bonded/encrypted pair. Instead we allow t
 
 #####Why does ```FTPenManager``` have all this firmware update state?
 
-We've improved the Pencil connection experience and this required updating Pencil firmware. Since the UI for pencil firmware update is rather involved, we provided an API to open Paper by FiftyThree and invoke the Pencil firmware upgrade path there. We use ```x-callback-urls``` to do inter-app communication. We provide a minimal set of functions in the SDK to check if newer firmware can be installed and to invoke Paper with the right parameters to install it. Typically, you'd add a button in an settings table view.
+We've improved the Pencil connection experience and this required updating Pencil firmware. Since the UI for pencil firmware update is rather involved, we provided an API to open Paper by FiftyThree and invoke the Pencil firmware upgrade path there. We use ```x-callback-urls``` to do inter-app communication. We provide a minimal set of functions in the SDK to check if newer firmware can be installed, if the proper version of Paper is installed, and to invoke Paper with the right parameters to install it.Typically, you'd add a button in an settings table view.
 
 If you want to add support for this in your app you'll need to do the following:
 
@@ -41,7 +41,7 @@ If you want to add support for this in your app you'll need to do the following:
 [FTPenManager sharedInstance].shouldCheckForFirmwareUpdates = YES;
 ```
 
-* Implement the optional method in the ```FTPenManagerDelegate``` protocol ```penManagerFirmwareUpdateIsAvailableDidChange```. In this method you want to check if there's new firmware *and* if Paper is installed. For instance.
+* Implement the optional method in the ```FTPenManagerDelegate``` protocol ```penManagerFirmwareUpdateIsAvailableDidChange```. In this method you want to check if there's new firmware *and* if the proper Paper is installed (Paper version 1.6.3 or later is required to perform the firmware update.) For instance:
 
 ```
 - (void)penManagerFirmwareUpdateIsAvailableDidChange
