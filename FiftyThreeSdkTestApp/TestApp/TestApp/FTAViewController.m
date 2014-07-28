@@ -46,11 +46,11 @@
     view.drawableDepthFormat = GLKViewDrawableDepthFormatNone;
     self.drawer.view = view;
 
-    // We add a number of bar buttons for testing.
+    // We add a number of bar buttons for testing
     // (1) A button to tear down FTPenManager
     // (2) A button to startup FTPenManager
-    // (3) A Button to clear the page of ink.
-    // (4) A button to trigger firmware update if needed.
+    // (3) A Button to clear the page of ink
+    // (4) A button to trigger firmware update if needed
     // (5) A button to show a popover with Pen status. This uses the FTPenInformation API to
     //     populate a table view. See FTASettingsViewController.
 
@@ -92,7 +92,7 @@
     [self.view addSubview:self.bar];
     self.isPencilEnabled = NO;
 
-    // Defaults to 30, we ant to catch any performance problems so we crank it up.
+    // Defaults to 30, we want to catch any performance problems so we crank it up
     self.preferredFramesPerSecond = 60;
 
     _strokeColors =
@@ -105,8 +105,8 @@
       @(FTTouchClassificationPalm) : [UIColor colorWithRed:0.1 green:0.2 blue:0.1 alpha:0.5]
     };
 
-    // Multi touch is required for processing palm and pen touches.
-    // See handleTouches below.
+    // Multitouch is required for processing palm and pen touches
+    // See handleTouches below
     [self.view setMultipleTouchEnabled:YES];
     [self.view setUserInteractionEnabled:YES];
     [self.view setExclusiveTouch:NO];
@@ -126,7 +126,7 @@
             // Paper can return to your app. The application name is shown in a button labelled:
             // Back To {Application Name}
             NSString *applicationName = @"SDK Test App";
-            // In the plist we register sdktestapp as an url type. See The app delegate.
+            // In the plist we register sdktestapp as an url type. See the app delegate.
             NSURL *successUrl = [NSURL URLWithString:@"sdktestapp://x-callback-url/success"];
             NSURL *cancelUrl = [NSURL URLWithString:@"sdktestapp://x-callback-url/cancel"];
             NSURL *errorUrl = [NSURL URLWithString:@"sdktestapp://x-callback-url/error"];
