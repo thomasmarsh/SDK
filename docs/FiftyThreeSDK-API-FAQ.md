@@ -31,7 +31,7 @@ Our pairing model doesn't use the BTLE bonded/encrypted pair. Instead we allow t
 
 #####Why does ```FTPenManager``` have all this firmware update state?
 
-We've improved the Pencil connection experience and this required updating Pencil firmware. Since the UI for pencil firmware update is rather involved we provided an API to open Paper by FiftyThree and invoke the Pencil firmware upgrade. We use ```x-callback-urls``` to do inter-app communication. We provide a minimal set of functions in the SDK to check if newer firmware can be installed and to invoke Paper with the right parameters to install it. Typically, you'd add a button in an settings table view.
+We've improved the Pencil connection experience and this required updating Pencil firmware. Since the UI for pencil firmware update is rather involved, we provided an API to open Paper by FiftyThree and invoke the Pencil firmware upgrade path there. We use ```x-callback-urls``` to do inter-app communication. We provide a minimal set of functions in the SDK to check if newer firmware can be installed and to invoke Paper with the right parameters to install it. Typically, you'd add a button in an settings table view.
 
 If you want to add support for this in your app you'll need to do the following:
 
