@@ -30,8 +30,8 @@ typedef NS_ENUM(NSInteger, FTPenManagerState)
 
 typedef NS_ENUM(NSInteger, FTPenBatteryLevel)
 {
-    FTPenBatteryLevelUnknown,           // This is reported initially. It can take up to 20 seconds to read
-                                        // the battery level off the stylus.
+    FTPenBatteryLevelUnknown,           // This is reported initially until the actual battery level can be returned. 
+                                        // It can take up to 20 seconds to read the battery level off the stylus.
     FTPenBatteryLevelHigh,
     FTPenBatteryLevelMediumHigh,
     FTPenBatteryLevelMediumLow,
