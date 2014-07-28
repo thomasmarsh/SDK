@@ -11,9 +11,9 @@
 #import <GLKit/GLKit.h>
 
 // This utility class hides the details of OpenGL rendering & our scene.
-// Here strokeId, is mapped to FTTouchId.
-// This uses very simple pointsprite rendering (like GLPaint sample app) and linear
-// interpolation.
+// Here strokeId is mapped to FTTouchId.
+// This uses very simple PointSprite rendering (like GLPaint sample app)
+// and linear interpolation.
 @interface FTADrawer : NSObject
 - (void)appendCGPoint:(CGPoint)p forStroke:(NSInteger)strokeId;
 - (void)setColor:(UIColor *)c forStroke:(NSInteger)strokeId;
