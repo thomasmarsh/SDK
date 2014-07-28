@@ -50,21 +50,9 @@ If you want to add support for this in your app you'll need to do the following:
 
     if (firmwareUpdateIsAvailable != nil && [firmwareUpdateIsAvailable boolValue])
     {
-        BOOL isPaperInstalled = [FTPenManager sharedInstance].canInvokePaperToUpdatePencilFirmware;
-        if (isPaperInstalled)
-        {
-            self.updateFirmwareButton.enabled = YES; // Assuming you've got a UIButton somewhere in your UIViewController sublcass.
-        }
-        else
-        {
-           // The user needs to install the latest version of Paper to complete the firmware upgrade
-           // You might enable the Update Firmware button, but have it trigger an alert:
-           // "You need to install the latest version of Paper by FiftyThree to upgrade Pencil's firmware"
-           // and include a link to the FiftyThree firmware update support page in the alert
-           // e.g., [FTPenManager sharedInstance].firmwareUpdateSupportLink
-
-        }
-
+        // Note, we always enable the button but if Paper isn't installed that button
+        // will open the support site.
+        self.updateFirmwareButton.enabled = YES;
     }
     else
     {
@@ -103,7 +91,18 @@ If you want to add support for this in your app you'll need to do the following:
             {
                 // If we for some reason couldn't open the url. We might alert to user.
             }
-
+        }
+        else
+        {
+            // If Paper isn't installed or is too old to support firmware update we'll direct the user
+            // to FiftyThree's support site. This site walks them through installing Paper and doing
+            // firmware update.
+            NSURL *firmwareUpdateSupportUrl = [FTPenManager sharedInstance].firmwareUpdateSupportLink;
+            BOOL result = [[UIApplication sharedApplication] openURL:firmwareUpdateSupportUrl];
+            if (!result)
+            {
+                // Very unlikely that opening mobile safari would fail. But you might alert the user here.
+            }
         }
     }
 }
