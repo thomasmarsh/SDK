@@ -20,25 +20,25 @@
 @implementation FTAUtil
 + (GLuint)loadDiscTextureWithSize:(NSUInteger)resolution
 {
-    // make bitmap context
+    // Make bitmap context
     CGColorSpaceRef space = CGColorSpaceCreateDeviceGray();
     CGContextRef context = CGBitmapContextCreate(NULL, resolution, resolution, 8, 1 * resolution, space, (CGBitmapInfo)kCGImageAlphaOnly);
     CGContextSetInterpolationQuality(context, kCGInterpolationHigh);
     CGColorSpaceRelease(space);
 
-    //Clear context
+    // Clear context
     CGContextClearRect(context, CGRectMake(0, 0, resolution, resolution));
     CGContextSetGrayFillColor(context, 1.0, 1.0);
 
-    // Draw circle.
+    // Draw circle
     float halfSize = resolution/2.0;
     CGContextAddArc(context, halfSize, halfSize, halfSize - 0.5f, 0, M_PI * 2, false);
     CGContextFillPath(context);
 
-    // Grab data.
+    // Grab data
     void* data = CGBitmapContextGetData(context);
 
-    // Upload pixel data to GPU texture.
+    // Upload pixel data to GPU texture
     GLuint texture;
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_2D, texture);
@@ -143,32 +143,32 @@
     GLuint vertShader, fragShader;
     NSString *vertShaderPathname, *fragShaderPathname;
 
-    // Uniform etc.. code assumes that shaders have same uniforms and attributes.
+    // Uniform etc... code assumes that shaders have same uniforms and attributes
     GLuint program = 0;
 
     program = glCreateProgram();
 
-    // Create and compile vertex shader.
+    // Create and compile vertex shader
     vertShaderPathname = [[NSBundle mainBundle] pathForResource:shader.shaderName ofType:@"vsh"];
     if (![FTAUtil compileShader:&vertShader type:GL_VERTEX_SHADER file:vertShaderPathname]) {
         NSLog(@"Failed to compile vertex shader");
         return NO;
     }
 
-    // Create and compile fragment shader.
+    // Create and compile fragment shader
     fragShaderPathname = [[NSBundle mainBundle] pathForResource:shader.shaderName ofType:@"fsh"];
     if (![FTAUtil compileShader:&fragShader type:GL_FRAGMENT_SHADER file:fragShaderPathname]) {
         NSLog(@"Failed to compile fragment shader");
         return NO;
     }
 
-    // Attach vertex shader to program.
+    // Attach vertex shader to program
     glAttachShader(program, vertShader);
 
-    // Attach fragment shader to program.
+    // Attach fragment shader to program
     glAttachShader(program, fragShader);
 
-    // Link program.
+    // Link program
     if (![FTAUtil linkProgram:program]) {
         NSLog(@"Failed to link program: %d", program);
 
@@ -197,7 +197,7 @@
         shader.attribute[shader.attributeNames[i]] = shader.attributeLocations[i];
     }
 
-    // Get uniform locations.
+    // Get uniform locations
     shader.uniformLocations = [@[] mutableCopy];
     shader.uniform = [@{} mutableCopy];
     for(int i = 0; i < [shader.uniformNames count]; ++i)
@@ -211,7 +211,7 @@
 
     shader.glProgram = program;
 
-    // Release vertex and fragment shaders.
+    // Release vertex and fragment shaders
     if (vertShader)
     {
         glDetachShader(program, vertShader);
