@@ -58,7 +58,7 @@ extern "C"
     // Returns true if the given FTPenManagerState is a state in which the pen is disconnected:
     //   * FTPenManagerStateDisconnected
     //   * FTPenManagerStateDisconnectedLongPressToUnpair
-    //   * FTPenManagerStateReconnectin
+    //   * FTPenManagerStateReconnecting
     ///
     //  @param state The current state.
     ///
@@ -80,7 +80,7 @@ extern "C"
 @property (nonatomic, readonly) FTPenBatteryLevel batteryLevel;
 // This is nil if we've not yet read the firmware revision.
 @property (nonatomic, readonly) NSString *firmwareRevision;
-// We only recommend using these properties for diagnostics. For example showing a dot in the settings UI
+// We only recommend using these properties for diagnostics. For example, showing a dot in the settings UI
 // to indicate the tip is pressed and show the user that the application is correctly communicating with
 // the pen.
 @property (nonatomic, readonly) BOOL isTipPressed;
@@ -91,7 +91,7 @@ extern "C"
 @protocol FTPenManagerDelegate <NSObject>
 @required
 // Invoked when the state property of PenManager is changed.
-// This typically occures during the connection flow however it
+// This typically occures during the connection flow.  However it
 // can also happen if the battery module is removed from the stylus or
 // Core Bluetooth drops the BTLE connection.
 // See also FTPenManagerStateIsDisconnected & FTPenManagerStateIsConnected
@@ -99,7 +99,7 @@ extern "C"
 
 @optional
 // Invoked when any of the BTLE information is read off the pen. See FTPenInformation.
-// This is also invoted if tip or eraser state is changed.
+// This is also invoked if tip or eraser state is changed.
 - (void)penInformationDidChange;
 
 // See FTPenManager (FirmwareUpdateSupport)
@@ -169,14 +169,14 @@ typedef NS_ENUM(NSInteger, FTPairingUIStyle) {
 // See also penManagerFirmwareUpdateIsAvailableDidChange
 @property (nonatomic, readonly) NSNumber *firmwareUpdateIsAvailable;
 
-// Provides an link to offer some information from our support page about the firmware release notes.
+// Provides a link to the firmware release notes.
 @property (nonatomic, readonly) NSURL *firmwareUpdateReleaseNotesLink;
 
-// Provides an link to offer some information from our support page about the firmware upgrade.
+// Provides a link to the FiftyThree support page on firmware upgrades.
 @property (nonatomic, readonly) NSURL *firmwareUpdateSupportLink;
 
 // Returns NO if you're on an iphone or a device without Paper installed. (Or an older build of Paper that
-// doesn't support the firmware upgrades of Pencil.)
+// doesn't support Pencil firmware upgrades.)
 @property (nonatomic, readonly) BOOL canInvokePaperToUpdatePencilFirmware;
 
 // This invokes Paper via x-callback-urls to upgrade the firmware.
