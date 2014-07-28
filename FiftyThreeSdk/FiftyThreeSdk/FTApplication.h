@@ -15,7 +15,7 @@
 // If you aren't using a custom UIApplication object just alter main.m to inject this class
 // into the event processing pipeline via the 3rd argument to UIApplicationMain.
 //
-// For example if FTAAppDelegate is your app delegate, you'd add #include <FiftyThreeSdk/FiftyThreeSdk.h>
+// For example, if FTAAppDelegate is your app delegate, you'd add #include <FiftyThreeSdk/FiftyThreeSdk.h>
 // then alter main as follows:
 //
 //    @autoreleasepool {
