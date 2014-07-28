@@ -16,7 +16,7 @@ typedef NS_ENUM(NSInteger, FTLogLevel)
     FTLogLevelEnabledVerbose
 };
 
-// This is used by the FiftyThreeSdk for logging connection related states and errors.
+// This is used by the FiftyThreeSdk for logging connection-related states and errors.
 @interface FTLog : NSObject
 // This defaults to FTLogLevelDisabled
 + (FTLogLevel)logLevel;
