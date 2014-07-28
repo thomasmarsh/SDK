@@ -42,7 +42,7 @@ glLabelObjectEXT((type),(object), 0, (label));\
 @end;
 
 @interface FTAUtil : NSObject
-// Loads a opengl texture that has a circle with 100% opacity in a square texture with
+// Loads an OpenGL texture that has a circle with 100% opacity in a square texture with
 // width = height = size.
 + (GLuint)loadDiscTextureWithSize:(NSUInteger)h;
 + (FTAShaderInfo *)loadShader:(FTAShaderInfo *)shader;
