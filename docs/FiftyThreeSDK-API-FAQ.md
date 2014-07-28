@@ -31,7 +31,7 @@ Our pairing model doesn't use the BTLE bonded/encrypted pair. Instead we allow t
 
 #####Why does ```FTPenManager``` have all this firmware update state?
 
-We've improved the Pencil connection experience and this required updating Pencil firmware. Since the UI for pencil firmware update is rather involved, we provided an API to open Paper by FiftyThree and invoke the Pencil firmware upgrade path there. We use ```x-callback-urls``` to do inter-app communication. We provide a minimal set of functions in the SDK to check if newer firmware can be installed, if the proper version of Paper is installed, and to invoke Paper with the right parameters to install it.Typically, you'd add a button in an settings table view.
+We've improved the Pencil connection experience and this required updating Pencil firmware. Since the UI for Pencil firmware update is rather involved, we provided an API to open Paper by FiftyThree and invoke the firmware upgrade path there. ```x-callback-urls``` is used to do inter-app communication. We provide a minimal set of functions in the SDK to check if newer firmware can be installed, if the proper version of Paper is installed, and to invoke Paper with the right parameters to install the firmware. Typically, you'd add a button in a settings table view.
 
 If you want to add support for this in your app you'll need to do the following:
 
@@ -41,7 +41,7 @@ If you want to add support for this in your app you'll need to do the following:
 [FTPenManager sharedInstance].shouldCheckForFirmwareUpdates = YES;
 ```
 
-* Implement the optional method in the ```FTPenManagerDelegate``` protocol ```penManagerFirmwareUpdateIsAvailableDidChange```. In this method you want to check if there's new firmware *and* if the proper Paper is installed (Paper version 1.6.3 or later is required to perform the firmware update.) For instance:
+* Implement the optional method in the ```FTPenManagerDelegate``` protocol ```penManagerFirmwareUpdateIsAvailableDidChange```. In this method you want to check if there's new firmware *and* if the proper version of Paper is installed.  Paper version 1.6.3 or later is required to perform the firmware update, and if either no version or earlier versions are installed,  the ```canInvokePaperToUpdatePencilFirmware``` property will return false.  For instance:
 
 ```
 - (void)penManagerFirmwareUpdateIsAvailableDidChange
@@ -53,14 +53,18 @@ If you want to add support for this in your app you'll need to do the following:
         BOOL isPaperInstalled = [FTPenManager sharedInstance].canInvokePaperToUpdatePencilFirmware;
         if (isPaperInstalled)
         {
-            self.updateFirmwareButton.enabled = YES; // Assuming you've got a UIButton some where in your UIViewController sublcass.
+            self.updateFirmwareButton.enabled = YES; // Assuming you've got a UIButton somewhere in your UIViewController sublcass.
         }
         else
         {
-            self.updateFirmwareButton.enabled = NO;
+           // The user needs to install the latest version of Paper to complete the firmware upgrade
+           // You might enable the Update Firmware button, but have it trigger an alert:
+           // "You need to install the latest version of Paper by FiftyThree to upgrade Pencil's firmware"
+           // and include a link to the FiftyThree firmware update support page in the alert
+           // e.g., [FTPenManager sharedInstance].firmwareUpdateSupportLink
+
         }
-        // You might show a link to the FiftyThree support page.
-        // e.g., [FTPenManager sharedInstance].firmwareUpdateSupportLink
+
     }
     else
     {
@@ -69,7 +73,7 @@ If you want to add support for this in your app you'll need to do the following:
 }
 ```
 
-* If your user taps the firmware update button you've show above, you'll need to invoke firmware update. The API we provide allows you to provide callback URLs to your app. You'd need to add these urls to your applications URL Types in your Info.plist. Below shows the sample code to invoke firmware upgrade.
+* If your user taps the firmware update button you've show above, you'll need to invoke firmware update. The API we provide allows you to provide callback URLs to your app. You'd need to add these urls to your application's URL Types in your Info.plist. Shown below is the sample code to invoke firmware upgrade.
 
 ```
 - (void)updateFirmware:(id)sender
