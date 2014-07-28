@@ -222,12 +222,12 @@
     [self setupFBO];
 
     //
-    // The rendering proceeds as follows
+    // The rendering proceeds as follows:
     //  (1) Clear
     //  (2) Render any contents that we've got saved to a texture.
     //  (3) Render any strokes that are "active" and either subject to
     //      appending new geometry or are subject to re-classification.
-    //  (4) Update our saved texture with any strokes that are no-longer active.
+    //  (4) Update our saved texture with any strokes that are no longer active.
 
     glClearColor(0.9f, 0.9f, 0.9f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
@@ -293,7 +293,7 @@
     NSMutableArray *oldScene = [@[] mutableCopy];
     for (Stroke *v in sortedScene)
     {
-        // Don't bother keeping older strokes we "commit" them to a texture
+        // Don't bother keeping older strokes.  We "commit" them to a texture
         // if (a) they haven't been reclassified.
         //    (b) they haven't been appended too recently.
         BOOL old = (now - v.lastAltered) > 0.5;
@@ -364,7 +364,7 @@
     return location;
 }
 #pragma mark - OpenGL ES Drawing
-// Drawings a line onscreen based on where the user touches
+// Draws a line onscreen based on where the user touches
 - (void)renderLineFromPoint:(CGPoint)start toPoint:(CGPoint)end
 {
     static GLfloat*     vertexBuffer = NULL;
