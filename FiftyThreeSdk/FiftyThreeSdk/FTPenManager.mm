@@ -2027,7 +2027,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
 #pragma mark - Firmware
 
--(void)setFirmwareUpdateIsAvailble:(NSNumber *)firmwareUpdateIsAvailable
+-(void)setFirmwareUpdateIsAvailable:(NSNumber *)firmwareUpdateIsAvailable
 {
     NSNumber *oldValue = self.firmwareUpdateIsAvailable;
     _firmwareUpdateIsAvailable = firmwareUpdateIsAvailable;
