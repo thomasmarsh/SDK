@@ -163,22 +163,30 @@
         //  2 --4
         //  | \ |
         //  1-- 3
-        static GLfloat squareVertices[4*4] =
+
+        GLfloat w = self.view.bounds.size.width;
+        GLfloat h = self.view.bounds.size.height;
+
+        GLfloat squareVertices[4*4] =
         {
             0.0f, 0.0f,      0.0f, 0.0f, // x y u v
             0.0f,  768.0,    0.0f, 1.0f,
             1024.0f, 0.0f,   1.0f, 0.0f,
             1024.0f, 768.0,  1.0f, 1.0f
         };
-        static BOOL scaled = NO;
-        if (!scaled)
+
+        for(int i = 0; i < 4; ++i)
         {
-            for(int i = 0; i < 4; ++i)
+            if (squareVertices[i*4 + 0] == 1024.0f)
             {
-                squareVertices[i*4 + 0] *= self.scale;
-                squareVertices[i*4 + 1] *= self.scale;
+                squareVertices[i*4 + 0] = w;
             }
-            scaled = YES;
+            if (squareVertices[i*4 + 1] == 768.0f)
+            {
+                squareVertices[i*4 + 1] = h;
+            }
+            squareVertices[i*4 + 0] *= self.scale;
+            squareVertices[i*4 + 1] *= self.scale;
         }
 
         // Load data to the Vertex Buffer Object
@@ -402,7 +410,7 @@
     glEnableVertexAttribArray([_pointSpriteShader.attribute[@"inVertex"] intValue]);
     glVertexAttribPointer([_pointSpriteShader.attribute[@"inVertex"] intValue], 2, GL_FLOAT, GL_FALSE, 0, 0);
 
-    // We don't need the use program as there's only ever 1 shader in use.
+    glUseProgram(_pointSpriteShader.glProgram);
     glDrawArrays(GL_POINTS, 0, (int)vertexCount);
 
     glDisableVertexAttribArray([_pointSpriteShader.attribute[@"inVertex"] intValue]);
@@ -427,7 +435,7 @@
 - (void)setPointSize
 {
     glUseProgram(_pointSpriteShader.glProgram);
-    glUniform1f([_pointSpriteShader.uniform[@"pointSize"] intValue], 8.0f);
+    glUniform1f([_pointSpriteShader.uniform[@"pointSize"] intValue], 8.0);
 }
 - (void)updateViewportAndTransforms
 {
