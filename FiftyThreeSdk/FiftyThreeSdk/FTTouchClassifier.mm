@@ -27,6 +27,7 @@ using std::vector;
 
 @interface FTTouchClassifier ()
 @property (nonatomic) EventToObjCAdapter<const vector<TouchClassificationChangedEventArgs> & >::Ptr touchClassificationsDidChangeAdapter;
+@property (nonatomic) EventToObjCAdapter<const vector<TouchClassificationChangedEventArgs> & >::Ptr touchContinuedClassificationsDidChangeAdapter;
 @end
 
 using namespace fiftythree::core;
@@ -44,6 +45,10 @@ using namespace fiftythree::sdk;
             self.touchClassificationsDidChangeAdapter = EventToObjCAdapter<const std::vector<TouchClassificationChangedEventArgs> & >::Bind(classifier->TouchClassificationsDidChange(),
                                                                                                                                         self,
                                                                                                                                         @selector(touchClassificationsDidChange:));
+            
+            self.touchClassificationsDidChangeAdapter = EventToObjCAdapter<const std::vector<TouchClassificationChangedEventArgs> & >::Bind(classifier->TouchContinuedClassificationsDidChange(),
+                                                                                                                                            self,
+                                                                                                                                            @selector(touchClassificationsDidChange:));
         }
 
         return self;
@@ -126,9 +131,12 @@ using namespace fiftythree::sdk;
                 info.oldValue = [FTTouchClassifier classification:t.oldValue];
             }
 
-            info.newValue = [FTTouchClassifier classification:t.newValue];
+            info.newValue = [FTTouchClassifier classification: t.touch->ContinuedClassification()];
             info.touchId = (NSInteger)t.touch->Id();
-            [updatedTouchClassifications addObject:info];
+            if (info.newValue != info.oldValue)
+            {
+                [updatedTouchClassifications addObject:info];
+            }
         }
     }
 
@@ -165,7 +173,7 @@ using namespace fiftythree::sdk;
         }
         else
         {
-            switch (ftTouch->CurrentClassification()())
+            switch (ftTouch->ContinuedClassification())
             {
                 case TouchClassification::UnknownDisconnected:
                 {

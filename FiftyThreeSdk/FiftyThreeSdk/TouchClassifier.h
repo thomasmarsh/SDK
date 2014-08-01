@@ -113,6 +113,10 @@ public:
     // These touches may be expired and may transition classifications of Untracked or RemovedFromClassification.
     virtual Event<const std::vector<TouchClassificationChangedEventArgs> & > & TouchClassificationsDidChange() = 0;
 
+    // Fired with a list of all classifications that have changed.
+    // These touches may be expired and may transition classifications of Untracked or RemovedFromClassification.
+    virtual Event<const std::vector<TouchClassificationChangedEventArgs> & > & TouchContinuedClassificationsDidChange() = 0;
+
     virtual void ClearSessionStatistics() = 0;
     virtual SessionStatistics::Ptr SessionStatistics() = 0;
 

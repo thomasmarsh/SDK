@@ -9,18 +9,20 @@
 
 #include <vector>
 
-#include "Core/Enum.h"
 #include "Core/Event.hpp"
 #include "Core/Memory.h"
 #include "Core/Optional.h"
 #include "Core/Touch/Touch.h"
-#include "FiftyThreeSdk/Classification/Classifier.h"
 #include "FiftyThreeSdk/TouchClassifier.h"
 
 namespace fiftythree
 {
 namespace sdk
 {
+    
+class Classifier;
+class OffscreenTouchClassificationLinker;
+    
 // This contains some common functionality.
 class TouchClassifierImpl : virtual public TouchClassifier
 {
@@ -42,6 +44,7 @@ public:
     virtual bool HasPenActivityOccurredRecently();
     virtual void UpdateClassifications();
     virtual Event<const std::vector<TouchClassificationChangedEventArgs> & > & TouchClassificationsDidChange();
+    virtual Event<const std::vector<TouchClassificationChangedEventArgs> & > & TouchContinuedClassificationsDidChange();
     virtual void ClearSessionStatistics();
     virtual SessionStatistics::Ptr SessionStatistics();
 
@@ -59,11 +62,17 @@ protected:
 
     void SetCopyGestureClassifications(bool b);
 private:
-    Classifier::Ptr _Classifier;
+    fiftythree::core::shared_ptr<class fiftythree::sdk::Classifier> _Classifier;
+    fiftythree::core::shared_ptr<class fiftythree::sdk::OffscreenTouchClassificationLinker> _Linker;
+    
+    void TouchesLinkageCausedReclassification(const Event<std::vector<core::Touch::cPtr>> & sender, std::vector<core::Touch::cPtr> touches);
+    
     bool _ShowLog;
     bool _Connected;
     bool _CopyGestureClassifications;
     Event<const std::vector<TouchClassificationChangedEventArgs> &> _TouchClassificationsDidChange;
+    Event<const std::vector<TouchClassificationChangedEventArgs> &> _TouchContinuedClassificationsDidChange;
+
 };
 
 }

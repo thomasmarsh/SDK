@@ -11,6 +11,7 @@
 #include "Core/Touch/TouchTracker.h"
 #include "FiftyThreeSdk/Classification//Classifier.h"
 #include "FiftyThreeSdk/TouchClassifierImpl.h"
+#include "FiftyThreeSdk/OffscreenTouchClassificationLinker.h"
 
 using namespace fiftythree::core;
 using namespace fiftythree::sdk;
@@ -25,12 +26,20 @@ namespace fiftythree
 {
 namespace sdk
 {
-TouchClassifierImpl::TouchClassifierImpl() : _Classifier(Classifier::New()), _Connected(false), _ShowLog(false), _CopyGestureClassifications(false)
+TouchClassifierImpl::TouchClassifierImpl() : _Classifier(Classifier::New()),
+                                             _Linker(OffscreenTouchClassificationLinker::New()),
+                                            _Connected(false),
+                                            _ShowLog(false),
+                                            _CopyGestureClassifications(false)
 {
     _Classifier->SetUsePrivateAPI(false);
     _Classifier->SetUseDebugLogging(_ShowLog);
 }
 
+void TouchClassifierImpl::TouchesLinkageCausedReclassification(const Event<std::vector<core::Touch::cPtr>> & sender, std::vector<core::Touch::cPtr> touches)
+{
+    
+}
 void TouchClassifierImpl::TouchesDidChanged(const std::set<Touch::cPtr> & touches)
 {
     std::set<Touch::Ptr> nonConstTouches;
@@ -118,6 +127,15 @@ void TouchClassifierImpl::UpdateClassifications()
 
     vector<TouchClassificationChangedEventArgs> eventArgs;
     vector<TouchClassificationChangedEventArgs> allChangedEventArgs;
+    vector<TouchClassificationChangedEventArgs> continuedClassificationArgs;
+    
+    for (const Touch::cPtr & touch : TouchTracker::Instance()->RecentTouches())
+    {
+        TouchClassificationChangedEventArgs args;
+        args.touch = touch;
+        args.oldValue = touch->ContinuedClassification();
+        continuedClassificationArgs.emplace_back(args);
+    }
 
     // OK now we need to get the data back out and onto the touch objects
     for (const Touch::cPtr & touch : TouchTracker::Instance()->RecentTouches())
@@ -163,7 +181,35 @@ void TouchClassifierImpl::UpdateClassifications()
             allChangedEventArgs.push_back(args);
         }
     }
-
+    
+    _Linker->UpdateTouchContinuationLinkage();
+    for (auto & e : continuedClassificationArgs)
+    {
+        bool shouldOverride = ShouldOverrideClassifications();
+        if (shouldOverride)
+        {
+            fiftythree::core::optional<TouchClassification> touchClassification = OverrideClassificationForTouch(e.touch);
+            e.newValue = touchClassification ? *touchClassification : e.oldValue;
+        }
+        else
+        {
+            e.newValue = e.touch->ContinuedClassification();
+        }
+    }
+    
+    continuedClassificationArgs.erase(remove_if(continuedClassificationArgs.begin(),
+                                                continuedClassificationArgs.end(),
+                                                [](const TouchClassificationChangedEventArgs & e)
+                                                    {
+                                                        return e.newValue == e.oldValue || e.newValue == TouchClassification::UntrackedTouch;
+                                                    }), continuedClassificationArgs.end());
+    
+    
+    if (!continuedClassificationArgs.empty())
+    {
+        _TouchContinuedClassificationsDidChange.Fire(continuedClassificationArgs);
+    }
+    
     if (!eventArgs.empty())
     {
         if (_ShowLog)
@@ -219,6 +265,12 @@ Event<const vector<TouchClassificationChangedEventArgs> &> & TouchClassifierImpl
 {
     return _TouchClassificationsDidChange;
 }
+
+Event<const vector<TouchClassificationChangedEventArgs> &> & TouchClassifierImpl::TouchContinuedClassificationsDidChange()
+{
+    return _TouchContinuedClassificationsDidChange;
+}
+    
 TouchClassifier::Ptr TouchClassifier::New()
 {
     return make_shared<TouchClassifierImpl>();
