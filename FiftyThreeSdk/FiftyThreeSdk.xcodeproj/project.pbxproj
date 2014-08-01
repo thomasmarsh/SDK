@@ -29,6 +29,7 @@
 		04493E3C18C628A00003AFB8 /* PenConnectionView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 04493E3B18C628A00003AFB8 /* PenConnectionView.mm */; };
 		04497AE61950B6EF002E899B /* FTXCallbackURL.m in Sources */ = {isa = PBXBuildFile; fileRef = 04497AE51950B6EF002E899B /* FTXCallbackURL.m */; };
 		0467BAEE198BE91600E8B63B /* OffscreenStrokeDetectionUtilities.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0467BAEC198BE91600E8B63B /* OffscreenStrokeDetectionUtilities.cpp */; };
+		0467BAF1198C00AB00E8B63B /* OffscreenTouchClassificationLinker.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0467BAEF198C00AB00E8B63B /* OffscreenTouchClassificationLinker.cpp */; };
 		0489D38B18CE2A7400B41E20 /* FTSDKVersionInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 0489D38A18CE2A7400B41E20 /* FTSDKVersionInfo.m */; };
 		0489D42018CE382100B41E20 /* FTTouchClassifier.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0489D41F18CE382100B41E20 /* FTTouchClassifier.mm */; };
 		04E99BEC18BFE53500BC4DCB /* FTTrialSeparationMonitor.mm in Sources */ = {isa = PBXBuildFile; fileRef = 04E99BEB18BFE53500BC4DCB /* FTTrialSeparationMonitor.mm */; };
@@ -108,6 +109,8 @@
 		04497AE51950B6EF002E899B /* FTXCallbackURL.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FTXCallbackURL.m; path = FiftyThreeSdk/FTXCallbackURL.m; sourceTree = "<group>"; };
 		0467BAEC198BE91600E8B63B /* OffscreenStrokeDetectionUtilities.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = OffscreenStrokeDetectionUtilities.cpp; path = FiftyThreeSdk/OffscreenStrokeDetectionUtilities.cpp; sourceTree = "<group>"; };
 		0467BAED198BE91600E8B63B /* OffscreenStrokeDetectionUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OffscreenStrokeDetectionUtilities.h; path = FiftyThreeSdk/OffscreenStrokeDetectionUtilities.h; sourceTree = "<group>"; };
+		0467BAEF198C00AB00E8B63B /* OffscreenTouchClassificationLinker.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = OffscreenTouchClassificationLinker.cpp; path = FiftyThreeSdk/OffscreenTouchClassificationLinker.cpp; sourceTree = "<group>"; };
+		0467BAF0198C00AB00E8B63B /* OffscreenTouchClassificationLinker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OffscreenTouchClassificationLinker.h; path = FiftyThreeSdk/OffscreenTouchClassificationLinker.h; sourceTree = "<group>"; };
 		0489D36E18CE13D800B41E20 /* FTEventDispatcher+Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "FTEventDispatcher+Private.h"; path = "FiftyThreeSdk/FTEventDispatcher+Private.h"; sourceTree = "<group>"; };
 		0489D38918CE2A7400B41E20 /* FTSDKVersionInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FTSDKVersionInfo.h; path = FiftyThreeSdk/FTSDKVersionInfo.h; sourceTree = "<group>"; };
 		0489D38A18CE2A7400B41E20 /* FTSDKVersionInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FTSDKVersionInfo.m; path = FiftyThreeSdk/FTSDKVersionInfo.m; sourceTree = "<group>"; };
@@ -375,6 +378,8 @@
 				3CC31DCB17933ABB002CD4FB /* TransitionKit */,
 				0467BAEC198BE91600E8B63B /* OffscreenStrokeDetectionUtilities.cpp */,
 				0467BAED198BE91600E8B63B /* OffscreenStrokeDetectionUtilities.h */,
+				0467BAEF198C00AB00E8B63B /* OffscreenTouchClassificationLinker.cpp */,
+				0467BAF0198C00AB00E8B63B /* OffscreenTouchClassificationLinker.h */,
 			);
 			name = FiftyThreeSdk;
 			sourceTree = "<group>";
@@ -471,6 +476,7 @@
 				0416CABE18A42B51004EAC00 /* EigenLAB.cpp in Sources */,
 				66D779BC16E57461001C4F55 /* TIUpdateManager.mm in Sources */,
 				0416CABC18A42B51004EAC00 /* Debug.cpp in Sources */,
+				0467BAF1198C00AB00E8B63B /* OffscreenTouchClassificationLinker.cpp in Sources */,
 				0489D38B18CE2A7400B41E20 /* FTSDKVersionInfo.m in Sources */,
 				663AFED916FA6BD800681A90 /* PenEvent.cpp in Sources */,
 				66BEC2861703B397009207F9 /* FTFirmwareManager.mm in Sources */,

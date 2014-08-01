@@ -6,6 +6,7 @@
 //
 
 #import "Core/Log.h"
+#import "FTLog.h"
 #import "FTLogPrivate.h"
 
 using namespace fiftythree::core;
@@ -39,6 +40,7 @@ namespace
 #ifdef USE_LOGGING
     LogService::Instance()->RemoveFilter(FTLogSDK);
     LogService::Instance()->RemoveFilter(FTLogSDKVerbose);
+    LogService::Instance()->RemoveFilter(FTLogSDKClassificationLinker);
 
     switch (sLogLevel)
     {
@@ -51,6 +53,7 @@ namespace
         default:
             LogService::Instance()->AddFilter(FTLogSDK);
             LogService::Instance()->AddFilter(FTLogSDKVerbose);
+            LogService::Instance()->AddFilter(FTLogSDKClassificationLinker);
             break;
     }
 #endif

@@ -38,7 +38,24 @@ Settings::Settings() :
         OffscreenStrokes_AccelerationDecayLambda(0.15f),
         OffscreenStrokes_VelocityDecayLambda(0.35f),
         OffscreenStrokes_GroundingSampleCount(10),
-        OffscreenStrokes_MinTotalStrokeLength(30.f)
+        OffscreenStrokes_MinTotalStrokeLength(30.f),
+        OffscreenTouches_MaxHistorySeconds(0.25f),
+        OffscreenTouches_MaxDiscardSamples(1),
+        OffscreenTouches_MaxSampleCount(3),
+        OffscreenTouches_MinSampleCount(2),
+        OffscreenTouches_MaxExtraSampleCount(0),
+        OffscreenTouches_UnreliableSampleEdgeDistance(15),
+        OffscreenTouches_MinEdgeDistance(50),
+        OffscreenTouches_FastSmoothingLambda(0.5f),
+        OffscreenTouches_SlowSmoothingLambda(0.25f),
+        OffscreenTouches_FastVelocity(420),
+        OffscreenTouches_SlowVelocity(180),
+        OffscreenTouches_AccelerationDecayLambda(0.15f),
+        OffscreenTouches_VelocityDecayLambda(0.35f),
+        OffscreenTouches_MaxExtrapolationDurationSeconds(0.125f),
+        OffscreenTouches_MaxExtrapolationSampleCount(200),
+        OffscreenTouches_MaxPenOffscreenDistance(300),
+        OffscreenTouches_MaxPenOffscreenSeconds(0.6f)
 {
 }
 

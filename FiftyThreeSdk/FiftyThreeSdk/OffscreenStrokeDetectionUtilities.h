@@ -42,6 +42,23 @@ struct Settings
     float OffscreenStrokes_VelocityDecayLambda;
     int OffscreenStrokes_GroundingSampleCount;
     float OffscreenStrokes_MinTotalStrokeLength;
+    float OffscreenTouches_MaxHistorySeconds;
+    int OffscreenTouches_MaxDiscardSamples;
+    int OffscreenTouches_MaxSampleCount;
+    int OffscreenTouches_MinSampleCount;
+    int OffscreenTouches_MaxExtraSampleCount;
+    int OffscreenTouches_UnreliableSampleEdgeDistance;
+    float OffscreenTouches_MinEdgeDistance;
+    float OffscreenTouches_FastSmoothingLambda;
+    float OffscreenTouches_SlowSmoothingLambda;
+    float OffscreenTouches_FastVelocity;
+    float OffscreenTouches_SlowVelocity;
+    float OffscreenTouches_AccelerationDecayLambda;
+    float OffscreenTouches_VelocityDecayLambda;
+    float OffscreenTouches_MaxExtrapolationDurationSeconds;
+    float OffscreenTouches_MaxExtrapolationSampleCount;
+    float OffscreenTouches_MaxPenOffscreenDistance;
+    float OffscreenTouches_MaxPenOffscreenSeconds;
 
     Settings();
 };
