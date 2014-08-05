@@ -36,10 +36,6 @@ TouchClassifierImpl::TouchClassifierImpl() : _Classifier(Classifier::New()),
     _Classifier->SetUseDebugLogging(_ShowLog);
 }
 
-void TouchClassifierImpl::TouchesLinkageCausedReclassification(const Event<std::vector<core::Touch::cPtr>> & sender, std::vector<core::Touch::cPtr> touches)
-{
-    
-}
 void TouchClassifierImpl::TouchesDidChanged(const std::set<Touch::cPtr> & touches)
 {
     std::set<Touch::Ptr> nonConstTouches;

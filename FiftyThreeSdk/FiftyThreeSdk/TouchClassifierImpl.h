@@ -64,9 +64,7 @@ protected:
 private:
     fiftythree::core::shared_ptr<class fiftythree::sdk::Classifier> _Classifier;
     fiftythree::core::shared_ptr<class fiftythree::sdk::OffscreenTouchClassificationLinker> _Linker;
-    
-    void TouchesLinkageCausedReclassification(const Event<std::vector<core::Touch::cPtr>> & sender, std::vector<core::Touch::cPtr> touches);
-    
+        
     bool _ShowLog;
     bool _Connected;
     bool _CopyGestureClassifications;

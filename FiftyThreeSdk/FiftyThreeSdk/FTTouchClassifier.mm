@@ -139,8 +139,11 @@ using namespace fiftythree::sdk;
             }
         }
     }
-
-    [self.delegate classificationsDidChangeForTouches:updatedTouchClassifications];
+    
+    if ([updatedTouchClassifications count] > 0)
+    {
+        [self.delegate classificationsDidChangeForTouches:updatedTouchClassifications];
+    }
 }
 
 // Returns a unique id for the touch.
