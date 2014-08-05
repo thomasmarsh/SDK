@@ -470,7 +470,7 @@ Geometric2DLine<typename DerivedA::Scalar> GeometricLeastSquaresLineFit(const Ei
     A(0,1) = X.dot(Y);
     A(1,0) = A(0,1);
 
-    Eigen::SelfAdjointEigenSolver<Eigen::Matrix<DataT, 2, 2> > eig(A);
+    Eigen::SelfAdjointEigenSolver<Eigen::Matrix<DataT, 2, 2>> eig(A);
     int minInd = 0;
 
     if (eig.eigenvalues()(0) > eig.eigenvalues()(1))
@@ -535,7 +535,7 @@ Geometric2DLine<typename DerivedA::Scalar> GeometricLeastSquaresLineFit(const Ei
     A(0,1) = X.dot(Y);
     A(1,0) = A(0,1);
 
-    Eigen::SelfAdjointEigenSolver<Eigen::Matrix<DataT, 2, 2> > eig(A);
+    Eigen::SelfAdjointEigenSolver<Eigen::Matrix<DataT, 2, 2>> eig(A);
     int minInd = 0;
 
     if (eig.eigenvalues()(0) > eig.eigenvalues()(1))

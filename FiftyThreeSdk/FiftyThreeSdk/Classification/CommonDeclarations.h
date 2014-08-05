@@ -78,7 +78,7 @@ typedef Eigen::Map<Eigen::VectorXf> VectorXfMap;
 typedef Eigen::Map<Eigen::VectorXi> VectorXiMap;
 typedef Eigen::Map<float> FloatMap;
 
-typedef Eigen::Map<Eigen::VectorXf, 0, Eigen::InnerStride<2> > Stride2Map;
+typedef Eigen::Map<Eigen::VectorXf, 0, Eigen::InnerStride<2>> Stride2Map;
 
 typedef Eigen::Vector2f XYType;
 

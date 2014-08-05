@@ -227,8 +227,8 @@ public:
     std::vector< Eigen::Vector2f > & XY() { return _XYDataStream.Data(); }
 
     Eigen::Map<Eigen::VectorXf> XYMap(Interval const & I);
-    Eigen::Map<Eigen::MatrixX2f, 0, Eigen::Stride<1,2> > XYMatrixMap();
-    Eigen::Map<Eigen::MatrixX2f, 0, Eigen::Stride<1,2> > XYMatrixMap(int endIndex);
+    Eigen::Map<Eigen::MatrixX2f, 0, Eigen::Stride<1,2>> XYMatrixMap();
+    Eigen::Map<Eigen::MatrixX2f, 0, Eigen::Stride<1,2>> XYMatrixMap(int endIndex);
 
     Eigen::Map<Eigen::VectorXf> ArclengthParameterMap(int endIndex);
     Eigen::Map<Eigen::VectorXf> ArclengthParameterMap();

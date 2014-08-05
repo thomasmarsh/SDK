@@ -233,7 +233,7 @@ InputSample NaiveVelocityFromSamples(const vector<InputSample> & samples)
     InputSample velocity = lastSample - secondToLastSample;
     return velocity;
 }
-    optional<vector<InputSample> > FilterEdgeSamples(const vector<InputSample> & edgeSamples,
+    optional<vector<InputSample>> FilterEdgeSamples(const vector<InputSample> & edgeSamples,
                                                      OffscreenStrokesMode offscreenStrokesMode,
                                                      int minSampleCount,
                                                      int maxDiscardSamples,
@@ -366,7 +366,7 @@ InputSample NaiveVelocityFromSamples(const vector<InputSample> & samples)
         }
 
         int minSampleCount = 2;
-        optional<vector<InputSample> > filteredEdgeSamples = fiftythree::core::none;
+        optional<vector<InputSample>> filteredEdgeSamples = fiftythree::core::none;
         // Try multiple values of maxDiscardSamples, walking back from the "max max" value to zero.
         //
         // In this way, we prefer making the decision with a higher degree of confidence (ie. discarding

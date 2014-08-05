@@ -31,7 +31,7 @@ public:
     typedef std::vector<DataType> ContainerType;
 
     typedef DataStream<DataType> Stream;
-    typedef fiftythree::core::shared_ptr< DataStream<DataType> > Ptr;
+    typedef fiftythree::core::shared_ptr< DataStream<DataType>> Ptr;
 
 protected:
 
@@ -67,7 +67,7 @@ public:
 
     std::vector<DataType> ValuesAtTimes(std::vector<float> const & t)
     {
-        return Interp< std::vector<DataType> >(&(_relativeTimestamp[0]), _data, &(t[0]), _relativeTimestamp.size(), t.size());
+        return Interp< std::vector<DataType>>(&(_relativeTimestamp[0]), _data, &(t[0]), _relativeTimestamp.size(), t.size());
     }
 
     void AddPoint(DataType value, double timestamp)

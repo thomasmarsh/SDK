@@ -77,7 +77,7 @@ void PenTracker::UpdateLocations()
 
         VectorXf evalWeight(1);
         evalWeight[0] = wEval;
-        vector<Vector2f> weightedMedianPalm = Interp< vector<Vector2f> >(wPalm, clusterCenters, evalWeight);
+        vector<Vector2f> weightedMedianPalm = Interp< vector<Vector2f>>(wPalm, clusterCenters, evalWeight);
 
         medianPalm = weightedMedianPalm[0];
     }

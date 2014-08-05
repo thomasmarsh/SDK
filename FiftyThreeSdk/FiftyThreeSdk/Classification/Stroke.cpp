@@ -628,17 +628,17 @@ Eigen::Map<Eigen::VectorXf> Stroke::XYMap(Interval const & I)
     return Eigen::Map<VectorXf>(data + 2 * I._index, 2*I._count);
 }
 
-Eigen::Map<Eigen::MatrixX2f, 0, Eigen::Stride<1,2> > Stroke::XYMatrixMap()
+Eigen::Map<Eigen::MatrixX2f, 0, Eigen::Stride<1,2>> Stroke::XYMatrixMap()
 {
     return XYMatrixMap((int)Size()-1l);
 }
 
-Eigen::Map<Eigen::MatrixX2f, 0, Eigen::Stride<1,2> > Stroke::XYMatrixMap(int endIndex)
+Eigen::Map<Eigen::MatrixX2f, 0, Eigen::Stride<1,2>> Stroke::XYMatrixMap(int endIndex)
 {
     float *data = XYPointer();
     endIndex = ClampedIndex(endIndex);
 
-    return Eigen::Map<Eigen::MatrixX2f, 0, Eigen::Stride<1,2> >(data, endIndex + 1, 2);
+    return Eigen::Map<Eigen::MatrixX2f, 0, Eigen::Stride<1,2>>(data, endIndex + 1, 2);
 }
 
 Eigen::Map<Eigen::VectorXf> Stroke::RelativeTimestampMap()
