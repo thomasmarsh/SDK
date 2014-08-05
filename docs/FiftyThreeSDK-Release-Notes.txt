@@ -1,3 +1,7 @@
+1.2
+- Improve classification of offscreen strokes
+- Bug fixes
+
 1.1
 - Added FTPenBatteryLevelUnknown to FTPenBatteryLevel. FTPenInfo reports FTPenBatteryLevelUnknown until the real status is read off the Pencil.
 - Removed FTPenManager update & penManagerNeedsUpdateDidChange & automaticUpdatesEnabled.
