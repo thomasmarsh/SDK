@@ -1,5 +1,5 @@
 1.2
-- Improve classification of offscreen strokes
+- Improved classification of offscreen strokes
 - Bug fixes
 
 1.1
