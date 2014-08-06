@@ -14,6 +14,7 @@
 @property (nonatomic, readonly) NSString *version;
 @property (nonatomic, readonly) NSInteger majorVersion;
 @property (nonatomic, readonly) NSInteger minorVersion;
+@property (nonatomic, readonly) NSInteger patchVersion;
 @property (nonatomic, readonly) NSString *commit;
 @property (nonatomic, readonly) NSString *timestamp;
 @end

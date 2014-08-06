@@ -110,6 +110,11 @@
     [self.view setMultipleTouchEnabled:YES];
     [self.view setUserInteractionEnabled:YES];
     [self.view setExclusiveTouch:NO];
+
+    // If for some reason you need to check the SDK version you can do the following.
+    // Note that this *doesn't* start up CoreBluetooth.
+    FTSDKVersionInfo *versionInfo = [[FTSDKVersionInfo alloc] init];
+    NSLog(@"FiftyThree SDK Version:%@", versionInfo.version);
 }
 
 #pragma mark - Bar Button Press handlers.

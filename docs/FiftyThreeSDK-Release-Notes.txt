@@ -1,6 +1,7 @@
-1.2
+1.1.1
 - Improved classification of offscreen strokes
 - Bug fixes
+- Added patchVersion property to FTSDKVersionInfo
 
 1.1
 - Added FTPenBatteryLevelUnknown to FTPenBatteryLevel. FTPenInfo reports FTPenBatteryLevelUnknown until the real status is read off the Pencil.

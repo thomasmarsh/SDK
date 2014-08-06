@@ -513,7 +513,6 @@
         switch(status)
         {
             case GL_FRAMEBUFFER_COMPLETE:
-                NSLog(@"fbo complete");
                 break;
 
             case GL_FRAMEBUFFER_UNSUPPORTED:
