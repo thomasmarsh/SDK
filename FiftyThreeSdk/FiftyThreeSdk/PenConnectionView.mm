@@ -297,7 +297,7 @@ static const CGFloat kPairingSpotTouchRadius_Moved = 150.f;
     }
     else
     {
-        self.penManager.isPairingSpotPressed = nil;
+        self.penManager.isPairingSpotPressed = NO;
     }
 
     if ([self.delegate respondsToSelector:@selector(isPairingSpotPressedDidChange:)])

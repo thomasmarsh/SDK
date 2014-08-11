@@ -5,6 +5,8 @@
 //  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
 #import <CoreGraphics/CoreGraphics.h>
+#import <OpenGLES/ES2/gl.h>
+#import <OpenGLES/ES2/glext.h>
 
 #import "FTAUtil.h"
 
