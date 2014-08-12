@@ -946,35 +946,69 @@ VectorXf TouchClassificationProxy::PenPriorForClusters(vector<Cluster::Ptr> cons
 
     }
 
+ 
+    
     // now size prior...
-    if (_usePrivateTouchSizeAPI)
+    if(_clusterTracker->TouchWithId(_clusterTracker->MostRecentTouch()) &&
+       _clusterTracker->TouchWithId(_clusterTracker->MostRecentTouch())->CurrentSample().TouchRadius())
     {
         for (int j=0; j<prior.size(); j++)
         {
 
             Cluster::Ptr const & cluster = clusters[j];
 
-            float muPen  = 5.2f;
-            float muPalm = 11.0f;
-
-            float sigmaPen  = .25f;
-            float sigmaPalm = 3.0f;
+            float penLikelihood = 0.0f;
+            float r = cluster->_meanTouchRadius;
+            float rMax = cluster->_maxTouchRadius;
 
             if (_clusterTracker->MostRecentPenTipType() == TouchClassification::Eraser)
             {
-                sigmaPen = .5f;
-                muPen    = 7.5f;
+                float mu = 35.0f;
+                float sigma = 5.0f;
+                
+                float dEraser = (r - mu) / sigma;
+                penLikelihood = (1.0f / sigma) * expf(-.5f * dEraser * dEraser);
             }
+            else
+            {
 
-            float r = cluster->_meanTouchRadius;
+                // model the pen tip as a mixture of two normal distributions,
+                // one representing a pen held in writing position with a small contact patch,
+                // and another a somewhat angled tip
+                
+                float muVerticalTip    = 10.4375f;
+                float sigmaVerticalTip = 1.0f;
+                
+                float muAngledTip    = 27.0f;
+                float sigmaAngledTip = 16.0f;
+                
+                float dPenVertical     = (r - muVerticalTip) / sigmaVerticalTip;
+                float dPenAngled       = (r - muAngledTip)   / sigmaAngledTip;
+                
+                float likelihoodVertical  = (1.0f / sigmaVerticalTip)  * expf(-.5f * dPenVertical * dPenVertical);
+                float likelihoodAngled    = (1.0f / sigmaAngledTip) * expf(-.5f * dPenAngled * dPenAngled);
+                
+                penLikelihood = .5f * (likelihoodAngled + likelihoodVertical);
 
-            float dPen  = (r - muPen) / sigmaPen;
+                if(r > 55.0f || rMax > 55.0f)
+                {
+                    penLikelihood = 0.0f;
+                }
+                
+                
+            }
+            
+            
 
+            
+            
+            float sigmaPalm      = 37.0f;
+            float muPalm         = 87.0f;
+            
             // min since we're using dumb normal distributions and we don't want to be penalized for being big.
             // if r exceeds muPalm, clamp dPalm to zero, which maximizes the likelihood.
             float dPalm = std::min(0.0f, (r - muPalm)) / sigmaPalm;
-
-            float penLikelihood  = (1.0f / sigmaPen)  * expf(-.5f * dPen * dPen);
+            
             float palmLikelihood = (1.0f / sigmaPalm) * expf(-.5f * dPalm * dPalm);
 
             float pPen = penLikelihood / (.0001f + penLikelihood + palmLikelihood);
@@ -1762,11 +1796,6 @@ void TouchClassificationProxy::OnTouchesChanged(const std::set<core::Touch::Ptr>
             ++it;
         }
     }
-}
-
-void TouchClassificationProxy::SetUsePrivateAPI(bool v)
-{
-    SetUsePrivateTouchSizeAPI(v);
 }
 
 void TouchClassificationProxy::SetUseDebugLogging(bool v)

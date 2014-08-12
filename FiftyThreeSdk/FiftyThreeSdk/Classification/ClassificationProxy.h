@@ -117,8 +117,6 @@ public:
 
     core::TouchClassification Classify(core::TouchId touchID);
 
-    void SetUsePrivateAPI(bool v);
-
     void SetUseDebugLogging(bool v);
 
     std::vector<core::TouchId> TouchesReclassified();
@@ -184,8 +182,6 @@ protected:
     std::vector<core::TouchId> _activeTouchesReclassified;
 
     Eigen::Vector2f _penDirection;
-
-    bool _usePrivateTouchSizeAPI;
 
 protected:
 
@@ -306,15 +302,6 @@ public:
         return &_penTracker;
     }
 
-    bool UsePrivateAPI()
-    {
-        return _usePrivateTouchSizeAPI;
-    }
-
-    void SetUsePrivateTouchSizeAPI(bool useIt)
-    {
-        _usePrivateTouchSizeAPI = useIt;
-    }
 
     // touches which are very short can end in the unknown state.
     // this is a backstop which makes sure they get assigned to something before the
@@ -352,7 +339,6 @@ public:
     _penEventClassifier(_clusterTracker, &_commonData),
     _needsClassification(false),
     _penTracker(_clusterTracker, &_commonData),
-    _usePrivateTouchSizeAPI(false),
     _showDebugLogMessages(false),
     _rtFlag(false),
     _testingIsolated(false),

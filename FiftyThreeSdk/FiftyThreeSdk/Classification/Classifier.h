@@ -79,10 +79,6 @@ public:
     //  Ideally GRs ask binary questions rather than have to know about ranges and valid stats...
     virtual Eigen::VectorXf GeometricStatistics(core::TouchId  touch0) = 0;
 
-    // This enables the use of a simple prior based on pathRadius on UIKit's touch object.
-    // this is a private API thus off by default.
-    virtual void SetUsePrivateAPI(bool v) = 0;
-
     virtual void SetUseDebugLogging(bool v) = 0;
 
     // Returns a list of touch ids since the last call to ClearTouchesReclassified

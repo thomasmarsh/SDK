@@ -86,6 +86,8 @@ struct Cluster
     double _becameStaleTime;
 
     float _meanTouchRadius;
+    float _minTouchRadius;
+    float _maxTouchRadius;
 
     bool  _simultaneousTouches;
     bool  _wasInterior;

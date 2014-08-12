@@ -32,7 +32,6 @@ TouchClassifierImpl::TouchClassifierImpl() : _Classifier(Classifier::New()),
                                             _ShowLog(false),
                                             _CopyGestureClassifications(false)
 {
-    _Classifier->SetUsePrivateAPI(false);
     _Classifier->SetUseDebugLogging(_ShowLog);
 }
 

@@ -402,6 +402,9 @@ Cluster::Cluster()
     _meanTouchRadius      = 0.0f;
     _meanPenProbability   = 0.0f;
     _meanPalmProbability  = 0.0f;
+    
+    _maxTouchRadius       = 0.0f;
+    _minTouchRadius       = std::numeric_limits<float>::max();
 
     _endedPenDirectionScore = 0.0f;
 
@@ -637,25 +640,25 @@ void ClusterTracker::AddPointToCluster(Vector2f p, double timestamp, Cluster::Pt
         }
     }
 
-     // update mean size
+     // update size stats
 
-    if (_commonData->proxy->UsePrivateAPI())
+    core::Touch::Ptr touch = _touchLog->TouchWithId(touchId);
+    
+    if (touch && touch->CurrentSample().TouchRadius())
     {
-         core::Touch::Ptr touch = _touchLog->TouchWithId(touchId);
-
-        if (touch && touch->CurrentSample().TouchRadius())
+        float r  = *(touch->CurrentSample().TouchRadius());
+        
+        float lambda = .02f;
+        if (cluster->_meanTouchRadius == 0.0f)
         {
-            float r  = *(touch->CurrentSample().TouchRadius());
-
-            float lambda = .02f;
-            if (cluster->_meanTouchRadius == 0.0f)
-            {
-                lambda = 1.0f;
-            }
-
-            cluster->_meanTouchRadius = lambda * r + (1.0f - lambda) * cluster->_meanTouchRadius;
-
+            lambda = 1.0f;
         }
+        
+        cluster->_meanTouchRadius = lambda * r + (1.0f - lambda) * cluster->_meanTouchRadius;
+        
+        cluster->_maxTouchRadius = std::max(cluster->_maxTouchRadius, r);
+        cluster->_minTouchRadius = std::min(cluster->_maxTouchRadius, r);
+        
     }
 
     _commonData->proxy->TouchStatistics()[touchId]._clusterId = cluster->_id;

@@ -310,14 +310,11 @@ void TouchLogger::TouchesChanged(const std::set<core::Touch::Ptr> & touches)
 
                     _touchData.insert(TouchDataPair(touch->Id(), data));
                     _activeTouches.insert(touch->Id());
-
-                    if (_commonData->proxy->UsePrivateAPI())
+                    
+                    if (touch->CurrentSample().TouchRadius())
                     {
-                        if (touch->CurrentSample().TouchRadius())
-                        {
-                            float r  = *(touch->CurrentSample().TouchRadius());
-                            stroke->AddTouchRadius(r);
-                        }
+                        float r  = *(touch->CurrentSample().TouchRadius());
+                        stroke->AddTouchRadius(r);
                     }
 
                 }
@@ -350,15 +347,11 @@ void TouchLogger::TouchesChanged(const std::set<core::Touch::Ptr> & touches)
 
                     touchData->SetEndedTime(timestamp);
 
-                    if (_commonData->proxy->UsePrivateAPI())
+                    if ( touch->CurrentSample().TouchRadius())
                     {
-                        if ( touch->CurrentSample().TouchRadius())
-                        {
-                            float r  = *(touch->CurrentSample().TouchRadius());
-                            touchData->Stroke()->AddTouchRadius(r);
-                        }
+                        float r  = *(touch->CurrentSample().TouchRadius());
+                        touchData->Stroke()->AddTouchRadius(r);
                     }
-
                 }
 
                 break;
@@ -410,13 +403,10 @@ void TouchLogger::TouchesChanged(const std::set<core::Touch::Ptr> & touches)
 
                             _endedTouchesStaged.push_back(touch->Id());
 
-                            if (_commonData->proxy->UsePrivateAPI())
+                            if (touch->CurrentSample().TouchRadius())
                             {
-                                if (touch->CurrentSample().TouchRadius())
-                                {
-                                    float r  = *(touch->CurrentSample().TouchRadius());
-                                    touchData->Stroke()->AddTouchRadius(r);
-                                }
+                                float r  = *(touch->CurrentSample().TouchRadius());
+                                touchData->Stroke()->AddTouchRadius(r);
                             }
                         }
                     }
@@ -464,15 +454,11 @@ void TouchLogger::TouchesChanged(const std::set<core::Touch::Ptr> & touches)
                     LogEndedTouch(touch->Id());
                     _endedTouchesStaged.push_back(touch->Id());
 
-                    if (_commonData->proxy->UsePrivateAPI())
+                    if (touch->CurrentSample().TouchRadius())
                     {
-                        if (touch->CurrentSample().TouchRadius())
-                        {
-                            float r  = *(touch->CurrentSample().TouchRadius());
-                            touchData->Stroke()->AddTouchRadius(r);
-                        }
+                        float r  = *(touch->CurrentSample().TouchRadius());
+                        touchData->Stroke()->AddTouchRadius(r);
                     }
-
                 }
 
                 break;
