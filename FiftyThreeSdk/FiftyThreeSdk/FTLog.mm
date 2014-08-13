@@ -46,6 +46,7 @@ namespace
     {
         case FTLogLevelEnabled:
             LogService::Instance()->AddFilter(FTLogSDKVerbose);
+            LogService::Instance()->AddFilter(FTLogSDKClassificationLinker);
             break;
         case FTLogLevelEnabledVerbose:
             break;
