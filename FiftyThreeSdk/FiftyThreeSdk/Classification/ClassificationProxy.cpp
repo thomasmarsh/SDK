@@ -16,6 +16,7 @@
 #include "FiftyThreeSdk/Classification/Helpers.h"
 #include "FiftyThreeSdk/Classification/LineFitting.h"
 #include "FiftyThreeSdk/Classification/Stroke.h"
+#include "FiftyThreeSdk/Classification/TouchSize.h"
 
 using Eigen::Vector2f;
 using fiftythree::core::TouchClassification;
@@ -663,8 +664,16 @@ void TouchClassificationProxy::SetClusterType(Cluster::Ptr const & cluster, Touc
             }
         }
 
+        if(cluster->IsPenType() && newType == TouchClassification::Unknown)
+        {
+            //std::cerr << "\npen -> unknown";
+        }
+        
         if (cluster->IsPenType() && (newType == TouchClassification::Palm || newType == TouchClassification::Finger))
         {
+            
+            std::cerr << "\nsetting pen to palm or finger";
+            
             float penDownDt = -1.0f;
             if (_touchStatistics.count(cluster->MostRecentTouch()))
             {
@@ -872,6 +881,15 @@ VectorXf TouchClassificationProxy::PenPriorForTouches(TouchIdVector const &touch
     return touchPriors;
 }
 
+bool TouchClassificationProxy::TouchRadiusAvailable()
+{
+    return (_clusterTracker->TouchWithId(_clusterTracker->MostRecentTouch()) &&
+            _clusterTracker->TouchWithId(_clusterTracker->MostRecentTouch())->CurrentSample().TouchRadius());
+}
+    
+    
+    
+    
 VectorXf TouchClassificationProxy::PenPriorForClusters(vector<Cluster::Ptr> const & clusters)
 {
 
@@ -949,8 +967,7 @@ VectorXf TouchClassificationProxy::PenPriorForClusters(vector<Cluster::Ptr> cons
  
     
     // now size prior...
-    if(_clusterTracker->TouchWithId(_clusterTracker->MostRecentTouch()) &&
-       _clusterTracker->TouchWithId(_clusterTracker->MostRecentTouch())->CurrentSample().TouchRadius())
+    if(TouchRadiusAvailable())
     {
         for (int j=0; j<prior.size(); j++)
         {
@@ -997,9 +1014,6 @@ VectorXf TouchClassificationProxy::PenPriorForClusters(vector<Cluster::Ptr> cons
                 
                 
             }
-            
-            
-
             
             
             float sigmaPalm      = 37.0f;
@@ -1267,7 +1281,9 @@ IdTypeMap TouchClassificationProxy::ReclassifyCurrentEvent()
         {
             return types;
         }
+        
 
+        
         // as a special case, we'll check for a finger if there's an "isolated touch".
         // the logic for identifying this case is slightly tricky due to the
         // temporal blurring that clusters use.  the touch is isolated, but the clusters might not be.
@@ -1281,19 +1297,28 @@ IdTypeMap TouchClassificationProxy::ReclassifyCurrentEvent()
             CurrentClass(liveTouches.back()) != TouchClassification::RemovedFromClassification)
         {
 
-            if (_touchStatistics[liveTouches[0]]._preIsolation > _fingerSmudgeIsolationSeconds)
+            Cluster::Ptr cluster = _clusterTracker->Cluster(liveTouches[0]);
+            
+            if(TouchSize::IsPenGivenTouchRadius(*_clusterTracker->Data(liveTouches[0])))
             {
-                // a single live cluster which satisifes a temporal isolation condition will trigger a sequence
-                // of finger smudges
-                checkForFingerSequence = true;
+                checkForFingerSequence = false;
             }
             else
             {
-                // new smudges don't need to satisfy any condition if the previous touch was a smudge
-                TouchId previousId = _clusterTracker->TouchPrecedingTouch(liveTouches[0]);
-                if (previousId != InvalidTouchId() && CurrentClass(previousId) == TouchClassification::Finger)
+                if (_touchStatistics[liveTouches[0]]._preIsolation > _fingerSmudgeIsolationSeconds)
                 {
+                    // a single live cluster which satisifes a temporal isolation condition will trigger a sequence
+                    // of finger smudges
                     checkForFingerSequence = true;
+                }
+                else
+                {
+                    // new smudges don't need to satisfy any condition if the previous touch was a smudge
+                    TouchId previousId = _clusterTracker->TouchPrecedingTouch(liveTouches[0]);
+                    if (previousId != InvalidTouchId() && CurrentClass(previousId) == TouchClassification::Finger)
+                    {
+                        checkForFingerSequence = true;
+                    }
                 }
             }
         }
@@ -1305,7 +1330,7 @@ IdTypeMap TouchClassificationProxy::ReclassifyCurrentEvent()
         if (checkForFingerSequence)
         {
 
-            Cluster::Ptr    cluster       = timeOrderedClusters.back();
+            Cluster::Ptr    cluster       = _clusterTracker->Cluster(liveTouches[0]); //timeOrderedClusters.back();
             std::pair<TouchClassification, float> pair = _penEventClassifier.TypeAndScoreForCluster(*cluster);
 
             TouchClassification newType = TouchClassification::Unknown;
@@ -1457,11 +1482,18 @@ IdTypeMap TouchClassificationProxy::ReclassifyCurrentEvent()
                         }
 
                         bool isBestConcurrent = dominationScore > 1.0f;
-                        if (isBestConcurrent && probePair.second > .2f &&
-                           (! probeCluster->_wasInterior) &&
-                           atCorrectEnd)
+                        if (
+                            (! probeCluster->_wasInterior) &&
+                            atCorrectEnd)
                         {
-                            newTypes[probeCluster] = probePair.first;
+                            if ((isBestConcurrent && probePair.second > .2f)) {
+                                newTypes[probeCluster] = probePair.first;
+                            }
+                            else if(TouchRadiusAvailable() &&
+                                    TouchSize::IsPenGivenTouchRadius(*_clusterTracker->Data(probeCluster->MostRecentTouch())))
+                            {
+                                newTypes[probeCluster] = core::TouchClassification::Pen;
+                            }
                         }
                         else
                         {
@@ -1933,6 +1965,8 @@ bool TouchClassificationProxy::ReclassifyIfNeeded(double timestamp)
 {
     bool didSomething = false;
 
+    std::cerr << "\nRIN";
+    
     ProcessDebounceQueue();
     UpdateIsolationStatistics();
 

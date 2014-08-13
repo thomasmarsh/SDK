@@ -55,6 +55,7 @@
 		66D779BA16E57461001C4F55 /* FTPen.mm in Sources */ = {isa = PBXBuildFile; fileRef = 66D779B316E57461001C4F55 /* FTPen.mm */; };
 		66D779BB16E57461001C4F55 /* FTPenManager.mm in Sources */ = {isa = PBXBuildFile; fileRef = 66D779B516E57461001C4F55 /* FTPenManager.mm */; };
 		66D779BC16E57461001C4F55 /* TIUpdateManager.mm in Sources */ = {isa = PBXBuildFile; fileRef = 66D779B816E57461001C4F55 /* TIUpdateManager.mm */; };
+		C95A63DC199BC12C00A2B8C1 /* TouchSize.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C95A63DA199BC12C00A2B8C1 /* TouchSize.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -178,6 +179,8 @@
 		66D779B616E57461001C4F55 /* FTServiceUUIDs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FTServiceUUIDs.h; path = FiftyThreeSdk/FTServiceUUIDs.h; sourceTree = SOURCE_ROOT; };
 		66D779B716E57461001C4F55 /* TIUpdateManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TIUpdateManager.h; path = FiftyThreeSdk/TIUpdateManager.h; sourceTree = SOURCE_ROOT; };
 		66D779B816E57461001C4F55 /* TIUpdateManager.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; lineEnding = 0; name = TIUpdateManager.mm; path = FiftyThreeSdk/TIUpdateManager.mm; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
+		C95A63DA199BC12C00A2B8C1 /* TouchSize.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TouchSize.cpp; sourceTree = "<group>"; };
+		C95A63DB199BC12C00A2B8C1 /* TouchSize.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TouchSize.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -195,6 +198,8 @@
 		0416CA8918A42B51004EAC00 /* Classification */ = {
 			isa = PBXGroup;
 			children = (
+				C95A63DA199BC12C00A2B8C1 /* TouchSize.cpp */,
+				C95A63DB199BC12C00A2B8C1 /* TouchSize.h */,
 				0416CA8B18A42B51004EAC00 /* ClassificationProxy.cpp */,
 				0416CA8C18A42B51004EAC00 /* ClassificationProxy.h */,
 				0416CA8D18A42B51004EAC00 /* Classifier.h */,
@@ -493,6 +498,7 @@
 				3C2F9C3D1780786F00A5FFBC /* FTPenServiceClient.mm in Sources */,
 				3C2F9C411780802600A5FFBC /* FTServiceClient.m in Sources */,
 				3C2F9C441780A7BA00A5FFBC /* FTPenUsageServiceClient.mm in Sources */,
+				C95A63DC199BC12C00A2B8C1 /* TouchSize.cpp in Sources */,
 				0416CABF18A42B51004EAC00 /* FiniteDifferences.cpp in Sources */,
 				04E99BEC18BFE53500BC4DCB /* FTTrialSeparationMonitor.mm in Sources */,
 				04493DE518C545140003AFB8 /* TouchClassifierImpl.cpp in Sources */,

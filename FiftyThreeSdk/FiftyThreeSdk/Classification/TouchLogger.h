@@ -53,9 +53,27 @@ protected:
 
     int                 _isolatedIncrementalUpdateIndex;  // Index determining incremental updates
 
+
+    
+    
 public:
     typedef fiftythree::core::shared_ptr<TouchData> Ptr;
 
+    float               _radiusMean;
+    float               _radiusMin;
+    float               _radiusMax;
+    
+    // _radiusM2 is the total sum of squared deviations from the current _radiusMean and
+    // has a convenient update formula.  variance is then estimated as _radiusM2 / (N-1)
+    // where N is number of samples.
+    //
+    // See:
+    // http://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Incremental_algorithm
+    //
+    float               _radiusM2;
+    float               _radiusVariance;
+    
+    
 protected:
     // methods
 

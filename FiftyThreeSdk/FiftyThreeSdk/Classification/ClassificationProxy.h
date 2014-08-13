@@ -254,6 +254,9 @@ public:
     {
         return _activeStylusConnected;
     }
+    
+    bool TouchRadiusAvailable();
+
 
     // compare the cluster's score to all concurrent clusters.
     // return the minimum ratio of (cluster score) / (other cluster score).

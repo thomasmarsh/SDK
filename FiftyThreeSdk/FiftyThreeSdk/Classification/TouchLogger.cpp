@@ -315,6 +315,12 @@ void TouchLogger::TouchesChanged(const std::set<core::Touch::Ptr> & touches)
                     {
                         float r  = *(touch->CurrentSample().TouchRadius());
                         stroke->AddTouchRadius(r);
+                        
+                        data->_radiusMax       = r;
+                        data->_radiusMin       = r;
+                        data->_radiusMean      = r;
+                        data->_radiusM2        = 0.0f;
+                        data->_radiusVariance  = 0.0f;
                     }
 
                 }
@@ -351,6 +357,19 @@ void TouchLogger::TouchesChanged(const std::set<core::Touch::Ptr> & touches)
                     {
                         float r  = *(touch->CurrentSample().TouchRadius());
                         touchData->Stroke()->AddTouchRadius(r);
+                        
+                        
+                        touchData->_radiusMax       = std::max(touchData->_radiusMax, r);
+                        touchData->_radiusMin       = std::min(touchData->_radiusMin, r);
+                        
+                        float N     = touch->History()->size();
+                        float delta = r - touchData->_radiusMean;
+                        
+                        touchData->_radiusMean      += delta / N;
+                        touchData->_radiusM2        += delta * (r - touchData->_radiusMean);
+                        touchData->_radiusVariance   = touchData->_radiusM2 / (N-1);
+                        
+                        
                     }
                 }
 
