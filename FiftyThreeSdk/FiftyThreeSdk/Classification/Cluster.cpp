@@ -508,10 +508,6 @@ void ClusterTracker::RemoveUnusedStaleClusters()
             {
                 tCutoff                        = cluster->FirstTimestamp();
             }
-            else
-            {
-                DebugAssert(_touchLog->Phase(oldestReclassifiableTouch) != TouchPhase::Began);
-            }
 
             // the entire cluster gets reclassified, so we need to use the timestamp from the earliest
             // touch in the cluster.
@@ -1275,6 +1271,10 @@ void ClusterTracker::TouchesChanged(const std::set<core::Touch::Ptr> & touches)
     }
     else
     {
+        
+        MarkStaleClusters(CurrentTime());
+        RemoveUnusedStaleClusters();
+        
         UpdateClusters();
     }
 }

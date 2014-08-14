@@ -1782,7 +1782,8 @@ vector<float> TouchClassificationProxy::SizeDataForTouch(TouchId touchId)
 
 void TouchClassificationProxy::OnTouchesChanged(const std::set<core::Touch::Ptr> & touches)
 {
-    // this updates the touchLog and the clusters
+    // this updates the touchLog and the clusters, and sets the current time in the touchLog
+    // from the most recent Touch timestamp.
     _clusterTracker->TouchesChanged(touches);
 
     UpdateSessionStatistics();
@@ -2006,7 +2007,7 @@ bool TouchClassificationProxy::ReclassifyIfNeeded(double timestamp)
         ClassifyIsolatedStrokes();
 
         _clusterTracker->MarkStaleClusters(_clusterTracker->CurrentTime());
-
+        
         SetOldUnknownTouchesToType(TouchClassification::Palm);
 
         RecomputeClusterPriors();
