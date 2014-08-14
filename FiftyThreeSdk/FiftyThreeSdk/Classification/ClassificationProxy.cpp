@@ -672,8 +672,6 @@ void TouchClassificationProxy::SetClusterType(Cluster::Ptr const & cluster, Touc
         if (cluster->IsPenType() && (newType == TouchClassification::Palm || newType == TouchClassification::Finger))
         {
             
-            std::cerr << "\nsetting pen to palm or finger";
-            
             float penDownDt = -1.0f;
             if (_touchStatistics.count(cluster->MostRecentTouch()))
             {
@@ -1966,8 +1964,6 @@ bool TouchClassificationProxy::ReclassifyIfNeeded(double timestamp)
 {
     bool didSomething = false;
 
-    std::cerr << "\nRIN";
-    
     ProcessDebounceQueue();
     UpdateIsolationStatistics();
 
