@@ -30,11 +30,14 @@
 @property (nonatomic) BOOL hasListener;
 @property (nonatomic) NSInteger inactivityTimeout;
 @property (nonatomic) FTPenPressureSetup *pressureSetup;
+@property (nonatomic) FTAccelerationSetup *accelerationSetup;
+
 @property (nonatomic) NSString *manufacturingID;
 @property (nonatomic, readonly) FTPenLastErrorCode *lastErrorCode;
 @property (nonatomic) NSData *authenticationCode;
 @property (nonatomic, readonly) BOOL canWriteCentralId;
 @property (nonatomic) UInt32 centralId;
+@property (nonatomic) FTAcceleration acceleration;
 
 @property (nonatomic, readonly) BOOL isReady;
 @property (nonatomic, readonly) BOOL isPoweringOff;
@@ -58,6 +61,7 @@
 - (void)penServiceClient:(FTPenServiceClient *)penServiceClient isTipPressedDidChange:(BOOL)isTipPressed;
 - (void)penServiceClient:(FTPenServiceClient *)penServiceClient didUpdateTipPressure:(float)tipPressure;
 - (void)penServiceClient:(FTPenServiceClient *)penServiceClient didUpdateEraserPressure:(float)eraserPressure;
+- (void)penServiceClient:(FTPenServiceClient *)penServiceClient didUpdateAcceleration:(FTAcceleration)acceleration;
 - (void)penServiceClient:(FTPenServiceClient *)penServiceClient isEraserPressedDidChange:(BOOL)isEraserPressed;
 - (void)penServiceClient:(FTPenServiceClient *)penServiceClient batteryLevelDidChange:(NSNumber *)batteryLevel;
 - (void)penServiceClient:(FTPenServiceClient *)penServiceClient didReadManufacturingID:(NSString *)manufacturingID;

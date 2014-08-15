@@ -38,6 +38,8 @@ using namespace fiftythree::core;
 @property (nonatomic) CBCharacteristic *lastErrorCodeCharacteristic;
 @property (nonatomic) CBCharacteristic *authenticationCodeCharacteristic;
 @property (nonatomic) CBCharacteristic *centralIdCharacteristic;
+@property (nonatomic) CBCharacteristic *accelerationCharacteristic;
+@property (nonatomic) CBCharacteristic *accelerationSetupCharacteristic;
 
 @property (nonatomic) BOOL isTipPressedDidSetNofifyValue;
 @property (nonatomic) BOOL isEraserPressedDidSetNofifyValue;
@@ -46,12 +48,16 @@ using namespace fiftythree::core;
 @property (nonatomic) BOOL batteryLevelDidSetNofifyValue;
 @property (nonatomic) BOOL batteryLevelDidReceiveFirstUpdate;
 @property (nonatomic) BOOL hasListenerDidSetNofifyValue;
+@property (nonatomic) BOOL accelerationCharacteristicDidSetNofifyValue;
+
 @property (nonatomic) BOOL didInitialReadOfInactivityTimeout;
 @property (nonatomic) BOOL didInitialReadOfPressureSetup;
+@property (nonatomic) BOOL didInitialReadOfAccelerationSetup;
 @property (nonatomic) BOOL didInitialReadOfManufacturingID;
 @property (nonatomic) BOOL didInitialReadOfLastErrorCode;
 @property (nonatomic) BOOL didInitialReadOfAuthenticationCode;
 @property (nonatomic) BOOL didInitialReadOfHasListener;
+@property (nonatomic) BOOL didInitialReadOfAcceleration;
 
 @property (nonatomic, readwrite) NSDate *lastTipReleaseTime;
 
@@ -200,6 +206,26 @@ using namespace fiftythree::core;
     }
 }
 
+- (void)setAccelerationSetup:(FTAccelerationSetup *)setup
+{
+    FTAssert(setup, @"setup non-nil");
+
+    _accelerationSetup = setup;
+    if (self.accelerationSetup)
+    {
+        static int length = 11;
+        uint8_t bytes[length];
+        NSData *data = [NSData dataWithBytes:bytes length:11];
+        [self.accelerationSetup writeToNSData:data];
+
+        [self.peripheral writeValue:data
+                  forCharacteristic:self.accelerationSetupCharacteristic
+                               type:CBCharacteristicWriteWithResponse];
+
+        [self.peripheral readValueForCharacteristic:self.accelerationSetupCharacteristic];
+    }
+}
+
 - (void)setManufacturingID:(NSString *)manufacturingID
 {
     FTAssert(manufacturingID.length == 15, @"Manufacturing ID must be 15 characters");
@@ -311,6 +337,8 @@ using namespace fiftythree::core;
         self.lastErrorCodeCharacteristic = nil;
         self.authenticationCodeCharacteristic = nil;
         self.centralIdCharacteristic = nil;
+        self.accelerationCharacteristic = nil;
+        self.accelerationSetupCharacteristic = nil;
 
         self.isTipPressedDidSetNofifyValue = NO;
         self.isEraserPressedDidSetNofifyValue = NO;
@@ -326,6 +354,8 @@ using namespace fiftythree::core;
         self.didInitialReadOfLastErrorCode = NO;
         self.didInitialReadOfAuthenticationCode = NO;
         self.didInitialReadOfHasListener = NO;
+        self.didInitialReadOfAcceleration = NO;
+        self.didInitialReadOfAccelerationSetup = NO;
 
         return nil;
     }
@@ -356,6 +386,8 @@ using namespace fiftythree::core;
                                          [FTPenServiceUUIDs lastErrorCode],
                                          [FTPenServiceUUIDs pressureSetup],
                                          [FTPenServiceUUIDs centralId],
+                                         [FTPenServiceUUIDs acceleration],
+                                         [FTPenServiceUUIDs accelerationSetup]
                                          ];
 
             [peripheral discoverCharacteristics:characteristics forService:self.penService];
@@ -480,6 +512,19 @@ using namespace fiftythree::core;
         {
             self.centralIdCharacteristic = characteristic;
         }
+        // Acceleration
+        if (!self.accelerationCharacteristic &&
+            [characteristic.UUID isEqual:[FTPenServiceUUIDs acceleration]])
+        {
+            self.accelerationCharacteristic = characteristic;
+        }
+
+        // AccelerationSetup
+        if (!self.accelerationSetupCharacteristic &&
+            [characteristic.UUID isEqual:[FTPenServiceUUIDs accelerationSetup]])
+        {
+            self.accelerationSetupCharacteristic = characteristic;
+        }
     }
 
     [self ensureCharacteristicNotificationsAndInitialization];
@@ -563,6 +608,30 @@ using namespace fiftythree::core;
         _eraserPressure = [characteristic valueAsNSUInteger];
         [self.delegate penServiceClient:self didUpdateEraserPressure:_eraserPressure];
     }
+    else if ([characteristic.UUID isEqual:[FTPenServiceUUIDs acceleration]])
+    {
+        if (self.accelerationCharacteristic)
+        {
+            FTAssert(characteristic == self.accelerationCharacteristic, @"accelerationCharacteristic is acceleration characteristic");
+
+            NSData *data = characteristic.value;
+
+            _acceleration.x = 0x0;
+            _acceleration.y = 0x0;
+            _acceleration.z = 0x0;
+
+            _acceleration.x = ((unsigned char *)data.bytes)[0];
+            _acceleration.x |= (((unsigned char *)data.bytes)[1] << 8);
+
+            _acceleration.y = ((unsigned char *)data.bytes)[2];
+            _acceleration.y |= (((unsigned char *)data.bytes)[3] << 8);
+
+            _acceleration.z = ((unsigned char *)data.bytes)[4];
+            _acceleration.z |= (((unsigned char *)data.bytes)[5] << 8);
+
+            [self.delegate penServiceClient:self didUpdateAcceleration:_acceleration];
+        }
+    }
     else if ([characteristic isEqual:self.batteryLevelCharacteristic])
     {
         // Ignore the first battery level update that results from setting notification on the
@@ -575,8 +644,6 @@ using namespace fiftythree::core;
             [self.delegate penServiceClient:self batteryLevelDidChange:self.batteryLevel];
 
             [self resetBatteryLevelReadTimer];
-
-            //NSLog(@"BatteryLevel did update value: %@", self.batteryLevel);
         }
         else
         {
@@ -594,6 +661,14 @@ using namespace fiftythree::core;
         {
             _pressureSetup = [[FTPenPressureSetup alloc] initWithNSData:characteristic.value];
             [updatedProperties addObject:kFTPenPressureSetupPropertyName];
+        }
+    }
+    else if ([characteristic isEqual:self.accelerationSetupCharacteristic])
+    {
+        if (characteristic.value.length == 11)
+        {
+            _accelerationSetup = [[FTAccelerationSetup alloc] initWithNSData:characteristic.value];
+            [updatedProperties addObject:kFTPenAccelerationSetupPropertyName];
         }
     }
     else if ([characteristic.UUID isEqual:[FTPenServiceUUIDs manufacturingID]])
@@ -767,6 +842,13 @@ using namespace fiftythree::core;
             self.eraserPressureDidSetNofifyValue = YES;
         }
 
+        if (self.accelerationCharacteristic && !self.accelerationCharacteristicDidSetNofifyValue)
+        {
+            [self.peripheral setNotifyValue:YES
+                          forCharacteristic:self.accelerationCharacteristic];
+            self.accelerationCharacteristicDidSetNofifyValue = YES;
+        }
+
         if (self.batteryLevelCharacteristic && !self.batteryLevelDidSetNofifyValue)
         {
             [self.peripheral setNotifyValue:YES
@@ -798,7 +880,11 @@ using namespace fiftythree::core;
             [self.peripheral readValueForCharacteristic:self.pressureSetupCharacteristic];
             self.didInitialReadOfPressureSetup = YES;
         }
-
+        if (self.accelerationSetupCharacteristic && !self.didInitialReadOfAccelerationSetup)
+        {
+            [self.peripheral readValueForCharacteristic:self.accelerationSetupCharacteristic];
+            self.didInitialReadOfAccelerationSetup = YES;
+        }
         if (self.manufacturingIDCharacteristic && !self.didInitialReadOfManufacturingID)
         {
             [self.peripheral readValueForCharacteristic:self.manufacturingIDCharacteristic];

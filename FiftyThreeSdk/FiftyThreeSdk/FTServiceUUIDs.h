@@ -10,7 +10,6 @@
 #import <CoreBluetooth/CoreBluetooth.h>
 
 @interface FTPenServiceUUIDs : NSObject
-
 + (CBUUID *)penService;
 + (CBUUID *)isTipPressed;
 + (CBUUID *)isEraserPressed;
@@ -26,9 +25,9 @@
 + (CBUUID *)lastErrorCode;
 + (CBUUID *)authenticationCode;
 + (CBUUID *)centralId;
-
++ (CBUUID *)acceleration;
++ (CBUUID *)accelerationSetup;
 + (NSString *)nameForUUID:(CBUUID *)UUID;
-
 @end
 
 @interface FTPenUsageServiceUUIDs : NSObject

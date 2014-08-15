@@ -42,6 +42,13 @@ extern NSString * const kFTPenBatteryLevelPropertyName;
 
 @protocol FTPenDelegate;
 
+struct FTAcceleration
+{
+int16_t x;
+int16_t y;
+int16_t z;
+};
+
 @interface FTPen : NSObject
 
 @property (nonatomic, weak) id<FTPenDelegate> delegate;
@@ -62,6 +69,7 @@ extern NSString * const kFTPenBatteryLevelPropertyName;
 @property (nonatomic, readonly) BOOL isEraserPressed;
 @property (nonatomic, readonly) float tipPressure;
 @property (nonatomic, readonly) float eraserPressure;
+@property (nonatomic, readonly) FTAcceleration acceleration;
 @property (nonatomic, readonly) NSDate *lastTipReleaseTime;
 @property (nonatomic, readonly) NSNumber *batteryLevel;
 
@@ -75,6 +83,7 @@ extern NSString * const kFTPenBatteryLevelPropertyName;
 - (void)pen:(FTPen *)pen isEraserPressedDidChange:(BOOL)isEraserPressed;
 - (void)pen:(FTPen *)pen tipPressureDidChange:(float)tipPressure;
 - (void)pen:(FTPen *)pen eraserPressureDidChange:(float)eraserPressure;
+- (void)pen:(FTPen *)pen accelerationDidChange:(FTAcceleration)acceleration;
 - (void)pen:(FTPen *)pen batteryLevelDidChange:(NSNumber *)batteryLevel;
 
 @end

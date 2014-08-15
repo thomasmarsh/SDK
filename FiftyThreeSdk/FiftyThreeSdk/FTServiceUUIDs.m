@@ -54,6 +54,12 @@
 // 0365CFC0-BE72-11E3-A496-0002A5D5C51B
 #define FT_PEN_SERVICE_CENTRAL_ID_UUID CFUUIDGetConstantUUIDWithBytes(kCFAllocatorSystemDefault, 0x03, 0x65, 0xCF, 0xC0, 0xBE, 0x72, 0x11, 0xE3, 0xA4, 0x96, 0x00, 0x02, 0xA5, 0xD5, 0xC5, 0x1B)
 
+// FCCE8FB8-D4C9-4390-8D75-21CE748EC303
+#define FT_PEN_SERVICE_ACCEL_UUID CFUUIDGetConstantUUIDWithBytes(kCFAllocatorSystemDefault, 0xFC, 0xCE, 0x8F, 0xB8, 0xD4, 0xC9, 0x43, 0x90, 0x8D, 0x75, 0x21, 0xCE, 0x74, 0x8E, 0xC3, 0x03)
+
+// CC454B53-1622-4604-95DD-A30ECC6A678E
+#define FT_PEN_SERVICE_ACCEL_SETUP_UUID  CFUUIDGetConstantUUIDWithBytes(kCFAllocatorSystemDefault,0xCC, 0x45, 0x4B, 0x53, 0x16, 0x22, 0x46, 0x04, 0x95, 0xDD, 0xA3, 0x0E, 0xCC, 0x6A, 0x67, 0x8E)
+
 @implementation FTPenServiceUUIDs
 
 + (CBUUID *)penService
@@ -131,6 +137,16 @@
     return [CBUUID UUIDWithCFUUID:FT_PEN_SERVICE_CENTRAL_ID_UUID];
 }
 
++ (CBUUID *)acceleration
+{
+    return [CBUUID UUIDWithCFUUID:FT_PEN_SERVICE_ACCEL_UUID];
+}
+
++ (CBUUID *)accelerationSetup
+{
+    return [CBUUID UUIDWithCFUUID:FT_PEN_SERVICE_ACCEL_SETUP_UUID];
+}
+
 + (NSString *)nameForUUID:(CBUUID *)UUID
 {
     NSDictionary *UUIDs = @{ [FTPenServiceUUIDs penService] : @"PenService",
@@ -148,6 +164,8 @@
                              [FTPenServiceUUIDs lastErrorCode] : @"LastErrorCode",
                              [FTPenServiceUUIDs authenticationCode] : @"AuthenticationCode",
                              [FTPenServiceUUIDs centralId] : @"CentralId",
+                             [FTPenServiceUUIDs acceleration] : @"Acceleration",
+                             [FTPenServiceUUIDs accelerationSetup] : @"AccelerationSetup",
                              };
     return [UUIDs objectForKey:UUID];
 }
