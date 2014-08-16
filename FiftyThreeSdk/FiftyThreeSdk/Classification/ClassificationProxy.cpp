@@ -664,14 +664,14 @@ void TouchClassificationProxy::SetClusterType(Cluster::Ptr const & cluster, Touc
             }
         }
 
-        if(cluster->IsPenType() && newType == TouchClassification::Unknown)
+        if (cluster->IsPenType() && newType == TouchClassification::Unknown)
         {
             //std::cerr << "\npen -> unknown";
         }
-        
+
         if (cluster->IsPenType() && (newType == TouchClassification::Palm || newType == TouchClassification::Finger))
         {
-            
+
             float penDownDt = -1.0f;
             if (_touchStatistics.count(cluster->MostRecentTouch()))
             {
@@ -884,10 +884,7 @@ bool TouchClassificationProxy::TouchRadiusAvailable()
     return (_clusterTracker->TouchWithId(_clusterTracker->MostRecentTouch()) &&
             _clusterTracker->TouchWithId(_clusterTracker->MostRecentTouch())->CurrentSample().TouchRadius());
 }
-    
-    
-    
-    
+
 VectorXf TouchClassificationProxy::PenPriorForClusters(vector<Cluster::Ptr> const & clusters)
 {
 
@@ -962,10 +959,8 @@ VectorXf TouchClassificationProxy::PenPriorForClusters(vector<Cluster::Ptr> cons
 
     }
 
- 
-    
     // now size prior...
-    if(TouchRadiusAvailable())
+    if (TouchRadiusAvailable())
     {
         for (int j=0; j<prior.size(); j++)
         {
@@ -980,7 +975,7 @@ VectorXf TouchClassificationProxy::PenPriorForClusters(vector<Cluster::Ptr> cons
             {
                 float mu = 35.0f;
                 float sigma = 5.0f;
-                
+
                 float dEraser = (r - mu) / sigma;
                 penLikelihood = (1.0f / sigma) * expf(-.5f * dEraser * dEraser);
             }
@@ -990,37 +985,35 @@ VectorXf TouchClassificationProxy::PenPriorForClusters(vector<Cluster::Ptr> cons
                 // model the pen tip as a mixture of two normal distributions,
                 // one representing a pen held in writing position with a small contact patch,
                 // and another a somewhat angled tip
-                
+
                 float muVerticalTip    = 10.4375f;
                 float sigmaVerticalTip = 1.0f;
-                
+
                 float muAngledTip    = 27.0f;
                 float sigmaAngledTip = 16.0f;
-                
+
                 float dPenVertical     = (r - muVerticalTip) / sigmaVerticalTip;
                 float dPenAngled       = (r - muAngledTip)   / sigmaAngledTip;
-                
+
                 float likelihoodVertical  = (1.0f / sigmaVerticalTip)  * expf(-.5f * dPenVertical * dPenVertical);
                 float likelihoodAngled    = (1.0f / sigmaAngledTip) * expf(-.5f * dPenAngled * dPenAngled);
-                
+
                 penLikelihood = .5f * (likelihoodAngled + likelihoodVertical);
 
-                if(r > 55.0f || rMax > 55.0f)
+                if (r > 55.0f || rMax > 55.0f)
                 {
                     penLikelihood = 0.0f;
                 }
-                
-                
+
             }
-            
-            
+
             float sigmaPalm      = 37.0f;
             float muPalm         = 87.0f;
-            
+
             // min since we're using dumb normal distributions and we don't want to be penalized for being big.
             // if r exceeds muPalm, clamp dPalm to zero, which maximizes the likelihood.
             float dPalm = std::min(0.0f, (r - muPalm)) / sigmaPalm;
-            
+
             float palmLikelihood = (1.0f / sigmaPalm) * expf(-.5f * dPalm * dPalm);
 
             float pPen = penLikelihood / (.0001f + penLikelihood + palmLikelihood);
@@ -1279,9 +1272,7 @@ IdTypeMap TouchClassificationProxy::ReclassifyCurrentEvent()
         {
             return types;
         }
-        
 
-        
         // as a special case, we'll check for a finger if there's an "isolated touch".
         // the logic for identifying this case is slightly tricky due to the
         // temporal blurring that clusters use.  the touch is isolated, but the clusters might not be.
@@ -1296,8 +1287,8 @@ IdTypeMap TouchClassificationProxy::ReclassifyCurrentEvent()
         {
 
             Cluster::Ptr cluster = _clusterTracker->Cluster(liveTouches[0]);
-            
-            if(TouchSize::IsPenGivenTouchRadius(*_clusterTracker->Data(liveTouches[0])))
+
+            if (TouchSize::IsPenGivenTouchRadius(*_clusterTracker->Data(liveTouches[0])))
             {
                 checkForFingerSequence = false;
             }
@@ -1484,24 +1475,35 @@ IdTypeMap TouchClassificationProxy::ReclassifyCurrentEvent()
                             (! probeCluster->_wasInterior) &&
                             atCorrectEnd)
                         {
-                            if ((isBestConcurrent && probePair.second > .2f)) {
+                            if ((isBestConcurrent && probePair.second > .2f))
+                            {
                                 newTypes[probeCluster] = probePair.first;
                             }
-                            else if(TouchRadiusAvailable() &&
-                                    TouchSize::IsPenGivenTouchRadius(*_clusterTracker->Data(probeCluster->MostRecentTouch())))
+                            else if (TouchRadiusAvailable() &&
+                                     TouchSize::IsPenGivenTouchRadius(*_clusterTracker->Data(probeCluster->MostRecentTouch())))
                             {
-                                newTypes[probeCluster] = core::TouchClassification::Pen;
+                                // this is just an early classification and will get overridden by PenEvents
+                                // in the (probePair.second > .8f) clause above -- IF any events arrive.
+                                // However, we should still
+                                // make a good effort to figure pen vs. eraser, since eraser can look like
+                                // pen tip, depending on how it is angled.
+
+                                if (_clusterTracker->MostRecentPenTipType() == core::TouchClassification::Eraser)
+                                {
+                                    newTypes[probeCluster] = core::TouchClassification::Eraser;
+                                }
+                                else
+                                {
+                                    newTypes[probeCluster] = core::TouchClassification::Pen;
+                                }
                             }
                         }
                         else
                         {
                             newTypes[probeCluster] = TouchClassification::Palm;
                         }
-
                     }
-
                 }
-
             }
 
             // now for each pen, check to see if anybody else wants these pen events.
@@ -2003,7 +2005,7 @@ bool TouchClassificationProxy::ReclassifyIfNeeded(double timestamp)
         ClassifyIsolatedStrokes();
 
         _clusterTracker->MarkStaleClusters(_clusterTracker->CurrentTime());
-        
+
         SetOldUnknownTouchesToType(TouchClassification::Palm);
 
         RecomputeClusterPriors();

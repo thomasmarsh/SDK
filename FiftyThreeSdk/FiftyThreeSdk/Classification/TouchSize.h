@@ -2,8 +2,7 @@
 //  TouchSize.h
 //  FiftyThreeSdk
 //
-//  Created by matt on 8/13/14.
-//  Copyright (c) 2014 FiftyThree. All rights reserved.
+//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
 
 #pragma once
@@ -21,25 +20,23 @@
 #include "FiftyThreeSdk/Classification/Quadrature.h"
 #include "FiftyThreeSdk/Classification/TouchLogger.h"
 
-
 namespace fiftythree
 {
 namespace sdk
 {
 class TouchSize
 {
-    
+
 public:
-    
+
     constexpr static float PenTipRadius = 10.4375f;
-    
+
     // pen tip is very small -- this tells the caller if the size statistics
-    // confidently indicate a pen.
-    //static bool IsPenGivenTouchRadius(float meanRadius, float minRadius, float maxRadius, float variance);
-    
+    // confidently indicate a pen.  with Pencil, the eraser tip can also look like
+    // a pen when held at an angle with the short side making contact, so
+    // IsPenGivenTouchRadius() will be fooled in that case.  the switch needs to save the day.
     static bool IsPenGivenTouchRadius(TouchData const &data);
-    
-    
+
 };
 }
 }
