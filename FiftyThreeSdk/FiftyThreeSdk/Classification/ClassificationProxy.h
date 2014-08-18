@@ -194,6 +194,8 @@ protected:
     void ReclassifyClusters();
 
     void FingerTapIsolationRule(IdTypeMap & newTypes);
+    
+    void FingerToPalmRules(IdTypeMap & newTypes);
 
     void SetClusterType(Cluster::Ptr const & cluster, core::TouchClassification newType, IdTypeMap & changedTypes);
 

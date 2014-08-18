@@ -661,6 +661,17 @@ void TouchClassificationProxy::SetClusterType(Cluster::Ptr const & cluster, Touc
             else if ((length > _longFingerLength) || lifetime > _longDuration)
             {
                 onlyUpdateUnknownTouches = true;
+
+                // if we have a concurrent pen, this is definitely a palm.
+                // however, a concurrent palm can just mean they brushed the screen with their hand.
+                for(auto otherTouch : _clusterTracker->ConcurrentTouches(cluster->MostRecentTouch()))
+                {
+                    if (CurrentClass(otherTouch) == core::TouchClassification::Pen ||
+                        CurrentClass(otherTouch) == core::TouchClassification::Eraser)
+                    {
+                        onlyUpdateUnknownTouches = false;
+                    }
+                }
             }
         }
 
@@ -1131,6 +1142,42 @@ void TouchClassificationProxy::UpdateIsolationStatistics()
     }
 }
 
+    
+// the finger sequence logic doesn't take care of the transition from Finger back to Palm.
+// this method does that.
+void TouchClassificationProxy::FingerToPalmRules(IdTypeMap & newTypes)
+{
+    
+    for(auto cluster : _clusterTracker->CurrentEventAllClusters())
+    {
+        if(cluster->_clusterTouchType == core::TouchClassification::Finger)
+        {
+            for (auto touch : cluster->Touches())
+            {
+                // pre and post isolation will get set to -1 if there's a concurrent touch, so this
+                // will DWIW here.
+                if (_touchStatistics[touch]._preIsolation < _fingerSmudgeIsolationSeconds)
+                {
+                    // if there's a concurrent touch, always make this a palm.
+                    if(_touchStatistics[touch]._preIsolation < 0.0f)
+                    {
+                        SetClusterType(cluster, core::TouchClassification::Palm, newTypes);
+                    }
+                    else
+                    {
+                        // if the previous touch was also a finger, this is likely a rapid sequence of smudge
+                        auto precedingTouch = _clusterTracker->TouchPrecedingTouch(touch);
+                        if(CurrentClass(precedingTouch) != core::TouchClassification::Finger)
+                        {
+                            SetClusterType(cluster, core::TouchClassification::Palm, newTypes);
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+    
 // enforce the 'no touches arrived too soon after a tap' rule
 void TouchClassificationProxy::FingerTapIsolationRule(IdTypeMap & changedTypes)
 {
@@ -1158,7 +1205,6 @@ void TouchClassificationProxy::FingerTapIsolationRule(IdTypeMap & changedTypes)
         if (CurrentClass(touchId) != TouchClassification::Finger &&
            _isolatedStrokesClassifier.IsTap(touchId))
         {
-            std::cerr << "\n finger tap isolation rule";
             _currentTypes[touchId] = TouchClassification::Palm;
             changedTypes[touchId]  = TouchClassification::Palm;
         }
@@ -1257,6 +1303,8 @@ IdTypeMap TouchClassificationProxy::ReclassifyCurrentEvent()
     else
     {
 
+        FingerToPalmRules(types);
+        
         // this will compute all the relevant probabilities so we have consistent information
         // in the loop below.
         for (Cluster::Ptr & cluster:timeOrderedClusters)
