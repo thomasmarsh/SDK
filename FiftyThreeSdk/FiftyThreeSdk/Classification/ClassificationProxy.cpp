@@ -664,7 +664,7 @@ void TouchClassificationProxy::SetClusterType(Cluster::Ptr const & cluster, Touc
 
                 // if we have a concurrent pen, this is definitely a palm.
                 // however, a concurrent palm can just mean they brushed the screen with their hand.
-                for(auto otherTouch : _clusterTracker->ConcurrentTouches(cluster->MostRecentTouch()))
+                for (const auto & otherTouch : _clusterTracker->ConcurrentTouches(cluster->MostRecentTouch()))
                 {
                     if (CurrentClass(otherTouch) == core::TouchClassification::Pen ||
                         CurrentClass(otherTouch) == core::TouchClassification::Eraser)
@@ -673,11 +673,6 @@ void TouchClassificationProxy::SetClusterType(Cluster::Ptr const & cluster, Touc
                     }
                 }
             }
-        }
-
-        if (cluster->IsPenType() && newType == TouchClassification::Unknown)
-        {
-            //std::cerr << "\npen -> unknown";
         }
 
         if (cluster->IsPenType() && (newType == TouchClassification::Palm || newType == TouchClassification::Finger))
@@ -973,7 +968,7 @@ VectorXf TouchClassificationProxy::PenPriorForClusters(vector<Cluster::Ptr> cons
     // now size prior...
     if (TouchRadiusAvailable())
     {
-        for (int j=0; j<prior.size(); j++)
+        for (int j = 0; j < prior.size(); j++)
         {
 
             Cluster::Ptr const & cluster = clusters[j];
@@ -984,11 +979,11 @@ VectorXf TouchClassificationProxy::PenPriorForClusters(vector<Cluster::Ptr> cons
 
             if (_clusterTracker->MostRecentPenTipType() == TouchClassification::Eraser)
             {
-                float mu = 35.0f;
-                float sigma = 5.0f;
+                constexpr float mu = 35.0f;
+                constexpr float sigma = 5.0f;
 
                 float dEraser = (r - mu) / sigma;
-                penLikelihood = (1.0f / sigma) * expf(-.5f * dEraser * dEraser);
+                penLikelihood = (1.0f / sigma) * std::exp(-.5f * dEraser * dEraser);
             }
             else
             {
@@ -997,17 +992,17 @@ VectorXf TouchClassificationProxy::PenPriorForClusters(vector<Cluster::Ptr> cons
                 // one representing a pen held in writing position with a small contact patch,
                 // and another a somewhat angled tip
 
-                float muVerticalTip    = 10.4375f;
-                float sigmaVerticalTip = 1.0f;
+                constexpr float muVerticalTip    = 10.4375f;
+                constexpr float sigmaVerticalTip = 1.0f;
 
-                float muAngledTip    = 27.0f;
-                float sigmaAngledTip = 16.0f;
+                constexpr float muAngledTip    = 27.0f;
+                constexpr float sigmaAngledTip = 16.0f;
 
                 float dPenVertical     = (r - muVerticalTip) / sigmaVerticalTip;
                 float dPenAngled       = (r - muAngledTip)   / sigmaAngledTip;
 
-                float likelihoodVertical  = (1.0f / sigmaVerticalTip)  * expf(-.5f * dPenVertical * dPenVertical);
-                float likelihoodAngled    = (1.0f / sigmaAngledTip) * expf(-.5f * dPenAngled * dPenAngled);
+                float likelihoodVertical  = (1.0f / sigmaVerticalTip)  * std::exp(-.5f * dPenVertical * dPenVertical);
+                float likelihoodAngled    = (1.0f / sigmaAngledTip) * std::exp(-.5f * dPenAngled * dPenAngled);
 
                 penLikelihood = .5f * (likelihoodAngled + likelihoodVertical);
 
@@ -1018,14 +1013,14 @@ VectorXf TouchClassificationProxy::PenPriorForClusters(vector<Cluster::Ptr> cons
 
             }
 
-            float sigmaPalm      = 37.0f;
-            float muPalm         = 87.0f;
+            constexpr float sigmaPalm      = 37.0f;
+            constexpr float muPalm         = 87.0f;
 
             // min since we're using dumb normal distributions and we don't want to be penalized for being big.
             // if r exceeds muPalm, clamp dPalm to zero, which maximizes the likelihood.
             float dPalm = std::min(0.0f, (r - muPalm)) / sigmaPalm;
 
-            float palmLikelihood = (1.0f / sigmaPalm) * expf(-.5f * dPalm * dPalm);
+            float palmLikelihood = (1.0f / sigmaPalm) * std::exp(-.5f * dPalm * dPalm);
 
             float pPen = penLikelihood / (.0001f + penLikelihood + palmLikelihood);
             prior[j] *= pPen;
@@ -1142,24 +1137,23 @@ void TouchClassificationProxy::UpdateIsolationStatistics()
     }
 }
 
-    
 // the finger sequence logic doesn't take care of the transition from Finger back to Palm.
 // this method does that.
 void TouchClassificationProxy::FingerToPalmRules(IdTypeMap & newTypes)
 {
-    
-    for(auto cluster : _clusterTracker->CurrentEventAllClusters())
+
+    for (const auto & cluster : _clusterTracker->CurrentEventAllClusters())
     {
-        if(cluster->_clusterTouchType == core::TouchClassification::Finger)
+        if (cluster->_clusterTouchType == core::TouchClassification::Finger)
         {
-            for (auto touch : cluster->Touches())
+            for (const auto & touch : cluster->Touches())
             {
                 // pre and post isolation will get set to -1 if there's a concurrent touch, so this
                 // will DWIW here.
                 if (_touchStatistics[touch]._preIsolation < _fingerSmudgeIsolationSeconds)
                 {
                     // if there's a concurrent touch, always make this a palm.
-                    if(_touchStatistics[touch]._preIsolation < 0.0f)
+                    if (_touchStatistics[touch]._preIsolation < 0.0f)
                     {
                         SetClusterType(cluster, core::TouchClassification::Palm, newTypes);
                     }
@@ -1167,7 +1161,7 @@ void TouchClassificationProxy::FingerToPalmRules(IdTypeMap & newTypes)
                     {
                         // if the previous touch was also a finger, this is likely a rapid sequence of smudge
                         auto precedingTouch = _clusterTracker->TouchPrecedingTouch(touch);
-                        if(CurrentClass(precedingTouch) != core::TouchClassification::Finger)
+                        if (CurrentClass(precedingTouch) != core::TouchClassification::Finger)
                         {
                             SetClusterType(cluster, core::TouchClassification::Palm, newTypes);
                         }
@@ -1177,7 +1171,7 @@ void TouchClassificationProxy::FingerToPalmRules(IdTypeMap & newTypes)
         }
     }
 }
-    
+
 // enforce the 'no touches arrived too soon after a tap' rule
 void TouchClassificationProxy::FingerTapIsolationRule(IdTypeMap & changedTypes)
 {
@@ -1304,7 +1298,7 @@ IdTypeMap TouchClassificationProxy::ReclassifyCurrentEvent()
     {
 
         FingerToPalmRules(types);
-        
+
         // this will compute all the relevant probabilities so we have consistent information
         // in the loop below.
         for (Cluster::Ptr & cluster:timeOrderedClusters)
@@ -1367,7 +1361,7 @@ IdTypeMap TouchClassificationProxy::ReclassifyCurrentEvent()
         if (checkForFingerSequence)
         {
 
-            Cluster::Ptr    cluster       = _clusterTracker->Cluster(liveTouches[0]); //timeOrderedClusters.back();
+            Cluster::Ptr    cluster       = _clusterTracker->Cluster(liveTouches[0]);
             std::pair<TouchClassification, float> pair = _penEventClassifier.TypeAndScoreForCluster(*cluster);
 
             TouchClassification newType = TouchClassification::Unknown;
@@ -1519,9 +1513,7 @@ IdTypeMap TouchClassificationProxy::ReclassifyCurrentEvent()
                         }
 
                         bool isBestConcurrent = dominationScore > 1.0f;
-                        if (
-                            (! probeCluster->_wasInterior) &&
-                            atCorrectEnd)
+                        if ((! probeCluster->_wasInterior) && atCorrectEnd)
                         {
                             if ((isBestConcurrent && probePair.second > .2f))
                             {

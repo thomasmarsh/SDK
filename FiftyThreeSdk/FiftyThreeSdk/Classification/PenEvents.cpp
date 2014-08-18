@@ -709,7 +709,7 @@ float PenEventClassifier::SwitchDurationLikelihoodForTimingError(float timingErr
     // Erlang pdf has a single maximum at 1/lambda (see above).
     timingError = std::max(1.0f / lambda, std::abs(timingError));
 
-    float likelihood = (lambda * lambda) * timingError * expf(- lambda * timingError);
+    float likelihood = (lambda * lambda) * timingError * std::exp(- lambda * timingError);
 
     DebugAssert(likelihood >= 0.0f);
 
@@ -734,7 +734,7 @@ float PenEventClassifier::SwitchDownLikelihoodForDeltaT(float deltaT)
         // in actual use it seems like any reasonable choice of decreasing function will work fine,
         // so long as there's significant decay by 3-4 cycles.
         // the lambda = 20 parameter models the average wait as (1 / 20) sec, or about 3 cycles.
-        return lambda * expf(-lambda * fabsf(s));
+        return lambda * std::exp(-lambda * fabsf(s));
     }
 
 }
@@ -756,7 +756,7 @@ float PenEventClassifier::SwitchUpLikelihoodForDeltaT(float deltaT)
 
         // hand-fit exponential based on training data.
         // in actual use it seems like any reasonable choice of decreasing function will work fine.
-        return lambda * expf(-lambda * fabsf(s));
+        return lambda * std::exp(-lambda * fabsf(s));
     }
 
 }

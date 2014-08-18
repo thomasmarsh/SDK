@@ -10,8 +10,8 @@
 #include "Core/Touch/Touch.h"
 #include "Core/Touch/TouchTracker.h"
 #include "FiftyThreeSdk/Classification//Classifier.h"
-#include "FiftyThreeSdk/TouchClassifierImpl.h"
 #include "FiftyThreeSdk/OffscreenTouchClassificationLinker.h"
+#include "FiftyThreeSdk/TouchClassifierImpl.h"
 
 using namespace fiftythree::core;
 using namespace fiftythree::sdk;
@@ -123,7 +123,7 @@ void TouchClassifierImpl::UpdateClassifications()
     vector<TouchClassificationChangedEventArgs> eventArgs;
     vector<TouchClassificationChangedEventArgs> allChangedEventArgs;
     vector<TouchClassificationChangedEventArgs> continuedClassificationArgs;
-    
+
     for (const Touch::cPtr & touch : TouchTracker::Instance()->RecentTouches())
     {
         TouchClassificationChangedEventArgs args;
@@ -176,7 +176,7 @@ void TouchClassifierImpl::UpdateClassifications()
             allChangedEventArgs.push_back(args);
         }
     }
-    
+
     _Linker->UpdateTouchContinuationLinkage();
     for (auto & e : continuedClassificationArgs)
     {
@@ -191,20 +191,19 @@ void TouchClassifierImpl::UpdateClassifications()
             e.newValue = e.touch->ContinuedClassification();
         }
     }
-    
+
     continuedClassificationArgs.erase(remove_if(continuedClassificationArgs.begin(),
                                                 continuedClassificationArgs.end(),
                                                 [](const TouchClassificationChangedEventArgs & e)
                                                     {
                                                         return e.newValue == e.oldValue || e.newValue == TouchClassification::UntrackedTouch;
                                                     }), continuedClassificationArgs.end());
-    
-    
+
     if (!continuedClassificationArgs.empty())
     {
         _TouchContinuedClassificationsDidChange.Fire(continuedClassificationArgs);
     }
-    
+
     if (!eventArgs.empty())
     {
         if (_ShowLog)
@@ -265,7 +264,7 @@ Event<const vector<TouchClassificationChangedEventArgs> &> & TouchClassifierImpl
 {
     return _TouchContinuedClassificationsDidChange;
 }
-    
+
 TouchClassifier::Ptr TouchClassifier::New()
 {
     return make_shared<TouchClassifierImpl>();

@@ -94,7 +94,6 @@ struct TouchStatistics
     _tEnded(-1.0f)
     {
     }
-
 };
 
 class TouchClassificationProxy : public Classifier
@@ -194,7 +193,7 @@ protected:
     void ReclassifyClusters();
 
     void FingerTapIsolationRule(IdTypeMap & newTypes);
-    
+
     void FingerToPalmRules(IdTypeMap & newTypes);
 
     void SetClusterType(Cluster::Ptr const & cluster, core::TouchClassification newType, IdTypeMap & changedTypes);
@@ -256,9 +255,8 @@ public:
     {
         return _activeStylusConnected;
     }
-    
-    bool TouchRadiusAvailable();
 
+    bool TouchRadiusAvailable();
 
     // compare the cluster's score to all concurrent clusters.
     // return the minimum ratio of (cluster score) / (other cluster score).
@@ -306,7 +304,6 @@ public:
     {
         return &_penTracker;
     }
-
 
     // touches which are very short can end in the unknown state.
     // this is a backstop which makes sure they get assigned to something before the

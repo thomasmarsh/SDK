@@ -5,9 +5,8 @@
 //  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
 
-#include "FiftyThreeSdk/Classification/TouchSize.h"
 #include "FiftyThreeSdk/Classification/TouchLogger.h"
-
+#include "FiftyThreeSdk/Classification/TouchSize.h"
 
 using namespace fiftythree::core;
 

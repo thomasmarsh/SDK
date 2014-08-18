@@ -7,8 +7,6 @@
 
 #pragma once
 
-#include <cmath>
-
 namespace fiftythree
 {
 namespace sdk
