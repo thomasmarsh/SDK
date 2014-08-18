@@ -5,20 +5,9 @@
 //  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
 
-#include "Core/Eigen.h"
-#include "Core/Touch/Touch.h"
-#include "Core/Touch/TouchTracker.h"
-#include "FiftyThreeSdk/Classification/ClassificationProxy.h"
-#include "FiftyThreeSdk/Classification/Helpers.h"
-#include "FiftyThreeSdk/Classification/LineFitting.h"
-#include "FiftyThreeSdk/Classification/Stroke.h"
 #include "FiftyThreeSdk/Classification/TouchSize.h"
+#include "FiftyThreeSdk/Classification/TouchLogger.h"
 
-using Eigen::Vector2f;
-using fiftythree::core::TouchClassification;
-using fiftythree::core::TouchId;
-using std::tie;
-using std::vector;
 
 using namespace fiftythree::core;
 

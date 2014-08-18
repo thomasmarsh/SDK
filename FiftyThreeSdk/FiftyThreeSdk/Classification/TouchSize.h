@@ -9,16 +9,13 @@
 
 #include <cmath>
 
-#include "FiftyThreeSdk/Classification/Cluster.h"
-#include "FiftyThreeSdk/Classification/CommonDeclarations.h"
-#include "FiftyThreeSdk/Classification/Debug.h"
-#include "FiftyThreeSdk/Classification/EigenLAB.h"
-#include "FiftyThreeSdk/Classification/FiniteDifferences.h"
-#include "FiftyThreeSdk/Classification/IsolatedStrokes.h"
-#include "FiftyThreeSdk/Classification/PenDirection.h"
-#include "FiftyThreeSdk/Classification/PenEvents.h"
-#include "FiftyThreeSdk/Classification/Quadrature.h"
-#include "FiftyThreeSdk/Classification/TouchLogger.h"
+namespace fiftythree
+{
+namespace sdk
+{
+    class TouchData;
+}
+}
 
 namespace fiftythree
 {
