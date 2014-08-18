@@ -42,12 +42,12 @@ extern NSString * const kFTPenBatteryLevelPropertyName;
 
 @protocol FTPenDelegate;
 
-struct FTAcceleration
+typedef struct FTAcceleration
 {
 int16_t x;
 int16_t y;
 int16_t z;
-};
+} FTAcceleration;
 
 @interface FTPen : NSObject
 
