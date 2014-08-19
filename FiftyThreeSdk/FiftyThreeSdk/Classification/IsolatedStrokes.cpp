@@ -240,7 +240,7 @@ EdgeThumbState IsolatedStrokesClassifier::TestEdgeThumb(core::TouchId touchId)
     }
 
     Stroke::Ptr stroke           = _clusterTracker->Stroke(touchId);
-    if (!stroke)
+    if (! stroke)
     {
         return EdgeThumbState::NotThumb;
     }
@@ -381,8 +381,16 @@ IdTypeMap IsolatedStrokesClassifier::ReclassifyActiveTouches()
     {
         for (int i=0; i<ids.size(); ++i)
         {
+            
+            
             Stroke::Ptr stroke = _clusterTracker->Stroke(ids[i]);
 
+            if(! stroke)
+            {
+                types.insert(IdTypePair(ids[i], fiftythree::core::TouchClassification::Unknown));
+                continue;
+            }
+            
             float score = Score(*stroke);
 
             _scores[ids[i]] = score;

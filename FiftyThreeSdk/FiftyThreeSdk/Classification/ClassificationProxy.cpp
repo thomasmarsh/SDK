@@ -561,6 +561,12 @@ Eigen::VectorXf TouchClassificationProxy::GeometricStatistics(TouchId  touch0)
 // know when it is safe to remove clusters.
 bool TouchClassificationProxy::IsReclassifiable(core::Touch::Ptr const & touch, Stroke::Ptr const & stroke)
 {
+    
+    if(! touch)
+    {
+        return false;
+    }
+    
     if (CurrentClass(touch->Id()) == TouchClassification::RemovedFromClassification ||
         touch->Phase() == core::TouchPhase::Cancelled)
     {
