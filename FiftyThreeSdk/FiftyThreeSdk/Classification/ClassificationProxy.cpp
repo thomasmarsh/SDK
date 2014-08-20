@@ -366,6 +366,15 @@ TouchClassification TouchClassificationProxy::ClassifyForGesture(TouchId touch0,
                 return TouchClassification::Unknown;
             }
 
+            if (touch->CurrentSample().TouchRadius())
+            {
+                float r = *(touch->CurrentSample().TouchRadius());
+                if (TouchSize::IsPalmGivenTouchRadius(r))
+                {
+                    return TouchClassification::Palm;
+                }
+            }
+
             TouchData::Ptr touchData = _clusterTracker->Data(touch0);
             Stroke::Ptr const & stroke = touchData->Stroke();
 

@@ -10,22 +10,24 @@
 
 using namespace fiftythree::core;
 
-using namespace Eigen;
-
 namespace fiftythree
 {
 namespace sdk
 {
+bool TouchSize::IsPenGivenTouchRadius(TouchData const &data)
+{
+    // really want equality, i.e. the pen tip size is typically exactly equal to PenTipRadius.
+    // but we allow a little bit of flexibility.
+    return (data._radiusMax < 2.1f * PenTipRadius) &&
+    std::abs(data._radiusMean - PenTipRadius) < 1.5f &&
+    std::sqrt(data._radiusVariance) < (.25f * PenTipRadius);
+}
 
-    bool TouchSize::IsPenGivenTouchRadius(TouchData const &data)
-    {
-        // really want equality, i.e. the pen tip size is typically exactly equal to PenTipRadius.
-        // but we allow a little bit of flexibility.
-        return (data._radiusMax < 2.1f * PenTipRadius) &&
-        std::abs(data._radiusMean - PenTipRadius) < 1.5f &&
-        std::sqrt(data._radiusVariance) < (.25f * PenTipRadius);
-    }
-
+bool TouchSize::IsPalmGivenTouchRadius(float r)
+{
+    constexpr float threshold = 70.0f; // Should this be a function of tolerance?
+    return r > threshold;
+}
 }
 }
 

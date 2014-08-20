@@ -11,17 +11,10 @@ namespace fiftythree
 {
 namespace sdk
 {
-    class TouchData;
-}
-}
+class TouchData;
 
-namespace fiftythree
-{
-namespace sdk
-{
 class TouchSize
 {
-
 public:
 
     constexpr static float PenTipRadius = 6.0f;
@@ -32,6 +25,7 @@ public:
     // IsPenGivenTouchRadius() will be fooled in that case.  the switch needs to save the day.
     static bool IsPenGivenTouchRadius(TouchData const &data);
 
+    static bool IsPalmGivenTouchRadius(float r);
 };
 }
 }
