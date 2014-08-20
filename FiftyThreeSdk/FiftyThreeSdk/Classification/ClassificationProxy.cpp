@@ -562,7 +562,7 @@ Eigen::VectorXf TouchClassificationProxy::GeometricStatistics(TouchId  touch0)
 bool TouchClassificationProxy::IsReclassifiable(core::Touch::Ptr const & touch, Stroke::Ptr const & stroke)
 {
 
-    if(! touch)
+    if (!touch)
     {
         return false;
     }
