@@ -210,8 +210,11 @@ TouchClassification TouchClassificationProxy::ClassifyPair(TouchId touch0, Touch
         return TouchClassification::Unknown;
     }
 
-    Stroke::Ptr stroke0 = _clusterTracker->Stroke(touch0);
-    Stroke::Ptr stroke1 = _clusterTracker->Stroke(touch1);
+    auto data0 = _clusterTracker->Data(touch0);
+    auto data1 = _clusterTracker->Data(touch0);
+
+    auto stroke0 = data0->Stroke();
+    auto stroke1 = data1->Stroke();
 
     float corr = .5f;
     if (stroke0->Size() > 1 && stroke1->Size() > 1)
@@ -287,6 +290,17 @@ TouchClassification TouchClassificationProxy::ClassifyPair(TouchId touch0, Touch
         distanceToPalm = (centroid - palmLocation).norm();
     }
 
+    bool isPalmViaRadiusTest = false;
+
+    if (!stroke0->TouchRadius().empty() && !stroke1->TouchRadius().empty())
+    {
+        constexpr float varianceThreshold = 46.65f;
+        constexpr float maxThreshold = 41.99f;
+
+        isPalmViaRadiusTest = data0->_radiusVariance > varianceThreshold || data1->_radiusVariance > varianceThreshold;
+        isPalmViaRadiusTest &= data1->_radiusMax > maxThreshold || data1->_radiusMax > maxThreshold;
+    }
+
     switch (type)
     {
         case TwoTouchPairType::Pinch:
@@ -297,9 +311,9 @@ TouchClassification TouchClassificationProxy::ClassifyPair(TouchId touch0, Touch
                 corr > _pairwisePinchCorrelationCutoff &&
                 kinkFreeRatio > _pairwisePinchKinkFreeCutoff &&
                 totalLengthScore > _pairwisePinchTotalTravelThreshold &&
-                dot > _pairwisePinchAbsDotThreshold)
+                dot > _pairwisePinchAbsDotThreshold &&
+                !isPalmViaRadiusTest)
             {
-
                 return TouchClassification::Finger;
             }
             else
@@ -378,10 +392,18 @@ TouchClassification TouchClassificationProxy::ClassifyForGesture(TouchId touch0,
                         return TouchClassification::Unknown;
                     }
 
-                    if (touch->MaxTouchRadius() && *(touch->MaxTouchRadius()) > 60.0f)
+                    constexpr float tapPalmVFingerThreshold = 55.0f;
+                    if (touch->MaxTouchRadius() && *(touch->MaxTouchRadius()) > tapPalmVFingerThreshold)
                     {
                         return TouchClassification::Palm;
                     }
+                    else if (touch->MaxTouchRadius() && *(touch->MaxTouchRadius()) <= tapPalmVFingerThreshold)
+                    {
+                        return TouchClassification::Finger;
+                    }
+
+                    // We only use the isolation in time test if we have no touch radius information.
+                    // this isolation in time test is very conservative test so we want to avoid it if at all possible.
 
                     bool isStartIsolated = _touchStatistics[touch0]._preIsolation  > 0.05f;
                     bool isEndIsolated = _touchStatistics[touch0]._postIsolation  > 0.06f;
@@ -425,15 +447,11 @@ TouchClassification TouchClassificationProxy::ClassifyForGesture(TouchId touch0,
                     {
                         return TouchClassification::Unknown;
                     }
-                    if (touch->MaxTouchRadius())
-                    {
-                        float r = *(touch->MaxTouchRadius());
-                        if (TouchSize::IsPalmGivenTouchRadius(r))
-                        {
-                            return TouchClassification::Palm;
-                        }
-                    }
 
+                    if (touch->MaxTouchRadius() && *(touch->MaxTouchRadius()) > 60.0f)
+                    {
+                        return TouchClassification::Palm;
+                    }
 
                     // Max Travel is the dist to the farthest point from the start point.
                     // maxTraval ~= arcLength  => straightline. This is pretty robust with small # samples.
@@ -1497,6 +1515,7 @@ IdTypeMap TouchClassificationProxy::ReclassifyCurrentEvent()
                     float dominationScore                  = DominationScore(probeCluster);
 
                     auto mostRecentTouch     = _clusterTracker->TouchWithId(probeCluster->MostRecentTouch());
+<<<<<<< HEAD
                     bool waitingForPenEvent =   (probeCluster->_touchIds.size() == 1 &&
                                                  probePair.second == 0.0f &&
                                                  (probeCluster->_clusterTouchType == TouchClassification::Palm || probeCluster->_clusterTouchType == TouchClassification::Unknown) &&
@@ -1513,6 +1532,8 @@ IdTypeMap TouchClassificationProxy::ReclassifyCurrentEvent()
                     {
                         probeCluster->_waitingForPenEvent = false;
                     }
+=======
+>>>>>>> 04df413... Squash to WIP
 
                     // simple threshold based on pen score.  score is the odds ratio: P(pen) / P(palm).
                     // we set it slightly less than 1.0 to allow for the occasional low-scoring pen, at the

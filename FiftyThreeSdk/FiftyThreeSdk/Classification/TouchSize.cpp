@@ -25,7 +25,7 @@ bool TouchSize::IsPenGivenTouchRadius(TouchData const &data)
 
 bool TouchSize::IsPalmGivenTouchRadius(float r)
 {
-    constexpr float threshold = 70.0f; // Should this be a function of tolerance?
+    constexpr float threshold = 65.0f; // Should this be a function of tolerance?
     return r > threshold;
 }
 }
