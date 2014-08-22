@@ -358,21 +358,12 @@ TouchClassification TouchClassificationProxy::ClassifyForGesture(TouchId touch0,
                 return touchType;
             }
 
-            core::Touch::Ptr touch = _clusterTracker->TouchWithId(touch0);
+            auto touch = _clusterTracker->TouchWithId(touch0);
 
             if (!touch)
             {
                 DebugAssert(false);
                 return TouchClassification::Unknown;
-            }
-
-            if (touch->CurrentSample().TouchRadius())
-            {
-                float r = *(touch->CurrentSample().TouchRadius());
-                if (TouchSize::IsPalmGivenTouchRadius(r))
-                {
-                    return TouchClassification::Palm;
-                }
             }
 
             TouchData::Ptr touchData = _clusterTracker->Data(touch0);
@@ -385,6 +376,11 @@ TouchClassification TouchClassificationProxy::ClassifyForGesture(TouchId touch0,
                     if (touch->Phase() != core::TouchPhase::Ended)
                     {
                         return TouchClassification::Unknown;
+                    }
+
+                    if (touch->MaxTouchRadius() && *(touch->MaxTouchRadius()) > 60.0f)
+                    {
+                        return TouchClassification::Palm;
                     }
 
                     bool isStartIsolated = _touchStatistics[touch0]._preIsolation  > 0.05f;
@@ -429,6 +425,15 @@ TouchClassification TouchClassificationProxy::ClassifyForGesture(TouchId touch0,
                     {
                         return TouchClassification::Unknown;
                     }
+                    if (touch->MaxTouchRadius())
+                    {
+                        float r = *(touch->MaxTouchRadius());
+                        if (TouchSize::IsPalmGivenTouchRadius(r))
+                        {
+                            return TouchClassification::Palm;
+                        }
+                    }
+
 
                     // Max Travel is the dist to the farthest point from the start point.
                     // maxTraval ~= arcLength  => straightline. This is pretty robust with small # samples.
@@ -461,6 +466,11 @@ TouchClassification TouchClassificationProxy::ClassifyForGesture(TouchId touch0,
                     if (touch->IsPhaseEndedOrCancelled())
                     {
                         return TouchClassification::Unknown;
+                    }
+
+                    if (touch->MaxTouchRadius() && *(touch->MaxTouchRadius()) > 60.0f)
+                    {
+                        return TouchClassification::Palm;
                     }
 
                     float dt = stroke->LastAbsoluteTimestamp() - stroke->FirstAbsoluteTimestamp();
