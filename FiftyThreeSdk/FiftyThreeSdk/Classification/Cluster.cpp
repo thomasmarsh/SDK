@@ -97,16 +97,9 @@ float Cluster::ConcurrentDuration(Cluster const &other) const
 
 }
 
-bool Cluster::ContainsTouch(core::TouchId probeId) const
+bool Cluster::ContainsTouch(core::TouchId touchId) const
 {
-    for (core::TouchId currId:_touchIds)
-    {
-        if (currId == probeId)
-        {
-            return true;
-        }
-    }
-    return false;
+    return std::find(_touchIds.begin(), _touchIds.end(), touchId) != _touchIds.end();
 }
 
 bool Cluster::ConcurrentWith(core::TouchId touchId, bool useStaleInterval) const
@@ -311,8 +304,7 @@ ClusterId InvalidClusterId()
 
 vector<TouchId>::iterator Cluster::FindTouch(core::TouchId touchId)
 {
-    vector<TouchId>::iterator it = std::find(_touchIds.begin(), _touchIds.end(), touchId);
-    return it;
+    return std::find(_touchIds.begin(), _touchIds.end(), touchId);
 }
 
 // this removes it from the cluster, but not from classification
@@ -325,15 +317,14 @@ bool Cluster::RemoveTouch(core::TouchId touchId)
         return false;
     }
 
-    long index = it - _touchIds.begin();
-
     _touchIds.erase(it);
-    _touchData.erase(_touchData.begin() + index);
+    DebugAssert(!ContainsTouch(touchId));
+
+    _touchData.erase(touchId);
 
     _touchLog->Data(touchId)->SetCluster(Cluster::Ptr());
 
     return true;
-
 }
 
 vector<core::TouchId> Cluster::ReclassifiableTouches() const
@@ -369,7 +360,7 @@ bool Cluster::ContainsReclassifiableTouch() const
 
 bool Cluster::InsertTouch(core::TouchId touchId)
 {
-    if (! ContainsTouch(touchId))
+    if (!ContainsTouch(touchId))
     {
         _touchIds.push_back(touchId);
         _touchData[touchId] = _touchLog->Data(touchId);
@@ -415,7 +406,7 @@ Cluster::Cluster()
 
 Cluster::Ptr Cluster::New()
 {
-    return Cluster::Ptr(new Cluster);
+    return make_shared<Cluster>();
 }
 
 Cluster::Ptr ClusterTracker::NewCluster(Vector2f center, double timestamp, TouchClassification defaultTouchType)
@@ -662,8 +653,7 @@ void ClusterTracker::AddPointToCluster(Vector2f p, double timestamp, Cluster::Pt
 void  Cluster::RemoveOldTouches(double cutoffTime)
 {
     auto copy = _touchIds;
-
-    for (core::TouchId touchId:copy)
+    for (core::TouchId touchId : copy)
     {
         DebugAssert(_touchData.count(touchId));
 

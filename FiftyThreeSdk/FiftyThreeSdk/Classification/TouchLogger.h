@@ -39,7 +39,7 @@ protected:
     Stroke::Ptr _stroke;
     core::Touch::Ptr  _touch;
 
-    ClusterPtr          _cluster;
+    fiftythree::core::weak_ptr<Cluster> _cluster;
 
     // In theory, this should have the same size as the stroke
     std::vector<core::TouchPhase> _phaseHistory;
@@ -117,12 +117,12 @@ public:
 
     ClusterCPtr Cluster() const
     {
-        return _cluster;
+        return _cluster.lock();
     }
 
     ClusterPtr Cluster()
     {
-        return _cluster;
+        return _cluster.lock();
     }
 
     void TouchEnded();
@@ -149,8 +149,6 @@ public:
     }
 
 };
-
-typedef std::pair<core::TouchId, TouchData::Ptr> IdDataPair;
 
 typedef std::pair<core::TouchId, TouchData::Ptr const &> IdDataRefPair;
 

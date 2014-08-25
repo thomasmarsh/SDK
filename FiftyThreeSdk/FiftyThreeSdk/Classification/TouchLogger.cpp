@@ -380,8 +380,7 @@ void TouchLogger::TouchesChanged(const std::set<core::Touch::Ptr> & touches)
                 // and should be treated as an ended touch.
                 TouchData::Ptr touchData;
 
-                boost::container::flat_map<core::TouchId, TouchData::Ptr>::const_iterator it = _touchData.find(touch->Id());
-
+                auto it = _touchData.find(touch->Id());
                 if (it != _touchData.end())
                 {
                     touchData = it->second;
