@@ -134,6 +134,9 @@ public:
                 UniformInTime,
                 UniformInSpace);
 
+    // Samples that occur less than this delta amount of time before the preceding sample are discarded.
+    static const float kMinSampleTimestampDelta;
+
 protected:
 
     DataStream2f _XYDataStream;

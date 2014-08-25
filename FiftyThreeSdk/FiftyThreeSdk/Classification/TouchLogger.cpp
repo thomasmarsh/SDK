@@ -345,13 +345,12 @@ void TouchLogger::TouchesChanged(const std::set<core::Touch::Ptr> & touches)
                 double timestamp    = touch->CurrentSample().TimestampSeconds();
                 Eigen::Vector2f xy  = touch->CurrentSample().Location();
 
-                if (timestamp > touchData->LastTimestamp() + .001 &&
-                   touchData->Stroke()->LastPoint() != xy)
+                if (timestamp >= touchData->LastTimestamp() + Stroke::kMinSampleTimestampDelta &&
+                    touchData->Stroke()->LastPoint() != xy)
                 {
                     touchData->Stroke()->AddPoint(xy, timestamp);
-                    touchData->SetPhase(core::TouchPhase::Moved);
-
                     touchData->SetEndedTime(timestamp);
+                    touchData->SetPhase(core::TouchPhase::Moved);
 
                     if ( touch->CurrentSample().TouchRadius())
                     {
@@ -397,11 +396,10 @@ void TouchLogger::TouchesChanged(const std::set<core::Touch::Ptr> & touches)
 
                             Stroke::Ptr stroke = touchData->Stroke();
 
-                            if (timestamp > touchData->LastTimestamp() + .001)
+                            if (timestamp >= touchData->LastTimestamp() + Stroke::kMinSampleTimestampDelta)
                             {
                                 touchData->Stroke()->AddPoint(xy, timestamp);
                             }
-
                             touchData->SetEndedTime(timestamp);
                             touchData->TouchEnded();
 
@@ -463,9 +461,11 @@ void TouchLogger::TouchesChanged(const std::set<core::Touch::Ptr> & touches)
 
                     Stroke::Ptr stroke = touchData->Stroke();
 
+                    if (timestamp >= touchData->LastTimestamp() + Stroke::kMinSampleTimestampDelta)
+                    {
+                        touchData->Stroke()->AddPoint(xy, timestamp);
+                    }
                     touchData->SetEndedTime(timestamp);
-
-                    touchData->Stroke()->AddPoint(xy, timestamp);
                     touchData->TouchEnded();
 
                     LogEndedTouch(touch->Id());

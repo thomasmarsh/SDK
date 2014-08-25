@@ -16,6 +16,8 @@ namespace fiftythree
 namespace sdk
 {
 
+const float Stroke::kMinSampleTimestampDelta = 0.0001f;
+
 float Stroke::ArcLength() const
 {
     if (_computeStatistics)
@@ -305,11 +307,7 @@ void Stroke::UpdateSummaryStatistics()
 
 void Stroke::AddPoint(Eigen::Vector2f const & xy, double timestamp)
 {
-
-    if ((! IsEmpty()) && timestamp < (LastAbsoluteTimestamp() + .0001))
-    {
-        DebugAssert(false);
-    }
+    DebugAssert(IsEmpty() || timestamp >= LastAbsoluteTimestamp() + kMinSampleTimestampDelta);
 
     _XYDataStream.AddPoint(xy, timestamp);
 
