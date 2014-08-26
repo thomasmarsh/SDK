@@ -16,7 +16,7 @@ namespace fiftythree
 namespace sdk
 {
 
-const float Stroke::kMinSampleTimestampDelta = 0.0001f;
+constexpr float Stroke::kMinSampleTimestampDelta = 0.0001f;
 
 float Stroke::ArcLength() const
 {
