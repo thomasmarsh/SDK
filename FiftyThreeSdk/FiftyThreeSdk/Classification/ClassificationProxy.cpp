@@ -561,12 +561,12 @@ Eigen::VectorXf TouchClassificationProxy::GeometricStatistics(TouchId  touch0)
 // know when it is safe to remove clusters.
 bool TouchClassificationProxy::IsReclassifiable(core::Touch::Ptr const & touch, Stroke::Ptr const & stroke)
 {
-    
+
     if(! touch)
     {
         return false;
     }
-    
+
     if (CurrentClass(touch->Id()) == TouchClassification::RemovedFromClassification ||
         touch->Phase() == core::TouchPhase::Cancelled)
     {
@@ -985,8 +985,8 @@ VectorXf TouchClassificationProxy::PenPriorForClusters(vector<Cluster::Ptr> cons
 
             if (_clusterTracker->MostRecentPenTipType() == TouchClassification::Eraser)
             {
-                constexpr float mu = 35.0f;
-                constexpr float sigma = 5.0f;
+                constexpr float mu = 21.0f;
+                constexpr float sigma = 3.0f;
 
                 float dEraser = (r - mu) / sigma;
                 penLikelihood = (1.0f / sigma) * std::exp(-.5f * dEraser * dEraser);
@@ -998,11 +998,11 @@ VectorXf TouchClassificationProxy::PenPriorForClusters(vector<Cluster::Ptr> cons
                 // one representing a pen held in writing position with a small contact patch,
                 // and another a somewhat angled tip
 
-                constexpr float muVerticalTip    = 10.4375f;
-                constexpr float sigmaVerticalTip = 1.0f;
+                constexpr float muVerticalTip    = 6.0f;
+                constexpr float sigmaVerticalTip = .5f;
 
-                constexpr float muAngledTip    = 27.0f;
-                constexpr float sigmaAngledTip = 16.0f;
+                constexpr float muAngledTip    = 16.0f;
+                constexpr float sigmaAngledTip = 10.0f;
 
                 float dPenVertical     = (r - muVerticalTip) / sigmaVerticalTip;
                 float dPenAngled       = (r - muAngledTip)   / sigmaAngledTip;
@@ -1012,15 +1012,15 @@ VectorXf TouchClassificationProxy::PenPriorForClusters(vector<Cluster::Ptr> cons
 
                 penLikelihood = .5f * (likelihoodAngled + likelihoodVertical);
 
-                if (r > 55.0f || rMax > 55.0f)
+                if (r > 40.0f || rMax > 40.0f)
                 {
                     penLikelihood = 0.0f;
                 }
 
             }
 
-            constexpr float sigmaPalm      = 37.0f;
-            constexpr float muPalm         = 87.0f;
+            constexpr float sigmaPalm      = 22.0f;
+            constexpr float muPalm         = 53.0f;
 
             // min since we're using dumb normal distributions and we don't want to be penalized for being big.
             // if r exceeds muPalm, clamp dPalm to zero, which maximizes the likelihood.

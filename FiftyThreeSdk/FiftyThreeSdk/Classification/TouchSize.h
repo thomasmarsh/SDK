@@ -24,7 +24,7 @@ class TouchSize
 
 public:
 
-    constexpr static float PenTipRadius = 10.4375f;
+    constexpr static float PenTipRadius = 6.0f;
 
     // pen tip is very small -- this tells the caller if the size statistics
     // confidently indicate a pen.  with Pencil, the eraser tip can also look like
