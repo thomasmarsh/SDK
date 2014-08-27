@@ -392,7 +392,7 @@ TouchClassification TouchClassificationProxy::ClassifyForGesture(TouchId touch0,
                         return TouchClassification::Unknown;
                     }
 
-                    constexpr float tapPalmVFingerThreshold = 55.0f;
+                    constexpr float tapPalmVFingerThreshold = 25.63f;
                     if (touch->MaxTouchRadius() && *(touch->MaxTouchRadius()) > tapPalmVFingerThreshold)
                     {
                         return TouchClassification::Palm;
@@ -448,7 +448,7 @@ TouchClassification TouchClassificationProxy::ClassifyForGesture(TouchId touch0,
                         return TouchClassification::Unknown;
                     }
 
-                    if (touch->MaxTouchRadius() && *(touch->MaxTouchRadius()) > 60.0f)
+                    if (touch->MaxTouchRadius() && *(touch->MaxTouchRadius()) > 27.96f)
                     {
                         return TouchClassification::Palm;
                     }
@@ -486,7 +486,7 @@ TouchClassification TouchClassificationProxy::ClassifyForGesture(TouchId touch0,
                         return TouchClassification::Unknown;
                     }
 
-                    if (touch->MaxTouchRadius() && *(touch->MaxTouchRadius()) > 60.0f)
+                    if (touch->MaxTouchRadius() && *(touch->MaxTouchRadius()) > 27.96f)
                     {
                         return TouchClassification::Palm;
                     }
