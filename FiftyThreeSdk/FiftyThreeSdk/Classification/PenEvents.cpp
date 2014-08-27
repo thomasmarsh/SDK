@@ -14,6 +14,7 @@
 #include "FiftyThreeSdk/Classification/PenEvents.h"
 #include "FiftyThreeSdk/Classification/Stroke.h"
 #include "FiftyThreeSdk/Classification/TouchLogger.h"
+#include "TouchSize.h"
 
 using namespace Eigen;
 using fiftythree::core::TouchClassification;
@@ -291,17 +292,39 @@ std::pair<TouchClassification, float> PenEventClassifier::TypeAndScoreForCluster
     PenEventIdSet validPenEvents = _clusterTracker->PenEventSetInTimeInterval(t0 - _maxPenEventDelay, t1+_maxPenEventDelay);
 
     // each touch needs 2 pen events.
-    if (cluster._touchIds.size() > 1 || (2 * int(cluster._touchIds.size()) - int(validPenEvents.size()) > 1))
+    if (2 * int(cluster._touchIds.size()) - int(validPenEvents.size()) > 1)
     {
-
-        cluster._meanPenProbability  = 0.0001f;
-        cluster._meanPalmProbability = 1.0f;
-
-        cluster._penScore      = pair.second;
-        cluster._penTotalScore = 0.0001f;
-
-        _clusterTypesAndScores[cluster._id] = pair;
-
+        if(cluster._touchIds.size() != 1)
+        {
+            cluster._meanPenProbability  = 0.0001f;
+            cluster._meanPalmProbability = 1.0f;
+            
+            cluster._penScore      = pair.second;
+            cluster._penTotalScore = 0.0001f;
+            
+            _clusterTypesAndScores[cluster._id] = pair;
+        }
+        else
+        {
+            // one touch.  perhaps we can defer to touch size.
+            auto touch = cluster._touchIds[0];
+            
+            if(TouchSize::IsPenGivenTouchRadius(*_clusterTracker->Data(touch)))
+            {
+                cluster._meanPalmProbability = .0001f;
+                cluster._meanPenProbability  = 1.0f;
+                
+                cluster._penScore = 1.0f;
+                cluster._penTotalScore = cluster._penScore;
+                
+                pair.first = core::TouchClassification::Pen;
+                pair.second = cluster._penScore;
+                
+                _clusterTypesAndScores[cluster._id] = pair;
+            }
+            
+        }
+        
         return pair;
     }
 
@@ -316,6 +339,9 @@ std::pair<TouchClassification, float> PenEventClassifier::TypeAndScoreForCluster
     {
         std::pair<TouchClassification, float> curr = TypeAndScoreForTouch(touchId, validPenEvents);
 
+        
+        
+        
         DebugAssert(curr.second <= 1.0001f);
 
         
