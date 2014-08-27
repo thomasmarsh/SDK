@@ -126,9 +126,6 @@ struct Cluster
 
     static Cluster::Ptr New();
 
-    // used to give rendering hints -- early in a touch's lifetime we may have strong
-    // evidence that it is a pen of some kind but no firm idea about pen vs. eraser vs finger.
-    bool            _waitingForPenEvent;
 
     // final score used in classification.  currently the odds ratio:
     // _penScore = P(all pen) / P(all palm).

@@ -411,7 +411,6 @@ Cluster::Cluster()
     _probabilityOneFlag = false;
 
     _becameStaleTime = std::numeric_limits<double>::max();
-    _waitingForPenEvent = true;
 }
 
 Cluster::Ptr Cluster::New()

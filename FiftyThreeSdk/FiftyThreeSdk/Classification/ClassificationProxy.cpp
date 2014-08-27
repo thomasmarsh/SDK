@@ -1515,25 +1515,6 @@ IdTypeMap TouchClassificationProxy::ReclassifyCurrentEvent()
                     float dominationScore                  = DominationScore(probeCluster);
 
                     auto mostRecentTouch     = _clusterTracker->TouchWithId(probeCluster->MostRecentTouch());
-<<<<<<< HEAD
-                    bool waitingForPenEvent =   (probeCluster->_touchIds.size() == 1 &&
-                                                 probePair.second == 0.0f &&
-                                                 (probeCluster->_clusterTouchType == TouchClassification::Palm || probeCluster->_clusterTouchType == TouchClassification::Unknown) &&
-                                                 (! mostRecentTouch->IsPhaseEndedOrCancelled()) &&
-                                                 _clusterTracker->Stroke(*probeCluster->_touchIds.begin())->Lifetime() < _maxPenEventWaitTime);
-
-                    // this clause exists to help prevent rendering flicker while we are waiting for a stray
-                    // pen event.
-                    if (waitingForPenEvent)
-                    {
-                        probeCluster->_waitingForPenEvent = true;
-                    }
-                    else
-                    {
-                        probeCluster->_waitingForPenEvent = false;
-                    }
-=======
->>>>>>> 04df413... Squash to WIP
 
                     // simple threshold based on pen score.  score is the odds ratio: P(pen) / P(palm).
                     // we set it slightly less than 1.0 to allow for the occasional low-scoring pen, at the

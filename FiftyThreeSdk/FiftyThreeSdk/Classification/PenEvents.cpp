@@ -318,17 +318,7 @@ std::pair<TouchClassification, float> PenEventClassifier::TypeAndScoreForCluster
 
         DebugAssert(curr.second <= 1.0001f);
 
-        // all this does is prevent rendering flicker since the rendering updates every time the
-        // touch changes type.  it is not necessary in a real app.
-        bool waitingForPenDown = ((! _clusterTracker->TouchWithId(touchId)->IsPhaseEndedOrCancelled()) &&
-                                  (_clusterTracker->CurrentTime() - _clusterTracker->Data(touchId)->FirstTimestamp()) < .1);
-
-        if (waitingForPenDown && curr.first == TouchClassification::Unknown)
-        {
-            // just ignore this guy for now
-            continue;
-        }
-
+        
         // geometric mean is more sensitive to bad fits than arithmetic mean.
         // in particular, a single zero-probability event
         // will kill the whole cluster.  to the extent that we're confident in our
