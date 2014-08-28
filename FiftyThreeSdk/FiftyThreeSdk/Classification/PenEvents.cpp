@@ -14,7 +14,7 @@
 #include "FiftyThreeSdk/Classification/PenEvents.h"
 #include "FiftyThreeSdk/Classification/Stroke.h"
 #include "FiftyThreeSdk/Classification/TouchLogger.h"
-#include "FiftyThreeSdk/TouchSize.h"
+#include "FiftyThreeSdk/Classification/TouchSize.h"
 
 using namespace Eigen;
 using fiftythree::core::TouchClassification;
