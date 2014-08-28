@@ -294,7 +294,24 @@ std::pair<TouchClassification, float> PenEventClassifier::TypeAndScoreForCluster
     // each touch needs 2 pen events.
     if (2 * int(cluster._touchIds.size()) - int(validPenEvents.size()) > 1)
     {
-        if(cluster._touchIds.size() != 1)
+        
+        auto touch = cluster._touchIds[0];
+        
+        if (cluster._touchIds.size() == 1 &&
+            TouchSize::IsPenGivenTouchRadius(*_clusterTracker->Data(touch)))
+        {
+            cluster._meanPalmProbability = .0001f;
+            cluster._meanPenProbability  = 1.0f;
+            
+            cluster._penScore = 1.0f;
+            cluster._penTotalScore = cluster._penScore;
+            
+            pair.first = core::TouchClassification::Pen;
+            pair.second = cluster._penScore;
+            
+            _clusterTypesAndScores[cluster._id] = pair;
+        }
+        else
         {
             cluster._meanPenProbability  = 0.0001f;
             cluster._meanPalmProbability = 1.0f;
@@ -303,26 +320,6 @@ std::pair<TouchClassification, float> PenEventClassifier::TypeAndScoreForCluster
             cluster._penTotalScore = 0.0001f;
             
             _clusterTypesAndScores[cluster._id] = pair;
-        }
-        else
-        {
-            // one touch.  perhaps we can defer to touch size.
-            auto touch = cluster._touchIds[0];
-            
-            if(TouchSize::IsPenGivenTouchRadius(*_clusterTracker->Data(touch)))
-            {
-                cluster._meanPalmProbability = .0001f;
-                cluster._meanPenProbability  = 1.0f;
-                
-                cluster._penScore = 1.0f;
-                cluster._penTotalScore = cluster._penScore;
-                
-                pair.first = core::TouchClassification::Pen;
-                pair.second = cluster._penScore;
-                
-                _clusterTypesAndScores[cluster._id] = pair;
-            }
-            
         }
         
         return pair;
