@@ -1252,6 +1252,7 @@ TouchIdVector TouchLogger::ConcurrentTouches(core::TouchId probeId)
         }
     }
 
+    
     _concurrentTouchesCache[probeId] = out;
 
     return out;

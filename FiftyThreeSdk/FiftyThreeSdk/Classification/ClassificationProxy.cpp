@@ -685,6 +685,7 @@ SessionStatistics::Ptr TouchClassificationProxy::SessionStatistics()
 
 void TouchClassificationProxy::SetClusterType(Cluster::Ptr const & cluster, TouchClassification newType, IdTypeMap &changedTypes)
 {
+    
     bool onlyUpdateUnknownTouches = false;
 
     if (_activeStylusConnected)
