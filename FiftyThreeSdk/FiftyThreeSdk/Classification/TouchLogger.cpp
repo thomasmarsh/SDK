@@ -321,10 +321,13 @@ void TouchLogger::TouchesChanged(const std::set<core::Touch::Ptr> & touches)
                         data->_radiusMean      = r;
                         data->_radiusM2        = 0.0f;
                         data->_radiusVariance  = 0.0f;
+
+                        data->_leadingRadiusMax       = data->_radiusMax;
+                        data->_leadingRadiusMin       = data->_radiusMin;
+                        data->_leadingRadiusMean      = data->_radiusMean;
+                        data->_leadingRadiusVariance  = data->_radiusVariance;
                     }
-
                 }
-
                 break;
             }
 
@@ -367,6 +370,13 @@ void TouchLogger::TouchesChanged(const std::set<core::Touch::Ptr> & touches)
                         touchData->_radiusM2        += delta * (r - touchData->_radiusMean);
                         touchData->_radiusVariance   = touchData->_radiusM2 / (N-1);
 
+                        if (touchData->Stroke()->Size() <= touchData->_leadingSegmentSampleCount)
+                        {
+                            touchData->_leadingRadiusMax       = touchData->_radiusMax;
+                            touchData->_leadingRadiusMin       = touchData->_radiusMin;
+                            touchData->_leadingRadiusMean      = touchData->_radiusMean;
+                            touchData->_leadingRadiusVariance  = touchData->_radiusVariance;
+                        }
                     }
                 }
 
@@ -474,6 +484,9 @@ void TouchLogger::TouchesChanged(const std::set<core::Touch::Ptr> & touches)
                     {
                         float r  = *(touch->CurrentSample().TouchRadius());
                         touchData->Stroke()->AddTouchRadius(r);
+
+                        // this radius from iOS is typically zero, so we deliberately are not
+                        // updating touch statistics here with the new radius.
                     }
                 }
 
@@ -1252,7 +1265,6 @@ TouchIdVector TouchLogger::ConcurrentTouches(core::TouchId probeId)
         }
     }
 
-    
     _concurrentTouchesCache[probeId] = out;
 
     return out;

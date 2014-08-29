@@ -70,6 +70,7 @@ bool TouchClassificationProxy::IsAnySwitchDown()
 
 void TouchClassificationProxy::OnPenEvent(const PenEvent & event)
 {
+
     DebugAssert(_debounceQueue.size() <= 1);
 
     bool ignoreFlag = false;
@@ -685,7 +686,7 @@ SessionStatistics::Ptr TouchClassificationProxy::SessionStatistics()
 
 void TouchClassificationProxy::SetClusterType(Cluster::Ptr const & cluster, TouchClassification newType, IdTypeMap &changedTypes)
 {
-    
+
     bool onlyUpdateUnknownTouches = false;
 
     if (_activeStylusConnected)
@@ -1384,7 +1385,7 @@ IdTypeMap TouchClassificationProxy::ReclassifyCurrentEvent()
                 {
                     // a single live cluster which satisifes a temporal isolation condition will trigger a sequence
                     // of finger smudges, unless it comes down in a palm cluster
-                    
+
                     if (cluster->_touchIds.size() == 1 || cluster->_clusterTouchType != TouchClassification::Palm)
                     {
                         checkForFingerSequence = true;

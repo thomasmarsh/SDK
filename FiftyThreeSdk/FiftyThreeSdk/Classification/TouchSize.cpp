@@ -18,9 +18,9 @@ bool TouchSize::IsPenGivenTouchRadius(TouchData const &data)
 {
     // really want equality, i.e. the pen tip size is typically exactly equal to PenTipRadius.
     // but we allow a little bit of flexibility.
-    return (data._radiusMax < 2.1f * PenTipRadius) &&
-    std::abs(data._radiusMean - PenTipRadius) < 1.5f &&
-    std::sqrt(data._radiusVariance) < (.25f * PenTipRadius);
+    return (data._leadingRadiusMax < 2.1f * PenTipRadius) &&
+    std::abs(data._leadingRadiusMean - PenTipRadius) < 1.5f &&
+    std::sqrt(data._leadingRadiusVariance) < (.25f * PenTipRadius);
 }
 
 bool TouchSize::IsPalmGivenTouchRadius(float r)

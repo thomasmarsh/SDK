@@ -70,6 +70,16 @@ public:
     float               _radiusM2;
     float               _radiusVariance;
 
+    // some sh... tuff to work around a particular bug where the switch doesn't fire and we move
+    // from pen to finger because the user rocked pencil to one side and made the touch larger.
+    float               _leadingRadiusMean;
+    float               _leadingRadiusMin;
+    float               _leadingRadiusMax;
+    float               _leadingRadiusVariance;
+
+    // what do we consider to be the "leading" segment?
+    static const int    _leadingSegmentSampleCount = 10;
+
 protected:
     // methods
 
