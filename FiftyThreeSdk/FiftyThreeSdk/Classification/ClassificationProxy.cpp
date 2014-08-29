@@ -1383,8 +1383,12 @@ IdTypeMap TouchClassificationProxy::ReclassifyCurrentEvent()
                 if (_touchStatistics[liveTouches[0]]._preIsolation > _fingerSmudgeIsolationSeconds)
                 {
                     // a single live cluster which satisifes a temporal isolation condition will trigger a sequence
-                    // of finger smudges
-                    checkForFingerSequence = true;
+                    // of finger smudges, unless it comes down in a palm cluster
+                    
+                    if (cluster->_touchIds.size() == 1 || cluster->_clusterTouchType != TouchClassification::Palm)
+                    {
+                        checkForFingerSequence = true;
+                    }
                 }
                 else
                 {
