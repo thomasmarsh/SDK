@@ -301,7 +301,7 @@ TouchClassification TouchClassificationProxy::ClassifyPair(TouchId touch0, Touch
         isPalmViaRadiusTest = data0->_radiusVariance > varianceThreshold || data1->_radiusVariance > varianceThreshold;
         isPalmViaRadiusTest &= data1->_radiusMax > maxThreshold || data1->_radiusMax > maxThreshold;
     }
-
+    
     switch (type)
     {
         case TwoTouchPairType::Pinch:
@@ -331,7 +331,8 @@ TouchClassification TouchClassificationProxy::ClassifyPair(TouchId touch0, Touch
                 corr > _pairwisePanCorrelationCutoff &&
                 kinkFreeRatio > _pairwisePanKinkFreeCutoff &&
                 startDistance < _pairwisePanStartDistanceThreshold &&
-                distanceToPalm > _pairwisePanPalmCentroidThreshold)
+                distanceToPalm > _pairwisePanPalmCentroidThreshold &&
+                !isPalmViaRadiusTest)
             {
                 return TouchClassification::Finger;
             }
@@ -393,7 +394,8 @@ TouchClassification TouchClassificationProxy::ClassifyForGesture(TouchId touch0,
                         return TouchClassification::Unknown;
                     }
 
-                    constexpr float tapPalmVFingerThreshold = 25.63f;
+                    constexpr float tapPalmVFingerThreshold = 19.63f;
+                    
                     if (touch->MaxTouchRadius() && *(touch->MaxTouchRadius()) > tapPalmVFingerThreshold)
                     {
                         return TouchClassification::Palm;
@@ -449,9 +451,16 @@ TouchClassification TouchClassificationProxy::ClassifyForGesture(TouchId touch0,
                         return TouchClassification::Unknown;
                     }
 
-                    if (touch->MaxTouchRadius() && *(touch->MaxTouchRadius()) > 27.96f)
+                    constexpr float longPressVFingerThreshold = 19.63f;
+
+                    // Early out if we've got real radius data.
+                    if (touch->MaxTouchRadius() && *(touch->MaxTouchRadius()) > longPressVFingerThreshold)
                     {
                         return TouchClassification::Palm;
+                    }
+                    else if (touch->MaxTouchRadius() && *(touch->MaxTouchRadius()) <= longPressVFingerThreshold)
+                    {
+                        return TouchClassification::Finger;
                     }
 
                     // Max Travel is the dist to the farthest point from the start point.
