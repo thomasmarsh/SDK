@@ -309,6 +309,11 @@ std::pair<TouchClassification, float> PenEventClassifier::TypeAndScoreForCluster
             pair.first = core::TouchClassification::Pen;
             pair.second = cluster._penScore;
 
+            if(_clusterTracker->MostRecentPenTipType() == core::TouchClassification::Eraser)
+            {
+                pair.first = core::TouchClassification::Eraser;
+            }
+            
             _clusterTypesAndScores[cluster._id] = pair;
         }
         else
