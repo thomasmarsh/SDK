@@ -1078,6 +1078,18 @@ VectorXf TouchClassificationProxy::PenPriorForClusters(vector<Cluster::Ptr> cons
     if (_trustHandednessOnceLocked && HandednessLocked())
     {
 
+        float interiorPenalty = .1f;
+        float palmEndPenalty  = .1f;
+
+        // if radius is available, trust handedness completely
+        if (TouchRadiusAvailable())
+        {
+            // .0001 allows some robustness to edge thumbs from the other hand in typical configurations
+            // with your palm down
+            interiorPenalty = 0.0001f;
+            palmEndPenalty  = 0.0001f;
+        }
+
         for (int j=0; j<clusters.size(); j++)
         {
 
@@ -1087,14 +1099,14 @@ VectorXf TouchClassificationProxy::PenPriorForClusters(vector<Cluster::Ptr> cons
             // a palm cluster
             if (cluster->_wasInterior)
             {
-                prior[j] *= 0.1f;
+                prior[j] *= interiorPenalty;
             }
 
             // we'd love to declare p = 0 in this case, but if you rotate your hand quickly by more than
             // 90 degrees this can happen pretty easily
             if (_penTracker.WasAtPalmEnd(cluster))
             {
-                prior[j] *= .1f;
+                prior[j] *= palmEndPenalty;
             }
 
         }

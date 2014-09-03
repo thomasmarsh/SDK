@@ -44,7 +44,7 @@ protected:
     // switch timing delay constant for switch arrival time exponentials.
     // 1 / lambda is the expected switch delay time
     //const float lambda = 20.0f;
-    const float lambda = 20.0f;
+    const float lambda = 3.0f;
 
     // based on some data with the production tips 11/25/2013
     const float _expectedDownDelayCycles  = 1.5f;
