@@ -260,6 +260,7 @@ std::pair<TouchClassification, float> PenEventClassifier::TypeAndScoreForCluster
 {
 
     std::pair<TouchClassification, float> pair(TouchClassification::Unknown, 0.0f);
+    std::pair<TouchClassification, float> sizePair(TouchClassification::Unknown, 0.0f);
 
     // if the cluster is stale or can't be reclassified, just return the last known
     // state.  this prevents chewing up a lot of CPU for nothing.
@@ -291,33 +292,39 @@ std::pair<TouchClassification, float> PenEventClassifier::TypeAndScoreForCluster
 
     PenEventIdSet validPenEvents = _clusterTracker->PenEventSetInTimeInterval(t0 - _maxPenEventDelay, t1+_maxPenEventDelay);
 
-    // each touch needs 2 pen events.
-    if (2 * int(cluster._touchIds.size()) - int(validPenEvents.size()) > 1)
+    // first check size...
+    auto touch = cluster._touchIds.back();
+
+    if (cluster._touchIds.size() == 1 &&
+        _commonData->proxy->TouchRadiusAvailable() &&
+        TouchSize::IsPenGivenTouchRadius(*_clusterTracker->Data(touch)))
     {
 
-        auto touch = cluster._touchIds[0];
+        cluster._meanPalmProbability = .0001f;
+        cluster._meanPenProbability  = 1.0f;
 
-        if (cluster._touchIds.size() == 1 &&
-            TouchSize::IsPenGivenTouchRadius(*_clusterTracker->Data(touch)))
+        TouchIdVector concurrentTouches = _clusterTracker->ConcurrentTouches(touch);
+        concurrentTouches.push_back(touch);
+        Eigen::VectorXf prior = _commonData->proxy->PenPriorForTouches(concurrentTouches);
+
+        cluster._penScore = 1.0f;
+        cluster._penTotalScore = cluster._penScore;
+
+        sizePair.first = core::TouchClassification::Pen;
+        sizePair.second = cluster._penScore;
+
+        if (_clusterTracker->MostRecentPenTipType() == core::TouchClassification::Eraser)
         {
-            cluster._meanPalmProbability = .0001f;
-            cluster._meanPenProbability  = 1.0f;
-
-            cluster._penScore = 1.0f;
-            cluster._penTotalScore = cluster._penScore;
-
-            pair.first = core::TouchClassification::Pen;
-            pair.second = cluster._penScore;
-
-            if(_clusterTracker->MostRecentPenTipType() == core::TouchClassification::Eraser)
-            {
-                pair.first = core::TouchClassification::Eraser;
-            }
-            
-            _clusterTypesAndScores[cluster._id] = pair;
+            sizePair.first = core::TouchClassification::Eraser;
         }
-        else
+    }
+    else
+    {
+
+        // each touch needs 2 pen events.  if we're off by more than one, mark palm.
+        if (2 * int(cluster._touchIds.size()) - int(validPenEvents.size()) > 1)
         {
+
             cluster._meanPenProbability  = 0.0001f;
             cluster._meanPalmProbability = 1.0f;
 
@@ -325,9 +332,9 @@ std::pair<TouchClassification, float> PenEventClassifier::TypeAndScoreForCluster
             cluster._penTotalScore = 0.0001f;
 
             _clusterTypesAndScores[cluster._id] = pair;
-        }
 
-        return pair;
+            return pair;
+        }
     }
 
     //float temp         = 1.0f;
@@ -374,15 +381,30 @@ std::pair<TouchClassification, float> PenEventClassifier::TypeAndScoreForCluster
 
     }
 
-    cluster._meanPenProbability  = pAllPen;  //std::pow(pAllPen,  1.0f / (.0001f + N));
-    cluster._meanPalmProbability = pAllPalm; //std::pow(pAllPalm, 1.0f / (.0001f + N));
+    // defer to size if it looks good...
+    if (sizePair.second > 0.0f && sizePair.second > pair.second)
+    {
+        pair = sizePair;
 
-    //float meanPAllPen = std::pow(pAllPen, 1.0f / float(cluster._touchIds.size()));
+        cluster._meanPenProbability  = 1.0f;  //std::pow(pAllPen,  1.0f / (.0001f + N));
+        cluster._meanPalmProbability = .0001f; //std::pow(pAllPalm, 1.0f / (.0001f + N));
 
-    cluster._penScore      = pair.second;
-    cluster._penTotalScore = totalPenMass;
+        cluster._penScore      = pair.second;
+        cluster._penTotalScore = pair.second;
 
-    _clusterTypesAndScores[cluster._id] = pair;
+        _clusterTypesAndScores[cluster._id] = pair;
+
+    }
+    else
+    {
+        cluster._meanPenProbability  = pAllPen;  //std::pow(pAllPen,  1.0f / (.0001f + N));
+        cluster._meanPalmProbability = pAllPalm; //std::pow(pAllPalm, 1.0f / (.0001f + N));
+
+        cluster._penScore      = pair.second;
+        cluster._penTotalScore = totalPenMass;
+
+        _clusterTypesAndScores[cluster._id] = pair;
+    }
 
     return pair;
 

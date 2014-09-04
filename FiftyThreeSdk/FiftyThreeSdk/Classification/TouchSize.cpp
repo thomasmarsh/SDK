@@ -19,7 +19,7 @@ bool TouchSize::IsPenGivenTouchRadius(TouchData const &data)
     // really want equality, i.e. the pen tip size is typically exactly equal to PenTipRadius.
     // but we allow a little bit of flexibility.
     return (data._leadingRadiusMax < 2.1f * PenTipRadius) &&
-    std::abs(data._leadingRadiusMean - PenTipRadius) < .2f * PenTipRadius &&
+    data._leadingRadiusMean - PenTipRadius < .2f * PenTipRadius &&
     std::sqrt(data._leadingRadiusVariance) < (.25f * PenTipRadius);
 }
 

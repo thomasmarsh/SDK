@@ -741,7 +741,7 @@ void ClusterTracker::RemoveTouchFromClassification(core::TouchId touchId)
 
     if (_commonData && _commonData->proxy && _commonData->proxy->_showDebugLogMessages)
     {
-        std::cerr << "\nREMOVE FROM CLASSIFICATION: " << touchId;
+        //std::cerr << "\nREMOVE FROM CLASSIFICATION: " << touchId;
     }
 
     if (cluster)

@@ -703,6 +703,14 @@ void TouchClassificationProxy::SetClusterType(Cluster::Ptr const & cluster, Touc
         float length   = cluster->TotalLength();
         float lifetime = cluster->LastTimestamp() - cluster->FirstTimestamp();
 
+        float dt = _clusterTracker->Time() - cluster->LastTimestamp();
+        if (cluster->_clusterTouchType == TouchClassification::Pen
+            && newType != TouchClassification::Pen
+            && TouchSize::IsPenGivenTouchRadius(*_clusterTracker->Data(cluster->_touchIds.back())))
+        {
+            //std::cerr << "\n dt = " << dt << ", score = " << cluster->_penScore << ", prior = " << cluster->_penPrior << ", newType = " << static_cast<int>(newType) << ", L = " << length;
+        }
+
         if (cluster->_clusterTouchType == TouchClassification::Finger && newType != TouchClassification::Finger)
         {
             if (newType == TouchClassification::Pen || newType == TouchClassification::Eraser)
@@ -1092,8 +1100,8 @@ VectorXf TouchClassificationProxy::PenPriorForClusters(vector<Cluster::Ptr> cons
         {
             // .0001 allows some robustness to edge thumbs from the other hand in typical configurations
             // with your palm down
-            interiorPenalty = 0.0001f;
-            palmEndPenalty  = 0.0001f;
+            interiorPenalty = 0.01f;
+            palmEndPenalty  = 0.01f;
         }
 
         for (int j=0; j<clusters.size(); j++)
@@ -1642,7 +1650,13 @@ IdTypeMap TouchClassificationProxy::ReclassifyCurrentEvent()
                                 continue;
                             }
 
-                            if (otherCluster->_penScore > cluster->_penScore)
+                            bool sizeOK = false;
+                            if (TouchRadiusAvailable())
+                            {
+                                sizeOK = TouchSize::IsPenGivenTouchRadius(*_clusterTracker->Data(cluster->_touchIds.back()));
+                            }
+
+                            if (otherCluster->_penScore > cluster->_penScore && ! sizeOK)
                             {
                                 newTypes[cluster] = TouchClassification::Palm;
 
