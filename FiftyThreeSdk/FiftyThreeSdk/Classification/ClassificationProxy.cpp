@@ -296,7 +296,7 @@ TouchClassification TouchClassificationProxy::ClassifyPair(TouchId touch0, Touch
     if (!stroke0->TouchRadius().empty() && !stroke1->TouchRadius().empty())
     {
         constexpr float varianceThreshold = 46.65f;
-        constexpr float maxThreshold = 41.99f;
+        constexpr float maxThreshold = 65.99f;
 
         isPalmViaRadiusTest = data0->_radiusVariance > varianceThreshold || data1->_radiusVariance > varianceThreshold;
         isPalmViaRadiusTest &= data1->_radiusMax > maxThreshold || data1->_radiusMax > maxThreshold;
