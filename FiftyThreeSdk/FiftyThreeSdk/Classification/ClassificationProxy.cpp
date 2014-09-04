@@ -301,7 +301,7 @@ TouchClassification TouchClassificationProxy::ClassifyPair(TouchId touch0, Touch
         isPalmViaRadiusTest = data0->_radiusVariance > varianceThreshold || data1->_radiusVariance > varianceThreshold;
         isPalmViaRadiusTest &= data1->_radiusMax > maxThreshold || data1->_radiusMax > maxThreshold;
     }
-    
+
     switch (type)
     {
         case TwoTouchPairType::Pinch:
@@ -395,7 +395,7 @@ TouchClassification TouchClassificationProxy::ClassifyForGesture(TouchId touch0,
                     }
 
                     constexpr float tapPalmVFingerThreshold = 19.63f;
-                    
+
                     if (touch->MaxTouchRadius() && *(touch->MaxTouchRadius()) > tapPalmVFingerThreshold)
                     {
                         return TouchClassification::Palm;
@@ -788,7 +788,6 @@ void TouchClassificationProxy::SetClusterType(Cluster::Ptr const & cluster, Touc
         {
             _currentTypes[touchId] = TouchClassification::Finger;
         }
-
     }
 }
 
@@ -1033,8 +1032,8 @@ VectorXf TouchClassificationProxy::PenPriorForClusters(vector<Cluster::Ptr> cons
 
             if (_clusterTracker->MostRecentPenTipType() == TouchClassification::Eraser)
             {
-                constexpr float mu = 21.0f;
-                constexpr float sigma = 3.0f;
+                constexpr float mu = 18.0f;
+                constexpr float sigma = 6.0f;
 
                 float dEraser = (r - mu) / sigma;
                 penLikelihood = (1.0f / sigma) * std::exp(-.5f * dEraser * dEraser);
@@ -1047,7 +1046,7 @@ VectorXf TouchClassificationProxy::PenPriorForClusters(vector<Cluster::Ptr> cons
                 // and another a somewhat angled tip
 
                 constexpr float muVerticalTip    = 6.0f;
-                constexpr float sigmaVerticalTip = .5f;
+                constexpr float sigmaVerticalTip = .25f;
 
                 constexpr float muAngledTip    = 16.0f;
                 constexpr float sigmaAngledTip = 10.0f;
@@ -1059,12 +1058,11 @@ VectorXf TouchClassificationProxy::PenPriorForClusters(vector<Cluster::Ptr> cons
                 float likelihoodAngled    = (1.0f / sigmaAngledTip) * std::exp(-.5f * dPenAngled * dPenAngled);
 
                 penLikelihood = .5f * (likelihoodAngled + likelihoodVertical);
+            }
 
-                if (r > 40.0f || rMax > 40.0f)
-                {
-                    penLikelihood = 0.0f;
-                }
-
+            if (rMax > 32.0f)
+            {
+                penLikelihood = 0.0f;
             }
 
             constexpr float sigmaPalm      = 22.0f;
@@ -1080,7 +1078,6 @@ VectorXf TouchClassificationProxy::PenPriorForClusters(vector<Cluster::Ptr> cons
             prior[j] *= pPen;
 
             DebugAssert(prior[j] >= 0.0f && prior[j] <= 1.0f);
-
         }
     }
 
@@ -1117,9 +1114,7 @@ VectorXf TouchClassificationProxy::PenPriorForClusters(vector<Cluster::Ptr> cons
             {
                 prior[j] *= palmEndPenalty;
             }
-
         }
-
     }
 
     int index = 0;
@@ -1133,7 +1128,6 @@ VectorXf TouchClassificationProxy::PenPriorForClusters(vector<Cluster::Ptr> cons
     }
 
     return prior;
-
 }
 
 void TouchClassificationProxy::UpdateIsolationStatistics()
