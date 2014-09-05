@@ -708,7 +708,8 @@ void TouchClassificationProxy::SetClusterType(Cluster::Ptr const & cluster, Touc
             && newType != TouchClassification::Pen
             && TouchSize::IsPenGivenTouchRadius(*_clusterTracker->Data(cluster->_touchIds.back())))
         {
-            //std::cerr << "\n dt = " << dt << ", score = " << cluster->_penScore << ", prior = " << cluster->_penPrior << ", newType = " << static_cast<int>(newType) << ", L = " << length;
+            //std::cerr << "\n dt = " << dt << ", score = " << cluster->_penScore << ", prior = " << cluster->_penPrior << ", L = " << length << ", palmEnd = " << cluster->_wasAtPalmEnd << ", interior = " << cluster->_wasInterior;
+            //std::cerr << ", count = " << cluster->_touchIds.size();
         }
 
         if (cluster->_clusterTouchType == TouchClassification::Finger && newType != TouchClassification::Finger)
@@ -746,7 +747,8 @@ void TouchClassificationProxy::SetClusterType(Cluster::Ptr const & cluster, Touc
                 penDownDt = _touchStatistics[cluster->MostRecentTouch()]._penDownDeltaT;
             }
 
-            if (_debounceWorkaroundEnabled &&
+            if ((! TouchRadiusAvailable()) &&
+                _debounceWorkaroundEnabled &&
                HandednessLocked() &&
                _penTracker.AtPenEnd(cluster, _clusterTracker->FastOrderedClusters(), true) &&
                cluster->_totalLength > 0.0f &&
@@ -1524,7 +1526,7 @@ IdTypeMap TouchClassificationProxy::ReclassifyCurrentEvent()
 
             SetClusterType(cluster, newType, types);
         }
-        else
+        else if(! TouchRadiusAvailable())
         {
 
             std::map<Cluster::Ptr, TouchClassification> newTypes;
@@ -1607,7 +1609,7 @@ IdTypeMap TouchClassificationProxy::ReclassifyCurrentEvent()
             for (Cluster::Ptr const & cluster:timeOrderedClusters)
             {
 
-                if (cluster->IsPenType() && cluster->AllTouchesEnded() && cluster->ContainsReclassifiableTouch())
+                if (cluster->IsPenType() && cluster->ContainsReclassifiableTouch())
                 {
                     TouchId touchId = cluster->MostRecentTouch();
 
@@ -1636,32 +1638,89 @@ IdTypeMap TouchClassificationProxy::ReclassifyCurrentEvent()
                         otherUpEvent   = _penEventClassifier.BestPenUpEventForTouch(otherTouchId);
                         otherDownEvent = _penEventClassifier.BestPenDownEventForTouch(otherTouchId);
 
+                        //std::cerr << "\n up = " << static_cast<int>(upEvent);
+                        //std::cerr << ", oUp = " << static_cast<int>(otherUpEvent);
+                        //std::cerr << ", down = " << static_cast<int>(downEvent);
+                        //std::cerr << ", oDown = " << static_cast<int>(otherDownEvent);
+                        
+                        
                         // if they share anything, make it winner-takes-all.
-                        if (downEvent >= 0 && ((upEvent >= 0 && upEvent == otherUpEvent) || (downEvent >= 0 && (downEvent == otherDownEvent))))
+                        if ((upEvent >= 0 && upEvent == otherUpEvent) || (downEvent >= 0 && (downEvent == otherDownEvent)))
                         {
-
-                            // a polite lie -- allowing touches to steal pen events from other touches actually
-                            // is a convenient hack to help with missed pen events during rapid drawing and
-                            // handwriting cases.
-                            if (HandednessLocked() &&
-                               (! cluster->_wasInterior) &&
-                               (! cluster->_wasAtPalmEnd))
+                            std::cerr << "\nsharing";
+                            
+                            if(! TouchRadiusAvailable())
                             {
-                                continue;
+                                // a polite lie -- allowing touches to steal pen events from other touches actually
+                                // is a convenient hack to help with missed pen events during rapid drawing and
+                                // handwriting cases.
+                                if (HandednessLocked() &&
+                                    (! cluster->_wasInterior) &&
+                                    (! cluster->_wasAtPalmEnd))
+                                {
+                                    continue;
+                                }
                             }
-
-                            bool sizeOK = false;
+                            
                             if (TouchRadiusAvailable())
                             {
-                                sizeOK = TouchSize::IsPenGivenTouchRadius(*_clusterTracker->Data(cluster->_touchIds.back()));
+                                bool clusterSizeOK = TouchSize::IsPenGivenTouchRadius(*_clusterTracker->Data(cluster->_touchIds.back()));
+                                bool otherSizeOK   = TouchSize::IsPenGivenTouchRadius(*_clusterTracker->Data(otherCluster->_touchIds.back()));
+                            
+                                float radius       = _clusterTracker->Data(cluster->_touchIds.back())->_radiusMean;
+                                float otherRadius  = _clusterTracker->Data(otherCluster->_touchIds.back())->_radiusMean;
+                                
+                                if (clusterSizeOK || otherSizeOK)
+                                {
+                                    // decide based on size in this case
+                                    // otherwise use the old "which one is better" code path
+                                    if (! clusterSizeOK)
+                                    {
+                                        newTypes[cluster] = TouchClassification::Palm;
+                                        std::cerr << " did something, r = " << radius;
+                                    }
+                                    else if(! otherSizeOK)
+                                    {
+                                        newTypes[otherCluster] = TouchClassification::Palm;
+                                        std::cerr << " did something, rOther = " << otherRadius << " vs " << radius;
+                                    }
+                                    else
+                                    {
+                                        // both are OK based on size...
+                                        std::cerr << " did nothing";
+                                    }
+                                    continue;
+                                }
+                                else
+                                {
+                                    // neither one is a clear winner -- choose the smaller one
+                                    
+                                    if(radius < otherRadius)
+                                    {
+                                        newTypes[otherCluster] = TouchClassification::Palm;
+                                    }
+                                    else
+                                    {
+                                        newTypes[cluster] = TouchClassification::Palm;
+                                    }
+                                    std::cerr << " chose smaller one, r = " << radius << ", rOther = " << otherRadius;
+                                    continue;
+                                }
+                                
+                                
                             }
-
-                            if (otherCluster->_penScore > cluster->_penScore && ! sizeOK)
+                            
+                            if ((otherCluster->_penScore > cluster->_penScore))
                             {
                                 newTypes[cluster] = TouchClassification::Palm;
-
+                                std::cerr << " prevented";
                             }
-
+                            else
+                            {
+                                std::cerr << " OK";
+                            }
+                            
+                            
                         }
 
                     }
@@ -1676,13 +1735,16 @@ IdTypeMap TouchClassificationProxy::ReclassifyCurrentEvent()
                 SetClusterType(pair.first, pair.second, types);
             }
 
+        } else if(TouchRadiusAvailable())
+        {
+            ReclassifyCurrentEventGivenSize(types);
         }
 
         // if there's not already a pen active, check each cluster to
         // see if a pen was accidentally added to the cluster.  if so, give it its own
         // cluster.  This typically happens during rapid drawing after a classification error
         // is made: a new pen touch gets stuck in a "palm" cluster.
-        if (! PenActive())
+        if ((! TouchRadiusAvailable() ) && (! PenActive()))
         {
             for (Cluster::Ptr const & cluster:timeOrderedClusters)
             {
@@ -1734,6 +1796,148 @@ IdTypeMap TouchClassificationProxy::ReclassifyCurrentEvent()
     return types;
 
 }
+    
+    
+void TouchClassificationProxy::ReclassifyCurrentEventGivenSize(IdTypeMap &changedTypes)
+{
+    std::map<Cluster::Ptr, TouchClassification> newTypes;
+    
+    vector<Cluster::Ptr> timeOrderedClusters = _clusterTracker->CurrentEventTimeOrderedClusters();
+    
+    std::set<Cluster::Ptr> activeClusters = _clusterTracker->CurrentEventActiveClusters();
+    
+    for (Cluster::Ptr const & probeCluster:timeOrderedClusters)
+    {
+        
+        if (! probeCluster->ContainsReclassifiableTouch())
+        {
+            continue;
+        }
+        
+        if (! probeCluster->Stale())
+        {
+            
+            std::pair<TouchClassification, float> probePair  = _penEventClassifier.TypeAndScoreForCluster(*probeCluster);
+            float dominationScore                            = DominationScore(probeCluster);
+            
+            auto mostRecentTouch                             = _clusterTracker->TouchWithId(probeCluster->MostRecentTouch());
+            
+            // todo: consistent use of most recent vs. cluster types...
+            TouchData::Ptr data = _clusterTracker->Data(probeCluster->MostRecentTouch());
+            bool isPenSized     = TouchSize::IsPenGivenTouchRadius(*data);
+            
+            bool atCorrectEnd = true;
+            if (HandednessLocked())
+            {
+                atCorrectEnd = ! probeCluster->_wasAtPalmEnd;
+            }
+
+            bool locationOK = (! probeCluster->_wasInterior) && atCorrectEnd;
+
+            
+            // in case of a pen, what tip should we use?  use the switch if available,
+            // otherwise use most recent switch.
+            TouchClassification tipType  = probePair.first;
+            if (tipType == TouchClassification::Unknown)
+            {
+                tipType = _clusterTracker->MostRecentPenTipType();
+            }
+            
+            
+            
+            // first, the easy case.  a small touch at the correct end.
+            // subsequent clauses handle harder situations.
+            if (locationOK &&
+                isPenSized)
+            {
+                newTypes[probeCluster] = tipType;
+            }
+            else if(locationOK && probeCluster->_penScore > .8f )
+            {
+                newTypes[probeCluster] = tipType;
+            }
+            else
+            {
+                newTypes[probeCluster] = TouchClassification::Palm;
+            }
+            
+            //std::cerr << "\n id = " << probeCluster->_id << ", sizeOK = " << isPenSized << ", score = " << probeCluster->_penScore << ", prior = " << probeCluster->_penPrior << ", radius = " << data->_radiusMean << ", type = " << static_cast<int>(newTypes[probeCluster]);
+            
+                
+        }
+    }
+
+    
+    // Now resolve conflicts -- there can be only one.
+    for (Cluster::Ptr const & probeCluster:timeOrderedClusters)
+    {
+        std::vector<Cluster::Ptr> concurrentClusters = _clusterTracker->ConcurrentClusters(probeCluster);
+
+        TouchClassification probeClass = CurrentClass(probeCluster->MostRecentTouch());
+        if (newTypes.count(probeCluster))
+        {
+            probeClass = newTypes[probeCluster];
+        }
+        
+        TouchData::Ptr const & probeData = _clusterTracker->Data(probeCluster->MostRecentTouch());
+
+        for (Cluster::Ptr const & otherCluster : concurrentClusters)
+        {
+        
+            TouchClassification otherClass = CurrentClass(otherCluster->MostRecentTouch());
+            if (newTypes.count(otherCluster))
+            {
+                otherClass = newTypes[otherCluster];
+            }
+
+            TouchData::Ptr const & otherData = _clusterTracker->Data(otherCluster->MostRecentTouch());
+
+            
+            if (probeClass == TouchClassification::Pen &&
+                otherClass == TouchClassification::Pen)
+            {
+                if (probeData->_radiusMean > otherData->_radiusMean)
+                {
+                    newTypes[probeCluster] = TouchClassification::Palm;
+                }
+            }
+            else if(probeClass == TouchClassification::Eraser &&
+                    otherClass == TouchClassification::Eraser)
+            {
+
+                constexpr float fullEraserSize = 24.0f;
+                
+                //float probeErr = std::abs(fullEraserSize - probeData->_radiusMean);
+                //float otherErr = std::abs(fullEraserSize - otherData->_radiusMean);
+                
+                
+                if (probeData->_radiusMean > otherData->_radiusMean)
+                {
+                    newTypes[probeCluster] = TouchClassification::Palm;
+                }
+
+                
+            }
+            
+            
+            
+        }
+        
+        
+    }
+    
+    
+    typedef std::pair<Cluster::Ptr const &, TouchClassification> ClusterTypePair;
+    for (ClusterTypePair pair:newTypes)
+    {
+        SetClusterType(pair.first, pair.second, changedTypes);
+    }
+    
+
+    
+}
+    
+    
 
 bool TouchClassificationProxy::IsLongestConcurrentTouch(TouchId probeId)
 {
@@ -1781,7 +1985,7 @@ float TouchClassificationProxy::DominationScore(Cluster::Ptr const & probe)
 
 void      TouchClassificationProxy::DebugPrintClusterStatus()
 {
-
+    
     return;
     if (!_showDebugLogMessages)
     {
@@ -1844,6 +2048,7 @@ void TouchClassificationProxy::ReclassifyClusters()
 {
     IdTypeMap types = ReclassifyCurrentEvent();
 
+
     TouchId touchId; TouchClassification type;
     for (const auto & pair :types)
     {
@@ -1868,6 +2073,7 @@ void TouchClassificationProxy::ReclassifyClusters()
             }
         }
     }
+    DebugPrintClusterStatus();
 }
 
 void TouchClassificationProxy::ClassifyIsolatedStrokes()

@@ -199,6 +199,8 @@ protected:
     void SetClusterType(Cluster::Ptr const & cluster, core::TouchClassification newType, IdTypeMap & changedTypes);
 
     IdTypeMap ReclassifyCurrentEvent();
+    
+    void ReclassifyCurrentEventGivenSize(IdTypeMap &changedTypes);
 
     bool _needsClassification;
 

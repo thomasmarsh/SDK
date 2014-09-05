@@ -295,7 +295,8 @@ std::pair<TouchClassification, float> PenEventClassifier::TypeAndScoreForCluster
     // first check size...
     auto touch = cluster._touchIds.back();
 
-    if (cluster._touchIds.size() == 1 &&
+    if (false &&
+        cluster._touchIds.size() == 1 &&
         _commonData->proxy->TouchRadiusAvailable() &&
         TouchSize::IsPenGivenTouchRadius(*_clusterTracker->Data(touch)))
     {
