@@ -1261,16 +1261,19 @@ void ClusterTracker::UpdateClusters()
     for (core::TouchId touchId:_touchLog->ActiveIds())
     {
 
-        if (Data(touchId)->LastTimestamp() < _currentEventBeganTimestamp)
+        if ((_currentEventBeganTimestamp < std::numeric_limits<double>::max() || Data(touchId)->Cluster()) &&
+            Data(touchId)->FirstTimestamp() < _currentEventBeganTimestamp)
         {
             continue;
         }
 
         Stroke::Ptr stroke = _commonData->proxy->ClusterTracker()->Stroke(touchId);
 
+        // only create new clusters if the touch is in phase began.
+        // otherwise it's a bug from bookkeeping.
+        
         Cluster::Ptr knownCluster = _touchLog->Cluster(touchId);
-
-        if (! knownCluster)
+        if (! knownCluster && Data(touchId)->Phase() == TouchPhase::Began)
         {
 
             Vector2f q           = stroke->WeightedCenterOfMass();
@@ -1322,7 +1325,7 @@ void ClusterTracker::UpdateClusters()
                 AddPointToCluster(stroke->XY(j), stroke->AbsoluteTimestamp(j), useCluster, touchId);
             }
         }
-        else
+        else if(knownCluster)
         {
             // doing this each time means we give weight to each point whether stationary or moving.
             // this is actually a feature since palms will update to the right place more rapidly.

@@ -787,6 +787,7 @@ void TouchClassificationProxy::SetClusterType(Cluster::Ptr const & cluster, Touc
 
             if (CurrentClass(touchId) != newType)
             {
+                //std::cerr << "\n id = " << _clusterTracker->Cluster(touchId)->_id << " was " << static_cast<int>(CurrentClass(touchId));
                 changedTypes[touchId] = newType;
             }
         }
@@ -1428,6 +1429,7 @@ IdTypeMap TouchClassificationProxy::ReclassifyCurrentEvent()
             }
         }
 
+        
         // if there's a pen connected, handle a single cluster as a special case.
         // if the switch classifier says it's a pen or eraser, use that decision.
         // however, if switch classifier says TouchClassification::Unknown then decide between finger and palm
@@ -1524,7 +1526,15 @@ IdTypeMap TouchClassificationProxy::ReclassifyCurrentEvent()
                 cluster->_checkForFingerSequence = false;
             }
 
-            SetClusterType(cluster, newType, types);
+            if(newType == TouchClassification::Finger)
+            {
+                SetClusterType(cluster, newType, types);
+            }
+            
+            if(! TouchRadiusAvailable())
+            {
+                SetClusterType(cluster, newType, types);
+            }
         }
         else if(! TouchRadiusAvailable())
         {
@@ -1735,7 +1745,11 @@ IdTypeMap TouchClassificationProxy::ReclassifyCurrentEvent()
                 SetClusterType(pair.first, pair.second, types);
             }
 
-        } else if(TouchRadiusAvailable())
+        }
+        
+        
+        
+        if(TouchRadiusAvailable())
         {
             ReclassifyCurrentEventGivenSize(types);
         }
@@ -1832,7 +1846,7 @@ void TouchClassificationProxy::ReclassifyCurrentEventGivenSize(IdTypeMap &change
                 atCorrectEnd = ! probeCluster->_wasAtPalmEnd;
             }
 
-            bool locationOK = (! probeCluster->_wasInterior) && atCorrectEnd;
+            bool locationOK = atCorrectEnd;  //(! probeCluster->_wasInterior);
 
             
             // in case of a pen, what tip should we use?  use the switch if available,
@@ -1842,8 +1856,6 @@ void TouchClassificationProxy::ReclassifyCurrentEventGivenSize(IdTypeMap &change
             {
                 tipType = _clusterTracker->MostRecentPenTipType();
             }
-            
-            
             
             // first, the easy case.  a small touch at the correct end.
             // subsequent clauses handle harder situations.
@@ -1860,10 +1872,6 @@ void TouchClassificationProxy::ReclassifyCurrentEventGivenSize(IdTypeMap &change
             {
                 newTypes[probeCluster] = TouchClassification::Palm;
             }
-            
-            //std::cerr << "\n id = " << probeCluster->_id << ", sizeOK = " << isPenSized << ", score = " << probeCluster->_penScore << ", prior = " << probeCluster->_penPrior << ", radius = " << data->_radiusMean << ", type = " << static_cast<int>(newTypes[probeCluster]);
-            
-                
         }
     }
 
@@ -1934,6 +1942,15 @@ void TouchClassificationProxy::ReclassifyCurrentEventGivenSize(IdTypeMap &change
     }
     
 
+    for (IdTypePair pair : changedTypes)
+    {
+        Cluster::Ptr probeCluster = _clusterTracker->Cluster(pair.first);
+        TouchData::Ptr data = _clusterTracker->Data(probeCluster->MostRecentTouch());
+        bool locationOK = ! probeCluster->_wasAtPalmEnd;
+        //std::cerr << "\n id = " << probeCluster->_id << ", score = " << probeCluster->_penScore << ", prior = " << probeCluster->_penPrior << ", r = " << data->_radiusMean << ", loc = " << locationOK << ", type = " << static_cast<int>(newTypes[probeCluster]);
+        
+    }
+    
     
 }
     
@@ -1965,6 +1982,12 @@ float TouchClassificationProxy::DominationScore(Cluster::Ptr const & probe)
     for (TouchId otherId:_clusterTracker->ConcurrentTouches(probe->MostRecentTouch()))
     {
         Cluster::Ptr const & otherCluster = _clusterTracker->Cluster(otherId);
+        
+        if(! otherCluster)
+        {
+            continue;
+        }
+        
         float ratio = probePair.second / (.0001f + otherCluster->_penScore);
 
 #if USE_DEBUG_ASSERT
