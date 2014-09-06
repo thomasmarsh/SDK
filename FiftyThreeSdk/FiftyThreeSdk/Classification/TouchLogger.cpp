@@ -5,6 +5,7 @@
 //  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
 
+#include <iomanip>
 #include <vector>
 
 #include "Core/Any.h"
@@ -502,9 +503,9 @@ void TouchLogger::TouchesChanged(const std::set<core::Touch::Ptr> & touches)
 
             case core::TouchPhase::Stationary:
             {
-                
+
                 TouchData::Ptr touchData;
-                
+
                 try
                 {
                     touchData = _touchData.at(touch->Id());
@@ -514,14 +515,12 @@ void TouchLogger::TouchesChanged(const std::set<core::Touch::Ptr> & touches)
                     DebugAssert(touchData);
                     continue;
                 }
-                
+
                 touchData->SetEndedTime(_currentTime);
-                
+
                 break;
             }
-                
-                
-                
+
             default:
                 break;
         }
@@ -1191,7 +1190,7 @@ void TouchLogger::RemoveTouch(core::TouchId touchId)
 
     _activeTouches.erase(touchId);
     _touchData.erase(touchId);
-    
+
     // in case he was in here, remove him.
     _concurrentTouchesCache.clear();
 
