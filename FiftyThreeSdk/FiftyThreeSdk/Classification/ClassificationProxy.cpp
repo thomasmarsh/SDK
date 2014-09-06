@@ -1991,8 +1991,8 @@ void TouchClassificationProxy::ReclassifyCurrentEventGivenSize(IdTypeMap &change
         SetClusterType(pair.first, pair.second, changedTypes);
     }
 
+    
     /*
-
     for (IdTypePair pair : changedTypes)
     {
         Cluster::Ptr probeCluster = _clusterTracker->Cluster(pair.first);
@@ -2020,7 +2020,6 @@ void TouchClassificationProxy::ReclassifyCurrentEventGivenSize(IdTypeMap &change
         std::cerr << "), type = " << static_cast<int>(newTypes[probeCluster]);
     }
     */
-
 }
 
 bool TouchClassificationProxy::IsLongestConcurrentTouch(TouchId probeId)

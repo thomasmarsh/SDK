@@ -452,7 +452,7 @@ void ClusterTracker::Reset()
     _needComputeClusterOrder = true;
     _lastEventEndedTimestamp = CurrentTime();
     _currentEventBeganTimestamp = std::numeric_limits<double>::max();
-
+    
     _currentEventStatistics = make_shared<ClusterEventStatistics>();
 }
 

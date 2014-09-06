@@ -517,6 +517,10 @@ void TouchLogger::TouchesChanged(const std::set<core::Touch::Ptr> & touches)
                 }
 
                 touchData->SetEndedTime(_currentTime);
+                if(touchData->Cluster())
+                {
+                    touchData->Cluster()->IncreaseLastTimestamp(_currentTime);
+                }
 
                 break;
             }
@@ -1266,25 +1270,28 @@ TouchIdVector TouchLogger::ConcurrentTouches(core::TouchId probeId)
 
     TouchIdVector out;
 
-    double t0 = Data(probeId)->FirstTimestamp();
-    double t1 = Data(probeId)->LastTimestamp();
-
-    for (const auto & pair :  _touchData)
+    if(Data(probeId))
     {
-        if (pair.first == probeId)
+        double t0 = Data(probeId)->FirstTimestamp();
+        double t1 = Data(probeId)->LastTimestamp();
+        
+        for (const auto & pair :  _touchData)
         {
-            continue;
-        }
-
-        double s0 = pair.second->FirstTimestamp();
-        double s1 = pair.second->LastTimestamp();
-
-        if ((s1 >= t0) && (s0 <= t1))
-        {
-            out.push_back(pair.first);
+            if (pair.first == probeId)
+            {
+                continue;
+            }
+            
+            double s0 = pair.second->FirstTimestamp();
+            double s1 = pair.second->LastTimestamp();
+            
+            if ((s1 >= t0) && (s0 <= t1))
+            {
+                out.push_back(pair.first);
+            }
         }
     }
-
+    
     _concurrentTouchesCache[probeId] = out;
 
     return out;

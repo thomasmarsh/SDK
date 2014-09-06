@@ -157,6 +157,11 @@ struct Cluster
 
     void  RemoveOldTouches(double cutoffTime);
 
+    void IncreaseLastTimestamp(double timestamp)
+    {
+        _lastTimestamp = std::max(timestamp, _lastTimestamp);
+    }
+    
     double LastTimestamp() const
     {
         return _lastTimestamp;
