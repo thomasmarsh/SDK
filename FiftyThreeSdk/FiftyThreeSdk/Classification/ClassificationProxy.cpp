@@ -1410,8 +1410,8 @@ IdTypeMap TouchClassificationProxy::ReclassifyCurrentEvent()
         {
 
             Cluster::Ptr cluster = _clusterTracker->Cluster(liveTouches[0]);
-
-            if (TouchSize::IsPenGivenTouchRadius(*_clusterTracker->Data(liveTouches[0])))
+            
+            if (_clusterTracker->Data(liveTouches[0]) && TouchSize::IsPenGivenTouchRadius(*_clusterTracker->Data(liveTouches[0])))
             {
                 checkForFingerSequence = false;
             }
@@ -1451,7 +1451,7 @@ IdTypeMap TouchClassificationProxy::ReclassifyCurrentEvent()
 
             TouchClassification newType = TouchClassification::Unknown;
 
-            if (cluster->_simultaneousTouches)
+            if (cluster && cluster->_simultaneousTouches)
             {
                 newType = TouchClassification::Palm;
             }
@@ -1907,12 +1907,19 @@ void TouchClassificationProxy::ReclassifyCurrentEventGivenSize(IdTypeMap &change
                 }
             }
             
-            
+            // "no small dots at palm end", even if radius test would allow them through
+            if(HandednessLocked() &&
+               (! atCorrectEnd) &&
+               probeCluster->_penScore < .2f &&
+               data->Stroke()->ArcLength() < 5.0f)
+            {
+                newTypes[probeCluster] = TouchClassification::Palm;
+            }
             // first, the easy case.  a small touch at the correct end.
             // subsequent clauses handle harder situations.
-            if (atCorrectEnd &&
-                leadingSamplesArePenSized &&
-                (! TouchSize::IsPalmGivenTouchRadius(data->_radiusMax)))
+            else if (atCorrectEnd &&
+                     leadingSamplesArePenSized &&
+                     (! TouchSize::IsPalmGivenTouchRadius(data->_radiusMax)))
             {
                 newTypes[probeCluster] = tipType;
             }
@@ -1920,7 +1927,7 @@ void TouchClassificationProxy::ReclassifyCurrentEventGivenSize(IdTypeMap &change
             // and location is OK and size is reasonable, call it a pen
             else if(_clusterTracker->ConcurrentClusters(probeCluster).size() > 0 &&
                     locationOK &&
-                    TouchSize::IsWeakPenGivenTouchRadius(data->_leadingRadiusMax) &&
+                    TouchSize::IsWeakPenGivenTouchRadius(data->_leadingRadiusMax, data->Stroke()->ArcLength()) &&
                     (! TouchSize::IsPalmGivenTouchRadius(data->_radiusMax)))
             {
                 newTypes[probeCluster] = tipType;
@@ -2002,7 +2009,7 @@ void TouchClassificationProxy::ReclassifyCurrentEventGivenSize(IdTypeMap &change
     }
 
     
-    /*
+    
     for (IdTypePair pair : changedTypes)
     {
         Cluster::Ptr probeCluster = _clusterTracker->Cluster(pair.first);
@@ -2021,7 +2028,7 @@ void TouchClassificationProxy::ReclassifyCurrentEventGivenSize(IdTypeMap &change
         std::cerr << std::setprecision(3);
         std::cerr << "\n" << static_cast<int>(probeCluster->MostRecentTouch()) <<  //" (" << static_cast<int>(probeCluster->_id) << ")" <<
         ": score = " << probeCluster->_penScore << ", prior = " << probeCluster->_penPrior << ", r = " << data->_radiusMean << ", locn = " << locationOK
-        << ", lock = " << HandednessLocked();
+        << ", lock = " << HandednessLocked() << ", L = " << data->Stroke()->ArcLength();
         
         std::cerr << ", conc = (";
         for (TouchId cId : concurrent)
@@ -2031,7 +2038,7 @@ void TouchClassificationProxy::ReclassifyCurrentEventGivenSize(IdTypeMap &change
 
         std::cerr << "), type = " << static_cast<int>(newTypes[probeCluster]);
     }
-    */
+    
 }
 
 bool TouchClassificationProxy::IsLongestConcurrentTouch(TouchId probeId)

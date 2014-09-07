@@ -23,9 +23,18 @@ bool TouchSize::IsPenGivenTouchRadius(TouchData const &data)
     std::sqrt(data._leadingRadiusVariance) < (.25f * PenTipRadius);
 }
 
-bool TouchSize::IsWeakPenGivenTouchRadius(float r)
+bool TouchSize::IsWeakPenGivenTouchRadius(float r, float arcLength)
 {
-    return r < 2.1f * PenTipRadius;
+    if(r > 3.1f * PenTipRadius)
+    {
+        return false;
+    }
+    else
+    {
+        // require more length at larger radii.  they are more likely to be palms
+        // and the artifacts are also much worse: the dreaded blotches.
+        return arcLength > r;
+    }
 }
 
     
