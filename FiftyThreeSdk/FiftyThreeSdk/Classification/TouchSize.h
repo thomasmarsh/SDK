@@ -25,6 +25,9 @@ public:
     // IsPenGivenTouchRadius() will be fooled in that case.  the switch needs to save the day.
     static bool IsPenGivenTouchRadius(TouchData const &data);
 
+    // a weaker test than the strict test above.  more palms will pass this.
+    static bool IsWeakPenGivenTouchRadius(float r);
+    
     static bool IsPalmGivenTouchRadius(float r);
 };
 }

@@ -1916,6 +1916,16 @@ void TouchClassificationProxy::ReclassifyCurrentEventGivenSize(IdTypeMap &change
             {
                 newTypes[probeCluster] = tipType;
             }
+            // if there's more than one cluster (so not an isolated stroke, which could be a finger)
+            // and location is OK and size is reasonable, call it a pen
+            else if(_clusterTracker->ConcurrentClusters(probeCluster).size() > 0 &&
+                    locationOK &&
+                    TouchSize::IsWeakPenGivenTouchRadius(data->_leadingRadiusMax) &&
+                    (! TouchSize::IsPalmGivenTouchRadius(data->_radiusMax)))
+            {
+                newTypes[probeCluster] = tipType;
+            }
+            // use switch events for larger touches which appear in the right location
             else if (locationOK &&
                      probeCluster->_penScore > .8f &&
                      (! TouchSize::IsPalmGivenTouchRadius(data->_radiusMax)))
@@ -2010,8 +2020,10 @@ void TouchClassificationProxy::ReclassifyCurrentEventGivenSize(IdTypeMap &change
 
         std::cerr << std::setprecision(3);
         std::cerr << "\n" << static_cast<int>(probeCluster->MostRecentTouch()) <<  //" (" << static_cast<int>(probeCluster->_id) << ")" <<
-        ": score = " << probeCluster->_penScore << ", prior = " << probeCluster->_penPrior << ", r = " << data->_radiusMean << ", loc = " << locationOK << ", conc = (";
-
+        ": score = " << probeCluster->_penScore << ", prior = " << probeCluster->_penPrior << ", r = " << data->_radiusMean << ", locn = " << locationOK
+        << ", lock = " << HandednessLocked();
+        
+        std::cerr << ", conc = (";
         for (TouchId cId : concurrent)
         {
             std::cerr << " " << static_cast<int>(cId);

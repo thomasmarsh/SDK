@@ -23,6 +23,13 @@ bool TouchSize::IsPenGivenTouchRadius(TouchData const &data)
     std::sqrt(data._leadingRadiusVariance) < (.25f * PenTipRadius);
 }
 
+bool TouchSize::IsWeakPenGivenTouchRadius(float r)
+{
+    return r < 2.1f * PenTipRadius;
+}
+
+    
+    
 bool TouchSize::IsPalmGivenTouchRadius(float r)
 {
     constexpr float threshold = 30.29f;
