@@ -1887,7 +1887,10 @@ void TouchClassificationProxy::ReclassifyCurrentEventGivenSize(IdTypeMap &change
             }
             else
             {
-                newTypes[probeCluster] = TouchClassification::Palm;
+                if(! probeCluster->_checkForFingerSequence)
+                {
+                    newTypes[probeCluster] = TouchClassification::Palm;
+                }
             }
         }
     }
