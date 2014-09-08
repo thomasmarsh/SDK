@@ -550,6 +550,8 @@ void TouchLogger::LogPenEvent(PenEvent event)
                                                    event._timestamp);
 
     PenEventId eventId(_penEventCounter);
+    
+    DebugAssert(_penEventCounter != -1);
 
     _penEventData.insert(std::pair<PenEventId, PenEventData::Ptr>(eventId, newEvent));
     _penEventOrder.push_back(eventId);
@@ -984,7 +986,17 @@ PenEventData::Ptr const & TouchLogger::PenData(PenEventId id)
 {
     AssertPenEvents(id);
 
-    return _penEventData[id];
+    auto it = _penEventData.find(id);
+    
+    if (it != _penEventData.end())
+    {
+        return it->second;
+    }
+    else
+    {
+        static PenEventData::Ptr nullPtr = PenEventData::Ptr();
+        return nullPtr;
+    }
 }
 
 vector<PenEventData::Ptr> TouchLogger::PenData(PenEventIdVector ids)
@@ -1002,9 +1014,12 @@ vector<PenEventData::Ptr> TouchLogger::PenData(PenEventIdVector ids)
 double TouchLogger::PenTime(PenEventId id)
 {
     AssertPenEvents(id);
-    if (_penEventData[id])
+    
+    auto it = _penEventData.find(id);
+    
+    if (it != _penEventData.end())
     {
-        return _penEventData[id]->Time();
+        return it->second->Time();
     }
     else
     {
@@ -1029,7 +1044,17 @@ PenEventType TouchLogger::PenType(PenEventId id)
 {
     AssertPenEvents(id);
 
-    return _penEventData[id]->Type();
+    auto it = _penEventData.find(id);
+    
+    if (it != _penEventData.end())
+    {
+        return it->second->Type();
+    }
+    else
+    {
+        return PenEventType::Unknown;
+    }
+
 }
 
 vector<PenEventType> TouchLogger::PenType(PenEventIdVector ids)
