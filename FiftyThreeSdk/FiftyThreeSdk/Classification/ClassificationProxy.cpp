@@ -1923,7 +1923,9 @@ void TouchClassificationProxy::ReclassifyCurrentEventGivenSize(IdTypeMap &change
             }
             // if there's more than one cluster (so not an isolated stroke, which could be a finger)
             // and location is OK and size is reasonable, call it a pen
-            else if (_clusterTracker->ConcurrentClusters(probeCluster).size() > 0 &&
+            else if ((! probeCluster->_checkForFingerSequence) &&
+                     (_clusterTracker->ConcurrentClusters(probeCluster).size() > 0 ||
+                      _clusterTracker->ConcurrentTouches(probeTouch).size() > 0) &&
                     locationOK &&
                     TouchSize::IsWeakPenGivenTouchRadius(data->_leadingRadiusMax, data->Stroke()->ArcLength()) &&
                     (! TouchSize::IsPalmGivenTouchRadius(data->_radiusMax)))
