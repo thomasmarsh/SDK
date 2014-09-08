@@ -27,7 +27,7 @@ public:
 
     // a weaker test than the strict test above.  more palms will pass this.
     static bool IsWeakPenGivenTouchRadius(float r, float arcLength);
-    
+
     static bool IsPalmGivenTouchRadius(float r);
 };
 }

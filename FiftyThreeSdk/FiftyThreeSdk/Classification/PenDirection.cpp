@@ -240,7 +240,7 @@ void PenTracker::UpdateLocations()
     }
 
     //std::cerr << "\ndPen = (" << _penDisplacement.x() << ", " << _penDisplacement.y() << ")";
-    
+
     // force the pen to stay on screen.
     Vector2f penLocation = PenLocation();
 

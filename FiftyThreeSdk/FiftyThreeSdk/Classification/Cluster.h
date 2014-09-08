@@ -126,7 +126,6 @@ struct Cluster
 
     static Cluster::Ptr New();
 
-
     // final score used in classification.  currently the odds ratio:
     // _penScore = P(all pen) / P(all palm).
     float _penScore;
@@ -161,7 +160,7 @@ struct Cluster
     {
         _lastTimestamp = std::max(timestamp, _lastTimestamp);
     }
-    
+
     double LastTimestamp() const
     {
         return _lastTimestamp;

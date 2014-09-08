@@ -25,7 +25,7 @@ bool TouchSize::IsPenGivenTouchRadius(TouchData const &data)
 
 bool TouchSize::IsWeakPenGivenTouchRadius(float r, float arcLength)
 {
-    if(r > 3.1f * PenTipRadius)
+    if (r > 3.1f * PenTipRadius)
     {
         return false;
     }
@@ -37,8 +37,6 @@ bool TouchSize::IsWeakPenGivenTouchRadius(float r, float arcLength)
     }
 }
 
-    
-    
 bool TouchSize::IsPalmGivenTouchRadius(float r)
 {
     constexpr float threshold = 30.29f;

@@ -761,7 +761,7 @@ void TouchClassificationProxy::SetClusterType(Cluster::Ptr const & cluster, Touc
                 }
             }
 
-            if(_clusterTracker->Stroke(cluster->MostRecentTouch())->ArcLength() > _longPenLength ||
+            if (_clusterTracker->Stroke(cluster->MostRecentTouch())->ArcLength() > _longPenLength ||
                _touchStatistics[cluster->MostRecentTouch()]._touchDuration > _longDuration)
             {
                 onlyUpdateUnknownTouches = true;
@@ -788,15 +788,14 @@ void TouchClassificationProxy::SetClusterType(Cluster::Ptr const & cluster, Touc
 
             if (CurrentClass(touchId) != newType)
             {
-                
+
                 // prevent batches of old palms from suddenly going to pen or eraser
-                if((newType == TouchClassification::Pen || newType == TouchClassification::Eraser) &&
+                if ((newType == TouchClassification::Pen || newType == TouchClassification::Eraser) &&
                    touchId != cluster->MostRecentTouch())
                 {
                     continue;
                 }
-                
-                
+
                 //std::cerr << "\n id = " << _clusterTracker->Cluster(touchId)->_id << " was " << static_cast<int>(CurrentClass(touchId));
                 changedTypes[touchId] = newType;
             }
@@ -1410,7 +1409,7 @@ IdTypeMap TouchClassificationProxy::ReclassifyCurrentEvent()
         {
 
             Cluster::Ptr cluster = _clusterTracker->Cluster(liveTouches[0]);
-            
+
             if (TouchRadiusAvailable() && _clusterTracker->Data(liveTouches[0]) && TouchSize::IsPenGivenTouchRadius(*_clusterTracker->Data(liveTouches[0])))
             {
                 checkForFingerSequence = false;
@@ -1857,48 +1856,47 @@ void TouchClassificationProxy::ReclassifyCurrentEventGivenSize(IdTypeMap &change
                 tipType = _clusterTracker->MostRecentPenTipType();
             }
 
-            
             // Now prevent stealing of switch events...
             PenEventId upEvent, downEvent;
             upEvent   = _penEventClassifier.BestPenUpEventForTouch(probeTouch);
             downEvent = _penEventClassifier.BestPenDownEventForTouch(probeTouch);
-            
+
             for (Cluster::Ptr otherCluster:timeOrderedClusters)
             {
-                
+
                 if (probeCluster == otherCluster)
                 {
                     continue;
                 }
-                
+
                 // only check against other pens -- is this a good idea?  what if
                 // we simply got something wrong on a previous pass?
                 if (! otherCluster->IsPenType())
                 {
                     continue;
                 }
-                
+
                 TouchId otherTouch = otherCluster->MostRecentTouch();
-                
+
                 PenEventId otherUpEvent, otherDownEvent;
                 otherUpEvent   = _penEventClassifier.BestPenUpEventForTouch(otherTouch);
                 otherDownEvent = _penEventClassifier.BestPenDownEventForTouch(otherTouch);
-                
+
                 // if they share anything, make it winner-takes-all.
                 if ((upEvent >= 0 && upEvent == otherUpEvent) || (downEvent >= 0 && (downEvent == otherDownEvent)))
                 {
-                    
+
                     TouchData::Ptr probeData = _clusterTracker->Data(probeTouch);
                     TouchData::Ptr otherData = _clusterTracker->Data(otherTouch);
-                    
+
                     bool otherSizeBetter   = otherCluster->_maxTouchRadius < .51f * probeCluster->_maxTouchRadius;
                     bool otherScoreBetter  = otherCluster->_penScore > probeCluster->_penScore && otherCluster->_penScore > .8f;
-                    
+
                     if ((otherSizeBetter && otherScoreBetter) ||
                         TouchSize::IsPalmGivenTouchRadius(probeCluster->_maxTouchRadius) ||
                         (TouchSize::IsPenGivenTouchRadius(*otherData) && (! TouchSize::IsPenGivenTouchRadius(*probeData))))
                     {
-                        if(probeCluster->_penScore > 0.0f)
+                        if (probeCluster->_penScore > 0.0f)
                         {
                             probeCluster->_penScore = -probeCluster->_penScore;
                             break;
@@ -1906,9 +1904,9 @@ void TouchClassificationProxy::ReclassifyCurrentEventGivenSize(IdTypeMap &change
                     }
                 }
             }
-            
+
             // "no small dots at palm end", even if radius test would allow them through
-            if(HandednessLocked() &&
+            if (HandednessLocked() &&
                (! atCorrectEnd) &&
                probeCluster->_penScore < .2f &&
                data->Stroke()->ArcLength() < 5.0f)
@@ -1925,7 +1923,7 @@ void TouchClassificationProxy::ReclassifyCurrentEventGivenSize(IdTypeMap &change
             }
             // if there's more than one cluster (so not an isolated stroke, which could be a finger)
             // and location is OK and size is reasonable, call it a pen
-            else if(_clusterTracker->ConcurrentClusters(probeCluster).size() > 0 &&
+            else if (_clusterTracker->ConcurrentClusters(probeCluster).size() > 0 &&
                     locationOK &&
                     TouchSize::IsWeakPenGivenTouchRadius(data->_leadingRadiusMax, data->Stroke()->ArcLength()) &&
                     (! TouchSize::IsPalmGivenTouchRadius(data->_radiusMax)))
@@ -2008,8 +2006,6 @@ void TouchClassificationProxy::ReclassifyCurrentEventGivenSize(IdTypeMap &change
         SetClusterType(pair.first, pair.second, changedTypes);
     }
 
-    
-    
     for (IdTypePair pair : changedTypes)
     {
         Cluster::Ptr probeCluster = _clusterTracker->Cluster(pair.first);
@@ -2029,7 +2025,7 @@ void TouchClassificationProxy::ReclassifyCurrentEventGivenSize(IdTypeMap &change
         std::cerr << "\n" << static_cast<int>(probeCluster->MostRecentTouch()) <<  //" (" << static_cast<int>(probeCluster->_id) << ")" <<
         ": score = " << probeCluster->_penScore << ", prior = " << probeCluster->_penPrior << ", r = " << data->_radiusMean << ", locn = " << locationOK
         << ", lock = " << HandednessLocked() << ", L = " << data->Stroke()->ArcLength();
-        
+
         std::cerr << ", conc = (";
         for (TouchId cId : concurrent)
         {
@@ -2038,7 +2034,7 @@ void TouchClassificationProxy::ReclassifyCurrentEventGivenSize(IdTypeMap &change
 
         std::cerr << "), type = " << static_cast<int>(newTypes[probeCluster]);
     }
-    
+
 }
 
 bool TouchClassificationProxy::IsLongestConcurrentTouch(TouchId probeId)
