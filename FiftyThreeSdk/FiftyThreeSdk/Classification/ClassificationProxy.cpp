@@ -1411,7 +1411,7 @@ IdTypeMap TouchClassificationProxy::ReclassifyCurrentEvent()
 
             Cluster::Ptr cluster = _clusterTracker->Cluster(liveTouches[0]);
             
-            if (_clusterTracker->Data(liveTouches[0]) && TouchSize::IsPenGivenTouchRadius(*_clusterTracker->Data(liveTouches[0])))
+            if (TouchRadiusAvailable() && _clusterTracker->Data(liveTouches[0]) && TouchSize::IsPenGivenTouchRadius(*_clusterTracker->Data(liveTouches[0])))
             {
                 checkForFingerSequence = false;
             }
