@@ -6,6 +6,7 @@
 //
 
 #include <algorithm>
+#include <iomanip>
 #include <list>
 #include <tuple>
 #include <vector>
@@ -416,9 +417,7 @@ Cluster::Ptr ClusterTracker::NewCluster(Vector2f center, double timestamp, Touch
     {
         _currentEventBeganTimestamp = timestamp;
     }
-
-    //DebugAssert(center.x() >= 0.0f && center.y() >= 0.0f);
-
+    
     ClusterId id = ClusterId(_counter++);
 
     _clusters[id]       = Cluster::New();
@@ -589,7 +588,7 @@ void ClusterTracker::AddPointToCluster(Vector2f p, double timestamp, Cluster::Pt
         cluster->_totalLength += (stroke->XY(lastIndex) - stroke->XY(lastIndex-1)).norm();
     }
 
-    cluster->_lastTimestamp = timestamp;
+    cluster->IncreaseLastTimestamp(timestamp);
 
     // update the best match with the new point
     float lambda = .15;
@@ -1115,7 +1114,7 @@ Cluster::Ptr ClusterTracker::NewClusterForTouch(TouchId touchId)
 
     Stroke::Ptr stroke = _touchLog->Stroke(touchId);
 
-    Cluster::Ptr newCluster = NewCluster(stroke->LastPoint(), CurrentTime(), _commonData->proxy->TouchTypeForNewCluster());
+    Cluster::Ptr newCluster = NewCluster(stroke->LastPoint(), _touchLog->Data(touchId)->FirstTimestamp(), _commonData->proxy->TouchTypeForNewCluster());
 
     _touchLog->Data(touchId)->SetCluster(newCluster);
 
@@ -1260,10 +1259,14 @@ void ClusterTracker::UpdateClusters()
 
     for (core::TouchId touchId:_touchLog->ActiveIds())
     {
-
+        // timestamps are sometimes not quite right...  allow a bit less than one cycle's worth of error.
+        // this should have been corrected recently.
+        constexpr double timingError = .75 / 60.0;
         if ((_currentEventBeganTimestamp < std::numeric_limits<double>::max() || Data(touchId)->Cluster()) &&
-            Data(touchId)->FirstTimestamp() < _currentEventBeganTimestamp)
+            Data(touchId)->FirstTimestamp() < _currentEventBeganTimestamp - timingError)
         {
+            //std::cerr << std::setprecision(9);
+            //std::cerr << "\n" << static_cast<int>(touchId) << ": tBegan = " << Data(touchId)->FirstTimestamp() << " < " << _currentEventBeganTimestamp;
             continue;
         }
 
@@ -1301,7 +1304,7 @@ void ClusterTracker::UpdateClusters()
 
             if (! nearestCluster)
             {
-                useCluster = NewCluster(q, CurrentTime(), _commonData->proxy->TouchTypeForNewCluster());
+                useCluster = NewCluster(q, Data(touchId)->FirstTimestamp(), _commonData->proxy->TouchTypeForNewCluster());
             }
             else
             {
@@ -1309,7 +1312,7 @@ void ClusterTracker::UpdateClusters()
 
                 if ( (d2 > (dMax * dMax)) && (_currentEventActiveClusters.size() < 6 || nearestWasPen))
                 {
-                    useCluster = NewCluster(q, CurrentTime(), _commonData->proxy->TouchTypeForNewCluster());
+                    useCluster = NewCluster(q, Data(touchId)->FirstTimestamp(), _commonData->proxy->TouchTypeForNewCluster());
                 }
                 else
                 {
@@ -1330,7 +1333,11 @@ void ClusterTracker::UpdateClusters()
             // doing this each time means we give weight to each point whether stationary or moving.
             // this is actually a feature since palms will update to the right place more rapidly.
             Vector2f p  = stroke->LastPoint();
-            AddPointToCluster(p, CurrentTime(), knownCluster, touchId);
+            AddPointToCluster(p, Data(touchId)->LastTimestamp(), knownCluster, touchId);
+        }
+        else
+        {
+            DebugAssert(false);
         }
     }
 

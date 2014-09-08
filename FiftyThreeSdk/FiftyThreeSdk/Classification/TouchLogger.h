@@ -110,10 +110,7 @@ public:
         return _isolatedIncrementalUpdateIndex;
     }
 
-    void SetEndedTime(double t)
-    {
-        _endedTime = t;
-    }
+    void SetEndedTime(double t);
 
     void SetTouch(core::Touch::Ptr touch)
     {
