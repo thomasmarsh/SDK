@@ -30,7 +30,6 @@ public:
     TouchClassifierImpl();
     virtual bool IsPenConnected();
     virtual void SetPenConnected(bool connected);
-    virtual bool IsPenOrEraserSwitchDown();
     virtual void PenStateDidChanged(const PenEventArgs & args);
     virtual void TouchesDidChanged(const std::set<core::Touch::cPtr> & touches);
     virtual void RemoveTouchFromClassification(const core::Touch::cPtr & touch);
@@ -40,8 +39,6 @@ public:
 
     virtual core::TouchClassification ClassifyForSingleTouchGestureType(const core::Touch::cPtr & touch, const SingleTouchGestureType & type);
     virtual Eigen::VectorXf GeometricStatistics(const core::Touch::cPtr & t0);
-    virtual bool AreAnyTouchesCurrentlyPenOrEraser();
-    virtual bool HasPenActivityOccurredRecently();
     virtual void UpdateClassifications();
     virtual Event<const std::vector<TouchClassificationChangedEventArgs> & > & TouchClassificationsDidChange();
     virtual Event<const std::vector<TouchClassificationChangedEventArgs> & > & TouchContinuedClassificationsDidChange();

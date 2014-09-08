@@ -128,12 +128,6 @@ public:
 
     Eigen::VectorXf GeometricStatistics(core::TouchId  touch0);
 
-    bool AreAnyTouchesCurrentlyPenOrEraser();
-
-    bool HasPenActivityOccurredRecently();
-
-    bool IsAnySwitchDown();
-
     bool IsReclassifiable(core::Touch::Ptr const & touch, Stroke::Ptr const &stroke);
 
     void RemoveEdgeThumbs();

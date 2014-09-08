@@ -77,7 +77,6 @@ public:
     // If the classifier should have differing behavior if the pen is connected, this is signalled here.
     virtual bool IsPenConnected() = 0;
     virtual void SetPenConnected(bool connected) = 0;
-    virtual bool IsPenOrEraserSwitchDown() = 0;
 
     // Report switch events to the classifier & updates touch classifications
     virtual void PenStateDidChanged(const PenEventArgs & args) = 0;
@@ -101,10 +100,6 @@ public:
     //      work in both repos. Once we get a better idea of what the edge pan gesture needs we'll do what
     //      we did with ClassifyPair and move the details of the stats back behind this interface.
     virtual Eigen::VectorXf GeometricStatistics(const core::Touch::cPtr & t0) = 0;
-
-    virtual bool AreAnyTouchesCurrentlyPenOrEraser() = 0;
-
-    virtual bool HasPenActivityOccurredRecently() = 0;
 
     // Call this once per frame before you use classifications.
     virtual void UpdateClassifications() = 0;

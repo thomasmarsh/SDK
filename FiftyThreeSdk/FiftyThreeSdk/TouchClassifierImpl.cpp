@@ -73,11 +73,6 @@ void TouchClassifierImpl::SetPenConnected(bool connected)
     _Connected = connected;
 }
 
-bool TouchClassifierImpl::IsPenOrEraserSwitchDown()
-{
-    return _Classifier->IsAnySwitchDown();
-}
-
 void TouchClassifierImpl::PenStateDidChanged(const PenEventArgs & args)
 {
     fiftythree::sdk::PenEvent event;
@@ -103,16 +98,6 @@ TouchClassification TouchClassifierImpl::ClassifyPair(const Touch::cPtr & t0, co
 TouchClassification TouchClassifierImpl::ClassifyForSingleTouchGestureType(const Touch::cPtr & touch, const SingleTouchGestureType & type)
 {
     return _Classifier->ClassifyForGesture(touch->Id(), type);
-}
-
-bool TouchClassifierImpl::AreAnyTouchesCurrentlyPenOrEraser()
-{
-    return _Classifier->AreAnyTouchesCurrentlyPenOrEraser();
-}
-
-bool TouchClassifierImpl::HasPenActivityOccurredRecently()
-{
-    return _Classifier->HasPenActivityOccurredRecently();
 }
 
 void TouchClassifierImpl::UpdateClassifications()

@@ -54,20 +54,6 @@ bool TouchClassificationProxy::PenActive()
     return false;
 }
 
-bool TouchClassificationProxy::IsAnySwitchDown()
-{
-    PenEventId eventId = _clusterTracker->MostRecentPenEvent();
-    if (eventId == PenEventId(-1))
-    {
-        return false;
-    }
-    else
-    {
-        PenEventType tipType = _clusterTracker->PenType(eventId);
-        return (tipType == PenEventType::Tip1Down || tipType == PenEventType::Tip2Down);
-    }
-}
-
 void TouchClassificationProxy::OnPenEvent(const PenEvent & event)
 {
 
@@ -144,54 +130,6 @@ bool TouchClassificationProxy::HandednessLocked()
         }
 
         return locked;
-    }
-    else
-    {
-        return false;
-    }
-}
-
-bool TouchClassificationProxy::AreAnyTouchesCurrentlyPenOrEraser()
-{
-    if (!_activeStylusConnected)
-    {
-        return false;
-    }
-    else
-    {
-        TouchIdVector touches = _clusterTracker->LiveTouches();
-        for (TouchId t:touches)
-        {
-            if (CurrentClass(t) == TouchClassification::Pen || CurrentClass(t) == TouchClassification::Eraser)
-            {
-                return true;
-            }
-        }
-        return false;
-    }
-}
-
-bool TouchClassificationProxy::HasPenActivityOccurredRecently()
-{
-    if (_activeStylusConnected)
-    {
-        bool areAnyTouchesCurrentlyPenOrEraser = AreAnyTouchesCurrentlyPenOrEraser();
-        if (areAnyTouchesCurrentlyPenOrEraser)
-        {
-            return true;
-        }
-        PenEventId id = _clusterTracker->MostRecentPenEvent();
-
-        if (id != -1)
-        {
-            double t = NSProcessInfoSystemUptime();
-            return (t - _clusterTracker->PenData(id)->Time()) < 0.08;
-        }
-        else
-        {
-            return false;
-        }
-
     }
     else
     {

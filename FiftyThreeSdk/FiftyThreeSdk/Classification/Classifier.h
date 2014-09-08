@@ -86,14 +86,6 @@ public:
 
     virtual void ClearTouchesReclassified() = 0;
 
-    virtual bool AreAnyTouchesCurrentlyPenOrEraser() = 0;
-
-    virtual bool HasPenActivityOccurredRecently() = 0;
-
-    // TODO:
-    //     API clean up. This needs to play nicely with debouncing etc..
-    virtual bool IsAnySwitchDown() = 0;
-
     virtual void ClearSessionStatistics() = 0;
     virtual fiftythree::sdk::SessionStatistics::Ptr SessionStatistics() = 0;
 
