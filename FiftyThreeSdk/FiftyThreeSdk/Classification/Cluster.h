@@ -524,6 +524,12 @@ public:
     {
         return _touchLog->MostRecentPenEvent();
     }
+    
+    double MostRecentPenEventTime()
+    {
+        PenEventId pid = MostRecentPenEvent();
+        return _touchLog->PenTime(pid);
+    }
 
     bool IsIdLogged(core::TouchId id)
     {

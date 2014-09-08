@@ -302,11 +302,18 @@ TouchClassification TouchClassificationProxy::ClassifyPair(TouchId touch0, Touch
         isPalmViaRadiusTest &= data1->_radiusMax > maxThreshold || data1->_radiusMax > maxThreshold;
     }
 
+    double mostRecentPenTime         = _clusterTracker->MostRecentPenEventTime();
+    constexpr double penTimeEpsilon  = .1;
+    double gestureBeganTime          = std::min(data0->FirstTimestamp(), data1->FirstTimestamp());
+    bool penActivity                 = mostRecentPenTime > gestureBeganTime - penTimeEpsilon;
+    
+    
     switch (type)
     {
         case TwoTouchPairType::Pinch:
         {
-            if (lengthScore > 0.0f &&
+            if (! penActivity &&
+                lengthScore > 0.0f &&
                 pBothFinger > _pairwisePinchFingerCutoff &&
                 lengthRatio > _pairwisePinchLengthRatioCutoff &&
                 corr > _pairwisePinchCorrelationCutoff &&
@@ -325,7 +332,8 @@ TouchClassification TouchClassificationProxy::ClassifyPair(TouchId touch0, Touch
         break;
         case TwoTouchPairType::Pan:
         {
-            if (lengthScore > 0.0f &&
+            if (! penActivity &&
+                lengthScore > 0.0f &&
                 pBothFinger > _pairwisePanFingerCutoff &&
                 lengthRatio > _pairwisePanLengthRatioCutoff &&
                 corr > _pairwisePanCorrelationCutoff &&

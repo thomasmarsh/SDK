@@ -1002,7 +1002,14 @@ vector<PenEventData::Ptr> TouchLogger::PenData(PenEventIdVector ids)
 double TouchLogger::PenTime(PenEventId id)
 {
     AssertPenEvents(id);
-    return _penEventData[id]->Time();
+    if (_penEventData[id])
+    {
+        return _penEventData[id]->Time();
+    }
+    else
+    {
+        return 0.0;
+    }
 }
 
 vector<double> TouchLogger::PenTime(PenEventIdVector ids)
@@ -1303,7 +1310,14 @@ TouchClassification TouchLogger::MostRecentPenTipType()
     {
         // using the fact that maps are sorted by key and keys are increasing ints
         auto pair = *(_penEventData.rbegin());
-        return pair.second->TouchType();
+        if(pair.second)
+        {
+            return pair.second->TouchType();
+        }
+        else
+        {
+            return TouchClassification::Pen;
+        }
     }
     else
     {
