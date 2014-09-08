@@ -150,6 +150,16 @@ TouchData::TouchData()
     _beganTime = -Inf;
 }
 
+void TouchData::SetEndedTime(double t)
+{
+    _endedTime = t;
+
+    if (Cluster())
+    {
+        Cluster()->IncreaseLastTimestamp(t);
+    }
+}
+
 PenEventType PenEventData::Type()
 {
     return _eventType;
@@ -266,6 +276,7 @@ void TouchLogger::TouchesChanged(const std::set<core::Touch::Ptr> & touches)
 
     _concurrentTouchesCache.clear();
 
+    /*
     _allCancelledFlag = true;
 
     for (const auto & touch :  touches)
@@ -277,6 +288,10 @@ void TouchLogger::TouchesChanged(const std::set<core::Touch::Ptr> & touches)
         }
 
     }
+     */
+
+    // more harm than good...
+    _allCancelledFlag = false;
 
     for (const auto & touch :  touches)
     {
@@ -517,10 +532,6 @@ void TouchLogger::TouchesChanged(const std::set<core::Touch::Ptr> & touches)
                 }
 
                 touchData->SetEndedTime(_currentTime);
-                if (touchData->Cluster())
-                {
-                    touchData->Cluster()->IncreaseLastTimestamp(_currentTime);
-                }
 
                 break;
             }
@@ -550,7 +561,7 @@ void TouchLogger::LogPenEvent(PenEvent event)
                                                    event._timestamp);
 
     PenEventId eventId(_penEventCounter);
-    
+
     DebugAssert(_penEventCounter != -1);
 
     _penEventData.insert(std::pair<PenEventId, PenEventData::Ptr>(eventId, newEvent));
@@ -987,7 +998,7 @@ PenEventData::Ptr const & TouchLogger::PenData(PenEventId id)
     AssertPenEvents(id);
 
     auto it = _penEventData.find(id);
-    
+
     if (it != _penEventData.end())
     {
         return it->second;
@@ -1014,9 +1025,9 @@ vector<PenEventData::Ptr> TouchLogger::PenData(PenEventIdVector ids)
 double TouchLogger::PenTime(PenEventId id)
 {
     AssertPenEvents(id);
-    
+
     auto it = _penEventData.find(id);
-    
+
     if (it != _penEventData.end())
     {
         return it->second->Time();
@@ -1045,7 +1056,7 @@ PenEventType TouchLogger::PenType(PenEventId id)
     AssertPenEvents(id);
 
     auto it = _penEventData.find(id);
-    
+
     if (it != _penEventData.end())
     {
         return it->second->Type();
@@ -1335,7 +1346,7 @@ TouchClassification TouchLogger::MostRecentPenTipType()
     {
         // using the fact that maps are sorted by key and keys are increasing ints
         auto pair = *(_penEventData.rbegin());
-        if(pair.second)
+        if (pair.second)
         {
             return pair.second->TouchType();
         }

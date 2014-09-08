@@ -821,50 +821,65 @@ VectorXf TouchClassificationProxy::PenPriorForTouches(TouchIdVector const &touch
 
         if (! cluster)
         {
-            std::cerr << "\nNO CLUSTER FOR " << touchId;
-            touchPriors[touchIndex] = 0.0f;
-            continue;
-        }
-
-        DebugAssert(cluster);
-
-        float clusterPrior       = cluster->_penPrior;
-        touchPriors[touchIndex]  = clusterPrior;
-
-        Stroke::Ptr stroke = _clusterTracker->Stroke(touchId);
-
-        if (stroke->Size() > 2)
-        {
-            float score = _isolatedStrokesClassifier.Score(*stroke);
-
-            _touchStatistics[touchId]._curvatureScore = score;
-
-            float curvaturePrior = std::max(0.0f, 1.0f - std::max(0.0f, score - .1f));
-
-            touchPriors[touchIndex] *= curvaturePrior;
-
-            if (isolatedCountsOK)
+            bool reclassifiable = IsReclassifiable(_clusterTracker->TouchWithId(touchId), _clusterTracker->Data(touchId)->Stroke());
+            if (reclassifiable)
             {
+                std::cerr << "\nNO CLUSTER FOR RECLASSIFIABLE " << touchId;
+                touchPriors[touchIndex] = 0.5f;
+            }
+            else
+            {
+                if (CurrentClass(touchId) == TouchClassification::Pen || CurrentClass(touchId) == TouchClassification::Eraser)
+                {
+                    touchPriors[touchIndex] = 1.0f;
+                }
+                else
+                {
+                    touchPriors[touchIndex] = 0.0f;
+                }
+            }
+        }
+        else
+        {
+            DebugAssert(cluster);
 
-                float isolatedScore = _isolatedStrokesClassifier.NPVoteScore(touchId);
-                //float isolatedScore = _isolatedStrokesClassifier.ConvexScore(touchId);
+            float clusterPrior       = cluster->_penPrior;
+            touchPriors[touchIndex]  = clusterPrior;
 
-//                std::cout << "scores for touch  " << touchId << "\n"
-//                          << "ConvexScore: " << _isolatedStrokesClassifier.ConvexScore(touchId) << "\n"
-//                          << "NPVoteScore: " << _isolatedStrokesClassifier.NPVoteScore(touchId) << "\n"
-//                          << "NPVoteCount: " << _isolatedStrokesClassifier.NPVoteCount(touchId) << "\n"
-//                          << "AdaboostScore: " << _isolatedStrokesClassifier.AdaboostScore(touchId) << "\n"
-//                          << "BayesLikelihoodScore: " << _isolatedStrokesClassifier.BayesLikelihoodScore(touchId) << "\n" << std::endl;
-//
-//                    std::cout << "Raw max curvature is " << _isolatedStrokesClassifier.LogMaxCurvature(touchId) << " and normalized curvature is " << _isolatedStrokesClassifier.NormalizedMaxCurvature(touchId) << std::endl;
+            Stroke::Ptr stroke = _clusterTracker->Stroke(touchId);
 
-                // We want a score of 0.5 to not do anything -- so multiply by 2
-                touchPriors[touchIndex] *= 2.0f * isolatedScore;
+            if (stroke->Size() > 2)
+            {
+                float score = _isolatedStrokesClassifier.Score(*stroke);
+
+                _touchStatistics[touchId]._curvatureScore = score;
+
+                float curvaturePrior = std::max(0.0f, 1.0f - std::max(0.0f, score - .1f));
+
+                touchPriors[touchIndex] *= curvaturePrior;
+
+                if (isolatedCountsOK)
+                {
+
+                    float isolatedScore = _isolatedStrokesClassifier.NPVoteScore(touchId);
+                    //float isolatedScore = _isolatedStrokesClassifier.ConvexScore(touchId);
+
+                    //                std::cout << "scores for touch  " << touchId << "\n"
+                    //                          << "ConvexScore: " << _isolatedStrokesClassifier.ConvexScore(touchId) << "\n"
+                    //                          << "NPVoteScore: " << _isolatedStrokesClassifier.NPVoteScore(touchId) << "\n"
+                    //                          << "NPVoteCount: " << _isolatedStrokesClassifier.NPVoteCount(touchId) << "\n"
+                    //                          << "AdaboostScore: " << _isolatedStrokesClassifier.AdaboostScore(touchId) << "\n"
+                    //                          << "BayesLikelihoodScore: " << _isolatedStrokesClassifier.BayesLikelihoodScore(touchId) << "\n" << std::endl;
+                    //
+                    //                    std::cout << "Raw max curvature is " << _isolatedStrokesClassifier.LogMaxCurvature(touchId) << " and normalized curvature is " << _isolatedStrokesClassifier.NormalizedMaxCurvature(touchId) << std::endl;
+
+                    // We want a score of 0.5 to not do anything -- so multiply by 2
+                    touchPriors[touchIndex] *= 2.0f * isolatedScore;
+
+                }
 
             }
-
         }
-
         touchIndex++;
     }
 
