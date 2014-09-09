@@ -247,6 +247,32 @@ TouchClassification TouchClassificationProxy::ClassifyPair(TouchId touch0, Touch
 
     switch (type)
     {
+        case TwoTouchPairType::AttemptedPan:
+        case TwoTouchPairType::AttemptedPinch:
+        {
+
+            //std::cerr << "\npBoth = " << pBothFinger << ", corr = " << corr << ", Lrat = " << lengthRatio <<
+            //", kink = " << kinkFreeRatio << ", dot = " << dot;
+
+            if (! penActivity &&
+                lengthScore > 0.0f &&
+                pBothFinger >= 0.0f &&
+                lengthRatio > .35 &&
+                corr > _pairwisePinchCorrelationCutoff &&
+                kinkFreeRatio > .5 &&
+                totalLengthScore > _pairwisePinchTotalTravelThreshold &&
+                dot > _pairwisePinchAbsDotThreshold &&
+                !isPalmViaRadiusTest)
+            {
+                //std::cerr << "\nWEAK FINGER";
+                return TouchClassification::Finger;
+            }
+            else
+            {
+                return TouchClassification::Palm;
+            }
+        }
+
         case TwoTouchPairType::Pinch:
         {
             if (! penActivity &&
@@ -1853,15 +1879,14 @@ void TouchClassificationProxy::ReclassifyCurrentEventGivenSize(IdTypeMap &change
             bool possiblePinch = false;
             bool possiblePan   = false;
 
-            TouchIdVector activeTouches = _clusterTracker->ActiveIds();
-            if (activeTouches.size() == 2 &&
-                (probeTouch == activeTouches[0] || probeTouch == activeTouches[1]))
+            TouchIdVector concurrentTouches = _clusterTracker->ConcurrentTouches(probeTouch);
+            if (concurrentTouches.size() == 1)
             {
-                possiblePan   = ClassifyPair(activeTouches[0], activeTouches[1],
-                                             TwoTouchPairType::Pan) == TouchClassification::Finger;
+                possiblePan   = ClassifyPair(concurrentTouches[0], probeTouch,
+                                             TwoTouchPairType::AttemptedPan) == TouchClassification::Finger;
 
-                possiblePinch = ClassifyPair(activeTouches[0], activeTouches[1],
-                                             TwoTouchPairType::Pinch) == TouchClassification::Finger;
+                possiblePinch = ClassifyPair(concurrentTouches[0], probeTouch,
+                                             TwoTouchPairType::AttemptedPinch) == TouchClassification::Finger;
             }
 
             // "no small dots at palm end", even if radius test would allow them through

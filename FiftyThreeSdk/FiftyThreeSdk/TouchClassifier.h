@@ -52,9 +52,14 @@ struct PenEventArgs
     double Timestamp;
 };
 
+// AttemptedGesture means it uses weaker criteria than required to trigger the gesture,
+// so we can say "it sorta looks like they might have been trying to pinch"
+// and adjust some rendering or other behavior
 DEFINE_ENUM(TwoTouchPairType,
             Pinch,
-            Pan);
+            Pan,
+            AttemptedPinch,
+            AttemptedPan);
 
 DEFINE_ENUM(SingleTouchGestureType,
             Tap,
