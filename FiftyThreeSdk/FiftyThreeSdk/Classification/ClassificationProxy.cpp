@@ -1627,16 +1627,9 @@ IdTypeMap TouchClassificationProxy::ReclassifyCurrentEvent()
                         otherUpEvent   = _penEventClassifier.BestPenUpEventForTouch(otherTouchId);
                         otherDownEvent = _penEventClassifier.BestPenDownEventForTouch(otherTouchId);
 
-                        //std::cerr << "\n up = " << static_cast<int>(upEvent);
-                        //std::cerr << ", oUp = " << static_cast<int>(otherUpEvent);
-                        //std::cerr << ", down = " << static_cast<int>(downEvent);
-                        //std::cerr << ", oDown = " << static_cast<int>(otherDownEvent);
-
                         // if they share anything, make it winner-takes-all.
                         if ((upEvent >= 0 && upEvent == otherUpEvent) || (downEvent >= 0 && (downEvent == otherDownEvent)))
                         {
-                            std::cerr << "\nsharing";
-
                             if (! TouchRadiusAvailable())
                             {
                                 // a polite lie -- allowing touches to steal pen events from other touches actually
@@ -1665,17 +1658,14 @@ IdTypeMap TouchClassificationProxy::ReclassifyCurrentEvent()
                                     if (! clusterSizeOK)
                                     {
                                         newTypes[cluster] = TouchClassification::Palm;
-                                        std::cerr << " did something, r = " << radius;
                                     }
                                     else if (! otherSizeOK)
                                     {
                                         newTypes[otherCluster] = TouchClassification::Palm;
-                                        std::cerr << " did something, rOther = " << otherRadius << " vs " << radius;
                                     }
                                     else
                                     {
                                         // both are OK based on size...
-                                        std::cerr << " did nothing";
                                     }
                                     continue;
                                 }
@@ -1691,7 +1681,6 @@ IdTypeMap TouchClassificationProxy::ReclassifyCurrentEvent()
                                     {
                                         newTypes[cluster] = TouchClassification::Palm;
                                     }
-                                    std::cerr << " chose smaller one, r = " << radius << ", rOther = " << otherRadius;
                                     continue;
                                 }
 
@@ -1700,19 +1689,14 @@ IdTypeMap TouchClassificationProxy::ReclassifyCurrentEvent()
                             if ((otherCluster->_penScore > cluster->_penScore))
                             {
                                 newTypes[cluster] = TouchClassification::Palm;
-                                std::cerr << " prevented";
                             }
                             else
                             {
-                                std::cerr << " OK";
+                                // is OK
                             }
-
                         }
-
                     }
-
                 }
-
             }
 
             typedef std::pair<Cluster::Ptr const &, TouchClassification> ClusterTypePair;
@@ -1720,7 +1704,6 @@ IdTypeMap TouchClassificationProxy::ReclassifyCurrentEvent()
             {
                 SetClusterType(pair.first, pair.second, types);
             }
-
         }
 
         if (TouchRadiusAvailable())
