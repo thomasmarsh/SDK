@@ -150,7 +150,7 @@ TouchClassification TouchClassificationProxy::ClassifyPair(TouchId touch0, Touch
     }
 
     auto data0 = _clusterTracker->Data(touch0);
-    auto data1 = _clusterTracker->Data(touch0);
+    auto data1 = _clusterTracker->Data(touch1);
 
     auto stroke0 = data0->Stroke();
     auto stroke1 = data1->Stroke();
