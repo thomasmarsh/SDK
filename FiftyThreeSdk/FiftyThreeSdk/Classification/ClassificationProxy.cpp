@@ -1850,6 +1850,20 @@ void TouchClassificationProxy::ReclassifyCurrentEventGivenSize(IdTypeMap &change
                 }
             }
 
+            bool possiblePinch = false;
+            bool possiblePan   = false;
+
+            TouchIdVector activeTouches = _clusterTracker->ActiveIds();
+            if (activeTouches.size() == 2 &&
+                (probeTouch == activeTouches[0] || probeTouch == activeTouches[1]))
+            {
+                possiblePan   = ClassifyPair(activeTouches[0], activeTouches[1],
+                                             TwoTouchPairType::Pan) == TouchClassification::Finger;
+
+                possiblePinch = ClassifyPair(activeTouches[0], activeTouches[1],
+                                             TwoTouchPairType::Pinch) == TouchClassification::Finger;
+            }
+
             // "no small dots at palm end", even if radius test would allow them through
             if (HandednessLocked() &&
                (! atCorrectEnd) &&
@@ -1869,6 +1883,8 @@ void TouchClassificationProxy::ReclassifyCurrentEventGivenSize(IdTypeMap &change
             // if there's more than one cluster (so not an isolated stroke, which could be a finger)
             // and location is OK and size is reasonable, call it a pen
             else if ((! probeCluster->_checkForFingerSequence) &&
+                     (! possiblePan) &&
+                     (! possiblePinch) &&
                      (_clusterTracker->ConcurrentClusters(probeCluster).size() > 0 ||
                       _clusterTracker->ConcurrentTouches(probeTouch).size() > 0) &&
                     locationOK &&
@@ -1886,7 +1902,7 @@ void TouchClassificationProxy::ReclassifyCurrentEventGivenSize(IdTypeMap &change
             }
             else
             {
-                if(! probeCluster->_checkForFingerSequence)
+                if (! probeCluster->_checkForFingerSequence)
                 {
                     newTypes[probeCluster] = TouchClassification::Palm;
                 }
