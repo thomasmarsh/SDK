@@ -105,16 +105,6 @@ void TouchClassificationProxy::OnPenEvent(const PenEvent & event)
      }
 }
 
-void TouchClassificationProxy::LockTypeForTouch(TouchId touchId)
-{
-    _touchLocked[touchId] = true;
-}
-
-bool TouchClassificationProxy::IsLocked(TouchId touchId)
-{
-    return _touchLocked[touchId];
-}
-
 bool TouchClassificationProxy::HandednessLocked()
 {
     if (_activeStylusConnected)
@@ -2139,23 +2129,15 @@ void TouchClassificationProxy::ReclassifyClusters()
     {
         tie(touchId, type) = pair;
 
-        if (! IsLocked(touchId))
+        _currentTypes[touchId] = type;
+        
+        if (_clusterTracker->IsEnded(touchId))
         {
-            _currentTypes[touchId] = type;
-
-            if (_clusterTracker->IsEnded(touchId))
-            {
-                _endedTouchesReclassified.push_back(touchId);
-            }
-            else
-            {
-                _activeTouchesReclassified.push_back(touchId);
-            }
-
-            if (type == TouchClassification::Palm)
-            {
-                //LockTypeForTouch(pair.first);
-            }
+            _endedTouchesReclassified.push_back(touchId);
+        }
+        else
+        {
+            _activeTouchesReclassified.push_back(touchId);
         }
     }
     DebugPrintClusterStatus();
@@ -2431,7 +2413,6 @@ void TouchClassificationProxy::InitializeTouchTypes()
             if (_currentTypes.count(id) == 0 )
             {
                 _currentTypes[id] = TouchClassification::UnknownDisconnected;
-                _touchLocked[id] = false;
             }
 
         }
@@ -2446,7 +2427,6 @@ void TouchClassificationProxy::InitializeTouchTypes()
                 if (_currentTypes.count(id) == 0 )
                 {
                     _currentTypes[id] = TouchClassification::Pen;
-                    _touchLocked[id] = false;
                 }
             }
         }
@@ -2457,7 +2437,6 @@ void TouchClassificationProxy::InitializeTouchTypes()
                 if (_currentTypes.count(id) == 0 )
                 {
                     _currentTypes[id] = TouchClassification::Palm;
-                    _touchLocked[id] = false;
                 }
             }
         }

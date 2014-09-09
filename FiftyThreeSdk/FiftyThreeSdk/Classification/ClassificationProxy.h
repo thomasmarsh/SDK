@@ -148,8 +148,6 @@ protected:
 
     std::map<core::TouchId, core::TouchClassification> _currentTypes;
 
-    std::map<core::TouchId, bool> _touchLocked;
-
     std::map<core::TouchId, TouchStatistics> _touchStatistics;
 
     ClusterTracker::Ptr _clusterTracker;
@@ -233,9 +231,6 @@ public:
     bool HandednessLocked();
 
     void InitializeTouchTypes();
-
-    void LockTypeForTouch(core::TouchId touchId);
-    bool IsLocked(core::TouchId touchId);
 
     float MaximumPenEventWaitTime() const;
 
@@ -331,7 +326,7 @@ public:
     Eigen::VectorXf PenPriorForClusters(std::vector<Cluster::Ptr> const & clusters);
 
     inline TouchClassificationProxy():
-    _commonData(&_currentTypes, &_touchLocked, this),
+    _commonData(&_currentTypes, this),
     _clusterTracker(ClusterTracker::Ptr::make_shared(&_commonData)),
     _isolatedStrokesClassifier(_clusterTracker, &_commonData),
     _penEventClassifier(_clusterTracker, &_commonData),
