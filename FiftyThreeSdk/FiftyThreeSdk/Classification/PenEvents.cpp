@@ -463,6 +463,9 @@ void PenEventClassifier::SetNeedsClassification()
     {
         _clusterTypesAndScores.erase(cluster->_id);
     }
+    
+    _bestPenDownEventForTouch.clear();
+    _bestPenUpEventForTouch.clear();
 }
 
 float PenEventClassifier::SwitchOnDurationInTimeInterval(double t0, double t1)

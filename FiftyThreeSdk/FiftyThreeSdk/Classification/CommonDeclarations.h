@@ -35,15 +35,12 @@ class TouchClassificationProxy;
 struct CommonData
 {
     const std::map<core::TouchId, core::TouchClassification>* const types;
-    const std::map<core::TouchId, bool>* const locked;
 
     TouchClassificationProxy* proxy;
 
     CommonData(std::map<core::TouchId, core::TouchClassification>* typesPointer,
-               std::map<core::TouchId, bool>* lockedPointer,
                TouchClassificationProxy* proxyPointer):
     types(typesPointer),
-    locked(lockedPointer),
     proxy(proxyPointer)
     {
     }
