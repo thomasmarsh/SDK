@@ -244,8 +244,7 @@ TouchClassification TouchClassificationProxy::ClassifyPair(TouchId touch0, Touch
     constexpr double penTimeEpsilon  = .1;
     double gestureBeganTime          = std::min(data0->FirstTimestamp(), data1->FirstTimestamp());
     bool penActivity                 = mostRecentPenTime > gestureBeganTime - penTimeEpsilon;
-    
-    
+
     switch (type)
     {
         case TwoTouchPairType::Pinch:
@@ -340,7 +339,7 @@ TouchClassification TouchClassificationProxy::ClassifyForGesture(TouchId touch0,
                         return TouchClassification::Unknown;
                     }
 
-                    constexpr float tapPalmVFingerThreshold = 19.63f;
+                    constexpr float tapPalmVFingerThreshold = 38.63f;
 
                     if (touch->MaxTouchRadius() && *(touch->MaxTouchRadius()) > tapPalmVFingerThreshold)
                     {
