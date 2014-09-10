@@ -147,8 +147,6 @@ TouchClassification TouchClassificationProxy::ClassifyPair(TouchId touch0, Touch
     auto stroke0 = data0->Stroke();
     auto stroke1 = data1->Stroke();
 
-    TwoTouchFit ttFit;
-    float pinchError = ttFit.Fit(*stroke0, *stroke1, 15, true);
     
     float corr = .5f;
     if (stroke0->Size() > 1 && stroke1->Size() > 1)
@@ -1779,6 +1777,17 @@ void TouchClassificationProxy::ReclassifyCurrentEventGivenSize(IdTypeMap &change
 
     std::set<Cluster::Ptr> activeClusters = _clusterTracker->CurrentEventActiveClusters();
 
+    if (_clusterTracker->ActiveIds().size() == 2)
+    {
+        TouchIdVector touches = _clusterTracker->ActiveIds();
+        Stroke::Ptr s0 = _clusterTracker->Data(touches[0])->Stroke();
+        Stroke::Ptr s1 = _clusterTracker->Data(touches[1])->Stroke();
+        
+        TwoTouchFit ttFit;
+        ttFit.Fit(*s0, *s1, 5, true);
+    }
+    
+    
     for (Cluster::Ptr const & probeCluster:timeOrderedClusters)
     {
 

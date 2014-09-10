@@ -131,9 +131,10 @@ float TwoTouchFit::Fit(Stroke & Z, Stroke & W, int maxPoints, bool isPinch)
     
     float kt  = (xp * ypp - yp * xpp) / (speed * speed * speed);
     
-    
-    std::cerr << "\n" << M << ": residual = " << std::sqrt(residualSquared) << ", kappa = " << kt;
-    
+    if(Z.Size() >= maxPoints && W.Size() >= maxPoints)
+    {
+        std::cerr << "\n" << M << ": residual = " << std::sqrt(residualSquared) << ", kappa = " << kt;
+    }
     return residualSquared;
     
     
