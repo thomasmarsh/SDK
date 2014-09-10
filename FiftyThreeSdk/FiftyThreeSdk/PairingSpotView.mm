@@ -5,13 +5,13 @@
 //  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
 
-#include "Core/Eigen.h"
-
 #import <QuartzCore/QuartzCore.h>
 
 #import "Core/AnimationPump.h"
 #import "Core/Easing.hpp"
+#import "Core/Eigen.h"
 #import "Core/Mathiness.h"
+#import "Core/NSTimer+Helpers.h"
 #import "Core/Spring.hpp"
 #import "FiftyThreeSdk/PairingSpotView.h"
 
@@ -799,11 +799,11 @@ NSString *FTPairingSpotCometStateName(FTPairingSpotCometState value)
         }
         else if (shouldFlashIcon && !self.flashAnimationTimer)
         {
-            self.flashAnimationTimer = [NSTimer scheduledTimerWithTimeInterval:self.viewSettings.FlashFrequencySeconds
-                                                                        target:self
-                                                                      selector:@selector(flashTimerFired:)
-                                                                      userInfo:nil
-                                                                       repeats:YES];
+            self.flashAnimationTimer = [NSTimer weakScheduledTimerWithTimeInterval:self.viewSettings.FlashFrequencySeconds
+                                                                            target:self
+                                                                          selector:@selector(flashTimerFired:)
+                                                                          userInfo:nil
+                                                                           repeats:YES];
             // Flash immediately as well.
             [self flashTimerFired:nil];
             isSettled = false;

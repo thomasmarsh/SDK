@@ -11,6 +11,7 @@
 
 #import "Core/Asserts.h"
 #import "Core/Log.h"
+#import "Core/NSTimer+Helpers.h"
 #import "FTError.h"
 #import "FTLogPrivate.h"
 #import "TIUpdateManager.h"
@@ -289,11 +290,11 @@ static NSString *const kImageBlockTransferUUID = @"F000FFC2-0451-4000-B000-00000
 - (void)scheduleWriteTimer
 {
     FTAssert(!self.imageBlockWriteTimer, @"write timer nil");
-    self.imageBlockWriteTimer = [NSTimer scheduledTimerWithTimeInterval:0.25
-                                                                 target:self
-                                                               selector:@selector(imageBlockWriteTimerFired:)
-                                                               userInfo:nil
-                                                                repeats:NO];
+    self.imageBlockWriteTimer = [NSTimer weakScheduledTimerWithTimeInterval:0.25
+                                                                     target:self
+                                                                   selector:@selector(imageBlockWriteTimerFired:)
+                                                                   userInfo:nil
+                                                                    repeats:NO];
 }
 
 - (void)imageBlockWriteTimerFired:(NSTimer *)writeTimer
