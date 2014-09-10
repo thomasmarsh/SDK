@@ -250,10 +250,6 @@ TouchClassification TouchClassificationProxy::ClassifyPair(TouchId touch0, Touch
         case TwoTouchPairType::AttemptedPan:
         case TwoTouchPairType::AttemptedPinch:
         {
-
-            //std::cerr << "\npBoth = " << pBothFinger << ", corr = " << corr << ", Lrat = " << lengthRatio <<
-            //", kink = " << kinkFreeRatio << ", dot = " << dot;
-
             if (! penActivity &&
                 lengthScore > 0.0f &&
                 pBothFinger >= 0.0f &&
@@ -264,7 +260,6 @@ TouchClassification TouchClassificationProxy::ClassifyPair(TouchId touch0, Touch
                 dot > _pairwisePinchAbsDotThreshold &&
                 !isPalmViaRadiusTest)
             {
-                //std::cerr << "\nWEAK FINGER";
                 return TouchClassification::Finger;
             }
             else
@@ -272,12 +267,10 @@ TouchClassification TouchClassificationProxy::ClassifyPair(TouchId touch0, Touch
                 return TouchClassification::Palm;
             }
         }
-
         case TwoTouchPairType::Pinch:
         {
             if (! penActivity &&
                 lengthScore > 0.0f &&
-                pBothFinger > _pairwisePinchFingerCutoff &&
                 lengthRatio > _pairwisePinchLengthRatioCutoff &&
                 corr > _pairwisePinchCorrelationCutoff &&
                 kinkFreeRatio > _pairwisePinchKinkFreeCutoff &&
