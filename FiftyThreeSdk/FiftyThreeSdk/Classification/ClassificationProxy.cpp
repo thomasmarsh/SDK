@@ -17,6 +17,8 @@
 #include "FiftyThreeSdk/Classification/LineFitting.h"
 #include "FiftyThreeSdk/Classification/Stroke.h"
 #include "FiftyThreeSdk/Classification/TouchSize.h"
+#include "FiftyThreeSdk/Classification/TwoTouchFit.h"
+#include "FiftyThreeSdk/FTLogPrivate.h"
 
 using Eigen::Vector2f;
 using fiftythree::core::TouchClassification;
@@ -145,6 +147,9 @@ TouchClassification TouchClassificationProxy::ClassifyPair(TouchId touch0, Touch
     auto stroke0 = data0->Stroke();
     auto stroke1 = data1->Stroke();
 
+    TwoTouchFit ttFit;
+    float pinchError = ttFit.Fit(*stroke0, *stroke1, 15, true);
+    
     float corr = .5f;
     if (stroke0->Size() > 1 && stroke1->Size() > 1)
     {

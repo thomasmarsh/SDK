@@ -56,6 +56,8 @@
 		66D779BB16E57461001C4F55 /* FTPenManager.mm in Sources */ = {isa = PBXBuildFile; fileRef = 66D779B516E57461001C4F55 /* FTPenManager.mm */; };
 		66D779BC16E57461001C4F55 /* TIUpdateManager.mm in Sources */ = {isa = PBXBuildFile; fileRef = 66D779B816E57461001C4F55 /* TIUpdateManager.mm */; };
 		C95A63DC199BC12C00A2B8C1 /* TouchSize.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C95A63DA199BC12C00A2B8C1 /* TouchSize.cpp */; };
+		D380A52119CC9221003CD0A1 /* FTLogPrivate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D380A52019CC9221003CD0A1 /* FTLogPrivate.cpp */; };
+		C98B459819C0DF310066E6EC /* TwoTouchFit.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C98B459619C0DF310066E6EC /* TwoTouchFit.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -182,6 +184,9 @@
 		8B36066C19D242D9002A67DE /* MissedSampleInjector.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = MissedSampleInjector.hpp; sourceTree = "<group>"; };
 		C95A63DA199BC12C00A2B8C1 /* TouchSize.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TouchSize.cpp; sourceTree = "<group>"; };
 		C95A63DB199BC12C00A2B8C1 /* TouchSize.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TouchSize.h; sourceTree = "<group>"; };
+		D380A52019CC9221003CD0A1 /* FTLogPrivate.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = FTLogPrivate.cpp; path = FiftyThreeSdk/FTLogPrivate.cpp; sourceTree = "<group>"; };
+		C98B459619C0DF310066E6EC /* TwoTouchFit.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TwoTouchFit.cpp; sourceTree = "<group>"; };
+		C98B459719C0DF310066E6EC /* TwoTouchFit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TwoTouchFit.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -242,6 +247,8 @@
 				0416CAB518A42B51004EAC00 /* Stroke.h */,
 				0416CAB618A42B51004EAC00 /* TouchLogger.cpp */,
 				0416CAB718A42B51004EAC00 /* TouchLogger.h */,
+				C98B459619C0DF310066E6EC /* TwoTouchFit.cpp */,
+				C98B459719C0DF310066E6EC /* TwoTouchFit.h */,
 			);
 			name = Classification;
 			path = FiftyThreeSdk/Classification;
@@ -509,6 +516,7 @@
 				3CC31DF517933C5F002CD4FB /* TKState.m in Sources */,
 				3CC31DF617933C5F002CD4FB /* TKStateMachine.m in Sources */,
 				0416CAC218A42B51004EAC00 /* IsolatedStrokesCalibration.cpp in Sources */,
+				C98B459819C0DF310066E6EC /* TwoTouchFit.cpp in Sources */,
 				0416CACB18A42B51004EAC00 /* Screen.cpp in Sources */,
 				04493E2F18C6223C0003AFB8 /* PairingSpotView.mm in Sources */,
 				3CF1369417A9F4440006AB2E /* FTFirmwareUpdateProgressView.m in Sources */,

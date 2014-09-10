@@ -225,7 +225,7 @@ public:
     void ToNormalizedCoordinates(Screen const & screen);
     void ToScreenCoordinates(Screen const & screen);
 
-    double           FirstAbsoluteTimestamp() { return _XYDataStream.FirstAbsoluteTimestamp(); }
+    double           FirstAbsoluteTimestamp()  { return _XYDataStream.FirstAbsoluteTimestamp(); }
     StdVectorFloat & RelativeTimestamp() { return _XYDataStream.RelativeTimestamp(); }
     std::vector< Eigen::Vector2f > & XY() { return _XYDataStream.Data(); }
 

@@ -418,7 +418,7 @@ float Stroke::TimestampRelativeToTime(int idx, double referenceTime)
     return AbsoluteTimestamp(idx) - referenceTime;
 }
 
-int Stroke::IndexClosestToTime(double time)
+int Stroke::IndexClosestToTime(double time) 
 {
 
     int idx = 0;
