@@ -30,6 +30,7 @@ float TwoTouchFit::Fit(Stroke & Z, Stroke & W, int minPoints, int maxPoints, boo
     
     MatrixXf A(M, 3);
     MatrixXf b(M, 2);
+    MatrixXf weight = MatrixXf::Identity(M, M);
 
     Vector2f tZ;
     Vector2f tW;
@@ -44,15 +45,15 @@ float TwoTouchFit::Fit(Stroke & Z, Stroke & W, int minPoints, int maxPoints, boo
     
         int iz = Z.IndexClosestToTime(W.FirstAbsoluteTimestamp());
     
-        tZ = Vector2f(Z.X(iz), Z.Y(iz));
-        tW = Vector2f(W.X(0), W.Y(0));
+        tZ = Z.XY(iz);
+        tW = W.XY(0);
     }
     else
     {
         int iw = W.IndexClosestToTime(Z.FirstAbsoluteTimestamp());
         
-        tZ = Vector2f(Z.X(0), Z.Y(0));
-        tW = Vector2f(W.X(iw), W.Y(iw));
+        tZ = Z.XY(0);
+        tW = W.XY(iw);
     }
     
     // we assume Z and W are basically symmetric about some line.
@@ -116,6 +117,11 @@ float TwoTouchFit::Fit(Stroke & Z, Stroke & W, int minPoints, int maxPoints, boo
         ++m;
     }
 
+    // give less weight to the first point on each stroke since there's a lot of noise
+    // in the first sample.  Calling it crap is an insult to fertilizer.
+    weight(0,0) = .5f;
+    weight(zCount,zCount) = .5f;
+    
     float tOffsetW = W.FirstAbsoluteTimestamp() - Z.FirstAbsoluteTimestamp();
     for(int k=0; k<wCount; k++)
     {
@@ -137,13 +143,13 @@ float TwoTouchFit::Fit(Stroke & Z, Stroke & W, int minPoints, int maxPoints, boo
         ++m;
     }
     
-    MatrixXf coeff = A.colPivHouseholderQr().solve(b);
+    MatrixXf coeff = (weight*A).colPivHouseholderQr().solve(weight*b);
     
-    float varZ = xyZ.squaredNorm();
-    float varW = xyW.squaredNorm();
+    float varZ = (weight.block(0, 0, zCount, zCount) * xyZ).squaredNorm();
+    float varW = (weight.block(zCount, zCount, wCount, wCount) * xyW).squaredNorm();
 
     float varTotal = varZ + varW;
-    float residual = (A * coeff - b).squaredNorm();
+    float residual = (weight * A * coeff - weight * b).squaredNorm();
     
     float rSquared = 0.0f;
     if(varTotal > 0.0f)
@@ -246,11 +252,11 @@ float TwoTouchFit::Fit(Stroke & Z, Stroke & W, int minPoints, int maxPoints, boo
     // TODO: consider scale-invariant quantities (or not)
     // multiplying by size is one way to get a unitless quantity, but there may be better
     // ways to use this information.  especially at small sizes where there's a lot of noise.
-    float size = std::sqrt(vZ.norm() * vW.norm());
+    //float size = std::sqrt(vZ.norm() * vW.norm());
     float kt   = (xp * ypp - yp * xpp) / (speed * speed * speed);
     
-    int minSize = std::min(Z.Size(), W.Size());
-    int maxSize = std::max(Z.Size(), W.Size());
+    int minSize = (int) std::min(Z.Size(), W.Size());
+    int maxSize = (int) std::max(Z.Size(), W.Size());
 
     if(maxSize == 4)
     {
