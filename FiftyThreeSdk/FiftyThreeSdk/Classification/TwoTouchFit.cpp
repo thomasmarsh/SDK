@@ -63,15 +63,19 @@ float TwoTouchFit::Fit(Stroke & Z, Stroke & W, int minPoints, int maxPoints, boo
     Vector2f vN       = Z.LastPoint() - W.LastPoint();
     
     Vector2f vEndpoints;
-    bool pinchingIn;
-    if(vN.squaredNorm() > v0.squaredNorm())
+    float scale = 1.0f;
+    if(v0.norm() > 0.0f)
     {
-        pinchingIn = false;
+        scale = vN.norm() / (.0001 + v0.norm());
+    }
+    
+    
+    if(scale > 1.0f)
+    {
         vEndpoints = vN;
     }
     else
     {
-        pinchingIn = true;
         vEndpoints = v0;
     }
     vEndpoints.normalize();
@@ -168,7 +172,7 @@ float TwoTouchFit::Fit(Stroke & Z, Stroke & W, int minPoints, int maxPoints, boo
         dirGoodness = std::max(0.0f, -dotZ * dotW);
         dirGoodness = std::sqrt(dirGoodness);
         float targetDot = .75f;
-        if(pinchingIn)
+        if(scale < 1.0f)
         {
             targetDot = .95f;
         }
