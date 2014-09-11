@@ -45,8 +45,11 @@ NSString *deviceSecretHeaderField    = @"X-device-secret";
 @property (nonatomic, strong) NSURLConnection *activeConnection;
 
 //NSOperation related
-@property (nonatomic, assign) BOOL finished;
-@property (nonatomic, assign) BOOL executing;
+// Note: Can't override NSOperation's readonly 'finished' and 'executing' with readwrite properties.
+// This was causing a crash with Xcode 6 + iOS 8.
+@property (nonatomic, assign) BOOL operationFinished;
+@property (nonatomic, assign) BOOL operationExecuting;
+
 @property (nonatomic, assign) NSTimeInterval timeoutInterval;
 @property (nonatomic, assign) UIBackgroundTaskIdentifier backgroundTaskId;
 @property (nonatomic, strong) NSThread *connectionThread;
@@ -97,7 +100,7 @@ const int kNonceRandomStringLength = 74;
     if (self.isCancelled) {
         // If it's already been cancelled, mark the operation as finished and don't start the connection.
         [self willChangeValueForKey:@"isFinished"];
-        self.finished = YES;
+        self.operationFinished = YES;
         [self didChangeValueForKey:@"isFinished"];
         return;
     }
@@ -109,10 +112,10 @@ const int kNonceRandomStringLength = 74;
 {
     if((nil != self.request) && !self.isCancelled){
             ABDebugLog_internal(@"Success_IssueRequest: Starting API call.");
-            self.executing = YES;
+            self.operationExecuting = YES;
             [self didChangeValueForKey:@"isExecuting"];
             [self willChangeValueForKey:@"isFinished"];
-            self.finished = NO;
+            self.operationFinished = NO;
             [self didChangeValueForKey:@"isFinished"];
             self.activeConnection = [[NSURLConnection alloc] initWithRequest:_request delegate:self startImmediately:YES] ;
         
@@ -126,7 +129,7 @@ const int kNonceRandomStringLength = 74;
             self.timeoutInterval = 60;
         [self scheduleTimeout];
         
-        while (!self.finished && !self.isCancelled) {
+        while (!self.operationFinished && !self.isCancelled) {
             [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode beforeDate:[NSDate distantFuture]];
         }
         
@@ -143,8 +146,8 @@ const int kNonceRandomStringLength = 74;
             [self willChangeValueForKey:@"isFinished"];
             [self willChangeValueForKey:@"isExecuting"];
             
-            self.finished = YES;
-            self.executing = NO;
+            self.operationFinished = YES;
+            self.operationExecuting = NO;
             
             [self didChangeValueForKey:@"isExecuting"];
             [self didChangeValueForKey:@"isFinished"];
@@ -152,10 +155,10 @@ const int kNonceRandomStringLength = 74;
         
     } else {
         ABErrorLog(@"Error_IssueRequest: API request was cancelled or did not initialize properly. Did not perform an API call.");
-        self.executing = NO;
+        self.operationExecuting = NO;
         [self didChangeValueForKey:@"isExecuting"];
         [self willChangeValueForKey:@"isFinished"];
-        self.finished = YES;
+        self.operationFinished = YES;
         [self didChangeValueForKey:@"isFinished"];
     }
 }
@@ -186,11 +189,11 @@ const int kNonceRandomStringLength = 74;
 
 // Flags
 - (BOOL)isExecuting {
-    return self.executing;
+    return self.operationExecuting;
 }
 
 - (BOOL)isFinished {
-    return self.finished;
+    return self.operationFinished;
 }
 
 -(void) scheduleTimeout
@@ -269,10 +272,10 @@ const int kNonceRandomStringLength = 74;
     if (self.isCancelled) {
         ABDebugLog_internal(@"API Call cancelled. didFailWithError, but Ignoring.");
         [self willChangeValueForKey:@"isExecuting"];
-        self.executing = NO;
+        self.operationExecuting = NO;
         [self didChangeValueForKey:@"isExecuting"];
         [self willChangeValueForKey:@"isFinished"];
-        self.finished = YES;
+        self.operationFinished = YES;
         [self didChangeValueForKey:@"isFinished"];
         return;
     }
@@ -288,10 +291,10 @@ const int kNonceRandomStringLength = 74;
     });
     
     [self willChangeValueForKey:@"isExecuting"];
-    self.executing = NO;
+    self.operationExecuting = NO;
     [self didChangeValueForKey:@"isExecuting"];
     [self willChangeValueForKey:@"isFinished"];
-    self.finished = YES;
+    self.operationFinished = YES;
     [self didChangeValueForKey:@"isFinished"];
 
     self.request = nil;
@@ -302,10 +305,10 @@ const int kNonceRandomStringLength = 74;
     if (self.isCancelled) {
         ABDebugLog_internal(@"API Call cancelled. connectionDidFinishLoading, but Ignoring.");
         [self willChangeValueForKey:@"isExecuting"];
-        self.executing = NO;
+        self.operationExecuting = NO;
         [self didChangeValueForKey:@"isExecuting"];
         [self willChangeValueForKey:@"isFinished"];
-        self.finished = YES;
+        self.operationFinished = YES;
         [self didChangeValueForKey:@"isFinished"];
         return;
     }
@@ -421,10 +424,10 @@ const int kNonceRandomStringLength = 74;
     }
     
     [self willChangeValueForKey:@"isFinished"];
-    self.executing = NO;
+    self.operationExecuting = NO;
     [self didChangeValueForKey:@"isExecuting"];
     [self willChangeValueForKey:@"isFinished"];
-    self.finished = YES;
+    self.operationFinished = YES;
     [self didChangeValueForKey:@"isFinished"];
     self.request = nil;
 }
