@@ -30,7 +30,7 @@ public:
     {
     }
     
-    float Fit(Stroke & Z, Stroke & W, int maxPoints, bool isPinch);
+    float Fit(Stroke & Z, Stroke & W, int minPoints, int maxPoints, bool isPinch);
     
 };
 

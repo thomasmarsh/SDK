@@ -1707,6 +1707,18 @@ IdTypeMap TouchClassificationProxy::ReclassifyCurrentEvent()
             }
         }
 
+        if (_clusterTracker->ActiveIds().size() == 2)
+        {
+            TouchIdVector touches = _clusterTracker->ActiveIds();
+            Stroke::Ptr s0 = _clusterTracker->Data(touches[0])->Stroke();
+            Stroke::Ptr s1 = _clusterTracker->Data(touches[1])->Stroke();
+            
+            TwoTouchFit ttFit;
+            ttFit.Fit(*s0, *s1, 3, 6, true);
+        }
+
+        
+        
         if (TouchRadiusAvailable())
         {
             ReclassifyCurrentEventGivenSize(types);
@@ -1777,21 +1789,6 @@ void TouchClassificationProxy::ReclassifyCurrentEventGivenSize(IdTypeMap &change
 
     std::set<Cluster::Ptr> activeClusters = _clusterTracker->CurrentEventActiveClusters();
 
-    if (_clusterTracker->ActiveIds().size() == 2)
-    {
-        TouchIdVector touches = _clusterTracker->ActiveIds();
-        Stroke::Ptr s0 = _clusterTracker->Data(touches[0])->Stroke();
-        Stroke::Ptr s1 = _clusterTracker->Data(touches[1])->Stroke();
-        
-        if(! TouchSize::IsPalmGivenTouchRadius(_clusterTracker->Data(touches[0])->_leadingRadiusMax) &&
-           ! TouchSize::IsPalmGivenTouchRadius(_clusterTracker->Data(touches[1])->_leadingRadiusMax))
-        {
-            TwoTouchFit ttFit;
-            ttFit.Fit(*s0, *s1, 4, true);
-        }
-    }
-    
-    
     for (Cluster::Ptr const & probeCluster:timeOrderedClusters)
     {
 
