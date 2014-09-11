@@ -115,10 +115,11 @@ float TwoTouchFit::Fit(Stroke & Z, Stroke & W, int minPoints, int maxPoints, boo
         
         ++m;
     }
-    
+
+    float tOffsetW = W.FirstAbsoluteTimestamp() - Z.FirstAbsoluteTimestamp();
     for(int k=0; k<wCount; k++)
     {
-        float t = W.RelativeTimestamp(k);
+        float t = W.RelativeTimestamp(k) + tOffsetW;
         
         A(m, 0) = t * t;
         A(m, 1) = t;
