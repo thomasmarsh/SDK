@@ -28,12 +28,6 @@ float TwoTouchFit::Fit(Stroke & Z, Stroke & W, int maxPoints, bool isPinch)
     Vector2f tZ;
     Vector2f tW;
     
-    float flip = 1.0f;
-    if(isPinch)
-    {
-        flip = -1.0f;
-    }
-    
     // if W's first timestamp happened after Z began, assume that W_0 happened while
     // Z was still being rendered, and we'll do our fit normalized so W_0 and the corresponding
     // point on Z are normalized to zero.  and vice-versa.
@@ -55,7 +49,19 @@ float TwoTouchFit::Fit(Stroke & Z, Stroke & W, int maxPoints, bool isPinch)
         tW = Vector2f(W.X(iw), W.Y(iw));
     }
     
+    // we assume Z and W are basically symmetric about some line.
+    // use the line joining the endpoints...
+
+    Vector2f v   = Z.XY(0) - W.XY(0);
+    v          = Vector2f(-v.y(), v.x()).normalized();
     
+    Matrix2f R;
+    
+    // Eigen doesn't have built-in reflections?
+    R(0,0) = v.x() * v.x() - v.y() * v.y();
+    R(1,1) = - R(0,0);
+    R(0,1) = 2.0f * v.x() * v.y();
+    R(1,0) = R(0,1);
     
     
     // assemble our matrix A of evaluation times.  rank of A is uncertain
@@ -84,8 +90,14 @@ float TwoTouchFit::Fit(Stroke & Z, Stroke & W, int maxPoints, bool isPinch)
         A(m, 1) = t;
         A(m, 2) = 1;
         
-        b(m, 0) = flip * (W.X(k) - tW.x());
-        b(m, 1) = flip * (W.Y(k) - tW.y());
+        Vector2f bw = W.XY(k) - tW;
+        if(isPinch)
+        {
+            bw = R*bw;
+        }
+        
+        b(m, 0) = bw.x();
+        b(m, 1) = bw.y();
         
         ++m;
     }

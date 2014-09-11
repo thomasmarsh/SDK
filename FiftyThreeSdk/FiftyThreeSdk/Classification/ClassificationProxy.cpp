@@ -1783,8 +1783,12 @@ void TouchClassificationProxy::ReclassifyCurrentEventGivenSize(IdTypeMap &change
         Stroke::Ptr s0 = _clusterTracker->Data(touches[0])->Stroke();
         Stroke::Ptr s1 = _clusterTracker->Data(touches[1])->Stroke();
         
-        TwoTouchFit ttFit;
-        ttFit.Fit(*s0, *s1, 5, true);
+        if(! TouchSize::IsPalmGivenTouchRadius(_clusterTracker->Data(touches[0])->_leadingRadiusMax) &&
+           ! TouchSize::IsPalmGivenTouchRadius(_clusterTracker->Data(touches[1])->_leadingRadiusMax))
+        {
+            TwoTouchFit ttFit;
+            ttFit.Fit(*s0, *s1, 4, true);
+        }
     }
     
     
