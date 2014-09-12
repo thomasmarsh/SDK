@@ -24,6 +24,11 @@ class TwoTouchFit
     
     float _residual;
     
+    Eigen::MatrixXf _A;
+    Eigen::MatrixXf _b;
+    Eigen::MatrixXf _weight;
+    
+    void ConstructProblem(Stroke & Z, Stroke & W, int zCount, int wCount, Eigen::Vector2f axisOfSymmetry = Eigen::Vector2f(0,0));
     
 public:
     TwoTouchFit() : _residual(-1.0f)
@@ -31,6 +36,8 @@ public:
     }
     
     float Fit(Stroke & Z, Stroke & W, int minPoints, int maxPoints, bool isPinch);
+    
+    float Curvature(float relativeTimestamp);
     
 };
 
