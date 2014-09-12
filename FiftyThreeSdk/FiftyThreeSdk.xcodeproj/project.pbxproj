@@ -56,6 +56,7 @@
 		66D779BB16E57461001C4F55 /* FTPenManager.mm in Sources */ = {isa = PBXBuildFile; fileRef = 66D779B516E57461001C4F55 /* FTPenManager.mm */; };
 		66D779BC16E57461001C4F55 /* TIUpdateManager.mm in Sources */ = {isa = PBXBuildFile; fileRef = 66D779B816E57461001C4F55 /* TIUpdateManager.mm */; };
 		C95A63DC199BC12C00A2B8C1 /* TouchSize.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C95A63DA199BC12C00A2B8C1 /* TouchSize.cpp */; };
+		D380A52119CC9221003CD0A1 /* FTLogPrivate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D380A52019CC9221003CD0A1 /* FTLogPrivate.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -181,6 +182,7 @@
 		66D779B816E57461001C4F55 /* TIUpdateManager.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; lineEnding = 0; name = TIUpdateManager.mm; path = FiftyThreeSdk/TIUpdateManager.mm; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		C95A63DA199BC12C00A2B8C1 /* TouchSize.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TouchSize.cpp; sourceTree = "<group>"; };
 		C95A63DB199BC12C00A2B8C1 /* TouchSize.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TouchSize.h; sourceTree = "<group>"; };
+		D380A52019CC9221003CD0A1 /* FTLogPrivate.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = FTLogPrivate.cpp; path = FiftyThreeSdk/FTLogPrivate.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -360,6 +362,7 @@
 				66A8389C16E531E40048FFE4 /* export */,
 				0489D36E18CE13D800B41E20 /* FTEventDispatcher+Private.h */,
 				041587DD18DB6C7800642939 /* FTEventDispatcher.mm */,
+				D380A52019CC9221003CD0A1 /* FTLogPrivate.cpp */,
 				3CD04E60197173AC007A375E /* FTLogPrivate.h */,
 				66D779B116E57461001C4F55 /* FTPen.h */,
 				0489D42718CE43E900B41E20 /* FTPenManager+Internal.h */,
@@ -471,6 +474,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				0489D42018CE382100B41E20 /* FTTouchClassifier.mm in Sources */,
+				D380A52119CC9221003CD0A1 /* FTLogPrivate.cpp in Sources */,
 				66D779B916E57461001C4F55 /* FTDeviceInfoServiceClient.mm in Sources */,
 				66D779BA16E57461001C4F55 /* FTPen.mm in Sources */,
 				0416CABB18A42B51004EAC00 /* Cluster.cpp in Sources */,

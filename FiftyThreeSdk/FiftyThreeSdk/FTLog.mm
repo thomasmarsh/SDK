@@ -38,23 +38,23 @@ namespace
     sLogLevel = logLevel;
 
 #ifdef USE_LOGGING
-    LogService::Instance()->RemoveFilter(FTLogSDK);
-    LogService::Instance()->RemoveFilter(FTLogSDKVerbose);
-    LogService::Instance()->RemoveFilter(FTLogSDKClassificationLinker);
+    SET_LOG_MODULE_SEVERITY(FTLogSDK, kFTLogSeverityInfo);
+    SET_LOG_MODULE_SEVERITY(FTLogSDKVerbose, kFTLogSeverityInfo);
+    SET_LOG_MODULE_SEVERITY(FTLogSDKClassificationLinker, kFTLogSeverityInfo);
 
     switch (sLogLevel)
     {
         case FTLogLevelEnabled:
-            LogService::Instance()->AddFilter(FTLogSDKVerbose);
-            LogService::Instance()->AddFilter(FTLogSDKClassificationLinker);
+            SET_LOG_MODULE_SEVERITY(FTLogSDKVerbose, kFTLogSeverityOff);
+            SET_LOG_MODULE_SEVERITY(FTLogSDKClassificationLinker, kFTLogSeverityOff);
             break;
         case FTLogLevelEnabledVerbose:
             break;
         case FTLogLevelDisabled:
         default:
-            LogService::Instance()->AddFilter(FTLogSDK);
-            LogService::Instance()->AddFilter(FTLogSDKVerbose);
-            LogService::Instance()->AddFilter(FTLogSDKClassificationLinker);
+            SET_LOG_MODULE_SEVERITY(FTLogSDK, kFTLogSeverityOff);
+            SET_LOG_MODULE_SEVERITY(FTLogSDKVerbose, kFTLogSeverityOff);
+            SET_LOG_MODULE_SEVERITY(FTLogSDKClassificationLinker, kFTLogSeverityOff);
             break;
     }
 #endif

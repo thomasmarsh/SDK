@@ -13,8 +13,6 @@
 #import "FTLogPrivate.h"
 #import "FTServiceUUIDs.h"
 
-using namespace fiftythree::core;
-
 @interface FTDeviceInfoServiceClient ()
 
 @property (nonatomic) CBService *deviceInfoService;

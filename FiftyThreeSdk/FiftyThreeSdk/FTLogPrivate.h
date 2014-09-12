@@ -9,9 +9,8 @@
 
 #include "Core/Log.h"
 
-enum FTLogModule
-{
-    FTLogSDK = 0x56878,
-    FTLogSDKVerbose,
-    FTLogSDKClassificationLinker
-};
+DEFINE_LOG_MODULES(FTLogModule,
+                   0x56878,
+                   FTLogSDK,
+                   FTLogSDKVerbose, // TODO: remove this in favor of using MLOG_DEBUG
+                   FTLogSDKClassificationLinker)
