@@ -6,6 +6,8 @@
 //  Copyright (c) 2014 FiftyThree. All rights reserved.
 //
 
+#include <iomanip>
+
 #include "TwoTouchFit.h"
 
 using namespace Eigen;
@@ -81,11 +83,16 @@ float TwoTouchFit::Fit(Stroke & Z, Stroke & W, int minPoints, int maxPoints, boo
     }
     vEndpoints.normalize();
     
-    Vector2f v   = vEndpoints;
-    v            = Vector2f(-v.y(), v.x());
+    Vector2f dZ = (Z.XY(zCount-1) - Z.XY(0)).normalized();
+    Vector2f dW = (W.XY(wCount-1) - W.XY(0)).normalized();
+
+    // reflect about the line of symmetry that bisects the angle made by the two average direction vectors
+    Vector2f dSymmetry   = (dZ - dW).normalized();
+    dSymmetry            = Vector2f(-dSymmetry.y(), dSymmetry.x());
     
     Matrix2f R;
     
+    Vector2f v = dSymmetry;
     // Eigen doesn't have built-in reflections?
     R(0,0) = v.x() * v.x() - v.y() * v.y();
     R(1,1) = - R(0,0);
@@ -119,8 +126,8 @@ float TwoTouchFit::Fit(Stroke & Z, Stroke & W, int minPoints, int maxPoints, boo
 
     // give less weight to the first point on each stroke since there's a lot of noise
     // in the first sample.  Calling it crap is an insult to fertilizer.
-    weight(0,0) = .5f;
-    weight(zCount,zCount) = .5f;
+    weight(0,0) = .25f;
+    weight(zCount,zCount) = .25f;
     
     float tOffsetW = W.FirstAbsoluteTimestamp() - Z.FirstAbsoluteTimestamp();
     for(int k=0; k<wCount; k++)
@@ -165,7 +172,9 @@ float TwoTouchFit::Fit(Stroke & Z, Stroke & W, int minPoints, int maxPoints, boo
     if (isPinch)
     {
         // we want motion in opposite directions, orthogonal to the line of symmetry
-        Vector2f vTarget  = vEndpoints;
+        Vector2f vTarget = vEndpoints;
+        //Vector2f vTarget(-dSymmetry.y(), dSymmetry.x());
+
 
         float    dotZ     = vZ.dot(vTarget) / vZ.norm();
         float    dotW     = vW.dot(vTarget) / vW.norm();
@@ -174,7 +183,7 @@ float TwoTouchFit::Fit(Stroke & Z, Stroke & W, int minPoints, int maxPoints, boo
         // pinches which start big are nearly diametrically opposed.
         // pinches which start small tend to make a shallower angle.
         // TODO: learn this distribution, if it actually helps to do so.
-        // consider that we might do better if we are stricter.
+        // but consider that we might do better if we are stricter.
 
         dirGoodness = std::max(0.0f, -dotZ * dotW);
         dirGoodness = std::sqrt(dirGoodness);
@@ -258,9 +267,10 @@ float TwoTouchFit::Fit(Stroke & Z, Stroke & W, int minPoints, int maxPoints, boo
     int minSize = (int) std::min(Z.Size(), W.Size());
     int maxSize = (int) std::max(Z.Size(), W.Size());
 
-    if(maxSize == 4)
+    if(minSize >= 3 && maxSize >= 3 && maxSize <= 4)
     {
-        std::cerr << "\n" << M << ": score = " << score << ", r2 = " << rSquared << ", dir = " << dirGoodness << ", kappa = " << kt << ", |vZ| = " << vZ.norm() << ", |vW| = " << vW.norm();
+        std::cerr << std::setprecision(3);
+        std::cerr << "\n" << M << ": score = " << score << ", r2 = " << rSquared << ", dir = " << dirGoodness << ", kappa = " << kt  << ", scale = " << scale << ", |vZ| = " << vZ.norm() << ", |vW| = " << vW.norm();
     }
     return score;
     
