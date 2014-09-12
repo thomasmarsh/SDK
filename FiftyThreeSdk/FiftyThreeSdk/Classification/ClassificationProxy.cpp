@@ -2165,28 +2165,23 @@ void TouchClassificationProxy::OnTouchesChanged(const std::set<core::Touch::Ptr>
 
     SetCurrentTime(_clusterTracker->Time());
 
-    // if iOS cancelled all the touches, because an alert popped up, phone call, etc.
-    // then don't do any work.  cluster tracker will have cleared all clusters.
-    if (!_clusterTracker->AllCancelledFlag())
+    _isolatedStrokesClassifier.MarkEdgeThumbs();
+    
+    _penTracker.UpdateLocations();
+    
+    // an empty touch set never happens at the moment.
+    if (! touches.empty())
     {
-        _isolatedStrokesClassifier.MarkEdgeThumbs();
-
-        _penTracker.UpdateLocations();
-
-        // an empty touch set never happens at the moment.
-        if (! touches.empty())
+        // default the touch type for any new touches.
+        for (core::Touch::cPtr snapshot:touches)
         {
-            // default the touch type for any new touches.
-            for (core::Touch::cPtr snapshot:touches)
+            if (!_currentTypes.count(snapshot->Id()))
             {
-                if (!_currentTypes.count(snapshot->Id()))
-                {
-                    _currentTypes[snapshot->Id()] = TouchTypeForNewCluster();
-                }
+                _currentTypes[snapshot->Id()] = TouchTypeForNewCluster();
             }
-
-            _needsClassification = true;
         }
+        
+        _needsClassification = true;
     }
 
     auto it = _currentTypes.begin();

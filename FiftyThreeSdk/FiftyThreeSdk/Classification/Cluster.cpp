@@ -1232,23 +1232,11 @@ vector<Cluster::Ptr> ClusterTracker::NonEndedPenClusters()
 void ClusterTracker::TouchesChanged(const std::set<core::Touch::Ptr> & touches)
 {
     _touchLog->TouchesChanged(touches);
-
-    // iOS cancelled all the touches, because an alert popped up, phone call, etc.
-    if (_touchLog->AllCancelledFlag())
-    {
-        ForceAllClustersStale(CurrentTime());
-
-        // this removes the clusters.  should we notify the touchLogger it can release resources?
-        RemoveUnusedStaleClusters();
-    }
-    else
-    {
-
-        MarkStaleClusters(CurrentTime());
-        RemoveUnusedStaleClusters();
-
-        UpdateClusters();
-    }
+    
+    MarkStaleClusters(CurrentTime());
+    RemoveUnusedStaleClusters();
+    
+    UpdateClusters();
 }
 
 void ClusterTracker::UpdateClusters()

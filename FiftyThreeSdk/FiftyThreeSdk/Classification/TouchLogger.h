@@ -267,11 +267,6 @@ protected:
 
     const CommonData* _commonData;
 
-    // detect the case where iOS cancels all touches because a phone call arrives, etc.
-    // it gets updated on each call to touchesChanged.  Classifier can use it to detect this
-    // situation and update/cancel clusters, etc.
-    bool _allCancelledFlag;
-
 public:
     typedef fiftythree::core::shared_ptr<TouchLogger> Ptr;
     typedef std::pair<core::TouchId, TouchData::Ptr> TouchDataPair;
@@ -381,11 +376,6 @@ public:
     // BEGIN: Methods in active use by the classifier
     //
     ////////////////////////////////////////////////////////
-
-    bool AllCancelledFlag()
-    {
-        return _allCancelledFlag;
-    }
 
     TouchIdVector ActiveIds();
     TouchIdVector ActiveNonEndedIds();

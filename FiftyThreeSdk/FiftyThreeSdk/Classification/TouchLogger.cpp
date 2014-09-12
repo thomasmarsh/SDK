@@ -276,23 +276,6 @@ void TouchLogger::TouchesChanged(const std::set<core::Touch::Ptr> & touches)
 
     _concurrentTouchesCache.clear();
 
-    /*
-    _allCancelledFlag = true;
-
-    for (const auto & touch :  touches)
-    {
-        if (touch->Phase() != core::TouchPhase::Cancelled)
-        {
-            _allCancelledFlag = false;
-            break;
-        }
-
-    }
-     */
-
-    // more harm than good...
-    _allCancelledFlag = false;
-
     for (const auto & touch :  touches)
     {
         if (_currentTime < touch->CurrentSample().TimestampSeconds())
@@ -430,15 +413,8 @@ void TouchLogger::TouchesChanged(const std::set<core::Touch::Ptr> & touches)
 
                             touchData->SetPhase(core::TouchPhase::Cancelled);
 
-                            if (_allCancelledFlag)
-                            {
-                                touch->DynamicProperties()[kClassifierUseCancelledTouch] = fiftythree::core::any(false);
-                            }
-                            else
-                            {
-                                touch->DynamicProperties()[kClassifierUseCancelledTouch] = fiftythree::core::any(true);
-                            }
-
+                            touch->DynamicProperties()[kClassifierUseCancelledTouch] = fiftythree::core::any(true);
+                            
                             LogEndedTouch(touch->Id());
 
                             _endedTouchesStaged.push_back(touch->Id());
