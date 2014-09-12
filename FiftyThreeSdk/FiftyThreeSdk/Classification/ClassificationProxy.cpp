@@ -9,6 +9,7 @@
 #include <tuple>
 
 #include "Core/Eigen.h"
+#include "Core/Log.h"
 #include "Core/Touch/Touch.h"
 #include "Core/Touch/TouchTracker.h"
 #include "FiftyThreeSdk/Classification/ClassificationProxy.h"
@@ -17,6 +18,7 @@
 #include "FiftyThreeSdk/Classification/LineFitting.h"
 #include "FiftyThreeSdk/Classification/Stroke.h"
 #include "FiftyThreeSdk/Classification/TouchSize.h"
+#include "FiftyThreeSdk/FTLogPrivate.h"
 
 using Eigen::Vector2f;
 using fiftythree::core::TouchClassification;
@@ -814,7 +816,7 @@ VectorXf TouchClassificationProxy::PenPriorForTouches(TouchIdVector const &touch
             bool reclassifiable = IsReclassifiable(_clusterTracker->TouchWithId(touchId), _clusterTracker->Data(touchId)->Stroke());
             if (reclassifiable)
             {
-                std::cerr << "\nNO CLUSTER FOR RECLASSIFIABLE " << touchId;
+                MLOG_WARN(FTLogSDK, "NO CLUSTER FOR RECLASSIFIABLE %i", static_cast<int>(touchId));
                 touchPriors[touchIndex] = 0.5f;
             }
             else
@@ -852,22 +854,10 @@ VectorXf TouchClassificationProxy::PenPriorForTouches(TouchIdVector const &touch
                 {
 
                     float isolatedScore = _isolatedStrokesClassifier.NPVoteScore(touchId);
-                    //float isolatedScore = _isolatedStrokesClassifier.ConvexScore(touchId);
-
-                    //                std::cout << "scores for touch  " << touchId << "\n"
-                    //                          << "ConvexScore: " << _isolatedStrokesClassifier.ConvexScore(touchId) << "\n"
-                    //                          << "NPVoteScore: " << _isolatedStrokesClassifier.NPVoteScore(touchId) << "\n"
-                    //                          << "NPVoteCount: " << _isolatedStrokesClassifier.NPVoteCount(touchId) << "\n"
-                    //                          << "AdaboostScore: " << _isolatedStrokesClassifier.AdaboostScore(touchId) << "\n"
-                    //                          << "BayesLikelihoodScore: " << _isolatedStrokesClassifier.BayesLikelihoodScore(touchId) << "\n" << std::endl;
-                    //
-                    //                    std::cout << "Raw max curvature is " << _isolatedStrokesClassifier.LogMaxCurvature(touchId) << " and normalized curvature is " << _isolatedStrokesClassifier.NormalizedMaxCurvature(touchId) << std::endl;
 
                     // We want a score of 0.5 to not do anything -- so multiply by 2
                     touchPriors[touchIndex] *= 2.0f * isolatedScore;
-
                 }
-
             }
         }
         touchIndex++;
@@ -900,7 +890,6 @@ VectorXf TouchClassificationProxy::PenPriorForTouches(TouchIdVector const &touch
             }
 
             DebugAssert(ratio > 0.0f && ratio <= 1.0f);
-
         }
 
         touchPriors[index] *= ratio;
@@ -2130,7 +2119,7 @@ void TouchClassificationProxy::ReclassifyClusters()
         tie(touchId, type) = pair;
 
         _currentTypes[touchId] = type;
-        
+
         if (_clusterTracker->IsEnded(touchId))
         {
             _endedTouchesReclassified.push_back(touchId);
@@ -2166,9 +2155,9 @@ void TouchClassificationProxy::OnTouchesChanged(const std::set<core::Touch::Ptr>
     SetCurrentTime(_clusterTracker->Time());
 
     _isolatedStrokesClassifier.MarkEdgeThumbs();
-    
+
     _penTracker.UpdateLocations();
-    
+
     // an empty touch set never happens at the moment.
     if (! touches.empty())
     {
@@ -2180,7 +2169,7 @@ void TouchClassificationProxy::OnTouchesChanged(const std::set<core::Touch::Ptr>
                 _currentTypes[snapshot->Id()] = TouchTypeForNewCluster();
             }
         }
-        
+
         _needsClassification = true;
     }
 
