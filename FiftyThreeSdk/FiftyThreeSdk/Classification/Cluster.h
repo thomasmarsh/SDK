@@ -558,11 +558,6 @@ public:
 
     void TouchesChanged(const std::set<core::Touch::Ptr> & touches);
 
-    bool AllCancelledFlag()
-    {
-        return _touchLog->AllCancelledFlag();
-    }
-
     double Time()
     {
         return _touchLog->Time();
