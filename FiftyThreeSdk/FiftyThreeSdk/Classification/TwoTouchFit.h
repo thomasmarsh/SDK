@@ -22,16 +22,20 @@ class TwoTouchFit
     float _ax, _bx, _cx;
     float _ay, _by, _cy;
     
-    float _residual;
+    float _score;
+    float _scale;
     
     Eigen::MatrixXf _A;
     Eigen::MatrixXf _b;
     Eigen::MatrixXf _weight;
     
-    void ConstructProblem(Stroke & Z, Stroke & W, int zCount, int wCount, Eigen::Vector2f axisOfSymmetry = Eigen::Vector2f(0,0));
+    Eigen::Vector2f _axisOfSymmetry;
+    Eigen::Vector2f _targetDirection;
+    
+    void ConstructProblem(Stroke & Z, Stroke & W, int zCount, int wCount);
     
 public:
-    TwoTouchFit() : _residual(-1.0f)
+    TwoTouchFit() : _score(-1.0f), _scale(0.0)
     {
     }
     

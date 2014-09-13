@@ -17,65 +17,36 @@ namespace fiftythree
 namespace sdk
 {
 
-float TwoTouchFit::Fit(Stroke & Z, Stroke & W, int minPoints, int maxPoints, bool isPinch)
+float TwoTouchFit::Fit(Stroke & zIn, Stroke & wIn, int minPoints, int maxPoints, bool isPinch)
 {
-    if(Z.Size() < minPoints || W.Size() < minPoints)
+    if(zIn.Size() < minPoints || wIn.Size() < minPoints)
     {
         return 0.0f;
     }
     
     // both have at least minPoints
-    int zCount = std::min((int) Z.Size(), maxPoints);
-    int wCount = std::min((int) W.Size(), maxPoints);
+    int zCount = std::min((int) zIn.Size(), maxPoints);
+    int wCount = std::min((int) wIn.Size(), maxPoints);
     
+    // make copies, since we're going to mess with the leading point
+    Stroke Z = zIn.SubStroke(Interval(0, zCount));
+    Stroke W = wIn.SubStroke(Interval(0, wCount));
     
-    // we assume Z and W are basically symmetric about some line.
-    // use the line joining the furthest endpoints for now.
-    // we could solve for the optimal reflection as well.
-
-    Vector2f v0       = Z.XY(0) - W.XY(0);
-    Vector2f vN       = Z.LastPoint() - W.LastPoint();
+    // the first point is pretty much garbage, so our measurements can get dominated by noise,
+    // especially in the motivating case which is very early gesture detection.
+    Z.DenoiseFirstPoint(1.0f);
+    W.DenoiseFirstPoint(1.0f);
     
-    Vector2f vEndpoints;
-    float scale = 1.0f;
-    if(v0.norm() > 0.0f)
-    {
-        scale = vN.norm() / v0.norm();
-    }
-    
-    if(scale > 1.0f)
-    {
-        vEndpoints = vN;
-    }
-    else
-    {
-        vEndpoints = v0;
-    }
-    vEndpoints.normalize();
-    
-    Vector2f vZ = Z.XY(zCount-1) - Z.XY(0);
-    Vector2f vW = W.XY(wCount-1) - W.XY(0);
-    
-    Vector2f dZ = vZ.normalized();
-    Vector2f dW = vW.normalized();
-
-    // reflect about the line of symmetry that bisects the angle made by the two average direction vectors
-    //Vector2f dSymmetry   = (dZ - dW);
-    
-    // reflect about the perp to the endpoints
-    Vector2f dSymmetry   = vEndpoints;
-    dSymmetry            = Vector2f(-dSymmetry.y(), dSymmetry.x()).normalized();
-
     if(isPinch)
     {
-        ConstructProblem(Z, W, zCount, wCount, dSymmetry);
+        ConstructProblem(Z, W, zCount, wCount);
     }
     else
     {
         ConstructProblem(Z, W, zCount, wCount);
     }
     
-    MatrixXf coeff = (_weight*_A).colPivHouseholderQr().solve(_weight*_b);
+    MatrixXf coeff = (_weight*_A).fullPivHouseholderQr().solve(_weight*_b);
     
     float varZ = (_weight.block(0, 0, zCount, zCount) * _b.block(0, 0, zCount, 2)).squaredNorm();
     float varW = (_weight.block(zCount, zCount, wCount, wCount) * _b.block(zCount, 0, wCount, 2)).squaredNorm();
@@ -88,16 +59,23 @@ float TwoTouchFit::Fit(Stroke & Z, Stroke & W, int minPoints, int maxPoints, boo
     {
         rSquared = 1.0f - residual / varTotal;
     }
+
+    Vector2f vZ = Z.LastPoint() - Z.FirstPoint();
+    Vector2f vW = W.LastPoint() - W.FirstPoint();
+
+    Vector2f dZ = vZ.normalized();
+    Vector2f dW = vW.normalized();
+
     
     float score;
     float dirGoodness;
     if (isPinch)
     {
+        
+        
         // we want motion in opposite directions, orthogonal to the line of symmetry
-        Vector2f vTarget = vEndpoints;
-
-        float    dotZ     = dZ.dot(vTarget);
-        float    dotW     = dW.dot(vTarget);
+        float    dotZ     = dZ.dot(_targetDirection);
+        float    dotW     = dW.dot(_targetDirection);
 
         // pinch in and out seem to be very different WRT typical angles.
         // pinches which start big are nearly diametrically opposed.
@@ -108,7 +86,7 @@ float TwoTouchFit::Fit(Stroke & Z, Stroke & W, int minPoints, int maxPoints, boo
         dirGoodness = std::max(0.0f, -dotZ * dotW);
         dirGoodness = std::sqrt(dirGoodness);
         float targetDot = .75f;
-        if(scale < 1.0f)
+        if(_scale < 1.0f)
         {
             targetDot = .95f;
         }
@@ -177,14 +155,17 @@ float TwoTouchFit::Fit(Stroke & Z, Stroke & W, int minPoints, int maxPoints, boo
     if(minSize >= 3 && maxSize >= 3 && maxSize <= 4)
     {
         std::cerr << std::setprecision(3);
-        std::cerr << "\nscore = " << score << ": (" << zCount << ", " << wCount << "), r2 = " << rSquared << ", dir = " << dirGoodness << ", kappa = " << kt  << ", scale = " << scale << ", |vZ| = " << vZ.norm() << ", |vW| = " << vW.norm();
+        std::cerr << "\nscore = " << score << ": (" << zCount << ", " << wCount << "), r2 = " << rSquared << ", dir = " << dirGoodness << ", kappa = " << kt  << ", scale = " << _scale << ", |vZ| = " << vZ.norm() << ", |vW| = " << vW.norm();
     }
-    return score;
+    
+    _score = score;
+    
+    return _score;
     
     
 }
     
-void TwoTouchFit::ConstructProblem(Stroke & Z, Stroke & W, int zCount, int wCount, Vector2f axisOfSymmetry)
+void TwoTouchFit::ConstructProblem(Stroke & Z, Stroke & W, int zCount, int wCount)
 {
     
     int M      =  zCount + wCount;
@@ -196,8 +177,8 @@ void TwoTouchFit::ConstructProblem(Stroke & Z, Stroke & W, int zCount, int wCoun
     _weight = MatrixXf::Identity(M, M);
     // give less weight to the first point on each stroke since there's a lot of noise
     // in the first sample.  Calling it crap is an insult to fertilizer.
-    _weight(0,0) = .25f;
-    _weight(zCount,zCount) = .25f;
+    //_weight(0,0) = .25f;
+    //_weight(zCount,zCount) = .25f;
     
     
     _weight *= .1f;
@@ -231,18 +212,6 @@ void TwoTouchFit::ConstructProblem(Stroke & Z, Stroke & W, int zCount, int wCoun
     }
 
     
-    Matrix2f R = Matrix2f::Identity();
-    
-    if(axisOfSymmetry != Vector2f(0,0))
-    {
-        Vector2f v = axisOfSymmetry;
-        // Eigen doesn't have built-in reflections?
-        R(0,0) = v.x() * v.x() - v.y() * v.y();
-        R(1,1) = - R(0,0);
-        R(0,1) = 2.0f * v.x() * v.y();
-        R(1,0) = R(0,1);
-    }
-    
     // this will make a copy so we don't mess with the underlying vectors when we subtract
     MatrixX2f xyZ = Z.XYMatrixMap(zCount - 1);
     MatrixX2f xyW = W.XYMatrixMap(wCount - 1);
@@ -251,8 +220,68 @@ void TwoTouchFit::ConstructProblem(Stroke & Z, Stroke & W, int zCount, int wCoun
     xyW -= tW.transpose().replicate(wCount, 1);
     
     // a bit of smoothing -- first point is noisy, so nudge it towards the reverse-extrapolated point
-    xyZ.row(0) = .5f * (xyZ.row(0) + (2.0f * xyZ.row(1) - xyZ.row(2)));
-    xyW.row(0) = .5f * (xyW.row(0) + (2.0f * xyW.row(1) - xyW.row(2)));
+    if(zCount > 3)
+    {
+        
+    }
+    else if(zCount > 2)
+    {
+        xyZ.row(0) = .5f * (xyZ.row(0) + (2.0f * xyZ.row(1) - xyZ.row(2)));
+    }
+
+    
+    if(wCount > 3)
+    {
+        
+    }
+    else if(wCount > 2)
+    {
+        xyW.row(0) = .5f * (xyW.row(0) + (2.0f * xyW.row(1) - xyW.row(2)));
+    }
+    
+    // we assume Z and W are basically symmetric about some line.
+    // use the line joining the furthest endpoints for now.
+    // we could solve for the optimal reflection as well.
+    
+    Vector2f v0       = Z.XY(0) - W.XY(0);
+    Vector2f vN       = Z.LastPoint() - W.LastPoint();
+    
+    Vector2f vEndpoints;
+    _scale = 1.0f;
+    if(v0.norm() > 0.0f)
+    {
+        _scale = vN.norm() / v0.norm();
+    }
+    
+    if(_scale > 1.0f)
+    {
+        vEndpoints = vN;
+    }
+    else
+    {
+        vEndpoints = v0;
+    }
+    vEndpoints.normalize();
+    
+    
+    // reflect about the perp to the endpoints
+    _targetDirection   = vEndpoints;
+    _axisOfSymmetry    = Vector2f(-_targetDirection.y(), _targetDirection.x()).normalized();
+
+    
+    
+    Matrix2f R = Matrix2f::Identity();
+    
+    if(_axisOfSymmetry != Vector2f(0,0))
+    {
+        Vector2f v = _axisOfSymmetry;
+        // Eigen doesn't have built-in reflections?
+        R(0,0) = v.x() * v.x() - v.y() * v.y();
+        R(1,1) = - R(0,0);
+        R(0,1) = 2.0f * v.x() * v.y();
+        R(1,0) = R(0,1);
+    }
+    
     
     constexpr float d1weight = 1.0f;
     constexpr float d2weight = 0.0f;

@@ -618,6 +618,55 @@ Eigen::Vector2f Stroke::LastPoint() const
         return _XYDataStream.Data((int)Size()-1l);
     }
 }
+    
+void Stroke::DenoiseFirstPoint(float lambda)
+{
+    constexpr float samplingInterval = 1.0f / 60.0f;
+    
+    switch (Size())
+    {
+        case 2:
+        case 1:
+        case 0:
+        {
+            return;
+            break;
+        }
+            
+        case 3:
+        {
+            // if it appears we're dropping samples, don't do anything.
+            if(RelativeTimestamp(2) > 2.5f * samplingInterval)
+            {
+                return;
+            }
+            
+            CubicPolynomial2f P     = CubicPolynomial2f::LineWithValuesAtTimes(XY(1), XY(2), RelativeTimestamp(1), RelativeTimestamp(2));
+            _XYDataStream.Data()[0] = (1.0f - lambda) * XY(0) + lambda * P.ValueAt(RelativeTimestamp(0));
+            
+            break;
+        }
+            
+        case 4:
+        default:
+        {
+            // if it appears we're dropping samples, don't do anything.
+            if(RelativeTimestamp(3) > 3.5f * samplingInterval)
+            {
+                return;
+            }
+
+            
+            CubicPolynomial2f P     = CubicPolynomial2f::QuadraticWithValuesAtTimes(XY(1), XY(2), XY(3),
+                                                                                    RelativeTimestamp(1), RelativeTimestamp(2), RelativeTimestamp(3));
+            _XYDataStream.Data()[0] = (1.0f - lambda) * XY(0) + lambda * P.ValueAt(RelativeTimestamp(0));
+
+            break;
+        }
+            
+    }
+}
+    
 
 Eigen::Map<Eigen::VectorXf> Stroke::XYMap(Interval const & I)
 {
@@ -749,11 +798,12 @@ Stroke Stroke::SubStroke(Interval subInterval) const
     int a = (int)validSubInterval._index;
     int b = (int)validSubInterval._index + (int)validSubInterval._count;
 
-    //subStroke.XY() = std::vector< Vector2f >(&_XY[a], &_XY[b]);
-    //subStroke._relativeTimestamp = std::vector<float>(&_relativeTimestamp[a], &_relativeTimestamp[b]);
-
     subStroke._XYDataStream.Data() = std::vector< Vector2f >(&(_XYDataStream.Data()[a]), &(_XYDataStream.Data()[b]));
+    subStroke._XYDataStream.RelativeTimestamp() = std::vector<float>(&(_XYDataStream.RelativeTimestamp()[a]),
+                                                                     &(_XYDataStream.RelativeTimestamp()[b]));
 
+    subStroke._XYDataStream.SetFirstAbsoluteTimestamp(FirstAbsoluteTimestamp());
+    
     DebugAssert(subStroke.Size() == subInterval._count);
 
     return subStroke;

@@ -225,7 +225,7 @@ public:
     void ToNormalizedCoordinates(Screen const & screen);
     void ToScreenCoordinates(Screen const & screen);
 
-    double           FirstAbsoluteTimestamp()  { return _XYDataStream.FirstAbsoluteTimestamp(); }
+    double           FirstAbsoluteTimestamp()  const { return _XYDataStream.FirstAbsoluteTimestamp(); }
     StdVectorFloat & RelativeTimestamp() { return _XYDataStream.RelativeTimestamp(); }
     std::vector< Eigen::Vector2f > & XY() { return _XYDataStream.Data(); }
 
@@ -338,6 +338,8 @@ public:
     // returns -1 if effective size is 1
     int PenultimateValidIndex() const;
 
+    void DenoiseFirstPoint(float lambda);
+    
     Interval MaximalInterval() const { return Interval(0, Size()); }
 
     float SegmentLength(Interval const &I);
