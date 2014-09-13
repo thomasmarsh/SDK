@@ -60,7 +60,10 @@ float TwoTouchFit::Fit(Stroke & Z, Stroke & W, int minPoints, int maxPoints, boo
     Vector2f dW = vW.normalized();
 
     // reflect about the line of symmetry that bisects the angle made by the two average direction vectors
-    Vector2f dSymmetry   = (dZ - dW);
+    //Vector2f dSymmetry   = (dZ - dW);
+    
+    // reflect about the perp to the endpoints
+    Vector2f dSymmetry   = vEndpoints;
     dSymmetry            = Vector2f(-dSymmetry.y(), dSymmetry.x()).normalized();
 
     if(isPinch)
