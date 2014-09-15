@@ -786,7 +786,9 @@ float Stroke::SegmentLength(fiftythree::sdk::Interval const &I)
 
 Stroke Stroke::SubStroke(Interval subInterval) const
 {
-    Stroke subStroke;
+    // no statistics on substrokes -- first, it doesn't make sense unless we replay all the samples,
+    // and second, creating the shared ptr can be a performance hit in loops.
+    Stroke subStroke(false);
 
     if (LastValidIndex() == -1)
     {

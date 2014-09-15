@@ -32,14 +32,18 @@ class TwoTouchFit
     Eigen::Vector2f _axisOfSymmetry;
     Eigen::Vector2f _targetDirection;
     
-    void ConstructProblem(Stroke & Z, Stroke & W, int zCount, int wCount);
+    void ConstructProblem(Stroke & Z, Stroke & W, int zCount, int wCount, bool doReflection);
+    
+    float Fit(Stroke & Z, Stroke & W, int minPoints, int maxPoints, bool isPinch);
+
     
 public:
     TwoTouchFit() : _score(-1.0f), _scale(0.0)
     {
     }
     
-    float Fit(Stroke & Z, Stroke & W, int minPoints, int maxPoints, bool isPinch);
+    float FitPinch(Stroke & Z, Stroke & W, int minPoints, int maxPoints);
+    float FitPan(Stroke & Z, Stroke & W, int minPoints, int maxPoints);
     
     float Curvature(float relativeTimestamp);
     

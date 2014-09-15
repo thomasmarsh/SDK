@@ -17,6 +17,19 @@ namespace fiftythree
 namespace sdk
 {
 
+    
+float TwoTouchFit::FitPinch(Stroke & zIn, Stroke & wIn, int minPoints, int maxPoints)
+{
+    return Fit(zIn, wIn, minPoints, maxPoints, true);
+}
+
+
+float TwoTouchFit::FitPan(Stroke & zIn, Stroke & wIn, int minPoints, int maxPoints)
+{
+    return Fit(zIn, wIn, minPoints, maxPoints, false);
+}
+
+    
 float TwoTouchFit::Fit(Stroke & zIn, Stroke & wIn, int minPoints, int maxPoints, bool isPinch)
 {
     if(zIn.Size() < minPoints || wIn.Size() < minPoints)
@@ -37,14 +50,7 @@ float TwoTouchFit::Fit(Stroke & zIn, Stroke & wIn, int minPoints, int maxPoints,
     Z.DenoiseFirstPoint(1.0f);
     W.DenoiseFirstPoint(1.0f);
     
-    if(isPinch)
-    {
-        ConstructProblem(Z, W, zCount, wCount);
-    }
-    else
-    {
-        ConstructProblem(Z, W, zCount, wCount);
-    }
+    ConstructProblem(Z, W, zCount, wCount, isPinch);
     
     MatrixXf coeff = (_weight*_A).fullPivHouseholderQr().solve(_weight*_b);
     
@@ -165,7 +171,7 @@ float TwoTouchFit::Fit(Stroke & zIn, Stroke & wIn, int minPoints, int maxPoints,
     
 }
     
-void TwoTouchFit::ConstructProblem(Stroke & Z, Stroke & W, int zCount, int wCount)
+void TwoTouchFit::ConstructProblem(Stroke & Z, Stroke & W, int zCount, int wCount, bool doReflection)
 {
     
     int M      =  zCount + wCount;
@@ -175,12 +181,9 @@ void TwoTouchFit::ConstructProblem(Stroke & Z, Stroke & W, int zCount, int wCoun
     
     
     _weight = MatrixXf::Identity(M, M);
-    // give less weight to the first point on each stroke since there's a lot of noise
-    // in the first sample.  Calling it crap is an insult to fertilizer.
-    //_weight(0,0) = .25f;
-    //_weight(zCount,zCount) = .25f;
     
-    
+    // we'll use a smallish weight on the ell^2 error.  use more weight on the derivatives.
+    // this is the sort of thing we really need training data to tune in.
     _weight *= .1f;
     
     
@@ -219,30 +222,6 @@ void TwoTouchFit::ConstructProblem(Stroke & Z, Stroke & W, int zCount, int wCoun
     xyZ -= tZ.transpose().replicate(zCount, 1);
     xyW -= tW.transpose().replicate(wCount, 1);
     
-    // a bit of smoothing -- first point is noisy, so nudge it towards the reverse-extrapolated point
-    if(zCount > 3)
-    {
-        
-    }
-    else if(zCount > 2)
-    {
-        xyZ.row(0) = .5f * (xyZ.row(0) + (2.0f * xyZ.row(1) - xyZ.row(2)));
-    }
-
-    
-    if(wCount > 3)
-    {
-        
-    }
-    else if(wCount > 2)
-    {
-        xyW.row(0) = .5f * (xyW.row(0) + (2.0f * xyW.row(1) - xyW.row(2)));
-    }
-    
-    // we assume Z and W are basically symmetric about some line.
-    // use the line joining the furthest endpoints for now.
-    // we could solve for the optimal reflection as well.
-    
     Vector2f v0       = Z.XY(0) - W.XY(0);
     Vector2f vN       = Z.LastPoint() - W.LastPoint();
     
@@ -263,17 +242,20 @@ void TwoTouchFit::ConstructProblem(Stroke & Z, Stroke & W, int zCount, int wCoun
     }
     vEndpoints.normalize();
     
-    
-    // reflect about the perp to the endpoints
-    _targetDirection   = vEndpoints;
-    _axisOfSymmetry    = Vector2f(-_targetDirection.y(), _targetDirection.x()).normalized();
-
-    
-    
     Matrix2f R = Matrix2f::Identity();
     
-    if(_axisOfSymmetry != Vector2f(0,0))
+    if(doReflection)
     {
+        
+        // we assume Z and W are basically symmetric about some line.
+        // use the line joining the furthest endpoints for now.
+        // we could solve for the optimal reflection as well, but this likely will do worse since
+        // it'll let lousy data look better than it should.
+        
+        // reflect about the perp to the endpoints
+        _targetDirection   = vEndpoints;
+        _axisOfSymmetry    = Vector2f(-_targetDirection.y(), _targetDirection.x()).normalized();
+        
         Vector2f v = _axisOfSymmetry;
         // Eigen doesn't have built-in reflections?
         R(0,0) = v.x() * v.x() - v.y() * v.y();
@@ -316,7 +298,8 @@ void TwoTouchFit::ConstructProblem(Stroke & Z, Stroke & W, int zCount, int wCoun
         ++m;
     }
     
-    
+    // the touches probably didn't begin at the same time, so we need to compute the offset
+    // so we fit the curve at the correct relative timestamps.
     float tOffsetW = W.FirstAbsoluteTimestamp() - Z.FirstAbsoluteTimestamp();
     for(int k=0; k<wCount; k++)
     {
@@ -343,7 +326,6 @@ void TwoTouchFit::ConstructProblem(Stroke & Z, Stroke & W, int zCount, int wCoun
             _weight(m,m-1)   += -2.0f * d2weight;
             _weight(m,m)     +=  d2weight;
         }
-
 
         ++m;
     }

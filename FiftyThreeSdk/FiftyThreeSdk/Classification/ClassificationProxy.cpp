@@ -1714,7 +1714,7 @@ IdTypeMap TouchClassificationProxy::ReclassifyCurrentEvent()
             Stroke::Ptr s1 = _clusterTracker->Data(touches[1])->Stroke();
             
             TwoTouchFit ttFit;
-            ttFit.Fit(*s0, *s1, 3, 6, true);
+            ttFit.FitPan(*s0, *s1, 3, 6);
         }
 
         

@@ -208,12 +208,14 @@ public:
 
     static Stroke::Ptr New() { return Stroke::Ptr(new Stroke()); }
 
-    Stroke() :
+    
+    
+    Stroke(bool computeStatistics = true) :
     _offscreenExitFlag(false),
     _offscreenArrivalFlag(false),
     _samplingType(SamplingType::UniformInSpace),
     _XYSamplesPerSecond(60),
-    _computeStatistics(true)
+    _computeStatistics(computeStatistics)
     {
         if (_computeStatistics)
         {
