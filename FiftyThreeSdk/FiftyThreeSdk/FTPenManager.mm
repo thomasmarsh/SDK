@@ -2529,6 +2529,30 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
     sharedInstance = nil;
 }
+#pragma mark - Surface pressure iOS8 APIs
+- (NSNumber *)normalizedRadiusForTouch:(UITouch *)uiTouch
+{
+    BOOL connected = FTPenManagerStateIsConnected(self.state);
+    auto ftTouch = fiftythree::core::spc<fiftythree::core::TouchTrackerObjC>(fiftythree::core::TouchTracker::Instance())->TouchForUITouch(uiTouch);
+    if (connected && ftTouch && ftTouch->CurrentSample().TouchRadius())
+    {
+        float r = *(ftTouch->CurrentSample().TouchRadius());
+        return @(r);
+    }
+    return nil;
+}
+
+- (NSNumber *)smoothedRadiusForTouch:(UITouch *)uiTouch
+{
+    BOOL connected = FTPenManagerStateIsConnected(self.state);
+    auto ftTouch = fiftythree::core::spc<fiftythree::core::TouchTrackerObjC>(fiftythree::core::TouchTracker::Instance())->TouchForUITouch(uiTouch);
+    if (connected && ftTouch && ftTouch->SmoothedRadius())
+    {
+        float r = *(ftTouch->SmoothedRadius());
+        return @(r);
+    }
+    return nil;
+}
 
 #pragma mark - Firmware Upgrade Inter app Communication
 // Internal. TODO: once hotfix is RI-ed back to develop move PaperAppDelegate to use this for scheme tests.

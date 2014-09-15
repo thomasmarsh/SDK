@@ -15,7 +15,7 @@
 // This uses very simple PointSprite rendering (like GLPaint sample app)
 // and linear interpolation.
 @interface FTADrawer : NSObject
-- (void)appendCGPoint:(CGPoint)p forStroke:(NSInteger)strokeId;
+- (void)appendCGPoint:(CGPoint)p andRadius:(CGFloat)r forStroke:(NSInteger)strokeId;
 - (void)setColor:(UIColor *)c forStroke:(NSInteger)strokeId;
 - (void)removeStroke:(NSInteger)strokeId;
 - (void)removeAllStrokes;

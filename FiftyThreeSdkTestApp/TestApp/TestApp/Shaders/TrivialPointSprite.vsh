@@ -51,14 +51,13 @@
 
  */
 
-attribute vec4 inVertex;
+attribute vec3 inVertex;
 
 uniform mat4 MVP;
-uniform float pointSize;
 uniform lowp vec4 color;
 
 void main()
 {
     gl_Position = MVP * vec4(inVertex.x, inVertex.y, 0, 1);
-    gl_PointSize = pointSize;
+    gl_PointSize = inVertex.z;
 }

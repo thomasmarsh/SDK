@@ -1,3 +1,8 @@
+1.1.2
+- Bug fixes
+- Classify earlier using Apple's new touch radius APIs on iOS8+
+- Two new methods on FTPenManager - normalizedRadiusForTouch: and smoothedRadiusForTouch:
+
 1.1.1
 - Improved classification of offscreen strokes
 - Bug fixes

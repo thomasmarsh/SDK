@@ -273,17 +273,30 @@
             NSInteger k = [[FTPenManager sharedInstance].classifier idForTouch:touch];
 
             CGPoint location = [touch locationInView:self.view];
+
+            // We also surface unfiltered radius. This is very quantized.
+            // NSNumber *radius = [[FTPenManager sharedInstance] normalizedRadiusForTouch:touch];
+            NSNumber *smoothedRadius =  [[FTPenManager sharedInstance] smoothedRadiusForTouch:touch];
+
+            CGFloat r = 4;
+            if (smoothedRadius)
+            {
+                r = [smoothedRadius floatValue];
+                r = MAX(r, 1.0f);
+                r = MIN(r, 85.0f);
+            }
+
             if (touch.phase == UITouchPhaseBegan)
             {
-                [self.drawer appendCGPoint:location forStroke:k];
+                [self.drawer appendCGPoint:location andRadius:r forStroke:k];
             }
             else if(touch.phase == UITouchPhaseMoved)
             {
-                [self.drawer appendCGPoint:location forStroke:k];
+                [self.drawer appendCGPoint:location andRadius:r forStroke:k];
             }
             else if(touch.phase == UITouchPhaseEnded)
             {
-                [self.drawer appendCGPoint:location forStroke:k];
+                [self.drawer appendCGPoint:location andRadius:r forStroke:k];
             }
             else if (touch.phase == UITouchPhaseCancelled)
             {

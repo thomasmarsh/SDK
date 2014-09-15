@@ -30,7 +30,7 @@ typedef NS_ENUM(NSInteger, FTPenManagerState)
 
 typedef NS_ENUM(NSInteger, FTPenBatteryLevel)
 {
-    FTPenBatteryLevelUnknown,           // This is reported initially until the actual battery level can be returned. 
+    FTPenBatteryLevelUnknown,           // This is reported initially until the actual battery level can be returned.
                                         // It can take up to 20 seconds to read the battery level off the stylus.
     FTPenBatteryLevelHigh,
     FTPenBatteryLevelMediumHigh,
@@ -148,6 +148,19 @@ typedef NS_ENUM(NSInteger, FTPairingUIStyle) {
 //
 // This must be called on the UI thread.
 - (void)shutdown;
+
+#pragma mark - SurfacePressure APIs iOS8+
+
+// Returns a normalized value that corresponds to physical touch size in MM. This signal
+// is very heavily quantized.
+//
+// Returns nil if you are not on iOS8 or pencil isn't connected.
+- (NSNumber *)normalizedRadiusForTouch:(UITouch *)uiTouch;
+
+// Returns a smoothed normalized value that is suitable for rendering variable width ink.
+//
+// Returns nil if you are not on iOS8+ or pencil isn't connected.
+- (NSNumber *)smoothedRadiusForTouch:(UITouch *)uiTouch;
 
 #pragma mark -  FTPenManager - Support & Marketing URLs
 

@@ -20,6 +20,7 @@
 @property (nonatomic) NSTimeInterval lastAltered;
 // CG Points with inverted Y-axis to match our OpenGL coordinate system.
 @property (nonatomic) NSMutableArray *glGeometry;
+@property (nonatomic) NSMutableArray *glRadii;
 @property (nonatomic) UIColor *color;
 @property (nonatomic) NSInteger drawOrder;
 @end
@@ -94,7 +95,7 @@
     [self updateViewportAndTransforms];
 }
 
-- (void)appendCGPoint:(CGPoint)p forStroke:(NSInteger)strokeId
+- (void)appendCGPoint:(CGPoint)p andRadius:(CGFloat)r forStroke:(NSInteger)strokeId
 {
     Stroke *s = self.scene[@(strokeId)];
 
@@ -104,6 +105,8 @@
         s.lastAltered = [[NSProcessInfo processInfo] systemUptime];
         s.glGeometry = [@[] mutableCopy];
         [s.glGeometry addObject:[NSValue valueWithCGPoint:[self glPointFromCGPoint:p]]];
+        s.glRadii = [@[] mutableCopy];
+        [s.glRadii addObject:[NSNumber numberWithDouble: (double)r]];
         s.drawOrder = strokeId;
         s.color = [UIColor whiteColor];
 
@@ -118,6 +121,7 @@
     {
         s.lastAltered = [[NSProcessInfo processInfo] systemUptime];
         [s.glGeometry addObject:[NSValue valueWithCGPoint:[self glPointFromCGPoint:p]]];
+        [s.glRadii addObject:[NSNumber numberWithDouble: (double)r]];
     }
 }
 
@@ -286,14 +290,18 @@
                 for(NSInteger i = 0; i < [v.glGeometry count]-1; ++i)
                 {
                     [self renderLineFromPoint:[(NSValue*)v.glGeometry[i] CGPointValue]
-                                      toPoint:[(NSValue*)v.glGeometry[i+1] CGPointValue]];
+                                      toPoint:[(NSValue*)v.glGeometry[i+1] CGPointValue]
+                                  radiusStart:[(NSNumber*)v.glRadii[i] floatValue]
+                                   radiusStop:[(NSNumber*)v.glRadii[i+1] floatValue]];
                 }
             }
         }
         else if ([v.glGeometry count] == 1)
         {
             [self renderLineFromPoint:[(NSValue*)v.glGeometry[0] CGPointValue]
-                              toPoint:[(NSValue*)v.glGeometry[0] CGPointValue]];
+                              toPoint:[(NSValue*)v.glGeometry[0] CGPointValue]
+                          radiusStart:[(NSNumber*)v.glRadii[0] floatValue]
+                           radiusStop:[(NSNumber*)v.glRadii[0] floatValue]];
         }
     }
 
@@ -350,14 +358,19 @@
                     for(NSInteger i = 0; i < [v.glGeometry count]-1; ++i)
                     {
                         [self renderLineFromPoint:[(NSValue*)v.glGeometry[i] CGPointValue]
-                                          toPoint:[(NSValue*)v.glGeometry[i+1] CGPointValue]];
+                                          toPoint:[(NSValue*)v.glGeometry[i+1] CGPointValue]
+                                         radiusStart:[(NSNumber*)v.glRadii[i] floatValue]
+                                       radiusStop:[(NSNumber*)v.glRadii[i+1] floatValue]];
                     }
                 }
             }
             else if ([v.glGeometry count] == 1)
             {
                 [self renderLineFromPoint:[(NSValue*)v.glGeometry[0] CGPointValue]
-                                  toPoint:[(NSValue*)v.glGeometry[0] CGPointValue]];
+                                  toPoint:[(NSValue*)v.glGeometry[0] CGPointValue]
+                              radiusStart:[(NSNumber*)v.glRadii[0] floatValue]
+                               radiusStop:[(NSNumber*)v.glRadii[0] floatValue]];
+
             }
         }
 
@@ -375,7 +388,10 @@
 }
 #pragma mark - OpenGL ES Drawing
 // Draws a line onscreen based on where the user touches
-- (void)renderLineFromPoint:(CGPoint)start toPoint:(CGPoint)end
+- (void)renderLineFromPoint:(CGPoint)start
+                    toPoint:(CGPoint)end
+                radiusStart:(CGFloat)startRadius
+                 radiusStop:(CGFloat)stopRadius
 {
     static GLfloat*     vertexBuffer = NULL;
     static NSUInteger   vertexMax = 64;
@@ -386,31 +402,39 @@
     // Allocate vertex array buffer
     if (vertexBuffer == NULL)
     {
-        vertexBuffer = malloc(vertexMax * 2 * sizeof(GLfloat));
+        vertexBuffer = malloc(vertexMax * 3 * sizeof(GLfloat));
     }
 
     // Add points to the buffer so there are drawing points every X pixels
     count = MAX(ceilf(sqrtf((end.x - start.x) * (end.x - start.x) + (end.y - start.y) * (end.y - start.y)) / kBrushPixelStep), 1);
+
+    GLfloat dx = end.x - start.x;
+    GLfloat dy = end.y - start.y;
+    GLfloat dr = stopRadius - startRadius;
 
     for (i = 0; i < count; ++i)
     {
         if(vertexCount == vertexMax)
         {
             vertexMax = 2 * vertexMax;
-            vertexBuffer = realloc(vertexBuffer, vertexMax * 2 * sizeof(GLfloat));
+            vertexBuffer = realloc(vertexBuffer, vertexMax * 3 * sizeof(GLfloat));
         }
 
-        vertexBuffer[2 * vertexCount + 0] = start.x + (end.x - start.x) * ((GLfloat)i / (GLfloat)count);
-        vertexBuffer[2 * vertexCount + 1] = start.y + (end.y - start.y) * ((GLfloat)i / (GLfloat)count);
+        GLfloat progress =  ((GLfloat)i / (GLfloat)count);
+
+        vertexBuffer[3 * vertexCount + 0] = start.x + dx * progress;
+        vertexBuffer[3 * vertexCount + 1] = start.y + dy * progress;
+        vertexBuffer[3 * vertexCount + 2] = startRadius + dr * progress;
         ++vertexCount;
     }
 
     // Load data to the Vertex Buffer Object
     glBindBuffer(GL_ARRAY_BUFFER, _vertexBuffer);
-    glBufferData(GL_ARRAY_BUFFER, vertexCount*2*sizeof(GLfloat), vertexBuffer, GL_DYNAMIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, vertexCount*3*sizeof(GLfloat), vertexBuffer, GL_DYNAMIC_DRAW);
 
     glEnableVertexAttribArray([_pointSpriteShader.attribute[@"inVertex"] intValue]);
-    glVertexAttribPointer([_pointSpriteShader.attribute[@"inVertex"] intValue], 2, GL_FLOAT, GL_FALSE, 0, 0);
+
+    glVertexAttribPointer([_pointSpriteShader.attribute[@"inVertex"] intValue], 3, GL_FLOAT, GL_FALSE, 0, 0);
 
     glUseProgram(_pointSpriteShader.glProgram);
     glDrawArrays(GL_POINTS, 0, (int)vertexCount);
@@ -434,11 +458,7 @@
     glUseProgram(_pointSpriteShader.glProgram);
     glUniform4fv([_pointSpriteShader.uniform[@"color"] intValue], 1, brushColor);
 }
-- (void)setPointSize
-{
-    glUseProgram(_pointSpriteShader.glProgram);
-    glUniform1f([_pointSpriteShader.uniform[@"pointSize"] intValue], 8.0);
-}
+
 - (void)updateViewportAndTransforms
 {
     float w = self.size.width;
@@ -550,7 +570,6 @@
     glEnable(GL_BLEND);
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
-    [self setPointSize];
     [self updateViewportAndTransforms];
 }
 
@@ -604,7 +623,7 @@
 {
     _pointSpriteShader = [[FTAShaderInfo alloc] init];
     _pointSpriteShader.shaderName = @"TrivialPointSprite";
-    _pointSpriteShader.uniformNames = [@[@"MVP", @"pointSize", @"color", @"texture"] mutableCopy];
+    _pointSpriteShader.uniformNames = [@[@"MVP", @"color", @"texture"] mutableCopy];
     _pointSpriteShader.attributeNames = [@[@"inVertex"] mutableCopy];
     _pointSpriteShader = [FTAUtil loadShader:_pointSpriteShader];
 
