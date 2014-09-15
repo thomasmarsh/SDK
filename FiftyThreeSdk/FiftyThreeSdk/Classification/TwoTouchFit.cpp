@@ -47,12 +47,15 @@ float TwoTouchFit::Fit(Stroke & zIn, Stroke & wIn, int minPoints, int maxPoints,
     
     // the first point is pretty much garbage, so our measurements can get dominated by noise,
     // especially in the motivating case which is very early gesture detection.
-    Z.DenoiseFirstPoint(1.0f);
-    W.DenoiseFirstPoint(1.0f);
+    if(isPinch)
+    {
+        Z.DenoiseFirstPoint(1.0f);
+        W.DenoiseFirstPoint(1.0f);
+    }
     
     ConstructProblem(Z, W, zCount, wCount, isPinch);
     
-    MatrixXf coeff = (_weight*_A).fullPivHouseholderQr().solve(_weight*_b);
+    MatrixXf coeff = (_weight*_A).jacobiSvd(ComputeThinU | ComputeThinV).solve(_weight*_b);
     
     float varZ = (_weight.block(0, 0, zCount, zCount) * _b.block(0, 0, zCount, 2)).squaredNorm();
     float varW = (_weight.block(zCount, zCount, wCount, wCount) * _b.block(zCount, 0, wCount, 2)).squaredNorm();
@@ -66,6 +69,11 @@ float TwoTouchFit::Fit(Stroke & zIn, Stroke & wIn, int minPoints, int maxPoints,
         rSquared = 1.0f - residual / varTotal;
     }
 
+    if(rSquared > .99f)
+    {
+        //std::cerr << "\ncoeff = \n" << coeff;
+    }
+    
     Vector2f vZ = Z.LastPoint() - Z.FirstPoint();
     Vector2f vW = W.LastPoint() - W.FirstPoint();
 
@@ -184,8 +192,17 @@ void TwoTouchFit::ConstructProblem(Stroke & Z, Stroke & W, int zCount, int wCoun
     
     // we'll use a smallish weight on the ell^2 error.  use more weight on the derivatives.
     // this is the sort of thing we really need training data to tune in.
-    _weight *= .1f;
+    //_weight *= 100.1f;
     
+    float d1weight = 0.0f;
+    float d2weight = 0.0f;
+    
+    if(doReflection)
+    {
+        d1weight = 1.0f;
+        _weight *= .1f;
+    }
+
     
     Vector2f tZ;
     Vector2f tW;
@@ -265,8 +282,6 @@ void TwoTouchFit::ConstructProblem(Stroke & Z, Stroke & W, int zCount, int wCoun
     }
     
     
-    constexpr float d1weight = 1.0f;
-    constexpr float d2weight = 0.0f;
     
     // assemble our matrix A of evaluation times,
     // and RHS matrix b.  b(:,1) is x-coords, b(:,2) is y-coords.

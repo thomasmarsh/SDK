@@ -424,7 +424,7 @@ int Stroke::IndexClosestToTime(double time)
     int idx = 0;
     double currentDiff = std::abs(time - FirstAbsoluteTimestamp());
 
-    for (int i = 0; i < Size(); ++i)
+    for (int i = 1; i < Size(); ++i)
     {
         double newDiff = std::abs(time - AbsoluteTimestamp(i));
 
