@@ -619,9 +619,11 @@ Eigen::Vector2f Stroke::LastPoint() const
     }
 }
     
-void Stroke::DenoiseFirstPoint(float lambda)
+void Stroke::DenoiseFirstPoint(float lambda, float maxTravel)
 {
     constexpr float samplingInterval = 1.0f / 60.0f;
+    
+    CubicPolynomial2f P;
     
     switch (Size())
     {
@@ -638,11 +640,12 @@ void Stroke::DenoiseFirstPoint(float lambda)
             // if it appears we're dropping samples, don't do anything.
             if(RelativeTimestamp(2) > 2.5f * samplingInterval)
             {
-                return;
+                //return;
             }
             
-            CubicPolynomial2f P     = CubicPolynomial2f::LineWithValuesAtTimes(XY(1), XY(2), RelativeTimestamp(1), RelativeTimestamp(2));
-            _XYDataStream.Data()[0] = (1.0f - lambda) * XY(0) + lambda * P.ValueAt(RelativeTimestamp(0));
+            P     = CubicPolynomial2f::LineWithValuesAtTimes(XY(1), XY(2),
+                                                             RelativeTimestamp(1), RelativeTimestamp(2));
+            
             
             break;
         }
@@ -653,18 +656,24 @@ void Stroke::DenoiseFirstPoint(float lambda)
             // if it appears we're dropping samples, don't do anything.
             if(RelativeTimestamp(3) > 3.5f * samplingInterval)
             {
-                return;
+                //return;
             }
 
             
-            CubicPolynomial2f P     = CubicPolynomial2f::QuadraticWithValuesAtTimes(XY(1), XY(2), XY(3),
-                                                                                    RelativeTimestamp(1), RelativeTimestamp(2), RelativeTimestamp(3));
-            _XYDataStream.Data()[0] = (1.0f - lambda) * XY(0) + lambda * P.ValueAt(RelativeTimestamp(0));
-
+            P     = CubicPolynomial2f::QuadraticWithValuesAtTimes(XY(1), XY(2), XY(3),
+                                                                  RelativeTimestamp(1), RelativeTimestamp(2), RelativeTimestamp(3));
+    
             break;
         }
             
     }
+    
+    Vector2f target         = (1.0f - lambda) * XY(0) + lambda * P.ValueAt(RelativeTimestamp(0));
+    Vector2f correction     = target - XY(0);
+    float legalLength       = std::min(correction.norm(), maxTravel);
+    correction             *= legalLength / correction.norm();
+    
+    _XYDataStream.Data()[0] = XY(0) + correction;
 }
     
 

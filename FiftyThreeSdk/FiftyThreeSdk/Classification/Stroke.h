@@ -340,7 +340,7 @@ public:
     // returns -1 if effective size is 1
     int PenultimateValidIndex() const;
 
-    void DenoiseFirstPoint(float lambda);
+    void DenoiseFirstPoint(float lambda, float maxTravel = 2.0f);
     
     Interval MaximalInterval() const { return Interval(0, Size()); }
 

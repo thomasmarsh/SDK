@@ -161,6 +161,26 @@ float TwoTouchFit::Fit(Stroke & zIn, Stroke & wIn, int minPoints, int maxPoints,
     float tEval = .5f * (tW1 + tZ1);
     float tMax  = std::max(tW1, tZ1);
     
+    float dtMax = 0.0f;
+    for(int j=1; j<zCount; j++)
+    {
+        float dt = Z.RelativeTimestamp(j) - Z.RelativeTimestamp(j-1);
+        if(dt > dtMax)
+        {
+            dtMax = dt;
+        }
+    }
+
+    for(int j=1; j<wCount; j++)
+    {
+        float dt = W.RelativeTimestamp(j) - W.RelativeTimestamp(j-1);
+        if(dt > dtMax)
+        {
+            dtMax = dt;
+        }
+    }
+
+    
     float kt    = std::max(std::max(std::abs(Curvature(tMin)), std::abs(Curvature(tEval))), std::abs(Curvature(tMax)));
     
     int minSize = (int) std::min(Z.Size(), W.Size());
@@ -169,7 +189,7 @@ float TwoTouchFit::Fit(Stroke & zIn, Stroke & wIn, int minPoints, int maxPoints,
     if(minSize >= 3 && maxSize >= 3 && maxSize <= 4)
     {
         std::cerr << std::setprecision(3);
-        std::cerr << "\nscore = " << score << ": (" << zCount << ", " << wCount << "), r2 = " << rSquared << ", dir = " << dirGoodness << ", kappa = " << kt  << ", scale = " << _scale << ", |vZ| = " << vZ.norm() << ", |vW| = " << vW.norm();
+        std::cerr << "\nscore = " << score << ": (" << zCount << ", " << wCount << "), r2 = " << rSquared << ", dir = " << dirGoodness << ", kappa = " << kt  << ", scale = " << _scale << ", |vZ| = " << vZ.norm() << ", |vW| = " << vW.norm() << ", dt = " << dtMax;
     }
     
     _score = score;
@@ -191,8 +211,8 @@ void TwoTouchFit::ConstructProblem(Stroke & Z, Stroke & W, int zCount, int wCoun
     _weight = MatrixXf::Identity(M, M);
     
     // we'll use a smallish weight on the ell^2 error.  use more weight on the derivatives.
+    // todo: investigate using delta-t in addition to simply finite differences.
     // this is the sort of thing we really need training data to tune in.
-    //_weight *= 100.1f;
     
     float d1weight = 0.0f;
     float d2weight = 0.0f;
@@ -200,7 +220,14 @@ void TwoTouchFit::ConstructProblem(Stroke & Z, Stroke & W, int zCount, int wCoun
     if(doReflection)
     {
         d1weight = 1.0f;
-        _weight *= .1f;
+        d2weight = .25f;
+        
+        _weight *= .25;
+    }
+    else
+    {
+        d2weight = 1.0f;
+        d1weight = 1.0f;
     }
 
     
@@ -219,7 +246,6 @@ void TwoTouchFit::ConstructProblem(Stroke & Z, Stroke & W, int zCount, int wCoun
     {
         
         int iz = Z.IndexClosestToTime(W.FirstAbsoluteTimestamp());
-        
         tZ = Z.XY(iz);
         tW = W.XY(0);
     }
@@ -231,6 +257,11 @@ void TwoTouchFit::ConstructProblem(Stroke & Z, Stroke & W, int zCount, int wCoun
         tW = W.XY(iw);
     }
 
+    if(doReflection)
+    {
+        tZ = Z.XY(0);
+        tW = W.XY(0);
+    }
     
     // this will make a copy so we don't mess with the underlying vectors when we subtract
     MatrixX2f xyZ = Z.XYMatrixMap(zCount - 1);
