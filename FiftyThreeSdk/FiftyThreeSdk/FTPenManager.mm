@@ -1589,7 +1589,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
 #pragma mark -
 
--(void)discconnectOrBecomeSingle
+-(void)disconnectOrBecomeSingle
 {
     [self disconnect];
 
