@@ -7,6 +7,7 @@
 
 #import <Foundation/Foundation.h>
 
+#import "Core/NSTimer+Helpers.h"
 #import "Core/Property.hpp"
 #import "Core/Threading.h"
 #import "Core/Touch/TouchTracker.h"
@@ -109,12 +110,11 @@ static const NSTimeInterval kTrialSeparationInitializeTime = 1.0;
         if (!haveRecentlySeenATouch && TouchTracker::Instance()->LiveTouchCount() == 0)
         {
             [self clearTimer];
-            self.timer = [NSTimer scheduledTimerWithTimeInterval:kTrialSeparationInitializeTime
-                                                 target:self
-                                               selector:@selector(timerFired:)
-                                               userInfo:nil
-                                                repeats:NO];
-
+            self.timer = [NSTimer weakScheduledTimerWithTimeInterval:kTrialSeparationInitializeTime
+                                                              target:self
+                                                            selector:@selector(timerFired:)
+                                                            userInfo:nil
+                                                             repeats:NO];
         }
     }
 }

@@ -18,6 +18,7 @@
 #import "Core/Asserts.h"
 #import "Core/Log.h"
 #import "Core/NSString+FTTimeWithInterval.h"
+#import "Core/NSTimer+Helpers.h"
 #import "Core/Touch/TouchTracker.h"
 #import "FiftyThreeSdk/PenConnectionView.h"
 #import "FiftyThreeSdk/TouchClassifier.h"
@@ -2293,11 +2294,11 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
 - (void)startIsScanningForPeripheralsToggleTimer
 {
-    self.isScanningForPeripheralsToggleTimer = [NSTimer scheduledTimerWithTimeInterval:kIsScanningForPeripheralsToggleTimerInterval
-                                                                                target:self
-                                                                              selector:@selector(isScanningForPeripheralsToggleTimerFired:)
-                                                                              userInfo:nil
-                                                                               repeats:YES];
+    self.isScanningForPeripheralsToggleTimer = [NSTimer weakScheduledTimerWithTimeInterval:kIsScanningForPeripheralsToggleTimerInterval
+                                                                                    target:self
+                                                                                  selector:@selector(isScanningForPeripheralsToggleTimerFired:)
+                                                                                  userInfo:nil
+                                                                                   repeats:YES];
 }
 
 - (void)isScanningForPeripheralsToggleTimerFired:(NSTimer *)timer
@@ -2369,11 +2370,11 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     {
         [self resetEnsureHasListenerTimer];
 
-        self.ensureHasListenerTimer = [NSTimer scheduledTimerWithTimeInterval:0.2f
-                                                                       target:self
-                                                                     selector:@selector(ensureHasListenerTimerDidFire:)
-                                                                     userInfo:nil
-                                                                      repeats:YES];
+        self.ensureHasListenerTimer = [NSTimer weakScheduledTimerWithTimeInterval:0.2f
+                                                                           target:self
+                                                                         selector:@selector(ensureHasListenerTimerDidFire:)
+                                                                         userInfo:nil
+                                                                          repeats:YES];
         self.ensureHasListenerTimerStartTime = [NSDate date];
     }
 }

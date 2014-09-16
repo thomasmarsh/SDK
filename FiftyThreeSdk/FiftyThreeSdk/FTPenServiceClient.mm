@@ -11,6 +11,7 @@
 #import "CBPeripheral+Helpers.h"
 #import "Core/Asserts.h"
 #import "Core/Log.h"
+#import "Core/NSTimer+Helpers.h"
 #import "FTError.h"
 #import "FTLogPrivate.h"
 #import "FTPenManager.h"
@@ -862,11 +863,11 @@ using namespace fiftythree::core;
             // read of the characteristic. The complexity here is that the Pencil's battery level is
             // unreliable for the first 20s, so we either wait for the first notification in order to get the
             // level, or in the case that we don't get one, we read manually.
-            self.batteryLevelReadTimer = [NSTimer scheduledTimerWithTimeInterval:22.0
-                                                                          target:self
-                                                                        selector:@selector(batteryLevelReadTimerDidFire:)
-                                                                        userInfo:nil
-                                                                         repeats:NO];
+            self.batteryLevelReadTimer = [NSTimer weakScheduledTimerWithTimeInterval:22.0
+                                                                              target:self
+                                                                            selector:@selector(batteryLevelReadTimerDidFire:)
+                                                                            userInfo:nil
+                                                                             repeats:NO];
         }
 
         if (self.inactivityTimeoutCharacteristic && !self.didInitialReadOfInactivityTimeout)
