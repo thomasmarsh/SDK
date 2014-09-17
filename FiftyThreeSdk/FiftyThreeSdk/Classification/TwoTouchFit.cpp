@@ -32,10 +32,12 @@ float TwoTouchFit::FitPan(Stroke & zIn, Stroke & wIn, int minPoints, int maxPoin
     
 float TwoTouchFit::Fit(Stroke & zIn, Stroke & wIn, int minPoints, int maxPoints, bool isPinch)
 {
+    _sizeOKFlag = false;
     if(zIn.Size() < minPoints || wIn.Size() < minPoints)
     {
         return 0.0f;
     }
+    _sizeOKFlag = true;
     
     // both have at least minPoints
     int zCount = std::min((int) zIn.Size(), maxPoints);

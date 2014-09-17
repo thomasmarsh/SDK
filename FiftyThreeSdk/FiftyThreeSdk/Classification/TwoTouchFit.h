@@ -24,6 +24,8 @@ class TwoTouchFit
     
     float _score;
     float _scale;
+
+    bool  _sizeOKFlag;
     
     Eigen::MatrixXf _A;
     Eigen::MatrixXf _b;
@@ -38,7 +40,7 @@ class TwoTouchFit
 
     
 public:
-    TwoTouchFit() : _score(-1.0f), _scale(0.0)
+    TwoTouchFit() : _score(-1.0f), _scale(0.0), _sizeOKFlag(false)
     {
     }
     
@@ -46,6 +48,11 @@ public:
     float FitPan(Stroke & Z, Stroke & W, int minPoints, int maxPoints);
     
     float Curvature(float relativeTimestamp);
+    
+    bool SizeOKFlag() const
+    {
+        return _sizeOKFlag;
+    }
     
 };
 
