@@ -9,6 +9,7 @@
 
 #include "Core/Enum.h"
 #include "Core/Memory.h"
+#include "Core/Touch/Touch.h"
 #include "FiftyThreeSdk/Classification/CommonDeclarations.h"
 #include "FiftyThreeSdk/Classification/DataStream.hpp"
 #include "FiftyThreeSdk/Classification/Eigen.h"
@@ -208,6 +209,7 @@ public:
 
     static Stroke::Ptr New() { return Stroke::Ptr(new Stroke()); }
 
+    Stroke(core::Touch const & touch, int maxPoints = std::numeric_limits<int>::max());
     
     
     Stroke(bool computeStatistics = true) :

@@ -619,6 +619,24 @@ Eigen::Vector2f Stroke::LastPoint() const
     }
 }
     
+    
+Stroke::Stroke(core::Touch const & touch, int maxPoints) : _computeStatistics(false)
+{
+    int counter = 0;
+    for (auto sample : *(touch.History()))
+    {
+        if(maxPoints && counter >= maxPoints)
+        {
+            break;
+        }
+        
+        AddPoint(sample.Location(), sample.TimestampSeconds());
+        
+        ++counter;
+    }
+}
+    
+    
 void Stroke::DenoiseFirstPoint(float lambda, float maxTravel)
 {
     constexpr float samplingInterval = 1.0f / 60.0f;

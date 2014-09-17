@@ -186,7 +186,7 @@ float TwoTouchFit::Fit(Stroke & zIn, Stroke & wIn, int minPoints, int maxPoints,
     int minSize = (int) std::min(Z.Size(), W.Size());
     int maxSize = (int) std::max(Z.Size(), W.Size());
 
-    if(minSize >= 3 && maxSize >= 3 && maxSize <= 4)
+    if(false) //minSize >= 3 && maxSize >= 3 && maxSize <= 4)
     {
         std::cerr << std::setprecision(3);
         std::cerr << "\nscore = " << score << ": (" << zCount << ", " << wCount << "), r2 = " << rSquared << ", dir = " << dirGoodness << ", kappa = " << kt  << ", scale = " << _scale << ", |vZ| = " << vZ.norm() << ", |vW| = " << vW.norm() << ", dt = " << dtMax;
