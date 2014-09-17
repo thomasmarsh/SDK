@@ -68,14 +68,11 @@ float TwoTouchFit::Fit(Stroke & zIn, Stroke & wIn, int minPoints, int maxPoints,
     float rSquared = 0.0f;
     if(varTotal > 0.0f)
     {
-        rSquared = 1.0f - residual / varTotal;
+        float sampleSize = zCount + wCount;
+        float adjustment = (sampleSize - 1.0f) / (sampleSize - 2.0f);
+        rSquared = 1.0f - adjustment * residual / varTotal;
     }
 
-    if(rSquared > .99f)
-    {
-        //std::cerr << "\ncoeff = \n" << coeff;
-    }
-    
     Vector2f vZ = Z.LastPoint() - Z.FirstPoint();
     Vector2f vW = W.LastPoint() - W.FirstPoint();
 
@@ -188,10 +185,10 @@ float TwoTouchFit::Fit(Stroke & zIn, Stroke & wIn, int minPoints, int maxPoints,
     int minSize = (int) std::min(Z.Size(), W.Size());
     int maxSize = (int) std::max(Z.Size(), W.Size());
 
-    if(false) //minSize >= 3 && maxSize >= 3 && maxSize <= 4)
+    if(true) //minSize >= 3 && maxSize >= 3 && maxSize <= 4)
     {
         std::cerr << std::setprecision(3);
-        std::cerr << "\nscore = " << score << ": (" << zCount << ", " << wCount << "), r2 = " << rSquared << ", dir = " << dirGoodness << ", kappa = " << kt  << ", scale = " << _scale << ", |vZ| = " << vZ.norm() << ", |vW| = " << vW.norm() << ", dt = " << dtMax;
+        std::cerr << "\nscore = " << score << ": (" << zCount << ", " << wCount << "), r2 = " << rSquared << ", dir = " << dirGoodness << ", varRatio = " << std::log(varW / varZ)  << ", scale = " << _scale << ", |vZ| = " << vZ.norm() << ", |vW| = " << vW.norm() << ", dt = " << dtMax;
     }
     
     _score = score;
@@ -261,9 +258,11 @@ void TwoTouchFit::ConstructProblem(Stroke & Z, Stroke & W, int zCount, int wCoun
 
     if(doReflection)
     {
-        tZ = Z.XY(0);
-        tW = W.XY(0);
+        //tZ = Z.XY(0);
+        //tW = W.XY(0);
     }
+    
+    
     
     // this will make a copy so we don't mess with the underlying vectors when we subtract
     MatrixX2f xyZ = Z.XYMatrixMap(zCount - 1);
@@ -292,7 +291,18 @@ void TwoTouchFit::ConstructProblem(Stroke & Z, Stroke & W, int zCount, int wCoun
     }
     vEndpoints.normalize();
     
-    Matrix2f R = Matrix2f::Identity();
+    
+    // normalize W so the last point has the same norm as the last point on Z.
+    // accounts for changes in length, which can be dramatically unstable for pinches.
+    // does not seem to be necessary for pan.
+    float scale = 1.0f;
+    
+    if(doReflection)
+    {
+        scale = xyZ.row(zCount-1).norm() / xyW.row(wCount-1).norm();
+    }
+    
+    Matrix2f T = Matrix2f::Identity() * scale;
     
     if(doReflection)
     {
@@ -306,12 +316,17 @@ void TwoTouchFit::ConstructProblem(Stroke & Z, Stroke & W, int zCount, int wCoun
         _targetDirection   = vEndpoints;
         _axisOfSymmetry    = Vector2f(-_targetDirection.y(), _targetDirection.x()).normalized();
         
+        Matrix2f R;
+        
         Vector2f v = _axisOfSymmetry;
         // Eigen doesn't have built-in reflections?
         R(0,0) = v.x() * v.x() - v.y() * v.y();
         R(1,1) = - R(0,0);
         R(0,1) = 2.0f * v.x() * v.y();
         R(1,0) = R(0,1);
+        
+        T = R * T;
+        
     }
     
     
@@ -357,7 +372,7 @@ void TwoTouchFit::ConstructProblem(Stroke & Z, Stroke & W, int zCount, int wCoun
         _A(m, 1) = t;
         _A(m, 2) = 1;
         
-        Vector2f bw = R * xyW.row(k).transpose();
+        Vector2f bw = T * xyW.row(k).transpose();
         
         _b(m, 0) = bw.x();
         _b(m, 1) = bw.y();

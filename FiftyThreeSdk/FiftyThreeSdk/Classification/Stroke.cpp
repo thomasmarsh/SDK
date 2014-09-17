@@ -655,32 +655,16 @@ void Stroke::DenoiseFirstPoint(float lambda, float maxTravel)
             
         case 3:
         {
-            // if it appears we're dropping samples, don't do anything.
-            if(RelativeTimestamp(2) > 2.5f * samplingInterval)
-            {
-                //return;
-            }
-            
             P     = CubicPolynomial2f::LineWithValuesAtTimes(XY(1), XY(2),
                                                              RelativeTimestamp(1), RelativeTimestamp(2));
-            
-            
             break;
         }
             
         case 4:
         default:
         {
-            // if it appears we're dropping samples, don't do anything.
-            if(RelativeTimestamp(3) > 3.5f * samplingInterval)
-            {
-                //return;
-            }
-
-            
             P     = CubicPolynomial2f::QuadraticWithValuesAtTimes(XY(1), XY(2), XY(3),
                                                                   RelativeTimestamp(1), RelativeTimestamp(2), RelativeTimestamp(3));
-    
             break;
         }
             
