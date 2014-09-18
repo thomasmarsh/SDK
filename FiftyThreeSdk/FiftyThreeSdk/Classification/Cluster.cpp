@@ -74,14 +74,14 @@ bool Cluster::AllTouchesEnded() const
 {
     for (core::TouchId currId:_touchIds)
     {
-        //Touch::Ptr touch = _touchLog->TouchWithId(currId);
-
-        DebugAssert(_touchData.count(currId));
-
-        TouchData::Ptr const & touch = _touchData.at(currId);
-        if (touch && (! touch->IsPhaseEndedOrCancelled()))
+        if (_touchData.count(currId))
         {
-            return false;
+
+            TouchData::Ptr const & touch = _touchData.at(currId);
+            if (touch && (! touch->IsPhaseEndedOrCancelled()))
+            {
+                return false;
+            }
         }
     }
 
@@ -107,16 +107,22 @@ bool Cluster::ConcurrentWith(core::TouchId touchId, bool useStaleInterval) const
 {
 
     Cluster const &otherCluster = *(_touchLog->Cluster(touchId));
-    DebugAssert(otherCluster._touchData.count(touchId));
 
     // _becameStaleTime is defaulted to the largest possible double.
     double t0 = FirstTimestamp();
     double t1 = _becameStaleTime;
 
+    if (otherCluster._touchData.count(touchId) == 0)
+    {
+        DebugAssert(false);
+        return false;
+    }
+
+    TouchData::Ptr const & data = otherCluster._touchData.at(touchId);
+
     // there's really no notion of "Stale" for a touch, but the basic idea of
     // staleness is to allow some temporal blurring of lifetimes.  hence this
     // seems consistent with the intent.
-    TouchData::Ptr const & data = otherCluster._touchData.at(touchId);
     double s0 = data->FirstTimestamp();
     double s1 = data->LastTimestamp() + (double) _commonData->proxy->ClusterTracker()->StaleInterval();
 
@@ -131,7 +137,7 @@ bool Cluster::ConcurrentWith(core::TouchId touchId, bool useStaleInterval) const
             t1 = _touchLog->CurrentTime();
         }
 
-        if (_touchData.at(touchId)->Touch()->IsPhaseEndedOrCancelled())
+        if (_touchData.count(touchId) && _touchData.at(touchId)->Touch()->IsPhaseEndedOrCancelled())
         {
             s1 = data->LastTimestamp();
         }
@@ -417,7 +423,7 @@ Cluster::Ptr ClusterTracker::NewCluster(Vector2f center, double timestamp, Touch
     {
         _currentEventBeganTimestamp = timestamp;
     }
-    
+
     ClusterId id = ClusterId(_counter++);
 
     _clusters[id]       = Cluster::New();
@@ -649,7 +655,11 @@ void  Cluster::RemoveOldTouches(double cutoffTime)
     auto copy = _touchIds;
     for (core::TouchId touchId : copy)
     {
-        DebugAssert(_touchData.count(touchId));
+        if (_touchData.count(touchId) == 0)
+        {
+            DebugAssert(false);
+            continue;
+        }
 
         TouchData::Ptr const & touch = _touchData.at(touchId);
         if (touch->IsPhaseEndedOrCancelled())
@@ -671,7 +681,11 @@ float Cluster::TotalLength() const
 
     for (core::TouchId touchId:_touchIds)
     {
-        DebugAssert(_touchData.count(touchId));
+        if (_touchData.count(touchId) == 0)
+        {
+            DebugAssert(false);
+            continue;
+        }
         totalLength += _touchData.at(touchId)->Stroke()->ArcLength();
     }
     return totalLength;
@@ -685,6 +699,12 @@ Eigen::Vector2f Cluster::CenterOfMass() const
 
     for (core::TouchId touchId:_touchIds)
     {
+        if(_touchData.count(touchId) == 0)
+        {
+            DebugAssert(false);
+            continue;
+        }
+
         Stroke::Ptr const & stroke = _touchData.at(touchId)->Stroke();
         float weight = stroke->Size();
 
@@ -1232,10 +1252,10 @@ vector<Cluster::Ptr> ClusterTracker::NonEndedPenClusters()
 void ClusterTracker::TouchesChanged(const std::set<core::Touch::Ptr> & touches)
 {
     _touchLog->TouchesChanged(touches);
-    
+
     MarkStaleClusters(CurrentTime());
     RemoveUnusedStaleClusters();
-    
+
     UpdateClusters();
 }
 

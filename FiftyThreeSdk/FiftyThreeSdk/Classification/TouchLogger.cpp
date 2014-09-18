@@ -414,7 +414,7 @@ void TouchLogger::TouchesChanged(const std::set<core::Touch::Ptr> & touches)
                             touchData->SetPhase(core::TouchPhase::Cancelled);
 
                             touch->DynamicProperties()[kClassifierUseCancelledTouch] = fiftythree::core::any(true);
-                            
+
                             LogEndedTouch(touch->Id());
 
                             _endedTouchesStaged.push_back(touch->Id());
@@ -522,7 +522,11 @@ void TouchLogger::TouchesChanged(const std::set<core::Touch::Ptr> & touches)
     {
         if (! _removedTouches.count(touch->Id()))
         {
-            _touchData.at(touch->Id())->SetTouch(touch);
+            auto it = _touchData.find(touch->Id());
+            if (it != _touchData.end())
+            {
+                it->second->SetTouch(touch);
+            }
         }
     }
 
@@ -755,9 +759,10 @@ TouchIdVector TouchLogger::IntersectTouchIdVectors(TouchIdVector* v1, TouchIdSet
 
 core::Touch::Ptr const & TouchLogger::TouchWithId(core::TouchId touchId)
 {
-    if (_touchData.find(touchId) != _touchData.end())
+    auto it = _touchData.find(touchId);
+    if (it != _touchData.end())
     {
-        return _touchData.at(touchId)->Touch();
+        return it->second->Touch();
     }
     else
     {
@@ -792,7 +797,15 @@ vector<TouchData::Ptr> TouchLogger::Data(TouchIdVector ids)
 
     for (int i=0; i < ids.size(); ++i)
     {
-        data.push_back(_touchData.at(ids[i]));
+        auto it = _touchData.find(ids[i]);
+        if (it != _touchData.end())
+        {
+            data.push_back(it->second);
+        }
+        else
+        {
+            data.push_back(TouchData::New());
+        }
     }
 
     return data;
@@ -1402,6 +1415,13 @@ void TouchLogger::InsertStroke(core::TouchId touchId, Eigen::VectorXd t, Eigen::
                                              core::TouchPhase::Began,
                                              t(0));
         _touchData.insert(TouchDataPair(touchId, data));
+    }
+
+    // InsertStroke is only called for testing and debugging, so this doesn't matter.
+    // Production code doesn't ever use this.
+    if (_touchData.count(touchId) == 0)
+    {
+        return;
     }
 
     TouchData::Ptr touchData = _touchData.at(touchId);
