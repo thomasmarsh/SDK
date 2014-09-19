@@ -123,16 +123,16 @@ struct StrokeStatistics
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
 
+DEFINE_ENUM(StrokeSamplingType,
+            UniformInTime,
+            UniformInSpace);
+
 class Stroke
 {
 
 public:
 
     typedef fiftythree::core::shared_ptr<Stroke> Ptr;
-
-    DEFINE_ENUM(SamplingType,
-                UniformInTime,
-                UniformInSpace);
 
     // Samples that occur less than this delta amount of time before the preceding sample are discarded.
     static const float kMinSampleTimestampDelta;
