@@ -15,6 +15,7 @@
 #include "FiftyThreeSdk/Classification/EigenLAB.h"
 #include "FiftyThreeSdk/Classification/FiniteDifferences.h"
 #include "FiftyThreeSdk/Classification/IsolatedStrokes.h"
+#include "FiftyThreeSdk/Classification/MissedSampleInjector.hpp"
 #include "FiftyThreeSdk/Classification/PenDirection.h"
 #include "FiftyThreeSdk/Classification/PenEvents.h"
 #include "FiftyThreeSdk/Classification/Quadrature.h"
