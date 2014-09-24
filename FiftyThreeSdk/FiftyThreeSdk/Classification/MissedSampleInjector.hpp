@@ -35,9 +35,14 @@ public:
 
     MissedSampleInjector() :
     _realAndInjectedSamples(typename DataStreamType::Ptr(new DataStreamType)),
-    _minimumInjectedSampleSpacing(25.0f)
+    _minimumInjectedSampleSpacing(12.5)
     {
 
+    }
+
+    DataStreamType const &RealAndInjectedSamples()
+    {
+        return *_realAndInjectedSamples;
     }
 
     void SetSamplingRate(float samplesPerSecond)
