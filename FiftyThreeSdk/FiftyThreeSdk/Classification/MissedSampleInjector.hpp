@@ -60,12 +60,14 @@ public:
         assert(_realAndInjectedSamples);
 
         int missingCount = 0;
+        int sizeOnEntry = _realAndInjectedSamples->Size();
 
-        if (! _realAndInjectedSamples->IsEmpty())
+        // check if size >= 2 since the second point on iOS is unpredictable and we don't want to stuff a line
+        // segment in there
+        if (_realAndInjectedSamples->Size() > 1)
         {
-
-            int sizeOnEntry = _realAndInjectedSamples->Size();
-
+            
+            
             float samplingInterval = 1.0f / _realAndInjectedSamples->_sampleRate;
 
             float dt = timestamp - _realAndInjectedSamples->LastAbsoluteTimestamp();
@@ -73,11 +75,18 @@ public:
             missingCount = std::max(0, int(roundf(dt / samplingInterval)) - 1);
 
             float ds = (_realAndInjectedSamples->LastPoint() - point).norm();
-
-            missingCount = std::min(missingCount, int(ds * 2.0f));
-
+            
+            if(ds < _minimumInjectedSampleSpacing)
+            {
+                missingCount = 0;
+            }
+            else
+            {
+                missingCount = std::min(missingCount, int(ds * 2.0f));
+            }
+            
             // ds > minspacing just ensures we won't detect a lot of missing samples when they stop
-            if (missingCount > 0 && ds > _minimumInjectedSampleSpacing)
+            if (missingCount > 0)
             {
 
                 // the missing samples will be recovered by evaluating segment
@@ -95,14 +104,11 @@ public:
                 switch (samples->Size())
                 {
                     case 1:
-                    default:
                     {
                         DataType fromPoint  = samples->LastPoint();
                         segment             = CubicPolynomial<DataType>::LineWithValuesAtTimes(fromPoint, point, -1.0f, float(missingCount));
                         break;
                     }
-
-                        /*
                     case 2:
                     default:
                     {
@@ -114,8 +120,6 @@ public:
 
                         break;
                     }
-                        */
-
                         // there is no "case 3:" because it was too sensitive to noise.  if you move slowly,
                         // then suddenly go fast, and detect a few dropped samples, the slow samples produce
                         // a wildly erratic polynomial and the interpolated samples shoot all over the place.
@@ -130,23 +134,22 @@ public:
                 for (int j=0; j<missingCount; j++, t++, injectTimestamp += dtInject)
                 {
                     DataType injectee = segment.ValueAt(t);
-
-                    std::cerr << "\n inject = (" << injectee.x() << ", " << injectee.y() << "), t = " << injectTimestamp;
+                    
+                    //std::cerr << "\n inject = (" << injectee.x() << ", " << injectee.y() << "), t = " << injectTimestamp;
 
                     _realAndInjectedSamples->AddPoint(injectee, injectTimestamp);
                     //_target->AddPoint(injectee, injectTimestamp);
                 }
             }
-
         }
-
-        //DebugAssert(_real)
-
-        std::cerr << "\n addpt = (" << point.x() << ", " << point.y() << "), t = " << timestamp;
+        
+        //std::cerr << "\n addpt = (" << point.x() << ", " << point.y() << "), t = " << timestamp << ", Size() = " << _realAndInjectedSamples->Size();
 
         _realAndInjectedSamples->AddPoint(point, timestamp);
-        //_target->AddPoint(point, timestamp);
+        
+        DebugAssert(_realAndInjectedSamples->Size() - sizeOnEntry == 1 + missingCount);
 
+        
         return 1 + missingCount;
 
     }
