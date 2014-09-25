@@ -87,7 +87,7 @@ public:
             }
             else
             {
-                missingCount = std::min(missingCount, int(ds * 2.0f));
+                missingCount = std::min(missingCount, int(ds));
             }
 
             // ds > minspacing just ensures we won't detect a lot of missing samples when they stop
