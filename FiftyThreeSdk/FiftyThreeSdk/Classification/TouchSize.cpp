@@ -25,7 +25,8 @@ bool TouchSize::IsPenGivenTouchRadius(TouchData const &data)
 
 bool TouchSize::IsWeakPenGivenTouchRadius(float r, float arcLength)
 {
-    if (r > 3.1f * PenTipRadius)
+    constexpr float notPenTipScaleFactor = 1.9f;
+    if (r > notPenTipScaleFactor * PenTipRadius)
     {
         return false;
     }
