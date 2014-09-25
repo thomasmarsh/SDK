@@ -35,7 +35,7 @@ public:
 
     MissedSampleInjector() :
     _realAndInjectedSamples(typename DataStreamType::Ptr(new DataStreamType)),
-    _minimumInjectedSampleSpacing(12.5)
+    _minimumInjectedSampleSpacing(25.0f)
     {
 
     }
@@ -64,6 +64,8 @@ public:
         if (! _realAndInjectedSamples->IsEmpty())
         {
 
+            int sizeOnEntry = _realAndInjectedSamples->Size();
+
             float samplingInterval = 1.0f / _realAndInjectedSamples->_sampleRate;
 
             float dt = timestamp - _realAndInjectedSamples->LastAbsoluteTimestamp();
@@ -90,14 +92,17 @@ public:
                     //samples = _target->SmoothedSamplePoints();
                 }
 
-                switch (samples->Size()) {
+                switch (samples->Size())
+                {
                     case 1:
+                    default:
                     {
                         DataType fromPoint  = samples->LastPoint();
-                        segment             = CubicPolynomial<DataType>::LineWithValuesAtTimes(fromPoint, point, -1, missingCount);
+                        segment             = CubicPolynomial<DataType>::LineWithValuesAtTimes(fromPoint, point, -1.0f, float(missingCount));
                         break;
                     }
 
+                        /*
                     case 2:
                     default:
                     {
@@ -105,10 +110,11 @@ public:
                         DataType p = samples->ReverseData(1);
                         DataType q = samples->LastPoint();
 
-                        segment = CubicPolynomial<DataType>::QuadraticWithValuesAtTimes(p, q, point, -2, -1, missingCount);
+                        segment = CubicPolynomial<DataType>::QuadraticWithValuesAtTimes(p, q, point, -2.0f, -1.0f, float(missingCount));
 
                         break;
                     }
+                        */
 
                         // there is no "case 3:" because it was too sensitive to noise.  if you move slowly,
                         // then suddenly go fast, and detect a few dropped samples, the slow samples produce
@@ -123,8 +129,9 @@ public:
 
                 for (int j=0; j<missingCount; j++, t++, injectTimestamp += dtInject)
                 {
-
                     DataType injectee = segment.ValueAt(t);
+
+                    std::cerr << "\n inject = (" << injectee.x() << ", " << injectee.y() << "), t = " << injectTimestamp;
 
                     _realAndInjectedSamples->AddPoint(injectee, injectTimestamp);
                     //_target->AddPoint(injectee, injectTimestamp);
@@ -132,6 +139,10 @@ public:
             }
 
         }
+
+        //DebugAssert(_real)
+
+        std::cerr << "\n addpt = (" << point.x() << ", " << point.y() << "), t = " << timestamp;
 
         _realAndInjectedSamples->AddPoint(point, timestamp);
         //_target->AddPoint(point, timestamp);
