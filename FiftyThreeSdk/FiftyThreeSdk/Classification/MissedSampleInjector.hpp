@@ -25,7 +25,8 @@ public:
     typedef DataStream<DataType> DataStreamType;
 
     typename DataStreamType::Ptr _realAndInjectedSamples;
-
+    typename DataStreamType::Ptr _realSamples;
+    
     typedef boost::shared_ptr< MissedSampleInjector<DataType> > Ptr;
 
     float _minimumInjectedSampleSpacing;
@@ -35,6 +36,7 @@ public:
 
     MissedSampleInjector() :
     _realAndInjectedSamples(typename DataStreamType::Ptr(new DataStreamType)),
+    _realSamples(typename DataStreamType::Ptr(new DataStreamType)),
     _minimumInjectedSampleSpacing(25.0f)
     {
 
@@ -44,15 +46,22 @@ public:
     {
         return *_realAndInjectedSamples;
     }
-
+    
+    DataStreamType const &RealSamples()
+    {
+        return *_realSamples;
+    }
+    
     void SetSamplingRate(float samplesPerSecond)
     {
         _realAndInjectedSamples->_sampleRate = samplesPerSecond;
+        _realSamples->_sampleRate = samplesPerSecond;
     }
 
     void Reset()
     {
         _realAndInjectedSamples = typename DataStreamType::Ptr(new DataStreamType);
+        _realSamples = typename DataStreamType::Ptr(new DataStreamType);
     }
 
     size_t AddPoint(DataType const & point, double timestamp)
@@ -62,6 +71,8 @@ public:
         int missingCount = 0;
         int sizeOnEntry = _realAndInjectedSamples->Size();
 
+        _realSamples->AddPoint(point, timestamp);
+        
         // check if size >= 2 since the second point on iOS is unpredictable and we don't want to stuff a line
         // segment in there
         if (_realAndInjectedSamples->Size() > 1)
@@ -92,8 +103,8 @@ public:
                 // the missing samples will be recovered by evaluating segment
                 // at times = 0, 1, 2, ..., (missingCount - 1)
                 CubicPolynomial<DataType> segment;
-
-                typename DataStreamType::Ptr samples = _realAndInjectedSamples;
+                
+                typename DataStreamType::Ptr samples = _realSamples;
                 if (_useSmoothedSamples)
                 {
                     // this case here is not used at the moment, but i suppose it could be useful for something
