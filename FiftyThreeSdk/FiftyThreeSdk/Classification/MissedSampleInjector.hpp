@@ -72,6 +72,8 @@ public:
 
             float ds = (_realAndInjectedSamples->LastPoint() - point).norm();
 
+            missingCount = std::min(missingCount, int(ds * 2.0f));
+
             // ds > minspacing just ensures we won't detect a lot of missing samples when they stop
             if (missingCount > 0 && ds > _minimumInjectedSampleSpacing)
             {
