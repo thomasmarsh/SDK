@@ -60,9 +60,9 @@ static NSString *applicationDocumentsDirectory()
 //
 // Although many service endpoints narrowly define what response codes they will return on
 // success, we usually want to future-proof the client and accept any normal success code.
-+ (BOOL)isSuccessStatusCode:(int)statusCode
++ (BOOL)isSuccessStatusCode:(NSInteger)statusCode
 {
-    int statusCodeBlock = statusCode - statusCode % 100;
+    NSInteger statusCodeBlock = statusCode - statusCode % 100;
     return (statusCodeBlock == 200 || statusCodeBlock == 300);
 }
 
