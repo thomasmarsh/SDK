@@ -31,7 +31,7 @@ NSString * const kFTPenDidWriteHasListenerNotificationName = @"com.fiftythree.pe
 NSString * const kFTPenNamePropertyName = @"name";
 NSString * const kFTPenInactivityTimeoutPropertyName = @"inactivityTimeout";
 NSString * const kFTPenPressureSetupPropertyName = @"pressureSetup";
-NSString * const kFTPenAccelerationSetupPropertyName = @"accelerationSetup";
+NSString * const kFTPenMotionSetupPropertyName = @"motionSetup";
 NSString * const kFTPenManufacturerNamePropertyName = @"manufacturerName";
 NSString * const kFTPenModelNumberPropertyName = @"modelNumber";
 NSString * const kFTPenSerialNumberPropertyName = @"serialNumber";
@@ -60,41 +60,23 @@ NSString * const kFTPenAuthenticationCodePropertyName = @"authenticationCode";
 NSString * const kFTPenHasListenerPropertyName = @"hasListener";
 NSString * const kFTPenAccelerationPropertyName = @"acceleration";
 
-@implementation FTAccelerationSetup
+@implementation FTMotionSetup
 
 - (id)initWithSamplePeriodMilliseconds:(uint8_t)samplePeriodMilliseconds
          notificatinPeriodMilliseconds:(uint8_t)notificatinPeriodMilliseconds
-                      controlRegister1:(uint8_t)controlRegister1
-                      controlRegister2:(uint8_t)controlRegister2
-                      controlRegister3:(uint8_t)controlRegister3
-                      controlRegister4:(uint8_t)controlRegister4
-                      controlRegister5:(uint8_t)controlRegister5
-                      controlRegister6:(uint8_t)controlRegister6
-                   interrupt1Threshold:(uint8_t)interrupt1Threshold
-                    interrupt1Duration:(uint8_t)interrupt1Duration
-                      interrupt1Config:(uint8_t)interrupt1Config
 {
     self = [super init];
     if (self)
     {
         _samplePeriodMilliseconds = samplePeriodMilliseconds;
         _notificatinPeriodMilliseconds = notificatinPeriodMilliseconds;
-        _controlRegister1 = controlRegister1;
-        _controlRegister2 = controlRegister2;
-        _controlRegister3 = controlRegister3;
-        _controlRegister4 = controlRegister4;
-        _controlRegister5 = controlRegister5;
-        _controlRegister6 = controlRegister6;
-        _interrupt1Threshold = interrupt1Threshold;
-        _interrupt1Duration = interrupt1Duration;
-        _interrupt1Config = interrupt1Config;
     }
     return self;
 }
 
 - (id)initWithNSData:(NSData *)data
 {
-    FTAssert(data.length == 11, @"FTAccelerationSetup data is 10 bytes long");
+    FTAssert(data.length == 2, @"FTMotionSetup data is 2 bytes long");
 
     self = [super init];
     if (self)
@@ -102,15 +84,6 @@ NSString * const kFTPenAccelerationPropertyName = @"acceleration";
         uint8_t *bytes = (uint8_t *)data.bytes;
         _samplePeriodMilliseconds = bytes[0];
         _notificatinPeriodMilliseconds = bytes[1];
-        _controlRegister1 = bytes[2];
-        _controlRegister2 = bytes[3];
-        _controlRegister3 = bytes[4];
-        _controlRegister4 = bytes[5];
-        _controlRegister5 = bytes[6];
-        _controlRegister6 = bytes[7];
-        _interrupt1Threshold = bytes[8];
-        _interrupt1Duration = bytes[9];
-        _interrupt1Config = bytes[10];
     }
 
     return self;
@@ -118,20 +91,11 @@ NSString * const kFTPenAccelerationPropertyName = @"acceleration";
 
 - (void)writeToNSData:(NSData *)data
 {
-    FTAssert(data.length == 11, @"acceldata data is 11 bytes long");
+    FTAssert(data.length == 2, @"FTMotionSetup data is 2 bytes long");
 
     uint8_t *bytes = (uint8_t *)data.bytes;
     bytes[0] = _samplePeriodMilliseconds;
     bytes[1] = _notificatinPeriodMilliseconds;
-    bytes[2] = _controlRegister1;
-    bytes[3] = _controlRegister2;
-    bytes[4] = _controlRegister3;
-    bytes[5] = _controlRegister4;
-    bytes[6] = _controlRegister5;
-    bytes[7] = _controlRegister6;
-    bytes[8] = _interrupt1Threshold;
-    bytes[9] = _interrupt1Duration;
-    bytes[10] = _interrupt1Config;
 }
 
 @end
@@ -281,14 +245,14 @@ NSString * const kFTPenAccelerationPropertyName = @"acceleration";
     self.penServiceClient.pressureSetup = pressureSetup;
 }
 
-- (FTAccelerationSetup *)accelerationSetup
+- (FTMotionSetup *)motionSetup
 {
-    return [self.penServiceClient accelerationSetup];
+    return [self.penServiceClient motionSetup];
 }
 
-- (void)setAccelerationSetup:(FTAccelerationSetup *)accelerationSetup
+- (void)setMotionSetup:(FTMotionSetup *)motionSetup
 {
-    self.penServiceClient.accelerationSetup = accelerationSetup;
+    self.penServiceClient.motionSetup = motionSetup;
 }
 
 - (void)setInactivityTimeout:(NSInteger)inactivityTimeout
@@ -360,9 +324,9 @@ NSString * const kFTPenAccelerationPropertyName = @"acceleration";
 {
     return self.penServiceClient.batteryLevel;
 }
-- (FTAcceleration)acceleration
+- (FTMotionSample)motion
 {
-    return self.penServiceClient.acceleration;
+    return self.penServiceClient.motion;
 }
 
 - (BOOL)isPoweringOff
@@ -604,11 +568,11 @@ NSString * const kFTPenAccelerationPropertyName = @"acceleration";
     }
 }
 
-- (void)penServiceClient:(FTPenServiceClient *)penServiceClient didUpdateAcceleration:(FTAcceleration)acceleration
+- (void)penServiceClient:(FTPenServiceClient *)penServiceClient didUpdateMotion:(FTMotionSample)motion
 {
-    if ([self.delegate respondsToSelector:@selector(pen:accelerationDidChange:)])
+    if ([self.delegate respondsToSelector:@selector(pen:motionDidChange:)])
     {
-        [self.delegate pen:self accelerationDidChange:acceleration];
+        [self.delegate pen:self motionDidChange:motion];
     }
 }
 

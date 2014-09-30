@@ -39,8 +39,8 @@ using namespace fiftythree::core;
 @property (nonatomic) CBCharacteristic *lastErrorCodeCharacteristic;
 @property (nonatomic) CBCharacteristic *authenticationCodeCharacteristic;
 @property (nonatomic) CBCharacteristic *centralIdCharacteristic;
-@property (nonatomic) CBCharacteristic *accelerationCharacteristic;
-@property (nonatomic) CBCharacteristic *accelerationSetupCharacteristic;
+@property (nonatomic) CBCharacteristic *motionCharacteristic;
+@property (nonatomic) CBCharacteristic *motionSetupCharacteristic;
 
 @property (nonatomic) BOOL isTipPressedDidSetNofifyValue;
 @property (nonatomic) BOOL isEraserPressedDidSetNofifyValue;
@@ -49,16 +49,16 @@ using namespace fiftythree::core;
 @property (nonatomic) BOOL batteryLevelDidSetNofifyValue;
 @property (nonatomic) BOOL batteryLevelDidReceiveFirstUpdate;
 @property (nonatomic) BOOL hasListenerDidSetNofifyValue;
-@property (nonatomic) BOOL accelerationCharacteristicDidSetNofifyValue;
+@property (nonatomic) BOOL motionCharacteristicDidSetNofifyValue;
 
 @property (nonatomic) BOOL didInitialReadOfInactivityTimeout;
 @property (nonatomic) BOOL didInitialReadOfPressureSetup;
-@property (nonatomic) BOOL didInitialReadOfAccelerationSetup;
+@property (nonatomic) BOOL didInitialReadOfMotionSetup;
 @property (nonatomic) BOOL didInitialReadOfManufacturingID;
 @property (nonatomic) BOOL didInitialReadOfLastErrorCode;
 @property (nonatomic) BOOL didInitialReadOfAuthenticationCode;
 @property (nonatomic) BOOL didInitialReadOfHasListener;
-@property (nonatomic) BOOL didInitialReadOfAcceleration;
+@property (nonatomic) BOOL didInitialReadOfMotion;
 
 @property (nonatomic, readwrite) NSDate *lastTipReleaseTime;
 
@@ -207,23 +207,23 @@ using namespace fiftythree::core;
     }
 }
 
-- (void)setAccelerationSetup:(FTAccelerationSetup *)setup
+- (void)setMotionSetup:(FTMotionSetup *)setup
 {
     FTAssert(setup, @"setup non-nil");
 
-    _accelerationSetup = setup;
-    if (self.accelerationSetup)
+    _motionSetup = setup;
+    if (self.motionSetup)
     {
-        static int length = 11;
+        static int length = 2;
         uint8_t bytes[length];
-        NSData *data = [NSData dataWithBytes:bytes length:11];
-        [self.accelerationSetup writeToNSData:data];
+        NSData *data = [NSData dataWithBytes:bytes length:2];
+        [self.motionSetup writeToNSData:data];
 
         [self.peripheral writeValue:data
-                  forCharacteristic:self.accelerationSetupCharacteristic
+                  forCharacteristic:self.motionSetupCharacteristic
                                type:CBCharacteristicWriteWithResponse];
 
-        [self.peripheral readValueForCharacteristic:self.accelerationSetupCharacteristic];
+        [self.peripheral readValueForCharacteristic:self.motionSetupCharacteristic];
     }
 }
 
@@ -338,8 +338,8 @@ using namespace fiftythree::core;
         self.lastErrorCodeCharacteristic = nil;
         self.authenticationCodeCharacteristic = nil;
         self.centralIdCharacteristic = nil;
-        self.accelerationCharacteristic = nil;
-        self.accelerationSetupCharacteristic = nil;
+        self.motionCharacteristic = nil;
+        self.motionSetupCharacteristic = nil;
 
         self.isTipPressedDidSetNofifyValue = NO;
         self.isEraserPressedDidSetNofifyValue = NO;
@@ -355,8 +355,8 @@ using namespace fiftythree::core;
         self.didInitialReadOfLastErrorCode = NO;
         self.didInitialReadOfAuthenticationCode = NO;
         self.didInitialReadOfHasListener = NO;
-        self.didInitialReadOfAcceleration = NO;
-        self.didInitialReadOfAccelerationSetup = NO;
+        self.didInitialReadOfMotion = NO;
+        self.didInitialReadOfMotionSetup = NO;
 
         return nil;
     }
@@ -387,8 +387,8 @@ using namespace fiftythree::core;
                                          [FTPenServiceUUIDs lastErrorCode],
                                          [FTPenServiceUUIDs pressureSetup],
                                          [FTPenServiceUUIDs centralId],
-                                         [FTPenServiceUUIDs acceleration],
-                                         [FTPenServiceUUIDs accelerationSetup]
+                                         [FTPenServiceUUIDs motion],
+                                         [FTPenServiceUUIDs motionSetup]
                                          ];
 
             [peripheral discoverCharacteristics:characteristics forService:self.penService];
@@ -513,18 +513,18 @@ using namespace fiftythree::core;
         {
             self.centralIdCharacteristic = characteristic;
         }
-        // Acceleration
-        if (!self.accelerationCharacteristic &&
-            [characteristic.UUID isEqual:[FTPenServiceUUIDs acceleration]])
+        // Motion
+        if (!self.motionSetup &&
+            [characteristic.UUID isEqual:[FTPenServiceUUIDs motion]])
         {
-            self.accelerationCharacteristic = characteristic;
+            self.motionCharacteristic = characteristic;
         }
 
-        // AccelerationSetup
-        if (!self.accelerationSetupCharacteristic &&
-            [characteristic.UUID isEqual:[FTPenServiceUUIDs accelerationSetup]])
+        // MotionSetup
+        if (!self.motionSetupCharacteristic &&
+            [characteristic.UUID isEqual:[FTPenServiceUUIDs motionSetup]])
         {
-            self.accelerationSetupCharacteristic = characteristic;
+            self.motionSetupCharacteristic = characteristic;
         }
     }
 
@@ -609,28 +609,46 @@ using namespace fiftythree::core;
         _eraserPressure = [characteristic valueAsNSUInteger];
         [self.delegate penServiceClient:self didUpdateEraserPressure:_eraserPressure];
     }
-    else if ([characteristic.UUID isEqual:[FTPenServiceUUIDs acceleration]])
+    else if ([characteristic.UUID isEqual:[FTPenServiceUUIDs motion]])
     {
-        if (self.accelerationCharacteristic)
+        if (self.motionCharacteristic)
         {
-            FTAssert(characteristic == self.accelerationCharacteristic, @"accelerationCharacteristic is acceleration characteristic");
+            FTAssert(characteristic == self.motionCharacteristic, @"characteristic = self.motionCharacteristic");
 
             NSData *data = characteristic.value;
 
-            _acceleration.x = 0x0;
-            _acceleration.y = 0x0;
-            _acceleration.z = 0x0;
+            _motion.acceleration.x = 0x0;
+            _motion.acceleration.y = 0x0;
+            _motion.acceleration.z = 0x0;
 
-            _acceleration.x = ((unsigned char *)data.bytes)[0];
-            _acceleration.x |= (((unsigned char *)data.bytes)[1] << 8);
+            _motion.acceleration.x = ((unsigned char *)data.bytes)[0];
+            _motion.acceleration.x |= (((unsigned char *)data.bytes)[1] << 8);
 
-            _acceleration.y = ((unsigned char *)data.bytes)[2];
-            _acceleration.y |= (((unsigned char *)data.bytes)[3] << 8);
+            _motion.acceleration.y = ((unsigned char *)data.bytes)[2];
+            _motion.acceleration.y |= (((unsigned char *)data.bytes)[3] << 8);
 
-            _acceleration.z = ((unsigned char *)data.bytes)[4];
-            _acceleration.z |= (((unsigned char *)data.bytes)[5] << 8);
+            _motion.acceleration.z = ((unsigned char *)data.bytes)[4];
+            _motion.acceleration.z |= (((unsigned char *)data.bytes)[5] << 8);
 
-            [self.delegate penServiceClient:self didUpdateAcceleration:_acceleration];
+            _motion.magneticForce.x = 0x0;
+            _motion.magneticForce.y = 0x0;
+            _motion.magneticForce.z = 0x0;
+
+            if (data.length >= 12)
+            {
+                // Some units have a mag. We optionally also read that data.
+
+                _motion.magneticForce.x = ((unsigned char *)data.bytes)[6];
+                _motion.magneticForce.x |= (((unsigned char *)data.bytes)[7] << 8);
+
+                _motion.magneticForce.y = ((unsigned char *)data.bytes)[8];
+                _motion.magneticForce.y |= (((unsigned char *)data.bytes)[9] << 8);
+
+                _motion.magneticForce.z = ((unsigned char *)data.bytes)[10];
+                _motion.magneticForce.z |= (((unsigned char *)data.bytes)[11] << 8);
+            }
+
+            [self.delegate penServiceClient:self didUpdateMotion:_motion];
         }
     }
     else if ([characteristic isEqual:self.batteryLevelCharacteristic])
@@ -664,12 +682,12 @@ using namespace fiftythree::core;
             [updatedProperties addObject:kFTPenPressureSetupPropertyName];
         }
     }
-    else if ([characteristic isEqual:self.accelerationSetupCharacteristic])
+    else if ([characteristic isEqual:self.motionSetupCharacteristic])
     {
-        if (characteristic.value.length == 11)
+        if (characteristic.value.length == 2)
         {
-            _accelerationSetup = [[FTAccelerationSetup alloc] initWithNSData:characteristic.value];
-            [updatedProperties addObject:kFTPenAccelerationSetupPropertyName];
+            _motionSetup = [[FTMotionSetup alloc] initWithNSData:characteristic.value];
+            [updatedProperties addObject:kFTPenMotionSetupPropertyName];
         }
     }
     else if ([characteristic.UUID isEqual:[FTPenServiceUUIDs manufacturingID]])
@@ -843,11 +861,11 @@ using namespace fiftythree::core;
             self.eraserPressureDidSetNofifyValue = YES;
         }
 
-        if (self.accelerationCharacteristic && !self.accelerationCharacteristicDidSetNofifyValue)
+        if (self.motionCharacteristic && !self.motionCharacteristicDidSetNofifyValue)
         {
             [self.peripheral setNotifyValue:YES
-                          forCharacteristic:self.accelerationCharacteristic];
-            self.accelerationCharacteristicDidSetNofifyValue = YES;
+                          forCharacteristic:self.motionCharacteristic];
+            self.motionCharacteristicDidSetNofifyValue = YES;
         }
 
         if (self.batteryLevelCharacteristic && !self.batteryLevelDidSetNofifyValue)
@@ -881,10 +899,10 @@ using namespace fiftythree::core;
             [self.peripheral readValueForCharacteristic:self.pressureSetupCharacteristic];
             self.didInitialReadOfPressureSetup = YES;
         }
-        if (self.accelerationSetupCharacteristic && !self.didInitialReadOfAccelerationSetup)
+        if (self.motionSetupCharacteristic && !self.didInitialReadOfMotionSetup)
         {
-            [self.peripheral readValueForCharacteristic:self.accelerationSetupCharacteristic];
-            self.didInitialReadOfAccelerationSetup = YES;
+            [self.peripheral readValueForCharacteristic:self.motionSetupCharacteristic];
+            self.didInitialReadOfMotionSetup = YES;
         }
         if (self.manufacturingIDCharacteristic && !self.didInitialReadOfManufacturingID)
         {

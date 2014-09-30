@@ -24,7 +24,7 @@ extern NSString * const kFTPenCentralIdPropertyName;
 
 extern NSString * const kFTPenInactivityTimeoutPropertyName;
 extern NSString * const kFTPenPressureSetupPropertyName;
-extern NSString * const kFTPenAccelerationSetupPropertyName;
+extern NSString * const kFTPenMotionSetupPropertyName;
 
 extern NSString * const kFTPenManufacturingIDPropertyName;
 extern NSString * const kFTPenLastErrorCodePropertyName;
@@ -64,32 +64,14 @@ extern NSString * const kFTPenHasListenerPropertyName;
 
 @end
 
-@interface FTAccelerationSetup : NSObject
+@interface FTMotionSetup : NSObject
 
 @property (nonatomic, readonly) uint8_t samplePeriodMilliseconds;
 @property (nonatomic, readonly) uint8_t notificatinPeriodMilliseconds;
-@property (nonatomic, readonly) uint8_t controlRegister1;
-@property (nonatomic, readonly) uint8_t controlRegister2;
-@property (nonatomic, readonly) uint8_t controlRegister3;
-@property (nonatomic, readonly) uint8_t controlRegister4;
-@property (nonatomic, readonly) uint8_t controlRegister5;
-@property (nonatomic, readonly) uint8_t controlRegister6;
-@property (nonatomic, readonly) uint8_t interrupt1Threshold;
-@property (nonatomic, readonly) uint8_t interrupt1Duration;
-@property (nonatomic, readonly) uint8_t interrupt1Config;
 
 - (id)init __unavailable;
 - (id)initWithSamplePeriodMilliseconds:(uint8_t)samplePeriodMilliseconds
-         notificatinPeriodMilliseconds:(uint8_t)notificatinPeriodMilliseconds
-                      controlRegister1:(uint8_t)controlRegister1
-                      controlRegister2:(uint8_t)controlRegister2
-                      controlRegister3:(uint8_t)controlRegister3
-                      controlRegister4:(uint8_t)controlRegister4
-                      controlRegister5:(uint8_t)controlRegister5
-                      controlRegister6:(uint8_t)controlRegister6
-                   interrupt1Threshold:(uint8_t)interrupt1Threshold
-                    interrupt1Duration:(uint8_t)interrupt1Duration
-                      interrupt1Config:(uint8_t)interrupt1Config;
+         notificatinPeriodMilliseconds:(uint8_t)notificatinPeriodMilliseconds;
 
 - (id)initWithNSData:(NSData *)data;
 - (void)writeToNSData:(NSData *)data;
@@ -142,7 +124,7 @@ extern NSString * const kFTPenHasListenerPropertyName;
 @property (nonatomic) BOOL hasListenerSupportsNotifications;
 @property (nonatomic) BOOL hasListener;
 @property (nonatomic) FTPenPressureSetup *pressureSetup;
-@property (nonatomic) FTAccelerationSetup *accelerationSetup;
+@property (nonatomic) FTMotionSetup *motionSetup;
 
 @property (nonatomic) NSString *manufacturingID;
 @property (nonatomic) NSData *authenticationCode;

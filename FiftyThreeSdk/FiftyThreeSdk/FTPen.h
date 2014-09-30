@@ -42,12 +42,26 @@ extern NSString * const kFTPenBatteryLevelPropertyName;
 
 @protocol FTPenDelegate;
 
-typedef struct FTAcceleration
+typedef struct FTAccelerationSample
 {
 int16_t x;
 int16_t y;
 int16_t z;
-} FTAcceleration;
+} FTAccelerationSample;
+
+typedef struct FTMagneticForceSample
+{
+    int16_t x;
+    int16_t y;
+    int16_t z;
+} FTMagneticForceSample;
+
+typedef struct FTMotionSample
+{
+    FTAccelerationSample acceleration;
+    FTMagneticForceSample magneticForce;
+
+} FTMotionSample;
 
 @interface FTPen : NSObject
 
@@ -69,7 +83,7 @@ int16_t z;
 @property (nonatomic, readonly) BOOL isEraserPressed;
 @property (nonatomic, readonly) float tipPressure;
 @property (nonatomic, readonly) float eraserPressure;
-@property (nonatomic, readonly) FTAcceleration acceleration;
+@property (nonatomic, readonly) FTMotionSample motion;
 @property (nonatomic, readonly) NSDate *lastTipReleaseTime;
 @property (nonatomic, readonly) NSNumber *batteryLevel;
 
@@ -83,7 +97,7 @@ int16_t z;
 - (void)pen:(FTPen *)pen isEraserPressedDidChange:(BOOL)isEraserPressed;
 - (void)pen:(FTPen *)pen tipPressureDidChange:(float)tipPressure;
 - (void)pen:(FTPen *)pen eraserPressureDidChange:(float)eraserPressure;
-- (void)pen:(FTPen *)pen accelerationDidChange:(FTAcceleration)acceleration;
+- (void)pen:(FTPen *)pen motionDidChange:(FTMotionSample)motion;
 - (void)pen:(FTPen *)pen batteryLevelDidChange:(NSNumber *)batteryLevel;
 
 @end

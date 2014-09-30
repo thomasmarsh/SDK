@@ -25,8 +25,8 @@
 + (CBUUID *)lastErrorCode;
 + (CBUUID *)authenticationCode;
 + (CBUUID *)centralId;
-+ (CBUUID *)acceleration;
-+ (CBUUID *)accelerationSetup;
++ (CBUUID *)motion;
++ (CBUUID *)motionSetup;
 + (NSString *)nameForUUID:(CBUUID *)UUID;
 @end
 
