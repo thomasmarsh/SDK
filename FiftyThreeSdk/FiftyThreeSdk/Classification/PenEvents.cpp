@@ -273,7 +273,7 @@ std::pair<TouchClassification, float> PenEventClassifier::TypeAndScoreForCluster
         return pair;
     }
 
-    std::map< ClusterId, std::pair<TouchClassification, float>>::iterator it = _clusterTypesAndScores.find(cluster._id);
+    auto it = _clusterTypesAndScores.find(cluster._id);
 
     // we cache the scores, clearing cache when SetNeedsClassification is called.
     if (it != _clusterTypesAndScores.end())
@@ -463,7 +463,7 @@ void PenEventClassifier::SetNeedsClassification()
     {
         _clusterTypesAndScores.erase(cluster->_id);
     }
-    
+
     _bestPenDownEventForTouch.clear();
     _bestPenUpEventForTouch.clear();
 }

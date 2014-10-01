@@ -738,8 +738,7 @@ TouchIdVector TouchLogger::IntersectTouchIdVectors(TouchIdVector* v1, TouchIdVec
 {
     TouchIdVector vOut(*v1);
 
-    TouchIdVector::iterator it;
-    it = std::set_intersection(v1->begin(), v1->end(), v2->begin(), v2->end(), vOut.begin());
+    auto it = std::set_intersection(v1->begin(), v1->end(), v2->begin(), v2->end(), vOut.begin());
 
     vOut.resize(it-vOut.begin());
 
@@ -1230,19 +1229,19 @@ void TouchLogger::RemoveTouch(core::TouchId touchId)
     // in case he was in here, remove him.
     _concurrentTouchesCache.clear();
 
-    std::deque<TouchId>::iterator it2 = std::find(_endedTouches.begin(), _endedTouches.end(), touchId);
+    auto it2 = std::find(_endedTouches.begin(), _endedTouches.end(), touchId);
     if (it2 != _endedTouches.end())
     {
         _endedTouches.erase(it2);
     }
 
-    vector<TouchId>::iterator it3 = std::find(_cancelledTouches.begin(), _cancelledTouches.end(), touchId);
+    auto it3 = std::find(_cancelledTouches.begin(), _cancelledTouches.end(), touchId);
     if (it3 != _cancelledTouches.end())
     {
         _cancelledTouches.erase(it3);
     }
 
-    vector<TouchId>::iterator it4 = std::find(_endedTouchesStaged.begin(), _endedTouchesStaged.end(), touchId);
+    auto it4 = std::find(_endedTouchesStaged.begin(), _endedTouchesStaged.end(), touchId);
     if (it4 != _endedTouchesStaged.end())
     {
         _endedTouchesStaged.erase(it4);
