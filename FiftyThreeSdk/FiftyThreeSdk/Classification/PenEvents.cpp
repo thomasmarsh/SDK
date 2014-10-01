@@ -6,6 +6,7 @@
 //
 
 #include "Core/Eigen.h"
+#include "Core/STLUtils.h"
 #include "Core/Touch/Touch.h"
 #include "Core/Touch/TouchTracker.h"
 #include "FiftyThreeSdk/Classification/ClassificationProxy.h"
@@ -18,6 +19,7 @@
 
 using namespace Eigen;
 using fiftythree::core::TouchClassification;
+using fiftythree::core::find;
 
 namespace fiftythree
 {
@@ -828,7 +830,7 @@ void PenEventClassifier::FoundPenEventTouch(PenEventId id)
 
 bool PenEventClassifier::IsPenEventTouchFound(PenEventId id)
 {
-    return (std::find(_penDownCleared.begin(), _penDownCleared.end(), id) != _penDownCleared.end());
+    return (find(_penDownCleared, id) != _penDownCleared.end());
 }
 }
 }

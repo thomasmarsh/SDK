@@ -100,7 +100,7 @@ float Cluster::ConcurrentDuration(Cluster const &other) const
 
 bool Cluster::ContainsTouch(core::TouchId touchId) const
 {
-    return std::find(_touchIds.begin(), _touchIds.end(), touchId) != _touchIds.end();
+    return find(_touchIds.begin(), _touchIds.end(), touchId) != _touchIds.end();
 }
 
 bool Cluster::ConcurrentWith(core::TouchId touchId, bool useStaleInterval) const
@@ -311,7 +311,7 @@ ClusterId InvalidClusterId()
 
 vector<TouchId>::iterator Cluster::FindTouch(core::TouchId touchId)
 {
-    return std::find(_touchIds.begin(), _touchIds.end(), touchId);
+    return find(_touchIds.begin(), _touchIds.end(), touchId);
 }
 
 // this removes it from the cluster, but not from classification
