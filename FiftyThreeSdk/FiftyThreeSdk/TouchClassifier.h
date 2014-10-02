@@ -26,8 +26,7 @@ DEFINE_ENUM(PenEventType,
 struct SessionStatistics
 {
 public:
-    typedef fiftythree::core::shared_ptr<SessionStatistics> Ptr;
-    typedef fiftythree::core::shared_ptr<const SessionStatistics> cPtr;
+    ALIAS_PTR_TYPES(SessionStatistics);
 
     std::vector<int> _tip1DownHistogram;
     std::vector<int> _tip1SwitchOnHistogram;
@@ -76,8 +75,7 @@ struct TouchClassificationChangedEventArgs
 class TouchClassifier
 {
 public:
-    typedef fiftythree::core::shared_ptr<TouchClassifier> Ptr;
-    typedef fiftythree::core::shared_ptr<const TouchClassifier> cPtr;
+    ALIAS_PTR_TYPES(TouchClassifier);
 
     // If the classifier should have differing behavior if the pen is connected, this is signalled here.
     virtual bool IsPenConnected() = 0;

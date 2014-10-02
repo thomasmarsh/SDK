@@ -21,8 +21,7 @@ namespace sdk
 struct StrokeStatistics
 {
 
-    typedef fiftythree::core::shared_ptr<StrokeStatistics> Ptr;
-    typedef fiftythree::core::shared_ptr<const StrokeStatistics> cPtr;
+    ALIAS_PTR_TYPES(StrokeStatistics);
 
     // 1.0 is a constant which was obtained from training data.
     // the optimal value will depend on screen size and pixel/point coordinate system.
@@ -132,7 +131,7 @@ class Stroke
 
 public:
 
-    typedef fiftythree::core::shared_ptr<Stroke> Ptr;
+    ALIAS_PTR_TYPES(Stroke);
 
     // Samples that occur less than this delta amount of time before the preceding sample are discarded.
     static const float kMinSampleTimestampDelta;

@@ -21,8 +21,7 @@ namespace sdk
 class OffscreenTouchClassificationLinker
 {
 public:
-    typedef fiftythree::core::shared_ptr<OffscreenTouchClassificationLinker> Ptr;
-    typedef fiftythree::core::shared_ptr<const OffscreenTouchClassificationLinker> cPtr;
+    ALIAS_PTR_TYPES(OffscreenTouchClassificationLinker);
 
 protected:
     ~OffscreenTouchClassificationLinker() {}

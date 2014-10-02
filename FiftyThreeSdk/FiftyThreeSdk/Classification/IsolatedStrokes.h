@@ -54,7 +54,7 @@ public:
 // and likelihoods are, etc
 struct ScoreCalibration
 {
-    typedef fiftythree::core::shared_ptr<ScoreCalibration> Ptr;
+    ALIAS_PTR_TYPES(ScoreCalibration);
     ScoreCalibration();
     static ScoreCalibration::Ptr New();
 
@@ -73,7 +73,7 @@ struct ScoreCalibration
 // Calibration for the Neyman-Pearson statistical tests
 struct NPCalibration
 {
-    typedef fiftythree::core::shared_ptr<NPCalibration> Ptr;
+    ALIAS_PTR_TYPES(NPCalibration);
     NPCalibration();
     static NPCalibration::Ptr New();
 
@@ -90,7 +90,7 @@ struct NPCalibration
 // Calibration for the Bayesian classification
 struct BayesCalibration
 {
-    typedef fiftythree::core::shared_ptr<BayesCalibration> Ptr;
+    ALIAS_PTR_TYPES(BayesCalibration);
     BayesCalibration();
     static BayesCalibration::Ptr New();
 
@@ -104,7 +104,7 @@ struct BayesCalibration
 // Calibration for Adaptive Boosting calibration
 struct AdaboostCalibration
 {
-    typedef fiftythree::core::shared_ptr<AdaboostCalibration> Ptr;
+    ALIAS_PTR_TYPES(AdaboostCalibration);
     AdaboostCalibration();
     static AdaboostCalibration::Ptr New();
 
@@ -122,7 +122,7 @@ struct AdaboostCalibration
 // Keeps data for touchId's for reclassification of strokes
 struct StrokeChunkLog
 {
-    typedef fiftythree::core::shared_ptr<StrokeChunkLog> Ptr;
+    ALIAS_PTR_TYPES(StrokeChunkLog);
     StrokeChunkLog();
     static StrokeChunkLog::Ptr New();
     StrokeChunkLog(int chunkIndex);

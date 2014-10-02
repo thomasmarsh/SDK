@@ -54,7 +54,7 @@ protected:
     int                 _isolatedIncrementalUpdateIndex;  // Index determining incremental updates
 
 public:
-    typedef fiftythree::core::shared_ptr<TouchData> Ptr;
+    ALIAS_PTR_TYPES(TouchData);
 
     float               _radiusMean;
     float               _radiusMin;
@@ -169,7 +169,7 @@ protected:
     PenEventType _eventType;
 
 public:
-    typedef fiftythree::core::shared_ptr<PenEventData> Ptr;
+    ALIAS_PTR_TYPES(PenEventData);
 
 protected:
     // methods
@@ -268,7 +268,7 @@ protected:
     const CommonData* _commonData;
 
 public:
-    typedef fiftythree::core::shared_ptr<TouchLogger> Ptr;
+    ALIAS_PTR_TYPES(TouchLogger);
     typedef std::pair<core::TouchId, TouchData::Ptr> TouchDataPair;
 
 protected:

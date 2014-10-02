@@ -51,7 +51,7 @@ struct ClusterEventStatistics
     {
     }
 
-    typedef fiftythree::core::shared_ptr<ClusterEventStatistics> Ptr;
+    ALIAS_PTR_TYPES(ClusterEventStatistics);
 
     // some stats used to help build confidence in the event
     // early on in an event we may need to consider orientation change,
@@ -120,7 +120,7 @@ struct Cluster
     std::vector<core::TouchId> _touchIds;
     boost::container::flat_map<core::TouchId, TouchData::Ptr> _touchData;
 
-    typedef fiftythree::core::shared_ptr<Cluster> Ptr;
+    ALIAS_PTR_TYPES(Cluster);
 
     Cluster();
 
@@ -259,7 +259,7 @@ class ClusterTracker
 {
 
 public:
-    typedef fiftythree::core::shared_ptr<ClusterTracker> Ptr;
+    ALIAS_PTR_TYPES(ClusterTracker);
 
 protected:
 
@@ -524,7 +524,7 @@ public:
     {
         return _touchLog->MostRecentPenEvent();
     }
-    
+
     double MostRecentPenEventTime()
     {
         PenEventId pid = MostRecentPenEvent();

@@ -220,7 +220,7 @@ public:
         return _touchStatistics;
     }
 
-    typedef fiftythree::core::shared_ptr<TouchClassificationProxy> Ptr;
+    ALIAS_PTR_TYPES(TouchClassificationProxy);
 
     core::TouchClassification CurrentClass(core::TouchId touchId);
 

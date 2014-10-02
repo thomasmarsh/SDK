@@ -31,7 +31,7 @@ public:
     typedef std::vector<DataType> ContainerType;
 
     typedef DataStream<DataType> Stream;
-    typedef fiftythree::core::shared_ptr< DataStream<DataType>> Ptr;
+    ALIAS_PTR_TYPES( DataStream<DataType>);
 
 protected:
 

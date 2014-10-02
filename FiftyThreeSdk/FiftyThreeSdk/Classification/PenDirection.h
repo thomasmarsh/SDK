@@ -23,7 +23,7 @@ class PenTracker
 {
 
 public:
-    typedef fiftythree::core::shared_ptr<PenTracker> Ptr;
+    ALIAS_PTR_TYPES(PenTracker);
 
 protected:
     ClusterTracker::Ptr _clusterTracker;

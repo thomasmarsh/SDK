@@ -45,8 +45,7 @@ struct PenEvent
 class Classifier
 {
 public:
-    typedef fiftythree::core::shared_ptr<Classifier> Ptr;
-    typedef fiftythree::core::shared_ptr<const Classifier> cPtr;
+    ALIAS_PTR_TYPES(Classifier);
 
     // Invoke this to update internal classification structures.
     virtual bool ReclassifyIfNeeded(double timestamp = -1.0) = 0;

@@ -28,8 +28,7 @@ DEFINE_ENUM(FTPenTip,
 class PenEvent
 {
 public:
-    typedef fiftythree::core::shared_ptr<PenEvent> Ptr;
-    typedef fiftythree::core::shared_ptr<const PenEvent> cPtr;
+    ALIAS_PTR_TYPES(PenEvent);
 
     fiftythree::core::InputSample Sample;
     FTPenEventType Type;

@@ -25,7 +25,7 @@ DEFINE_ENUM(PlaybackEntryType,
 
 struct PlaybackEntry
 {
-    typedef fiftythree::core::shared_ptr<PlaybackEntry> Ptr;
+    ALIAS_PTR_TYPES(PlaybackEntry);
 
     PlaybackEntryType               _type;
     std::set<core::Touch::Ptr>   _touches;
