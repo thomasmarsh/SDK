@@ -11,9 +11,6 @@
          location = "group:../../BuildConfigurations/ApplicationDebug.xcconfig">
       </FileRef>
       <FileRef
-         location = "group:../../BuildConfigurations/ApplicationInternal.xcconfig">
-      </FileRef>
-      <FileRef
          location = "group:../../BuildConfigurations/ApplicationPreview.xcconfig">
       </FileRef>
       <FileRef
@@ -39,9 +36,6 @@
       </FileRef>
       <FileRef
          location = "group:../../BuildConfigurations/SubprojectDebug.xcconfig">
-      </FileRef>
-      <FileRef
-         location = "group:../../BuildConfigurations/SubprojectInternal.xcconfig">
       </FileRef>
       <FileRef
          location = "group:../../BuildConfigurations/SubprojectPreview.xcconfig">

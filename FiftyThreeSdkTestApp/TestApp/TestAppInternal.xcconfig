@@ -1,9 +1,0 @@
-//
-//  TestAppInternal.xcconfig
-//  TestApp
-//
-//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
-//
-
-#include "../../../BuildConfigurations/ApplicationInternal.xcconfig"
-#include "TestApp.xcconfig"

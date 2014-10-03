@@ -137,7 +137,6 @@
 		3C2F9C431780A7BA00A5FFBC /* FTPenUsageServiceClient.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; lineEnding = 0; name = FTPenUsageServiceClient.mm; path = FiftyThreeSdk/FTPenUsageServiceClient.mm; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		3C373F26186353C100830FD7 /* FiftyThreeSdk.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = FiftyThreeSdk.xcconfig; sourceTree = "<group>"; };
 		3C373F27186353D700830FD7 /* FiftyThreeSdkDebug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = FiftyThreeSdkDebug.xcconfig; sourceTree = "<group>"; };
-		3C373F28186353FA00830FD7 /* FiftyThreeSdkInternal.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = FiftyThreeSdkInternal.xcconfig; sourceTree = "<group>"; };
 		3C373F291863540600830FD7 /* FiftyThreeSdkPreview.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = FiftyThreeSdkPreview.xcconfig; sourceTree = "<group>"; };
 		3C373F2A1863541300830FD7 /* FiftyThreeSdkProduction.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = FiftyThreeSdkProduction.xcconfig; sourceTree = "<group>"; };
 		3C373F2B1863542400830FD7 /* FiftyThreeSdkRelease.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = FiftyThreeSdkRelease.xcconfig; sourceTree = "<group>"; };
@@ -273,7 +272,6 @@
 			children = (
 				3C373F26186353C100830FD7 /* FiftyThreeSdk.xcconfig */,
 				3C373F27186353D700830FD7 /* FiftyThreeSdkDebug.xcconfig */,
-				3C373F28186353FA00830FD7 /* FiftyThreeSdkInternal.xcconfig */,
 				3C373F291863540600830FD7 /* FiftyThreeSdkPreview.xcconfig */,
 				3C373F2A1863541300830FD7 /* FiftyThreeSdkProduction.xcconfig */,
 				3C373F2B1863542400830FD7 /* FiftyThreeSdkRelease.xcconfig */,
@@ -528,19 +526,6 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
-		3C44210D186360E70002CFE5 /* Internal */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 3C373F28186353FA00830FD7 /* FiftyThreeSdkInternal.xcconfig */;
-			buildSettings = {
-			};
-			name = Internal;
-		};
-		3C44210E186360E70002CFE5 /* Internal */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-			};
-			name = Internal;
-		};
 		3C44210F186360EF0002CFE5 /* Preview */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 3C373F291863540600830FD7 /* FiftyThreeSdkPreview.xcconfig */;
@@ -601,7 +586,6 @@
 			buildConfigurations = (
 				66A8387D16E52D840048FFE4 /* Debug */,
 				66A8387E16E52D840048FFE4 /* Release */,
-				3C44210D186360E70002CFE5 /* Internal */,
 				3C44210F186360EF0002CFE5 /* Preview */,
 				3C442111186360F50002CFE5 /* Production */,
 			);
@@ -613,7 +597,6 @@
 			buildConfigurations = (
 				66A8388016E52D840048FFE4 /* Debug */,
 				66A8388116E52D840048FFE4 /* Release */,
-				3C44210E186360E70002CFE5 /* Internal */,
 				3C442110186360EF0002CFE5 /* Preview */,
 				3C442112186360F50002CFE5 /* Production */,
 			);
