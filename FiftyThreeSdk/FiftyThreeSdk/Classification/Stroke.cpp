@@ -418,7 +418,7 @@ float Stroke::TimestampRelativeToTime(int idx, double referenceTime)
     return AbsoluteTimestamp(idx) - referenceTime;
 }
 
-int Stroke::IndexClosestToTime(double time) 
+int Stroke::IndexClosestToTime(double time)
 {
 
     int idx = 0;
@@ -618,8 +618,7 @@ Eigen::Vector2f Stroke::LastPoint() const
         return _XYDataStream.Data((int)Size()-1l);
     }
 }
-    
-    
+
 Stroke::Stroke(core::Touch const & touch, int maxPoints) : _computeStatistics(false)
 {
     int counter = 0;
@@ -629,20 +628,19 @@ Stroke::Stroke(core::Touch const & touch, int maxPoints) : _computeStatistics(fa
         {
             break;
         }
-        
+
         AddPoint(sample.Location(), sample.TimestampSeconds());
-        
+
         ++counter;
     }
 }
-    
-    
+
 void Stroke::DenoiseFirstPoint(float lambda, float maxTravel)
 {
     constexpr float samplingInterval = 1.0f / 60.0f;
-    
+
     CubicPolynomial2f P;
-    
+
     switch (Size())
     {
         case 2:
@@ -652,14 +650,14 @@ void Stroke::DenoiseFirstPoint(float lambda, float maxTravel)
             return;
             break;
         }
-            
+
         case 3:
         {
             P     = CubicPolynomial2f::LineWithValuesAtTimes(XY(1), XY(2),
                                                              RelativeTimestamp(1), RelativeTimestamp(2));
             break;
         }
-            
+
         case 4:
         default:
         {
@@ -667,17 +665,16 @@ void Stroke::DenoiseFirstPoint(float lambda, float maxTravel)
                                                                   RelativeTimestamp(1), RelativeTimestamp(2), RelativeTimestamp(3));
             break;
         }
-            
+
     }
-    
+
     Vector2f target         = (1.0f - lambda) * XY(0) + lambda * P.ValueAt(RelativeTimestamp(0));
     Vector2f correction     = target - XY(0);
     float legalLength       = std::min(correction.norm(), maxTravel);
     correction             *= legalLength / correction.norm();
-    
+
     _XYDataStream.Data()[0] = XY(0) + correction;
 }
-    
 
 Eigen::Map<Eigen::VectorXf> Stroke::XYMap(Interval const & I)
 {
@@ -816,7 +813,7 @@ Stroke Stroke::SubStroke(Interval subInterval) const
                                                                      &(_XYDataStream.RelativeTimestamp()[b]));
 
     subStroke._XYDataStream.SetFirstAbsoluteTimestamp(FirstAbsoluteTimestamp());
-    
+
     DebugAssert(subStroke.Size() == subInterval._count);
 
     return subStroke;

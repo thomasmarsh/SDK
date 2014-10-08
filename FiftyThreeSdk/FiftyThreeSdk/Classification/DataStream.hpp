@@ -60,7 +60,7 @@ public:
 
     double        SetFirstAbsoluteTimestamp(double newValue) { _t0 = newValue; }
     double           FirstAbsoluteTimestamp() const { return _t0; }
-    
+
     StdVectorFloat & RelativeTimestamp() { return _relativeTimestamp; }
     StdVectorFloat const & RelativeTimestamp() const { return _relativeTimestamp; }
 

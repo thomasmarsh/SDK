@@ -210,8 +210,7 @@ public:
     static Stroke::Ptr New() { return Stroke::Ptr(new Stroke()); }
 
     Stroke(core::Touch const & touch, int maxPoints = std::numeric_limits<int>::max());
-    
-    
+
     Stroke(bool computeStatistics = true) :
     _offscreenExitFlag(false),
     _offscreenArrivalFlag(false),
@@ -343,7 +342,7 @@ public:
     int PenultimateValidIndex() const;
 
     void DenoiseFirstPoint(float lambda, float maxTravel = 2.0f);
-    
+
     Interval MaximalInterval() const { return Interval(0, Size()); }
 
     float SegmentLength(Interval const &I);

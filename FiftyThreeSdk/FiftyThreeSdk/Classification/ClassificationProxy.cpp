@@ -147,7 +147,6 @@ TouchClassification TouchClassificationProxy::ClassifyPair(TouchId touch0, Touch
     auto stroke0 = data0->Stroke();
     auto stroke1 = data1->Stroke();
 
-    
     float corr = .5f;
     if (stroke0->Size() > 1 && stroke1->Size() > 1)
     {
@@ -1712,13 +1711,11 @@ IdTypeMap TouchClassificationProxy::ReclassifyCurrentEvent()
             TouchIdVector touches = _clusterTracker->ActiveIds();
             Stroke::Ptr s0 = _clusterTracker->Data(touches[0])->Stroke();
             Stroke::Ptr s1 = _clusterTracker->Data(touches[1])->Stroke();
-            
+
             //TwoTouchFit ttFit;
             //ttFit.FitPan(*s0, *s1, 3, 6);
         }
 
-        
-        
         if (TouchRadiusAvailable())
         {
             ReclassifyCurrentEventGivenSize(types);
