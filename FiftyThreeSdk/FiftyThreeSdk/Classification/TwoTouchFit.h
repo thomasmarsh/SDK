@@ -7,8 +7,6 @@
 
 #pragma once
 
-#include <vector>
-
 #include "FiftyThreeSdk/Classification/Eigen.h"
 #include "FiftyThreeSdk/Classification/Stroke.h"
 

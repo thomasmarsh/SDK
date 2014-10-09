@@ -7,7 +7,7 @@
 
 #include <iomanip>
 
-#include "TwoTouchFit.h"
+#include "FiftyThreeSdk/Classification/TwoTouchFit.h"
 
 using namespace Eigen;
 
@@ -29,7 +29,7 @@ float TwoTouchFit::FitPan(Stroke & zIn, Stroke & wIn, int minPoints, int maxPoin
 float TwoTouchFit::Fit(Stroke & zIn, Stroke & wIn, int minPoints, int maxPoints, bool isPinch)
 {
     _sizeOKFlag = false;
-    if(zIn.Size() < minPoints || wIn.Size() < minPoints)
+    if (zIn.Size() < minPoints || wIn.Size() < minPoints)
     {
         return 0.0f;
     }
@@ -43,14 +43,6 @@ float TwoTouchFit::Fit(Stroke & zIn, Stroke & wIn, int minPoints, int maxPoints,
     Stroke Z = zIn.SubStroke(Interval(0, zCount));
     Stroke W = wIn.SubStroke(Interval(0, wCount));
 
-    // the first point is pretty much garbage, so our measurements can get dominated by noise,
-    // especially in the motivating case which is very early gesture detection.
-    if(isPinch)
-    {
-        Z.DenoiseFirstPoint(1.0f);
-        W.DenoiseFirstPoint(1.0f);
-    }
-
     ConstructProblem(Z, W, zCount, wCount, isPinch);
 
     MatrixXf coeff = (_weight*_A).jacobiSvd(ComputeThinU | ComputeThinV).solve(_weight*_b);
@@ -62,7 +54,7 @@ float TwoTouchFit::Fit(Stroke & zIn, Stroke & wIn, int minPoints, int maxPoints,
     float residual = (_weight * _A * coeff - _weight * _b).squaredNorm();
 
     float rSquared = 0.0f;
-    if(varTotal > 0.0f)
+    if (varTotal > 0.0f)
     {
         float sampleSize = zCount + wCount;
         float adjustment = (sampleSize - 1.0f) / (sampleSize - 2.0f);
@@ -93,7 +85,7 @@ float TwoTouchFit::Fit(Stroke & zIn, Stroke & wIn, int minPoints, int maxPoints,
         dirGoodness = std::max(0.0f, -dotZ * dotW);
         dirGoodness = std::sqrt(dirGoodness);
         float targetDot = .75f;
-        if(_scale < 1.0f)
+        if (_scale < 1.0f)
         {
             targetDot = .95f;
         }
@@ -154,33 +146,22 @@ float TwoTouchFit::Fit(Stroke & zIn, Stroke & wIn, int minPoints, int maxPoints,
     float tMax  = std::max(tW1, tZ1);
 
     float dtMax = 0.0f;
-    for(int j=1; j<zCount; j++)
+    for (int j=1; j<zCount; j++)
     {
         float dt = Z.RelativeTimestamp(j) - Z.RelativeTimestamp(j-1);
-        if(dt > dtMax)
+        if (dt > dtMax)
         {
             dtMax = dt;
         }
     }
 
-    for(int j=1; j<wCount; j++)
+    for (int j=1; j<wCount; j++)
     {
         float dt = W.RelativeTimestamp(j) - W.RelativeTimestamp(j-1);
-        if(dt > dtMax)
+        if (dt > dtMax)
         {
             dtMax = dt;
         }
-    }
-
-    float kt    = std::max(std::max(std::abs(Curvature(tMin)), std::abs(Curvature(tEval))), std::abs(Curvature(tMax)));
-
-    int minSize = (int) std::min(Z.Size(), W.Size());
-    int maxSize = (int) std::max(Z.Size(), W.Size());
-
-    if(true) //minSize >= 3 && maxSize >= 3 && maxSize <= 4)
-    {
-        //std::cerr << std::setprecision(3);
-        //std::cerr << "\nscore = " << score << ": (" << zCount << ", " << wCount << "), r2 = " << rSquared << ", dir = " << dirGoodness << ", varRatio = " << std::log(varW / varZ)  << ", scale = " << _scale << ", |vZ| = " << vZ.norm() << ", |vW| = " << vW.norm() << ", dt = " << dtMax;
     }
 
     _score = score;
@@ -206,7 +187,7 @@ void TwoTouchFit::ConstructProblem(Stroke & Z, Stroke & W, int zCount, int wCoun
     float d1weight = 0.0f;
     float d2weight = 0.0f;
 
-    if(doReflection)
+    if (doReflection)
     {
         d1weight = 1.0f;
         d2weight = .25f;
@@ -230,7 +211,7 @@ void TwoTouchFit::ConstructProblem(Stroke & Z, Stroke & W, int zCount, int wCoun
     // point on Z are normalized to zero.  and vice-versa.
     // if the two strokes don't overlap in time, this degenerates and the fit will likely
     // be awful, which is probably what we want.
-    if(W.FirstAbsoluteTimestamp() > Z.FirstAbsoluteTimestamp())
+    if (W.FirstAbsoluteTimestamp() > Z.FirstAbsoluteTimestamp())
     {
 
         int iz = Z.IndexClosestToTime(W.FirstAbsoluteTimestamp());
@@ -245,7 +226,7 @@ void TwoTouchFit::ConstructProblem(Stroke & Z, Stroke & W, int zCount, int wCoun
         tW = W.XY(iw);
     }
 
-    if(doReflection)
+    if (doReflection)
     {
         //tZ = Z.XY(0);
         //tW = W.XY(0);
@@ -263,12 +244,12 @@ void TwoTouchFit::ConstructProblem(Stroke & Z, Stroke & W, int zCount, int wCoun
 
     Vector2f vEndpoints;
     _scale = 1.0f;
-    if(v0.norm() > 0.0f)
+    if (v0.norm() > 0.0f)
     {
         _scale = vN.norm() / v0.norm();
     }
 
-    if(_scale > 1.0f)
+    if (_scale > 1.0f)
     {
         vEndpoints = vN;
     }
@@ -283,14 +264,14 @@ void TwoTouchFit::ConstructProblem(Stroke & Z, Stroke & W, int zCount, int wCoun
     // does not seem to be necessary for pan.
     float scale = 1.0f;
 
-    if(doReflection)
+    if (doReflection)
     {
         scale = xyZ.row(zCount-1).norm() / xyW.row(wCount-1).norm();
     }
 
     Matrix2f T = Matrix2f::Identity() * scale;
 
-    if(doReflection)
+    if (doReflection)
     {
 
         // we assume Z and W are basically symmetric about some line.
@@ -318,7 +299,7 @@ void TwoTouchFit::ConstructProblem(Stroke & Z, Stroke & W, int zCount, int wCoun
     // assemble our matrix A of evaluation times,
     // and RHS matrix b.  b(:,1) is x-coords, b(:,2) is y-coords.
     int m = 0;
-    for(int j=0; j<zCount; j++)
+    for (int j=0; j<zCount; j++)
     {
         float t = Z.RelativeTimestamp(j);
 
@@ -329,13 +310,13 @@ void TwoTouchFit::ConstructProblem(Stroke & Z, Stroke & W, int zCount, int wCoun
         _b(m, 0) = xyZ(j,0);
         _b(m, 1) = xyZ(j,1);
 
-        if(j>0)
+        if (j>0)
         {
             _weight(m,m-1) += -d1weight;
             _weight(m,m)   +=  d1weight;
         }
 
-        if(j>1)
+        if (j>1)
         {
             _weight(m,m-2)   +=  d2weight;
             _weight(m,m-1)   += -2.0f * d2weight;
@@ -348,7 +329,7 @@ void TwoTouchFit::ConstructProblem(Stroke & Z, Stroke & W, int zCount, int wCoun
     // the touches probably didn't begin at the same time, so we need to compute the offset
     // so we fit the curve at the correct relative timestamps.
     float tOffsetW = W.FirstAbsoluteTimestamp() - Z.FirstAbsoluteTimestamp();
-    for(int k=0; k<wCount; k++)
+    for (int k=0; k<wCount; k++)
     {
         float t = W.RelativeTimestamp(k) + tOffsetW;
 
@@ -361,13 +342,13 @@ void TwoTouchFit::ConstructProblem(Stroke & Z, Stroke & W, int zCount, int wCoun
         _b(m, 0) = bw.x();
         _b(m, 1) = bw.y();
 
-        if(k>0)
+        if (k>0)
         {
             _weight(m,m-1) += -d1weight;
             _weight(m,m)   +=  d1weight;
         }
 
-        if(k>1)
+        if (k>1)
         {
             _weight(m,m-2)   +=  d2weight;
             _weight(m,m-1)   += -2.0f * d2weight;

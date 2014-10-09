@@ -17,7 +17,6 @@
 #include "FiftyThreeSdk/Classification/LineFitting.h"
 #include "FiftyThreeSdk/Classification/Stroke.h"
 #include "FiftyThreeSdk/Classification/TouchSize.h"
-#include "FiftyThreeSdk/Classification/TwoTouchFit.h"
 #include "FiftyThreeSdk/FTLogPrivate.h"
 
 using Eigen::Vector2f;
@@ -1704,16 +1703,6 @@ IdTypeMap TouchClassificationProxy::ReclassifyCurrentEvent()
             {
                 SetClusterType(pair.first, pair.second, types);
             }
-        }
-
-        if (_clusterTracker->ActiveIds().size() == 2)
-        {
-            TouchIdVector touches = _clusterTracker->ActiveIds();
-            Stroke::Ptr s0 = _clusterTracker->Data(touches[0])->Stroke();
-            Stroke::Ptr s1 = _clusterTracker->Data(touches[1])->Stroke();
-
-            //TwoTouchFit ttFit;
-            //ttFit.FitPan(*s0, *s1, 3, 6);
         }
 
         if (TouchRadiusAvailable())

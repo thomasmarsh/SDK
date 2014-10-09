@@ -424,6 +424,9 @@ int Stroke::IndexClosestToTime(double time)
     int idx = 0;
     double currentDiff = std::abs(time - FirstAbsoluteTimestamp());
 
+    // i == 1 is the correct starting place.  the i == 0 case is handled above,
+    // and if the second point on the curve is further away in time, we'll immediately exit the loop.
+    // this happens when time <= FirstAbsoluteTimestamp() + .5 * (sampling interval)
     for (int i = 1; i < Size(); ++i)
     {
         double newDiff = std::abs(time - AbsoluteTimestamp(i));
@@ -622,9 +625,9 @@ Eigen::Vector2f Stroke::LastPoint() const
 Stroke::Stroke(core::Touch const & touch, int maxPoints) : _computeStatistics(false)
 {
     int counter = 0;
-    for (auto sample : *(touch.History()))
+    for (auto & sample : *(touch.History()))
     {
-        if(maxPoints && counter >= maxPoints)
+        if (maxPoints && counter >= maxPoints)
         {
             break;
         }
@@ -637,7 +640,6 @@ Stroke::Stroke(core::Touch const & touch, int maxPoints) : _computeStatistics(fa
 
 void Stroke::DenoiseFirstPoint(float lambda, float maxTravel)
 {
-    constexpr float samplingInterval = 1.0f / 60.0f;
 
     CubicPolynomial2f P;
 
@@ -653,16 +655,16 @@ void Stroke::DenoiseFirstPoint(float lambda, float maxTravel)
 
         case 3:
         {
-            P     = CubicPolynomial2f::LineWithValuesAtTimes(XY(1), XY(2),
-                                                             RelativeTimestamp(1), RelativeTimestamp(2));
+            P = CubicPolynomial2f::LineWithValuesAtTimes(XY(1), XY(2),
+                                                         RelativeTimestamp(1), RelativeTimestamp(2));
             break;
         }
 
         case 4:
         default:
         {
-            P     = CubicPolynomial2f::QuadraticWithValuesAtTimes(XY(1), XY(2), XY(3),
-                                                                  RelativeTimestamp(1), RelativeTimestamp(2), RelativeTimestamp(3));
+            P = CubicPolynomial2f::QuadraticWithValuesAtTimes(XY(1), XY(2), XY(3),
+                                                              RelativeTimestamp(1), RelativeTimestamp(2), RelativeTimestamp(3));
             break;
         }
 
