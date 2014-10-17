@@ -20,8 +20,6 @@ extern NSString * const kFTPenManagerDidFailToDiscoverPenNotificationName;
 
 @property (nonatomic, readonly) FTPen *pen;
 
-@property (nonatomic) BOOL isPairingSpotPressed;
-
 @property (nonatomic, readonly) FTXCallbackURL *pencilFirmwareUpgradeURL;
 
 #pragma mark -  FTPenManager  - Advanced DisplayLink Support
@@ -44,6 +42,10 @@ extern NSString * const kFTPenManagerDidFailToDiscoverPenNotificationName;
 - (void)update;
 
 - (void)disconnect;
+
+#pragma mark - Used by Adobe.
 - (void)disconnectOrBecomeSingle;
+@property (nonatomic) BOOL disableLongPressToUnpairIfTipPressed;
+@property (nonatomic) BOOL isPairingSpotPressed;
 
 @end

@@ -267,6 +267,9 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 @property (nonatomic) BOOL automaticUpdatesEnabled;
 
 @property (nonatomic) BOOL needsUpdate;
+
+@property (nonatomic) BOOL disableLongPressToUnpairIfTipPressed;
+
 @end
 
 @implementation FTPenManager
@@ -325,6 +328,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
         self.shouldCheckForFirmwareUpdates = NO;
         self.firmwareUpdateIsAvailable = nil;
+        self.disableLongPressToUnpairIfTipPressed = NO;
     }
 
     return self;
@@ -932,6 +936,11 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
          FTAssert(weakSelf.pen, @"pen is non-nil");
          FTAssert(weakSelf.pen.peripheral.state == CBPeripheralStateConnected, @"pen peripheral is connected");
 
+         if (self.disableLongPressToUnpairIfTipPressed && weakSelf.pen.isTipPressed)
+         {
+             [self fireStateMachineEvent:kReturnToMarriedEventName];
+         }
+
          weakSelf.state = FTPenManagerStateConnectedLongPressToUnpair;
 
          weakSelf.scanningState = ScanningStateEnabledWithPolling;
@@ -943,20 +952,28 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     {
         weakSelf.scanningState = ScanningStateDisabled;
         weakSelf.peripheralsDiscoveredDuringLongPress = nil;
+
     }];
     [marriedWaitingForLongPressToUnpairState setTimeoutExpiredBlock:^(TKState *state, TKStateMachine *stateMachine)
      {
          FTAssert(weakSelf.pen, @"pen is non-nil");
          FTAssert(weakSelf.pen.peripheral.state == CBPeripheralStateConnected, @"pen peripheral is connected");
 
-         [weakSelf.pen powerOff];
-
-         if (weakSelf.peripheralsDiscoveredDuringLongPress.count > 0)
+         if (self.disableLongPressToUnpairIfTipPressed && weakSelf.pen.isTipPressed)
          {
-             weakSelf.onDeckPeripheral = [weakSelf.peripheralsDiscoveredDuringLongPress anyObject];
+             [self fireStateMachineEvent:kReturnToMarriedEventName];
          }
+         else
+         {
+             [weakSelf.pen powerOff];
 
-         [weakSelf fireStateMachineEvent:kDisconnectAndBecomeSingleEventName];
+             if (weakSelf.peripheralsDiscoveredDuringLongPress.count > 0)
+             {
+                 weakSelf.onDeckPeripheral = [weakSelf.peripheralsDiscoveredDuringLongPress anyObject];
+             }
+
+             [weakSelf fireStateMachineEvent:kDisconnectAndBecomeSingleEventName];
+         }
      }];
 
     // Preparing to Swing
