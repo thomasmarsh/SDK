@@ -9,6 +9,7 @@
 
 #include "Core/Enum.h"
 #include "Core/Memory.h"
+#include "Core/Touch/Touch.h"
 #include "FiftyThreeSdk/Classification/CommonDeclarations.h"
 #include "FiftyThreeSdk/Classification/DataStream.hpp"
 #include "FiftyThreeSdk/Classification/Eigen.h"
@@ -207,12 +208,14 @@ public:
 
     static Stroke::Ptr New() { return Stroke::Ptr(new Stroke()); }
 
-    Stroke() :
+    Stroke(core::Touch const & touch, int maxPoints = std::numeric_limits<int>::max());
+
+    Stroke(bool computeStatistics = true) :
     _offscreenExitFlag(false),
     _offscreenArrivalFlag(false),
     _samplingType(SamplingType::UniformInSpace),
     _XYSamplesPerSecond(60),
-    _computeStatistics(true)
+    _computeStatistics(computeStatistics)
     {
         if (_computeStatistics)
         {
@@ -224,7 +227,7 @@ public:
     void ToNormalizedCoordinates(Screen const & screen);
     void ToScreenCoordinates(Screen const & screen);
 
-    double           FirstAbsoluteTimestamp() { return _XYDataStream.FirstAbsoluteTimestamp(); }
+    double           FirstAbsoluteTimestamp()  const { return _XYDataStream.FirstAbsoluteTimestamp(); }
     StdVectorFloat & RelativeTimestamp() { return _XYDataStream.RelativeTimestamp(); }
     std::vector< Eigen::Vector2f > & XY() { return _XYDataStream.Data(); }
 
@@ -336,6 +339,8 @@ public:
     int SecondValidIndex() const;
     // returns -1 if effective size is 1
     int PenultimateValidIndex() const;
+
+    void DenoiseFirstPoint(float lambda, float maxTravel = 2.0f);
 
     Interval MaximalInterval() const { return Interval(0, Size()); }
 

@@ -179,6 +179,7 @@
 		66D779B616E57461001C4F55 /* FTServiceUUIDs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FTServiceUUIDs.h; path = FiftyThreeSdk/FTServiceUUIDs.h; sourceTree = SOURCE_ROOT; };
 		66D779B716E57461001C4F55 /* TIUpdateManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TIUpdateManager.h; path = FiftyThreeSdk/TIUpdateManager.h; sourceTree = SOURCE_ROOT; };
 		66D779B816E57461001C4F55 /* TIUpdateManager.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; lineEnding = 0; name = TIUpdateManager.mm; path = FiftyThreeSdk/TIUpdateManager.mm; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
+		8B36066C19D242D9002A67DE /* MissedSampleInjector.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = MissedSampleInjector.hpp; sourceTree = "<group>"; };
 		C95A63DA199BC12C00A2B8C1 /* TouchSize.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TouchSize.cpp; sourceTree = "<group>"; };
 		C95A63DB199BC12C00A2B8C1 /* TouchSize.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TouchSize.h; sourceTree = "<group>"; };
 		D380A52019CC9221003CD0A1 /* FTLogPrivate.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = FTLogPrivate.cpp; path = FiftyThreeSdk/FTLogPrivate.cpp; sourceTree = "<group>"; };
@@ -209,6 +210,7 @@
 				0416CA9018A42B51004EAC00 /* CommonDeclarations.h */,
 				0416CA9218A42B51004EAC00 /* CubicPolynomial.hpp */,
 				0416CA9318A42B51004EAC00 /* DataStream.hpp */,
+				8B36066C19D242D9002A67DE /* MissedSampleInjector.hpp */,
 				0416CA9418A42B51004EAC00 /* Debug.cpp */,
 				0416CA9518A42B51004EAC00 /* Debug.h */,
 				0416CA9618A42B51004EAC00 /* DumbStylus.cpp */,

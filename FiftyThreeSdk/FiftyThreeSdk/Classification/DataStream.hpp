@@ -58,7 +58,9 @@ public:
 
     static DataStream<DataType>::Ptr New() { return Stream::Ptr(new Stream()); }
 
-    double           FirstAbsoluteTimestamp() { return _t0; }
+    double        SetFirstAbsoluteTimestamp(double newValue) { _t0 = newValue; }
+    double           FirstAbsoluteTimestamp() const { return _t0; }
+
     StdVectorFloat & RelativeTimestamp() { return _relativeTimestamp; }
     StdVectorFloat const & RelativeTimestamp() const { return _relativeTimestamp; }
 

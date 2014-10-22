@@ -424,7 +424,10 @@ int Stroke::IndexClosestToTime(double time)
     int idx = 0;
     double currentDiff = std::abs(time - FirstAbsoluteTimestamp());
 
-    for (int i = 0; i < Size(); ++i)
+    // i == 1 is the correct starting place.  the i == 0 case is handled above,
+    // and if the second point on the curve is further away in time, we'll immediately exit the loop.
+    // this happens when time <= FirstAbsoluteTimestamp() + .5 * (sampling interval)
+    for (int i = 1; i < Size(); ++i)
     {
         double newDiff = std::abs(time - AbsoluteTimestamp(i));
 
@@ -619,6 +622,62 @@ Eigen::Vector2f Stroke::LastPoint() const
     }
 }
 
+Stroke::Stroke(core::Touch const & touch, int maxPoints) : _computeStatistics(false)
+{
+    int counter = 0;
+    for (auto & sample : *(touch.History()))
+    {
+        if (maxPoints && counter >= maxPoints)
+        {
+            break;
+        }
+
+        AddPoint(sample.Location(), sample.TimestampSeconds());
+
+        ++counter;
+    }
+}
+
+void Stroke::DenoiseFirstPoint(float lambda, float maxTravel)
+{
+
+    CubicPolynomial2f P;
+
+    switch (Size())
+    {
+        case 2:
+        case 1:
+        case 0:
+        {
+            return;
+            break;
+        }
+
+        case 3:
+        {
+            P = CubicPolynomial2f::LineWithValuesAtTimes(XY(1), XY(2),
+                                                         RelativeTimestamp(1), RelativeTimestamp(2));
+            break;
+        }
+
+        case 4:
+        default:
+        {
+            P = CubicPolynomial2f::QuadraticWithValuesAtTimes(XY(1), XY(2), XY(3),
+                                                              RelativeTimestamp(1), RelativeTimestamp(2), RelativeTimestamp(3));
+            break;
+        }
+
+    }
+
+    Vector2f target         = (1.0f - lambda) * XY(0) + lambda * P.ValueAt(RelativeTimestamp(0));
+    Vector2f correction     = target - XY(0);
+    float legalLength       = std::min(correction.norm(), maxTravel);
+    correction             *= legalLength / correction.norm();
+
+    _XYDataStream.Data()[0] = XY(0) + correction;
+}
+
 Eigen::Map<Eigen::VectorXf> Stroke::XYMap(Interval const & I)
 {
     float *data = XYPointer();
@@ -737,7 +796,9 @@ float Stroke::SegmentLength(fiftythree::sdk::Interval const &I)
 
 Stroke Stroke::SubStroke(Interval subInterval) const
 {
-    Stroke subStroke;
+    // no statistics on substrokes -- first, it doesn't make sense unless we replay all the samples,
+    // and second, creating the shared ptr can be a performance hit in loops.
+    Stroke subStroke(false);
 
     if (LastValidIndex() == -1)
     {
@@ -749,10 +810,11 @@ Stroke Stroke::SubStroke(Interval subInterval) const
     int a = (int)validSubInterval._index;
     int b = (int)validSubInterval._index + (int)validSubInterval._count;
 
-    //subStroke.XY() = std::vector< Vector2f >(&_XY[a], &_XY[b]);
-    //subStroke._relativeTimestamp = std::vector<float>(&_relativeTimestamp[a], &_relativeTimestamp[b]);
-
     subStroke._XYDataStream.Data() = std::vector< Vector2f >(&(_XYDataStream.Data()[a]), &(_XYDataStream.Data()[b]));
+    subStroke._XYDataStream.RelativeTimestamp() = std::vector<float>(&(_XYDataStream.RelativeTimestamp()[a]),
+                                                                     &(_XYDataStream.RelativeTimestamp()[b]));
+
+    subStroke._XYDataStream.SetFirstAbsoluteTimestamp(FirstAbsoluteTimestamp());
 
     DebugAssert(subStroke.Size() == subInterval._count);
 
