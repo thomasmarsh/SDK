@@ -6,6 +6,7 @@
 //
 
 #import "Core/NSString+urlEncoding.h"
+#import "Core/NSURL+Helpers.h"
 #import "FiftyThreeSdk/FTXCallbackURL.h"
 
 @interface FTXCallbackURL ()
@@ -95,38 +96,10 @@ NSString * const kFTXCallbackUrlSuccessKey = @"x-success";
     return url;
 }
 
-+(NSDictionary*)parseQueryString:(NSString*)query
-{
-    if ([query length] == 0)
-    {
-        return nil;
-    }
-
-    NSMutableDictionary* parameters = [NSMutableDictionary dictionary];
-
-    for (NSString* parameter in [query componentsSeparatedByString:@"&"])
-    {
-        NSRange range = [parameter rangeOfString:@"="];
-
-        if (range.location != NSNotFound)
-        {
-            NSString * value = [parameter substringFromIndex:range.location+range.length];
-            NSString * urlDecodedValue = [value urlDecodeUsingEncoding:NSUTF8StringEncoding];
-            [parameters setValue:urlDecodedValue
-                          forKey:[parameter substringToIndex:range.location]];
-        }
-        else
-        {
-            [parameters setValue:@"" forKey:[parameter urlDecodeUsingEncoding:NSUTF8StringEncoding]];
-        }
-    }
-    return parameters;
-}
-
 + (FTXCallbackURL *)URLWithNSURL:(NSURL *)other
 {
     FTXCallbackURL *url = [[FTXCallbackURL alloc] initWithString:[other absoluteString]];
-    NSDictionary *queryParameters = [FTXCallbackURL parseQueryString:other.query];
+    NSDictionary *queryParameters = [url generateQueryDictionary];
 
     if ([queryParameters objectForKey:kFTXCallbackUrlSourceKey])
     {
@@ -148,9 +121,11 @@ NSString * const kFTXCallbackUrlSuccessKey = @"x-success";
         url.cancelUrl = [NSURL URLWithString:queryParameters[kFTXCallbackUrlCancelKey]];
     }
 
-    if (other.path)
+    if (other.path.length > 0)
     {
-        url.action = ([url.path characterAtIndex:0] == '/')? [url.path substringFromIndex:1] : url.path;
+        url.action = (([url.path characterAtIndex:0] == '/')
+                      ? [url.path substringFromIndex:1]
+                      : url.path);
     }
     return url;
 }
