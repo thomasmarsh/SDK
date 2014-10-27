@@ -6,7 +6,7 @@
 //
 
 #import "Core/NSString+urlEncoding.h"
-#import "Core/NSURL+Helpers.h"
+#import "Core/NSURL+FTHelpers.h"
 #import "FiftyThreeSdk/FTXCallbackURL.h"
 
 @interface FTXCallbackURL ()
