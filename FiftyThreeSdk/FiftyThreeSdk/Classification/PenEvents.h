@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <list>
+
 #include "Core/Touch/Touch.h"
 #include "FiftyThreeSdk/Classification/Cluster.h"
 #include "FiftyThreeSdk/Classification/CommonDeclarations.h"
