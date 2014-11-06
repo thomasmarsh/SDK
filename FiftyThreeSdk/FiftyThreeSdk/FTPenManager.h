@@ -162,6 +162,9 @@ typedef NS_ENUM(NSInteger, FTPairingUIStyle) {
 // Returns nil if you are not on iOS8+ or pencil isn't connected.
 - (NSNumber *)smoothedRadiusForTouch:(UITouch *)uiTouch;
 
+// Unnormalized smoothed radius the value is CGPoints.
+- (NSNumber *)smoothedRadiusInCGPointsForTouch:(UITouch *)uiTouch;
+
 #pragma mark -  FTPenManager - Support & Marketing URLs
 
 // This provides a link the FiftyThree's marketing page about Pencil.

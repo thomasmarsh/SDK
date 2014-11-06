@@ -2572,6 +2572,18 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     return nil;
 }
 
+- (NSNumber *)smoothedRadiusInCGPointsForTouch:(UITouch *)uiTouch
+{
+    BOOL connected = FTPenManagerStateIsConnected(self.state);
+    auto ftTouch = fiftythree::core::spc<fiftythree::core::TouchTrackerObjC>(fiftythree::core::TouchTracker::Instance())->TouchForUITouch(uiTouch);
+    if (connected && ftTouch && ftTouch->SmoothedCGPointRadius())
+    {
+        float r = *(ftTouch->SmoothedCGPointRadius());
+        return @(r);
+    }
+    return nil;
+}
+
 #pragma mark - Firmware Upgrade Inter app Communication
 // Internal. TODO: once hotfix is RI-ed back to develop move PaperAppDelegate to use this for scheme tests.
 - (FTXCallbackURL *)pencilFirmwareUpgradeURL
