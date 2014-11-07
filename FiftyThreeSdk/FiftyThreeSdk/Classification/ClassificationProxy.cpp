@@ -659,7 +659,7 @@ void TouchClassificationProxy::SetClusterType(Cluster::Ptr const & cluster, Touc
         float length   = cluster->TotalLength();
         float lifetime = cluster->LastTimestamp() - cluster->FirstTimestamp();
 
-        float dt = _clusterTracker->Time() - cluster->LastTimestamp();
+//        float dt = _clusterTracker->Time() - cluster->LastTimestamp();
         if (cluster->_clusterTouchType == TouchClassification::Pen
             && newType != TouchClassification::Pen
             && TouchSize::IsPenGivenTouchRadius(*_clusterTracker->Data(cluster->_touchIds.back())))
