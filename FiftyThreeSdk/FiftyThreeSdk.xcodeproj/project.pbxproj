@@ -160,7 +160,6 @@
 		661993D516EF973900B2BEE9 /* FTError.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FTError.h; path = FiftyThreeSdk/FTError.h; sourceTree = SOURCE_ROOT; };
 		663AFED716FA6BD800681A90 /* PenEvent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = PenEvent.cpp; path = FiftyThreeSdk/PenEvent.cpp; sourceTree = SOURCE_ROOT; };
 		663AFED816FA6BD800681A90 /* PenEvent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PenEvent.h; path = FiftyThreeSdk/PenEvent.h; sourceTree = SOURCE_ROOT; };
-		6644317216F7FB920049E570 /* boost.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = boost.framework; path = ../../ThirdParty/boost/framework/boost.framework; sourceTree = "<group>"; };
 		665C1F5E16F0F23100F1BCB7 /* FTPen+Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "FTPen+Private.h"; path = "FiftyThreeSdk/FTPen+Private.h"; sourceTree = SOURCE_ROOT; };
 		666DC55C170CF33C00D6B3C2 /* FTApplication.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FTApplication.h; path = FiftyThreeSdk/FTApplication.h; sourceTree = SOURCE_ROOT; };
 		666DC55D170CF33C00D6B3C2 /* FTApplication.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FTApplication.m; path = FiftyThreeSdk/FTApplication.m; sourceTree = SOURCE_ROOT; };
@@ -348,7 +347,6 @@
 		66A8387316E52D840048FFE4 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				6644317216F7FB920049E570 /* boost.framework */,
 				66A8387416E52D840048FFE4 /* Foundation.framework */,
 			);
 			name = Frameworks;
