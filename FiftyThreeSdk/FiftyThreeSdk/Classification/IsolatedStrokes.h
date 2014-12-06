@@ -287,7 +287,7 @@ void MaxAndL2Norm(const Eigen::MatrixBase<DerivedA> &x, const Eigen::MatrixBase<
 template<typename DerivedA, typename DerivedB>
 std::pair<typename DerivedA::Scalar, typename DerivedA::Scalar> MaxAndL2Norm(const Eigen::MatrixBase<DerivedA> &x, const Eigen::MatrixBase<DerivedB> &weights)
 {
-    return std::make_pair(RowwiseMaxNorm(x), weights.dot(x.cwiseAbs2().rowwise().sum()));
+    return {RowwiseMaxNorm(x), weights.dot(x.cwiseAbs2().rowwise().sum())};
 }
 
 template<typename DerivedA, typename DerivedB>

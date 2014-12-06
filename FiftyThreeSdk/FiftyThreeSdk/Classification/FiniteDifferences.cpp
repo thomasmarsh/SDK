@@ -12,7 +12,6 @@
 #include "FiftyThreeSdk/Classification/EigenLAB.h"
 #include "FiftyThreeSdk/Classification/FiniteDifferences.h"
 
-using std::make_pair;
 using std::map;
 using std::vector;
 
@@ -48,20 +47,20 @@ vector<int> DividedDifferenceStencil(const int &order)
         int tempOrder = 0;
         // [0]
         stencil.push_back(0);
-        StoredResults.insert( std::make_pair(tempOrder, stencil) );
+        StoredResults.insert({tempOrder, stencil});
 
         tempOrder = 1;
         // [-1 0]
         stencil.push_back(0);
         stencil[0] = -1;
-        StoredResults.insert( std::make_pair(tempOrder, stencil) );
+        StoredResults.insert({tempOrder, stencil});
 
         tempOrder = 2;
         // [1 -1 0]
         stencil.push_back(0);
         stencil[0] = 1;
         stencil[1] = -1;
-        StoredResults.insert( std::make_pair(tempOrder, stencil) );
+        StoredResults.insert({tempOrder, stencil});
 
         tempOrder = 3;
         // [-2 1 -1 0]
@@ -69,7 +68,7 @@ vector<int> DividedDifferenceStencil(const int &order)
         stencil[0] = -2;
         stencil[1] = 1;
         stencil[2] = -1;
-        StoredResults.insert( std::make_pair(tempOrder, stencil) );
+        StoredResults.insert({tempOrder, stencil});
     }
 
     DebugAssert(order >= 0);
@@ -97,7 +96,7 @@ vector<int> DividedDifferenceStencil(const int &order)
 
         stencil[order] = 0;
 
-        StoredResults.insert(make_pair(order, stencil));
+        StoredResults.insert({order, stencil});
     }
     return stencil;
 }
