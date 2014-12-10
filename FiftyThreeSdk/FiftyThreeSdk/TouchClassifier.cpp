@@ -5,17 +5,14 @@
 //  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
 //
 
-#include <ios>
-
 #include "Core/Touch/Touch.h"
 #include "Core/Touch/TouchTracker.h"
 #include "FiftyThreeSdk/Classification//Classifier.h"
 #include "FiftyThreeSdk/TouchClassifier.h"
 
-typedef fiftythree::sdk::Classifier Classifier;
+using Classifier = fiftythree::sdk::Classifier;
 using namespace fiftythree::core;
 using namespace fiftythree::sdk;
-using std::cout;
 using std::vector;
 
 namespace fiftythree

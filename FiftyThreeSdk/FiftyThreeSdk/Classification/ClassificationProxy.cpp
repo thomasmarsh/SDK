@@ -7,6 +7,7 @@
 
 #include <iomanip>
 #include <tuple>
+#include <iostream>
 
 #include "Core/Eigen.h"
 #include "Core/Log.h"

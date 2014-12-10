@@ -7,6 +7,7 @@
 
 #include <cmath>
 #include <numeric>
+#include <iostream>
 
 #include "Core/Eigen.h"
 #include "Core/Memory.h"
