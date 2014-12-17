@@ -41,10 +41,32 @@ typedef NS_ENUM(NSInteger, FTTouchClassification)
 
 //  This describes a Touch classification change.
 @interface FTTouchClassificationInfo : NSObject
-@property (nonatomic, readonly) UITouch *touch;
+
+// The touch property may be nil. For example if the touch has already ended but we re-classify it
+// due to reading more data off the pen.
+//
+// Background: UITouches aren't designed to be retained
+// as they are reused: https://developer.apple.com/library/ios/documentation/UIKit/Reference/UITouch_Class/
+// Here's the relevant bit from Apple's UITouch documentation:
+//
+// "You should never retain an UITouch object when handling an event.
+//  If you need to keep information about a touch from one phase to another, you should copy that information
+//  from the UITouch object."
+//
+// This is motivation for providing the integer key touchId and the method
+// (NSInteger)idForTouch:(UITouch *)touch;
+// 
+@property (nonatomic, readonly, weak) UITouch *touch;
+
+// See above about why we use touchId integer for book keeping code. This is unique per touch.
 @property (nonatomic, readonly) NSInteger touchId;
+
+// Prior classification state.
 @property (nonatomic, readonly) FTTouchClassification oldValue;
+
+// Newest classification result. Rendering should be updated to reflect this state.
 @property (nonatomic, readonly) FTTouchClassification newValue;
+
 @end
 
 @protocol FTTouchClassificationsChangedDelegate <NSObject>

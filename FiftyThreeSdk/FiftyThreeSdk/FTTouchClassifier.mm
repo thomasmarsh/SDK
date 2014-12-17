@@ -12,7 +12,7 @@
 #import "FiftyThreeSdk/TouchClassifier.h"
 
 @interface FTTouchClassificationInfo ()
-@property (nonatomic, readwrite) UITouch *touch;
+@property (nonatomic, readwrite, weak) UITouch *touch;
 @property (nonatomic, readwrite) NSInteger touchId;
 @property (nonatomic, readwrite) FTTouchClassification oldValue;
 @property (nonatomic, readwrite) FTTouchClassification newValue;
@@ -45,7 +45,7 @@ using namespace fiftythree::sdk;
             self.touchClassificationsDidChangeAdapter = EventToObjCAdapter<const std::vector<TouchClassificationChangedEventArgs> & >::Bind(classifier->TouchClassificationsDidChange(),
                                                                                                                                         self,
                                                                                                                                         @selector(touchClassificationsDidChange:));
-            
+
             self.touchClassificationsDidChangeAdapter = EventToObjCAdapter<const std::vector<TouchClassificationChangedEventArgs> & >::Bind(classifier->TouchContinuedClassificationsDidChange(),
                                                                                                                                             self,
                                                                                                                                             @selector(touchClassificationsDidChange:));
@@ -139,7 +139,7 @@ using namespace fiftythree::sdk;
             }
         }
     }
-    
+
     if ([updatedTouchClassifications count] > 0)
     {
         [self.delegate classificationsDidChangeForTouches:updatedTouchClassifications];
