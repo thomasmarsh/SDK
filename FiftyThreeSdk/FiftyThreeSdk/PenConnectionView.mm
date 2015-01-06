@@ -2,7 +2,7 @@
 //  PenConnectionView.mm
 //  FiftyThreeSdk
 //
-//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
+//  Copyright (c) 2015 FiftyThree, Inc. All rights reserved.
 //
 
 #include "Core/Eigen.h"
@@ -13,7 +13,7 @@
 
 #import "Core/Enum.h"
 #import "Core/Touch/TouchTracker.h"
-#import "Core/UIView+Helpers.h"
+#import "Core/UIView+FTHelpers.h"
 #import "FiftyThreeSdk/FTPenManager+Internal.h"
 #import "FiftyThreeSdk/FTPenManager.h"
 #import "FiftyThreeSdk/PairingSpotView.h"
