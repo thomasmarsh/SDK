@@ -136,8 +136,8 @@ typedef NS_ENUM(NSInteger, FTPairingUIStyle) {
 // Use this to get at the instance. Note, this will initialize CoreBluetooth and
 // potentially trigger the system UIAlertView for enabling Bluetooth LE.
 //
-// Please note that you need to be running on iOS7 or higher to use any of this SDK. You can safely *link*
-// against this SDK and not call it on iOS6.
+// Please note that you need to be running on iOS 7 or higher to use any of this SDK. You can safely *link*
+// against this SDK and not call it on iOS 6.
 + (FTPenManager *)sharedInstance;
 
 // This provides a view that implements our BTLE pairing UI. The control is 81x101 points.
@@ -157,12 +157,12 @@ typedef NS_ENUM(NSInteger, FTPairingUIStyle) {
 // Returns a normalized value that corresponds to physical touch size in MM. This signal
 // is very heavily quantized.
 //
-// Returns nil if you are not on iOS8 or pencil isn't connected.
+// Returns nil if you are not on iOS 8 or pencil isn't connected.
 - (NSNumber *)normalizedRadiusForTouch:(UITouch *)uiTouch;
 
 // Returns a smoothed normalized value that is suitable for rendering variable width ink.
 //
-// Returns nil if you are not on iOS8+ or pencil isn't connected.
+// Returns nil if you are not on iOS 8+ or pencil isn't connected.
 - (NSNumber *)smoothedRadiusForTouch:(UITouch *)uiTouch;
 
 // Unnormalized smoothed radius the value is CGPoints.

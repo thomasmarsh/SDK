@@ -820,7 +820,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
         BOOL hasRecentCoreBluetooth = weakSelf.centralManager && [weakSelf.centralManager respondsToSelector:@selector(retrieveConnectedPeripheralsWithServices:)];
 
-        NSAssert(hasRecentCoreBluetooth, @"iOS7 or later is required.");
+        NSAssert(hasRecentCoreBluetooth, @"iOS 7 or later is required.");
 
         NSArray *peripherals = [weakSelf.centralManager retrieveConnectedPeripheralsWithServices:@[[FTPenServiceUUIDs penService]]];
 
@@ -2488,7 +2488,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 {
     NSAssert([NSThread isMainThread], @"sharedInstance must be called on the UI thread.");
     BOOL isOS7 = (floor(NSFoundationVersionNumber) > NSFoundationVersionNumber_iOS_6_1);
-    NSAssert(isOS7, @"iOS7 or greater is required.");
+    NSAssert(isOS7, @"iOS 7 or greater is required.");
 
     if (!sharedInstance)
     {

@@ -1,6 +1,6 @@
 1.1.8 
-- Fix startup crash when optionally linking against FiftyThree SDK on iOS6 devices. 
-- Updated documentation to note that to use FiftyThree SDK you should be running on iOS7 or greater.
+- Fix startup crash when optionally linking against FiftyThree SDK on iOS 6 devices. 
+- Updated documentation to note that to use FiftyThree SDK you should be running on iOS 7 or greater.
 
 1.1.7
 - Bug Fixes
