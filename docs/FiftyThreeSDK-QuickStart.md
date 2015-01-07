@@ -6,7 +6,7 @@ FiftyThree, Inc. Confidential.
 
 This SDK requires the following:
 
-1) iOS7 or above. We use a number of newer CoreBluetooth APIs. You can check at run time and not use ```FTPenManager``` if you're on iOS6.1 or below.
+1) iOS7 or above. We use a number of newer CoreBluetooth APIs. You can check at run time and not use ```FTPenManager``` if you're on iOS6. Older versions of iOS aren't supported at all and will crash at run time.
 
 2) Bluetooth Low Energy (BTLE) compatible hardware. BTLE isn't supported on the iPad 2, iPhone 4 and earlier.
 

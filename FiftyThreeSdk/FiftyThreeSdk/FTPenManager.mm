@@ -2,7 +2,7 @@
 //  FTPenManager.mm
 //  FiftyThreeSdk
 //
-//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
+//  Copyright (c) 2015 FiftyThree, Inc. All rights reserved.
 //
   //
 //  FTPenManager.mm
@@ -817,6 +817,10 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
                                                                        TKStateMachine *stateMachine)
     {
         weakSelf.state = FTPenManagerStateSeeking;
+
+        BOOL hasRecentCoreBluetooth = weakSelf.centralManager && [weakSelf.centralManager respondsToSelector:@selector(retrieveConnectedPeripheralsWithServices:)];
+
+        NSAssert(hasRecentCoreBluetooth, @"iOS7 or later is required.");
 
         NSArray *peripherals = [weakSelf.centralManager retrieveConnectedPeripheralsWithServices:@[[FTPenServiceUUIDs penService]]];
 
@@ -2436,50 +2440,6 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     MLOG_INFO(FTLogSDKVerbose, "tipPressureDid Chage %f", tipPressure);
 }
 
-#pragma mark - Public API
-
-+ (FTPenManager *)sharedInstance
-{
-    NSAssert([NSThread isMainThread], @"sharedInstance must be called on the UI thread.");
-    if (!sharedInstance)
-    {
-        [FTEventDispatcher sharedInstance].classifier = fiftythree::sdk::TouchClassifier::New();
-
-        sharedInstance = [[FTPenManager alloc] init];
-        sharedInstance.classifier = [[FTTouchClassifier alloc] init];
-        sharedInstance.automaticUpdatesEnabled = YES;
-    }
-    return sharedInstance;
-}
-
-- (UIView *)pairingButtonWithStyle:(FTPairingUIStyle)style
-{
-    NSAssert([NSThread isMainThread], @"This must be called on the UI thread.");
-
-    PenConnectionView *penConnectionView = [[PenConnectionView alloc] init];
-    penConnectionView.penManager = self;
-    penConnectionView.suppressDialogs = YES;
-    penConnectionView.isActive = true;
-    penConnectionView.delegate = self;
-    if (FTPairingUIStyleDebug == style)
-    {
-        penConnectionView.debugControlsVisibility = VisibilityStateVisible;
-    }
-    else
-    {
-        penConnectionView.debugControlsVisibility = VisibilityStateHidden;
-    }
-
-    auto instance = fiftythree::core::spc<AnimationPumpObjC>(AnimationPump::Instance());
-    DebugAssert(instance->GetDelegate() == nil || instance->GetDelegate() == self);
-
-    instance->SetDelegate(self);
-
-    [self.pairingViews addObject:penConnectionView];
-
-    return penConnectionView;
-}
-
 - (void)setAutomaticUpdatesEnabled:(BOOL)useDisplayLink
 {
     if (useDisplayLink)
@@ -2522,6 +2482,53 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     }
 }
 
+#pragma mark - Public API
+
++ (FTPenManager *)sharedInstance
+{
+    NSAssert([NSThread isMainThread], @"sharedInstance must be called on the UI thread.");
+    BOOL isOS7 = (floor(NSFoundationVersionNumber) > NSFoundationVersionNumber_iOS_6_1);
+    NSAssert(isOS7, @"iOS7 or greater is required.");
+
+    if (!sharedInstance)
+    {
+        [FTEventDispatcher sharedInstance].classifier = fiftythree::sdk::TouchClassifier::New();
+
+        sharedInstance = [[FTPenManager alloc] init];
+        sharedInstance.classifier = [[FTTouchClassifier alloc] init];
+        sharedInstance.automaticUpdatesEnabled = YES;
+    }
+    return sharedInstance;
+}
+
+- (UIView *)pairingButtonWithStyle:(FTPairingUIStyle)style
+{
+    NSAssert([NSThread isMainThread], @"This must be called on the UI thread.");
+
+    PenConnectionView *penConnectionView = [[PenConnectionView alloc] init];
+    penConnectionView.penManager = self;
+    penConnectionView.suppressDialogs = YES;
+    penConnectionView.isActive = true;
+    penConnectionView.delegate = self;
+    if (FTPairingUIStyleDebug == style)
+    {
+        penConnectionView.debugControlsVisibility = VisibilityStateVisible;
+    }
+    else
+    {
+        penConnectionView.debugControlsVisibility = VisibilityStateHidden;
+    }
+
+    auto instance = fiftythree::core::spc<AnimationPumpObjC>(AnimationPump::Instance());
+    DebugAssert(instance->GetDelegate() == nil || instance->GetDelegate() == self);
+
+    instance->SetDelegate(self);
+
+    [self.pairingViews addObject:penConnectionView];
+
+    return penConnectionView;
+}
+
 - (void)shutdown
 {
     NSAssert([NSThread isMainThread], @"shutdown must be called on the UI thread.");
@@ -2547,6 +2554,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
     sharedInstance = nil;
 }
+
 #pragma mark - Surface pressure iOS8 APIs
 - (NSNumber *)normalizedRadiusForTouch:(UITouch *)uiTouch
 {
