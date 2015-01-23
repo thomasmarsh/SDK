@@ -2,7 +2,7 @@
 //  FTPen.mm
 //  FiftyThreeSdk
 //
-//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
+//  Copyright (c) 2015 FiftyThree, Inc. All rights reserved.
 //
 
 #import <CoreBluetooth/CoreBluetooth.h>
@@ -702,18 +702,26 @@ NSString * const kFTPenAccelerationPropertyName = @"acceleration";
     return self.deviceInfoServiceClient.PnPID;
 }
 
-#pragma mark - Model
+#pragma mark - Style
 
-- (NSNumber *)isAluminumPencil
+- (FTPencilStyle)style
 {
-    if (!self.modelNumber)
+    if (self.modelNumber)
     {
-        return nil;
+        // Example modelNumber: 53PA02
+        NSString *modelNumber = self.modelNumber;
+        if ([modelNumber hasPrefix:@"53PA01"])
+        {
+            // TODO: There were 30K gold pencils with this model number. We need to detect these and correct.
+            return FTPencilStyleGraphite;
+        }
+        else if ([modelNumber hasPrefix:@"53PA05"])
+        {
+            return FTPencilStyleGold;
+        }
     }
-    // Example modelNumber: 53PA02
-    NSString *modelNumber = self.modelNumber;
-    NSString *metalModelNumberPrefix = @"53PA";
-    return @([modelNumber hasPrefix:metalModelNumberPrefix]);
+
+    return FTPencilStyleWalnut;
 }
 
 @end

@@ -2,7 +2,7 @@
 //  FTPen+Private.h
 //  FiftyThreeSdk
 //
-//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
+//  Copyright (c) 2015 FiftyThree, Inc. All rights reserved.
 //
 
 #pragma once
@@ -30,6 +30,13 @@ extern NSString * const kFTPenManufacturingIDPropertyName;
 extern NSString * const kFTPenLastErrorCodePropertyName;
 extern NSString * const kFTPenAuthenticationCodePropertyName;
 extern NSString * const kFTPenHasListenerPropertyName;
+
+enum FTPencilStyle
+{
+    FTPencilStyleWalnut,
+    FTPencilStyleGraphite,
+    FTPencilStyleGold,
+};
 
 @class CBCentralManager;
 @class CBPeripheral;
@@ -149,9 +156,9 @@ extern NSString * const kFTPenHasListenerPropertyName;
 
 // Returns a boolean value as a NSNumber, or nil if this cannot be determined.
 //
-// Returns @(YES) IFF a pencil is connected, its model number is known and it is an aluminum
-// pencil.
-@property (nonatomic, readonly) NSNumber *isAluminumPencil;
+// If a pencil is connected and its model number is known, this will return the style
+// otherwise, it defaults to Walnut
+@property (nonatomic, readonly) FTPencilStyle style;
 
 - (id)initWithPeripheral:(CBPeripheral *)peripheral;
 
