@@ -116,13 +116,13 @@ std::pair<TouchClassification, bool> IsolatedStrokesClassifier::ClassifyForPinch
     float normalD4     = stats->_normalD4     / (.0001f + L);
     float tangentD4    = stats->_tangentialD4 / (.0001f + L);
 
-    float jerkOverK    = normalJerk / totalAbsK;
+    __unused float jerkOverK    = normalJerk / totalAbsK;
     if (totalAbsK == 0.0f)
     {
         jerkOverK = 0.0f;
     }
 
-    float jerkNOverT = normalJerk / tangentJerk;
+    __unused float jerkNOverT = normalJerk / tangentJerk;
     if (tangentJerk == 0.0f)
     {
         if (normalJerk > 0.0f)
@@ -135,7 +135,7 @@ std::pair<TouchClassification, bool> IsolatedStrokesClassifier::ClassifyForPinch
         }
     }
 
-    float d4NOverT = normalD4 / tangentD4;
+    __unused float d4NOverT = normalD4 / tangentD4;
     if (tangentD4 == 0.0f)
     {
         if (normalD4 > 0.0f)
@@ -148,11 +148,11 @@ std::pair<TouchClassification, bool> IsolatedStrokesClassifier::ClassifyForPinch
         }
     }
 
-    float d4TOverK;
-    float d4NOverK;
+    __unused float d4TOverK;
+    __unused float d4NOverK;
 
-    float jerkTOverK;
-    float jerkNOverK;
+    __unused float jerkTOverK;
+    __unused float jerkNOverK;
 
     d4TOverK   = stats->_tangentialD4   /   (1.0f + stats->_normalD2);
     d4NOverK   = stats->_normalD4       /   (1.0f + stats->_normalD2);
@@ -160,7 +160,7 @@ std::pair<TouchClassification, bool> IsolatedStrokesClassifier::ClassifyForPinch
     jerkTOverK = stats->_tangentialD3   /   (1.0f + stats->_normalD2);
     jerkNOverK = stats->_normalD3       /   (1.0f + stats->_normalD2);
 
-    float pFinger = sqrtf(totalKScore * normalKScore);
+    __unused float pFinger = sqrtf(totalKScore * normalKScore);
     if (normalKScore < totalKScore)
     {
         // kScore is a uses only normal acceleration so if it is more confident, use it.
@@ -183,9 +183,9 @@ std::pair<TouchClassification, bool> IsolatedStrokesClassifier::ClassifyForPinch
     }
 
     float npVoteScore = 1.0f;
-    float bayesScore  = 1.0f;
-    float convexScore = 1.0f;
-    float boostScore  = 1.0f;
+    __unused float bayesScore  = 1.0f;
+    __unused float convexScore = 1.0f;
+    __unused float boostScore  = 1.0f;
     if (TouchIdIsolatedSize(touchId) >= 4)
     {
         bayesScore  = BayesLikelihoodScore(touchId);
@@ -205,7 +205,7 @@ std::pair<TouchClassification, bool> IsolatedStrokesClassifier::ClassifyForPinch
        )
     {
 
-        float confidence = std::max(0.0f, stats->_arcLength - 11.0f);
+        __unused float confidence = std::max(0.0f, stats->_arcLength - 11.0f);
         confidence       = confidence / (1.0f + confidence);
 
         if (L > 22.0f && npVoteScore > .99f)
