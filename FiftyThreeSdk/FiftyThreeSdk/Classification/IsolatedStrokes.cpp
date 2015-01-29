@@ -101,71 +101,7 @@ std::pair<TouchClassification, bool> IsolatedStrokesClassifier::ClassifyForPinch
 
     StrokeStatistics::cPtr stats  = stroke->EarlyStatistics();
 
-    float totalAbsK              = stats->_totalAbsoluteD2InSpace;
     float L                      = stats->_arcLength;
-
-    float normalD2   = stats->_normalD2  / (.0001f + L);
-
-    float totalKScore  = std::max(1.0f - totalAbsK / (.0001f + L), 0.0f);
-
-    float normalKScore  = std::max(1.0f - normalD2, 0.0f);
-
-    float normalJerk   = stats->_normalD3     / (.0001f + L);
-    float tangentJerk  = stats->_tangentialD3 / (.0001f + L);
-
-    float normalD4     = stats->_normalD4     / (.0001f + L);
-    float tangentD4    = stats->_tangentialD4 / (.0001f + L);
-
-    __unused float jerkOverK    = normalJerk / totalAbsK;
-    if (totalAbsK == 0.0f)
-    {
-        jerkOverK = 0.0f;
-    }
-
-    __unused float jerkNOverT = normalJerk / tangentJerk;
-    if (tangentJerk == 0.0f)
-    {
-        if (normalJerk > 0.0f)
-        {
-            jerkNOverT = 1000.0f;
-        }
-        else
-        {
-            jerkNOverT = 0.0f;
-        }
-    }
-
-    __unused float d4NOverT = normalD4 / tangentD4;
-    if (tangentD4 == 0.0f)
-    {
-        if (normalD4 > 0.0f)
-        {
-            d4NOverT = 1000.0f;
-        }
-        else
-        {
-            d4NOverT = 0.0f;
-        }
-    }
-
-    __unused float d4TOverK;
-    __unused float d4NOverK;
-
-    __unused float jerkTOverK;
-    __unused float jerkNOverK;
-
-    d4TOverK   = stats->_tangentialD4   /   (1.0f + stats->_normalD2);
-    d4NOverK   = stats->_normalD4       /   (1.0f + stats->_normalD2);
-
-    jerkTOverK = stats->_tangentialD3   /   (1.0f + stats->_normalD2);
-    jerkNOverK = stats->_normalD3       /   (1.0f + stats->_normalD2);
-
-    __unused float pFinger = sqrtf(totalKScore * normalKScore);
-    if (normalKScore < totalKScore)
-    {
-        // kScore is a uses only normal acceleration so if it is more confident, use it.
-        pFinger = normalKScore;
-    }
 
     if (!_clusterTracker->TouchWithId(touchId)->IsPhaseEndedOrCancelled())
     {
@@ -183,15 +119,9 @@ std::pair<TouchClassification, bool> IsolatedStrokesClassifier::ClassifyForPinch
     }
 
     float npVoteScore = 1.0f;
-    __unused float bayesScore  = 1.0f;
-    __unused float convexScore = 1.0f;
-    __unused float boostScore  = 1.0f;
     if (TouchIdIsolatedSize(touchId) >= 4)
     {
-        bayesScore  = BayesLikelihoodScore(touchId);
         npVoteScore = NPVoteScoreWithFalsePositiveRate(touchId, .02f);
-        convexScore = ConvexScore(touchId);
-        boostScore  = AdaboostScore(touchId);
     }
 
     if (true
@@ -204,9 +134,6 @@ std::pair<TouchClassification, bool> IsolatedStrokesClassifier::ClassifyForPinch
        && npVoteScore > .01f
        )
     {
-
-        __unused float confidence = std::max(0.0f, stats->_arcLength - 11.0f);
-        confidence       = confidence / (1.0f + confidence);
 
         if (L > 22.0f && npVoteScore > .99f)
         {

@@ -227,13 +227,6 @@ float PenEventClassifier::DurationTimeErrorProbabilityForTouch(core::TouchId pro
             touchDuration = _clusterTracker->CurrentTime() - _clusterTracker->Data(otherId)->FirstTimestamp();
         }
 
-        __unused float timingError = std::abs(touchDuration - switchOnDuration);
-
-        // we don't expect perfect timing, so we don't want to pay a penalty for small errors.
-        // subtract off twice the median switch timing error.
-        float shrinkage = 2.0f * .69f / lambda;
-        timingError = std::max(0.0f, timingError - shrinkage);
-
         if (probeId == otherId)
         {
             probeDuration = touchDuration;

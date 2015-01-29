@@ -192,9 +192,6 @@ void Stroke::UpdateSummaryStatistics()
         _statistics->_totalAbsoluteD2InSpace += d2.norm();
         _statistics->_totalSquaredD2InSpace  += d2.squaredNorm();
 
-        __unused float cross  = d2.x() * d1.y() - d2.y() * d1.x();
-        cross        = std::abs(cross);
-
         float dot    = d2.x() * d1.x() + d2.y() * d1.y();
         dot          = std::abs(dot);
 
