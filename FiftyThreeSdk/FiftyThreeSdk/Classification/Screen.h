@@ -47,8 +47,8 @@ public:
 
     Screen() :
     _scale(1.0f),
-    _heightInPoints(fiftythree::core::DeviceInfo::SafeInstance()->GetDisplayMetrics().ScreenHeight),
-    _widthInPoints(fiftythree::core::DeviceInfo::SafeInstance()->GetDisplayMetrics().ScreenWidth),
+    _heightInPoints(fiftythree::core::DeviceInfo::Instance()->GetDisplayMetrics().ScreenHeight),
+    _widthInPoints(fiftythree::core::DeviceInfo::Instance()->GetDisplayMetrics().ScreenWidth),
     _offscreenStrokes_minEdgeDistance(10.0f),
     _offscreenStrokes_unreliableSampleEdgeDistance(15.0f)
     {
