@@ -2,7 +2,7 @@
 //  OffscreenStrokeDetectionUtilities.cpp
 //  FiftyThreeSdk
 //
-//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
+//  Copyright (c) 2015 FiftyThree, Inc. All rights reserved.
 //
 #include "Core/Mathiness.h"
 #include "Core/Touch/TouchTracker.h"
@@ -304,7 +304,7 @@ InputSample NaiveVelocityFromSamples(const vector<InputSample> & samples)
                     isLastSampleReliable = !IsUnreliableSample(sample) && discardedSampleCount != 0;
                     break;
                 default:
-                    DebugAssert(0);
+                    FTFail("Fell through case statement");
             }
             if (isLastSampleReliable)
             {
@@ -484,7 +484,7 @@ InputSample NaiveVelocityFromSamples(const vector<InputSample> & samples)
                 sampleIdxDelta = +1;
                 break;
             default:
-                DebugAssert(0);
+                FTFail("Fell through case statement");
         }
         vector<InputSample> edgeSamples;
         for (int idx = 0; idx < windowSize; ++idx)

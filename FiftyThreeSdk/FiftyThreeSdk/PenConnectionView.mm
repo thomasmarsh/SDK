@@ -429,7 +429,7 @@ static const CGFloat kPairingSpotTouchRadius_Moved = 150.f;
         }
 
         default:
-            DebugAssert(0);
+            FTFail("Fell through case statement");
             [self.pairingSpotView setConnectionState:FTPairingSpotConnectionStateUnpaired
                                       isDisconnected:NO];
             break;
@@ -683,7 +683,7 @@ static const CGFloat kPairingSpotTouchRadius_Moved = 150.f;
                 shouldIgnore = YES;
                 break;
             default:
-                DebugAssert(0);
+                FTFail("Fell through case statement");
                 break;
         }
     }

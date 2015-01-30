@@ -2,7 +2,7 @@
 //  PairingSpotView.mm
 //  FiftyThreeSdk
 //
-//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
+//  Copyright (c) 2015 FiftyThree, Inc. All rights reserved.
 //
 
 #import <QuartzCore/QuartzCore.h>
@@ -47,7 +47,7 @@ NSString *FTPairingSpotIconTypeName(FTPairingSpotIconType value)
         case FTPairingSpotIconTypeCriticallyLowBattery:
             return @"CriticallyLowBattery";
         default:
-            DebugAssert(0);
+            FTFail("Fell through case statement");
             return @"Unknown";
     }
 }
@@ -63,7 +63,7 @@ NSString *FTPairingSpotIconAnimationStateName(FTPairingSpotIconAnimationState va
         case FTPairingSpotIconAnimationStateAnimatedIn:
             return @"FTPairingSpotIconAnimationStateAnimatedIn";
         default:
-            DebugAssert(0);
+            FTFail("Fell through case statement");
             return @"Unknown";
     }
 }
@@ -81,7 +81,7 @@ NSString *FTPairingSpotConnectionStateName(FTPairingSpotConnectionState value)
         case FTPairingSpotConnectionStateCriticallyLowBattery:
             return @"FTPairingSpotConnectionStateCriticallyLowBattery";
         default:
-            DebugAssert(0);
+            FTFail("Fell through case statement");
             return @"Unknown";
     }
 }
@@ -97,7 +97,7 @@ NSString *FTPairingSpotCometStateName(FTPairingSpotCometState value)
         case FTPairingSpotCometStateCounterClockwise:
             return @"FTPairingSpotCometStateCounterClockwise";
         default:
-            DebugAssert(0);
+            FTFail("Fell through case statement");
             return @"Unknown";
     }
 }
@@ -389,7 +389,7 @@ NSString *FTPairingSpotCometStateName(FTPairingSpotCometState value)
             iconType = FTPairingSpotIconTypeCriticallyLowBattery;
             break;
         default:
-            DebugAssert(0);
+            FTFail("Fell through case statement");
             break;
     }
 
