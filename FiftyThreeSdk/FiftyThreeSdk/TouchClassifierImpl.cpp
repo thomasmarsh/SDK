@@ -2,7 +2,7 @@
 //  TouchClassifierImpl.cpp
 //  FiftyThreeSdk
 //
-//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
+//  Copyright (c) 2015 FiftyThree, Inc. All rights reserved.
 //
 #include <iostream>
 #include <vector>
@@ -124,25 +124,13 @@ void TouchClassifierImpl::UpdateClassifications()
         args.touch = touch;
         args.oldValue = touch->CurrentClassification()();
 
-        bool shouldOverride = ShouldOverrideClassifications();
-        if (shouldOverride)
+        if (_CopyGestureClassifications)
         {
-            fiftythree::core::optional<TouchClassification> touchClassification = OverrideClassificationForTouch(touch);
-            args.newValue = touchClassification ? *touchClassification : args.oldValue;
-
-            *const_cast<Property<TouchClassification> *>(&touch->SingleTapClassification()) = args.newValue;
-            *const_cast<Property<TouchClassification> *>(&touch->LongPressClassification()) = args.newValue;
+            *const_cast<Property<TouchClassification> *>(&touch->SingleTapClassification()) = _Classifier->ClassifyForGesture(touch->Id(), fiftythree::sdk::SingleTouchGestureType::Tap);
+            *const_cast<Property<TouchClassification> *>(&touch->LongPressClassification()) = _Classifier->ClassifyForGesture(touch->Id(), fiftythree::sdk::SingleTouchGestureType::LongPress);
         }
-        else
-        {
-            if (_CopyGestureClassifications)
-            {
-                *const_cast<Property<TouchClassification> *>(&touch->SingleTapClassification()) = _Classifier->ClassifyForGesture(touch->Id(), fiftythree::sdk::SingleTouchGestureType::Tap);
-                *const_cast<Property<TouchClassification> *>(&touch->LongPressClassification()) = _Classifier->ClassifyForGesture(touch->Id(), fiftythree::sdk::SingleTouchGestureType::LongPress);
-            }
 
-            args.newValue = _Classifier->Classify(touch->Id());
-        }
+        args.newValue = _Classifier->Classify(touch->Id());
 
         // The classifier let's us know if it stops tracking a touch. Don't expose this to the client
         // code -- it should just retain the last classification.
@@ -165,16 +153,7 @@ void TouchClassifierImpl::UpdateClassifications()
     _Linker->UpdateTouchContinuationLinkage();
     for (auto & e : continuedClassificationArgs)
     {
-        bool shouldOverride = ShouldOverrideClassifications();
-        if (shouldOverride)
-        {
-            fiftythree::core::optional<TouchClassification> touchClassification = OverrideClassificationForTouch(e.touch);
-            e.newValue = touchClassification ? *touchClassification : e.oldValue;
-        }
-        else
-        {
-            e.newValue = e.touch->ContinuedClassification();
-        }
+        e.newValue = e.touch->ContinuedClassification();
     }
 
     continuedClassificationArgs.erase(remove_if(continuedClassificationArgs.begin(),
@@ -223,16 +202,6 @@ void TouchClassifierImpl::SetCopyGestureClassifications(bool b)
 Classifier::Ptr TouchClassifierImpl::Classifier()
 {
     return _Classifier;
-}
-
-bool TouchClassifierImpl::ShouldOverrideClassifications()
-{
-    return false;
-}
-
-fiftythree::core::optional<TouchClassification> TouchClassifierImpl::OverrideClassificationForTouch(const Touch::cPtr & touch)
-{
-    return fiftythree::core::none;
 }
 
 Eigen::VectorXf TouchClassifierImpl::GeometricStatistics(const Touch::cPtr & t0)

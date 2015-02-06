@@ -2,7 +2,7 @@
 //  TouchClassifierImpl.h
 //  FiftyThreeSdk
 //
-//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
+//  Copyright (c) 2015 FiftyThree, Inc. All rights reserved.
 //
 
 #pragma once
@@ -19,10 +19,10 @@ namespace fiftythree
 {
 namespace sdk
 {
-    
+
 class Classifier;
 class OffscreenTouchClassificationLinker;
-    
+
 // This contains some common functionality.
 class TouchClassifierImpl : virtual public TouchClassifier
 {
@@ -52,16 +52,11 @@ protected:
     // The following two methods let you customize the dispatch of classification events to
     // override the classifier. You might want to do this if you're supporting another stylus e.g., PogoConnect.
 
-    // Default implementation returns false
-    virtual bool ShouldOverrideClassifications();
-
-    virtual fiftythree::core::optional<core::TouchClassification> OverrideClassificationForTouch(const core::Touch::cPtr & touch);
-
     void SetCopyGestureClassifications(bool b);
 private:
     fiftythree::core::shared_ptr<class fiftythree::sdk::Classifier> _Classifier;
     fiftythree::core::shared_ptr<class fiftythree::sdk::OffscreenTouchClassificationLinker> _Linker;
-        
+
     bool _ShowLog;
     bool _Connected;
     bool _CopyGestureClassifications;
