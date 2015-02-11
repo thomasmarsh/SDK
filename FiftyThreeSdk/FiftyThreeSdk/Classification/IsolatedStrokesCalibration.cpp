@@ -7,6 +7,7 @@
 
 #include "Core/Eigen.h"
 #include "FiftyThreeSdk/Classification/IsolatedStrokes.h"
+// clang-format off
 
 using namespace Eigen;
 
@@ -898,3 +899,6 @@ void IsolatedStrokesClassifier::InitializeLikelihoods() {
 //  (   12 ,   16 ,  020  )  ||   ( 175, 122 )      ( 004, 860 )      ( 004, 860 )
 //
 //
+
+// clang-format on
+
