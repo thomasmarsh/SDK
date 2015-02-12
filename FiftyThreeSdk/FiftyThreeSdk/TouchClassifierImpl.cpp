@@ -7,6 +7,7 @@
 #include <iostream>
 #include <vector>
 
+#include "Core/STLUtils.h"
 #include "Core/Touch/Touch.h"
 #include "Core/Touch/TouchTracker.h"
 #include "FiftyThreeSdk/Classification//Classifier.h"
@@ -156,12 +157,11 @@ void TouchClassifierImpl::UpdateClassifications()
         e.newValue = e.touch->ContinuedClassification();
     }
 
-    continuedClassificationArgs.erase(remove_if(continuedClassificationArgs.begin(),
-                                                continuedClassificationArgs.end(),
-                                                [](const TouchClassificationChangedEventArgs & e)
-                                                    {
-                                                        return e.newValue == e.oldValue || e.newValue == TouchClassification::UntrackedTouch;
-                                                    }), continuedClassificationArgs.end());
+    EraseIf(continuedClassificationArgs,
+            [](const TouchClassificationChangedEventArgs & e)
+            {
+                return e.newValue == e.oldValue || e.newValue == TouchClassification::UntrackedTouch;
+            });
 
     if (!continuedClassificationArgs.empty())
     {
