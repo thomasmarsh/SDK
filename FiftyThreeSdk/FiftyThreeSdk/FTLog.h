@@ -2,10 +2,12 @@
 //  FTLog.h
 //  FiftyThreeSdk
 //
-//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
+//  Copyright (c) 2015 FiftyThree, Inc. All rights reserved.
 //  Use of this code is subject to the terms of the FiftyThree SDK License Agreement, included with this SDK as the file "FiftyThreeSDK-License.txt"
 
 #pragma once
+
+// clang-format off
 
 #import <Foundation/Foundation.h>
 
@@ -23,3 +25,4 @@ typedef NS_ENUM(NSInteger, FTLogLevel)
 + (void)setLogLevel:(FTLogLevel)logLevel;
 
 @end
+// clang-format on

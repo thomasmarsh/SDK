@@ -2,10 +2,12 @@
 //  FTEventDispatcher.h
 //  FiftyThreeSdk
 //
-//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
+//  Copyright (c) 2015 FiftyThree, Inc. All rights reserved.
 //  Use of this code is subject to the terms of the FiftyThree SDK License Agreement, included with this SDK as the file "FiftyThreeSDK-License.txt"
 
 #pragma once
+
+// clang-format off
 
 #import <Foundation/Foundation.h>
 
@@ -13,7 +15,7 @@
 
 //  This singleton handles event dispatch for
 //  FiftyThree's classification system. It is used internally by FTApplication
-//  This *does not* touch any Bluetooth-related functionality.  
+//  This *does not* touch any Bluetooth-related functionality.
 //  Its role is to process touch data for gesture & classification purposes.
 //
 @interface FTEventDispatcher : NSObject
@@ -29,3 +31,4 @@
 //
 - (void)sendEvent:(UIEvent *)event;
 @end
+// clang-format on

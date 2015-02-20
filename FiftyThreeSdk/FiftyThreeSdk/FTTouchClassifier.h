@@ -2,10 +2,12 @@
 //  FTTouchClassifier.h
 //  FiftyThreeSdk
 //
-//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
+//  Copyright (c) 2015 FiftyThree, Inc. All rights reserved.
 //  Use of this code is subject to the terms of the FiftyThree SDK License Agreement, included with this SDK as the file "FiftyThreeSDK-License.txt"
 
 #pragma once
+
+// clang-format off
 
 #import <Foundation/Foundation.h>
 
@@ -55,7 +57,7 @@ typedef NS_ENUM(NSInteger, FTTouchClassification)
 //
 // This is motivation for providing the integer key touchId and the method
 // (NSInteger)idForTouch:(UITouch *)touch;
-// 
+//
 @property (nonatomic, readonly, weak) UITouch *touch;
 
 // See above about why we use touchId integer for book keeping code. This is unique per touch.
@@ -101,3 +103,4 @@ typedef NS_ENUM(NSInteger, FTTouchClassification)
 - (void)removeTouchFromClassification:(UITouch *)touch;
 
 @end
+// clang-format on

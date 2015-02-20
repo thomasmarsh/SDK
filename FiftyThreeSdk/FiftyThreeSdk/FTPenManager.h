@@ -7,6 +7,8 @@
 
 #pragma once
 
+// clang-format off
+
 #import <Foundation/Foundation.h>
 
 #import "FiftyThreeSdk/FTTouchClassifier.h"
@@ -208,3 +210,4 @@ typedef NS_ENUM(NSInteger, FTPairingUIStyle) {
                                      error:(NSURL*)errorCallbackUrl   // e.g., YourApp://x-callback-url/error
                                     cancel:(NSURL*)cancelCallbackUrl; // e.g., YourApp://x-callback-url/cancel
 @end
+// clang-format on

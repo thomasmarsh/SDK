@@ -2,7 +2,7 @@
 //  CubicPolynomial.hpp
 //  FiftyThreeSdk
 //
-//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
+//  Copyright (c) 2015 FiftyThree, Inc. All rights reserved.
 //
 
 #pragma once
@@ -80,7 +80,6 @@ public:
 
     static CubicPolynomial<T> LineFromTo(T p, T q)
     {
-
         T d = p;
         T c = q - d;
 
@@ -96,33 +95,39 @@ public:
     // formulas just come from explicit computation.
     CubicPolynomial<T> ExtendCubicTo(T value) const
     {
+        // clang-format off
 
         T b = .5f * this->SecondDerivativeAt(1);
         T c =       this->FirstDerivativeAt(1);
         T d =       this->ValueAt(1);
         T a =       value - (b + c + d);
+        // clang-format on
 
         return CubicPolynomial(a,b,c,d);
     }
 
     static CubicPolynomial<T> CubicThroughPointsWithFirstDerivatives(T p0, T p1, T fp0, T fp1)
     {
+        // clang-format off
         T c = fp0;
         T d = p0;
         T a = fp1 - 2.0f * p1 + c + 2.0f * d;
         T b = p1 - (a + c + d);
 
         return CubicPolynomial(a,b,c,d);
+        // clang-format on
     }
 
     static CubicPolynomial<T> CubicThroughPointsWithDerivativesAtZero(T p1, T p2, T fp0, T fpp0)
     {
+        // clang-format off
         T b = .5f * fpp0;
         T c = fp0;
         T d = p1;
         T a = p2 - (b + c + d);
 
         return CubicPolynomial(a,b,c,d);
+        // clang-format on
     }
 
     CubicPolynomial<T> ExtendQuadraticTo(T value) const
@@ -249,6 +254,7 @@ public:
         Eigen::Matrix3f AInv = A.inverse();
 
         T a = T::Zero();
+        // clang-format off
 
         // we write the matrix multiply out by hand since Eigen doesn't understand
         // what we want to do here.  what we really want is essentially
@@ -258,7 +264,7 @@ public:
         T b = AInv(0,0) * p + AInv(0,1) * q + AInv(0,2) * r;
         T c = AInv(1,0) * p + AInv(1,1) * q + AInv(1,2) * r;
         T d = AInv(2,0) * p + AInv(2,1) * q + AInv(2,2) * r;
-
+        // clang-format on
         CubicPolynomial<T> P = CubicPolynomial<T>(a, b, c, d);
 
         P._t0 = t0;
@@ -273,12 +279,13 @@ public:
 
     static CubicPolynomial<T> CubicWithValuesAtTimes(T p, T q, T r, T s, float t0, float t1, float t2, float t3)
     {
+        // clang-format off
         Eigen::Matrix4f A;
         A << t0*t0*t0, t0*t0, t0, 1,
         t1*t1*t1, t1*t1, t1, 1,
         t2*t2*t2, t2*t2, t2, 1,
         t3*t3*t3, t3*t3, t3, 1;
-
+        // clang-format on
         Eigen::Matrix4f AInv = A.inverse();
 
         // we write the matrix multiply out by hand since Eigen doesn't understand

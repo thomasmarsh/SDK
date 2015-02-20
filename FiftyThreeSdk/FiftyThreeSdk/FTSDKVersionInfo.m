@@ -2,11 +2,12 @@
 //  FTSDKVersionInfo.m
 //  FiftyThreeSdk
 //
-//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
+//  Copyright (c) 2015 FiftyThree, Inc. All rights reserved.
 //
 
 #import "FTSDKVersionInfo.h"
 
+// clang-format off
 @implementation FTSDKVersionInfo
 - (NSString *)version
 {
@@ -34,3 +35,4 @@
     return @"";
 }
 @end
+// clang-format on

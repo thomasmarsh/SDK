@@ -2,7 +2,7 @@
 //  ClassificationProxy.h
 //  FiftyThreeSdk
 //
-//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
+//  Copyright (c) 2015 FiftyThree, Inc. All rights reserved.
 //
 
 #pragma once
@@ -25,7 +25,7 @@
 // to the classifier.
 
 //
-
+// clang-format off
 // The ClassificationProxy is what the app will deal with.  The proxy makes final decisions,
 // and shields the app from the details of how and when the decision is made.  He's supposed
 // to implement the application decision rules given what the classifier thinks.
@@ -38,7 +38,7 @@
 // StylusConnected();                 Enables explicit PenEvent classification decision tree
 // StylusDisconnected();              Uses implicit PenEvent classification decision tree (default, and current
 // implementation)
-//
+// clang-format on
 namespace fiftythree
 {
 namespace sdk

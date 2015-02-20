@@ -2,7 +2,7 @@
 //  TouchSize.cpp
 //  FiftyThreeSdk
 //
-//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
+//  Copyright (c) 2015 FiftyThree, Inc. All rights reserved.
 //
 
 #include "FiftyThreeSdk/Classification/TouchLogger.h"
@@ -46,6 +46,7 @@ bool TouchSize::IsPalmGivenTouchRadius(float r)
 }
 }
 
+// clang-format off
 /*
 
  Ideal:
@@ -89,3 +90,4 @@ bool TouchSize::IsPalmGivenTouchRadius(float r)
  mu = 19.9978, stdev = 8.53942, min = 10.4375, max = 31.3438
 
  */
+// clang-format on
