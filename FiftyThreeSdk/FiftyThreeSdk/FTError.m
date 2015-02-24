@@ -7,4 +7,4 @@
 
 #import "FTError.h"
 
-NSString * const kFiftyThreeErrorDomain = @"com.fiftythree.errorDomain";
+NSString *const kFiftyThreeErrorDomain = @"com.fiftythree.errorDomain";

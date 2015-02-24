@@ -17,18 +17,20 @@ namespace fiftythree
 {
 namespace sdk
 {
-
 DEFINE_ENUM(EdgeThumbState,
             NotThumb,
             Possible,
             Thumb);
 
-struct PenEvent
-{
+struct PenEvent {
     PenEventType _type;
-    double       _timestamp;
+    double _timestamp;
 
-    PenEvent() : _type(PenEventType::Tip1Up), _timestamp(0.0) {}
+    PenEvent()
+    : _type(PenEventType::Tip1Up)
+    , _timestamp(0.0)
+    {
+    }
 
     bool UpEvent() const
     {
@@ -57,26 +59,26 @@ public:
     virtual void StylusDisconnected() = 0;
 
     // Let the classifier know of changes to the world.
-    virtual void OnPenEvent(const PenEvent & pen) = 0;
-    virtual void OnTouchesChanged(const std::set<core::Touch::Ptr> & set) = 0;
+    virtual void OnPenEvent(const PenEvent &pen) = 0;
+    virtual void OnTouchesChanged(const std::set<core::Touch::Ptr> &set) = 0;
 
     // The caller can let the classifier know a touch has been marked
     virtual void RemoveTouchFromClassification(core::TouchId touchId) = 0;
 
     // Invoke this on each touch ID, to get the latest classification. Note, this
     // may take a few frames to be up-to-date.
-    virtual core::TouchClassification Classify(core::TouchId touchID)  = 0;
+    virtual core::TouchClassification Classify(core::TouchId touchID) = 0;
 
     // Given a pair of touches what are their most likely type.
-    virtual core::TouchClassification ClassifyPair(core::TouchId touch0, core::TouchId touch1, const TwoTouchPairType & type)  = 0;
+    virtual core::TouchClassification ClassifyPair(core::TouchId touch0, core::TouchId touch1, const TwoTouchPairType &type) = 0;
 
     // Given a single touch what is mostly likely for 1-touch gestures.
-    virtual core::TouchClassification ClassifyForGesture(core::TouchId touch0, const SingleTouchGestureType & type) = 0;
+    virtual core::TouchClassification ClassifyForGesture(core::TouchId touch0, const SingleTouchGestureType &type) = 0;
 
     // TODO:
     //  Revisit this API once isolated stroke stuff has settled down a bit.
     //  Ideally GRs ask binary questions rather than have to know about ranges and valid stats...
-    virtual Eigen::VectorXf GeometricStatistics(core::TouchId  touch0) = 0;
+    virtual Eigen::VectorXf GeometricStatistics(core::TouchId touch0) = 0;
 
     virtual void SetUseDebugLogging(bool v) = 0;
 
@@ -110,13 +112,13 @@ public:
     // end.  the minPenDownDt is a sanity check on the pen-down event for that particular touch, we don't
     // want the workaround to fire when the best pen event arrived long before the touch began since this
     // is very unlikely.
-    bool  _debounceWorkaroundEnabled = true;
+    bool _debounceWorkaroundEnabled = true;
     float _debounceWorkaroundMinPenDownDt = 0.0f;
 
-    bool  _trustHandednessOnceLocked = true;
+    bool _trustHandednessOnceLocked = true;
 
-    bool  _handednessRequirePenDown = false;
-    bool  _handednessNoPenDownMinLength = 11.0f;
+    bool _handednessRequirePenDown = false;
+    bool _handednessNoPenDownMinLength = 11.0f;
     float _handednessRecentPenEventDt = .3f;
     float _handednessMinPenDownDt = -.0167;
     float _handednessMaxPenDownDt = .5f;
@@ -133,7 +135,7 @@ public:
     // so if we see (_smudgeCommitCount) fingers in the current cluster event, don't apply
     // the isolation rule anymore.  assume they're just tapping really fast.
     // we still apply the other rules for declaring finger, so this should be pretty safe
-    int   _smudgeCommitCount = 2;
+    int _smudgeCommitCount = 2;
 
     float _minFingerIsolatedStrokeTravel = 7.0f; // Was 44, see IsolatedStrokes TestPalmVFinger.
     // number of cycles we're allowing pen events to arrive before touches.
@@ -160,8 +162,8 @@ public:
     float _maxTapGestureTapArcLengthAtMaxDuration = 22;
     float _maxTapGestureTapArcLengthAtMinDuration = 13;
     // values from Matt.
-    float _minTapGestureTapDuration =  0.0145f;
-    float _maxTapGestureTapDuration =  0.32;
+    float _minTapGestureTapDuration = 0.0145f;
+    float _maxTapGestureTapDuration = 0.32;
 
     // only debounce the really insane ones.  if we debounce everything, we end up eliminating valid
     // data which has lousy timing data.

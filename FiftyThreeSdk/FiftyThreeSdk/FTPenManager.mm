@@ -4,7 +4,7 @@
 //
 //  Copyright (c) 2015 FiftyThree, Inc. All rights reserved.
 //
-  //
+//
 //  FTPenManager.mm
 //  FiftyThreeSdk
 //
@@ -36,26 +36,26 @@
 #import "TIUpdateManager.h"
 #import "TransitionKit.h"
 
-static NSString * const kCharcoalPeripheralName = @"Charcoal by 53";
-static NSString * const kPencilPeripheralName = @"Pencil";
+static NSString *const kCharcoalPeripheralName = @"Charcoal by 53";
+static NSString *const kPencilPeripheralName = @"Pencil";
 
-NSString * const kPairedPeripheralUUIDUserDefaultsKey = @"com.fiftythree.pen.pairedPeripheralUUID";
-NSString * const kPairedPeripheralLastActivityTimeUserDefaultsKey = @"com.fiftythree.pen.pairedPeripheralLastActivityTime";
+NSString *const kPairedPeripheralUUIDUserDefaultsKey = @"com.fiftythree.pen.pairedPeripheralUUID";
+NSString *const kPairedPeripheralLastActivityTimeUserDefaultsKey = @"com.fiftythree.pen.pairedPeripheralLastActivityTime";
 
-NSString * const kFTPenManagerDidUpdateStateNotificationName = @"com.fiftythree.penManager.didUpdateState";
-NSString * const kFTPenManagerDidFailToDiscoverPenNotificationName = @"com.fiftythree.penManager.didFailToDiscoverPen";
-NSString * const kFTPenUnexpectedDisconnectNotificationName = @"com.fiftythree.penManager.unexpectedDisconnect";
-NSString * const kFTPenUnexpectedDisconnectWhileConnectingNotifcationName = @"com.fiftythree.penManager.unexpectedDisconnectWhileConnecting";
-NSString * const kFTPenUnexpectedDisconnectWhileUpdatingFirmwareNotificationName = @"com.fiftythre.penManager.unexpectedDisconnectWhileUpdatingFirmware";
+NSString *const kFTPenManagerDidUpdateStateNotificationName = @"com.fiftythree.penManager.didUpdateState";
+NSString *const kFTPenManagerDidFailToDiscoverPenNotificationName = @"com.fiftythree.penManager.didFailToDiscoverPen";
+NSString *const kFTPenUnexpectedDisconnectNotificationName = @"com.fiftythree.penManager.unexpectedDisconnect";
+NSString *const kFTPenUnexpectedDisconnectWhileConnectingNotifcationName = @"com.fiftythree.penManager.unexpectedDisconnectWhileConnecting";
+NSString *const kFTPenUnexpectedDisconnectWhileUpdatingFirmwareNotificationName = @"com.fiftythre.penManager.unexpectedDisconnectWhileUpdatingFirmware";
 
-NSString * const kFTPenManagerFirmwareUpdateDidBegin = @"com.fiftythree.penManger.firmwareUpdateDidBegin";
-NSString * const kFTPenManagerFirmwareUpdateDidBeginSendingUpdate = @"com.fiftythree.penManger.firmwareUpdateDidBeginSendingUpdate";
-NSString * const kFTPenManagerFirmwareUpdateDidUpdatePercentComplete = @"com.fiftythree.penManger.firmwareUpdateDidUpdatePercentComplete";
-NSString * const kFTPenManagerPercentCompleteProperty = @"com.fiftythree.penManager.percentComplete";
-NSString * const kFTPenManagerFirmwareUpdateDidFinishSendingUpdate = @"com.fiftythree.penManger.firmwareUpdateDidFinishSendingUpdate";
-NSString * const kFTPenManagerFirmwareUpdateDidCompleteSuccessfully = @"com.fiftythree.penManger.firmwareUpdateDidCompleteSuccessfully";
-NSString * const kFTPenManagerFirmwareUpdateDidFail = @"com.fiftythree.penManger.firmwareUpdateDidFail";
-NSString * const kFTPenManagerFirmwareUpdateWasCancelled = @"com.fiftythree.penManger.firmwareUpdateWasCancelled";
+NSString *const kFTPenManagerFirmwareUpdateDidBegin = @"com.fiftythree.penManger.firmwareUpdateDidBegin";
+NSString *const kFTPenManagerFirmwareUpdateDidBeginSendingUpdate = @"com.fiftythree.penManger.firmwareUpdateDidBeginSendingUpdate";
+NSString *const kFTPenManagerFirmwareUpdateDidUpdatePercentComplete = @"com.fiftythree.penManger.firmwareUpdateDidUpdatePercentComplete";
+NSString *const kFTPenManagerPercentCompleteProperty = @"com.fiftythree.penManager.percentComplete";
+NSString *const kFTPenManagerFirmwareUpdateDidFinishSendingUpdate = @"com.fiftythree.penManger.firmwareUpdateDidFinishSendingUpdate";
+NSString *const kFTPenManagerFirmwareUpdateDidCompleteSuccessfully = @"com.fiftythree.penManger.firmwareUpdateDidCompleteSuccessfully";
+NSString *const kFTPenManagerFirmwareUpdateDidFail = @"com.fiftythree.penManger.firmwareUpdateDidFail";
+NSString *const kFTPenManagerFirmwareUpdateWasCancelled = @"com.fiftythree.penManger.firmwareUpdateWasCancelled";
 
 static const NSTimeInterval kInactivityTimeout = 10.0 * 60.0;
 static const NSTimeInterval kDatingScanningTimeout = 4.f;
@@ -125,13 +125,12 @@ static NSString *const kAttemptConnectionFromUpdatingFirmwareEventName = @"Attem
 
 namespace
 {
-    static FTPenManager *sharedInstance = nil;
+static FTPenManager *sharedInstance = nil;
 }
 
 #pragma mark -
 
-typedef enum
-{
+typedef enum {
     ScanningStateDisabled,
     ScanningStateEnabled,
     ScanningStateEnabledWithPolling
@@ -153,8 +152,7 @@ BOOL FTPenManagerStateIsDisconnected(FTPenManagerState state)
 
 NSString *FTPenManagerStateToString(FTPenManagerState state)
 {
-    switch (state)
-    {
+    switch (state) {
         case FTPenManagerStateUninitialized:
             return @"FTPenManagerStateUninitialized";
         case FTPenManagerStateUnpaired:
@@ -190,7 +188,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 @property (nonatomic, readwrite) BOOL isEraserPressed;
 @end
 
-@protocol FTPenManagerDelegatePrivate<FTPenManagerDelegate>
+@protocol FTPenManagerDelegatePrivate <FTPenManagerDelegate>
 @optional
 // See FTPenManager's automaticUpdates property.
 //
@@ -278,8 +276,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 {
     _penHasListener = penHasListener;
 
-    if (self.pen.hasListener != _penHasListener)
-    {
+    if (self.pen.hasListener != _penHasListener) {
         self.pen.hasListener = _penHasListener;
     }
 }
@@ -287,8 +284,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 - (id)init
 {
     self = [super init];
-    if (self)
-    {
+    if (self) {
         _state = FTPenManagerStateUninitialized;
 
         _scanningState = ScanningStateDisabled;
@@ -312,12 +308,11 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
                                                      name:UIApplicationWillResignActiveNotification
                                                    object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(penDidWriteHasListener:)
+                                                 selector:@selector(penDidWriteHasListener:)
                                                      name:kFTPenDidWriteHasListenerNotificationName
                                                    object:nil];
 
-        MLOG_INFO(FTLogSDK, "Paired peripheral CentralId: %x",
-                  (unsigned int)[self centralIdFromPeripheralId:self.pairedPeripheralUUID]);
+        MLOG_INFO(FTLogSDK, "Paired peripheral CentralId: %x", (unsigned int)[self centralIdFromPeripheralId:self.pairedPeripheralUUID]);
 
         [self initializeStateMachine];
 
@@ -339,8 +334,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     [self reset];
 
     auto instance = fiftythree::core::spc<AnimationPumpObjC>(AnimationPump::Instance());
-    if (instance->GetDelegate() == self)
-    {
+    if (instance->GetDelegate() == self) {
         instance->SetDelegate(nil);
     }
 
@@ -382,8 +376,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 {
     // Lazily initialize the CBCentralManager so that we don't invoke the system Bluetooth alert (if Bluetooth
     // is disabled) until the user presses the pairing spot.
-    if (!_centralManager)
-    {
+    if (!_centralManager) {
         _centralManager = [[CBCentralManager alloc] initWithDelegate:self queue:nil];
     }
     return _centralManager;
@@ -391,12 +384,10 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
 - (void)setState:(FTPenManagerState)state
 {
-    if (_state != state)
-    {
+    if (_state != state) {
         _state = state;
 
-        if ([UIApplication sharedApplication].applicationState == UIApplicationStateActive)
-        {
+        if ([UIApplication sharedApplication].applicationState == UIApplicationStateActive) {
             self.penHasListener = YES;
         }
 
@@ -418,8 +409,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     [[NSNotificationCenter defaultCenter] removeObserver:kFTPenBatteryLevelDidChangeNotificationName];
     [[NSNotificationCenter defaultCenter] removeObserver:kFTPenDidUpdatePrivatePropertiesNotificationName];
 
-    if (_pen)
-    {
+    if (_pen) {
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(penDidEncounterError:)
                                                      name:kFTPenDidEncounterErrorNotificationName
@@ -452,7 +442,6 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
                                                  selector:@selector(penBatteryLevelDidChange:)
                                                      name:kFTPenBatteryLevelDidChangeNotificationName
                                                    object:_pen];
-
     }
 }
 
@@ -469,12 +458,9 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
     // Also update the last activity time. Be sure to do this prior to synchronize, since setting last
     // activity time does not call synchronize on its own.
-    if (pairedPeripheralUUID != NULL)
-    {
+    if (pairedPeripheralUUID != NULL) {
         self.pairedPeripheralLastActivityTime = [NSDate date];
-    }
-    else
-    {
+    } else {
         self.pairedPeripheralLastActivityTime = nil;
     }
 
@@ -484,8 +470,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 - (NSUUID *)pairedPeripheralUUID
 {
     id object = [[NSUserDefaults standardUserDefaults] valueForKey:kPairedPeripheralUUIDUserDefaultsKey];
-    if ([object isKindOfClass:NSString.class])
-    {
+    if ([object isKindOfClass:NSString.class]) {
         return [[NSUUID alloc] initWithUUIDString:object];
     }
     return nil;
@@ -523,52 +508,37 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     // Make sure that we favor transitions that go through disconnect over going straight
     // to single. Some states may support both, but if we're connected we need to disconnect
     // first.
-    if ([self.stateMachine canFireEvent:kDisconnectAndBecomeSingleEventName])
-    {
+    if ([self.stateMachine canFireEvent:kDisconnectAndBecomeSingleEventName]) {
         [self fireStateMachineEvent:kDisconnectAndBecomeSingleEventName];
-    }
-    else if ([self.stateMachine canFireEvent:kDisconnectAndBecomeSeparatedEventName])
-    {
+    } else if ([self.stateMachine canFireEvent:kDisconnectAndBecomeSeparatedEventName]) {
         [self fireStateMachineEvent:kDisconnectAndBecomeSeparatedEventName];
-    }
-    else if ([self.stateMachine canFireEvent:kBecomeSingleEventName])
-    {
+    } else if ([self.stateMachine canFireEvent:kBecomeSingleEventName]) {
         [self fireStateMachineEvent:kBecomeSingleEventName];
     }
 }
 
 - (void)penIsReadyDidChange:(NSNotification *)notification
 {
-    if (self.pen.isReady)
-    {
+    if (self.pen.isReady) {
         MLOG_INFO(FTLogSDK, "Pen is ready");
 
-        if ([self currentStateHasName:kDatingAttemptingConnectiongStateName])
-        {
+        if ([self currentStateHasName:kDatingAttemptingConnectiongStateName]) {
             [self fireStateMachineEvent:kBecomeEngagedEventName];
-        }
-        else if ([self currentStateHasName:kSeparatedAttemptingConnectionStateName] ||
-                 [self currentStateHasName:kSwingingAttemptingConnectionStateName])
-        {
+        } else if ([self currentStateHasName:kSeparatedAttemptingConnectionStateName] ||
+                   [self currentStateHasName:kSwingingAttemptingConnectionStateName]) {
             [self fireStateMachineEvent:kBecomeMarriedEventName];
         }
-    }
-    else
-    {
+    } else {
         // TODO: Can this ever happen?
     }
 }
 
 - (void)penIsTipPressedDidChange:(NSNotification *)notification
 {
-    if (!self.pen.isTipPressed && self.pen.lastTipReleaseTime)
-    {
-        if ([self currentStateHasName:kEngagedStateName])
-        {
+    if (!self.pen.isTipPressed && self.pen.lastTipReleaseTime) {
+        if ([self currentStateHasName:kEngagedStateName]) {
             [self fireStateMachineEvent:kWaitForPairingSpotReleaseEventName];
-        }
-        else if ([self currentStateHasName:kEngagedWaitingForTipReleaseStateName])
-        {
+        } else if ([self currentStateHasName:kEngagedWaitingForTipReleaseStateName]) {
             [self comparePairingSpotAndTipReleaseTimesAndTransitionState];
         }
     }
@@ -586,68 +556,47 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
 - (void)updatePenInfoObjectAndInvokeDelegate
 {
-    if (self.pen)
-    {
-        if (!self.info)
-        {
+    if (self.pen) {
+        if (!self.info) {
             self.info = [[FTPenInformation alloc] init];
         }
 
-        if (self.pen.batteryLevel)
-        {
+        if (self.pen.batteryLevel) {
             int batteryLevel = [self.pen.batteryLevel intValue];
 
-            if (batteryLevel <= 10)
-            {
+            if (batteryLevel <= 10) {
                 self.info.batteryLevel = FTPenBatteryLevelCriticallyLow;
-            }
-            else if (batteryLevel <= 25)
-            {
+            } else if (batteryLevel <= 25) {
                 self.info.batteryLevel = FTPenBatteryLevelLow;
-            }
-            else if (batteryLevel <= 50)
-            {
+            } else if (batteryLevel <= 50) {
                 self.info.batteryLevel = FTPenBatteryLevelMediumLow;
-            }
-            else if (batteryLevel <= 75)
-            {
+            } else if (batteryLevel <= 75) {
                 self.info.batteryLevel = FTPenBatteryLevelMediumHigh;
-            }
-            else
-            {
+            } else {
                 self.info.batteryLevel = FTPenBatteryLevelHigh;
             }
-        }
-        else
-        {
+        } else {
             self.info.batteryLevel = FTPenBatteryLevelUnknown;
         }
 
-        if (self.pen)
-        {
+        if (self.pen) {
             NSInteger currentVersion = [FTFirmwareManager currentRunningFirmwareVersion:self.pen];
-            if (currentVersion > 0)
-            {
+            if (currentVersion > 0) {
                 self.info.firmwareRevision = [@(currentVersion) stringValue];
-            }
-            else
-            {
+            } else {
                 self.info.firmwareRevision = nil;
             }
             [self attemptLoadFirmwareFromNetworkForVersionChecking];
-            if (currentVersion != -1)
-            {
+            if (currentVersion != -1) {
                 [self updateFirmwareUpdateIsAvailble];
             }
         }
 
-        if (self.pen.name)
-        {
+        if (self.pen.name) {
             self.info.name = self.pen.name;
         }
 
-        if (self.pen.manufacturerName)
-        {
+        if (self.pen.manufacturerName) {
             self.info.manufacturerName = self.pen.manufacturerName;
         }
 
@@ -656,13 +605,11 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
         [self ensureNeedsUpdate];
 
-        if ([self.delegate respondsToSelector:@selector(penManagerNeedsUpdateDidChange)])
-        {
-            [((id<FTPenManagerDelegatePrivate>)self.delegate) penManagerNeedsUpdateDidChange];
+        if ([self.delegate respondsToSelector:@selector(penManagerNeedsUpdateDidChange)]) {
+            [((id<FTPenManagerDelegatePrivate>)self.delegate)penManagerNeedsUpdateDidChange];
         }
-        if ([self.delegate respondsToSelector:@selector(penInformationDidChange)])
-        {
-            [((id<FTPenManagerDelegatePrivate>)self.delegate) penInformationDidChange];
+        if ([self.delegate respondsToSelector:@selector(penInformationDidChange)]) {
+            [((id<FTPenManagerDelegatePrivate>)self.delegate)penInformationDidChange];
         }
     }
 }
@@ -678,16 +625,13 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     // apps' delegate *before* the current running application gets background message. If the pen think's
     // hasListener has been set to zero but this app is in the foreground, we need to ensure the hasListener
     // comes into line with the value we expect it to be.
-    if (self.pen.hasListener != self.penHasListener)
-    {
+    if (self.pen.hasListener != self.penHasListener) {
         self.pen.hasListener = self.penHasListener;
     }
 
     BOOL hasInactivityTimeoutUpdated = [notfication.userInfo[kFTPenNotificationPropertiesKey] containsObject:kFTPenInactivityTimeoutPropertyName];
-    if (hasInactivityTimeoutUpdated)
-    {
-        if (self.state != FTPenManagerStateUpdatingFirmware && self.pen.inactivityTimeout == 0)
-        {
+    if (hasInactivityTimeoutUpdated) {
+        if (self.state != FTPenManagerStateUpdatingFirmware && self.pen.inactivityTimeout == 0) {
             // Make sure inactivity time out is sane except when we're doing FW upgrades.
             self.pen.inactivityTimeout = 10;
         }
@@ -699,13 +643,11 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     // Firmware update can't proceed until we've refreshed the factory and upgrade firmware
     // versions. (The reason for this is that after the upgrade -> factory reset we need the
     // check that we're running the factory version to be accurate.)
-    if ([self currentStateHasName:kUpdatingFirmwareStateName])
-    {
+    if ([self currentStateHasName:kUpdatingFirmwareStateName]) {
         FTAssert(self.pen, @"pen is non-nil");
         if (self.pen.firmwareRevision &&
             self.pen.softwareRevision &&
-            !self.updateManager)
-        {
+            !self.updateManager) {
             MLOG_INFO(FTLogSDK, "Factory firmware version: %s", ObjcDescription(self.pen.firmwareRevision));
             MLOG_INFO(FTLogSDK, "Upgrade firmware version: %s", ObjcDescription(self.pen.softwareRevision));
 
@@ -718,8 +660,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
             // update *after* the reset has happened.
             FTFirmwareImageType type;
             BOOL result = [FTFirmwareManager imageTypeRunningOnPen:self.pen andType:&type];
-            if (result && type == FTFirmwareImageTypeFactory)
-            {
+            if (result && type == FTFirmwareImageTypeFactory) {
                 [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenManagerFirmwareUpdateDidBeginSendingUpdate
                                                                     object:self];
             }
@@ -733,19 +674,15 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
 - (void)ensureCentralId
 {
-    if ([self currentStateHasName:kMarriedStateName])
-    {
+    if ([self currentStateHasName:kMarriedStateName]) {
         FTAssert(self.pen, @"pen is non-nil");
 
         // We have to wait until we both know the current firmware version and we can write the central ID
         // before actually writing it. Also, don't write it more than once.
         if (self.pen.centralId == 0x0 &&
             self.pen.canWriteCentralId &&
-            self.pen.softwareRevision != nil)
-        {
-            self.pen.centralId = ([FTFirmwareManager currentRunningFirmwareVersion:self.pen] > 55 ?
-                                  [self centralIdFromPeripheralId:self.pen.peripheral.identifier] :
-                                  0x1);
+            self.pen.softwareRevision != nil) {
+            self.pen.centralId = ([FTFirmwareManager currentRunningFirmwareVersion:self.pen] > 55 ? [self centralIdFromPeripheralId:self.pen.peripheral.identifier] : 0x1);
         }
     }
 }
@@ -764,8 +701,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     // States
     //
 
-    void (^attemptingConnectionCommon)() = ^()
-    {
+    void (^attemptingConnectionCommon)() = ^() {
         FTAssert(weakSelf.pen, @"pen is non-nil");
 
         [weakSelf.centralManager connectPeripheral:weakSelf.pen.peripheral options:nil];
@@ -774,8 +710,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     // WaitingForCentralManagerToPowerOn
     TKState *waitingForCentralManagerToPowerOnState = [TKState stateWithName:kWaitingForCentralManagerToPowerOnStateName];
     [waitingForCentralManagerToPowerOnState setDidEnterStateBlock:^(TKState *state,
-                                                                    TKStateMachine *stateMachine)
-    {
+                                                                    TKStateMachine *stateMachine) {
         [weakSelf reset];
 
         // Generally we wait until the user presses the pairing spot before initializing the CBCentralManager.
@@ -789,33 +724,30 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
         weakSelf.state = FTPenManagerStateUninitialized;
     }];
     [waitingForCentralManagerToPowerOnState setDidExitStateBlock:^(TKState *state,
-                                                                     TKStateMachine *stateMachine)
-    {
+                                                                   TKStateMachine *stateMachine){
     }];
 
     // Single
     TKState *singleState = [TKState stateWithName:kSingleStateName];
-    [singleState setDidEnterStateBlock:^(TKState *state, TKStateMachine *stateMachine)
-    {
+    [singleState setDidEnterStateBlock:^(TKState *state, TKStateMachine *stateMachine) {
         FTAssert(!weakSelf.pen, @"Pen is nil");
 
         weakSelf.state = FTPenManagerStateUnpaired;
 
         weakSelf.pairedPeripheralUUID = NULL;
 
-        // If we enter the single state and discover that the pairing spot is currently
-        // pressed, then proceed directly to the dating state.
-//        if (weakSelf.isPairingSpotPressed)
-//        {
-//            [weakSelf fireStateMachineEvent:kBeginDatingEventName];
-//        }
+      // If we enter the single state and discover that the pairing spot is currently
+      // pressed, then proceed directly to the dating state.
+      //        if (weakSelf.isPairingSpotPressed)
+      //        {
+      //            [weakSelf fireStateMachineEvent:kBeginDatingEventName];
+      //        }
     }];
 
     // DatingRetrievingConnectedPeripherals
     TKState *datingRetrievingConnectedPeripheralsState = [TKState stateWithName:kDatingRetrievingConnectedPeripheralsStateName];
     [datingRetrievingConnectedPeripheralsState setDidEnterStateBlock:^(TKState *state,
-                                                                       TKStateMachine *stateMachine)
-    {
+                                                                       TKStateMachine *stateMachine) {
         weakSelf.state = FTPenManagerStateSeeking;
 
         BOOL hasRecentCoreBluetooth = weakSelf.centralManager && [weakSelf.centralManager respondsToSelector:@selector(retrieveConnectedPeripheralsWithServices:)];
@@ -846,19 +778,16 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     // DatingScanning
     TKState *datingScanningState = [TKState stateWithName:kDatingScanningStateName
                                        andTimeoutDuration:kDatingScanningTimeout];
-    [datingScanningState setDidEnterStateBlock:^(TKState *state, TKStateMachine *stateMachine)
-    {
+    [datingScanningState setDidEnterStateBlock:^(TKState *state, TKStateMachine *stateMachine) {
         weakSelf.state = FTPenManagerStateSeeking;
 
         weakSelf.scanningState = ScanningStateEnabled;
     }];
-    [datingScanningState setDidExitStateBlock:^(TKState *state, TKStateMachine *stateMachine)
-    {
+    [datingScanningState setDidExitStateBlock:^(TKState *state, TKStateMachine *stateMachine) {
         weakSelf.scanningState = ScanningStateDisabled;
     }];
     [datingScanningState setTimeoutExpiredBlock:^(TKState *state,
-                                                  TKStateMachine *stateMachine)
-    {
+                                                  TKStateMachine *stateMachine) {
         [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenManagerDidFailToDiscoverPenNotificationName
                                                             object:self];
         [weakSelf fireStateMachineEvent:kBecomeSingleEventName];
@@ -867,21 +796,18 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     // Dating - Attempting Connection
     TKState *datingAttemptingConnectionState = [TKState stateWithName:kDatingAttemptingConnectiongStateName
                                                    andTimeoutDuration:kAttemptingConnectionStateTimeout];
-    [datingAttemptingConnectionState setDidEnterStateBlock:^(TKState *state, TKStateMachine *stateMachine)
-    {
+    [datingAttemptingConnectionState setDidEnterStateBlock:^(TKState *state, TKStateMachine *stateMachine) {
         weakSelf.state = FTPenManagerStateConnecting;
         attemptingConnectionCommon();
     }];
     [datingAttemptingConnectionState setTimeoutExpiredBlock:^(TKState *state,
-                                                              TKStateMachine *stateMachine)
-    {
+                                                              TKStateMachine *stateMachine) {
         [weakSelf fireStateMachineEvent:kDisconnectAndBecomeSingleEventName];
     }];
 
     // Engaged
     TKState *engagedState = [TKState stateWithName:kEngagedStateName];
-    [engagedState setDidEnterStateBlock:^(TKState *state, TKStateMachine *stateMachine)
-    {
+    [engagedState setDidEnterStateBlock:^(TKState *state, TKStateMachine *stateMachine) {
         weakSelf.state = FTPenManagerStateConnected;
     }];
 
@@ -891,28 +817,24 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     [engagedWaitingForTipReleaseState setDidEnterStateBlock:^(TKState *state, TKStateMachine *stateMachine) {
         weakSelf.state = FTPenManagerStateConnected;
     }];
-    [engagedWaitingForTipReleaseState setTimeoutExpiredBlock:^(TKState *state, TKStateMachine *stateMachine)
-    {
+    [engagedWaitingForTipReleaseState setTimeoutExpiredBlock:^(TKState *state, TKStateMachine *stateMachine) {
         [weakSelf fireStateMachineEvent:kDisconnectAndBecomeSingleEventName];
     }];
 
     // Engaged - Waiting for Pairing Spot Release
     TKState *engagedWaitingForPairingSpotReleaseState = [TKState stateWithName:kEngagedWaitingForPairingSpotReleaseStateName
                                                             andTimeoutDuration:kEngagedStateTimeout];
-    [engagedWaitingForPairingSpotReleaseState setDidEnterStateBlock:^(TKState *state, TKStateMachine *stateMachine)
-    {
+    [engagedWaitingForPairingSpotReleaseState setDidEnterStateBlock:^(TKState *state, TKStateMachine *stateMachine) {
         weakSelf.state = FTPenManagerStateConnected;
     }];
     [engagedWaitingForPairingSpotReleaseState setTimeoutExpiredBlock:^(TKState *state,
-                                                                       TKStateMachine *stateMachine)
-    {
+                                                                       TKStateMachine *stateMachine) {
         [weakSelf fireStateMachineEvent:kDisconnectAndBecomeSingleEventName];
     }];
 
     // Married
     TKState *marriedState = [TKState stateWithName:kMarriedStateName];
-    [marriedState setDidEnterStateBlock:^(TKState *state, TKStateMachine *stateMachine)
-    {
+    [marriedState setDidEnterStateBlock:^(TKState *state, TKStateMachine *stateMachine) {
         FTAssert(weakSelf.pen != nil, @"pen can't be nil");
         FTAssert(weakSelf.pen.peripheral.state == CBPeripheralStateConnected, @"pen peripheral is connected");
         FTAssert(weakSelf.pen.peripheral.identifier != nil, @"pen peripheral UUID is non-nil");
@@ -935,8 +857,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     TKState *marriedWaitingForLongPressToUnpairState = [TKState stateWithName:kMarriedWaitingForLongPressToUnpairStateName
                                                            andTimeoutDuration:kMarriedWaitingForLongPressToUnpairTimeout];
     [marriedWaitingForLongPressToUnpairState setDidEnterStateBlock:^(TKState *state,
-                                                                     TKStateMachine *stateMachine)
-     {
+                                                                     TKStateMachine *stateMachine) {
          FTAssert(weakSelf.pen, @"pen is non-nil");
          FTAssert(weakSelf.pen.peripheral.state == CBPeripheralStateConnected, @"pen peripheral is connected");
 
@@ -950,16 +871,14 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
          weakSelf.scanningState = ScanningStateEnabledWithPolling;
 
          weakSelf.peripheralsDiscoveredDuringLongPress = [NSMutableSet set];
-     }];
+    }];
     [marriedWaitingForLongPressToUnpairState setDidExitStateBlock:^(TKState *state,
-                                                                        TKStateMachine *stateMachine)
-    {
+                                                                    TKStateMachine *stateMachine) {
         weakSelf.scanningState = ScanningStateDisabled;
         weakSelf.peripheralsDiscoveredDuringLongPress = nil;
 
     }];
-    [marriedWaitingForLongPressToUnpairState setTimeoutExpiredBlock:^(TKState *state, TKStateMachine *stateMachine)
-     {
+    [marriedWaitingForLongPressToUnpairState setTimeoutExpiredBlock:^(TKState *state, TKStateMachine *stateMachine) {
          FTAssert(weakSelf.pen, @"pen is non-nil");
          FTAssert(weakSelf.pen.peripheral.state == CBPeripheralStateConnected, @"pen peripheral is connected");
 
@@ -978,13 +897,12 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
              [weakSelf fireStateMachineEvent:kDisconnectAndBecomeSingleEventName];
          }
-     }];
+    }];
 
     // Preparing to Swing
     TKState *preparingToSwingState = [TKState stateWithName:kPreparingToSwingStateName];
     [preparingToSwingState setDidEnterStateBlock:^(TKState *state,
-                                                   TKStateMachine *stateMachine)
-    {
+                                                   TKStateMachine *stateMachine) {
         FTAssert(weakSelf.pairedPeripheralUUID != NULL, @"paired peripheral UUID is non-nil");
 
         weakSelf.state = FTPenManagerStateDisconnected;
@@ -995,18 +913,15 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     // Swinging
     TKState *swingingState = [TKState stateWithName:kSwingingStateName
                                  andTimeoutDuration:kSwingingStateTimeout];
-    [swingingState setDidEnterStateBlock:^(TKState *state, TKStateMachine *stateMachine)
-    {
+    [swingingState setDidEnterStateBlock:^(TKState *state, TKStateMachine *stateMachine) {
         weakSelf.state = FTPenManagerStateDisconnected;
 
         weakSelf.scanningState = ScanningStateEnabledWithPolling;
     }];
-    [swingingState setDidExitStateBlock:^(TKState *state, TKStateMachine *stateMachine)
-    {
+    [swingingState setDidExitStateBlock:^(TKState *state, TKStateMachine *stateMachine) {
         weakSelf.scanningState = ScanningStateDisabled;
     }];
-    [swingingState setTimeoutExpiredBlock:^(TKState *state, TKStateMachine *stateMachine)
-    {
+    [swingingState setTimeoutExpiredBlock:^(TKState *state, TKStateMachine *stateMachine) {
         [weakSelf fireStateMachineEvent:kBecomeSingleEventName];
     }];
 
@@ -1014,8 +929,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     TKState *swingingAttemptingConnectionState = [TKState stateWithName:kSwingingAttemptingConnectionStateName
                                                      andTimeoutDuration:kAttemptingConnectionStateTimeout];
     [swingingAttemptingConnectionState setDidEnterStateBlock:^(TKState *state,
-                                                               TKStateMachine *stateMachine)
-    {
+                                                               TKStateMachine *stateMachine) {
         weakSelf.state = FTPenManagerStateReconnecting;
 
         weakSelf.pen.requiresTipBePressedToBecomeReady = NO;
@@ -1023,29 +937,25 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
         attemptingConnectionCommon();
     }];
     [swingingAttemptingConnectionState setTimeoutExpiredBlock:^(TKState *state,
-                                                               TKStateMachine *stateMachine)
-    {
+                                                                TKStateMachine *stateMachine) {
         [weakSelf fireStateMachineEvent:kDisconnectAndBecomeSingleEventName];
     }];
 
     // Separated
     TKState *separatedState = [TKState stateWithName:kSeparatedStateName];
-    [separatedState setDidEnterStateBlock:^(TKState *state, TKStateMachine *stateMachine)
-    {
+    [separatedState setDidEnterStateBlock:^(TKState *state, TKStateMachine *stateMachine) {
         weakSelf.state = FTPenManagerStateDisconnected;
 
         weakSelf.scanningState = ScanningStateEnabled;
     }];
-    [separatedState setDidExitStateBlock:^(TKState *state, TKStateMachine *stateMachine)
-    {
+    [separatedState setDidExitStateBlock:^(TKState *state, TKStateMachine *stateMachine) {
         weakSelf.scanningState = ScanningStateDisabled;
     }];
 
     // Separated - Retrieving Connceted Peripherals
     TKState *separatedRetrievingConnectedPeripheralsState = [TKState stateWithName:kSeparatedRetrievingConnectedPeripheralsStateName];
     [separatedRetrievingConnectedPeripheralsState setDidEnterStateBlock:^(TKState *state,
-                                                                          TKStateMachine *stateMachine)
-    {
+                                                                          TKStateMachine *stateMachine) {
         weakSelf.state = FTPenManagerStateDisconnected;
 
         NSArray *peripherals = [weakSelf.centralManager retrieveConnectedPeripheralsWithServices:@[[FTPenServiceUUIDs penService]]];
@@ -1070,16 +980,14 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     TKState *separatedAttemptingConnectionState = [TKState stateWithName:kSeparatedAttemptingConnectionStateName
                                                       andTimeoutDuration:kAttemptingConnectionStateTimeout];
     [separatedAttemptingConnectionState setDidEnterStateBlock:^(TKState *state,
-                                                                TKStateMachine *stateMachine)
-    {
+                                                                TKStateMachine *stateMachine) {
         weakSelf.state = FTPenManagerStateReconnecting;
 
         weakSelf.pen.requiresTipBePressedToBecomeReady = NO;
 
         attemptingConnectionCommon();
     }];
-    [separatedAttemptingConnectionState setTimeoutExpiredBlock:^(TKState *state, TKStateMachine *stateMachine)
-    {
+    [separatedAttemptingConnectionState setTimeoutExpiredBlock:^(TKState *state, TKStateMachine *stateMachine) {
         [weakSelf fireStateMachineEvent:kDisconnectAndBecomeSeparatedEventName];
     }];
 
@@ -1087,24 +995,21 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     TKState *separatedWaitingForLongPressToUnpairState = [TKState stateWithName:kSeparatedWaitingForLongPressToUnpairStateName
                                                              andTimeoutDuration:kSeparatedWaitingForLongPressToUnpairTimeout];
     [separatedWaitingForLongPressToUnpairState setDidEnterStateBlock:^(TKState *state,
-                                                                       TKStateMachine *stateMachine)
-     {
+                                                                       TKStateMachine *stateMachine) {
          weakSelf.state = FTPenManagerStateDisconnectedLongPressToUnpair;
 
          weakSelf.peripheralsDiscoveredDuringLongPress = [NSMutableSet set];
 
          weakSelf.scanningState = ScanningStateEnabledWithPolling;
-     }];
+    }];
     [separatedWaitingForLongPressToUnpairState setDidExitStateBlock:^(TKState *state,
-                                                                      TKStateMachine *stateMachine)
-     {
+                                                                      TKStateMachine *stateMachine) {
          weakSelf.scanningState = ScanningStateDisabled;
 
          weakSelf.peripheralsDiscoveredDuringLongPress = nil;
-     }];
+    }];
     [separatedWaitingForLongPressToUnpairState setTimeoutExpiredBlock:^(TKState *state,
-                                                                        TKStateMachine *stateMachine)
-     {
+                                                                        TKStateMachine *stateMachine) {
          if (weakSelf.peripheralsDiscoveredDuringLongPress.count > 0)
          {
              FTAssert(!weakSelf.pen, @"pen non-nil");
@@ -1117,12 +1022,11 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
          {
              [weakSelf fireStateMachineEvent:kBecomeSingleEventName];
          }
-     }];
+    }];
 
     // Disconnecting and Becoming Single
     TKState *disconnectingAndBecomingSingleState = [TKState stateWithName:kDisconnectingAndBecomingSingleStateName];
-    [disconnectingAndBecomingSingleState setDidEnterStateBlock:^(TKState *state, TKStateMachine *stateMachine)
-    {
+    [disconnectingAndBecomingSingleState setDidEnterStateBlock:^(TKState *state, TKStateMachine *stateMachine) {
         weakSelf.state = FTPenManagerStateUnpaired;
 
         if (weakSelf.pen)
@@ -1138,15 +1042,13 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
         }
     }];
     [disconnectingAndBecomingSingleState setDidExitStateBlock:^(TKState *state,
-                                                                TKStateMachine *stateMachine)
-    {
+                                                                TKStateMachine *stateMachine) {
         self.onDeckPeripheral = nil;
     }];
 
     // Disconnecting and Becoming Separated
     TKState *disconnectingAndBecomingSeparatedState = [TKState stateWithName:kDisconnectingAndBecomingSeparatedStateName];
-    [disconnectingAndBecomingSeparatedState setDidEnterStateBlock:^(TKState *state, TKStateMachine *stateMachine)
-     {
+    [disconnectingAndBecomingSeparatedState setDidEnterStateBlock:^(TKState *state, TKStateMachine *stateMachine) {
          weakSelf.state = FTPenManagerStateDisconnected;
 
          if (weakSelf.pen)
@@ -1160,12 +1062,11 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
          {
              [weakSelf fireStateMachineEvent:kCompleteDisconnectionAndBecomeSeparatedEventName];
          }
-     }];
+    }];
 
     // Updating Firmware
     TKState *updatingFirmwareState = [TKState stateWithName:kUpdatingFirmwareStateName];
-    [updatingFirmwareState setDidEnterStateBlock:^(TKState *state, TKStateMachine *stateMachine)
-    {
+    [updatingFirmwareState setDidEnterStateBlock:^(TKState *state, TKStateMachine *stateMachine) {
         FTAssert(weakSelf.pen, @"Pen must be non-nil");
         FTAssert(weakSelf.firmwareImagePath, @"firmwareImagePath must be non-nil");
         FTAssert(!weakSelf.updateManager, @"Update manager must be nil");
@@ -1189,8 +1090,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
         [self.pen refreshFirmwareVersionProperties];
     }];
     [updatingFirmwareState setDidExitStateBlock:^(TKState *state,
-                                                  TKStateMachine *stateMachine)
-    {
+                                                  TKStateMachine *stateMachine) {
         [weakSelf.updateManager cancelUpdate];
         weakSelf.updateManager = nil;
 
@@ -1206,8 +1106,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     TKState *updatingFirmwareAttemptingConnectionState = [TKState stateWithName:kUpdatingFirmwareAttemptingConnectionStateName
                                                              andTimeoutDuration:kAttemptingConnectionStateTimeout];
     [updatingFirmwareAttemptingConnectionState setDidEnterStateBlock:^(TKState *state,
-                                                                       TKStateMachine *stateMachine)
-    {
+                                                                       TKStateMachine *stateMachine) {
         FTAssert(weakSelf.pen, @"Pen must be non-nil");
         FTAssert(weakSelf.pen.peripheral, @"Pen peripheral is non-nil");
         FTAssert(weakSelf.pen.peripheral.state == CBPeripheralStateDisconnected,
@@ -1221,8 +1120,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
         attemptingConnectionCommon();
     }];
     [updatingFirmwareAttemptingConnectionState setTimeoutExpiredBlock:^(TKState *state,
-                                                                        TKStateMachine *stateMachine)
-    {
+                                                                        TKStateMachine *stateMachine) {
         FTAssert(weakSelf.pen, @"Pen must be non-nil");
 
         [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenManagerFirmwareUpdateDidFail
@@ -1232,27 +1130,28 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     }];
 
     [self.stateMachine addStates:@[
-     waitingForCentralManagerToPowerOnState,
-     singleState,
-     datingRetrievingConnectedPeripheralsState,
-     datingScanningState,
-     datingAttemptingConnectionState,
-     engagedState,
-     engagedWaitingForTipReleaseState,
-     engagedWaitingForPairingSpotReleaseState,
-     marriedState,
-     marriedWaitingForLongPressToUnpairState,
-     preparingToSwingState,
-     swingingState,
-     swingingAttemptingConnectionState,
-     separatedState,
-     separatedRetrievingConnectedPeripheralsState,
-     separatedAttemptingConnectionState,
-     separatedWaitingForLongPressToUnpairState,
-     disconnectingAndBecomingSingleState,
-     disconnectingAndBecomingSeparatedState,
-     updatingFirmwareState,
-     updatingFirmwareAttemptingConnectionState]];
+        waitingForCentralManagerToPowerOnState,
+        singleState,
+        datingRetrievingConnectedPeripheralsState,
+        datingScanningState,
+        datingAttemptingConnectionState,
+        engagedState,
+        engagedWaitingForTipReleaseState,
+        engagedWaitingForPairingSpotReleaseState,
+        marriedState,
+        marriedWaitingForLongPressToUnpairState,
+        preparingToSwingState,
+        swingingState,
+        swingingAttemptingConnectionState,
+        separatedState,
+        separatedRetrievingConnectedPeripheralsState,
+        separatedAttemptingConnectionState,
+        separatedWaitingForLongPressToUnpairState,
+        disconnectingAndBecomingSingleState,
+        disconnectingAndBecomingSeparatedState,
+        updatingFirmwareState,
+        updatingFirmwareAttemptingConnectionState
+    ]];
 
     //
     // Events
@@ -1264,146 +1163,152 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
     TKEvent *beginDatingRetrievingConnectedPeripheralsEvent = [TKEvent eventWithName:kBeginDatingAndRetrieveConnectedPeripheralsEventName
                                                              transitioningFromStates:@[
-                                                               waitingForCentralManagerToPowerOnState,
-                                                               singleState,
-                                                               separatedState,
-                                                               marriedState,
-                                                               datingAttemptingConnectionState]
+                                                                 waitingForCentralManagerToPowerOnState,
+                                                                 singleState,
+                                                                 separatedState,
+                                                                 marriedState,
+                                                                 datingAttemptingConnectionState
+                                                             ]
                                                                              toState:datingRetrievingConnectedPeripheralsState];
     TKEvent *beginDatingScanningEvent = [TKEvent eventWithName:kBeginDatingScanningEventName
                                        transitioningFromStates:@[
-                                         datingRetrievingConnectedPeripheralsState]
+                                           datingRetrievingConnectedPeripheralsState
+                                       ]
                                                        toState:datingScanningState];
     TKEvent *becomeSingleEvent = [TKEvent eventWithName:kBecomeSingleEventName
                                 transitioningFromStates:@[
-                                                          waitingForCentralManagerToPowerOnState,
-                                                          datingScanningState,
-                                                          datingRetrievingConnectedPeripheralsState,
-                                                          separatedState,
-                                                          separatedWaitingForLongPressToUnpairState,
-                                                          swingingState,
-                                                          updatingFirmwareState]
+                                    waitingForCentralManagerToPowerOnState,
+                                    datingScanningState,
+                                    datingRetrievingConnectedPeripheralsState,
+                                    separatedState,
+                                    separatedWaitingForLongPressToUnpairState,
+                                    swingingState,
+                                    updatingFirmwareState
+                                ]
                                                 toState:singleState];
     TKEvent *attemptConnectionFromDatingEvent = [TKEvent eventWithName:kAttemptConnectionFromDatingEventName
-                                               transitioningFromStates:@[datingScanningState,
-                                                 datingRetrievingConnectedPeripheralsState,
-                                                 separatedWaitingForLongPressToUnpairState,
-                                                 disconnectingAndBecomingSingleState]
+                                               transitioningFromStates:@[ datingScanningState,
+                                                                          datingRetrievingConnectedPeripheralsState,
+                                                                          separatedWaitingForLongPressToUnpairState,
+                                                                          disconnectingAndBecomingSingleState ]
                                                                toState:datingAttemptingConnectionState];
     TKEvent *becomeEngagedEvent = [TKEvent eventWithName:kBecomeEngagedEventName
-                                 transitioningFromStates:@[datingAttemptingConnectionState]
+                                 transitioningFromStates:@[ datingAttemptingConnectionState ]
                                                  toState:engagedState];
     TKEvent *waitForTipReleaseEvent = [TKEvent eventWithName:kWaitForTipReleaseEventName
-                                     transitioningFromStates:@[engagedState]
+                                     transitioningFromStates:@[ engagedState ]
                                                      toState:engagedWaitingForTipReleaseState];
     TKEvent *waitForPairingSpotReleaseEvent = [TKEvent eventWithName:kWaitForPairingSpotReleaseEventName
-                                             transitioningFromStates:@[engagedState]
+                                             transitioningFromStates:@[ engagedState ]
                                                              toState:engagedWaitingForPairingSpotReleaseState];
     TKEvent *becomeMarriedEvent = [TKEvent eventWithName:kBecomeMarriedEventName
                                  transitioningFromStates:@[
-                                   engagedWaitingForPairingSpotReleaseState,
-                                   engagedWaitingForTipReleaseState,
-                                   swingingAttemptingConnectionState,
-                                   separatedAttemptingConnectionState,
-                                   updatingFirmwareState]
+                                     engagedWaitingForPairingSpotReleaseState,
+                                     engagedWaitingForTipReleaseState,
+                                     swingingAttemptingConnectionState,
+                                     separatedAttemptingConnectionState,
+                                     updatingFirmwareState
+                                 ]
                                                  toState:marriedState];
     TKEvent *waitForLongPressToUnpairFromMarriedEvent = [TKEvent eventWithName:kWaitForLongPressToUnpairFromMarriedEventName
-                                                           transitioningFromStates:@[marriedState]
-                                                                           toState:marriedWaitingForLongPressToUnpairState];
+                                                       transitioningFromStates:@[ marriedState ]
+                                                                       toState:marriedWaitingForLongPressToUnpairState];
     TKEvent *kWaitForLongPressToUnpairFromSeparatedEventNameEvent = [TKEvent eventWithName:KkWaitForLongPressToUnpairFromSeparatedEventNameEventName
-                                                         transitioningFromStates:@[separatedState]
-                                                                         toState:separatedWaitingForLongPressToUnpairState];
+                                                                   transitioningFromStates:@[ separatedState ]
+                                                                                   toState:separatedWaitingForLongPressToUnpairState];
     TKEvent *returnToMarriedEvent = [TKEvent eventWithName:kReturnToMarriedEventName
-                                   transitioningFromStates:@[marriedWaitingForLongPressToUnpairState]
+                                   transitioningFromStates:@[ marriedWaitingForLongPressToUnpairState ]
                                                    toState:marriedState];
     TKEvent *disconnectAndBecomeSingleEvent = [TKEvent eventWithName:kDisconnectAndBecomeSingleEventName
                                              transitioningFromStates:@[
-                                               datingAttemptingConnectionState,
-                                               separatedAttemptingConnectionState,
-                                               engagedState,
-                                               engagedWaitingForPairingSpotReleaseState,
-                                               engagedWaitingForTipReleaseState,
-                                               marriedState,
-                                               marriedWaitingForLongPressToUnpairState,
-                                               swingingAttemptingConnectionState,
-                                               updatingFirmwareAttemptingConnectionState]
+                                                 datingAttemptingConnectionState,
+                                                 separatedAttemptingConnectionState,
+                                                 engagedState,
+                                                 engagedWaitingForPairingSpotReleaseState,
+                                                 engagedWaitingForTipReleaseState,
+                                                 marriedState,
+                                                 marriedWaitingForLongPressToUnpairState,
+                                                 swingingAttemptingConnectionState,
+                                                 updatingFirmwareAttemptingConnectionState
+                                             ]
                                                              toState:disconnectingAndBecomingSingleState];
     TKEvent *disconnectAndBecomeSeparatedEvent = [TKEvent eventWithName:kDisconnectAndBecomeSeparatedEventName
-                                                transitioningFromStates:@[separatedAttemptingConnectionState]
+                                                transitioningFromStates:@[ separatedAttemptingConnectionState ]
                                                                 toState:disconnectingAndBecomingSeparatedState];
     TKEvent *completeDisconnectionAndBecomeSingleEvent = [TKEvent eventWithName:kCompleteDisconnectionAndBecomeSingleEventName
-                                                        transitioningFromStates:@[disconnectingAndBecomingSingleState]
+                                                        transitioningFromStates:@[ disconnectingAndBecomingSingleState ]
                                                                         toState:singleState];
     TKEvent *completeDisconnectionAndBecomeSeparatedEvent = [TKEvent eventWithName:kCompleteDisconnectionAndBecomeSeparatedEventName
-                                                           transitioningFromStates:@[disconnectingAndBecomingSeparatedState]
+                                                           transitioningFromStates:@[ disconnectingAndBecomingSeparatedState ]
                                                                            toState:separatedState];
     TKEvent *prepareToSwingEvent = [TKEvent eventWithName:kPrepareToSwingEventName
-                                  transitioningFromStates:@[marriedState]
+                                  transitioningFromStates:@[ marriedState ]
                                                   toState:preparingToSwingState];
     TKEvent *swingEvent = [TKEvent eventWithName:kSwingEventName
-                         transitioningFromStates:@[preparingToSwingState]
+                         transitioningFromStates:@[ preparingToSwingState ]
                                          toState:swingingState];
     TKEvent *attemptConnectionFromSwingingEvent = [TKEvent eventWithName:kAttemptConnectionFromSwingingEventName
-                                                 transitioningFromStates:@[swingingState]
+                                                 transitioningFromStates:@[ swingingState ]
                                                                  toState:swingingAttemptingConnectionState];
     TKEvent *becomeSeparatedEvent = [TKEvent eventWithName:kBecomeSeparatedEventName
                                    transitioningFromStates:@[
-                                     marriedState,
-                                     separatedRetrievingConnectedPeripheralsState,
-                                     separatedAttemptingConnectionState,
-                                     separatedWaitingForLongPressToUnpairState
-                                     ]
+                                       marriedState,
+                                       separatedRetrievingConnectedPeripheralsState,
+                                       separatedAttemptingConnectionState,
+                                       separatedWaitingForLongPressToUnpairState
+                                   ]
                                                    toState:separatedState];
     TKEvent *retrieveConnectedPeripheralsFromSeparatedEvent = [TKEvent eventWithName:kRetrieveConnectedPeripheralsFromSeparatedEventName
                                                              transitioningFromStates:@[
-                                                               waitingForCentralManagerToPowerOnState,
-                                                               separatedState]
+                                                                 waitingForCentralManagerToPowerOnState,
+                                                                 separatedState
+                                                             ]
                                                                              toState:separatedRetrievingConnectedPeripheralsState];
     TKEvent *attemptConnectionFromSeparatedEvent = [TKEvent eventWithName:kAttemptConnectionFromSeparatedEventName
                                                   transitioningFromStates:@[
-                                                    separatedState,
-                                                    separatedRetrievingConnectedPeripheralsState]
+                                                      separatedState,
+                                                      separatedRetrievingConnectedPeripheralsState
+                                                  ]
                                                                   toState:separatedAttemptingConnectionState];
 
     TKEvent *updateFirmwareEvent = [TKEvent eventWithName:kUpdateFirmwareEventName
                                   transitioningFromStates:@[ marriedState,
-                                    updatingFirmwareAttemptingConnectionState]
+                                                             updatingFirmwareAttemptingConnectionState ]
                                                   toState:updatingFirmwareState];
     TKEvent *attemptConnectionFromUpdatingFirmwareEvent = [TKEvent eventWithName:kAttemptConnectionFromUpdatingFirmwareEventName
-                                                         transitioningFromStates:@[updatingFirmwareState]
+                                                         transitioningFromStates:@[ updatingFirmwareState ]
                                                                          toState:updatingFirmwareAttemptingConnectionState];
 
     [self.stateMachine addEvents:@[
-     waitForCentralManagerToPowerOn,
-     beginDatingRetrievingConnectedPeripheralsEvent,
-     beginDatingScanningEvent,
-     becomeSingleEvent,
-     attemptConnectionFromDatingEvent,
-     becomeEngagedEvent,
-     waitForTipReleaseEvent,
-     waitForPairingSpotReleaseEvent,
-     becomeMarriedEvent,
-     waitForLongPressToUnpairFromMarriedEvent,
-     kWaitForLongPressToUnpairFromSeparatedEventNameEvent,
-     returnToMarriedEvent,
-     disconnectAndBecomeSingleEvent,
-     disconnectAndBecomeSeparatedEvent,
-     completeDisconnectionAndBecomeSingleEvent,
-     completeDisconnectionAndBecomeSeparatedEvent,
-     prepareToSwingEvent,
-     swingEvent,
-     attemptConnectionFromSwingingEvent,
-     becomeSeparatedEvent,
-     attemptConnectionFromSeparatedEvent,
-     retrieveConnectedPeripheralsFromSeparatedEvent,
-     updateFirmwareEvent,
-     attemptConnectionFromUpdatingFirmwareEvent,
-     ]];
+        waitForCentralManagerToPowerOn,
+        beginDatingRetrievingConnectedPeripheralsEvent,
+        beginDatingScanningEvent,
+        becomeSingleEvent,
+        attemptConnectionFromDatingEvent,
+        becomeEngagedEvent,
+        waitForTipReleaseEvent,
+        waitForPairingSpotReleaseEvent,
+        becomeMarriedEvent,
+        waitForLongPressToUnpairFromMarriedEvent,
+        kWaitForLongPressToUnpairFromSeparatedEventNameEvent,
+        returnToMarriedEvent,
+        disconnectAndBecomeSingleEvent,
+        disconnectAndBecomeSeparatedEvent,
+        completeDisconnectionAndBecomeSingleEvent,
+        completeDisconnectionAndBecomeSeparatedEvent,
+        prepareToSwingEvent,
+        swingEvent,
+        attemptConnectionFromSwingingEvent,
+        becomeSeparatedEvent,
+        attemptConnectionFromSeparatedEvent,
+        retrieveConnectedPeripheralsFromSeparatedEvent,
+        updateFirmwareEvent,
+        attemptConnectionFromUpdatingFirmwareEvent,
+    ]];
 
     self.stateMachine.initialState = waitingForCentralManagerToPowerOnState;
 
-    MLOG_INFO(FTLogSDK, "Activating state machine with initial state: %s",
-              ObjcDescription(self.stateMachine.initialState.name));
+    MLOG_INFO(FTLogSDK, "Activating state machine with initial state: %s", ObjcDescription(self.stateMachine.initialState.name));
     [self.stateMachine activate];
 
     [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenManagerDidUpdateStateNotificationName
@@ -1427,11 +1332,8 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 - (void)fireStateMachineEvent:(NSString *)eventName
 {
     NSError *error = nil;
-    if (![self.stateMachine fireEvent:eventName error:&error])
-    {
-        MLOG_ERROR(FTLogSDK, "Failed to fire state machine event (%s): %s",
-                   ObjcDescription(eventName),
-                   ObjcDescription(error.localizedDescription));
+    if (![self.stateMachine fireEvent:eventName error:&error]) {
+        MLOG_ERROR(FTLogSDK, "Failed to fire state machine event (%s): %s", ObjcDescription(eventName), ObjcDescription(error.localizedDescription));
     }
 }
 
@@ -1449,8 +1351,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     // If we're currently separated, then it's possible that the paired pen was connected in
     // another app on this device. Therefore, do a quick check to see if the paired pen
     // shows up in the connected peripherals.
-    if ([self currentStateHasName:kSeparatedStateName])
-    {
+    if ([self currentStateHasName:kSeparatedStateName]) {
         [self fireStateMachineEvent:kRetrieveConnectedPeripheralsFromSeparatedEventName];
     }
 
@@ -1471,27 +1372,23 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     // applicationDidEnterBackground, but in practice that does not appear to be the case.
     [self resetBackgroundTask];
 
-    __weak __typeof(&*self)weakSelf = self;
+    __weak __typeof(&*self) weakSelf = self;
     self.backgroundTaskId = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
         [weakSelf resetBackgroundTask];
     }];
 
     // Set HasListener NO regardless of whatever the current state of penHasListener is. We depend on the
     // write notification to end the background task.
-    if (self.penHasListener)
-    {
+    if (self.penHasListener) {
         self.penHasListener = NO;
-    }
-    else
-    {
+    } else {
         self.pen.hasListener = NO;
     }
 }
 
 - (void)resetBackgroundTask
 {
-    if (self.backgroundTaskId != UIBackgroundTaskInvalid)
-    {
+    if (self.backgroundTaskId != UIBackgroundTaskInvalid) {
         MLOG_INFO(FTLogSDK, "FTPenManager did end background task");
 
         [[UIApplication sharedApplication] endBackgroundTask:self.backgroundTaskId];
@@ -1512,12 +1409,9 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 {
     _isPairingSpotPressed = isPairingSpotPressed;
 
-    if (isPairingSpotPressed)
-    {
+    if (isPairingSpotPressed) {
         [self pairingSpotWasPressed];
-    }
-    else
-    {
+    } else {
         [self pairingSpotWasReleased];
     }
 }
@@ -1530,18 +1424,12 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     // possibly provoke the system Bluetooth alert if Bluetooth is not enabled.
     [self ensureCentralManager];
 
-    if (![self currentStateHasName:kWaitingForCentralManagerToPowerOnStateName])
-    {
-        if ([self currentStateHasName:kSingleStateName])
-        {
+    if (![self currentStateHasName:kWaitingForCentralManagerToPowerOnStateName]) {
+        if ([self currentStateHasName:kSingleStateName]) {
             [self fireStateMachineEvent:kBeginDatingAndRetrieveConnectedPeripheralsEventName];
-        }
-        else if ([self currentStateHasName:kSeparatedStateName])
-        {
+        } else if ([self currentStateHasName:kSeparatedStateName]) {
             [self fireStateMachineEvent:KkWaitForLongPressToUnpairFromSeparatedEventNameEventName];
-        }
-        else if ([self currentStateHasName:kMarriedStateName])
-        {
+        } else if ([self currentStateHasName:kMarriedStateName]) {
             FTAssert(self.pen.peripheral.state == CBPeripheralStateConnected, @"Pen peripheral is connected");
 
             [self fireStateMachineEvent:kWaitForLongPressToUnpairFromMarriedEventName];
@@ -1556,31 +1444,20 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     self.lastPairingSpotReleaseTime = [NSDate date];
 
     if ([self currentStateHasName:kDatingRetrievingConnectedPeripheralsStateName] ||
-        [self currentStateHasName:kDatingScanningStateName])
-    {
+        [self currentStateHasName:kDatingScanningStateName]) {
         [self fireStateMachineEvent:kBecomeSingleEventName];
-    }
-    else if ([self currentStateHasName:kDatingAttemptingConnectiongStateName])
-    {
+    } else if ([self currentStateHasName:kDatingAttemptingConnectiongStateName]) {
         // If we were in the middle of connecting, but the pairing spot was released
         // prematurely, then cancel the connection. The pen must be connected and ready in
         // order to transition to the "engaged" state.
         [self fireStateMachineEvent:kDisconnectAndBecomeSingleEventName];
-    }
-    else if ([self currentStateHasName:kEngagedStateName])
-    {
+    } else if ([self currentStateHasName:kEngagedStateName]) {
         [self fireStateMachineEvent:kWaitForTipReleaseEventName];
-    }
-    else if ([self currentStateHasName:kEngagedWaitingForPairingSpotReleaseStateName])
-    {
+    } else if ([self currentStateHasName:kEngagedWaitingForPairingSpotReleaseStateName]) {
         [self comparePairingSpotAndTipReleaseTimesAndTransitionState];
-    }
-    else if ([self currentStateHasName:kMarriedWaitingForLongPressToUnpairStateName])
-    {
+    } else if ([self currentStateHasName:kMarriedWaitingForLongPressToUnpairStateName]) {
         [self fireStateMachineEvent:kReturnToMarriedEventName];
-    }
-    else if ([self currentStateHasName:kSeparatedWaitingForLongPressToUnpairStateName])
-    {
+    } else if ([self currentStateHasName:kSeparatedWaitingForLongPressToUnpairStateName]) {
         [self fireStateMachineEvent:kBecomeSeparatedEventName];
     }
 }
@@ -1588,42 +1465,37 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 - (void)comparePairingSpotAndTipReleaseTimesAndTransitionState
 {
     FTAssert([self currentStateHasName:kEngagedWaitingForTipReleaseStateName] ||
-             [self currentStateHasName:kEngagedWaitingForPairingSpotReleaseStateName], @"");
+                 [self currentStateHasName:kEngagedWaitingForPairingSpotReleaseStateName],
+             @"");
     FTAssert(self.lastPairingSpotReleaseTime && self.pen.lastTipReleaseTime, @"");
 
     NSDate *t0 = self.lastPairingSpotReleaseTime;
     NSDate *t1 = self.pen.lastTipReleaseTime;
     NSTimeInterval tipAndPairingSpoteReleaseTimeDifference = fabs([t0 timeIntervalSinceDate:t1]);
 
-    MLOG_INFO(FTLogSDK, "Difference in pairing spot and tip press release times (ms): %f",
-              tipAndPairingSpoteReleaseTimeDifference * 1000.0);
+    MLOG_INFO(FTLogSDK, "Difference in pairing spot and tip press release times (ms): %f", tipAndPairingSpoteReleaseTimeDifference * 1000.0);
 
-    if (tipAndPairingSpoteReleaseTimeDifference < kEngagedStateTimeout)
-    {
+    if (tipAndPairingSpoteReleaseTimeDifference < kEngagedStateTimeout) {
         [self fireStateMachineEvent:kBecomeMarriedEventName];
-    }
-    else
-    {
+    } else {
         [self fireStateMachineEvent:kDisconnectAndBecomeSingleEventName];
     }
 }
 
 #pragma mark -
 
--(void)disconnectOrBecomeSingle
+- (void)disconnectOrBecomeSingle
 {
     [self disconnect];
 
-    if ([self.stateMachine canFireEvent:kBecomeSingleEventName])
-    {
+    if ([self.stateMachine canFireEvent:kBecomeSingleEventName]) {
         [self fireStateMachineEvent:kBecomeSingleEventName];
     }
 }
 
 - (void)disconnect
 {
-    if ([self.stateMachine canFireEvent:kDisconnectAndBecomeSingleEventName])
-    {
+    if ([self.stateMachine canFireEvent:kDisconnectAndBecomeSingleEventName]) {
         [self fireStateMachineEvent:kDisconnectAndBecomeSingleEventName];
     }
 }
@@ -1632,8 +1504,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 {
     MLOG_INFO(FTLogSDK, "Start Trial Separation");
 
-    if ([self.stateMachine canFireEvent:kPrepareToSwingEventName])
-    {
+    if ([self.stateMachine canFireEvent:kPrepareToSwingEventName]) {
         [self fireStateMachineEvent:kPrepareToSwingEventName];
     }
 }
@@ -1644,35 +1515,22 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 {
     FTAssert(self.centralManager == centralManager, @"centralManager matches expected");
 
-    if (centralManager.state == CBCentralManagerStatePoweredOn)
-    {
-        if ([self currentStateHasName:kWaitingForCentralManagerToPowerOnStateName])
-        {
-            if (self.pairedPeripheralUUID)
-            {
+    if (centralManager.state == CBCentralManagerStatePoweredOn) {
+        if ([self currentStateHasName:kWaitingForCentralManagerToPowerOnStateName]) {
+            if (self.pairedPeripheralUUID) {
                 [self fireStateMachineEvent:kRetrieveConnectedPeripheralsFromSeparatedEventName];
-            }
-            else
-            {
-                if (self.isPairingSpotPressed)
-                {
+            } else {
+                if (self.isPairingSpotPressed) {
                     [self fireStateMachineEvent:kBeginDatingAndRetrieveConnectedPeripheralsEventName];
-                }
-                else
-                {
+                } else {
                     [self fireStateMachineEvent:kBecomeSingleEventName];
                 }
             }
         }
-    }
-    else
-    {
-        if ([self currentStateHasName:kWaitingForCentralManagerToPowerOnStateName])
-        {
+    } else {
+        if ([self currentStateHasName:kWaitingForCentralManagerToPowerOnStateName]) {
             [self reset];
-        }
-        else
-        {
+        } else {
             [self fireStateMachineEvent:kWaitForCentralManagerToPowerOnEventName];
         }
 
@@ -1685,23 +1543,17 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 {
     NSData *manufacturerData = advertisementData[CBAdvertisementDataManufacturerDataKey];
 
-    if (manufacturerData.length > 0)
-    {
-        if (manufacturerData.length == 4)
-        {
+    if (manufacturerData.length > 0) {
+        if (manufacturerData.length == 4) {
             UInt32 valueSwapped;
             [manufacturerData getBytes:&valueSwapped length:4];
             UInt32 value = CFSwapInt32(valueSwapped);
             return value;
-        }
-        else
-        {
+        } else {
             unsigned char value = ((unsigned char *)manufacturerData.bytes)[0];
             return value;
         }
-    }
-    else
-    {
+    } else {
         DebugAssert(false);
     }
     return 0x0;
@@ -1721,12 +1573,9 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     uuid_t bytes;
     [uuid getUUIDBytes:bytes];
 
-    if (bytes[0] == 0x0 && bytes[1] == 0x0 && bytes[2] == 0x0 && bytes[3] == 0x0)
-    {
+    if (bytes[0] == 0x0 && bytes[1] == 0x0 && bytes[2] == 0x0 && bytes[3] == 0x0) {
         return 0x2;
-    }
-    else
-    {
+    } else {
         return bytes[0] | (bytes[1] << 8) | (bytes[2] << 16) | (bytes[3] << 24);
     }
 }
@@ -1735,38 +1584,30 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
                 withAdvertisementData:(NSDictionary *)advertisementData
                 requireCentralIdMatch:(BOOL)requireCentralIdMatch
 {
-
     UInt32 advertisedCentralId = [self peripheralAdvertisementCentralId:advertisementData];
 
     UInt32 peripheralCentralId = [self centralIdFromPeripheralId:peripheral.identifier];
 
-    MLOG_INFO(FTLogSDKVerbose, "advertisedCentralId %ld  peripheralCentralId %ld",
-              (long)advertisedCentralId,
-              (long)peripheralCentralId);
+    MLOG_INFO(FTLogSDKVerbose, "advertisedCentralId %ld  peripheralCentralId %ld", (long)advertisedCentralId, (long)peripheralCentralId);
 
     // There are two cases here.
     // We're looking at an older v55 firmware that only has 1 byte of advertising data, or newer firmware.
     // We assume it's reconciling with us if the advertising data is 1 byte.
 
-    if (advertisedCentralId == 0x1 && !requireCentralIdMatch)
-    {
+    if (advertisedCentralId == 0x1 && !requireCentralIdMatch) {
         return YES;
-    }
-    else if (peripheralCentralId != 0x0)
-    {
+    } else if (peripheralCentralId != 0x0) {
         // It's looking for us, as we previously set the charateristic.
         return peripheralCentralId == advertisedCentralId;
-    }
-    else
-    {
+    } else {
         return NO;
     }
 }
 
 - (void)centralManager:(CBCentralManager *)central
- didDiscoverPeripheral:(CBPeripheral *)peripheral
-     advertisementData:(NSDictionary *)advertisementData
-                  RSSI:(NSNumber *)RSSI
+    didDiscoverPeripheral:(CBPeripheral *)peripheral
+        advertisementData:(NSDictionary *)advertisementData
+                     RSSI:(NSNumber *)RSSI
 {
     BOOL isPeripheralReconciling = [self isPeripheralReconciling:advertisementData];
     BOOL isPeripheralReconcilingWithUs = [self isPeripheralReconcilingWithUs:peripheral
@@ -1776,105 +1617,75 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
                                                                    withAdvertisementData:advertisementData
                                                                    requireCentralIdMatch:YES];
 
-    MLOG_INFO(FTLogSDK, "Discovered peripheral with name: \"%s\" PotentialCentralId: %x CentralId: %x",
-              ObjcDescription(peripheral.name),
-              (unsigned int)[self centralIdFromPeripheralId:peripheral.identifier],
-              (unsigned int)[self peripheralAdvertisementCentralId:advertisementData]);
+    MLOG_INFO(FTLogSDK, "Discovered peripheral with name: \"%s\" PotentialCentralId: %x CentralId: %x", ObjcDescription(peripheral.name), (unsigned int)[self centralIdFromPeripheralId:peripheral.identifier], (unsigned int)[self peripheralAdvertisementCentralId:advertisementData]);
 
-    if ([self currentStateHasName:kDatingScanningStateName])
-    {
+    if ([self currentStateHasName:kDatingScanningStateName]) {
         FTAssert(!self.pen, @"pen is nil");
 
         // When single, we only connect with Pencil's that are not currently reconciling, since they may
         // be reconciling with another central. We make an exception for Pencil's that are specifically trying
         // to reconcile with us. This shouldn't generally happen, since we would typically be in Separated
         // in that case. However, this makes us robust to edge cases.
-        if (!isPeripheralReconciling || isPeripheralReconcilingSpecificallyWithUs)
-        {
+        if (!isPeripheralReconciling || isPeripheralReconcilingSpecificallyWithUs) {
             self.pen = [[FTPen alloc] initWithPeripheral:peripheral];
             [self fireStateMachineEvent:kAttemptConnectionFromDatingEventName];
-        }
-        else
-        {
+        } else {
             self.scanningState = ScanningStateEnabledWithPolling;
         }
-    }
-    else if ([self currentStateHasName:kSwingingStateName])
-    {
-        if ([self isPairedPeripheral:peripheral])
-        {
-            if (isPeripheralReconciling && isPeripheralReconcilingWithUs)
-            {
+    } else if ([self currentStateHasName:kSwingingStateName]) {
+        if ([self isPairedPeripheral:peripheral]) {
+            if (isPeripheralReconciling && isPeripheralReconcilingWithUs) {
                 FTAssert(!self.pen, @"pen is nil");
                 self.pen = [[FTPen alloc] initWithPeripheral:peripheral];
                 [self fireStateMachineEvent:kAttemptConnectionFromSwingingEventName];
-            }
-            else
-            {
+            } else {
                 [self.stateMachine resetStateTimeoutTimer];
             }
         }
-    }
-    else if ([self currentStateHasName:kSeparatedStateName])
-    {
-        if (isPeripheralReconciling)
-        {
+    } else if ([self currentStateHasName:kSeparatedStateName]) {
+        if (isPeripheralReconciling) {
             if ([self isPairedPeripheral:peripheral] &&
-                isPeripheralReconcilingWithUs)
-            {
+                isPeripheralReconcilingWithUs) {
                 FTAssert(!self.pen, @"pen is nil");
 
                 FTPen *pen = [[FTPen alloc] initWithPeripheral:peripheral];
-                if (pen.isTipPressed == YES && fiftythree::core::TouchTracker::Instance()->LiveTouchCount() == 0)
-                {
+                if (pen.isTipPressed == YES && fiftythree::core::TouchTracker::Instance()->LiveTouchCount() == 0) {
                     // if there's no touch on this iPad, we need to tell the pen to transition to the swinging state as
                     // it may be trying to connect to another iPad. This is because if the pen wakes up it's
                     // in the reconciling state but may need to pair with a new device instead of us.
 
                     self.pen = pen;
                     [self startTrialSeparation];
-                }
-                else
-                {
+                } else {
                     // [FTLog logVerboseWithFormat:@"Pencil kAttemptConnectionFromSeparatedEventName"];
                     self.pen = pen;
                     [self fireStateMachineEvent:kAttemptConnectionFromSeparatedEventName];
                 }
-            }
-            else if ([self isPairedPeripheral:peripheral] &&
-                     !isPeripheralReconcilingWithUs)
-            {
+            } else if ([self isPairedPeripheral:peripheral] &&
+                       !isPeripheralReconcilingWithUs) {
                 // [FTLog logVerboseWithFormat:@"Explict Single"];
                 [self fireStateMachineEvent:kBecomeSingleEventName];
             }
         }
-    }
-    else if ([self currentStateHasName:kMarriedWaitingForLongPressToUnpairStateName])
-    {
+    } else if ([self currentStateHasName:kMarriedWaitingForLongPressToUnpairStateName]) {
         // Reject the paired peripheral. We don't want to reconnect to the peripheral we may be using
         // to press the pairing spot to sever the pairing right now.
-        if (![self isPairedPeripheral:peripheral] && !isPeripheralReconciling)
-        {
+        if (![self isPairedPeripheral:peripheral] && !isPeripheralReconciling) {
             [self.peripheralsDiscoveredDuringLongPress addObject:peripheral];
         }
-    }
-    else if ([self currentStateHasName:kSeparatedWaitingForLongPressToUnpairStateName])
-    {
+    } else if ([self currentStateHasName:kSeparatedWaitingForLongPressToUnpairStateName]) {
         // Unlike in kMarriedWaitingForLongPressToDisconnectStateName, we will accept the paired peripheral
         // when separated. It might just be trying to reconnect!
-        if (!isPeripheralReconciling)
-        {
+        if (!isPeripheralReconciling) {
             [self.peripheralsDiscoveredDuringLongPress addObject:peripheral];
         }
     }
 }
 
 - (void)centralManager:(CBCentralManager *)central didFailToConnectPeripheral:(CBPeripheral *)peripheral
-                 error:(NSError *)error
+                         error:(NSError *)error
 {
-    MLOG_ERROR(FTLogSDK, "Failed to connect to peripheral: %s. (%s).",
-               ObjcDescription(peripheral),
-               ObjcDescription(error.localizedDescription));
+    MLOG_ERROR(FTLogSDK, "Failed to connect to peripheral: %s. (%s).", ObjcDescription(peripheral), ObjcDescription(error.localizedDescription));
 
     [self handleError];
 }
@@ -1884,43 +1695,32 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     if (self.pen.peripheral == peripheral &&
         ([self currentStateHasName:kDatingAttemptingConnectiongStateName] ||
          [self currentStateHasName:kSwingingAttemptingConnectionStateName] ||
-         [self currentStateHasName:kSeparatedAttemptingConnectionStateName]))
-    {
+         [self currentStateHasName:kSeparatedAttemptingConnectionStateName])) {
         [self.pen peripheralConnectionStatusDidChange];
-    }
-    else if ([self currentStateHasName:kUpdatingFirmwareAttemptingConnectionStateName])
-    {
+    } else if ([self currentStateHasName:kUpdatingFirmwareAttemptingConnectionStateName]) {
         [self.pen peripheralConnectionStatusDidChange];
         [self fireStateMachineEvent:kUpdateFirmwareEventName];
-    }
-    else
-    {
+    } else {
         [self.centralManager cancelPeripheralConnection:peripheral];
     }
 }
 
 - (void)centralManager:(CBCentralManager *)central didDisconnectPeripheral:(CBPeripheral *)peripheral
-                 error:(NSError *)error
+                      error:(NSError *)error
 {
     FTAssert(self.pen.peripheral == peripheral, @"Peripheral matches pen peripheral.");
 
-    if (self.pen.peripheral == peripheral)
-    {
-        if (error)
-        {
-            MLOG_INFO(FTLogSDK, "Disconnected peripheral with error: %s",
-                      ObjcDescription(error.localizedDescription));
+    if (self.pen.peripheral == peripheral) {
+        if (error) {
+            MLOG_INFO(FTLogSDK, "Disconnected peripheral with error: %s", ObjcDescription(error.localizedDescription));
 
-            if ([error.localizedDescription isEqualToString: @"The connection has timed out unexpectedly."])
-            {
+            if ([error.localizedDescription isEqualToString:@"The connection has timed out unexpectedly."]) {
                 //[FTLog logVerboseWithFormat:@"timed out--<"];
             }
         }
 
-        if ([self currentStateHasName:kUpdatingFirmwareStateName])
-        {
-            if (self.updateManager.state == TIUpdateManagerStateSucceeded)
-            {
+        if ([self currentStateHasName:kUpdatingFirmwareStateName]) {
+            if (self.updateManager.state == TIUpdateManagerStateSucceeded) {
                 FTPen *pen = self.pen;
                 self.pen = nil;
                 [pen peripheralConnectionStatusDidChange];
@@ -1930,14 +1730,11 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
                                                                     object:self];
 
                 [self fireStateMachineEvent:kBecomeSingleEventName];
-            }
-            else
-            {
+            } else {
                 MLOG_INFO(FTLogSDK, "Peripheral did disconnect while updating firmware. Reconnecting.");
                 FTFirmwareImageType type;
                 BOOL result = [FTFirmwareManager imageTypeRunningOnPen:self.pen andType:&type];
-                if (result && type == FTFirmwareImageTypeFactory)
-                {
+                if (result && type == FTFirmwareImageTypeFactory) {
                     [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenUnexpectedDisconnectWhileUpdatingFirmwareNotificationName
                                                                         object:self.pen];
                 }
@@ -1949,66 +1746,48 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
                 self.pen = [[FTPen alloc] initWithPeripheral:self.pen.peripheral];
                 [self fireStateMachineEvent:kAttemptConnectionFromUpdatingFirmwareEventName];
             }
-        }
-        else if ([self currentStateHasName:kUpdatingFirmwareAttemptingConnectionStateName] ||
-                 [self currentStateHasName:kDatingAttemptingConnectiongStateName] ||
-                 [self currentStateHasName:kSeparatedAttemptingConnectionStateName] ||
-                 [self currentStateHasName:kSwingingAttemptingConnectionStateName])
-        {
+        } else if ([self currentStateHasName:kUpdatingFirmwareAttemptingConnectionStateName] ||
+                   [self currentStateHasName:kDatingAttemptingConnectiongStateName] ||
+                   [self currentStateHasName:kSeparatedAttemptingConnectionStateName] ||
+                   [self currentStateHasName:kSwingingAttemptingConnectionStateName]) {
             [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenUnexpectedDisconnectWhileConnectingNotifcationName
                                                                 object:self.pen];
 
             MLOG_INFO(FTLogSDKVerbose, "Trying connectPeripheral again...");
             // Try again. Eventually the state will timeout.
             [self.centralManager connectPeripheral:self.pen.peripheral options:nil];
-        }
-        else
-        {
+        } else {
             FTPen *pen = self.pen;
             self.pen = nil;
 
             [pen peripheralConnectionStatusDidChange];
 
-            if ([self currentStateHasName:kDisconnectingAndBecomingSingleStateName])
-            {
-                if (self.onDeckPeripheral)
-                {
+            if ([self currentStateHasName:kDisconnectingAndBecomingSingleStateName]) {
+                if (self.onDeckPeripheral) {
                     self.pen = [[FTPen alloc] initWithPeripheral:self.onDeckPeripheral];
                     [self fireStateMachineEvent:kAttemptConnectionFromDatingEventName];
-                }
-                else
-                {
+                } else {
                     [self fireStateMachineEvent:kCompleteDisconnectionAndBecomeSingleEventName];
                 }
-            }
-            else if ([self currentStateHasName:kDisconnectingAndBecomingSeparatedStateName])
-            {
+            } else if ([self currentStateHasName:kDisconnectingAndBecomingSeparatedStateName]) {
                 [self fireStateMachineEvent:kCompleteDisconnectionAndBecomeSeparatedEventName];
-            }
-            else if ([self currentStateHasName:kPreparingToSwingStateName])
-            {
+            } else if ([self currentStateHasName:kPreparingToSwingStateName]) {
                 [self fireStateMachineEvent:kSwingEventName];
-            }
-            else
-            {
+            } else {
                 // Estimate whether the peripheral disconnected due to inactivity timeout by comparing
                 // the time since last activity to the inactivity timeout duration.
                 //
                 // TODO: The peripheral should report this to us in a robust fashion, either by setting a
                 // charachteristic or returning an error code in the disconnect.
                 BOOL didDisconnectDueToInactivityTimeout = NO;
-                if ([self currentStateHasName:kMarriedStateName])
-                {
+                if ([self currentStateHasName:kMarriedStateName]) {
                     static const NSTimeInterval kInactivityTimeoutMargin = 20.0;
                     NSTimeInterval timeSinceLastActivity = -[self.pairedPeripheralLastActivityTime timeIntervalSinceNow];
                     MLOG_INFO(FTLogSDK, "Did disconnect, time since last activity: %f", timeSinceLastActivity);
 
-                    const NSTimeInterval inactivityTimeout = (pen.inactivityTimeout == -1 ?
-                                                              kInactivityTimeout :
-                                                              pen.inactivityTimeout * 60.0);
+                    const NSTimeInterval inactivityTimeout = (pen.inactivityTimeout == -1 ? kInactivityTimeout : pen.inactivityTimeout * 60.0);
 
-                    if (timeSinceLastActivity - inactivityTimeout >= -kInactivityTimeoutMargin)
-                    {
+                    if (timeSinceLastActivity - inactivityTimeout >= -kInactivityTimeoutMargin) {
                         didDisconnectDueToInactivityTimeout = YES;
                         MLOG_INFO(FTLogSDK, "Did disconnect due to peripheral inactivity timeout.");
                     }
@@ -2021,25 +1800,19 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
                      [self currentStateHasName:kMarriedWaitingForLongPressToUnpairStateName] ||
                      [self currentStateHasName:kEngagedStateName] ||
                      [self currentStateHasName:kEngagedWaitingForPairingSpotReleaseStateName] ||
-                     [self currentStateHasName:kEngagedWaitingForTipReleaseStateName]))
-                {
+                     [self currentStateHasName:kEngagedWaitingForTipReleaseStateName])) {
                     [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenUnexpectedDisconnectNotificationName
                                                                         object:pen];
                 }
 
-                if ([self currentStateHasName:kMarriedStateName])
-                {
+                if ([self currentStateHasName:kMarriedStateName]) {
                     [self fireStateMachineEvent:kBecomeSeparatedEventName];
                     [self fireStateMachineEvent:kRetrieveConnectedPeripheralsFromSeparatedEventName];
-                }
-                else if ([self currentStateHasName:kMarriedWaitingForLongPressToUnpairStateName])
-                {
+                } else if ([self currentStateHasName:kMarriedWaitingForLongPressToUnpairStateName]) {
                     [self fireStateMachineEvent:kBecomeSeparatedEventName];
-                }
-                else if ([self currentStateHasName:kEngagedStateName] ||
-                         [self currentStateHasName:kEngagedWaitingForPairingSpotReleaseStateName] ||
-                         [self currentStateHasName:kEngagedWaitingForTipReleaseStateName])
-                {
+                } else if ([self currentStateHasName:kEngagedStateName] ||
+                           [self currentStateHasName:kEngagedWaitingForPairingSpotReleaseStateName] ||
+                           [self currentStateHasName:kEngagedWaitingForTipReleaseStateName]) {
                     [self fireStateMachineEvent:kDisconnectAndBecomeSingleEventName];
                 }
             }
@@ -2049,15 +1822,13 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
 #pragma mark - Firmware
 
--(void)setFirmwareUpdateIsAvailable:(NSNumber *)firmwareUpdateIsAvailable
+- (void)setFirmwareUpdateIsAvailable:(NSNumber *)firmwareUpdateIsAvailable
 {
     NSNumber *oldValue = self.firmwareUpdateIsAvailable;
     _firmwareUpdateIsAvailable = firmwareUpdateIsAvailable;
-    if (oldValue != firmwareUpdateIsAvailable)
-    {
+    if (oldValue != firmwareUpdateIsAvailable) {
         // OK let the outside world know
-        if ([self.delegate respondsToSelector:@selector(penManagerFirmwareUpdateIsAvailableDidChange)])
-        {
+        if ([self.delegate respondsToSelector:@selector(penManagerFirmwareUpdateIsAvailableDidChange)]) {
             [self.delegate penManagerFirmwareUpdateIsAvailableDidChange];
         }
     }
@@ -2068,11 +1839,9 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 - (void)updateFirmwareUpdateIsAvailble
 {
     BOOL isConnected = FTPenManagerStateIsConnected(self.state);
-    if (isConnected && self.pen && self.latestFirmwareVersion > 0)
-    {
+    if (isConnected && self.pen && self.latestFirmwareVersion > 0) {
         NSInteger currentVersion = [FTFirmwareManager currentRunningFirmwareVersion:self.pen];
-        if (currentVersion > 0)
-        {
+        if (currentVersion > 0) {
             self.firmwareUpdateIsAvailable = @(self.latestFirmwareVersion > currentVersion);
         }
     }
@@ -2082,19 +1851,16 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 // is availble.
 - (void)attemptLoadFirmwareFromNetworkForVersionChecking
 {
-    if (FTPenManagerStateIsConnected(self.state) && self.pen)
-    {
+    if (FTPenManagerStateIsConnected(self.state) && self.pen) {
         BOOL checkedRecently = (self.lastFirmwareNetworkCheckTime &&
                                 fabs([self.lastFirmwareNetworkCheckTime timeIntervalSinceNow]) > 60.0 * 5); // 5 minutes.
 
-        if (self.shouldCheckForFirmwareUpdates && !self.isFetchingLatestFirmware && !checkedRecently)
-        {
+        if (self.shouldCheckForFirmwareUpdates && !self.isFetchingLatestFirmware && !checkedRecently) {
             self.isFetchingLatestFirmware = YES;
 
             __weak FTPenManager *weakSelf = self;
 
-            [FTFirmwareManager fetchLatestFirmwareWithCompletionHandler:^(NSData *data)
-             {
+            [FTFirmwareManager fetchLatestFirmwareWithCompletionHandler:^(NSData *data) {
                  FTPenManager *strongSelf = weakSelf;
                  if (strongSelf)
                  {
@@ -2124,7 +1890,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
                          }
                      }
                  }
-             }];
+            }];
         }
     }
 }
@@ -2133,10 +1899,9 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 {
     BOOL isOlderThanADay = self.lastFirmwareNetworkCheckTime && fabs([self.lastFirmwareNetworkCheckTime timeIntervalSinceNow]) > 60.0 * 60.0 * 24.0; // 1 day.
 
-    if (isOlderThanADay)
-    {
+    if (isOlderThanADay) {
         self.lastFirmwareNetworkCheckTime = nil;
-        self.latestFirmware  = nil;
+        self.latestFirmware = nil;
         self.latestFirmwareVersion = -1;
     }
 }
@@ -2145,14 +1910,12 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 {
     BOOL checkedRecently = self.lastFirmwareNetworkCheckTime && fabs([self.lastFirmwareNetworkCheckTime timeIntervalSinceNow]) > 60.0 * 5; // 5 minutes.
 
-    if (!self.isFetchingLatestFirmware && !checkedRecently)
-    {
+    if (!self.isFetchingLatestFirmware && !checkedRecently) {
         self.isFetchingLatestFirmware = YES;
 
-        __weak FTPenManager * weakSelf = self;
+        __weak FTPenManager *weakSelf = self;
 
-        [FTFirmwareManager fetchLatestFirmwareWithCompletionHandler:^(NSData *data)
-         {
+        [FTFirmwareManager fetchLatestFirmwareWithCompletionHandler:^(NSData *data) {
              FTPenManager *strongSelf = weakSelf;
              if (strongSelf)
              {
@@ -2175,7 +1938,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
                      }
                  }
              }
-         }];
+        }];
     }
 }
 
@@ -2187,8 +1950,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
     *currentVersion = [FTFirmwareManager currentRunningFirmwareVersion:self.pen];
 
-    if (*currentVersion != -1 && self.latestFirmware)
-    {
+    if (*currentVersion != -1 && self.latestFirmware) {
         *updateVersion = self.latestFirmwareVersion;
         return @(*updateVersion > *currentVersion);
     }
@@ -2197,8 +1959,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
 - (BOOL)updateFirmware
 {
-    if (self.latestFirmware)
-    {
+    if (self.latestFirmware) {
         // Write it.
         NSString *tempFilePath = [NSTemporaryDirectory() stringByAppendingPathComponent:[[NSUUID UUID] UUIDString]];
         [self.latestFirmware writeToFile:tempFilePath atomically:YES];
@@ -2212,8 +1973,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 {
     FTAssert(firmwareImagePath, @"firmwareImagePath must be non-nil");
 
-    if ([self.stateMachine canFireEvent:kUpdateFirmwareEventName])
-    {
+    if ([self.stateMachine canFireEvent:kUpdateFirmwareEventName]) {
         self.firmwareImagePath = firmwareImagePath;
         [self fireStateMachineEvent:kUpdateFirmwareEventName];
         return YES;
@@ -2226,19 +1986,15 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 {
     BOOL didCancel = NO;
 
-    if ([self currentStateHasName:kUpdatingFirmwareStateName])
-    {
+    if ([self currentStateHasName:kUpdatingFirmwareStateName]) {
         [self fireStateMachineEvent:kBecomeMarriedEventName];
         didCancel = YES;
-    }
-    else if ([self currentStateHasName:kUpdatingFirmwareAttemptingConnectionStateName])
-    {
+    } else if ([self currentStateHasName:kUpdatingFirmwareAttemptingConnectionStateName]) {
         [self fireStateMachineEvent:kDisconnectAndBecomeSeparatedEventName];
         didCancel = YES;
     }
 
-    if (didCancel)
-    {
+    if (didCancel) {
         [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenManagerFirmwareUpdateWasCancelled
                                                             object:self];
     }
@@ -2252,12 +2008,9 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     FTAssert(self.updateManager, @"update manager non-nil");
     FTAssert(manager, nil);
 
-    if (error)
-    {
+    if (error) {
         // TODO: Should retry...
-    }
-    else
-    {
+    } else {
         [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenManagerFirmwareUpdateDidFinishSendingUpdate
                                                             object:self];
     }
@@ -2269,8 +2022,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
     FTFirmwareImageType type;
     BOOL result = [FTFirmwareManager imageTypeRunningOnPen:self.pen andType:&type];
-    if (result && type == FTFirmwareImageTypeFactory)
-    {
+    if (result && type == FTFirmwareImageTypeFactory) {
         [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenManagerFirmwareUpdateDidUpdatePercentComplete
                                                             object:self
                                                           userInfo:@{ kFTPenManagerPercentCompleteProperty : @(percentComplete) }];
@@ -2281,27 +2033,19 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
 - (void)setScanningState:(ScanningState)scanningState
 {
-    if (_scanningState != scanningState)
-    {
+    if (_scanningState != scanningState) {
         _scanningState = scanningState;
 
-        if (scanningState == ScanningStateDisabled)
-        {
+        if (scanningState == ScanningStateDisabled) {
             self.isScanningForPeripherals = NO;
             [self invalidateIsScanningForPeripheralsToggleTimer];
-        }
-        else if (scanningState == ScanningStateEnabled)
-        {
+        } else if (scanningState == ScanningStateEnabled) {
             self.isScanningForPeripherals = YES;
             [self invalidateIsScanningForPeripheralsToggleTimer];
-        }
-        else if (scanningState == ScanningStateEnabledWithPolling)
-        {
+        } else if (scanningState == ScanningStateEnabledWithPolling) {
             self.isScanningForPeripherals = YES;
             [self startIsScanningForPeripheralsToggleTimer];
-        }
-        else
-        {
+        } else {
             FTAssert(NO, @"Unexpected scanning state");
         }
     }
@@ -2325,28 +2069,23 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 - (void)isScanningForPeripheralsToggleTimerFired:(NSTimer *)timer
 {
     // TODO: This means the peripheral has not yet been disconnected. We should handle this more gracefully.
-    if (!self.pen)
-    {
+    if (!self.pen) {
         self.isScanningForPeripherals = !self.isScanningForPeripherals;
     }
 }
 
 - (void)setIsScanningForPeripherals:(BOOL)isScanningForPeripherals
 {
-    if (_isScanningForPeripherals != isScanningForPeripherals)
-    {
+    if (_isScanningForPeripherals != isScanningForPeripherals) {
         _isScanningForPeripherals = isScanningForPeripherals;
 
-        if (_isScanningForPeripherals)
-        {
+        if (_isScanningForPeripherals) {
             MLOG_INFO(FTLogSDK, "Begin scan for peripherals.");
 
             NSDictionary *options = @{ CBCentralManagerScanOptionAllowDuplicatesKey : @NO };
-            [self.centralManager scanForPeripheralsWithServices:@[[FTPenServiceUUIDs penService]]
+            [self.centralManager scanForPeripheralsWithServices:@[ [FTPenServiceUUIDs penService] ]
                                                         options:options];
-        }
-        else
-        {
+        } else {
             MLOG_INFO(FTLogSDK, "End scan for peripherals.");
 
             [self.centralManager stopScan];
@@ -2359,9 +2098,8 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     self.needsUpdate = YES;
     self.displayLink.paused = NO;
 
-    if ([self.delegate respondsToSelector:@selector(penManagerNeedsUpdateDidChange)])
-    {
-        [((id<FTPenManagerDelegatePrivate>)self.delegate) penManagerNeedsUpdateDidChange];
+    if ([self.delegate respondsToSelector:@selector(penManagerNeedsUpdateDidChange)]) {
+        [((id<FTPenManagerDelegatePrivate>)self.delegate)penManagerNeedsUpdateDidChange];
     }
 }
 
@@ -2374,8 +2112,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 // comes into line with the value we expect it to be.
 - (void)ensureHasListenerTimerDidFire:(NSTimer *)timer
 {
-    if (-[self.ensureHasListenerTimerStartTime timeIntervalSinceNow] > 2.0)
-    {
+    if (-[self.ensureHasListenerTimerStartTime timeIntervalSinceNow] > 2.0) {
         [self resetEnsureHasListenerTimer];
     }
     self.pen.hasListener = self.penHasListener;
@@ -2387,8 +2124,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     // HasListener characteristic.
     if (([self currentStateHasName:kMarriedStateName] ||
          [self currentStateHasName:kUpdatingFirmwareStateName]) &&
-        (!self.pen.canWriteHasListener || !self.pen.hasListenerSupportsNotifications))
-    {
+        (!self.pen.canWriteHasListener || !self.pen.hasListenerSupportsNotifications)) {
         [self resetEnsureHasListenerTimer];
 
         self.ensureHasListenerTimer = [NSTimer weakScheduledTimerWithTimeInterval:0.2f
@@ -2442,13 +2178,10 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
 - (void)setAutomaticUpdatesEnabled:(BOOL)useDisplayLink
 {
-    if (useDisplayLink)
-    {
+    if (useDisplayLink) {
         self.displayLink = [CADisplayLink displayLinkWithTarget:sharedInstance selector:@selector(update)];
         [self.displayLink addToRunLoop:[NSRunLoop mainRunLoop] forMode:NSDefaultRunLoopMode];
-    }
-    else
-    {
+    } else {
         [self.displayLink invalidate];
         self.displayLink = nil;
     }
@@ -2468,16 +2201,13 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     bool oldValue = self.needsUpdate;
     self.needsUpdate = AnimationPump::Instance()->HasActiveAnimations();
 
-    if (oldValue != self.needsUpdate)
-    {
-        if ([self.delegate respondsToSelector:@selector(penManagerNeedsUpdateDidChange)])
-        {
-            [((id<FTPenManagerDelegatePrivate>)self.delegate) penManagerNeedsUpdateDidChange];
+    if (oldValue != self.needsUpdate) {
+        if ([self.delegate respondsToSelector:@selector(penManagerNeedsUpdateDidChange)]) {
+            [((id<FTPenManagerDelegatePrivate>)self.delegate)penManagerNeedsUpdateDidChange];
         }
     }
 
-    if (!self.needsUpdate)
-    {
+    if (!self.needsUpdate) {
         self.displayLink.paused = YES;
     }
 }
@@ -2490,8 +2220,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     BOOL isOS7 = (floor(NSFoundationVersionNumber) > NSFoundationVersionNumber_iOS_6_1);
     NSAssert(isOS7, @"iOS 7 or greater is required.");
 
-    if (!sharedInstance)
-    {
+    if (!sharedInstance) {
         [FTEventDispatcher sharedInstance].classifier = fiftythree::sdk::TouchClassifier::New();
 
         sharedInstance = [[FTPenManager alloc] init];
@@ -2510,12 +2239,9 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     penConnectionView.suppressDialogs = YES;
     penConnectionView.isActive = true;
     penConnectionView.delegate = self;
-    if (FTPairingUIStyleDebug == style)
-    {
+    if (FTPairingUIStyleDebug == style) {
         penConnectionView.debugControlsVisibility = VisibilityStateVisible;
-    }
-    else
-    {
+    } else {
         penConnectionView.debugControlsVisibility = VisibilityStateHidden;
     }
 
@@ -2535,8 +2261,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     self.delegate = nil;
     self.classifier.delegate = nil;
 
-    for (UIView *view in self.pairingViews)
-    {
+    for (UIView *view in self.pairingViews) {
         [view removeFromSuperview];
     }
 
@@ -2545,8 +2270,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     [self reset];
 
     auto instance = fiftythree::core::spc<AnimationPumpObjC>(AnimationPump::Instance());
-    if (instance->GetDelegate() == self)
-    {
+    if (instance->GetDelegate() == self) {
         instance->SetDelegate(nil);
     }
 
@@ -2560,8 +2284,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 {
     BOOL connected = FTPenManagerStateIsConnected(self.state);
     auto ftTouch = fiftythree::core::spc<fiftythree::core::TouchTrackerObjC>(fiftythree::core::TouchTracker::Instance())->TouchForUITouch(uiTouch);
-    if (connected && ftTouch && ftTouch->CurrentSample().TouchRadius())
-    {
+    if (connected && ftTouch && ftTouch->CurrentSample().TouchRadius()) {
         float r = *(ftTouch->CurrentSample().TouchRadius());
         return @(r);
     }
@@ -2572,8 +2295,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 {
     BOOL connected = FTPenManagerStateIsConnected(self.state);
     auto ftTouch = fiftythree::core::spc<fiftythree::core::TouchTrackerObjC>(fiftythree::core::TouchTracker::Instance())->TouchForUITouch(uiTouch);
-    if (connected && ftTouch && ftTouch->SmoothedRadius())
-    {
+    if (connected && ftTouch && ftTouch->SmoothedRadius()) {
         float r = *(ftTouch->SmoothedRadius());
         return @(r);
     }
@@ -2584,8 +2306,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 {
     BOOL connected = FTPenManagerStateIsConnected(self.state);
     auto ftTouch = fiftythree::core::spc<fiftythree::core::TouchTrackerObjC>(fiftythree::core::TouchTracker::Instance())->TouchForUITouch(uiTouch);
-    if (connected && ftTouch && ftTouch->SmoothedCGPointRadius())
-    {
+    if (connected && ftTouch && ftTouch->SmoothedCGPointRadius()) {
         float r = *(ftTouch->SmoothedCGPointRadius());
         return @(r);
     }
@@ -2618,8 +2339,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
                                    cancel:(NSURL *)cancelCallbackUrl
 {
     FTXCallbackURL *baseUrl = self.pencilFirmwareUpgradeURL;
-    if ([[UIApplication sharedApplication] canOpenURL:baseUrl])
-    {
+    if ([[UIApplication sharedApplication] canOpenURL:baseUrl]) {
         FTXCallbackURL *urlWithCallbacks = [FTXCallbackURL URLWithScheme:baseUrl.scheme
                                                                     host:baseUrl.host
                                                                   action:baseUrl.action

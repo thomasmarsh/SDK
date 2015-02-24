@@ -7,7 +7,7 @@
 
 #import "FTFirmwareUpdateProgressView.h"
 
-NSString * const kUpdateProgressViewMessage = @"%.1f%% Complete\nTime Remaining: %02d:%02d";
+NSString *const kUpdateProgressViewMessage = @"%.1f%% Complete\nTime Remaining: %02d:%02d";
 
 @interface FTFirmwareUpdateProgressView ()
 

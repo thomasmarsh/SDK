@@ -30,73 +30,72 @@ namespace fiftythree
 {
 namespace sdk
 {
-template<typename T>
+template <typename T>
 T round(T val)
 {
-  return floor(val + 0.5);
+    return floor(val + 0.5);
 }
 
-std::vector<Eigen::Vector2f> Diff(std::vector< Eigen::Vector2f > const & Z);
+std::vector<Eigen::Vector2f> Diff(std::vector<Eigen::Vector2f> const &Z);
 std::vector<float> NormDiff(std::vector<Eigen::Vector2f> const &Z);
 
-Eigen::VectorXf ComponentWiseNorm(std::vector< Eigen::Vector2f > const & Z);
+Eigen::VectorXf ComponentWiseNorm(std::vector<Eigen::Vector2f> const &Z);
 
 // In matlab: (sqrt(sum(M.^2, 2)))
-Eigen::VectorXf RowWiseComponentNorm(const Eigen::MatrixXf & M);
+Eigen::VectorXf RowWiseComponentNorm(const Eigen::MatrixXf &M);
 
-float SquaredNorm(std::vector< Eigen::Vector2f > const & Z);
+float SquaredNorm(std::vector<Eigen::Vector2f> const &Z);
 
 // For some reason .squaredNorm() doesn't work for vector subsets of matrices
-template<typename DerivedA>
+template <typename DerivedA>
 typename DerivedA::Scalar SquaredNorm(const Eigen::MatrixBase<DerivedA> &A)
 {
-    DebugAssert( ( A.rows() == 1 ) || ( A.cols() == 1) );
+    DebugAssert((A.rows() == 1) || (A.cols() == 1));
     return A.array().square().sum();
 }
 
 // Floating-point zero test
 // true if abs(input) <= nugget*machine_precision
-template<typename T>
+template <typename T>
 bool IsFPZero(T input, float nugget)
 {
-    return ( std::abs(input) <= nugget * std::numeric_limits<T>::epsilon() );
+    return (std::abs(input) <= nugget * std::numeric_limits<T>::epsilon());
 }
 
-template<typename T>
+template <typename T>
 bool IsFPZero(T input)
 {
     return IsFPZero(input, 50.0f);
 }
 
-template<typename DerivedA>
+template <typename DerivedA>
 void NormalizeVectorInPlace(Eigen::MatrixBase<DerivedA> &A)
 {
-    DebugAssert( ( A.rows() == 1 ) || ( A.cols() == 1 ) );
+    DebugAssert((A.rows() == 1) || (A.cols() == 1));
 
     typename DerivedA::Scalar ANorm = std::sqrt(SquaredNorm(A));
 
     // If the vector is the zero vector, don't normalize
-    if ( ! IsFPZero(ANorm) )
-    {
+    if (!IsFPZero(ANorm)) {
         A /= std::sqrt(SquaredNorm(A));
     }
 }
 
 // Returns the covariance matrix, in Matlab parlance: (D-mean(D))*(D-mean(D)'
-Eigen::MatrixXf Covariance(std::vector<Eigen::Vector2f> const & D);
+Eigen::MatrixXf Covariance(std::vector<Eigen::Vector2f> const &D);
 
 // Computes weighted mean of each column of XY
-template<typename DerivedData, typename DerivedWeights>
+template <typename DerivedData, typename DerivedWeights>
 Eigen::Matrix<typename DerivedData::Scalar, 1, Eigen::Dynamic> WeightedMean(const Eigen::MatrixBase<DerivedData> &XY,
-                                                               const Eigen::MatrixBase<DerivedWeights> &weights)
+                                                                            const Eigen::MatrixBase<DerivedWeights> &weights)
 {
     DebugAssert(XY.rows() == weights.rows());
 
     typedef typename DerivedData::Scalar DataT;
 
-    DataT weightSum = ((DataT) weights.sum());
+    DataT weightSum = ((DataT)weights.sum());
 
-    Eigen::Matrix<DataT, 1, Eigen::Dynamic> output = ( weights.transpose().template cast<DataT>() * XY )/weightSum;
+    Eigen::Matrix<DataT, 1, Eigen::Dynamic> output = (weights.transpose().template cast<DataT>() * XY) / weightSum;
 
     return output;
 }
@@ -108,30 +107,30 @@ Eigen::Matrix<typename DerivedData::Scalar, 1, Eigen::Dynamic> WeightedMean(cons
 // scale are the weights of each principal component.
 // principalDirection is the first component.
 // mean is computed as part of the computation and might be useful to the caller.
-void PCA2f(Eigen::MatrixX2f const & D,
-           Eigen::Vector2f & scale,
-           Eigen::Vector2f & principalDirection,
-           Eigen::Vector2f & mean);
+void PCA2f(Eigen::MatrixX2f const &D,
+           Eigen::Vector2f &scale,
+           Eigen::Vector2f &principalDirection,
+           Eigen::Vector2f &mean);
 
-std::vector<Eigen::Vector2f> Tail(std::vector< Eigen::Vector2f > const & Z, size_t n);
-void Append(std::vector< Eigen::Vector2f > & to, std::vector< Eigen::Vector2f > const & from);
+std::vector<Eigen::Vector2f> Tail(std::vector<Eigen::Vector2f> const &Z, size_t n);
+void Append(std::vector<Eigen::Vector2f> &to, std::vector<Eigen::Vector2f> const &from);
 
 Eigen::Vector2f CenterOfMass(std::vector<Eigen::Vector2f> const &points);
 float RadialMoment(std::vector<Eigen::Vector2f> points);
 float RadialMomentOfInertia(std::vector<Eigen::Vector2f> points);
 
-float Variance(std::vector<float> const & X);
-float Variance(Eigen::VectorXf const & X);
+float Variance(std::vector<float> const &X);
+float Variance(Eigen::VectorXf const &X);
 
 std::vector<float> Diff(std::vector<float> const &X);
 Eigen::VectorXf Diff(Eigen::VectorXf const &X);
 
 Eigen::VectorXf CumSum0NormDiff(std::vector<Eigen::Vector2f> const &Z);
 
-Eigen::VectorXf  CumSum(Eigen::VectorXf const & Z);
+Eigen::VectorXf CumSum(Eigen::VectorXf const &Z);
 // like MATLAB cumsum (cumulative sum) but with a zero in the first entry for convenience when
 // you're integrating somebody's derivative and you want the output to have the same length as input
-Eigen::VectorXf  CumSum0(Eigen::VectorXf const & Z);
+Eigen::VectorXf CumSum0(Eigen::VectorXf const &Z);
 
 Eigen::VectorXf Linspace(float from, float to, size_t size);
 
@@ -143,10 +142,8 @@ ContainerType Interp(float const *t, ContainerType const &Z, float const *ti, in
 {
     ContainerType out(outPointCount);
 
-    if (inPointCount == 1)
-    {
-        for (int j=0; j<outPointCount; j++)
-        {
+    if (inPointCount == 1) {
+        for (int j = 0; j < outPointCount; j++) {
             out[j] = Z[0];
         }
 
@@ -156,41 +153,32 @@ ContainerType Interp(float const *t, ContainerType const &Z, float const *ti, in
     // a is left endpoint of current interval
     unsigned int a = 0;
     unsigned int n = 0;
-    for (unsigned int i=outPointCount; i--; )
-    {
+    for (unsigned int i = outPointCount; i--;) {
         // advance a until ti[n] lies in the interval ( t[a], t[a+1] ]
-        while (ti[n] > t[a+1] && a < inPointCount-2)
-        {
+        while (ti[n] > t[a + 1] && a < inPointCount - 2) {
             a++;
         }
 
         // skip degenerate intervals unless we're at the very last point, in which case
         // the code below will just use the value at the appropriate endpoint
-        if (t[a+1] == t[a] && i>0)
-        {
+        if (t[a + 1] == t[a] && i > 0) {
             continue;
         }
 
-        float dt_inv     = 1.0f / (t[a+1] - t[a]);
-        if (t[a+1] == t[a])
-        {
+        float dt_inv = 1.0f / (t[a + 1] - t[a]);
+        if (t[a + 1] == t[a]) {
             dt_inv = 0;
         }
 
-        typename ContainerType::value_type  dZ   = Z[a+1] - Z[a];
+        typename ContainerType::value_type dZ = Z[a + 1] - Z[a];
 
-        if (ti[n] > t[inPointCount-1])
-        {
-            out[n] = Z[inPointCount-1];
+        if (ti[n] > t[inPointCount - 1]) {
+            out[n] = Z[inPointCount - 1];
 
-        }
-        else if (ti[n] < t[0])
-        {
+        } else if (ti[n] < t[0]) {
             out[n] = Z[0];
-        }
-        else
-        {
-            out[n] = Z[a] + (ti[n] - t[a])*dZ*dt_inv;
+        } else {
+            out[n] = Z[a] + (ti[n] - t[a]) * dZ * dt_inv;
         }
         n++;
     }
@@ -199,24 +187,24 @@ ContainerType Interp(float const *t, ContainerType const &Z, float const *ti, in
 }
 
 // assumes edges are in increasing order, otherwise results are wrong
-int HistogramBinIndex(float value, std::vector<float> const & edges);
+int HistogramBinIndex(float value, std::vector<float> const &edges);
 
 template <class ContainerType>
 ContainerType Interp(Eigen::VectorXf const &t, ContainerType const &Z, Eigen::VectorXf const &ti)
 {
-    return Interp<ContainerType>((float*) t.data(), Z, (float*) ti.data(), (int)t.size(), (int)ti.size());
+    return Interp<ContainerType>((float *)t.data(), Z, (float *)ti.data(), (int)t.size(), (int)ti.size());
 }
 
-inline Eigen::Map<Eigen::VectorXf> Map(std::vector< Eigen::Vector2f > const & Z);
+inline Eigen::Map<Eigen::VectorXf> Map(std::vector<Eigen::Vector2f> const &Z);
 
-inline Eigen::Map<Eigen::VectorXf> Map(std::vector<float> const & R);
-Eigen::Map<Eigen::VectorXi> Map(std::vector<int> const & R);
+inline Eigen::Map<Eigen::VectorXf> Map(std::vector<float> const &R);
+Eigen::Map<Eigen::VectorXi> Map(std::vector<int> const &R);
 
-inline Eigen::Map<Eigen::VectorXf> Map(Eigen::MatrixXf const & A);
+inline Eigen::Map<Eigen::VectorXf> Map(Eigen::MatrixXf const &A);
 
-inline Stride2Map XMap(std::vector< Eigen::Vector2f > const & Z);
+inline Stride2Map XMap(std::vector<Eigen::Vector2f> const &Z);
 
-inline Stride2Map YMap(std::vector< Eigen::Vector2f > const & Z);
+inline Stride2Map YMap(std::vector<Eigen::Vector2f> const &Z);
 
 // Eigen only seems to support cross-product on Vector3f
 float Cross2f(Eigen::Vector2f const &v, Eigen::Vector2f const &w);
@@ -224,19 +212,18 @@ float Cross2f(Eigen::Vector2f const &v, Eigen::Vector2f const &w);
 float ShrinkTowardsZero(float x, float shrinkageAmount);
 
 // move this to CubicPolynomial?
-template < class DataType >
-std::vector<DataType> EvaluateCubicAtTimes(CubicPolynomial<DataType> const & P, Eigen::VectorXf t)
+template <class DataType>
+std::vector<DataType> EvaluateCubicAtTimes(CubicPolynomial<DataType> const &P, Eigen::VectorXf t)
 {
     std::vector<DataType> values(t.size());
 
-    for (int j=0; j < t.size(); j++)
-    {
+    for (int j = 0; j < t.size(); j++) {
         values[j] = P.ValueAt(t[j]);
     }
     return values;
 }
 
-Eigen::Vector2f ComplexMultiply(Eigen::Vector2f const & z, Eigen::Vector2f const & w);
+Eigen::Vector2f ComplexMultiply(Eigen::Vector2f const &z, Eigen::Vector2f const &w);
 
 // this Perp() hack exists because in the case of Vector2f,
 // IncrementalSmoother needs to extract the component of one vector
@@ -244,20 +231,17 @@ Eigen::Vector2f ComplexMultiply(Eigen::Vector2f const & z, Eigen::Vector2f const
 // In order to make IncrementalSmoother into a template class, we need to make Perp mean
 // something in the case of Vector1f.  The DWIW thing is to return zero.
 template <class VectorType>
-VectorType Perp(VectorType const & decompose, VectorType const & relativeTo)
+VectorType Perp(VectorType const &decompose, VectorType const &relativeTo)
 {
     int dimension = VectorType::RowsAtCompileTime;
 
-    switch (dimension)
-    {
-        case 1:
-        {
+    switch (dimension) {
+        case 1: {
             return VectorType::Zero();
             break;
         }
 
-        default:
-        {
+        default: {
             // project decompose onto relativeTo
             VectorType projection = (decompose.dot(relativeTo) / (.0001f + relativeTo.squaredNorm())) * relativeTo;
             return decompose - projection;
@@ -266,16 +250,16 @@ VectorType Perp(VectorType const & decompose, VectorType const & relativeTo)
     }
 }
 
-float ArcLength(CubicPolynomial<XYType> const & P);
+float ArcLength(CubicPolynomial<XYType> const &P);
 
-int   sgn(float x);
+int sgn(float x);
 
 inline double get_time()
 {
     timeval tv;
     // timezone tz;
     gettimeofday(&tv, NULL);
-    double d_time = tv.tv_sec + tv.tv_usec/1000000.0;
+    double d_time = tv.tv_sec + tv.tv_usec / 1000000.0;
     return d_time;
 }
 
@@ -290,7 +274,7 @@ double toc();
 // [   .    .  ]          [   .    .  ]
 // [   .    .  ]          [   .    .  ]
 // [ xN1   xN2 ]          [ yN1   yN2 ]
-template<typename DerivedA>
+template <typename DerivedA>
 DerivedA OrthogonalizeXAgainstY(const Eigen::MatrixBase<DerivedA> &x,
                                 const Eigen::MatrixBase<DerivedA> &y)
 {
@@ -305,35 +289,32 @@ DerivedA OrthogonalizeXAgainstY(const Eigen::MatrixBase<DerivedA> &x,
 
     // Numerator is x.*y
     // Denominator is |y|.^2
-    ProjectionFactors = ( x.array() * y.array() ).rowwise().sum().array() /
-                        ( y.array().square()    ).rowwise().sum().array();
+    ProjectionFactors = (x.array() * y.array()).rowwise().sum().array() /
+                        (y.array().square()).rowwise().sum().array();
 
-    for (int i = 0; i < x.cols(); ++i)
-    {
-        result.block(0,i,N,1).array() -= (y.block(0,i,N,1).array() * ProjectionFactors.array());
+    for (int i = 0; i < x.cols(); ++i) {
+        result.block(0, i, N, 1).array() -= (y.block(0, i, N, 1).array() * ProjectionFactors.array());
     }
 
     // And now we have to un-nan things when y has a zero row.
     float tol = 1e-8;
-    Eigen::Matrix<bool,Eigen::Dynamic,1> flags = (y.array().square().rowwise().sum().array() > tol);
-    for (int i = 0; i < x.cols(); ++i)
-    {
-        result.block(0,i,N,1) = flags.select(result.block(0,i,N,1), x.block(0,i,N,1));
+    Eigen::Matrix<bool, Eigen::Dynamic, 1> flags = (y.array().square().rowwise().sum().array() > tol);
+    for (int i = 0; i < x.cols(); ++i) {
+        result.block(0, i, N, 1) = flags.select(result.block(0, i, N, 1), x.block(0, i, N, 1));
     }
 
     return result;
-
 }
 
 // Views each row as an N-d vector, and returns the max Eucliean 2-norm over all rows
-template<typename DerivedA>
+template <typename DerivedA>
 typename DerivedA::Scalar RowwiseMaxNorm(const Eigen::MatrixBase<DerivedA> &x)
 {
     return std::sqrt(x.cwiseAbs2().rowwise().sum().maxCoeff());
 }
 
 // Returns ( x.rows() x (maxDegree + 1) ) sized Vandermonde matrix
-template<typename T>
+template <typename T>
 Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> VandermondeMatrix(Eigen::Matrix<T, Eigen::Dynamic, 1> x, int maxDegree)
 {
     // Degree needs to be non-negative
@@ -344,8 +325,7 @@ Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> VandermondeMatrix(Eigen::Matrix
     Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> output;
     output.resize(Nx, maxDegree + 1);
 
-    for (int i = 0; i <= maxDegree; ++i)
-    {
+    for (int i = 0; i <= maxDegree; ++i) {
         output.block(0, i, Nx, 1) = x.array().pow(i);
     }
     return output;

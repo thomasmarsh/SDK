@@ -11,8 +11,7 @@
 
 #import "FiftyThreeSdk/LatencyTouchClassifier.h"
 
-@interface FTLatencyTouchClassfierTests : SenTestCase
-{
+@interface FTLatencyTouchClassfierTests : SenTestCase {
     fiftythree::sdk::LatencyTouchClassifier::Ptr _Classifier;
 }
 

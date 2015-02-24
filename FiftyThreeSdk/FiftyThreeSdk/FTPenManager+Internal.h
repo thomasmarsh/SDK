@@ -11,8 +11,8 @@
 #import "FTPenManager.h"
 #import "FTXCallbackURL.h"
 
-extern NSString * const kFTPenManagerDidUpdateStateNotificationName;
-extern NSString * const kFTPenManagerDidFailToDiscoverPenNotificationName;
+extern NSString *const kFTPenManagerDidUpdateStateNotificationName;
+extern NSString *const kFTPenManagerDidFailToDiscoverPenNotificationName;
 
 @interface FTPenManager (Internal)
 

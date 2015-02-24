@@ -11,6 +11,6 @@
 
 @interface Helpers : NSObject
 
-+(double) NSProcessInfoSystemUptime;
++ (double)NSProcessInfoSystemUptime;
 
 @end

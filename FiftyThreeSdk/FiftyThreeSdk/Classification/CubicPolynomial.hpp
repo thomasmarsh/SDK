@@ -29,7 +29,6 @@ namespace sdk
 template <class T>
 class CubicPolynomial
 {
-
     static_assert((T::ColsAtCompileTime == 1 &&
                    T::IsVectorAtCompileTime),
                   "Ensures it's an Eigen fixed sized column vector.");
@@ -39,8 +38,8 @@ protected:
     float _globalIntervalRight;
     float _standardIntervalLeft = -1;
     float _standardIntervalRight = 1;
-public:
 
+public:
     T _a, _b, _c, _d;
 
     // store the points at which the polynomial is defined, if they are known.
@@ -48,29 +47,35 @@ public:
 
     int _definingValueCount;
 
-    CubicPolynomial(T a, T b, T c, T d) : _a(a), _b(b), _c(c), _d(d), _definingValueCount(-1) {}
+    CubicPolynomial(T a, T b, T c, T d)
+    : _a(a)
+    , _b(b)
+    , _c(c)
+    , _d(d)
+    , _definingValueCount(-1)
+    {
+    }
     CubicPolynomial() {}
 
     T ValueAt(float t) const
     {
-        return _a * (t * t * t)    +
-        _b * (t * t) +
-        _c * t +
-        _d;
+        return _a * (t * t * t) +
+               _b * (t * t) +
+               _c * t +
+               _d;
     }
 
     T FirstDerivativeAt(float t) const
     {
         return 3.0f * _a * t * t +
-                2.0f * _b * t +
-                1.0f * _c;
+               2.0f * _b * t +
+               1.0f * _c;
     }
 
     T SecondDerivativeAt(float t) const
     {
-
         return 6.0f * _a * t +
-                2.0f * _b;
+               2.0f * _b;
     }
 
     static CubicPolynomial<T> Constant(T p)
@@ -103,7 +108,7 @@ public:
         T a =       value - (b + c + d);
         // clang-format on
 
-        return CubicPolynomial(a,b,c,d);
+        return CubicPolynomial(a, b, c, d);
     }
 
     static CubicPolynomial<T> CubicThroughPointsWithFirstDerivatives(T p0, T p1, T fp0, T fp1)
@@ -132,12 +137,11 @@ public:
 
     CubicPolynomial<T> ExtendQuadraticTo(T value) const
     {
+        T c = this->FirstDerivativeAt(1.0f);
+        T d = this->ValueAt(1.0f);
+        T b = value - (c + d);
 
-        T c =       this->FirstDerivativeAt(1.0f);
-        T d =       this->ValueAt(1.0f);
-        T b =       value - (c + d);
-
-        return CubicPolynomial(CubicPolynomial<T>::Zero(),b,c,d);
+        return CubicPolynomial(CubicPolynomial<T>::Zero(), b, c, d);
     }
 
     // this works for Eigen vector types.
@@ -149,19 +153,16 @@ public:
     // this produces polynomial P with P(0) = p, P(1) = r, and control point q
     static CubicPolynomial<T> QuadraticWithControlPoints(T p, T q, T r)
     {
-
         T a = CubicPolynomial<T>::Zero();
         T b = p - 2.0f * q + r;
         T c = 2.0f * (q - p);
         T d = p;
 
-        return CubicPolynomial<T>(a,b,c,d);
-
+        return CubicPolynomial<T>(a, b, c, d);
     }
 
     static CubicPolynomial<T> QuadraticWithValueAndDerivativesAtTime(T f, T fp, T fpp, float t)
     {
-
         T b = .5f * fpp;
         T c = fp - t * fpp;
         T d = f - .5f * fpp * t * t - (fp - t * fpp) * t;
@@ -176,22 +177,18 @@ public:
 
     static CubicPolynomial<T> QuadraticWithValueAndDerivativesAtZero(T f0, T fp0, T fpp0)
     {
-
         T b = .5f * fpp0;
         T c = fp0;
         T d = f0;
 
         return CubicPolynomial<T>(T::Zero(), b, c, d);
-
     }
 
     // the polynomial was constructed using one of the "ValuesAtTimes" factory methods,
     // we will store the times of definition.  useful for extrapolation, for example.
     float LastDefiningTimestamp() const
     {
-
-        switch (_definingValueCount)
-        {
+        switch (_definingValueCount) {
             case 1:
                 return _t0;
                 break;
@@ -218,7 +215,7 @@ public:
     {
         Eigen::Matrix2f A;
         A << t0, 1,
-        t1, 1;
+            t1, 1;
 
         Eigen::Matrix2f AInv = A.inverse();
 
@@ -230,8 +227,8 @@ public:
         //             AInv * [p_x, p_y; q_x, q_y],
         // i.e. AInv multiplying the vector componentwise
 
-        T c = AInv(0,0) * p + AInv(0,1) * q;
-        T d = AInv(1,0) * p + AInv(1,1) * q;
+        T c = AInv(0, 0) * p + AInv(0, 1) * q;
+        T d = AInv(1, 0) * p + AInv(1, 1) * q;
 
         CubicPolynomial<T> P = CubicPolynomial<T>(a, b, c, d);
 
@@ -241,15 +238,14 @@ public:
         P._definingValueCount = 2;
 
         return P;
-
     }
 
     static CubicPolynomial<T> QuadraticWithValuesAtTimes(T p, T q, T r, float t0, float t1, float t2)
     {
         Eigen::Matrix3f A;
-        A << t0*t0, t0, 1,
-        t1*t1, t1, 1,
-        t2*t2, t2, 1;
+        A << t0 *t0, t0, 1,
+            t1 *t1, t1, 1,
+            t2 *t2, t2, 1;
 
         Eigen::Matrix3f AInv = A.inverse();
 
@@ -274,7 +270,6 @@ public:
         P._definingValueCount = 3;
 
         return P;
-
     }
 
     static CubicPolynomial<T> CubicWithValuesAtTimes(T p, T q, T r, T s, float t0, float t1, float t2, float t3)
@@ -293,10 +288,10 @@ public:
         //             AInv * [p_x, p_y; q_x, q_y; r_x, r_y; s_x, s_y],
         // i.e. AInv multiplying the vector componentwise
 
-        T a = AInv(0,0) * p + AInv(0,1) * q + AInv(0,2) * r + AInv(0, 3) * s;
-        T b = AInv(1,0) * p + AInv(1,1) * q + AInv(1,2) * r + AInv(1, 3) * s;
-        T c = AInv(2,0) * p + AInv(2,1) * q + AInv(2,2) * r + AInv(2, 3) * s;
-        T d = AInv(3,0) * p + AInv(3,1) * q + AInv(3,2) * r + AInv(3, 3) * s;
+        T a = AInv(0, 0) * p + AInv(0, 1) * q + AInv(0, 2) * r + AInv(0, 3) * s;
+        T b = AInv(1, 0) * p + AInv(1, 1) * q + AInv(1, 2) * r + AInv(1, 3) * s;
+        T c = AInv(2, 0) * p + AInv(2, 1) * q + AInv(2, 2) * r + AInv(2, 3) * s;
+        T d = AInv(3, 0) * p + AInv(3, 1) * q + AInv(3, 2) * r + AInv(3, 3) * s;
 
         CubicPolynomial<T> P = CubicPolynomial<T>(a, b, c, d);
 
@@ -310,7 +305,6 @@ public:
         P._definingValueCount = 4;
 
         return P;
-
     }
 
     // a first-order finite difference approximation to arc length
@@ -328,17 +322,14 @@ public:
         // and evaluate the derivative at the midpoints
         float evaluationPoint = h * .5f;
         float totalLength = 0.0f;
-        for (size_t index = meshSize; index--; evaluationPoint += h)
-        {
-            T derivative           = FirstDerivativeAt(evaluationPoint);
+        for (size_t index = meshSize; index--; evaluationPoint += h) {
+            T derivative = FirstDerivativeAt(evaluationPoint);
             float distanceTraveled = derivative.norm() * h;
 
-            totalLength           += distanceTraveled;
-
+            totalLength += distanceTraveled;
         }
 
         return totalLength;
-
     }
 
     CubicPolynomial<T> ExtendLineTo(T value) const
@@ -347,13 +338,11 @@ public:
     }
 
 protected:
-
     // Just an affine map to the standard interval
     std::vector<float> MapToStandardInterval(std::vector<float> t)
     {
         // If this is not defined with samples, abort
-        if (_definingValueCount < 4)
-        {
+        if (_definingValueCount < 4) {
             return std::vector<float>();
         }
 

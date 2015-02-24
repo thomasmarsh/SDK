@@ -20,23 +20,22 @@ namespace sdk
 {
 class DumbStylusClassifier
 {
-    TouchLogger* _touchLog;
-    const CommonData* _commonData;
+    TouchLogger *_touchLog;
+    const CommonData *_commonData;
 
     std::map<ClusterId, core::TouchClassification> _clusterTypes;
-    std::map<core::TouchId, core::TouchClassification>  _touchTypes;
+    std::map<core::TouchId, core::TouchClassification> _touchTypes;
 
     IdTypeMap ReclassifyByHandedness();
-    void SetClusterType(Cluster::Ptr const & cluster, core::TouchClassification newType, IdTypeMap &changedTypes);
+    void SetClusterType(Cluster::Ptr const &cluster, core::TouchClassification newType, IdTypeMap &changedTypes);
 
 public:
-
     ALIAS_PTR_TYPES(DumbStylusClassifier);
 
-    DumbStylusClassifier(TouchLogger*      logPtr,
-                         const CommonData* dataPtr) :
-    _touchLog(logPtr),
-    _commonData(dataPtr)
+    DumbStylusClassifier(TouchLogger *logPtr,
+                         const CommonData *dataPtr)
+    : _touchLog(logPtr)
+    , _commonData(dataPtr)
     {
     }
 
@@ -45,15 +44,15 @@ public:
     core::TouchClassification CurrentType(core::TouchId touchId);
     core::TouchClassification ClusterType(ClusterId clusterId);
 
-    void      ClearStaleData();
+    void ClearStaleData();
 
-    void      ClearAllData()
+    void ClearAllData()
     {
         _clusterTypes.clear();
         _touchTypes.clear();
     }
 
-    bool      HandednessLocked();
+    bool HandednessLocked();
 };
 }
 }

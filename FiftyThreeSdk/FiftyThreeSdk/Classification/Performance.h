@@ -23,37 +23,35 @@ typedef std::pair<core::TouchClassification, std::map<core::TouchClassification,
 
 class PerformanceReport
 {
-
     std::map<core::TouchClassification, std::map<core::TouchClassification, int>> _counts;
     std::string _csvReport;
 
     std::vector<core::TouchClassification> _trueClasses;
 
 public:
-
     PerformanceReport() = default;
 
     // construct a performance report assuming the TRUE_CLASS column is correct
-    PerformanceReport(std::string const & csvReport);
+    PerformanceReport(std::string const &csvReport);
 
     // override the TRUE_CLASS column from the file with the spec'd data.  Used
     // when running RT's to allow labeled data to override the default.
-    PerformanceReport(std::string const & csvReport, std::vector<core::TouchClassification> const & trueClasses);
+    PerformanceReport(std::string const &csvReport, std::vector<core::TouchClassification> const &trueClasses);
 
-    void init(std::string const & csvReport, std::vector<core::TouchClassification> const & trueClasses);
+    void init(std::string const &csvReport, std::vector<core::TouchClassification> const &trueClasses);
 
-    std::vector<core::TouchClassification> const & TrueClasses()
+    std::vector<core::TouchClassification> const &TrueClasses()
     {
         return _trueClasses;
     }
 
     // not returning const ref because then you can't use bracket[] operator.
-    std::map<core::TouchClassification, int> & CountsForTouchType(core::TouchClassification probeType)
+    std::map<core::TouchClassification, int> &CountsForTouchType(core::TouchClassification probeType)
     {
         return _counts[probeType];
     }
 
-    std::string const & CSVReport()
+    std::string const &CSVReport()
     {
         return _csvReport;
     }
@@ -67,7 +65,6 @@ public:
     float ScoreForType(core::TouchClassification probeType);
 
     float OverallScore();
-
 };
 }
 }

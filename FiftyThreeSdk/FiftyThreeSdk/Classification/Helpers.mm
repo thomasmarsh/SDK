@@ -10,7 +10,7 @@
 
 @implementation Helpers
 
-+(double) NSProcessInfoSystemUptime;
++ (double)NSProcessInfoSystemUptime;
 {
     return [NSProcessInfo processInfo].systemUptime;
 }

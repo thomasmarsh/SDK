@@ -14,9 +14,9 @@
 
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
 
-#define kBrushPixelStep     3
+#define kBrushPixelStep 3
 
-@interface  Stroke : NSObject
+@interface Stroke : NSObject
 @property (nonatomic) NSTimeInterval lastAltered;
 // CG Points with inverted Y-axis to match our OpenGL coordinate system.
 @property (nonatomic) NSMutableArray *glGeometry;
@@ -28,8 +28,7 @@
 @implementation Stroke
 @end
 
-@interface FTADrawer ()
-{
+@interface FTADrawer () {
     FTAShaderInfo *_pointSpriteShader;
     FTAShaderInfo *_blitShader;
 
@@ -63,8 +62,7 @@
 
 - (id)init
 {
-    if (self = [super init])
-    {
+    if (self = [super init]) {
         self.context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
 
         if (!self.context) {
@@ -99,42 +97,35 @@
 {
     Stroke *s = self.scene[@(strokeId)];
 
-    if (!s)
-    {
+    if (!s) {
         Stroke *s = [[Stroke alloc] init];
         s.lastAltered = [[NSProcessInfo processInfo] systemUptime];
         s.glGeometry = [@[] mutableCopy];
         [s.glGeometry addObject:[NSValue valueWithCGPoint:[self glPointFromCGPoint:p]]];
         s.glRadii = [@[] mutableCopy];
-        [s.glRadii addObject:[NSNumber numberWithDouble: (double)r]];
+        [s.glRadii addObject:[NSNumber numberWithDouble:(double)r]];
         s.drawOrder = strokeId;
         s.color = [UIColor whiteColor];
 
-        if (!self.scene)
-        {
+        if (!self.scene) {
             self.scene = [@{} mutableCopy];
         }
 
         [self.scene setObject:s forKey:[NSNumber numberWithInteger:strokeId]];
-    }
-    else
-    {
+    } else {
         s.lastAltered = [[NSProcessInfo processInfo] systemUptime];
         [s.glGeometry addObject:[NSValue valueWithCGPoint:[self glPointFromCGPoint:p]]];
-        [s.glRadii addObject:[NSNumber numberWithDouble: (double)r]];
+        [s.glRadii addObject:[NSNumber numberWithDouble:(double)r]];
     }
 }
 
 - (void)setColor:(UIColor *)c forStroke:(NSInteger)strokeId
 {
-    Stroke * s = self.scene[@(strokeId)];
-    if (s)
-    {
+    Stroke *s = self.scene[@(strokeId)];
+    if (s) {
         s.lastAltered = [[NSProcessInfo processInfo] systemUptime];
         s.color = c;
-    }
-    else
-    {
+    } else {
         NSLog(@"Not Found!");
     }
 }
@@ -153,11 +144,10 @@
 
 - (void)blit
 {
-    if (!_blitBuffer)
-    {
+    if (!_blitBuffer) {
         glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-        glGenVertexArraysOES(1,&_blitVAO);
+        glGenVertexArraysOES(1, &_blitVAO);
         glBindVertexArrayOES(_blitVAO);
 
         glGenBuffers(1, &_blitBuffer);
@@ -173,36 +163,41 @@
         GLfloat w = self.view.bounds.size.width;
         GLfloat h = self.view.bounds.size.height;
 
-        GLfloat squareVertices[4*4] =
-        {
-            0.0f, 0.0f,      0.0f, 0.0f, // x y u v
-            0.0f,  768.0,    0.0f, 1.0f,
-            1024.0f, 0.0f,   1.0f, 0.0f,
-            1024.0f, 768.0,  1.0f, 1.0f
-        };
+        GLfloat squareVertices[4 * 4] =
+            {
+             0.0f, 0.0f, 0.0f, 0.0f, // x y u v
+             0.0f,
+             768.0,
+             0.0f,
+             1.0f,
+             1024.0f,
+             0.0f,
+             1.0f,
+             0.0f,
+             1024.0f,
+             768.0,
+             1.0f,
+             1.0f};
 
-        for(int i = 0; i < 4; ++i)
-        {
-            if (squareVertices[i*4 + 0] == 1024.0f)
-            {
-                squareVertices[i*4 + 0] = w;
+        for (int i = 0; i < 4; ++i) {
+            if (squareVertices[i * 4 + 0] == 1024.0f) {
+                squareVertices[i * 4 + 0] = w;
             }
-            if (squareVertices[i*4 + 1] == 768.0f)
-            {
-                squareVertices[i*4 + 1] = h;
+            if (squareVertices[i * 4 + 1] == 768.0f) {
+                squareVertices[i * 4 + 1] = h;
             }
-            squareVertices[i*4 + 0] *= self.scale;
-            squareVertices[i*4 + 1] *= self.scale;
+            squareVertices[i * 4 + 0] *= self.scale;
+            squareVertices[i * 4 + 1] *= self.scale;
         }
 
         // Load data to the Vertex Buffer Object
-        glBufferData(GL_ARRAY_BUFFER, 4*4*sizeof(GLfloat), squareVertices, GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, 4 * 4 * sizeof(GLfloat), squareVertices, GL_STATIC_DRAW);
 
         glEnableVertexAttribArray([_blitShader.attribute[@"inVertex"] intValue]);
-        glVertexAttribPointer([_blitShader.attribute[@"inVertex"] intValue], 2, GL_FLOAT, GL_FALSE, 4*sizeof(GLfloat), 0);
+        glVertexAttribPointer([_blitShader.attribute[@"inVertex"] intValue], 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), 0);
 
         glEnableVertexAttribArray([_blitShader.attribute[@"inTex"] intValue]);
-        glVertexAttribPointer([_blitShader.attribute[@"inTex"] intValue], 2, GL_FLOAT, GL_FALSE, 4*sizeof(GLfloat), (const void*) (2*sizeof(GLfloat)));
+        glVertexAttribPointer([_blitShader.attribute[@"inTex"] intValue], 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (const void *)(2 * sizeof(GLfloat)));
 
         glBindVertexArrayOES(0);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -248,8 +243,7 @@
 
     // If we've rendered any contents into the fboTexture we render
     // that first.
-    if (_useBackgroundTexture)
-    {
+    if (_useBackgroundTexture) {
         [self blit];
     }
 
@@ -259,7 +253,7 @@
     // We sort the scene on draw order.
     NSArray *scene = [_scene allValues];
     NSArray *sortedScene = [scene sortedArrayUsingComparator:
-                            ^NSComparisonResult(id obj1, id obj2) {
+                                      ^NSComparisonResult(id obj1, id obj2) {
                                 Stroke *lhs = obj1;
                                 Stroke *rhs = obj2;
 
@@ -275,33 +269,28 @@
                                 {
                                     return 1;
                                 }
-                            }];
+                                      }];
 
-    for(Stroke *v in sortedScene)
-    {
-        if ([v.glGeometry count] >= 2)
-        {
+    for (Stroke *v in sortedScene) {
+        if ([v.glGeometry count] >= 2) {
             [self setBrushColor:v.color];
 
             {
                 // Since each of these issues a draw call, this is quite expensive. We could
                 // do a lot of optimization here but it would make the code
                 // much less readable.
-                for(NSInteger i = 0; i < [v.glGeometry count]-1; ++i)
-                {
-                    [self renderLineFromPoint:[(NSValue*)v.glGeometry[i] CGPointValue]
-                                      toPoint:[(NSValue*)v.glGeometry[i+1] CGPointValue]
-                                  radiusStart:[(NSNumber*)v.glRadii[i] floatValue]
-                                   radiusStop:[(NSNumber*)v.glRadii[i+1] floatValue]];
+                for (NSInteger i = 0; i < [v.glGeometry count] - 1; ++i) {
+                    [self renderLineFromPoint:[(NSValue *)v.glGeometry[i] CGPointValue]
+                                      toPoint:[(NSValue *)v.glGeometry[i + 1] CGPointValue]
+                                  radiusStart:[(NSNumber *)v.glRadii[i] floatValue]
+                                   radiusStop:[(NSNumber *)v.glRadii[i + 1] floatValue]];
                 }
             }
-        }
-        else if ([v.glGeometry count] == 1)
-        {
-            [self renderLineFromPoint:[(NSValue*)v.glGeometry[0] CGPointValue]
-                              toPoint:[(NSValue*)v.glGeometry[0] CGPointValue]
-                          radiusStart:[(NSNumber*)v.glRadii[0] floatValue]
-                           radiusStop:[(NSNumber*)v.glRadii[0] floatValue]];
+        } else if ([v.glGeometry count] == 1) {
+            [self renderLineFromPoint:[(NSValue *)v.glGeometry[0] CGPointValue]
+                              toPoint:[(NSValue *)v.glGeometry[0] CGPointValue]
+                          radiusStart:[(NSNumber *)v.glRadii[0] floatValue]
+                           radiusStop:[(NSNumber *)v.glRadii[0] floatValue]];
         }
     }
 
@@ -309,32 +298,25 @@
 
     NSTimeInterval now = [[NSProcessInfo processInfo] systemUptime];
     NSMutableArray *oldScene = [@[] mutableCopy];
-    for (Stroke *v in sortedScene)
-    {
+    for (Stroke *v in sortedScene) {
         // Don't bother keeping older strokes.  We "commit" them to a texture
         // if (a) they haven't been reclassified.
         //    (b) they haven't been appended too recently.
         BOOL old = (now - v.lastAltered) > 0.5;
-        if (old)
-        {
+        if (old) {
             [_scene removeObjectForKey:@(v.drawOrder)];
             [oldScene addObject:v];
-        }
-        else
-        {
+        } else {
             break;
         }
     }
-    if ([oldScene count] >= 1)
-    {
+    if ([oldScene count] >= 1) {
         glBindFramebuffer(GL_FRAMEBUFFER, _fbo);
 
-        glViewport(0,0, _backingWidth, _backingHeight);
+        glViewport(0, 0, _backingWidth, _backingHeight);
 
-        if (!_useBackgroundTexture)
-        {
-            if (_clearFBO)
-            {
+        if (!_useBackgroundTexture) {
+            if (_clearFBO) {
                 glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
                 glClear(GL_COLOR_BUFFER_BIT);
                 _clearFBO = NO;
@@ -346,31 +328,25 @@
 
         [self setupPointSpriteShaderState];
 
-        for(Stroke *v in oldScene)
-        {
-            if ([v.glGeometry count] >= 2)
-            {
+        for (Stroke *v in oldScene) {
+            if ([v.glGeometry count] >= 2) {
                 [self setBrushColor:v.color];
                 {
                     // Since each of these issues a draw call, this is quite expensive. We could
                     // do a lot of optimization here but it would make the code
                     // much less readable.
-                    for(NSInteger i = 0; i < [v.glGeometry count]-1; ++i)
-                    {
-                        [self renderLineFromPoint:[(NSValue*)v.glGeometry[i] CGPointValue]
-                                          toPoint:[(NSValue*)v.glGeometry[i+1] CGPointValue]
-                                         radiusStart:[(NSNumber*)v.glRadii[i] floatValue]
-                                       radiusStop:[(NSNumber*)v.glRadii[i+1] floatValue]];
+                    for (NSInteger i = 0; i < [v.glGeometry count] - 1; ++i) {
+                        [self renderLineFromPoint:[(NSValue *)v.glGeometry[i] CGPointValue]
+                                          toPoint:[(NSValue *)v.glGeometry[i + 1] CGPointValue]
+                                      radiusStart:[(NSNumber *)v.glRadii[i] floatValue]
+                                       radiusStop:[(NSNumber *)v.glRadii[i + 1] floatValue]];
                     }
                 }
-            }
-            else if ([v.glGeometry count] == 1)
-            {
-                [self renderLineFromPoint:[(NSValue*)v.glGeometry[0] CGPointValue]
-                                  toPoint:[(NSValue*)v.glGeometry[0] CGPointValue]
-                              radiusStart:[(NSNumber*)v.glRadii[0] floatValue]
-                               radiusStop:[(NSNumber*)v.glRadii[0] floatValue]];
-
+            } else if ([v.glGeometry count] == 1) {
+                [self renderLineFromPoint:[(NSValue *)v.glGeometry[0] CGPointValue]
+                                  toPoint:[(NSValue *)v.glGeometry[0] CGPointValue]
+                              radiusStart:[(NSNumber *)v.glRadii[0] floatValue]
+                               radiusStop:[(NSNumber *)v.glRadii[0] floatValue]];
             }
         }
 
@@ -393,15 +369,14 @@
                 radiusStart:(CGFloat)startRadius
                  radiusStop:(CGFloat)stopRadius
 {
-    static GLfloat*     vertexBuffer = NULL;
-    static NSUInteger   vertexMax = 64;
-    NSUInteger          vertexCount = 0,
-    count,
-    i;
+    static GLfloat *vertexBuffer = NULL;
+    static NSUInteger vertexMax = 64;
+    NSUInteger vertexCount = 0,
+               count,
+               i;
 
     // Allocate vertex array buffer
-    if (vertexBuffer == NULL)
-    {
+    if (vertexBuffer == NULL) {
         vertexBuffer = malloc(vertexMax * 3 * sizeof(GLfloat));
     }
 
@@ -412,15 +387,13 @@
     GLfloat dy = end.y - start.y;
     GLfloat dr = stopRadius - startRadius;
 
-    for (i = 0; i < count; ++i)
-    {
-        if(vertexCount == vertexMax)
-        {
+    for (i = 0; i < count; ++i) {
+        if (vertexCount == vertexMax) {
             vertexMax = 2 * vertexMax;
             vertexBuffer = realloc(vertexBuffer, vertexMax * 3 * sizeof(GLfloat));
         }
 
-        GLfloat progress =  ((GLfloat)i / (GLfloat)count);
+        GLfloat progress = ((GLfloat)i / (GLfloat)count);
 
         vertexBuffer[3 * vertexCount + 0] = start.x + dx * progress;
         vertexBuffer[3 * vertexCount + 1] = start.y + dy * progress;
@@ -430,7 +403,7 @@
 
     // Load data to the Vertex Buffer Object
     glBindBuffer(GL_ARRAY_BUFFER, _vertexBuffer);
-    glBufferData(GL_ARRAY_BUFFER, vertexCount*3*sizeof(GLfloat), vertexBuffer, GL_DYNAMIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, vertexCount * 3 * sizeof(GLfloat), vertexBuffer, GL_DYNAMIC_DRAW);
 
     glEnableVertexAttribArray([_pointSpriteShader.attribute[@"inVertex"] intValue]);
 
@@ -448,7 +421,7 @@
     GLfloat brushColor[4];
     CGFloat colors[4];
 
-    [color getRed:colors green:colors+1 blue:colors+2 alpha:colors+3];
+    [color getRed:colors green:colors + 1 blue:colors + 2 alpha:colors + 3];
 
     brushColor[0] = colors[0]; // On 64 bit GLFloat != CGFloat.
     brushColor[1] = colors[1];
@@ -484,20 +457,17 @@
 // intialize FBO
 - (void)setupFBO
 {
-    if (!_fboInit)
-    {
+    if (!_fboInit) {
         _fboInit = YES;
         _clearFBO = YES;
         GLuint fbo_width = _backingWidth;
         GLuint fbo_height = _backingHeight;
 
-        if (_fboTex)
-        {
+        if (_fboTex) {
             glDeleteTextures(1, &_fboTex);
             _fboTex = 0;
         }
-        if (_fbo)
-        {
+        if (_fbo) {
             glDeleteFramebuffers(1, &_fbo);
             _fbo = 0;
         }
@@ -513,10 +483,11 @@
         glBindTexture(GL_TEXTURE_2D, _fboTex);
         DebugGLLabelObject(GL_TEXTURE, _fboTex, "fboText");
 
-        glTexImage2D( GL_TEXTURE_2D,
+        glTexImage2D(GL_TEXTURE_2D,
                      0,
                      GL_RGBA,
-                     fbo_width, fbo_height,
+                     fbo_width,
+                     fbo_height,
                      0,
                      GL_RGBA,
                      GL_UNSIGNED_BYTE,
@@ -532,8 +503,7 @@
         // FBO status check
         GLenum status;
         status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-        switch(status)
-        {
+        switch (status) {
             case GL_FRAMEBUFFER_COMPLETE:
                 break;
 
@@ -600,19 +570,15 @@
     glDeleteVertexArraysOES(1, &_blitVAO);
     glDeleteTextures(1, &_fboTex);
     glDeleteFramebuffers(1, &_fbo);
-    if (_pointSpriteShader)
-    {
-        if (_pointSpriteShader.glProgram)
-        {
+    if (_pointSpriteShader) {
+        if (_pointSpriteShader.glProgram) {
             glDeleteProgram(_pointSpriteShader.glProgram);
         }
         _pointSpriteShader = nil;
     }
 
-    if (_blitShader)
-    {
-        if (_blitShader.glProgram)
-        {
+    if (_blitShader) {
+        if (_blitShader.glProgram) {
             glDeleteProgram(_blitShader.glProgram);
         }
         _blitShader = nil;
@@ -623,14 +589,14 @@
 {
     _pointSpriteShader = [[FTAShaderInfo alloc] init];
     _pointSpriteShader.shaderName = @"TrivialPointSprite";
-    _pointSpriteShader.uniformNames = [@[@"MVP", @"color", @"texture"] mutableCopy];
-    _pointSpriteShader.attributeNames = [@[@"inVertex"] mutableCopy];
+    _pointSpriteShader.uniformNames = [@[ @"MVP", @"color", @"texture" ] mutableCopy];
+    _pointSpriteShader.attributeNames = [@[ @"inVertex" ] mutableCopy];
     _pointSpriteShader = [FTAUtil loadShader:_pointSpriteShader];
 
     _blitShader = [[FTAShaderInfo alloc] init];
     _blitShader.shaderName = @"TrivialBlit";
-    _blitShader.uniformNames = [@[@"texture"] mutableCopy];
-    _blitShader.attributeNames = [@[@"inVertex", @"inTex"] mutableCopy];
+    _blitShader.uniformNames = [@[ @"texture" ] mutableCopy];
+    _blitShader.attributeNames = [@[ @"inVertex", @"inTex" ] mutableCopy];
     _blitShader = [FTAUtil loadShader:_blitShader];
 
     return _blitShader && _pointSpriteShader;

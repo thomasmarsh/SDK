@@ -15,7 +15,6 @@
 @interface FTAViewController () <FTTouchClassificationsChangedDelegate,
                                  FTPenManagerDelegate,
                                  UIPopoverControllerDelegate> {
-
     NSDictionary *_strokeColors;
 }
 @property (nonatomic) UIToolbar *bar;
@@ -54,38 +53,38 @@
     // (5) A button to show a popover with Pen status. This uses the FTPenInformation API to
     //     populate a table view. See FTASettingsViewController.
 
-    self.bar = [[UIToolbar alloc] initWithFrame:CGRectMake(0, 0, MAX(self.view.frame.size.width,self.view.frame.size.height), 44)];
+    self.bar = [[UIToolbar alloc] initWithFrame:CGRectMake(0, 0, MAX(self.view.frame.size.width, self.view.frame.size.height), 44)];
 
     UIBarButtonItem *shutdownButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemStop
-                                                                             target:self
-                                                                             action:@selector(shutdownFTPenManager:)];
+                                                                                    target:self
+                                                                                    action:@selector(shutdownFTPenManager:)];
     UIBarButtonItem *startupButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemPlay
-                                                                             target:self
-                                                                             action:@selector(initializeFTPenManager:)];
+                                                                                   target:self
+                                                                                   action:@selector(initializeFTPenManager:)];
 
     UIBarButtonItem *spacer = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace
-                                                                             target:nil
-                                                                             action:nil];
+                                                                            target:nil
+                                                                            action:nil];
 
     UIBarButtonItem *clearButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh
-                                                                             target:self
-                                                                             action:@selector(clearScene:)];
+                                                                                 target:self
+                                                                                 action:@selector(clearScene:)];
 
     self.infoButton = [[UIBarButtonItem alloc] initWithTitle:@"   Info   "
-                                                                style:UIBarButtonItemStylePlain
-                                                               target:self
-                                                               action:@selector(showInfo:)];
+                                                       style:UIBarButtonItemStylePlain
+                                                      target:self
+                                                      action:@selector(showInfo:)];
 
     self.infoButton.enabled = NO;
 
     self.updateFirmwareButton = [[UIBarButtonItem alloc] initWithTitle:@"FW Update"
-                                     style:UIBarButtonItemStylePlain
-                                    target:self
-                                    action:@selector(updateFirmware:)];
+                                                                 style:UIBarButtonItemStylePlain
+                                                                target:self
+                                                                action:@selector(updateFirmware:)];
 
     self.updateFirmwareButton.enabled = NO;
 
-    [self.bar setItems:@[shutdownButton, startupButton, spacer, clearButton, self.updateFirmwareButton, self.infoButton]];
+    [self.bar setItems:@[ shutdownButton, startupButton, spacer, clearButton, self.updateFirmwareButton, self.infoButton ]];
     self.bar.barStyle = UIBarStyleBlack;
     self.bar.translucent = NO;
 
@@ -96,14 +95,14 @@
     self.preferredFramesPerSecond = 60;
 
     _strokeColors =
-    @{
-      @(FTTouchClassificationUnknownDisconnected) : [UIColor colorWithRed:0.5 green:0.5 blue:0.5 alpha:0.3],
-      @(FTTouchClassificationUnknown) : [UIColor colorWithRed:0.3 green:0.4 blue:0.1 alpha:0.5],
-      @(FTTouchClassificationPen) : [UIColor colorWithRed:0.1 green:0.3 blue:0.9 alpha:0.5],
-      @(FTTouchClassificationEraser) : [UIColor colorWithRed:0.9 green:0.1 blue:0.0 alpha:0.5],
-      @(FTTouchClassificationFinger) : [UIColor colorWithRed:0.0 green:0.9 blue:0.0 alpha:0.5],
-      @(FTTouchClassificationPalm) : [UIColor colorWithRed:0.1 green:0.2 blue:0.1 alpha:0.5]
-    };
+        @{
+            @(FTTouchClassificationUnknownDisconnected) : [UIColor colorWithRed:0.5 green:0.5 blue:0.5 alpha:0.3],
+            @(FTTouchClassificationUnknown) : [UIColor colorWithRed:0.3 green:0.4 blue:0.1 alpha:0.5],
+            @(FTTouchClassificationPen) : [UIColor colorWithRed:0.1 green:0.3 blue:0.9 alpha:0.5],
+            @(FTTouchClassificationEraser) : [UIColor colorWithRed:0.9 green:0.1 blue:0.0 alpha:0.5],
+            @(FTTouchClassificationFinger) : [UIColor colorWithRed:0.0 green:0.9 blue:0.0 alpha:0.5],
+            @(FTTouchClassificationPalm) : [UIColor colorWithRed:0.1 green:0.2 blue:0.1 alpha:0.5]
+        };
 
     // Multitouch is required for processing palm and pen touches
     // See handleTouches below
@@ -122,11 +121,9 @@
 {
     NSNumber *firmwareUpdateIsAvailable = [FTPenManager sharedInstance].firmwareUpdateIsAvailable;
 
-    if (firmwareUpdateIsAvailable != nil && [firmwareUpdateIsAvailable boolValue])
-    {
+    if (firmwareUpdateIsAvailable != nil && [firmwareUpdateIsAvailable boolValue]) {
         BOOL isPaperInstalled = [FTPenManager sharedInstance].canInvokePaperToUpdatePencilFirmware;
-        if (isPaperInstalled)
-        {
+        if (isPaperInstalled) {
             // We invoke Paper via url handlers. You can optionally specify urls so that
             // Paper can return to your app. The application name is shown in a button labelled:
             // Back To {Application Name}
@@ -136,25 +133,21 @@
             NSURL *cancelUrl = [NSURL URLWithString:@"sdktestapp://x-callback-url/cancel"];
             NSURL *errorUrl = [NSURL URLWithString:@"sdktestapp://x-callback-url/error"];
 
-            BOOL result = [[FTPenManager  sharedInstance] invokePaperToUpdatePencilFirmware:applicationName
-                                                                                    success:successUrl
-                                                                                      error:errorUrl
-                                                                                     cancel:cancelUrl];
+            BOOL result = [[FTPenManager sharedInstance] invokePaperToUpdatePencilFirmware:applicationName
+                                                                                   success:successUrl
+                                                                                     error:errorUrl
+                                                                                    cancel:cancelUrl];
 
-            if (!result)
-            {
+            if (!result) {
                 // If we for some reason couldn't open the url. We might alert to user.
             }
-        }
-        else
-        {
+        } else {
             // If Paper isn't installed or is too old to support firmware update we'll direct the user
             // to FiftyThree's support site. This site walks them through installing Paper and doing
             // firmware update.
             NSURL *firmwareUpdateSupportUrl = [FTPenManager sharedInstance].firmwareUpdateSupportLink;
             BOOL result = [[UIApplication sharedApplication] openURL:firmwareUpdateSupportUrl];
-            if (!result)
-            {
+            if (!result) {
                 // Very unlikely that opening mobile safari would fail. But you might alert the user here.
             }
         }
@@ -162,13 +155,12 @@
 }
 - (void)showInfo:(id)sender
 {
-    UIBarButtonItem *barButton = (UIBarButtonItem*)sender;
+    UIBarButtonItem *barButton = (UIBarButtonItem *)sender;
 
     self.popover = nil;
     self.popoverContents = nil;
 
-    if (self.isPencilEnabled)
-    {
+    if (self.isPencilEnabled) {
         self.popoverContents = [[FTASettingsViewController alloc] init];
         self.popoverContents.info = [FTPenManager sharedInstance].info;
 
@@ -190,8 +182,7 @@
     // stylus SDKs.
     [[FTPenManager sharedInstance] shutdown];
     self.isPencilEnabled = NO;
-    if (self.popover)
-    {
+    if (self.popover) {
         [self.popover dismissPopoverAnimated:NO];
         self.popover = nil;
     }
@@ -218,8 +209,7 @@
 #pragma mark - FTTouchClassificationDelegate
 - (void)classificationsDidChangeForTouches:(NSSet *)touches;
 {
-    for(FTTouchClassificationInfo *info in touches)
-    {
+    for (FTTouchClassificationInfo *info in touches) {
         [self.drawer setColor:_strokeColors[@(info.newValue)] forStroke:info.touchId];
     }
 }
@@ -234,8 +224,7 @@
 // Invoked when any of the BTLE information is read off the pen. See FTPenInformation.
 - (void)penInformationDidChange
 {
-    if (self.popoverContents)
-    {
+    if (self.popoverContents) {
         self.popoverContents.info = [FTPenManager sharedInstance].info;
         [self.popoverContents.tableView reloadData];
     }
@@ -246,14 +235,11 @@
 {
     NSNumber *firmwareUpdateIsAvailable = [FTPenManager sharedInstance].firmwareUpdateIsAvailable;
 
-    if (firmwareUpdateIsAvailable != nil && [firmwareUpdateIsAvailable boolValue])
-    {
+    if (firmwareUpdateIsAvailable != nil && [firmwareUpdateIsAvailable boolValue]) {
         // Note, we always enable the button but if Paper isn't installed that button
         // will open the support site.
         self.updateFirmwareButton.enabled = YES;
-    }
-    else
-    {
+    } else {
         self.updateFirmwareButton.enabled = NO;
     }
 }
@@ -266,40 +252,30 @@
 // This isn't correct if you can have multiple touches and multipleTouchEnabled set to YES.
 - (void)handleTouches:(NSSet *)touches withEvent:(UIEvent *)event
 {
-    if (_isPencilEnabled)
-    {
-        for (UITouch* touch in touches)
-        {
+    if (_isPencilEnabled) {
+        for (UITouch *touch in touches) {
             NSInteger k = [[FTPenManager sharedInstance].classifier idForTouch:touch];
 
             CGPoint location = [touch locationInView:self.view];
 
             // We also surface unfiltered radius. This is very quantized.
             // NSNumber *radius = [[FTPenManager sharedInstance] normalizedRadiusForTouch:touch];
-            NSNumber *smoothedRadius =  [[FTPenManager sharedInstance] smoothedRadiusForTouch:touch];
+            NSNumber *smoothedRadius = [[FTPenManager sharedInstance] smoothedRadiusForTouch:touch];
 
             CGFloat r = 4;
-            if (smoothedRadius)
-            {
+            if (smoothedRadius) {
                 r = [smoothedRadius floatValue];
                 r = MAX(r, 1.0f);
                 r = MIN(r, 85.0f);
             }
 
-            if (touch.phase == UITouchPhaseBegan)
-            {
+            if (touch.phase == UITouchPhaseBegan) {
                 [self.drawer appendCGPoint:location andRadius:r forStroke:k];
-            }
-            else if(touch.phase == UITouchPhaseMoved)
-            {
+            } else if (touch.phase == UITouchPhaseMoved) {
                 [self.drawer appendCGPoint:location andRadius:r forStroke:k];
-            }
-            else if(touch.phase == UITouchPhaseEnded)
-            {
+            } else if (touch.phase == UITouchPhaseEnded) {
                 [self.drawer appendCGPoint:location andRadius:r forStroke:k];
-            }
-            else if (touch.phase == UITouchPhaseCancelled)
-            {
+            } else if (touch.phase == UITouchPhaseCancelled) {
                 [self.drawer removeStroke:k];
             }
         }

@@ -12,12 +12,12 @@
 @interface CBPeripheral (Helpers)
 
 - (void)writeBOOL:(BOOL)value
-forCharacteristic:(CBCharacteristic *)characteristic
-             type:(CBCharacteristicWriteType)type;
+    forCharacteristic:(CBCharacteristic *)characteristic
+                 type:(CBCharacteristicWriteType)type;
 
 - (void)writeUInt32:(uint32_t)value
-  forCharacteristic:(CBCharacteristic *)characteristic
-               type:(CBCharacteristicWriteType)type;
+    forCharacteristic:(CBCharacteristic *)characteristic
+                 type:(CBCharacteristicWriteType)type;
 
 - (void)writeNSString:(NSString *)value
     forCharacteristic:(CBCharacteristic *)characteristic

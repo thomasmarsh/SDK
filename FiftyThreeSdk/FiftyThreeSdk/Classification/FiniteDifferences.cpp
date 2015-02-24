@@ -36,12 +36,11 @@ vector<int> DividedDifferenceStencil(const int &order)
     //   point at a time and (b) for successive derivative evaluations at the
     //   central location by adding one point at a time.
 
-    static map< int, vector<int>> StoredResults;
+    static map<int, vector<int>> StoredResults;
 
     // Hard-coding of stencils because we only care about derivatives less than
     // 4. More general code is below.
-    if (StoredResults.empty())
-    {
+    if (StoredResults.empty()) {
         vector<int> stencil;
 
         int tempOrder = 0;
@@ -72,27 +71,22 @@ vector<int> DividedDifferenceStencil(const int &order)
     }
 
     DebugAssert(order >= 0);
-    vector< int > stencil(order+1);
+    vector<int> stencil(order + 1);
 
-    if (StoredResults.count(order) > 0)
-    {
+    if (StoredResults.count(order) > 0) {
         stencil = StoredResults[order];
-    }
-    else
-    {
+    } else {
         // The general code which generates the special cases above.
 
-        for (int i=0; i < order; ++i)
-        {
-            stencil[i] = (int) std::floor((i+2)/2.0f);
+        for (int i = 0; i < order; ++i) {
+            stencil[i] = (int)std::floor((i + 2) / 2.0f);
 
-            if ((i % 2) == 0)
-            {
+            if ((i % 2) == 0) {
                 stencil[i] *= -1;
             }
         }
 
-        std::reverse(stencil.begin(), stencil.end()-1);
+        std::reverse(stencil.begin(), stencil.end() - 1);
 
         stencil[order] = 0;
 

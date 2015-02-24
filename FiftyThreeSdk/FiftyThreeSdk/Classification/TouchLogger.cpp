@@ -65,21 +65,16 @@ core::TouchPhase TouchData::Phase()
 
 core::TouchPhase TouchData::Phase(int idx)
 {
-    if (idx < 0)
-    {
+    if (idx < 0) {
         return _phaseHistory[0];
-    }
-    else if ( idx > _phaseHistory.size() - 1 )
-    {
+    } else if (idx > _phaseHistory.size() - 1) {
         return _phaseHistory.back();
-    }
-    else
-    {
+    } else {
         return _phaseHistory[idx];
     }
 }
 
-Stroke::Ptr const & TouchData::Stroke()
+Stroke::Ptr const &TouchData::Stroke()
 {
     return _stroke;
 }
@@ -145,7 +140,7 @@ TouchData::TouchData(core::TouchId touchId,
 TouchData::TouchData()
 {
     _phase = core::TouchPhase::Unknown;
-    _touchId =  InvalidTouchId();
+    _touchId = InvalidTouchId();
     _stroke = Stroke::Ptr();
     _beganTime = -Inf;
 }
@@ -154,8 +149,7 @@ void TouchData::SetEndedTime(double t)
 {
     _endedTime = t;
 
-    if (Cluster())
-    {
+    if (Cluster()) {
         Cluster()->IncreaseLastTimestamp(t);
     }
 }
@@ -191,20 +185,27 @@ PenEventData::Ptr PenEventData::New()
 
 PenEventData::PenEventData(int eventId,
                            PenEventType eventType,
-                           double eventTime) : _eventId(eventId), _eventTime(eventTime), _eventType(eventType) {}
+                           double eventTime)
+: _eventId(eventId)
+, _eventTime(eventTime)
+, _eventType(eventType)
+{
+}
 
-PenEventData::PenEventData() : _eventId(-1), _eventTime(-Inf), _eventType(PenEventType::Unknown) {}
+PenEventData::PenEventData()
+: _eventId(-1)
+, _eventTime(-Inf)
+, _eventType(PenEventType::Unknown)
+{
+}
 
 void TouchLogger::LogEndedTouch(core::TouchId id)
 {
     auto location = std::find(_endedTouches.begin(), _endedTouches.end(), id);
-    if (location != _endedTouches.end())
-    {
+    if (location != _endedTouches.end()) {
         // Already ended this touch...abort.
         return;
-    }
-    else
-    {
+    } else {
         _endedTouches.push_back(id);
     }
 
@@ -218,8 +219,7 @@ bool TouchLogger::PenEventXBeforePenEventY(PenEventId idX, PenEventId idY)
 
 void TouchLogger::FlushEndedTouchesFromActiveSet()
 {
-    for (const auto &id :  _endedTouchesStaged)
-    {
+    for (const auto &id : _endedTouchesStaged) {
         _activeTouches.erase(id);
     }
 
@@ -229,11 +229,9 @@ void TouchLogger::FlushEndedTouchesFromActiveSet()
 core::TouchId TouchLogger::TouchPrecedingTouch(core::TouchId probeId)
 {
     core::TouchId previousId = InvalidTouchId();
-    for (IdDataRefPair pair :  _touchData)
-    {
+    for (IdDataRefPair pair : _touchData) {
         core::TouchId touchId = pair.first;
-        if (touchId == probeId)
-        {
+        if (touchId == probeId) {
             return previousId;
         }
         previousId = touchId;
@@ -244,12 +242,9 @@ core::TouchId TouchLogger::TouchPrecedingTouch(core::TouchId probeId)
 
 core::TouchId TouchLogger::MostRecentTouch()
 {
-    if (_touchData.empty())
-    {
+    if (_touchData.empty()) {
         return InvalidTouchId();
-    }
-    else
-    {
+    } else {
         // uses flat_map's ordering to get the most recent
         return (*_touchData.rbegin()).first;
     }
@@ -259,46 +254,37 @@ core::TouchId TouchLogger::MostRecentTouch()
 // to extract the first reclassifiable touchId
 core::TouchId TouchLogger::OldestReclassifiableTouch()
 {
-
-    for (IdDataRefPair pair :  _touchData)
-    {
-        if (_commonData->proxy->IsReclassifiable(pair.second->Touch(), pair.second->Stroke()))
-        {
+    for (IdDataRefPair pair : _touchData) {
+        if (_commonData->proxy->IsReclassifiable(pair.second->Touch(), pair.second->Stroke())) {
             return pair.first;
         }
     }
     return InvalidTouchId();
 }
 
-void TouchLogger::TouchesChanged(const std::set<core::Touch::Ptr> & touches)
+void TouchLogger::TouchesChanged(const std::set<core::Touch::Ptr> &touches)
 {
     FlushEndedTouchesFromActiveSet();
 
     _concurrentTouchesCache.clear();
 
-    for (const auto & touch :  touches)
-    {
-        if (_currentTime < touch->CurrentSample().TimestampSeconds())
-        {
+    for (const auto &touch : touches) {
+        if (_currentTime < touch->CurrentSample().TimestampSeconds()) {
             UpdateTime(touch->CurrentSample().TimestampSeconds());
         }
 
-        if (_removedTouches.count(touch->Id()))
-        {
+        if (_removedTouches.count(touch->Id())) {
             continue;
         }
 
-        switch (touch->Phase())
-        {
-            case core::TouchPhase::Began:
-            {
+        switch (touch->Phase()) {
+            case core::TouchPhase::Began: {
                 // we may get the Began event twice if the touch stays still after it begins, and
                 // something else moves or otherwise changes.
-                if (_touchData.count(touch->Id()) == 0)
-                {
+                if (_touchData.count(touch->Id()) == 0) {
                     Stroke::Ptr stroke = Stroke::New();
-                    double timestamp    = touch->CurrentSample().TimestampSeconds();
-                    Eigen::Vector2f xy  = touch->CurrentSample().Location();
+                    double timestamp = touch->CurrentSample().TimestampSeconds();
+                    Eigen::Vector2f xy = touch->CurrentSample().Location();
 
                     stroke->AddPoint(xy, timestamp);
 
@@ -310,71 +296,63 @@ void TouchLogger::TouchesChanged(const std::set<core::Touch::Ptr> & touches)
                     _touchData.insert(TouchDataPair(touch->Id(), data));
                     _activeTouches.insert(touch->Id());
 
-                    if (touch->CurrentSample().TouchRadius())
-                    {
-                        float r  = *(touch->CurrentSample().TouchRadius());
+                    if (touch->CurrentSample().TouchRadius()) {
+                        float r = *(touch->CurrentSample().TouchRadius());
                         stroke->AddTouchRadius(r);
 
-                        data->_radiusMax       = r;
-                        data->_radiusMin       = r;
-                        data->_radiusMean      = r;
-                        data->_radiusM2        = 0.0f;
-                        data->_radiusVariance  = 0.0f;
+                        data->_radiusMax = r;
+                        data->_radiusMin = r;
+                        data->_radiusMean = r;
+                        data->_radiusM2 = 0.0f;
+                        data->_radiusVariance = 0.0f;
 
-                        data->_leadingRadiusMax       = data->_radiusMax;
-                        data->_leadingRadiusMin       = data->_radiusMin;
-                        data->_leadingRadiusMean      = data->_radiusMean;
-                        data->_leadingRadiusVariance  = data->_radiusVariance;
+                        data->_leadingRadiusMax = data->_radiusMax;
+                        data->_leadingRadiusMin = data->_radiusMin;
+                        data->_leadingRadiusMean = data->_radiusMean;
+                        data->_leadingRadiusVariance = data->_radiusVariance;
                     }
                 }
                 break;
             }
 
-            case core::TouchPhase::Moved:
-            {
+            case core::TouchPhase::Moved: {
                 TouchData::Ptr touchData;
 
-                try
-                {
+                try {
                     touchData = _touchData.at(touch->Id());
-                }
-                catch (...)
-                {
+                } catch (...) {
                     DebugAssert(touchData);
                     continue;
                 }
 
-                double timestamp    = touch->CurrentSample().TimestampSeconds();
-                Eigen::Vector2f xy  = touch->CurrentSample().Location();
+                double timestamp = touch->CurrentSample().TimestampSeconds();
+                Eigen::Vector2f xy = touch->CurrentSample().Location();
 
                 if (timestamp >= touchData->LastTimestamp() + Stroke::kMinSampleTimestampDelta &&
-                    touchData->Stroke()->LastPoint() != xy)
-                {
+                    touchData->Stroke()->LastPoint() != xy) {
                     touchData->Stroke()->AddPoint(xy, timestamp);
                     touchData->SetEndedTime(timestamp);
                     touchData->SetPhase(core::TouchPhase::Moved);
 
-                    if ( touch->CurrentSample().TouchRadius())
-                    {
-                        float r  = *(touch->CurrentSample().TouchRadius());
+                    if (touch->CurrentSample().TouchRadius()) {
+                        float r = *(touch->CurrentSample().TouchRadius());
                         touchData->Stroke()->AddTouchRadius(r);
 
-                        touchData->_radiusMax       = std::max(touchData->_radiusMax, r);
-                        touchData->_radiusMin       = std::min(touchData->_radiusMin, r);
+                        touchData->_radiusMax = std::max(touchData->_radiusMax, r);
+                        touchData->_radiusMin = std::min(touchData->_radiusMin, r);
 
-                        float N     = touch->History()->size();
+                        float N = touch->History()->size();
                         float delta = r - touchData->_radiusMean;
 
-                        touchData->_radiusMean      += delta / N;
-                        touchData->_radiusM2        += delta * (r - touchData->_radiusMean);
-                        touchData->_radiusVariance   = touchData->_radiusM2 / (N-1);
+                        touchData->_radiusMean += delta / N;
+                        touchData->_radiusM2 += delta * (r - touchData->_radiusMean);
+                        touchData->_radiusVariance = touchData->_radiusM2 / (N - 1);
 
-                        if (touchData->Stroke()->Size() <= touchData->_leadingSegmentSampleCount)
-                        {
-                            touchData->_leadingRadiusMax       = touchData->_radiusMax;
-                            touchData->_leadingRadiusMin       = touchData->_radiusMin;
-                            touchData->_leadingRadiusMean      = touchData->_radiusMean;
-                            touchData->_leadingRadiusVariance  = touchData->_radiusVariance;
+                        if (touchData->Stroke()->Size() <= touchData->_leadingSegmentSampleCount) {
+                            touchData->_leadingRadiusMax = touchData->_radiusMax;
+                            touchData->_leadingRadiusMin = touchData->_radiusMin;
+                            touchData->_leadingRadiusMean = touchData->_radiusMean;
+                            touchData->_leadingRadiusVariance = touchData->_radiusVariance;
                         }
                     }
                 }
@@ -382,30 +360,25 @@ void TouchLogger::TouchesChanged(const std::set<core::Touch::Ptr> & touches)
                 break;
             }
 
-            case core::TouchPhase::Cancelled:
-            {
+            case core::TouchPhase::Cancelled: {
                 // iOS will cancel large palm touches sometimes to break them into 2 touches
                 // and vice-versa. from our point of view, this is still valuable information
                 // and should be treated as an ended touch.
                 TouchData::Ptr touchData;
 
                 auto it = _touchData.find(touch->Id());
-                if (it != _touchData.end())
-                {
+                if (it != _touchData.end()) {
                     touchData = it->second;
                     DebugAssert(touchData);
 
-                    if (touchData)
-                    {
-                        if (touchData->Phase() != core::TouchPhase::Cancelled)
-                        {
-                            double timestamp    = touch->CurrentSample().TimestampSeconds();
-                            Eigen::Vector2f xy  = touch->CurrentSample().Location();
+                    if (touchData) {
+                        if (touchData->Phase() != core::TouchPhase::Cancelled) {
+                            double timestamp = touch->CurrentSample().TimestampSeconds();
+                            Eigen::Vector2f xy = touch->CurrentSample().Location();
 
                             Stroke::Ptr stroke = touchData->Stroke();
 
-                            if (timestamp >= touchData->LastTimestamp() + Stroke::kMinSampleTimestampDelta)
-                            {
+                            if (timestamp >= touchData->LastTimestamp() + Stroke::kMinSampleTimestampDelta) {
                                 touchData->Stroke()->AddPoint(xy, timestamp);
                             }
                             touchData->SetEndedTime(timestamp);
@@ -419,16 +392,13 @@ void TouchLogger::TouchesChanged(const std::set<core::Touch::Ptr> & touches)
 
                             _endedTouchesStaged.push_back(touch->Id());
 
-                            if (touch->CurrentSample().TouchRadius())
-                            {
-                                float r  = *(touch->CurrentSample().TouchRadius());
+                            if (touch->CurrentSample().TouchRadius()) {
+                                float r = *(touch->CurrentSample().TouchRadius());
                                 touchData->Stroke()->AddTouchRadius(r);
                             }
                         }
                     }
-                }
-                else
-                {
+                } else {
                     DebugAssert(touchData);
                     continue;
                 }
@@ -436,34 +406,27 @@ void TouchLogger::TouchesChanged(const std::set<core::Touch::Ptr> & touches)
                 break;
             }
 
-            case core::TouchPhase::Ended:
-            {
-
+            case core::TouchPhase::Ended: {
                 // iOS will cancel large palm touches under unclear circumstances.
                 // from our point of view, this is still valuable information and should be treated
                 // as an ended touch.
                 TouchData::Ptr touchData;
 
-                try
-                {
+                try {
                     touchData = _touchData.at(touch->Id());
 
-                }
-                catch(...)
-                {
+                } catch (...) {
                     DebugAssert(touchData);
                     continue;
                 }
 
-                if (touchData->Phase() != core::TouchPhase::Ended)
-                {
-                    double timestamp    = touch->CurrentSample().TimestampSeconds();
-                    Eigen::Vector2f xy  = touch->CurrentSample().Location();
+                if (touchData->Phase() != core::TouchPhase::Ended) {
+                    double timestamp = touch->CurrentSample().TimestampSeconds();
+                    Eigen::Vector2f xy = touch->CurrentSample().Location();
 
                     Stroke::Ptr stroke = touchData->Stroke();
 
-                    if (timestamp >= touchData->LastTimestamp() + Stroke::kMinSampleTimestampDelta)
-                    {
+                    if (timestamp >= touchData->LastTimestamp() + Stroke::kMinSampleTimestampDelta) {
                         touchData->Stroke()->AddPoint(xy, timestamp);
                     }
                     touchData->SetEndedTime(timestamp);
@@ -472,9 +435,8 @@ void TouchLogger::TouchesChanged(const std::set<core::Touch::Ptr> & touches)
                     LogEndedTouch(touch->Id());
                     _endedTouchesStaged.push_back(touch->Id());
 
-                    if (touch->CurrentSample().TouchRadius())
-                    {
-                        float r  = *(touch->CurrentSample().TouchRadius());
+                    if (touch->CurrentSample().TouchRadius()) {
+                        float r = *(touch->CurrentSample().TouchRadius());
                         touchData->Stroke()->AddTouchRadius(r);
 
                         // this radius from iOS is typically zero, so we deliberately are not
@@ -483,26 +445,19 @@ void TouchLogger::TouchesChanged(const std::set<core::Touch::Ptr> & touches)
                 }
 
                 break;
-
             }
 
-            case core::TouchPhase::Unknown:
-            {
+            case core::TouchPhase::Unknown: {
                 DebugAssert(false);
                 break;
             }
 
-            case core::TouchPhase::Stationary:
-            {
-
+            case core::TouchPhase::Stationary: {
                 TouchData::Ptr touchData;
 
-                try
-                {
+                try {
                     touchData = _touchData.at(touch->Id());
-                }
-                catch (...)
-                {
+                } catch (...) {
                     DebugAssert(touchData);
                     continue;
                 }
@@ -515,21 +470,16 @@ void TouchLogger::TouchesChanged(const std::set<core::Touch::Ptr> & touches)
             default:
                 break;
         }
-
     }
 
-    for (const auto & touch :  touches)
-    {
-        if (! _removedTouches.count(touch->Id()))
-        {
+    for (const auto &touch : touches) {
+        if (!_removedTouches.count(touch->Id())) {
             auto it = _touchData.find(touch->Id());
-            if (it != _touchData.end())
-            {
+            if (it != _touchData.end()) {
                 it->second->SetTouch(touch);
             }
         }
     }
-
 }
 
 void TouchLogger::LogPenEvent(PenEvent event)
@@ -547,18 +497,15 @@ void TouchLogger::LogPenEvent(PenEvent event)
     _penEventData.insert(std::pair<PenEventId, PenEventData::Ptr>(eventId, newEvent));
     _penEventOrder.push_back(eventId);
 
-   ++_penEventCounter;
+    ++_penEventCounter;
 }
 
 core::TouchId TouchLogger::MostRecentEndedPen()
 {
-    for (auto it = _touchData.rbegin(); it != _touchData.rend(); ++it)
-    {
-        if (it->second->Phase() == TouchPhase::Ended)
-        {
-            const auto & cluster = it->second->Cluster();
-            if (cluster->IsPenType())
-            {
+    for (auto it = _touchData.rbegin(); it != _touchData.rend(); ++it) {
+        if (it->second->Phase() == TouchPhase::Ended) {
+            const auto &cluster = it->second->Cluster();
+            if (cluster->IsPenType()) {
                 return it->first;
             }
         }
@@ -568,20 +515,16 @@ core::TouchId TouchLogger::MostRecentEndedPen()
 
 PenEventId TouchLogger::MostRecentPenEvent()
 {
-    if (_penEventData.empty())
-    {
+    if (_penEventData.empty()) {
         return PenEventId(-1);
-    }
-    else
-    {
+    } else {
         return (*_penEventData.rbegin()).first;
     }
 }
 
 void TouchLogger::RemoveMostRecentPenEvent()
 {
-    if (! _penEventData.empty())
-    {
+    if (!_penEventData.empty()) {
         _penEventData.erase((*_penEventData.rbegin()).first);
         _penEventOrder.pop_back();
     }
@@ -602,14 +545,10 @@ void TouchLogger::ClearAllData()
 
     // now clear removed touches if they are ended
     auto it = _removedTouches.begin();
-    for (;it != _removedTouches.end();)
-    {
-        if (! TouchTracker::Instance()->TouchWithId(*it))
-        {
+    for (; it != _removedTouches.end();) {
+        if (!TouchTracker::Instance()->TouchWithId(*it)) {
             _removedTouches.erase(it++);
-        }
-        else
-        {
+        } else {
             ++it;
         }
     }
@@ -619,69 +558,52 @@ void TouchLogger::ClearAllData()
 
 void TouchLogger::ClearUnclusteredEndedTouches()
 {
-
-    while ( NumberOfTouches() > 0)
-    {
-        if ( _endedTouches.size() > 0 )
-        {
+    while (NumberOfTouches() > 0) {
+        if (_endedTouches.size() > 0) {
             core::TouchId touchId = _endedTouches.front();
 
             TouchData::Ptr data;
-            try
-            {
+            try {
                 data = Data(touchId);
-            }
-            catch (...)
-            {
+            } catch (...) {
                 DebugAssert(false);
                 break;
             }
 
-            auto cluster  = data->Cluster();
+            auto cluster = data->Cluster();
 
             // the cluster tracker makes the decision to evict old touches from clusters.  if it is in
             // a cluster, it is relevant to classification, and if it is not in a cluster, it isn't relevant.
-            bool clusterExists   = cluster && _commonData->proxy->ClusterTracker()->ContainsClusterForKey(cluster->_id);
+            bool clusterExists = cluster && _commonData->proxy->ClusterTracker()->ContainsClusterForKey(cluster->_id);
 
-            bool reclassifiable  = _commonData->proxy->IsReclassifiable(data->Touch(), data->Stroke());
+            bool reclassifiable = _commonData->proxy->IsReclassifiable(data->Touch(), data->Stroke());
 
             // this should never happen.
             // a reclassifiable touch should always be in a cluster
-            if (reclassifiable && (! clusterExists))
-            {
+            if (reclassifiable && (!clusterExists)) {
                 DebugAssert(false);
             }
 
-            if (clusterExists || reclassifiable)
-            {
+            if (clusterExists || reclassifiable) {
                 break;
-            }
-            else
-            {
+            } else {
                 _touchData.erase(touchId);
                 _endedTouches.pop_front();
 
                 // IsolatedStrokes holds on to data until the logger tells it not to
                 _commonData->proxy->IsolatedStrokesClassifier()->TouchIdNoLongerLogged(touchId);
             }
-        }
-        else
-        {
+        } else {
             break;
         }
-
     }
 
     // now clear removed touches if they are ended
     auto it = _removedTouches.begin();
-    for (;it != _removedTouches.end();)
-    {
-        if (! TouchTracker::Instance()->TouchWithId(*it))
-        {
+    for (; it != _removedTouches.end();) {
+        if (!TouchTracker::Instance()->TouchWithId(*it)) {
             _removedTouches.erase(it++);
-        }
-        else
-        {
+        } else {
             ++it;
         }
     }
@@ -689,24 +611,19 @@ void TouchLogger::ClearUnclusteredEndedTouches()
 
 void TouchLogger::ClearStalePenEvents()
 {
-    if ( _penEventOrder.empty() )
-    {
+    if (_penEventOrder.empty()) {
         return;
     }
 
     // Assumes events are logged time-monotonically
-    while (LoggedPenEventCount() > 0)
-    {
+    while (LoggedPenEventCount() > 0) {
         PenEventId id = _penEventOrder.front();
         AssertPenEvents(id);
 
-        if (_currentTime - PenTime(id) > _trailingPenEventTimeWindow)
-        {
+        if (_currentTime - PenTime(id) > _trailingPenEventTimeWindow) {
             _penEventOrder.erase(_penEventOrder.begin());
             _penEventData.erase(id);
-        }
-        else
-        {
+        } else {
             break;
         }
     }
@@ -734,37 +651,34 @@ double TouchLogger::Time()
 }
 
 // Basically just a convenient wrapper for std::set_intersection
-TouchIdVector TouchLogger::IntersectTouchIdVectors(TouchIdVector* v1, TouchIdVector* v2)
+TouchIdVector TouchLogger::IntersectTouchIdVectors(TouchIdVector *v1, TouchIdVector *v2)
 {
     TouchIdVector vOut(*v1);
 
     auto it = std::set_intersection(v1->begin(), v1->end(), v2->begin(), v2->end(), vOut.begin());
 
-    vOut.resize(it-vOut.begin());
+    vOut.resize(it - vOut.begin());
 
     return vOut;
 }
 
-TouchIdVector TouchLogger::IntersectTouchIdVectors(TouchIdVector* v1, TouchIdSet* v2)
+TouchIdVector TouchLogger::IntersectTouchIdVectors(TouchIdVector *v1, TouchIdSet *v2)
 {
     TouchIdVector vOut(*v1);
 
     auto it = std::set_intersection(v1->begin(), v1->end(), v2->begin(), v2->end(), vOut.begin());
 
-    vOut.resize(it-vOut.begin());
+    vOut.resize(it - vOut.begin());
 
     return vOut;
 }
 
-core::Touch::Ptr const & TouchLogger::TouchWithId(core::TouchId touchId)
+core::Touch::Ptr const &TouchLogger::TouchWithId(core::TouchId touchId)
 {
     auto it = _touchData.find(touchId);
-    if (it != _touchData.end())
-    {
+    if (it != _touchData.end()) {
         return it->second->Touch();
-    }
-    else
-    {
+    } else {
         static fiftythree::core::Touch::Ptr nullPtr;
         return nullPtr;
     }
@@ -775,14 +689,11 @@ bool TouchLogger::ContainsTouchWithId(core::TouchId touchId)
     return _touchData.find(touchId) != _touchData.end();
 }
 
-TouchData::Ptr const & TouchLogger::Data(core::TouchId id)
+TouchData::Ptr const &TouchLogger::Data(core::TouchId id)
 {
-    if (_touchData.count(id))
-    {
+    if (_touchData.count(id)) {
         return _touchData[id];
-    }
-    else
-    {
+    } else {
         DebugAssert(_touchData.count(id));
         // TODO: Is this an anti-pattern?  I've seen others doing it.
         static TouchData::Ptr sentinel = TouchData::New();
@@ -794,15 +705,11 @@ vector<TouchData::Ptr> TouchLogger::Data(TouchIdVector ids)
 {
     vector<TouchData::Ptr> data;
 
-    for (int i=0; i < ids.size(); ++i)
-    {
+    for (int i = 0; i < ids.size(); ++i) {
         auto it = _touchData.find(ids[i]);
-        if (it != _touchData.end())
-        {
+        if (it != _touchData.end()) {
             data.push_back(it->second);
-        }
-        else
-        {
+        } else {
             data.push_back(TouchData::New());
         }
     }
@@ -812,25 +719,19 @@ vector<TouchData::Ptr> TouchLogger::Data(TouchIdVector ids)
 
 ClusterPtr TouchLogger::Cluster(core::TouchId touchId)
 {
-    if (_touchData.count(touchId))
-    {
+    if (_touchData.count(touchId)) {
         return _touchData.at(touchId)->Cluster();
-    }
-    else
-    {
+    } else {
         DebugAssert(false);
         return Cluster::New();
     }
 }
 
-Stroke::Ptr const & TouchLogger::Stroke(core::TouchId id)
+Stroke::Ptr const &TouchLogger::Stroke(core::TouchId id)
 {
-    if (_touchData.count(id))
-    {
+    if (_touchData.count(id)) {
         return _touchData.at(id)->Stroke();
-    }
-    else
-    {
+    } else {
         DebugAssert(false);
         static Stroke::Ptr errorCase;
         return errorCase;
@@ -842,8 +743,7 @@ vector<Stroke::Ptr> TouchLogger::Stroke(TouchIdVector ids)
     vector<Stroke::Ptr> strokes;
     strokes.reserve(_touchData.size());
 
-    for (const auto & id : ids)
-    {
+    for (const auto &id : ids) {
         strokes.push_back(_touchData[id]->Stroke());
     }
 
@@ -861,8 +761,7 @@ vector<core::TouchPhase> TouchLogger::Phase(TouchIdVector ids)
     vector<core::TouchPhase> phases;
     phases.reserve(ids.size());
 
-    for (const auto & id : ids)
-    {
+    for (const auto &id : ids) {
         phases.push_back(_touchData[id]->Phase());
     }
 
@@ -875,24 +774,17 @@ PenEventIdVector TouchLogger::PenEventsInTimeInterval(double t0, double t1, bool
     out.reserve(_penEventData.size());
 
     // this gets hit a lot so i'm keeping the conditional out of the loop.
-    if (includeEndpoints)
-    {
-        for (const auto & pair :  _penEventData)
-        {
+    if (includeEndpoints) {
+        for (const auto &pair : _penEventData) {
             double timestamp = pair.second->Time();
-            if (timestamp <= t1 && timestamp >= t0 )
-            {
+            if (timestamp <= t1 && timestamp >= t0) {
                 out.push_back(pair.first);
             }
         }
-    }
-    else
-    {
-        for (const auto & pair :  _penEventData)
-        {
+    } else {
+        for (const auto &pair : _penEventData) {
             double timestamp = pair.second->Time();
-            if (timestamp < t1 && timestamp > t0 )
-            {
+            if (timestamp < t1 && timestamp > t0) {
                 out.push_back(pair.first);
             }
         }
@@ -905,10 +797,8 @@ PenEventIdSet TouchLogger::PenEventSetInTimeInterval(double t0, double t1)
 {
     PenEventIdSet out;
 
-    for (const auto & pair :  _penEventData)
-    {
-        if (pair.second->Time() <= t1 && pair.second->Time() >= t0 )
-        {
+    for (const auto &pair : _penEventData) {
+        if (pair.second->Time() <= t1 && pair.second->Time() >= t0) {
             out.insert(pair.first);
         }
     }
@@ -920,11 +810,9 @@ PenEventIdSet TouchLogger::PenBeganEventSetInTimeInterval(double t0, double t1)
 {
     PenEventIdSet out;
 
-    for (const auto & pair :  _penEventData)
-    {
+    for (const auto &pair : _penEventData) {
         if ((pair.second->Type() == PenEventType::Tip1Down || pair.second->Type() == PenEventType::Tip2Down) &&
-           (pair.second->Time() <= t1 && pair.second->Time() >= t0) )
-        {
+            (pair.second->Time() <= t1 && pair.second->Time() >= t0)) {
             out.insert(pair.first);
         }
     }
@@ -936,11 +824,9 @@ PenEventIdSet TouchLogger::PenEndedEventSetInTimeInterval(double t0, double t1)
 {
     PenEventIdSet out;
 
-    for (const auto & pair :  _penEventData)
-    {
+    for (const auto &pair : _penEventData) {
         if ((pair.second->Type() == PenEventType::Tip1Up || pair.second->Type() == PenEventType::Tip2Up) &&
-           (pair.second->Time() <= t1 && pair.second->Time() >= t0) )
-        {
+            (pair.second->Time() <= t1 && pair.second->Time() >= t0)) {
             out.insert(pair.first);
         }
     }
@@ -952,11 +838,9 @@ PenEventIdVector TouchLogger::PenBeganEventsInTimeInterval(double t0, double t1)
 {
     PenEventIdVector out;
 
-    for (const auto & pair :  _penEventData)
-    {
+    for (const auto &pair : _penEventData) {
         if ((pair.second->Type() == PenEventType::Tip1Down || pair.second->Type() == PenEventType::Tip2Down) &&
-           (pair.second->Time() <= t1 && pair.second->Time() >= t0) )
-        {
+            (pair.second->Time() <= t1 && pair.second->Time() >= t0)) {
             out.push_back(pair.first);
         }
     }
@@ -969,11 +853,9 @@ PenEventIdVector TouchLogger::PenEndedEventsInTimeInterval(double t0, double t1)
     PenEventIdVector out;
     out.reserve(_penEventData.size());
 
-    for (const auto & pair :  _penEventData)
-    {
+    for (const auto &pair : _penEventData) {
         if ((pair.second->Type() == PenEventType::Tip1Up || pair.second->Type() == PenEventType::Tip2Up) &&
-           (pair.second->Time() <= t1 && pair.second->Time() >= t0) )
-        {
+            (pair.second->Time() <= t1 && pair.second->Time() >= t0)) {
             out.push_back(pair.first);
         }
     }
@@ -981,18 +863,15 @@ PenEventIdVector TouchLogger::PenEndedEventsInTimeInterval(double t0, double t1)
     return out;
 }
 
-PenEventData::Ptr const & TouchLogger::PenData(PenEventId id)
+PenEventData::Ptr const &TouchLogger::PenData(PenEventId id)
 {
     AssertPenEvents(id);
 
     auto it = _penEventData.find(id);
 
-    if (it != _penEventData.end())
-    {
+    if (it != _penEventData.end()) {
         return it->second;
-    }
-    else
-    {
+    } else {
         static PenEventData::Ptr nullPtr = PenEventData::Ptr();
         return nullPtr;
     }
@@ -1002,8 +881,7 @@ vector<PenEventData::Ptr> TouchLogger::PenData(PenEventIdVector ids)
 {
     vector<PenEventData::Ptr> events;
     events.reserve(ids.size());
-    for (const auto & id : ids)
-    {
+    for (const auto &id : ids) {
         events.push_back(PenData(id));
     }
 
@@ -1016,12 +894,9 @@ double TouchLogger::PenTime(PenEventId id)
 
     auto it = _penEventData.find(id);
 
-    if (it != _penEventData.end())
-    {
+    if (it != _penEventData.end()) {
         return it->second->Time();
-    }
-    else
-    {
+    } else {
         return 0.0;
     }
 }
@@ -1031,8 +906,7 @@ vector<double> TouchLogger::PenTime(PenEventIdVector ids)
     vector<double> times;
     times.reserve(ids.size());
 
-    for (const auto & id : ids)
-    {
+    for (const auto &id : ids) {
         times.push_back(PenTime(id));
     }
 
@@ -1045,15 +919,11 @@ PenEventType TouchLogger::PenType(PenEventId id)
 
     auto it = _penEventData.find(id);
 
-    if (it != _penEventData.end())
-    {
+    if (it != _penEventData.end()) {
         return it->second->Type();
-    }
-    else
-    {
+    } else {
         return PenEventType::Unknown;
     }
-
 }
 
 vector<PenEventType> TouchLogger::PenType(PenEventIdVector ids)
@@ -1061,8 +931,7 @@ vector<PenEventType> TouchLogger::PenType(PenEventIdVector ids)
     vector<PenEventType> types;
     types.reserve(ids.size());
 
-    for (const auto & id : ids)
-    {
+    for (const auto &id : ids) {
         types.push_back(PenType(id));
     }
 
@@ -1074,10 +943,8 @@ TouchIdVector TouchLogger::IdsInPhase(core::TouchPhase phase)
     TouchIdVector ids;
     ids.reserve(_touchData.size());
 
-    for (TouchDataPair  const & pair :  _touchData)
-    {
-        if ( pair.second->Phase() == phase )
-        {
+    for (TouchDataPair const &pair : _touchData) {
+        if (pair.second->Phase() == phase) {
             ids.push_back(pair.first);
         }
     }
@@ -1099,10 +966,8 @@ TouchIdVector TouchLogger::ActiveNonEndedIds()
 {
     TouchIdVector ids;
 
-    for (const auto & touchId :  _activeTouches)
-    {
-        if (! TouchWithId(touchId)->IsPhaseEndedOrCancelled())
-        {
+    for (const auto &touchId : _activeTouches) {
+        if (!TouchWithId(touchId)->IsPhaseEndedOrCancelled()) {
             ids.push_back(touchId);
         }
     }
@@ -1115,8 +980,7 @@ TouchIdVector TouchLogger::ActiveIds()
     TouchIdVector ids;
     ids.reserve(_activeTouches.size());
 
-    for (core::TouchId touchId :  _activeTouches)
-    {
+    for (core::TouchId touchId : _activeTouches) {
         ids.push_back(touchId);
     }
 
@@ -1125,10 +989,8 @@ TouchIdVector TouchLogger::ActiveIds()
 
 bool TouchLogger::IsEnded(core::TouchId touchId)
 {
-    for (core::TouchId endedId :  _endedTouches)
-    {
-        if (endedId == touchId)
-        {
+    for (core::TouchId endedId : _endedTouches) {
+        if (endedId == touchId) {
             return true;
         }
     }
@@ -1138,32 +1000,28 @@ bool TouchLogger::IsEnded(core::TouchId touchId)
 
 void TouchLogger::AssertIds(TouchIdVector ids)
 {
-    for (const auto & id : ids )
-    {
+    for (const auto &id : ids) {
         AssertIds(id);
     }
 }
 
 void TouchLogger::AssertIds(core::TouchId id)
 {
-    if (_touchData.count(id) < 1)
-    {
+    if (_touchData.count(id) < 1) {
         DebugAssert(false);
     }
 }
 
 void TouchLogger::AssertPenEvents(PenEventId id)
 {
-    if (_penEventData.count(id) < 1)
-    {
+    if (_penEventData.count(id) < 1) {
         DebugAssert(false);
     }
 }
 
 void TouchLogger::AssertPenEvents(PenEventIdVector ids)
 {
-    for (const auto & id : ids)
-    {
+    for (const auto &id : ids) {
         AssertPenEvents(id);
     }
 }
@@ -1177,16 +1035,13 @@ int TouchLogger::NumberOfTouches()
 TouchIdSet TouchLogger::TouchIdSetBeganInTimeInterval(double interval_start,
                                                       double interval_end)
 {
-
     TouchIdSet ids;
 
-    for (const auto & pair :  _touchData)
-    {
+    for (const auto &pair : _touchData) {
         double touchStart = pair.second->FirstTimestamp();
 
-        if (( touchStart <= interval_end) &&
-            ( touchStart >= interval_start ))
-        {
+        if ((touchStart <= interval_end) &&
+            (touchStart >= interval_start)) {
             ids.insert(pair.first);
         }
     }
@@ -1199,19 +1054,15 @@ TouchIdSet TouchLogger::TouchIdSetEndedInTimeInterval(double interval_start,
 {
     TouchIdSet ids;
 
-    for (const auto & pair :  _touchData)
-    {
-
-        if (! TouchWithId(pair.first)->IsPhaseEndedOrCancelled())
-        {
+    for (const auto &pair : _touchData) {
+        if (!TouchWithId(pair.first)->IsPhaseEndedOrCancelled()) {
             continue;
         }
 
         double touchEnd = pair.second->LastTimestamp();
 
         if ((touchEnd <= interval_end) &&
-            (touchEnd >= interval_start))
-        {
+            (touchEnd >= interval_start)) {
             ids.insert(pair.first);
         }
     }
@@ -1230,20 +1081,17 @@ void TouchLogger::RemoveTouch(core::TouchId touchId)
     _concurrentTouchesCache.clear();
 
     auto it2 = std::find(_endedTouches.begin(), _endedTouches.end(), touchId);
-    if (it2 != _endedTouches.end())
-    {
+    if (it2 != _endedTouches.end()) {
         _endedTouches.erase(it2);
     }
 
     auto it3 = std::find(_cancelledTouches.begin(), _cancelledTouches.end(), touchId);
-    if (it3 != _cancelledTouches.end())
-    {
+    if (it3 != _cancelledTouches.end()) {
         _cancelledTouches.erase(it3);
     }
 
     auto it4 = std::find(_endedTouchesStaged.begin(), _endedTouchesStaged.end(), touchId);
-    if (it4 != _endedTouchesStaged.end())
-    {
+    if (it4 != _endedTouchesStaged.end()) {
         _endedTouchesStaged.erase(it4);
     }
 }
@@ -1252,13 +1100,10 @@ TouchIdVector TouchLogger::TouchIdsBeganInTimeInterval(double interval_start, do
 {
     TouchIdVector ids;
 
-    for (const auto & pair :  _touchData)
-    {
+    for (const auto &pair : _touchData) {
         double touchStart = pair.second->FirstTimestamp();
 
-        if (( touchStart <= interval_end)
-            &&(touchStart >= interval_start ))
-        {
+        if ((touchStart <= interval_end) && (touchStart >= interval_start)) {
             ids.push_back(pair.first);
         }
     }
@@ -1269,22 +1114,18 @@ TouchIdVector TouchLogger::TouchIdsBeganInTimeInterval(double interval_start, do
 TouchIdVector TouchLogger::TouchIdsEndedInTimeInterval(double interval_start,
                                                        double interval_end)
 {
-
     TouchIdVector ids;
     ids.clear();
 
-    for (const auto & pair :  _touchData)
-    {
-        if ((! TouchWithId(pair.first)->IsPhaseEndedOrCancelled()) )
-        {
+    for (const auto &pair : _touchData) {
+        if ((!TouchWithId(pair.first)->IsPhaseEndedOrCancelled())) {
             continue;
         }
 
         double touchEnd = pair.second->LastTimestamp();
 
         if ((touchEnd <= interval_end) &&
-            (touchEnd >= interval_start))
-        {
+            (touchEnd >= interval_start)) {
             ids.push_back(pair.first);
         }
     }
@@ -1294,30 +1135,25 @@ TouchIdVector TouchLogger::TouchIdsEndedInTimeInterval(double interval_start,
 
 TouchIdVector TouchLogger::ConcurrentTouches(core::TouchId probeId)
 {
-    if (_concurrentTouchesCache.count(probeId))
-    {
+    if (_concurrentTouchesCache.count(probeId)) {
         return _concurrentTouchesCache[probeId];
     }
 
     TouchIdVector out;
 
-    if (Data(probeId))
-    {
+    if (Data(probeId)) {
         double t0 = Data(probeId)->FirstTimestamp();
         double t1 = Data(probeId)->LastTimestamp();
 
-        for (const auto & pair :  _touchData)
-        {
-            if (pair.first == probeId)
-            {
+        for (const auto &pair : _touchData) {
+            if (pair.first == probeId) {
                 continue;
             }
 
             double s0 = pair.second->FirstTimestamp();
             double s1 = pair.second->LastTimestamp();
 
-            if ((s1 >= t0) && (s0 <= t1))
-            {
+            if ((s1 >= t0) && (s0 <= t1)) {
                 out.push_back(pair.first);
             }
         }
@@ -1330,24 +1166,17 @@ TouchIdVector TouchLogger::ConcurrentTouches(core::TouchId probeId)
 
 TouchClassification TouchLogger::MostRecentPenTipType()
 {
-    if (! _penEventData.empty())
-    {
+    if (!_penEventData.empty()) {
         // using the fact that maps are sorted by key and keys are increasing ints
         auto pair = *(_penEventData.rbegin());
-        if (pair.second)
-        {
+        if (pair.second) {
             return pair.second->TouchType();
-        }
-        else
-        {
+        } else {
             return TouchClassification::Pen;
         }
-    }
-    else
-    {
+    } else {
         return TouchClassification::Pen;
     }
-
 }
 
 PenEventId TouchLogger::MostRecentPenUpEvent()
@@ -1356,11 +1185,9 @@ PenEventId TouchLogger::MostRecentPenUpEvent()
 
     for (auto it = _penEventOrder.rbegin();
          it < _penEventOrder.rend();
-         ++it)
-    {
+         ++it) {
         if (PenType(*it) == PenEventType::Tip1Up ||
-            PenType(*it) == PenEventType::Tip2Up)
-        {
+            PenType(*it) == PenEventType::Tip2Up) {
             id = *it;
             break;
         }
@@ -1373,13 +1200,11 @@ PenEventId TouchLogger::MostRecentPenDownEvent()
 {
     PenEventId id(-1);
 
-    for (auto it=_penEventOrder.rbegin();
+    for (auto it = _penEventOrder.rbegin();
          it < _penEventOrder.rend();
-         ++it)
-    {
+         ++it) {
         if (PenType(*it) == PenEventType::Tip1Down ||
-            PenType(*it) == PenEventType::Tip2Down)
-        {
+            PenType(*it) == PenEventType::Tip2Down) {
             id = *it;
             break;
         }
@@ -1397,12 +1222,11 @@ TouchIdVector TouchLogger::LiveTouches()
 
 void TouchLogger::InsertStroke(core::TouchId touchId, Eigen::VectorXd t, Eigen::VectorXf x, Eigen::VectorXf y, int startIndex, int endIndex)
 {
-    DebugAssert((t.rows() >= startIndex+1) && (t.rows() >= endIndex+1));
+    DebugAssert((t.rows() >= startIndex + 1) && (t.rows() >= endIndex + 1));
 
     Eigen::Vector2f xy;
 
-    if (!IsIdLogged(touchId))
-    {
+    if (!IsIdLogged(touchId)) {
         Stroke::Ptr stroke = Stroke::New();
 
         xy(0) = x(startIndex);
@@ -1418,15 +1242,13 @@ void TouchLogger::InsertStroke(core::TouchId touchId, Eigen::VectorXd t, Eigen::
 
     // InsertStroke is only called for testing and debugging, so this doesn't matter.
     // Production code doesn't ever use this.
-    if (_touchData.count(touchId) == 0)
-    {
+    if (_touchData.count(touchId) == 0) {
         return;
     }
 
     TouchData::Ptr touchData = _touchData.at(touchId);
 
-    for (int i = startIndex+1; i <= endIndex; ++i)
-    {
+    for (int i = startIndex + 1; i <= endIndex; ++i) {
         xy(0) = x(i);
         xy(1) = y(i);
         touchData->Stroke()->AddPoint(xy, t(i));
@@ -1436,12 +1258,11 @@ void TouchLogger::InsertStroke(core::TouchId touchId, Eigen::VectorXd t, Eigen::
 
 void TouchLogger::InsertStroke(core::TouchId touchId, Eigen::VectorXd t, Eigen::VectorXf x, Eigen::VectorXf y)
 {
-    InsertStroke(touchId, t, x, y, 0, (int)t.rows()-1);
+    InsertStroke(touchId, t, x, y, 0, (int)t.rows() - 1);
 }
 
 void TouchLogger::DeleteTouchId(core::TouchId id)
 {
-
     _touchData.erase(id);
 }
 

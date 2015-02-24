@@ -13,11 +13,10 @@
 
 @class FTPenManager;
 
-typedef NS_ENUM(NSInteger, VisibilityState)
-{
-    VisibilityStateVisible,     // Visible
-    VisibilityStateHidden,      // Not visible, but space is still reserved for the element in the layout
-    VisibilityStateCollapsed    // Not visible and the element is collapsed away, not taking up space in the layout
+typedef NS_ENUM(NSInteger, VisibilityState) {
+    VisibilityStateVisible,  // Visible
+    VisibilityStateHidden,   // Not visible, but space is still reserved for the element in the layout
+    VisibilityStateCollapsed // Not visible and the element is collapsed away, not taking up space in the layout
 };
 
 @class PenConnectionView;

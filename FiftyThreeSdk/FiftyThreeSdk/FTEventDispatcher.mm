@@ -17,8 +17,7 @@
 using namespace fiftythree::core;
 using namespace fiftythree::sdk;
 
-@interface FTEventDispatcher ()
-{
+@interface FTEventDispatcher () {
     TouchClassifier::Ptr _classifier;
 }
 @property (nonatomic) BOOL hasSeenFTPenManager;
@@ -27,8 +26,7 @@ using namespace fiftythree::sdk;
 @implementation FTEventDispatcher
 - (id)init
 {
-    if (self = [super init])
-    {
+    if (self = [super init]) {
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(isTipPressedStateChange:)
                                                      name:kFTPenIsTipPressedDidChangeNotificationName
@@ -78,8 +76,7 @@ using namespace fiftythree::sdk;
 
 - (TouchClassifier::Ptr)classifier
 {
-    if (self.hasSeenFTPenManager && _classifier)
-    {
+    if (self.hasSeenFTPenManager && _classifier) {
         ActiveClassifier::Activate(_classifier);
     }
 
@@ -93,17 +90,14 @@ using namespace fiftythree::sdk;
 
     // If this event is a "touches" event, then send it to the TouchTracker for processing. Hooking into touch
     // dispatch at this level allows TouchTracker to observe all touches in the system.
-    if (event.type == UIEventTypeTouches)
-    {
+    if (event.type == UIEventTypeTouches) {
         spc<TouchTrackerObjC>(TouchTracker::Instance())->ProcessTouchesEvent(event);
 
         TouchClassifier::Ptr classifier = self.classifier;
-        if (classifier)
-        {
+        if (classifier) {
             std::set<fiftythree::core::Touch::cPtr> touches;
 
-            for (UITouch *t in [event allTouches])
-            {
+            for (UITouch *t in [event allTouches]) {
                 auto touch = spc<TouchTrackerObjC>(TouchTracker::Instance())->TouchForUITouch(t);
                 touches.insert(touch);
             }
@@ -120,15 +114,12 @@ using namespace fiftythree::sdk;
 - (void)isTipPressedStateChange:(NSNotification *)notification
 {
     TouchClassifier::Ptr classifier = self.classifier;
-    if (classifier)
-    {
-        FTPen *pen = (FTPen*)notification.object;
+    if (classifier) {
+        FTPen *pen = (FTPen *)notification.object;
 
         PenEventArgs args;
         args.Timestamp = [NSProcessInfo processInfo].systemUptime;
-        args.Type = (pen.isTipPressed ?
-                     PenEventType::Tip1Down :
-                     PenEventType::Tip1Up);
+        args.Type = (pen.isTipPressed ? PenEventType::Tip1Down : PenEventType::Tip1Up);
         classifier->PenStateDidChanged(args);
     }
 }
@@ -136,15 +127,12 @@ using namespace fiftythree::sdk;
 - (void)isEraserPressedStateChange:(NSNotification *)notification
 {
     TouchClassifier::Ptr classifier = self.classifier;
-    if (classifier)
-    {
-        FTPen *pen = (FTPen*)notification.object;
+    if (classifier) {
+        FTPen *pen = (FTPen *)notification.object;
 
         PenEventArgs args;
         args.Timestamp = [NSProcessInfo processInfo].systemUptime;
-        args.Type = (pen.isEraserPressed ?
-                     PenEventType::Tip2Down :
-                     PenEventType::Tip2Up);
+        args.Type = (pen.isEraserPressed ? PenEventType::Tip2Down : PenEventType::Tip2Up);
         classifier->PenStateDidChanged(args);
     }
 }
@@ -154,8 +142,7 @@ using namespace fiftythree::sdk;
     self.hasSeenFTPenManager = YES;
 
     TouchClassifier::Ptr classifier = self.classifier;
-    if (classifier)
-    {
+    if (classifier) {
         FTPenManager *manager = (FTPenManager *)notification.object;
         BOOL connected = FTPenManagerStateIsConnected(manager.state);
         classifier->SetPenConnected(connected);

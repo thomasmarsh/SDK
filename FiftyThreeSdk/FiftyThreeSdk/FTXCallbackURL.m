@@ -17,10 +17,10 @@
 @property (nonatomic, readwrite) NSString *action;
 @end
 
-NSString * const kFTXCallbackUrlSourceKey = @"x-source";
-NSString * const kFTXCallbackUrlErrorKey = @"x-error";
-NSString * const kFTXCallbackUrlCancelKey = @"x-cancel";
-NSString * const kFTXCallbackUrlSuccessKey = @"x-success";
+NSString *const kFTXCallbackUrlSourceKey = @"x-source";
+NSString *const kFTXCallbackUrlErrorKey = @"x-error";
+NSString *const kFTXCallbackUrlCancelKey = @"x-cancel";
+NSString *const kFTXCallbackUrlSuccessKey = @"x-success";
 
 @implementation FTXCallbackURL
 // Create a XCallbackUrl with named parameters. This sets up query parameters & url encodes the bits.
@@ -32,20 +32,17 @@ NSString * const kFTXCallbackUrlSuccessKey = @"x-success";
                          errorUrl:(NSURL *)error
                         cancelUrl:(NSURL *)cancel
 {
-    if (!scheme && !host && !action && !source)
-    {
+    if (!scheme && !host && !action && !source) {
         return nil;
     }
 
     NSMutableString *baseUrl = [[NSString stringWithFormat:@"%@://%@/%@", scheme, host, action] mutableCopy];
 
-    if (success || error || cancel  || source)
-    {
+    if (success || error || cancel || source) {
         //OK we have some query parameters start adding them
         NSMutableArray *queryComponents = [@[] mutableCopy];
 
-        if (source)
-        {
+        if (source) {
             NSMutableString *component = [@"" mutableCopy];
             [component appendString:kFTXCallbackUrlSourceKey];
             [component appendString:@"="];
@@ -53,8 +50,7 @@ NSString * const kFTXCallbackUrlSuccessKey = @"x-success";
             [queryComponents addObject:component];
         }
 
-        if (success)
-        {
+        if (success) {
             NSMutableString *component = [@"" mutableCopy];
             [component appendString:kFTXCallbackUrlSuccessKey];
             [component appendString:@"="];
@@ -62,24 +58,20 @@ NSString * const kFTXCallbackUrlSuccessKey = @"x-success";
             [queryComponents addObject:component];
         }
 
-        if (error)
-        {
+        if (error) {
             NSMutableString *component = [@"" mutableCopy];
             [component appendString:kFTXCallbackUrlErrorKey];
             [component appendString:@"="];
             [component appendString:[[error absoluteString] urlEncodeUsingEncoding:NSUTF8StringEncoding]];
             [queryComponents addObject:component];
-
         }
 
-        if (cancel)
-        {
+        if (cancel) {
             NSMutableString *component = [@"" mutableCopy];
             [component appendString:kFTXCallbackUrlCancelKey];
             [component appendString:@"="];
             [component appendString:[[cancel absoluteString] urlEncodeUsingEncoding:NSUTF8StringEncoding]];
             [queryComponents addObject:component];
-
         }
         [baseUrl appendString:@"?"];
         [baseUrl appendString:[@"&" join:queryComponents]];
@@ -101,31 +93,26 @@ NSString * const kFTXCallbackUrlSuccessKey = @"x-success";
     FTXCallbackURL *url = [[FTXCallbackURL alloc] initWithString:[other absoluteString]];
     NSDictionary *queryParameters = [url generateQueryDictionary];
 
-    if ([queryParameters objectForKey:kFTXCallbackUrlSourceKey])
-    {
+    if ([queryParameters objectForKey:kFTXCallbackUrlSourceKey]) {
         url.source = queryParameters[kFTXCallbackUrlSourceKey];
     }
 
-    if ([queryParameters objectForKey:kFTXCallbackUrlSuccessKey])
-    {
+    if ([queryParameters objectForKey:kFTXCallbackUrlSuccessKey]) {
         url.successUrl = [NSURL URLWithString:queryParameters[kFTXCallbackUrlSuccessKey]];
     }
 
-    if ([queryParameters objectForKey:kFTXCallbackUrlErrorKey])
-    {
+    if ([queryParameters objectForKey:kFTXCallbackUrlErrorKey]) {
         url.errorUrl = [NSURL URLWithString:queryParameters[kFTXCallbackUrlErrorKey]];
     }
 
-    if ([queryParameters objectForKey:kFTXCallbackUrlCancelKey])
-    {
+    if ([queryParameters objectForKey:kFTXCallbackUrlCancelKey]) {
         url.cancelUrl = [NSURL URLWithString:queryParameters[kFTXCallbackUrlCancelKey]];
     }
 
-    if (other.path.length > 0)
-    {
+    if (other.path.length > 0) {
         url.action = (([url.path characterAtIndex:0] == '/')
-                      ? [url.path substringFromIndex:1]
-                      : url.path);
+                          ? [url.path substringFromIndex:1]
+                          : url.path);
     }
     return url;
 }

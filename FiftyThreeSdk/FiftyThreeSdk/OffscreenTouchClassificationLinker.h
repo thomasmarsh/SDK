@@ -28,8 +28,7 @@ protected:
     OffscreenTouchClassificationLinker() = default;
 
 public:
-
-    virtual Event<std::vector<core::Touch::cPtr>> & TouchesReclassified() = 0;
+    virtual Event<std::vector<core::Touch::cPtr>> &TouchesReclassified() = 0;
 
     virtual void UpdateTouchContinuationLinkage() = 0;
 

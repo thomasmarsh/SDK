@@ -11,18 +11,18 @@
 
 #import "FTPenManager.h"
 
-extern NSString * const kFTPenUnexpectedDisconnectNotificationName;
-extern NSString * const kFTPenUnexpectedDisconnectWhileConnectingNotifcationName;
-extern NSString * const kFTPenUnexpectedDisconnectWhileUpdatingFirmwareNotificationName;
+extern NSString *const kFTPenUnexpectedDisconnectNotificationName;
+extern NSString *const kFTPenUnexpectedDisconnectWhileConnectingNotifcationName;
+extern NSString *const kFTPenUnexpectedDisconnectWhileUpdatingFirmwareNotificationName;
 
-extern NSString * const kFTPenManagerFirmwareUpdateDidBegin;
-extern NSString * const kFTPenManagerFirmwareUpdateDidBeginSendingUpdate;
-extern NSString * const kFTPenManagerFirmwareUpdateDidUpdatePercentComplete;
-extern NSString * const kFTPenManagerPercentCompleteProperty;
-extern NSString * const kFTPenManagerFirmwareUpdateDidFinishSendingUpdate;
-extern NSString * const kFTPenManagerFirmwareUpdateDidCompleteSuccessfully;
-extern NSString * const kFTPenManagerFirmwareUpdateDidFail;
-extern NSString * const kFTPenManagerFirmwareUpdateWasCancelled;
+extern NSString *const kFTPenManagerFirmwareUpdateDidBegin;
+extern NSString *const kFTPenManagerFirmwareUpdateDidBeginSendingUpdate;
+extern NSString *const kFTPenManagerFirmwareUpdateDidUpdatePercentComplete;
+extern NSString *const kFTPenManagerPercentCompleteProperty;
+extern NSString *const kFTPenManagerFirmwareUpdateDidFinishSendingUpdate;
+extern NSString *const kFTPenManagerFirmwareUpdateDidCompleteSuccessfully;
+extern NSString *const kFTPenManagerFirmwareUpdateDidFail;
+extern NSString *const kFTPenManagerFirmwareUpdateWasCancelled;
 
 @interface FTPenManager ()
 

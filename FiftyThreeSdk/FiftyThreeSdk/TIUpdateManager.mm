@@ -47,8 +47,7 @@ static NSString *const kImageBlockTransferUUID = @"F000FFC2-0451-4000-B000-00000
 - (id)initWithPeripheral:(CBPeripheral *)peripheral delegate:(id<TIUpdateManagerDelegate>)delegate;
 {
     self = [super init];
-    if (self)
-    {
+    if (self) {
         _state = TIUpdateManagerStateNotStarted;
         _shouldRestorePeripheralDelegate = YES;
 
@@ -79,8 +78,7 @@ static NSString *const kImageBlockTransferUUID = @"F000FFC2-0451-4000-B000-00000
 
     _lastPercent = 0;
 
-    if (_shouldRestorePeripheralDelegate)
-    {
+    if (_shouldRestorePeripheralDelegate) {
         // Restore the original peripheral delegate.
         _peripheral.delegate = _oldPeripheralDelegate;
     }
@@ -98,8 +96,7 @@ static NSString *const kImageBlockTransferUUID = @"F000FFC2-0451-4000-B000-00000
 
     self.imagePath = imagePath;
     self.imageHandle = [NSFileHandle fileHandleForReadingAtPath:self.imagePath];
-    if (!self.imageHandle)
-    {
+    if (!self.imageHandle) {
         MLOG_ERROR(FTLogSDK, "Firmware: invalid file path: %s", ObjcDescription(self.imagePath));
 
         [self doneWithError:[self errorAborted]];
@@ -111,13 +108,12 @@ static NSString *const kImageBlockTransferUUID = @"F000FFC2-0451-4000-B000-00000
     self.imageSizeRemaining = self.imageSize;
     self.currentBlock = 0;
 
-    [self.peripheral discoverServices:@[[CBUUID UUIDWithString:kOADServiceUUID]]];
+    [self.peripheral discoverServices:@[ [CBUUID UUIDWithString:kOADServiceUUID] ]];
 }
 
 - (void)cancelUpdate
 {
-    if (self.state == TIUpdateManagerStateInProgress)
-    {
+    if (self.state == TIUpdateManagerStateInProgress) {
         MLOG_INFO(FTLogSDK, "Firmware: update cancelled");
 
         self.state = TIUpdateManagerStateCancelled;
@@ -127,8 +123,7 @@ static NSString *const kImageBlockTransferUUID = @"F000FFC2-0451-4000-B000-00000
 
 - (void)doneWithError:(NSError *)error
 {
-    if (!error)
-    {
+    if (!error) {
         error = [self errorAborted];
     }
 
@@ -156,45 +151,35 @@ static NSString *const kImageBlockTransferUUID = @"F000FFC2-0451-4000-B000-00000
 
 - (void)peripheral:(CBPeripheral *)peripheral didDiscoverServices:(NSError *)error
 {
-    if (error || !peripheral.services || peripheral.services.count == 0)
-    {
-        MLOG_ERROR(FTLogSDK, "Firmware: error discovering device info service: %s",
-                  ObjcDescription(error.localizedDescription));
+    if (error || !peripheral.services || peripheral.services.count == 0) {
+        MLOG_ERROR(FTLogSDK, "Firmware: error discovering device info service: %s", ObjcDescription(error.localizedDescription));
 
         [self doneWithError:error];
         return;
     }
 
-    NSArray* characteristics = @[[CBUUID UUIDWithString:kImageIdentifyUUID],
-                                 [CBUUID UUIDWithString:kImageBlockTransferUUID]
-                                 ];
+    NSArray *characteristics = @[ [CBUUID UUIDWithString:kImageIdentifyUUID],
+                                  [CBUUID UUIDWithString:kImageBlockTransferUUID] ];
 
-    for (CBService *service in peripheral.services)
-    {
+    for (CBService *service in peripheral.services) {
         [peripheral discoverCharacteristics:characteristics forService:service];
     }
 }
 
 - (void)peripheral:(CBPeripheral *)peripheral didDiscoverCharacteristicsForService:(CBService *)service
-             error:(NSError *)error
+                                   error:(NSError *)error
 {
-    if (error)
-    {
-        MLOG_ERROR(FTLogSDK, "Firmware: error discovering device info characteristics: %s",
-                   ObjcDescription(error.localizedDescription));
+    if (error) {
+        MLOG_ERROR(FTLogSDK, "Firmware: error discovering device info characteristics: %s", ObjcDescription(error.localizedDescription));
 
         [self doneWithError:error];
         return;
     }
 
-    for (CBCharacteristic *characteristic in service.characteristics)
-    {
-        if ([characteristic.UUID isEqual:[CBUUID UUIDWithString:kImageIdentifyUUID]])
-        {
+    for (CBCharacteristic *characteristic in service.characteristics) {
+        if ([characteristic.UUID isEqual:[CBUUID UUIDWithString:kImageIdentifyUUID]]) {
             self.imageIdentifyCharacteristic = characteristic;
-        }
-        else if ([characteristic.UUID isEqual:[CBUUID UUIDWithString:kImageBlockTransferUUID]])
-        {
+        } else if ([characteristic.UUID isEqual:[CBUUID UUIDWithString:kImageBlockTransferUUID]]) {
             self.imageBlockTransferCharacteristic = characteristic;
         }
     }
@@ -203,12 +188,10 @@ static NSString *const kImageBlockTransferUUID = @"F000FFC2-0451-4000-B000-00000
 }
 
 - (void)peripheral:(CBPeripheral *)peripheral didUpdateValueForCharacteristic:(CBCharacteristic *)characteristic
-             error:(NSError *)error
+                              error:(NSError *)error
 {
-    if (error)
-    {
-        MLOG_ERROR(FTLogSDK, "Firmware: error updating value for descriptor: %s",
-                   ObjcDescription(error.localizedDescription));
+    if (error) {
+        MLOG_ERROR(FTLogSDK, "Firmware: error updating value for descriptor: %s", ObjcDescription(error.localizedDescription));
 
         [self doneWithError:error];
         return;
@@ -216,12 +199,10 @@ static NSString *const kImageBlockTransferUUID = @"F000FFC2-0451-4000-B000-00000
 }
 
 - (void)peripheral:(CBPeripheral *)peripheral didWriteValueForCharacteristic:(CBCharacteristic *)characteristic
-             error:(NSError *)error
+                             error:(NSError *)error
 {
-    if (error)
-    {
-        MLOG_ERROR(FTLogSDK, "Firmware: error writing value for characteristic: %s",
-                   ObjcDescription(error.localizedDescription));
+    if (error) {
+        MLOG_ERROR(FTLogSDK, "Firmware: error writing value for characteristic: %s", ObjcDescription(error.localizedDescription));
 
         [self doneWithError:error];
         return;
@@ -229,12 +210,10 @@ static NSString *const kImageBlockTransferUUID = @"F000FFC2-0451-4000-B000-00000
 }
 
 - (void)peripheral:(CBPeripheral *)peripheral didWriteValueForDescriptor:(CBDescriptor *)descriptor
-             error:(NSError *)error
+                         error:(NSError *)error
 {
-    if (error)
-    {
-        MLOG_ERROR(FTLogSDK, "Firmware: error writing value for descriptor: %s",
-                   ObjcDescription(error.localizedDescription));
+    if (error) {
+        MLOG_ERROR(FTLogSDK, "Firmware: error writing value for descriptor: %s", ObjcDescription(error.localizedDescription));
 
         [self doneWithError:error];
         return;
@@ -242,12 +221,10 @@ static NSString *const kImageBlockTransferUUID = @"F000FFC2-0451-4000-B000-00000
 }
 
 - (void)peripheral:(CBPeripheral *)peripheral didUpdateValueForDescriptor:(CBDescriptor *)descriptor
-             error:(NSError *)error
+                          error:(NSError *)error
 {
-    if (error)
-    {
-        MLOG_ERROR(FTLogSDK, "Firmware: error updating value for descriptor: %s",
-                   ObjcDescription(error.localizedDescription));
+    if (error) {
+        MLOG_ERROR(FTLogSDK, "Firmware: error updating value for descriptor: %s", ObjcDescription(error.localizedDescription));
 
         [self doneWithError:error];
         return;
@@ -259,8 +236,7 @@ static NSString *const kImageBlockTransferUUID = @"F000FFC2-0451-4000-B000-00000
 - (void)maybeStartImageBlockWrite
 {
     if (self.imageIdentifyCharacteristic &&
-        self.imageBlockTransferCharacteristic)
-    {
+        self.imageBlockTransferCharacteristic) {
         [self startImageBlockWrite];
     }
 }
@@ -299,15 +275,13 @@ static NSString *const kImageBlockTransferUUID = @"F000FFC2-0451-4000-B000-00000
 
 - (void)imageBlockWriteTimerFired:(NSTimer *)writeTimer
 {
-    if (self.peripheral.state != CBPeripheralStateConnected)
-    {
+    if (self.peripheral.state != CBPeripheralStateConnected) {
         [self doneWithError:[self errorAborted]];
         return;
     }
 
     const int numBlocksToWrite = 4;
-    for (int i = 0; i < numBlocksToWrite; i++)
-    {
+    for (int i = 0; i < numBlocksToWrite; i++) {
         uint16_t indexHeader = CFSwapInt16HostToLittle(self.currentBlock);
         NSMutableData *data = [NSMutableData dataWithBytes:&indexHeader length:sizeof(indexHeader)];
         NSData *block = [self.imageHandle readDataOfLength:16];
@@ -325,21 +299,16 @@ static NSString *const kImageBlockTransferUUID = @"F000FFC2-0451-4000-B000-00000
         float percent = (float)(self.imageSize - self.imageSizeRemaining) / (float)self.imageSize * 100;
 
         // only send integral updates
-        if ((percent - self.lastPercent) > 0.1)
-        {
+        if ((percent - self.lastPercent) > 0.1) {
             [self.delegate updateManager:self didUpdatePercentComplete:percent];
             self.lastPercent = percent;
         }
 
-        if (self.imageSizeRemaining == 0)
-        {
+        if (self.imageSizeRemaining == 0) {
             [self done];
             break;
-        }
-        else
-        {
-            if (i == numBlocksToWrite - 1)
-            {
+        } else {
+            if (i == numBlocksToWrite - 1) {
                 self.imageBlockWriteTimer = nil;
                 [self scheduleWriteTimer];
             }

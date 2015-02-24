@@ -32,28 +32,23 @@ protected:
 public:
     Eigen::VectorXf Evaluate(Eigen::VectorXf x);
     float Evaluate(float x);
-    inline PolynomialModel(float scale, float shift, float leftB, float rightB, Eigen::VectorXf coefficients) :
-                            _scale(scale),
-                            _shift(shift),
-                            _leftB(leftB),
-                            _rightB(rightB),
-                            _coefficients(coefficients)
-    {
-    };
-    inline PolynomialModel() :
-                            _scale(1.0f),
-                            _shift(0.0f),
-                            _leftB(0.0f),
-                            _rightB(1.0f),
-                            _coefficients(Eigen::VectorXf::Zero(1))
-    {
-    };
+    inline PolynomialModel(float scale, float shift, float leftB, float rightB, Eigen::VectorXf coefficients)
+    : _scale(scale)
+    , _shift(shift)
+    , _leftB(leftB)
+    , _rightB(rightB)
+    , _coefficients(coefficients){};
+    inline PolynomialModel()
+    : _scale(1.0f)
+    , _shift(0.0f)
+    , _leftB(0.0f)
+    , _rightB(1.0f)
+    , _coefficients(Eigen::VectorXf::Zero(1)){};
 };
 
 // Calibration for determining how many scores we have, what their normalizations
 // and likelihoods are, etc
-struct ScoreCalibration
-{
+struct ScoreCalibration {
     ALIAS_PTR_TYPES(ScoreCalibration);
     ScoreCalibration();
     static ScoreCalibration::Ptr New();
@@ -71,8 +66,7 @@ struct ScoreCalibration
 };
 
 // Calibration for the Neyman-Pearson statistical tests
-struct NPCalibration
-{
+struct NPCalibration {
     ALIAS_PTR_TYPES(NPCalibration);
     NPCalibration();
     static NPCalibration::Ptr New();
@@ -88,8 +82,7 @@ struct NPCalibration
 };
 
 // Calibration for the Bayesian classification
-struct BayesCalibration
-{
+struct BayesCalibration {
     ALIAS_PTR_TYPES(BayesCalibration);
     BayesCalibration();
     static BayesCalibration::Ptr New();
@@ -102,8 +95,7 @@ struct BayesCalibration
 };
 
 // Calibration for Adaptive Boosting calibration
-struct AdaboostCalibration
-{
+struct AdaboostCalibration {
     ALIAS_PTR_TYPES(AdaboostCalibration);
     AdaboostCalibration();
     static AdaboostCalibration::Ptr New();
@@ -120,8 +112,7 @@ struct AdaboostCalibration
 };
 
 // Keeps data for touchId's for reclassification of strokes
-struct StrokeChunkLog
-{
+struct StrokeChunkLog {
     ALIAS_PTR_TYPES(StrokeChunkLog);
     StrokeChunkLog();
     static StrokeChunkLog::Ptr New();
@@ -136,14 +127,14 @@ struct StrokeChunkLog
 class IsolatedStrokesClassifier
 {
 protected:
-    ClusterTracker::Ptr      _clusterTracker;
-    const CommonData*        _commonData;
+    ClusterTracker::Ptr _clusterTracker;
+    const CommonData *_commonData;
 
     // Calibration containers
-    ScoreCalibration::Ptr       _scoreData;
-    NPCalibration::Ptr          _NPData;
-    BayesCalibration::Ptr       _BayesData;
-    AdaboostCalibration::Ptr    _AdaboostData;
+    ScoreCalibration::Ptr _scoreData;
+    NPCalibration::Ptr _NPData;
+    BayesCalibration::Ptr _BayesData;
+    AdaboostCalibration::Ptr _AdaboostData;
 
     std::vector<core::TouchId> _checkedTouches;
 
@@ -174,13 +165,13 @@ protected:
 
 public:
     inline IsolatedStrokesClassifier(ClusterTracker::Ptr clusterTracker,
-                                    const CommonData* dataPtr) :
-    _clusterTracker(clusterTracker),
-    _commonData(dataPtr),
-    _scoreData(ScoreCalibration::New()),
-    _NPData(NPCalibration::New()),
-    _BayesData(BayesCalibration::New()),
-    _AdaboostData(AdaboostCalibration::New())
+                                     const CommonData *dataPtr)
+    : _clusterTracker(clusterTracker)
+    , _commonData(dataPtr)
+    , _scoreData(ScoreCalibration::New())
+    , _NPData(NPCalibration::New())
+    , _BayesData(BayesCalibration::New())
+    , _AdaboostData(AdaboostCalibration::New())
     {
         InitializeLikelihoods();
 
@@ -192,7 +183,7 @@ public:
     IdTypeMap ReclassifyActiveTouches();
 
     float Score(core::TouchId id);
-    float Score(Stroke  & stroke);
+    float Score(Stroke &stroke);
 
     EdgeThumbState TestEdgeThumb(core::TouchId touchId);
     void MarkEdgeThumbs();
@@ -203,8 +194,8 @@ public:
     // classifiers work -- larger values mean palm.
     float NormalizedScore(core::TouchId id);
 
-    core::TouchClassification TestFingerVsPalm(Cluster::Ptr const & cluster);
-    bool IsPalmCluster(Cluster::Ptr const & cluster);
+    core::TouchClassification TestFingerVsPalm(Cluster::Ptr const &cluster);
+    bool IsPalmCluster(Cluster::Ptr const &cluster);
 
     void ScoreAssert(int scoreId, int chunkSize);
 
@@ -277,20 +268,20 @@ public:
 
 // We take maxes + integrate vector norms so much here's a convenience method to do it
 // Actually it's L2 norm squared
-template<typename DerivedA, typename DerivedB, typename DerivedC>
+template <typename DerivedA, typename DerivedB, typename DerivedC>
 void MaxAndL2Norm(const Eigen::MatrixBase<DerivedA> &x, const Eigen::MatrixBase<DerivedB> &weights, Eigen::MatrixBase<DerivedC> &results, int startIndex)
 {
-    results(startIndex) = (typename DerivedC::Scalar) RowwiseMaxNorm(x);
-    results(startIndex+1) = (typename DerivedC::Scalar) weights.dot(x.cwiseAbs2().rowwise().sum());
+    results(startIndex) = (typename DerivedC::Scalar)RowwiseMaxNorm(x);
+    results(startIndex + 1) = (typename DerivedC::Scalar)weights.dot(x.cwiseAbs2().rowwise().sum());
 }
 
-template<typename DerivedA, typename DerivedB>
+template <typename DerivedA, typename DerivedB>
 std::pair<typename DerivedA::Scalar, typename DerivedA::Scalar> MaxAndL2Norm(const Eigen::MatrixBase<DerivedA> &x, const Eigen::MatrixBase<DerivedB> &weights)
 {
     return {RowwiseMaxNorm(x), weights.dot(x.cwiseAbs2().rowwise().sum())};
 }
 
-template<typename DerivedA, typename DerivedB>
+template <typename DerivedA, typename DerivedB>
 typename DerivedA::Scalar ComputeL2Norm(const Eigen::MatrixBase<DerivedA> &x,
                                         const Eigen::MatrixBase<DerivedB> &weights)
 {

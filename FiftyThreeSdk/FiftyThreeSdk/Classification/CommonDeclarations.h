@@ -24,7 +24,7 @@ typedef std::map<core::TouchId, core::TouchClassification> IdTypeMap;
 typedef std::pair<core::TouchId, core::TouchClassification> IdTypePair;
 
 static const float Inf = std::numeric_limits<float>::infinity();
-static const int intInf = std::numeric_limits<int>::max() -3 ; // -3 because of indexing issues
+static const int intInf = std::numeric_limits<int>::max() - 3; // -3 because of indexing issues
 
 // Like TouchId, valid ids are non-negative
 //typedef int PenEventId;
@@ -32,16 +32,15 @@ STRONG_TYPEDEF(int, PenEventId);
 
 class TouchClassificationProxy;
 
-struct CommonData
-{
-    const std::map<core::TouchId, core::TouchClassification>* const types;
+struct CommonData {
+    const std::map<core::TouchId, core::TouchClassification> *const types;
 
-    TouchClassificationProxy* proxy;
+    TouchClassificationProxy *proxy;
 
-    CommonData(std::map<core::TouchId, core::TouchClassification>* typesPointer,
-               TouchClassificationProxy* proxyPointer):
-    types(typesPointer),
-    proxy(proxyPointer)
+    CommonData(std::map<core::TouchId, core::TouchClassification> *typesPointer,
+               TouchClassificationProxy *proxyPointer)
+    : types(typesPointer)
+    , proxy(proxyPointer)
     {
     }
 };
@@ -53,19 +52,40 @@ typedef std::vector<core::TouchClassification>::iterator TouchTypeIterator;
 // one of the threshold values below.
 // The last threshold should always be Inf. Otherwise...*boom*
 static const int isolatedBatchThresholds[] =
-{
-  4, 8, 12, 16, 20, 28, 36, 44, 52, 60, 70, 80, 90, 100, 150, 200, 250, 300, 350, 400, 500, 600, intInf
-};
+    {
+     4,
+     8,
+     12,
+     16,
+     20,
+     28,
+     36,
+     44,
+     52,
+     60,
+     70,
+     80,
+     90,
+     100,
+     150,
+     200,
+     250,
+     300,
+     350,
+     400,
+     500,
+     600,
+     intInf};
 
-template<typename DataType>
+template <typename DataType>
 class DataStream;
 
-typedef Eigen::Matrix<float,  1, 1> Vector1f;
+typedef Eigen::Matrix<float, 1, 1> Vector1f;
 typedef Eigen::Matrix<double, 1, 1> Vector1d;
 
-typedef DataStream<Eigen::Vector2f>  DataStream2f;
+typedef DataStream<Eigen::Vector2f> DataStream2f;
 typedef DataStream<Vector1f> DataStream1f;
-typedef Eigen::Matrix< float, 7, 1> Vector7f;
+typedef Eigen::Matrix<float, 7, 1> Vector7f;
 
 typedef DataStream<Vector7f> DataStream7f;
 
@@ -80,35 +100,41 @@ typedef Eigen::Map<Eigen::VectorXf, 0, Eigen::InnerStride<2>> Stride2Map;
 typedef Eigen::Vector2f XYType;
 
 // identifies a stretch of _count points with first point at _index
-struct Interval
-{
+struct Interval {
     size_t _index;
     size_t _count;
 
-    Interval(size_t index, size_t count) : _index(index), _count(count) {}
-    Interval() : _index(0), _count(0) {}
+    Interval(size_t index, size_t count)
+    : _index(index)
+    , _count(count)
+    {
+    }
+    Interval()
+    : _index(0)
+    , _count(0)
+    {
+    }
 
-    bool IsEmpty()   const
+    bool IsEmpty() const
     {
         return _count == 0;
     }
 
-    int  LastIndex() const
+    int LastIndex() const
     {
-        return (int)_index +(int) _count - 1;
+        return (int)_index + (int)_count - 1;
     }
 
     static Interval Zero()
     {
-        return Interval(0,0);
+        return Interval(0, 0);
     }
 
     Interval Intersection(Interval const &other) const
     {
-
         int a = std::max((int)_index, (int)other._index);
         int b = std::min(LastIndex(), other.LastIndex());
-        return Interval(a, std::max(0, b-a+1));
+        return Interval(a, std::max(0, b - a + 1));
     }
 
     bool operator==(Interval const &other)

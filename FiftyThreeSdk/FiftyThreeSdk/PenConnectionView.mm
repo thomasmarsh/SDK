@@ -28,7 +28,7 @@ DEFINE_ENUM(PairingSpotTouchState,
             Invalid,
             InvalidAndShouldBeIgnored);
 
-NSString * const kPencilConnectionStatusChangedWithPenConnectionViewNotificationName = @"PencilConnectionStatusChangedWithPenConnectionView";
+NSString *const kPencilConnectionStatusChangedWithPenConnectionViewNotificationName = @"PencilConnectionStatusChangedWithPenConnectionView";
 
 using namespace fiftythree::core;
 
@@ -52,8 +52,7 @@ static const CGFloat kPairingSpotTouchRadius_Moved = 150.f;
 - (id)initWithTarget:(id)target action:(SEL)action
 {
     self = [super initWithTarget:target action:action];
-    if (self)
-    {
+    if (self) {
         self.delaysTouchesEnded = NO;
     }
     return self;
@@ -63,8 +62,7 @@ static const CGFloat kPairingSpotTouchRadius_Moved = 150.f;
 {
     [super touchesBegan:touches withEvent:event];
 
-    if (self.state == UIGestureRecognizerStatePossible)
-    {
+    if (self.state == UIGestureRecognizerStatePossible) {
         self.state = UIGestureRecognizerStateBegan;
     }
 }
@@ -86,18 +84,15 @@ static const CGFloat kPairingSpotTouchRadius_Moved = 150.f;
 - (void)touchesEndedOrCancelled:(NSSet *)touches withEvent:(UIEvent *)event
 {
     BOOL hasActiveTouch = NO;
-    for (UITouch *touch in [event allTouches])
-    {
+    for (UITouch *touch in [event allTouches]) {
         if (![touches containsObject:touch] &&
-            [touch.gestureRecognizers containsObject:self])
-        {
+            [touch.gestureRecognizers containsObject:self]) {
             hasActiveTouch = YES;
             break;
         }
     }
 
-    if (!hasActiveTouch)
-    {
+    if (!hasActiveTouch) {
         // Cancel once all touches used by this gesture recognizers have ended or cancelled.
         self.state = UIGestureRecognizerStateCancelled;
     }
@@ -114,7 +109,7 @@ static const CGFloat kPairingSpotTouchRadius_Moved = 150.f;
 @property (nonatomic) UIView *tipPressedView;
 @property (nonatomic) UIView *eraserPressedView;
 @property (nonatomic) UIGestureRecognizer *gestureRecognizer;
-@property (nonatomic) EventToObjCAdapter<const std::vector<TouchClassificationChangedEventArgs> & >::Ptr touchClassificationsDidChangeAdapter;
+@property (nonatomic) EventToObjCAdapter<const std::vector<TouchClassificationChangedEventArgs> &>::Ptr touchClassificationsDidChangeAdapter;
 
 @property (nonatomic) NSNumber *hadLowBatteryWhenLastConnected;
 @property (nonatomic) NSNumber *hadCriticallyLowBatteryWhenLastConnected;
@@ -131,8 +126,7 @@ static const CGFloat kPairingSpotTouchRadius_Moved = 150.f;
 - (id)init
 {
     self = [super init];
-    if (self)
-    {
+    if (self) {
         self.opaque = NO;
         self.backgroundColor = [UIColor clearColor];
         self.ignoredTouchIds = [NSMutableSet set];
@@ -169,9 +163,9 @@ static const CGFloat kPairingSpotTouchRadius_Moved = 150.f;
 
         auto classifier = ActiveClassifier::Instance();
         DebugAssert(classifier);
-        self.touchClassificationsDidChangeAdapter = EventToObjCAdapter<const std::vector<TouchClassificationChangedEventArgs> & >::Bind(classifier->TouchClassificationsDidChange(),
-                                                                                                                                        self,
-                                                                                                                                        @selector(touchClassificationsDidChange));
+        self.touchClassificationsDidChangeAdapter = EventToObjCAdapter<const std::vector<TouchClassificationChangedEventArgs> &>::Bind(classifier->TouchClassificationsDidChange(),
+                                                                                                                                       self,
+                                                                                                                                       @selector(touchClassificationsDidChange));
 
         // Add a gesture recognizer to the view to capture _ANY_ gestures that occur while pressing on the
         // pairing spot. We do this to block the panning of the tray, etc. (We don't want the tray to pan
@@ -209,14 +203,11 @@ static const CGFloat kPairingSpotTouchRadius_Moved = 150.f;
 
 - (void)updateLayoutForDebugControls
 {
-    if (self.debugControlsVisibility == VisibilityStateCollapsed)
-    {
+    if (self.debugControlsVisibility == VisibilityStateCollapsed) {
         // PenConnectionView only has a pairing spot, so is square.
         [self setSize:CGSizeMake(81, 81)];
         _pairingSpotView.y = 0;
-    }
-    else
-    {
+    } else {
         // PenConnectionView has extra space at the top for debug controls (which may be hidden or visible)
         [self setSize:CGSizeMake(81, 101)];
         _pairingSpotView.y = 20;
@@ -225,10 +216,8 @@ static const CGFloat kPairingSpotTouchRadius_Moved = 150.f;
 
 - (void)setPenManager:(FTPenManager *)penManager
 {
-    if (_penManager != penManager)
-    {
-        if (_penManager)
-        {
+    if (_penManager != penManager) {
+        if (_penManager) {
             [[NSNotificationCenter defaultCenter] removeObserver:self
                                                             name:kFTPenManagerDidUpdateStateNotificationName
                                                           object:_penManager];
@@ -236,8 +225,7 @@ static const CGFloat kPairingSpotTouchRadius_Moved = 150.f;
 
         _penManager = penManager;
 
-        if (_penManager)
-        {
+        if (_penManager) {
             [[NSNotificationCenter defaultCenter] addObserver:self
                                                      selector:@selector(penManagerDidUpdateState:)
                                                          name:kFTPenManagerDidUpdateStateNotificationName
@@ -278,8 +266,7 @@ static const CGFloat kPairingSpotTouchRadius_Moved = 150.f;
 
 - (void)setPairingSpotTouch:(UITouch *)pairingSpotTouch
 {
-    if (_pairingSpotTouch == pairingSpotTouch)
-    {
+    if (_pairingSpotTouch == pairingSpotTouch) {
         return;
     }
 
@@ -291,17 +278,13 @@ static const CGFloat kPairingSpotTouchRadius_Moved = 150.f;
     // the FTPenManager. We sever at this point, rather than avoiding recording the pairing spot touch at all,
     // so that we can properly report isPairingSpotPressedDidChange:.
     if (![self.delegate respondsToSelector:@selector(canPencilBeConnected)] ||
-        [self.delegate canPencilBeConnected])
-    {
+        [self.delegate canPencilBeConnected]) {
         self.penManager.isPairingSpotPressed = hasPairingSpotTouch;
-    }
-    else
-    {
+    } else {
         self.penManager.isPairingSpotPressed = NO;
     }
 
-    if ([self.delegate respondsToSelector:@selector(isPairingSpotPressedDidChange:)])
-    {
+    if ([self.delegate respondsToSelector:@selector(isPairingSpotPressedDidChange:)]) {
         [self.delegate isPairingSpotPressedDidChange:hasPairingSpotTouch];
     }
 }
@@ -323,8 +306,7 @@ static const CGFloat kPairingSpotTouchRadius_Moved = 150.f;
 {
     DebugAssert(self.penManager);
 
-    switch (self.penManager.state)
-    {
+    switch (self.penManager.state) {
         case FTPenManagerStateSeeking:
         case FTPenManagerStateConnecting:
             self.pairingSpotView.cometState = FTPairingSpotCometStateClockwise;
@@ -340,8 +322,7 @@ static const CGFloat kPairingSpotTouchRadius_Moved = 150.f;
             break;
     }
 
-    switch (self.penManager.state)
-    {
+    switch (self.penManager.state) {
         case FTPenManagerStateUninitialized:
         case FTPenManagerStateUnpaired:
             [self.pairingSpotView setConnectionState:FTPairingSpotConnectionStateUnpaired
@@ -365,19 +346,14 @@ static const CGFloat kPairingSpotTouchRadius_Moved = 150.f;
         case FTPenManagerStateDisconnectedLongPressToUnpair:
 
             if (self.hadCriticallyLowBatteryWhenLastConnected &&
-                [self.hadCriticallyLowBatteryWhenLastConnected boolValue])
-            {
+                [self.hadCriticallyLowBatteryWhenLastConnected boolValue]) {
                 [self.pairingSpotView setConnectionState:FTPairingSpotConnectionStateCriticallyLowBattery
                                           isDisconnected:YES];
-            }
-            else if (self.hadLowBatteryWhenLastConnected &&
-                     [self.hadLowBatteryWhenLastConnected boolValue])
-            {
+            } else if (self.hadLowBatteryWhenLastConnected &&
+                       [self.hadLowBatteryWhenLastConnected boolValue]) {
                 [self.pairingSpotView setConnectionState:FTPairingSpotConnectionStateLowBattery
                                           isDisconnected:YES];
-            }
-            else
-            {
+            } else {
                 [self.pairingSpotView setConnectionState:FTPairingSpotConnectionStateConnected
                                           isDisconnected:YES];
             }
@@ -385,13 +361,11 @@ static const CGFloat kPairingSpotTouchRadius_Moved = 150.f;
 
         case FTPenManagerStateConnected:
         case FTPenManagerStateConnectedLongPressToUnpair:
-        case FTPenManagerStateUpdatingFirmware:
-        {
-            BOOL hasLowBattery =  self.penManager &&
-                                  self.penManager.pen &&
-                                  self.penManager.pen.batteryLevel &&
-                                  (self.penManager.info.batteryLevel == FTPenBatteryLevelLow
-                                   || self.penManager.info.batteryLevel == FTPenBatteryLevelCriticallyLow);
+        case FTPenManagerStateUpdatingFirmware: {
+            BOOL hasLowBattery = self.penManager &&
+                                 self.penManager.pen &&
+                                 self.penManager.pen.batteryLevel &&
+                                 (self.penManager.info.batteryLevel == FTPenBatteryLevelLow || self.penManager.info.batteryLevel == FTPenBatteryLevelCriticallyLow);
 
             BOOL hasCriticallyLowBattery = (hasLowBattery && self.penManager.info.batteryLevel == FTPenBatteryLevelCriticallyLow);
 
@@ -406,21 +380,16 @@ static const CGFloat kPairingSpotTouchRadius_Moved = 150.f;
             BOOL wasDisplayingCriticallyLowBattery = (self.pairingSpotView.connectionState == FTPairingSpotConnectionStateCriticallyLowBattery &&
                                                       self.lastPenManagerState != FTPenManagerStateReconnecting);
 
-            if (hasCriticallyLowBattery || wasDisplayingCriticallyLowBattery)
-            {
+            if (hasCriticallyLowBattery || wasDisplayingCriticallyLowBattery) {
                 [self.pairingSpotView setConnectionState:FTPairingSpotConnectionStateCriticallyLowBattery
                                           isDisconnected:NO];
                 self.hadLowBatteryWhenLastConnected = @(YES);
                 self.hadCriticallyLowBatteryWhenLastConnected = @(YES);
-            }
-            else if (hasLowBattery || wasDisplayingLowBattery)
-            {
+            } else if (hasLowBattery || wasDisplayingLowBattery) {
                 [self.pairingSpotView setConnectionState:FTPairingSpotConnectionStateLowBattery
                                           isDisconnected:NO];
                 self.hadLowBatteryWhenLastConnected = @(YES);
-            }
-            else
-            {
+            } else {
                 [self.pairingSpotView setConnectionState:FTPairingSpotConnectionStateConnected
                                           isDisconnected:NO];
             }
@@ -437,8 +406,7 @@ static const CGFloat kPairingSpotTouchRadius_Moved = 150.f;
 
     BOOL hasPairingSpotTouch = self.pairingSpotTouch != nil;
     if (self.penManager.state != self.lastPenManagerState &&
-        hasPairingSpotTouch)
-    {
+        hasPairingSpotTouch) {
         // Notify all other instances of PenConnectionView that we initiated the change of status.
         [[NSNotificationCenter defaultCenter] postNotificationName:kPencilConnectionStatusChangedWithPenConnectionViewNotificationName
                                                             object:self];
@@ -470,15 +438,11 @@ static const CGFloat kPairingSpotTouchRadius_Moved = 150.f;
     // Traverse the view hierarchy and ensure that the view parameter is attached to a visible part of the
     // hierarchy.
     UIResponder *responder = view;
-    while (responder)
-    {
-        if ([responder isKindOfClass:[UIWindow class]])
-        {
+    while (responder) {
+        if ([responder isKindOfClass:[UIWindow class]]) {
             return YES;
-        }
-        else if ([responder isKindOfClass:[UIView class]] &&
-                 ((UIView *)responder).hidden)
-        {
+        } else if ([responder isKindOfClass:[UIView class]] &&
+                   ((UIView *)responder).hidden) {
             return NO;
         }
         responder = [responder nextResponder];
@@ -498,8 +462,7 @@ static const CGFloat kPairingSpotTouchRadius_Moved = 150.f;
     // state.
     PenConnectionView *sender = notification.object;
     if (sender != self &&
-        ![self isVisibleAndInViewHierarchy:self])
-    {
+        ![self isVisibleAndInViewHierarchy:self]) {
         __weak PairingSpotView *weakPairingSpotView = self.pairingSpotView;
         dispatch_async(dispatch_get_main_queue(), ^{
             [weakPairingSpotView snapToCurrentState];
@@ -511,26 +474,23 @@ static const CGFloat kPairingSpotTouchRadius_Moved = 150.f;
 
 - (void)updateViews
 {
-    if (self.penManager && self.debugControlsVisibility == VisibilityStateVisible)
-    {
+    if (self.penManager && self.debugControlsVisibility == VisibilityStateVisible) {
         self.tipPressedView.hidden = NO;
         self.eraserPressedView.hidden = NO;
-    }
-    else
-    {
+    } else {
         self.tipPressedView.hidden = YES;
         self.eraserPressedView.hidden = YES;
     }
     [self updateLayoutForDebugControls];
 
-    UIColor *pressedColor = [UIColor colorWithRed:103/255.0f green:136/255.0f blue:67/255.0f alpha:1.0f];
-    UIColor *notPressedColor = [UIColor colorWithRed:197/255.0f green:62/255.0f blue:14/255.0f alpha:1.0f];
+    UIColor *pressedColor = [UIColor colorWithRed:103 / 255.0f green:136 / 255.0f blue:67 / 255.0f alpha:1.0f];
+    UIColor *notPressedColor = [UIColor colorWithRed:197 / 255.0f green:62 / 255.0f blue:14 / 255.0f alpha:1.0f];
     self.tipPressedView.backgroundColor = (self.penManager.pen.isTipPressed
-                                           ? pressedColor
-                                           : notPressedColor);
+                                               ? pressedColor
+                                               : notPressedColor);
     self.eraserPressedView.backgroundColor = (self.penManager.pen.isEraserPressed
-                                              ? pressedColor
-                                              : notPressedColor);
+                                                  ? pressedColor
+                                                  : notPressedColor);
 
     [self setNeedsDisplay];
 }
@@ -572,8 +532,7 @@ static const CGFloat kPairingSpotTouchRadius_Moved = 150.f;
 
 - (UIView *)tipPressedView
 {
-    if (!_tipPressedView)
-    {
+    if (!_tipPressedView) {
         _tipPressedView = [self tipOrEraserPressedView];
         _tipPressedView.userInteractionEnabled = NO;
     }
@@ -583,8 +542,7 @@ static const CGFloat kPairingSpotTouchRadius_Moved = 150.f;
 
 - (UIView *)eraserPressedView
 {
-    if (!_eraserPressedView)
-    {
+    if (!_eraserPressedView) {
         _eraserPressedView = [self tipOrEraserPressedView];
         _eraserPressedView.x += 15;
         _eraserPressedView.userInteractionEnabled = NO;
@@ -597,9 +555,7 @@ static const CGFloat kPairingSpotTouchRadius_Moved = 150.f;
 {
     static const CGFloat width = 10.f;
 
-    UIView *view = [[UIView alloc] initWithFrame:CGRectMake(27, 0,
-                                                            width,
-                                                            width)];
+    UIView *view = [[UIView alloc] initWithFrame:CGRectMake(27, 0, width, width)];
     view.layer.cornerRadius = 0.5f * width;
 
     return view;
@@ -624,26 +580,23 @@ static const CGFloat kPairingSpotTouchRadius_Moved = 150.f;
     DebugAssert(touch);
 
     if ([uiTouch.gestureRecognizers count] < 1 ||
-        ![uiTouch.gestureRecognizers containsObject:self.gestureRecognizer])
-    {
+        ![uiTouch.gestureRecognizers containsObject:self.gestureRecognizer]) {
         return PairingSpotTouchState::InvalidAndShouldBeIgnored;
     }
 
     if (touch &&
-        ([self.ignoredTouchIds containsObject:@((int) touch->Id())] ||
+        ([self.ignoredTouchIds containsObject:@((int)touch->Id())] ||
          ![self touchIntersectsPairingSpot:uiTouch
                                     radius:(touch->Phase() == TouchPhase::Began
-                                            ? kPairingSpotTouchRadius_Began
-                                            : kPairingSpotTouchRadius_Moved)]))
-    {
+                                                ? kPairingSpotTouchRadius_Began
+                                                : kPairingSpotTouchRadius_Moved)])) {
         return PairingSpotTouchState::InvalidAndShouldBeIgnored;
     }
 
     if (touch &&
         ((touch->Phase() != TouchPhase::Began &&
           touch->Phase() != TouchPhase::Moved) ||
-         touch->LongPressClassification()() == TouchClassification::Palm))
-    {
+         touch->LongPressClassification()() == TouchClassification::Palm)) {
         return PairingSpotTouchState::Invalid;
     }
 
@@ -654,9 +607,8 @@ static const CGFloat kPairingSpotTouchRadius_Moved = 150.f;
 {
     [self.ignoredTouchIds removeAllObjects];
 
-    for (const Touch::cPtr & touch : TouchTracker::Instance()->LiveTouches())
-    {
-        [self.ignoredTouchIds addObject:@((int) touch->Id())];
+    for (const Touch::cPtr &touch : TouchTracker::Instance()->LiveTouches()) {
+        [self.ignoredTouchIds addObject:@((int)touch->Id())];
     }
 }
 
@@ -669,8 +621,7 @@ static const CGFloat kPairingSpotTouchRadius_Moved = 150.f;
     // Determine if there's a valid pairing spot touch.
     NSArray *allUITouches = spc<TouchTrackerObjC>(TouchTracker::Instance())->AllUITouches();
     NSMutableArray *validPairingSpotTouches = [NSMutableArray array];
-    if (allUITouches.count == 1)
-    {
+    if (allUITouches.count == 1) {
         UITouch *touch = allUITouches[0];
 
         switch ([self evaludatePairingSpotTouch:touch]) {
@@ -688,17 +639,13 @@ static const CGFloat kPairingSpotTouchRadius_Moved = 150.f;
         }
     }
 
-    if (validPairingSpotTouches.count == 1)
-    {
+    if (validPairingSpotTouches.count == 1) {
         self.pairingSpotTouch = validPairingSpotTouches[0];
-    }
-    else
-    {
+    } else {
         self.pairingSpotTouch = nil;
 
         if (shouldIgnore ||
-            allUITouches.count > 1)
-        {
+            allUITouches.count > 1) {
             // If we're clearing the pairing touch because there was more than one live touch, ignore all live
             // touches for the duration of their existence.
             [self ignoreAllLiveTouches];
@@ -738,8 +685,7 @@ static const CGFloat kPairingSpotTouchRadius_Moved = 150.f;
 
 - (void)pairingSpotViewAnimationWasEnqueued:(PairingSpotView *)pairingSpotView
 {
-    if ([self.delegate respondsToSelector:@selector(penConnectionViewAnimationWasEnqueued:)])
-    {
+    if ([self.delegate respondsToSelector:@selector(penConnectionViewAnimationWasEnqueued:)]) {
         [self.delegate penConnectionViewAnimationWasEnqueued:self];
     }
 }

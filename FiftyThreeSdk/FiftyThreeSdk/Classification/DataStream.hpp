@@ -17,7 +17,6 @@ namespace fiftythree
 {
 namespace sdk
 {
-
 // this is probably more for making the code self-documenting than anything else...
 DEFINE_ENUM(SamplingType,
             UniformInTime,
@@ -26,15 +25,13 @@ DEFINE_ENUM(SamplingType,
 template <class DataType>
 class DataStream
 {
-
 public:
     typedef std::vector<DataType> ContainerType;
 
     typedef DataStream<DataType> Stream;
-    ALIAS_PTR_TYPES( DataStream<DataType>);
+    ALIAS_PTR_TYPES(DataStream<DataType>);
 
 protected:
-
     ContainerType _data;
     std::vector<float> _relativeTimestamp;
 
@@ -44,38 +41,41 @@ protected:
 
     int ClampedIndex(int index) const
     {
-        return std::max(0, std::min(index, (int) _data.size() - 1));
+        return std::max(0, std::min(index, (int)_data.size() - 1));
     }
 
 public:
-
     SamplingType _samplingType;
-    float        _sampleRate;
-    double             _t0;
+    float _sampleRate;
+    double _t0;
 
     // set t0 < 0 as a "this was not set" flag.
-    DataStream<DataType>() : _sampleRate(60.0f), _t0(-.001), _mostRecentTimestamp(-.001) {}
+    DataStream<DataType>()
+    : _sampleRate(60.0f)
+    , _t0(-.001)
+    , _mostRecentTimestamp(-.001)
+    {
+    }
 
     static DataStream<DataType>::Ptr New() { return Stream::Ptr(new Stream()); }
 
-    void        SetFirstAbsoluteTimestamp(double newValue) { _t0 = newValue; }
-    double           FirstAbsoluteTimestamp() const { return _t0; }
+    void SetFirstAbsoluteTimestamp(double newValue) { _t0 = newValue; }
+    double FirstAbsoluteTimestamp() const { return _t0; }
 
-    StdVectorFloat & RelativeTimestamp() { return _relativeTimestamp; }
-    StdVectorFloat const & RelativeTimestamp() const { return _relativeTimestamp; }
+    StdVectorFloat &RelativeTimestamp() { return _relativeTimestamp; }
+    StdVectorFloat const &RelativeTimestamp() const { return _relativeTimestamp; }
 
-    std::vector< DataType > & Data() { return _data; }
-    std::vector< DataType > const & Data() const { return _data; }
+    std::vector<DataType> &Data() { return _data; }
+    std::vector<DataType> const &Data() const { return _data; }
 
-    std::vector<DataType> ValuesAtTimes(std::vector<float> const & t)
+    std::vector<DataType> ValuesAtTimes(std::vector<float> const &t)
     {
-        return Interp< std::vector<DataType>>(&(_relativeTimestamp[0]), _data, &(t[0]), _relativeTimestamp.size(), t.size());
+        return Interp<std::vector<DataType>>(&(_relativeTimestamp[0]), _data, &(t[0]), _relativeTimestamp.size(), t.size());
     }
 
     void AddPoint(DataType value, double timestamp)
     {
-        if (_data.empty() && _t0 < 0.0)
-        {
+        if (_data.empty() && _t0 < 0.0) {
             _t0 = timestamp;
         }
 
@@ -93,43 +93,39 @@ public:
 
         int pointCount = std::min(int(Size()), order + 1);
 
-        switch (pointCount)
-        {
+        switch (pointCount) {
             case 0:
                 return CubicPolynomial<DataType>();
                 break;
 
-            case 1:
-            {
+            case 1: {
                 return CubicPolynomial<DataType>::Constant(Data(0));
                 break;
             }
 
-            case 2:
-            {
-                DataType p0   = Data(1);
-                double   absoluteT0    = AbsoluteTimestamp(1);
-                float    t0   = 0;
+            case 2: {
+                DataType p0 = Data(1);
+                double absoluteT0 = AbsoluteTimestamp(1);
+                float t0 = 0;
 
-                DataType p1   = Data(0);
-                float    t1   = absoluteT0 - AbsoluteTimestamp(0);
+                DataType p1 = Data(0);
+                float t1 = absoluteT0 - AbsoluteTimestamp(0);
 
                 return CubicPolynomial<DataType>::LineWithValuesAtTimes(p0, p1, t0, t1);
                 break;
             }
 
             case 3:
-            default:
-            {
-                DataType p0   = Data(2);
-                double   absoluteT0    = AbsoluteTimestamp(2);
-                float    t0   = 0;
+            default: {
+                DataType p0 = Data(2);
+                double absoluteT0 = AbsoluteTimestamp(2);
+                float t0 = 0;
 
-                DataType p1   = Data(1);
-                float    t1   = absoluteT0 - AbsoluteTimestamp(1);
+                DataType p1 = Data(1);
+                float t1 = absoluteT0 - AbsoluteTimestamp(1);
 
-                DataType p2   = Data(0);
-                float    t2   = absoluteT0 - AbsoluteTimestamp(0);
+                DataType p2 = Data(0);
+                float t2 = absoluteT0 - AbsoluteTimestamp(0);
 
                 return CubicPolynomial<DataType>::QuadraticWithValuesAtTimes(p0, p1, p2, t0, t1, t2);
                 break;
@@ -145,23 +141,19 @@ public:
 
         int pointCount = std::min(int(Size()), order + 1);
 
-        switch (pointCount)
-        {
-            case 0:
-            {
+        switch (pointCount) {
+            case 0: {
                 return CubicPolynomial<DataType>();
                 break;
             }
-            case 1:
-            {
+            case 1: {
                 return CubicPolynomial<DataType>::Constant(Data(0));
                 break;
             }
-            case 2:
-            {
+            case 2: {
                 DataType p0 = ReverseData(1);
                 double absoluteT0 = ReverseAbsoluteTimestamp(1);
-                float  t0 = 0;
+                float t0 = 0;
 
                 DataType p1 = ReverseData(0);
                 float t1 = ReverseAbsoluteTimestamp(0) - absoluteT0;
@@ -171,8 +163,7 @@ public:
                 break;
             }
             case 3:
-            default:
-            {
+            default: {
                 DataType p0 = ReverseData(2);
                 double absoluteT0 = ReverseAbsoluteTimestamp(2);
                 float t0 = 0;
@@ -189,7 +180,7 @@ public:
         }
     }
 
-    void AppendWithRelativeTimestamps(std::vector<DataType> const & inData, std::vector<float> const & inTimes)
+    void AppendWithRelativeTimestamps(std::vector<DataType> const &inData, std::vector<float> const &inTimes)
     {
         _data.insert(_data.end(), inData.begin(), inData.end());
         _relativeTimestamp.insert(_relativeTimestamp.end(), inData.begin(), inData.end());
@@ -198,7 +189,7 @@ public:
     // this returns bogus values for the timestamps -- the first appended point
     // will have the same timestamp as the last point on the current stroke.
     // this only makes sense geometrically but sometimes that's all you care about.
-    void Append(Stream const & other)
+    void Append(Stream const &other)
     {
         Append(other, 0);
     }
@@ -206,18 +197,21 @@ public:
     // this one rejiggers the timestamps so the first appended point looks like
     // it arrived at initialDt seconds after the final point currently in this->_data.  typically initialDt
     // is the sampling rate (i.e. unless they stop moving entirely).
-    void Append(Stream const & other, float initialDt)
+    void Append(Stream const &other, float initialDt)
     {
         size_t index = 0;
         float lastRelativeTime = LastRelativeTimestamp();
-        for (size_t j=other.Size(); j--; index++)
-        {
+        for (size_t j = other.Size(); j--; index++) {
             float newRelativeTime = (lastRelativeTime + initialDt) + (other.RelativeTimestamp(index) - other.RelativeTimestamp(0));
             AddPoint(other.Data(index), double(newRelativeTime) + _t0);
         }
     }
 
-    void Clear() { _data.clear(); _relativeTimestamp.clear(); }
+    void Clear()
+    {
+        _data.clear();
+        _relativeTimestamp.clear();
+    }
 
     DataType LastData() const
     {
@@ -228,12 +222,9 @@ public:
     // they return zeros when the _data is empty.
     DataType Data(int idx) const
     {
-        if (_data.empty())
-        {
+        if (_data.empty()) {
             return DataType::Zero();
-        }
-        else
-        {
+        } else {
             return _data[ClampedIndex(idx)];
         }
     }
@@ -250,8 +241,7 @@ public:
 
     DataType ReverseData(int idx) const
     {
-        if (IsEmpty())
-        {
+        if (IsEmpty()) {
             return DataType::Zero();
         }
 
@@ -262,25 +252,21 @@ public:
 
     DataType LastPoint() const
     {
-        if (Size() == 0)
-        {
+        if (Size() == 0) {
             //return DataType(0);
             return DataType::Zero();
-        }
-        else
-        {
-            return _data[Size()-1];
+        } else {
+            return _data[Size() - 1];
         }
     }
 
     Stream Tail(int count) const
     {
-        if (IsEmpty() || count < 1)
-        {
+        if (IsEmpty() || count < 1) {
             return Stream();
         }
 
-        count = std::min(count, (int) Size());
+        count = std::min(count, (int)Size());
 
         return SubStream(Interval(Size() - count, count));
     }
@@ -289,8 +275,7 @@ public:
     {
         Stream subStream;
 
-        if (LastValidIndex() == -1)
-        {
+        if (LastValidIndex() == -1) {
             return subStream;
         }
 
@@ -305,8 +290,7 @@ public:
         // reclock everything so times start at zero and _t0 has the absolute
         // timestamp of the first point
         subStream._t0 = _t0 + double(RelativeTimestamp(a));
-        for (int j=0; j<subStream._relativeTimestamp.size(); j++)
-        {
+        for (int j = 0; j < subStream._relativeTimestamp.size(); j++) {
             subStream._relativeTimestamp[j] -= RelativeTimestamp(a);
         }
 
@@ -319,8 +303,7 @@ public:
     {
         Stream outStream;
 
-        if (LastValidIndex() == -1)
-        {
+        if (LastValidIndex() == -1) {
             return outStream;
         }
 
@@ -336,9 +319,8 @@ public:
         // all the data has been copied.  we now need to offset the timestamps
         // so they are relative to the new first point in outStream.
         float dt = this->AbsoluteTimestamp(0) - t0;
-        for (int j=0; j<this->Size(); j++)
-        {
-            outStream._relativeTimestamp[j+1] += dt;
+        for (int j = 0; j < this->Size(); j++) {
+            outStream._relativeTimestamp[j + 1] += dt;
         }
 
         return outStream;
@@ -351,12 +333,9 @@ public:
 
     double AbsoluteTimestamp(int idx) const
     {
-        if (idx == LastValidIndex())
-        {
+        if (idx == LastValidIndex()) {
             return _mostRecentTimestamp;
-        }
-        else
-        {
+        } else {
             return _t0 + double(RelativeTimestamp(idx));
         }
     }
@@ -369,29 +348,23 @@ public:
 
     float RelativeTimestamp(int idx) const
     {
-        if (Size() == 0)
-        {
+        if (Size() == 0) {
             return 0;
-        }
-        else
-        {
+        } else {
             return _relativeTimestamp[ClampedIndex(idx)];
         }
     }
 
     float LastRelativeTimestamp() const
     {
-        if (Size() == 0)
-        {
+        if (Size() == 0) {
             return 0;
-        }
-        else
-        {
-            return RelativeTimestamp((int)Size()-1);
+        } else {
+            return RelativeTimestamp((int)Size() - 1);
         }
     }
 
-    size_t Size()    const { return _data.size(); }
+    size_t Size() const { return _data.size(); }
     bool IsEmpty() const { return _data.empty(); }
 };
 }

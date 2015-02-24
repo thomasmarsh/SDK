@@ -37,8 +37,7 @@
 - (id)initWithPeripheral:(CBPeripheral *)peripheral
 {
     self = [super init];
-    if (self)
-    {
+    if (self) {
         _peripheral = peripheral;
     }
     return self;
@@ -95,14 +94,9 @@
 
 - (NSArray *)ensureServicesForConnectionState:(BOOL)isConnected;
 {
-    if (isConnected)
-    {
-        return (self.deviceInfoService ?
-                nil :
-                @[[FTDeviceInfoServiceUUIDs deviceInfoService]]);
-    }
-    else
-    {
+    if (isConnected) {
+        return (self.deviceInfoService ? nil : @[ [FTDeviceInfoServiceUUIDs deviceInfoService] ]);
+    } else {
         self.deviceInfoService = nil;
 
         return nil;
@@ -113,23 +107,22 @@
 
 - (void)peripheral:(CBPeripheral *)peripheral didDiscoverServices:(NSError *)error
 {
-    if (!self.deviceInfoService)
-    {
+    if (!self.deviceInfoService) {
         self.deviceInfoService = [FTServiceClient findServiceWithPeripheral:peripheral
                                                                     andUUID:[FTDeviceInfoServiceUUIDs deviceInfoService]];
 
-        if (self.deviceInfoService)
-        {
-            NSArray* characteristics = @[
-                                         [FTDeviceInfoServiceUUIDs softwareRevision],
-                                         [FTDeviceInfoServiceUUIDs firmwareRevision],
-                                         [FTDeviceInfoServiceUUIDs serialNumber],
-                                         [FTDeviceInfoServiceUUIDs modelNumber],
-                                         [FTDeviceInfoServiceUUIDs manufacturerName],
-                                         [FTDeviceInfoServiceUUIDs hardwareRevision],
-                                         [FTDeviceInfoServiceUUIDs systemID],
-                                         [FTDeviceInfoServiceUUIDs IEEECertificationData],
-                                         [FTDeviceInfoServiceUUIDs PnPID]];
+        if (self.deviceInfoService) {
+            NSArray *characteristics = @[
+                [FTDeviceInfoServiceUUIDs softwareRevision],
+                [FTDeviceInfoServiceUUIDs firmwareRevision],
+                [FTDeviceInfoServiceUUIDs serialNumber],
+                [FTDeviceInfoServiceUUIDs modelNumber],
+                [FTDeviceInfoServiceUUIDs manufacturerName],
+                [FTDeviceInfoServiceUUIDs hardwareRevision],
+                [FTDeviceInfoServiceUUIDs systemID],
+                [FTDeviceInfoServiceUUIDs IEEECertificationData],
+                [FTDeviceInfoServiceUUIDs PnPID]
+            ];
 
             [peripheral discoverCharacteristics:characteristics forService:self.deviceInfoService];
         }
@@ -137,66 +130,47 @@
 }
 
 - (void)peripheral:(CBPeripheral *)peripheral didDiscoverCharacteristicsForService:(CBService *)service
-             error:(NSError *)error
+                                   error:(NSError *)error
 {
-    if (service != self.deviceInfoService)
-    {
+    if (service != self.deviceInfoService) {
         return;
     }
 
-    for (CBCharacteristic *characteristic in service.characteristics)
-    {
+    for (CBCharacteristic *characteristic in service.characteristics) {
         if (!self.manufacturerNameCharacteristic &&
-            [characteristic.UUID isEqual:[FTDeviceInfoServiceUUIDs manufacturerName]])
-        {
+            [characteristic.UUID isEqual:[FTDeviceInfoServiceUUIDs manufacturerName]]) {
             self.manufacturerNameCharacteristic = characteristic;
             [peripheral readValueForCharacteristic:characteristic];
-        }
-        else if (!self.modelNumberCharateristic &&
-                 [characteristic.UUID isEqual:[FTDeviceInfoServiceUUIDs modelNumber]])
-        {
+        } else if (!self.modelNumberCharateristic &&
+                   [characteristic.UUID isEqual:[FTDeviceInfoServiceUUIDs modelNumber]]) {
             self.modelNumberCharateristic = characteristic;
             [peripheral readValueForCharacteristic:characteristic];
-        }
-        else if (!self.serialNumberCharateristic &&
-                 [characteristic.UUID isEqual:[FTDeviceInfoServiceUUIDs serialNumber]])
-        {
+        } else if (!self.serialNumberCharateristic &&
+                   [characteristic.UUID isEqual:[FTDeviceInfoServiceUUIDs serialNumber]]) {
             self.serialNumberCharateristic = characteristic;
             [peripheral readValueForCharacteristic:characteristic];
-        }
-        else if (!self.firmwareRevisionCharateristic &&
-                 [characteristic.UUID isEqual:[FTDeviceInfoServiceUUIDs firmwareRevision]])
-        {
+        } else if (!self.firmwareRevisionCharateristic &&
+                   [characteristic.UUID isEqual:[FTDeviceInfoServiceUUIDs firmwareRevision]]) {
             self.firmwareRevisionCharateristic = characteristic;
             [peripheral readValueForCharacteristic:characteristic];
-        }
-        else if (!self.hardwareRevisionCharateristic &&
-                 [characteristic.UUID isEqual:[FTDeviceInfoServiceUUIDs hardwareRevision]])
-        {
+        } else if (!self.hardwareRevisionCharateristic &&
+                   [characteristic.UUID isEqual:[FTDeviceInfoServiceUUIDs hardwareRevision]]) {
             self.hardwareRevisionCharateristic = characteristic;
             [peripheral readValueForCharacteristic:characteristic];
-        }
-        else if (!self.softwareRevisionCharateristic &&
-                 [characteristic.UUID isEqual:[FTDeviceInfoServiceUUIDs softwareRevision]])
-        {
+        } else if (!self.softwareRevisionCharateristic &&
+                   [characteristic.UUID isEqual:[FTDeviceInfoServiceUUIDs softwareRevision]]) {
             self.softwareRevisionCharateristic = characteristic;
             [peripheral readValueForCharacteristic:characteristic];
-        }
-        else if (!self.systemIDCharateristic &&
-                 [characteristic.UUID isEqual:[FTDeviceInfoServiceUUIDs systemID]])
-        {
+        } else if (!self.systemIDCharateristic &&
+                   [characteristic.UUID isEqual:[FTDeviceInfoServiceUUIDs systemID]]) {
             self.systemIDCharateristic = characteristic;
             [peripheral readValueForCharacteristic:characteristic];
-        }
-        else if (!self.IEEECertificationDataCharateristic &&
-                 [characteristic.UUID isEqual:[FTDeviceInfoServiceUUIDs IEEECertificationData]])
-        {
+        } else if (!self.IEEECertificationDataCharateristic &&
+                   [characteristic.UUID isEqual:[FTDeviceInfoServiceUUIDs IEEECertificationData]]) {
             self.IEEECertificationDataCharateristic = characteristic;
             [peripheral readValueForCharacteristic:characteristic];
-        }
-        else if (!self.PnPIDCharateristic &&
-                 [characteristic.UUID isEqual:[FTDeviceInfoServiceUUIDs PnPID]])
-        {
+        } else if (!self.PnPIDCharateristic &&
+                   [characteristic.UUID isEqual:[FTDeviceInfoServiceUUIDs PnPID]]) {
             self.PnPIDCharateristic = characteristic;
             [peripheral readValueForCharacteristic:characteristic];
         }
@@ -204,15 +178,11 @@
 }
 
 - (void)peripheral:(CBPeripheral *)peripheral didUpdateValueForCharacteristic:(CBCharacteristic *)characteristic
-             error:(NSError *)error
+                              error:(NSError *)error
 {
-    if (error)
-    {
-        if ([FTDeviceInfoServiceUUIDs nameForUUID:characteristic.UUID])
-        {
-            MLOG_ERROR(FTLogSDK, "Error updating value for characteristic: %s error: %s.",
-                       ObjcDescription([FTPenServiceUUIDs nameForUUID:characteristic.UUID]),
-                       ObjcDescription(error.localizedDescription));
+    if (error) {
+        if ([FTDeviceInfoServiceUUIDs nameForUUID:characteristic.UUID]) {
+            MLOG_ERROR(FTLogSDK, "Error updating value for characteristic: %s error: %s.", ObjcDescription([FTPenServiceUUIDs nameForUUID:characteristic.UUID]), ObjcDescription(error.localizedDescription));
             // TODO: Report failed state
         }
         return;
@@ -221,63 +191,45 @@
     BOOL updatedCharacteristic = NO;
     NSMutableSet *updatedProperties = [NSMutableSet set];
 
-    if ([characteristic isEqual:self.manufacturerNameCharacteristic])
-    {
+    if ([characteristic isEqual:self.manufacturerNameCharacteristic]) {
         self.manufacturerName = [characteristic valueAsNSString];
         updatedCharacteristic = YES;
         [updatedProperties addObject:kFTPenManufacturerNamePropertyName];
-    }
-    else if ([characteristic isEqual:self.modelNumberCharateristic])
-    {
+    } else if ([characteristic isEqual:self.modelNumberCharateristic]) {
         self.modelNumber = [characteristic valueAsNSString];
         updatedCharacteristic = YES;
         [updatedProperties addObject:kFTPenModelNumberPropertyName];
-    }
-    else if ([characteristic isEqual:self.serialNumberCharateristic])
-    {
+    } else if ([characteristic isEqual:self.serialNumberCharateristic]) {
         self.serialNumber = [characteristic valueAsNSString];
         updatedCharacteristic = YES;
         [updatedProperties addObject:kFTPenSerialNumberPropertyName];
-    }
-    else if ([characteristic isEqual:self.firmwareRevisionCharateristic])
-    {
+    } else if ([characteristic isEqual:self.firmwareRevisionCharateristic]) {
         self.firmwareRevision = [characteristic valueAsNSString];
         updatedCharacteristic = YES;
         [updatedProperties addObject:kFTPenFirmwareRevisionPropertyName];
-    }
-    else if ([characteristic isEqual:self.hardwareRevisionCharateristic])
-    {
+    } else if ([characteristic isEqual:self.hardwareRevisionCharateristic]) {
         self.hardwareRevisionCharateristic = characteristic;
         self.hardwareRevision = [characteristic valueAsNSString];
         updatedCharacteristic = YES;
         [updatedProperties addObject:kFTPenHardwareRevisionPropertyName];
-    }
-    else if ([characteristic isEqual:self.softwareRevisionCharateristic])
-    {
+    } else if ([characteristic isEqual:self.softwareRevisionCharateristic]) {
         self.softwareRevisionCharateristic = characteristic;
         self.softwareRevision = [characteristic valueAsNSString];
         updatedCharacteristic = YES;
         [updatedProperties addObject:kFTPenSoftwareRevisionPropertyName];
-    }
-    else if ([characteristic isEqual:self.systemIDCharateristic])
-    {
+    } else if ([characteristic isEqual:self.systemIDCharateristic]) {
         self.systemID = [characteristic valueAsNSString];
         updatedCharacteristic = YES;
         [updatedProperties addObject:kFTPenSystemIDPropertyName];
-    }
-    else if ([characteristic isEqual:self.IEEECertificationDataCharateristic])
-    {
+    } else if ([characteristic isEqual:self.IEEECertificationDataCharateristic]) {
         self.IEEECertificationData = characteristic.value;
         updatedCharacteristic = YES;
         [updatedProperties addObject:kFTPenIEEECertificationDataPropertyName];
-    }
-    else if ([characteristic isEqual:self.IEEECertificationDataCharateristic])
-    {
-        if (characteristic.value.length != 7)
-        {
+    } else if ([characteristic isEqual:self.IEEECertificationDataCharateristic]) {
+        if (characteristic.value.length != 7) {
             return;
         }
-        char* bytes = (char *)characteristic.value.bytes;
+        char *bytes = (char *)characteristic.value.bytes;
 
         PnPID pnpID;
         pnpID.vendorIdSource = bytes[0];
@@ -290,8 +242,7 @@
         [updatedProperties addObject:kFTPenPnPIDCertificationDataPropertyName];
     }
 
-    if (updatedCharacteristic)
-    {
+    if (updatedCharacteristic) {
         [self.delegate deviceInfoServiceClientDidUpdateDeviceInfo:self
                                                 updatedProperties:updatedProperties];
     }
@@ -301,13 +252,11 @@
 
 - (void)refreshModelNumberAndSerialNumber
 {
-    if (self.modelNumberCharateristic)
-    {
+    if (self.modelNumberCharateristic) {
         [self.peripheral readValueForCharacteristic:self.modelNumberCharateristic];
     }
 
-    if (self.serialNumberCharateristic)
-    {
+    if (self.serialNumberCharateristic) {
         [self.peripheral readValueForCharacteristic:self.serialNumberCharateristic];
     }
 }
@@ -317,13 +266,11 @@
     self.firmwareRevision = nil;
     self.softwareRevision = nil;
 
-    if (self.firmwareRevisionCharateristic)
-    {
+    if (self.firmwareRevisionCharateristic) {
         [self.peripheral readValueForCharacteristic:self.firmwareRevisionCharateristic];
     }
 
-    if (self.softwareRevisionCharateristic)
-    {
+    if (self.softwareRevisionCharateristic) {
         [self.peripheral readValueForCharacteristic:self.softwareRevisionCharateristic];
     }
 }

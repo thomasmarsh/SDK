@@ -47,7 +47,7 @@
 
 @end
 
-@interface FTDeviceInfoServiceUUIDs :NSObject
+@interface FTDeviceInfoServiceUUIDs : NSObject
 
 + (CBUUID *)deviceInfoService;
 + (CBUUID *)manufacturerName;
@@ -70,7 +70,7 @@
 extern "C" {
 #endif
 
-    NSString *FTNameForServiceUUID(CBUUID *UUID);
+NSString *FTNameForServiceUUID(CBUUID *UUID);
 
 #ifdef __cplusplus
 }

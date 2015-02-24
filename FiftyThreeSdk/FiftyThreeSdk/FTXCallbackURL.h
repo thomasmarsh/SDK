@@ -10,8 +10,7 @@
 #import <Foundation/Foundation.h>
 
 // Internal helper for parsing x-callback-urls.
-@interface FTXCallbackURL : NSURL
-{
+@interface FTXCallbackURL : NSURL {
 }
 // Create a XCallbackUrl with named parameters. This sets up query parameters & url encodes the bits.
 + (FTXCallbackURL *)URLWithScheme:(NSString *)scheme

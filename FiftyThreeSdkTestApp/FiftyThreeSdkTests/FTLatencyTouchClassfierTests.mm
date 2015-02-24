@@ -36,17 +36,17 @@ using std::string;
 - (void)processStrokeDataFile:(NSString *)filename
 {
     NSArray *pathComponents = [filename componentsSeparatedByString:@"."];
-    NSString* path = [[NSBundle bundleForClass:[self class]] pathForResource:pathComponents[0] ofType:pathComponents[1]];
+    NSString *path = [[NSBundle bundleForClass:[self class]] pathForResource:pathComponents[0] ofType:pathComponents[1]];
     NSFileHandle *file = [NSFileHandle fileHandleForReadingAtPath:path];
     NSData *data = nil;
     do {
         data = [file readLineWithDelimiter:@"\n"];
         NSString *stringData = [[NSString alloc] initWithBytes:[data bytes]
-                                  length:[data length] encoding: NSUTF8StringEncoding];
+                                                        length:[data length]
+                                                      encoding:NSUTF8StringEncoding];
 
         NSArray *components = [stringData componentsSeparatedByString:@"="];
-        if ([components count] != 2)
-        {
+        if ([components count] != 2) {
             continue;
             //STAssertTrue(false, @"invalid data");
         }
@@ -55,22 +55,17 @@ using std::string;
         NSString *eventData = components[1];
         eventData = [eventData stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
 
-        if ([prefix isEqualToString:@"touch"])
-        {
+        if ([prefix isEqualToString:@"touch"]) {
             Touch::cPtr touch = Touch::FromString(std::string([eventData cStringUsingEncoding:NSUTF8StringEncoding]));
 
             TouchesSet touchesSet;
             touchesSet.insert(touch);
             _Classifier->TouchesBegan(touchesSet);
-        }
-        else if ([prefix isEqualToString:@"pen"])
-        {
+        } else if ([prefix isEqualToString:@"pen"]) {
             PenEvent::Ptr penEvent = PenEvent::FromString(std::string([eventData cStringUsingEncoding:NSUTF8StringEncoding]));
 
             _Classifier->ProcessPenEvent(*penEvent);
-        }
-        else if ([prefix isEqualToString:@"strokestate"])
-        {
+        } else if ([prefix isEqualToString:@"strokestate"]) {
             // TODO - check final states against classifier output
         }
     } while (data);

@@ -42,12 +42,9 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    if (section == 0)
-    {
+    if (section == 0) {
         return 6;
-    }
-    else
-    {
+    } else {
         return 0;
     }
 }
@@ -55,50 +52,41 @@
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     static NSString *CellIdentifier = @"TextCellForSettings";
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier ];
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
 
     // Note any property on FTPenInformation may be nil, you need to deal with that case
     // gracefully.
 
-    if (cell == nil)
-    {
+    if (cell == nil) {
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
     }
 
-    if (!self.info)
-    {
+    if (!self.info) {
         return cell;
     }
-    switch (indexPath.row)
-    {
-        case 0:
-        {
+    switch (indexPath.row) {
+        case 0: {
             cell.textLabel.text = [NSString stringWithFormat:@"Name:%@", self.info.name];
             break;
         }
-        case 1:
-        {
+        case 1: {
             cell.textLabel.text = [NSString stringWithFormat:@"Manufacturer:%@", self.info.manufacturerName];
             break;
         }
-        case 2:
-        {
+        case 2: {
             cell.textLabel.text = [NSString stringWithFormat:@"Battery:%ld", (long)self.info.batteryLevel];
             break;
         }
-        case 3:
-        {
+        case 3: {
             cell.textLabel.text = [NSString stringWithFormat:@"Firmware:%@", self.info.firmwareRevision];
             break;
         }
-        case 4:
-        {
-            cell.textLabel.text = [NSString stringWithFormat:@"Tip:%@", self.info.isTipPressed?@"YES":@"NO"];
+        case 4: {
+            cell.textLabel.text = [NSString stringWithFormat:@"Tip:%@", self.info.isTipPressed ? @"YES" : @"NO"];
             break;
         }
-        case 5:
-        {
-            cell.textLabel.text = [NSString stringWithFormat:@"Eraser:%@", self.info.isEraserPressed?@"YES":@"NO"];
+        case 5: {
+            cell.textLabel.text = [NSString stringWithFormat:@"Eraser:%@", self.info.isEraserPressed ? @"YES" : @"NO"];
             break;
         }
     }

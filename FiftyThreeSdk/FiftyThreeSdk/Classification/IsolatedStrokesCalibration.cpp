@@ -901,4 +901,3 @@ void IsolatedStrokesClassifier::InitializeLikelihoods() {
 //
 
 // clang-format on
-

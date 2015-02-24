@@ -36,8 +36,7 @@ using namespace fiftythree::core;
 - (id)initWithPeripheral:(CBPeripheral *)peripheral
 {
     self = [super init];
-    if (self)
-    {
+    if (self) {
         _peripheral = peripheral;
     }
     return self;
@@ -57,8 +56,7 @@ using namespace fiftythree::core;
 
 - (void)readValueForCharacteristic:(CBCharacteristic *)characteristic
 {
-    if (characteristic)
-    {
+    if (characteristic) {
         [self.peripheral readValueForCharacteristic:characteristic];
     }
 }
@@ -67,14 +65,9 @@ using namespace fiftythree::core;
 
 - (NSArray *)ensureServicesForConnectionState:(BOOL)isConnected;
 {
-    if (isConnected)
-    {
-        return (self.penUsageService ?
-                nil :
-                @[[FTPenUsageServiceUUIDs penUsageService]]);
-    }
-    else
-    {
+    if (isConnected) {
+        return (self.penUsageService ? nil : @[ [FTPenUsageServiceUUIDs penUsageService] ]);
+    } else {
         self.penUsageService = nil;
         self.numTipPressesCharacteristic = nil;
         self.numFailedConnectionsCharacteristic = nil;
@@ -92,30 +85,25 @@ using namespace fiftythree::core;
 
 - (void)peripheral:(CBPeripheral *)peripheral didDiscoverServices:(NSError *)error
 {
-    if (error)
-    {
-        MLOG_ERROR(FTLogSDK, "Error discovering services: %s",
-                   ObjcDescription(error.localizedDescription));
+    if (error) {
+        MLOG_ERROR(FTLogSDK, "Error discovering services: %s", ObjcDescription(error.localizedDescription));
 
         // TODO: Report failed state
         return;
     }
 
-    if (!self.penUsageService)
-    {
+    if (!self.penUsageService) {
         self.penUsageService = [FTServiceClient findServiceWithPeripheral:peripheral
                                                                   andUUID:[FTPenUsageServiceUUIDs penUsageService]];
-        if (self.penUsageService)
-        {
-            NSArray *characteristics = @[[FTPenUsageServiceUUIDs numTipPresses],
-                                         [FTPenUsageServiceUUIDs numEraserPresses],
-                                         [FTPenUsageServiceUUIDs numFailedConnections],
-                                         [FTPenUsageServiceUUIDs numSuccessfulConnections],
-                                         [FTPenUsageServiceUUIDs numResets],
-                                         [FTPenUsageServiceUUIDs numLinkTerminations],
-                                         [FTPenUsageServiceUUIDs numDroppedNotifications],
-                                         [FTPenUsageServiceUUIDs connectedSeconds]
-                                         ];
+        if (self.penUsageService) {
+            NSArray *characteristics = @[ [FTPenUsageServiceUUIDs numTipPresses],
+                                          [FTPenUsageServiceUUIDs numEraserPresses],
+                                          [FTPenUsageServiceUUIDs numFailedConnections],
+                                          [FTPenUsageServiceUUIDs numSuccessfulConnections],
+                                          [FTPenUsageServiceUUIDs numResets],
+                                          [FTPenUsageServiceUUIDs numLinkTerminations],
+                                          [FTPenUsageServiceUUIDs numDroppedNotifications],
+                                          [FTPenUsageServiceUUIDs connectedSeconds] ];
 
             [peripheral discoverCharacteristics:characteristics forService:self.penUsageService];
         }
@@ -123,69 +111,50 @@ using namespace fiftythree::core;
 }
 
 - (void)peripheral:(CBPeripheral *)peripheral didDiscoverCharacteristicsForService:(CBService *)service
-             error:(NSError *)error
+                                   error:(NSError *)error
 {
-    if (error || service.characteristics.count == 0)
-    {
-        MLOG_ERROR(FTLogSDK, "Error discovering characteristics: %s",
-                   ObjcDescription(error.localizedDescription));
+    if (error || service.characteristics.count == 0) {
+        MLOG_ERROR(FTLogSDK, "Error discovering characteristics: %s", ObjcDescription(error.localizedDescription));
 
         // TODO: Report failed state
         return;
     }
 
-    if (service != self.penUsageService)
-    {
+    if (service != self.penUsageService) {
         return;
     }
 
-    for (CBCharacteristic *characteristic in service.characteristics)
-    {
+    for (CBCharacteristic *characteristic in service.characteristics) {
         if (!self.numTipPressesCharacteristic &&
-            [characteristic.UUID isEqual:[FTPenUsageServiceUUIDs numTipPresses]])
-        {
+            [characteristic.UUID isEqual:[FTPenUsageServiceUUIDs numTipPresses]]) {
             self.numTipPressesCharacteristic = characteristic;
             [self.peripheral readValueForCharacteristic:characteristic];
-        }
-        else if (!self.numEraserPressesCharacteristic &&
-                 [characteristic.UUID isEqual:[FTPenUsageServiceUUIDs numEraserPresses]])
-        {
+        } else if (!self.numEraserPressesCharacteristic &&
+                   [characteristic.UUID isEqual:[FTPenUsageServiceUUIDs numEraserPresses]]) {
             self.numEraserPressesCharacteristic = characteristic;
             [self.peripheral readValueForCharacteristic:characteristic];
-        }
-        else if (!self.numFailedConnectionsCharacteristic &&
-                 [characteristic.UUID isEqual:[FTPenUsageServiceUUIDs numFailedConnections]])
-        {
+        } else if (!self.numFailedConnectionsCharacteristic &&
+                   [characteristic.UUID isEqual:[FTPenUsageServiceUUIDs numFailedConnections]]) {
             self.numFailedConnectionsCharacteristic = characteristic;
             [self.peripheral readValueForCharacteristic:characteristic];
-        }
-        else if (!self.numSuccessfulConnectionsCharacteristic &&
-                 [characteristic.UUID isEqual:[FTPenUsageServiceUUIDs numSuccessfulConnections]])
-        {
+        } else if (!self.numSuccessfulConnectionsCharacteristic &&
+                   [characteristic.UUID isEqual:[FTPenUsageServiceUUIDs numSuccessfulConnections]]) {
             self.numSuccessfulConnectionsCharacteristic = characteristic;
             [self.peripheral readValueForCharacteristic:characteristic];
-        }
-        else if (!self.numResetsCharacteristic &&
-                 [characteristic.UUID isEqual:[FTPenUsageServiceUUIDs numResets]])
-        {
+        } else if (!self.numResetsCharacteristic &&
+                   [characteristic.UUID isEqual:[FTPenUsageServiceUUIDs numResets]]) {
             self.numResetsCharacteristic = characteristic;
             [self.peripheral readValueForCharacteristic:characteristic];
-        }
-        else if (!self.numLinkTerminationsCharacteristic &&
-                 [characteristic.UUID isEqual:[FTPenUsageServiceUUIDs numLinkTerminations]])
-        {
+        } else if (!self.numLinkTerminationsCharacteristic &&
+                   [characteristic.UUID isEqual:[FTPenUsageServiceUUIDs numLinkTerminations]]) {
             self.numLinkTerminationsCharacteristic = characteristic;
             [self.peripheral readValueForCharacteristic:characteristic];
-        }
-        else if (!self.numDroppedNotificationsCharacteristic &&
-                 [characteristic.UUID isEqual:[FTPenUsageServiceUUIDs numDroppedNotifications]])
-        {
+        } else if (!self.numDroppedNotificationsCharacteristic &&
+                   [characteristic.UUID isEqual:[FTPenUsageServiceUUIDs numDroppedNotifications]]) {
             self.numDroppedNotificationsCharacteristic = characteristic;
             [self.peripheral readValueForCharacteristic:characteristic];
-        }
-        else if (!self.connectedSecondsCharacteristic &&
-                 [characteristic.UUID isEqual:[FTPenUsageServiceUUIDs connectedSeconds]])
-        {
+        } else if (!self.connectedSecondsCharacteristic &&
+                   [characteristic.UUID isEqual:[FTPenUsageServiceUUIDs connectedSeconds]]) {
             self.connectedSecondsCharacteristic = characteristic;
             [self.peripheral readValueForCharacteristic:characteristic];
         }
@@ -193,15 +162,11 @@ using namespace fiftythree::core;
 }
 
 - (void)peripheral:(CBPeripheral *)peripheral didUpdateValueForCharacteristic:(CBCharacteristic *)characteristic
-             error:(NSError *)error
+                              error:(NSError *)error
 {
-    if (error)
-    {
-        if ([FTPenUsageServiceUUIDs nameForUUID:characteristic.UUID])
-        {
-            MLOG_ERROR(FTLogSDK, "Error updating value for characteristic: %s error: %s.",
-                       ObjcDescription([FTPenServiceUUIDs nameForUUID:characteristic.UUID]),
-                       ObjcDescription(error.localizedDescription));
+    if (error) {
+        if ([FTPenUsageServiceUUIDs nameForUUID:characteristic.UUID]) {
+            MLOG_ERROR(FTLogSDK, "Error updating value for characteristic: %s error: %s.", ObjcDescription([FTPenServiceUUIDs nameForUUID:characteristic.UUID]), ObjcDescription(error.localizedDescription));
 
             // TODO: Report failed state
         }
@@ -210,58 +175,41 @@ using namespace fiftythree::core;
 
     NSMutableSet *updatedProperties = [NSMutableSet set];
 
-    if ([characteristic.UUID isEqual:[FTPenUsageServiceUUIDs numTipPresses]])
-    {
+    if ([characteristic.UUID isEqual:[FTPenUsageServiceUUIDs numTipPresses]]) {
         _numTipPresses = [characteristic valueAsNSUInteger];
         [updatedProperties addObject:kFTPenNumTipPressesPropertyName];
-    }
-    else if ([characteristic.UUID isEqual:[FTPenUsageServiceUUIDs numEraserPresses]])
-    {
+    } else if ([characteristic.UUID isEqual:[FTPenUsageServiceUUIDs numEraserPresses]]) {
         _numEraserPresses = [characteristic valueAsNSUInteger];
         [updatedProperties addObject:kFTPenNumEraserPressesPropertyName];
-    }
-    else if ([characteristic.UUID isEqual:[FTPenUsageServiceUUIDs numFailedConnections]])
-    {
+    } else if ([characteristic.UUID isEqual:[FTPenUsageServiceUUIDs numFailedConnections]]) {
         _numFailedConnections = [characteristic valueAsNSUInteger];
         [updatedProperties addObject:kFTPenNumFailedConnectionsPropertyName];
-    }
-    else if ([characteristic.UUID isEqual:[FTPenUsageServiceUUIDs numSuccessfulConnections]])
-    {
+    } else if ([characteristic.UUID isEqual:[FTPenUsageServiceUUIDs numSuccessfulConnections]]) {
         _numSuccessfulConnections = [characteristic valueAsNSUInteger];
         [updatedProperties addObject:kFTPenNumSuccessfulConnectionsPropertyName];
-    }
-    else if ([characteristic.UUID isEqual:[FTPenUsageServiceUUIDs numResets]])
-    {
+    } else if ([characteristic.UUID isEqual:[FTPenUsageServiceUUIDs numResets]]) {
         _numResets = [characteristic valueAsNSUInteger];
         [updatedProperties addObject:kFTPenNumResetsPropertyName];
-    }
-    else if ([characteristic.UUID isEqual:[FTPenUsageServiceUUIDs numLinkTerminations]])
-    {
+    } else if ([characteristic.UUID isEqual:[FTPenUsageServiceUUIDs numLinkTerminations]]) {
         _numLinkTerminations = [characteristic valueAsNSUInteger];
         [updatedProperties addObject:kFTPenNumLinkTerminationsPropertyName];
-    }
-    else if ([characteristic.UUID isEqual:[FTPenUsageServiceUUIDs numDroppedNotifications]])
-    {
+    } else if ([characteristic.UUID isEqual:[FTPenUsageServiceUUIDs numDroppedNotifications]]) {
         _numDroppedNotifications = [characteristic valueAsNSUInteger];
         [updatedProperties addObject:kFTPenNumDroppedNotificationsPropertyName];
-    }
-    else if ([characteristic.UUID isEqual:[FTPenUsageServiceUUIDs connectedSeconds]])
-    {
+    } else if ([characteristic.UUID isEqual:[FTPenUsageServiceUUIDs connectedSeconds]]) {
         _connectedSeconds = [characteristic valueAsNSUInteger];
         [updatedProperties addObject:kFTPenConnectedSecondsPropertyName];
     }
 
-    if (updatedProperties.count > 0)
-    {
+    if (updatedProperties.count > 0) {
         [self.delegate didUpdateUsageProperties:updatedProperties];
     }
 }
 
 - (void)peripheral:(CBPeripheral *)peripheral didUpdateNotificationStateForCharacteristic:(CBCharacteristic *)characteristic
-             error:(NSError *)error
+                                          error:(NSError *)error
 {
-    if (error)
-    {
+    if (error) {
         MLOG_ERROR(FTLogSDK, "Error changing notification state: %s.", ObjcDescription(error.localizedDescription));
 
         // TODO: Report failed state

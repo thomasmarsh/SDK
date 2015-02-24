@@ -2,7 +2,7 @@
 //  TrivialBlit.fsh
 //  TestApp
 //
-//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
+//  Copyright (c) 2015 FiftyThree, Inc. All rights reserved.
 //
 
 uniform sampler2D texture;

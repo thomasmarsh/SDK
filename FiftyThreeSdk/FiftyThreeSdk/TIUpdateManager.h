@@ -9,8 +9,7 @@
 
 #import <Foundation/Foundation.h>
 
-typedef NS_ENUM(NSInteger, TIUpdateManagerState)
-{
+typedef NS_ENUM(NSInteger, TIUpdateManagerState) {
     TIUpdateManagerStateNotStarted,
     TIUpdateManagerStateInProgress,
     TIUpdateManagerStateFailed,

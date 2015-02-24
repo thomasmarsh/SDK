@@ -18,7 +18,7 @@
 @property (nonatomic, readwrite) FTTouchClassification newValue;
 @end
 
-@implementation  FTTouchClassificationInfo
+@implementation FTTouchClassificationInfo
 @end
 
 using namespace fiftythree::core;
@@ -26,8 +26,8 @@ using namespace fiftythree::sdk;
 using std::vector;
 
 @interface FTTouchClassifier ()
-@property (nonatomic) EventToObjCAdapter<const vector<TouchClassificationChangedEventArgs> & >::Ptr touchClassificationsDidChangeAdapter;
-@property (nonatomic) EventToObjCAdapter<const vector<TouchClassificationChangedEventArgs> & >::Ptr touchContinuedClassificationsDidChangeAdapter;
+@property (nonatomic) EventToObjCAdapter<const vector<TouchClassificationChangedEventArgs> &>::Ptr touchClassificationsDidChangeAdapter;
+@property (nonatomic) EventToObjCAdapter<const vector<TouchClassificationChangedEventArgs> &>::Ptr touchContinuedClassificationsDidChangeAdapter;
 @end
 
 using namespace fiftythree::core;
@@ -36,19 +36,17 @@ using namespace fiftythree::sdk;
 
 - (id)init
 {
-    if (self = [super init])
-    {
+    if (self = [super init]) {
         TouchClassifier::Ptr classifier = ActiveClassifier::Instance();
 
-        if (classifier)
-        {
-            self.touchClassificationsDidChangeAdapter = EventToObjCAdapter<const std::vector<TouchClassificationChangedEventArgs> & >::Bind(classifier->TouchClassificationsDidChange(),
-                                                                                                                                        self,
-                                                                                                                                        @selector(touchClassificationsDidChange:));
+        if (classifier) {
+            self.touchClassificationsDidChangeAdapter = EventToObjCAdapter<const std::vector<TouchClassificationChangedEventArgs> &>::Bind(classifier->TouchClassificationsDidChange(),
+                                                                                                                                           self,
+                                                                                                                                           @selector(touchClassificationsDidChange:));
 
-            self.touchClassificationsDidChangeAdapter = EventToObjCAdapter<const std::vector<TouchClassificationChangedEventArgs> & >::Bind(classifier->TouchContinuedClassificationsDidChange(),
-                                                                                                                                            self,
-                                                                                                                                            @selector(touchClassificationsDidChange:));
+            self.touchClassificationsDidChangeAdapter = EventToObjCAdapter<const std::vector<TouchClassificationChangedEventArgs> &>::Bind(classifier->TouchContinuedClassificationsDidChange(),
+                                                                                                                                           self,
+                                                                                                                                           @selector(touchClassificationsDidChange:));
         }
 
         return self;
@@ -61,43 +59,28 @@ using namespace fiftythree::sdk;
 }
 + (FTTouchClassification)classification:(const fiftythree::core::TouchClassification &)c
 {
-    switch (c)
-    {
-        case TouchClassification::UnknownDisconnected:
-        {
+    switch (c) {
+        case TouchClassification::UnknownDisconnected: {
             return FTTouchClassificationUnknownDisconnected;
-        }
-        break;
-        case TouchClassification::Unknown:
-        {
+        } break;
+        case TouchClassification::Unknown: {
             return FTTouchClassificationUnknown;
-        }
-        break;
-        case TouchClassification::Finger:
-        {
+        } break;
+        case TouchClassification::Finger: {
             return FTTouchClassificationFinger;
-        }
-        break;
-        case TouchClassification::Palm:
-        {
+        } break;
+        case TouchClassification::Palm: {
             return FTTouchClassificationPalm;
-        }
-        break;
-        case TouchClassification::Pen:
-        {
+        } break;
+        case TouchClassification::Pen: {
             return FTTouchClassificationPen;
-        }
-        break;
-        case TouchClassification::Eraser:
-        {
+        } break;
+        case TouchClassification::Eraser: {
             return FTTouchClassificationEraser;
-        }
-        break;
-        default:
-        {
+        } break;
+        default: {
             return FTTouchClassificationUnknownDisconnected;
-        }
-        break;
+        } break;
     }
     return FTTouchClassificationUnknownDisconnected;
 }
@@ -105,43 +88,36 @@ using namespace fiftythree::sdk;
 + (BOOL)shouldReportClassificationChange:(const TouchClassificationChangedEventArgs &)change
 {
     return !(change.oldValue != TouchClassification::UnknownDisconnected &&
-             change.newValue == TouchClassification::UnknownDisconnected)
-    && change.newValue != TouchClassification::RemovedFromClassification &&
-    change.newValue != TouchClassification::UntrackedTouch;
+             change.newValue == TouchClassification::UnknownDisconnected) &&
+           change.newValue != TouchClassification::RemovedFromClassification &&
+           change.newValue != TouchClassification::UntrackedTouch;
 }
 
-- (void)touchClassificationsDidChange: (const vector<TouchClassificationChangedEventArgs> & )args
+- (void)touchClassificationsDidChange:(const vector<TouchClassificationChangedEventArgs> &)args
 {
     TouchClassifier::Ptr classifier = ActiveClassifier::Instance();
 
     NSMutableSet *updatedTouchClassifications = [[NSMutableSet alloc] init];
 
-    for (const auto & t : args)
-    {
-        if ([FTTouchClassifier shouldReportClassificationChange:t])
-        {
+    for (const auto &t : args) {
+        if ([FTTouchClassifier shouldReportClassificationChange:t]) {
             FTTouchClassificationInfo *info = [[FTTouchClassificationInfo alloc] init];
             info.touch = spc<TouchTrackerObjC>(TouchTracker::Instance())->UITouchForTouch(t.touch);
-            if (t.oldValue == TouchClassification::UnknownDisconnected && classifier->IsPenConnected())
-            {
+            if (t.oldValue == TouchClassification::UnknownDisconnected && classifier->IsPenConnected()) {
                 info.oldValue = FTTouchClassificationUnknown;
-            }
-            else
-            {
+            } else {
                 info.oldValue = [FTTouchClassifier classification:t.oldValue];
             }
 
-            info.newValue = [FTTouchClassifier classification: t.touch->ContinuedClassification()];
+            info.newValue = [FTTouchClassifier classification:t.touch->ContinuedClassification()];
             info.touchId = (NSInteger)t.touch->Id();
-            if (info.newValue != info.oldValue)
-            {
+            if (info.newValue != info.oldValue) {
                 [updatedTouchClassifications addObject:info];
             }
         }
     }
 
-    if ([updatedTouchClassifications count] > 0)
-    {
+    if ([updatedTouchClassifications count] > 0) {
         [self.delegate classificationsDidChangeForTouches:updatedTouchClassifications];
     }
 }
@@ -151,12 +127,9 @@ using namespace fiftythree::sdk;
 {
     Touch::Ptr ftTouch = spc<TouchTrackerObjC>(TouchTracker::Instance())->TouchForUITouch(touch);
 
-    if (ftTouch)
-    {
+    if (ftTouch) {
         return (NSInteger)ftTouch->Id();
-    }
-    else
-    {
+    } else {
         return -1;
     }
 }
@@ -165,54 +138,36 @@ using namespace fiftythree::sdk;
 {
     Touch::Ptr ftTouch = spc<TouchTrackerObjC>(TouchTracker::Instance())->TouchForUITouch(touch);
 
-    if (ftTouch)
-    {
+    if (ftTouch) {
         if (ftTouch->CurrentClassification() == TouchClassification::UntrackedTouch ||
             ftTouch->CurrentClassification() == TouchClassification::RemovedFromClassification ||
             ftTouch->CurrentClassification() == TouchClassification::Cancelled)
 
         {
             return NO;
-        }
-        else
-        {
-            switch (ftTouch->ContinuedClassification())
-            {
-                case TouchClassification::UnknownDisconnected:
-                {
+        } else {
+            switch (ftTouch->ContinuedClassification()) {
+                case TouchClassification::UnknownDisconnected: {
                     *result = FTTouchClassificationUnknownDisconnected;
-                }
-                break;
-                case TouchClassification::Unknown:
-                {
+                } break;
+                case TouchClassification::Unknown: {
                     *result = FTTouchClassificationUnknown;
-                }
-                break;
-                case TouchClassification::Finger:
-                {
+                } break;
+                case TouchClassification::Finger: {
                     *result = FTTouchClassificationFinger;
-                }
-                break;
-                case TouchClassification::Palm:
-                {
+                } break;
+                case TouchClassification::Palm: {
                     *result = FTTouchClassificationPalm;
-                }
-                break;
-                case TouchClassification::Pen:
-                {
+                } break;
+                case TouchClassification::Pen: {
                     *result = FTTouchClassificationPen;
-                }
-                break;
-                case TouchClassification::Eraser:
-                {
+                } break;
+                case TouchClassification::Eraser: {
                     *result = FTTouchClassificationEraser;
-                }
-                break;
-                default:
-                {
+                } break;
+                default: {
                     DebugAssert(false);
-                }
-                break;
+                } break;
             }
             return YES;
         }
@@ -224,8 +179,7 @@ using namespace fiftythree::sdk;
 {
     auto classifier = ActiveClassifier::Instance();
 
-    if (classifier)
-    {
+    if (classifier) {
         classifier->UpdateClassifications();
     }
 }
@@ -233,8 +187,7 @@ using namespace fiftythree::sdk;
 - (void)removeTouchFromClassification:(UITouch *)touch
 {
     auto classifier = ActiveClassifier::Instance();
-    if (classifier)
-    {
+    if (classifier) {
         auto ftTouch = spc<TouchTrackerObjC>(TouchTracker::Instance())->TouchForUITouch(touch);
         classifier->RemoveTouchFromClassification(ftTouch);
     }

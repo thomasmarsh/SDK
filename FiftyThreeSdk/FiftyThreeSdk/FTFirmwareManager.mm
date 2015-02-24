@@ -37,14 +37,11 @@ static NSString *applicationDocumentsDirectory()
     NSString *documentsDir = applicationDocumentsDirectory();
     NSArray *directoryContent = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:documentsDir
                                                                                     error:NULL];
-    for (NSString *fileName in directoryContent)
-    {
-        if ([[fileName pathExtension] isEqualToString:@"bin"])
-        {
+    for (NSString *fileName in directoryContent) {
+        if ([[fileName pathExtension] isEqualToString:@"bin"]) {
             NSString *imagePath = [documentsDir stringByAppendingPathComponent:fileName];
             NSInteger version = [FTFirmwareManager versionOfImageAtPath:imagePath];
-            if (!bestImagePath || version > bestVersion)
-            {
+            if (!bestImagePath || version > bestVersion) {
                 bestVersion = version;
                 bestImagePath = imagePath;
             }
@@ -68,7 +65,7 @@ static NSString *applicationDocumentsDirectory()
 
 + (NSURL *)firmwareURL
 {
-    NSString *endPoint =  @"https://www.fiftythree.com/downloads/pencilv1upgradeimage.bin";
+    NSString *endPoint = @"https://www.fiftythree.com/downloads/pencilv1upgradeimage.bin";
     return [NSURL URLWithString:endPoint];
 }
 
@@ -112,8 +109,7 @@ static NSString *applicationDocumentsDirectory()
 {
     uint16_t version = 0;
 
-    if (image.length > 4 + sizeof(version))
-    {
+    if (image.length > 4 + sizeof(version)) {
         version = *((uint16_t *)((uint8_t *)image.bytes + 4));
         version >>= 1;
         return version;
@@ -126,15 +122,13 @@ static NSString *applicationDocumentsDirectory()
     FTAssert(imagePath, @"image path non-nil");
 
     uint16_t version = 0;
-    if (imagePath)
-    {
+    if (imagePath) {
         NSFileHandle *fileHandle = [NSFileHandle fileHandleForReadingAtPath:imagePath];
         FTAssert(fileHandle, @"firmware file exists at path");
 
         [fileHandle seekToFileOffset:4];
         NSData *data = [fileHandle readDataOfLength:sizeof(version)];
-        if (data.length == sizeof(version))
-        {
+        if (data.length == sizeof(version)) {
             version = *((uint16_t *)data.bytes);
             version >>= 1; // LSB is ImgA/ImgB
         }
@@ -155,23 +149,19 @@ static NSString *applicationDocumentsDirectory()
     *version = -1;
     *isCurrentlyRunning = NO;
 
-    NSString *versionString = (imageType == FTFirmwareImageTypeFactory ?
-                               pen.firmwareRevision :
-                               pen.softwareRevision);
+    NSString *versionString = (imageType == FTFirmwareImageTypeFactory ? pen.firmwareRevision : pen.softwareRevision);
 
-    if (versionString)
-    {
+    if (versionString) {
         NSString *versionNumberString;
         NSError *error;
         NSRegularExpression *regex = [NSRegularExpression
-                                      regularExpressionWithPattern:@"\\s*(\\d+)(\\*?)\\s*"
-                                      options:NSRegularExpressionCaseInsensitive
-                                      error:&error];
+            regularExpressionWithPattern:@"\\s*(\\d+)(\\*?)\\s*"
+                                 options:NSRegularExpressionCaseInsensitive
+                                   error:&error];
         NSTextCheckingResult *match = [regex firstMatchInString:versionString
                                                         options:0
                                                           range:NSMakeRange(0, versionString.length)];
-        if (match)
-        {
+        if (match) {
             versionNumberString = [versionString substringWithRange:[match rangeAtIndex:1]];
             *version = [versionNumberString intValue];
 
@@ -193,10 +183,8 @@ static NSString *applicationDocumentsDirectory()
     if ([FTFirmwareManager firmwareVersionOnPen:pen
                                    forImageType:FTFirmwareImageTypeFactory
                                         version:&factoryVersion
-                             isCurrentlyRunning:&factoryIsCurrentlyRunning])
-    {
-        if (factoryIsCurrentlyRunning)
-        {
+                             isCurrentlyRunning:&factoryIsCurrentlyRunning]) {
+        if (factoryIsCurrentlyRunning) {
             currentVersion = factoryVersion;
         }
     }
@@ -204,10 +192,8 @@ static NSString *applicationDocumentsDirectory()
     if ([FTFirmwareManager firmwareVersionOnPen:pen
                                    forImageType:FTFirmwareImageTypeUpgrade
                                         version:&upgradeVersion
-                             isCurrentlyRunning:&upgradeIsCurrentlyRunning])
-    {
-        if (upgradeIsCurrentlyRunning)
-        {
+                             isCurrentlyRunning:&upgradeIsCurrentlyRunning]) {
+        if (upgradeIsCurrentlyRunning) {
             currentVersion = upgradeVersion;
         }
     }
@@ -224,8 +210,7 @@ static NSString *applicationDocumentsDirectory()
 
     NSInteger version = [FTFirmwareManager versionOfImageAtPath:imagePath];
     if (version != -1 &&
-        *currentVersion != -1)
-    {
+        *currentVersion != -1) {
         *updateVersion = version;
         return @(*currentVersion < version);
     }
@@ -239,16 +224,13 @@ static NSString *applicationDocumentsDirectory()
     BOOL factoryIsCurrentlyRunning;
 
     BOOL result = [FTFirmwareManager firmwareVersionOnPen:pen
-                                   forImageType:FTFirmwareImageTypeFactory
-                                        version:&factoryVersion
-                         isCurrentlyRunning:&factoryIsCurrentlyRunning];
+                                             forImageType:FTFirmwareImageTypeFactory
+                                                  version:&factoryVersion
+                                       isCurrentlyRunning:&factoryIsCurrentlyRunning];
 
-    if (factoryIsCurrentlyRunning)
-    {
+    if (factoryIsCurrentlyRunning) {
         *type = FTFirmwareImageTypeFactory;
-    }
-    else
-    {
+    } else {
         *type = FTFirmwareImageTypeUpgrade;
     }
     return result;

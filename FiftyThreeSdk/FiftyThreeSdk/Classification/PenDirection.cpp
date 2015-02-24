@@ -22,16 +22,14 @@ namespace fiftythree
 {
 namespace sdk
 {
-
 void PenTracker::UpdateLocations()
 {
-
     vector<Cluster::Ptr> allClusters = _commonData->proxy->ClusterTracker()->FastOrderedClusters();
 
-    float totalPenWeight  = 0.0f;
+    float totalPenWeight = 0.0f;
     float totalPalmWeight = 0.0f;
 
-    Vector2f newPenLocation  = Vector2f::Zero();
+    Vector2f newPenLocation = Vector2f::Zero();
     Vector2f newPalmLocation = Vector2f::Zero();
 
     // use weighted median -- means are too sensitive to outliers.
@@ -42,159 +40,126 @@ void PenTracker::UpdateLocations()
 
     Vector2f medianPalm = Vector2f::Zero();
 
-    if (N == 0)
-    {
-
-    }
-    else if (N == 1)
-    {
+    if (N == 0) {
+    } else if (N == 1) {
         medianPalm = allClusters[0]->_center;
-    }
-    else
-    {
-
+    } else {
         VectorXf wPalm(N); // per-cluster palm weights
         vector<Vector2f> clusterCenters(N);
 
-        for (int j=0; j<N; j++)
-        {
-            const auto & cluster = *(allClusters[j]);
+        for (int j = 0; j < N; j++) {
+            const auto &cluster = *(allClusters[j]);
 
-            float palmWeight  = std::max(0.0f, cluster._meanPalmProbability / (.01f + cluster._meanPenProbability) -.3f );
-            wPalm(j)          = palmWeight;
+            float palmWeight = std::max(0.0f, cluster._meanPalmProbability / (.01f + cluster._meanPenProbability) - .3f);
+            wPalm(j) = palmWeight;
 
             clusterCenters[j] = cluster._center;
         }
 
         VectorXf knots(N);
         knots[0] = wPalm[0] * .5f;
-        for (int j=1; j<N; j++)
-        {
-            knots[j] = knots[j-1] + .5f * wPalm[j-1] + .5f * wPalm[j];
+        for (int j = 1; j < N; j++) {
+            knots[j] = knots[j - 1] + .5f * wPalm[j - 1] + .5f * wPalm[j];
         }
 
-        float wEval = .5f * (knots[N-1] + knots[0]);
+        float wEval = .5f * (knots[N - 1] + knots[0]);
 
         VectorXf evalWeight(1);
         evalWeight[0] = wEval;
-        vector<Vector2f> weightedMedianPalm = Interp< vector<Vector2f>>(wPalm, clusterCenters, evalWeight);
+        vector<Vector2f> weightedMedianPalm = Interp<vector<Vector2f>>(wPalm, clusterCenters, evalWeight);
 
         medianPalm = weightedMedianPalm[0];
     }
 
     bool onlyEdgeThumbs = true;
-    for (Cluster::Ptr const & clusterPtr :  allClusters)
-    {
-        const auto & cluster = *clusterPtr;
+    for (Cluster::Ptr const &clusterPtr : allClusters) {
+        const auto &cluster = *clusterPtr;
 
-        if (cluster._touchIds.empty())
-        {
+        if (cluster._touchIds.empty()) {
             continue;
         }
 
-        Stroke::Ptr stroke           = _clusterTracker->Stroke(cluster._touchIds.back());
+        Stroke::Ptr stroke = _clusterTracker->Stroke(cluster._touchIds.back());
         StrokeStatistics::cPtr stats = stroke->Statistics();
 
         float palmWeight = 0.0f;
-        float penWeight  = 0.0f;
+        float penWeight = 0.0f;
 
-        if ((cluster._simultaneousTouches || cluster._wasInterior) && (! (cluster.IsPenType() || cluster.IsFingerType())))
-        {
+        if ((cluster._simultaneousTouches || cluster._wasInterior) && (!(cluster.IsPenType() || cluster.IsFingerType()))) {
             palmWeight = 1.0f;
-            penWeight  = 0.0f;
-        }
-        else
-        {
-
-            if (_commonData->proxy->ActiveStylusIsConnected())
-            {
+            penWeight = 0.0f;
+        } else {
+            if (_commonData->proxy->ActiveStylusIsConnected()) {
                 // shrink by 1 to only use weights we're pretty confident about
-                float penRatio   = std::max(0.0f, cluster._meanPenProbability  / (.01f + cluster._meanPalmProbability) - .3f);
-                float palmRatio   = std::max(0.0f, cluster._meanPalmProbability / (.01f + cluster._meanPenProbability)  - .3f);
+                float penRatio = std::max(0.0f, cluster._meanPenProbability / (.01f + cluster._meanPalmProbability) - .3f);
+                float palmRatio = std::max(0.0f, cluster._meanPalmProbability / (.01f + cluster._meanPenProbability) - .3f);
 
-                penWeight  = penRatio;
+                penWeight = penRatio;
                 palmWeight = palmRatio;
-            }
-            else
-            {
-                if (cluster.IsPenType() || cluster.IsFingerType())
-                {
+            } else {
+                if (cluster.IsPenType() || cluster.IsFingerType()) {
                     penWeight = 1.0f;
                     palmWeight = 0.0f;
-                }
-                else
-                {
+                } else {
                     penWeight = 0.0f;
                     palmWeight = 1.0f;
                 }
             }
         }
 
-        if ((! cluster._touchIds.empty()) && (! (cluster.IsPenType() || cluster.IsFingerType())))
-        {
+        if ((!cluster._touchIds.empty()) && (!(cluster.IsPenType() || cluster.IsFingerType()))) {
             EdgeThumbState state = _commonData->proxy->IsolatedStrokesClassifier()->TestEdgeThumb(cluster._touchIds.back());
 
             // no matter what else we do, ignore possible edge palms
-            if (state == EdgeThumbState::NotThumb)
-            {
+            if (state == EdgeThumbState::NotThumb) {
                 onlyEdgeThumbs = false;
-            }
-            else
-            {
+            } else {
                 palmWeight = 0.0f;
             }
         }
 
         // ignore taps and strokes which don't carry enough info for stats to be reliable,
         // at least for pens
-        const float tooShort   = 6.0f;
-        const int   minPoints  = 8;
+        const float tooShort = 6.0f;
+        const int minPoints = 8;
         const float longEnough = 22.0f;
         float lambda = 1.0f;
         if (stats->_arcLength < tooShort || (stroke->Size() < minPoints && true)) //(! stats->_arcLength > longEnough)))
         {
             lambda = 0.0f;
-        }
-        else if (stats->_arcLength < longEnough)
-        {
+        } else if (stats->_arcLength < longEnough) {
             // increase linearly to one as stroke reaches threshold
             lambda = (cluster._totalLength - tooShort) / (longEnough - tooShort);
             lambda = lambda * lambda;
         }
 
-        penWeight  *= lambda * stats->_smoothLength / 100.0f;
+        penWeight *= lambda * stats->_smoothLength / 100.0f;
 
-        newPenLocation  += penWeight * cluster._center;
-        totalPenWeight  += penWeight;
+        newPenLocation += penWeight * cluster._center;
+        totalPenWeight += penWeight;
 
         newPalmLocation += palmWeight * cluster._center;
         totalPalmWeight += palmWeight;
-
     }
 
     newPalmLocation /= (totalPalmWeight + .0001f);
-    newPenLocation  /= (totalPenWeight + .0001f);
+    newPenLocation /= (totalPenWeight + .0001f);
 
-    if (onlyEdgeThumbs)
-    {
+    if (onlyEdgeThumbs) {
         return;
     }
 
-    if (totalPalmWeight > 0.0f)
-    {
-        _mruPalmWeight   = totalPalmWeight;
+    if (totalPalmWeight > 0.0f) {
+        _mruPalmWeight = totalPalmWeight;
         _mruPalmLocation = newPalmLocation;
-    }
-    else
-    {
-        if (!onlyEdgeThumbs)
-        {
+    } else {
+        if (!onlyEdgeThumbs) {
             totalPalmWeight = _mruPalmWeight;
             newPalmLocation = _mruPalmLocation;
         }
     }
 
-    Vector2f vPalm       = newPalmLocation - _palmLocation;
+    Vector2f vPalm = newPalmLocation - _palmLocation;
     Vector2f vRecentPalm = newPalmLocation - _recentPalmLocation;
 
     // controls how much faster the short timescale adapts than the normal one
@@ -202,41 +167,32 @@ void PenTracker::UpdateLocations()
 
     float lambdaPalm;
     float lambdaRecentPalm;
-    if (!TrackingPalmLocation())
-    {
+    if (!TrackingPalmLocation()) {
         lambdaPalm = 1.0f;
         lambdaRecentPalm = 1.0f;
-    }
-    else
-    {
-        lambdaPalm       = std::max(0.0f, std::min(.1f, 4.0f * std::sqrt(totalPalmWeight) / (.0001f + vPalm.norm())));
-        lambdaRecentPalm = std::max(0.0f, std::min(recentMultiplier * .1f,
-                                                   recentMultiplier * 4.0f * std::sqrt(totalPalmWeight) / (.0001f + vRecentPalm.norm())));
+    } else {
+        lambdaPalm = std::max(0.0f, std::min(.1f, 4.0f * std::sqrt(totalPalmWeight) / (.0001f + vPalm.norm())));
+        lambdaRecentPalm = std::max(0.0f, std::min(recentMultiplier * .1f, recentMultiplier * 4.0f * std::sqrt(totalPalmWeight) / (.0001f + vRecentPalm.norm())));
     }
 
-    if (totalPalmWeight > 0.0f)
-    {
-        _palmLocation       = _palmLocation + lambdaPalm * vPalm;
+    if (totalPalmWeight > 0.0f) {
+        _palmLocation = _palmLocation + lambdaPalm * vPalm;
         _recentPalmLocation = _recentPalmLocation + lambdaRecentPalm * vRecentPalm;
-
     }
 
     // ok, palm location is updated.
     // now update the direction vector for the pen.
-    if (totalPenWeight > 0.0f && totalPalmWeight > 0.0f)
-    {
+    if (totalPenWeight > 0.0f && totalPalmWeight > 0.0f) {
         Vector2f newPenDisplacement = newPenLocation - newPalmLocation;
 
-        Vector2f vPen       = newPenDisplacement - _penDisplacement;
+        Vector2f vPen = newPenDisplacement - _penDisplacement;
         Vector2f vRecentPen = newPenDisplacement - _recentPenDisplacement;
 
-        float lambdaPen       = std::max(0.0f, std::min(.1f, 4.0f * std::sqrt(std::sqrt(totalPalmWeight * totalPenWeight)) / (.0001f + vPen.norm())));
-        float lambdaRecentPen = std::max(0.0f, std::min(recentMultiplier * .1f,
-                                                        recentMultiplier * 4.0f * std::sqrt(std::sqrt(totalPalmWeight * totalPenWeight)) / (.0001f + vRecentPen.norm())));
+        float lambdaPen = std::max(0.0f, std::min(.1f, 4.0f * std::sqrt(std::sqrt(totalPalmWeight * totalPenWeight)) / (.0001f + vPen.norm())));
+        float lambdaRecentPen = std::max(0.0f, std::min(recentMultiplier * .1f, recentMultiplier * 4.0f * std::sqrt(std::sqrt(totalPalmWeight * totalPenWeight)) / (.0001f + vRecentPen.norm())));
 
-        _penDisplacement       = _penDisplacement + lambdaPen * vPen;
+        _penDisplacement = _penDisplacement + lambdaPen * vPen;
         _recentPenDisplacement = _recentPenDisplacement + lambdaRecentPen * vRecentPen;
-
     }
 
     //std::cerr << "\ndPen = (" << _penDisplacement.x() << ", " << _penDisplacement.y() << ")";
@@ -244,28 +200,25 @@ void PenTracker::UpdateLocations()
     // force the pen to stay on screen.
     Vector2f penLocation = PenLocation();
 
-    float screenWidth  = Screen::MainScreen()._widthInPoints;
+    float screenWidth = Screen::MainScreen()._widthInPoints;
     float screenHeight = Screen::MainScreen()._widthInPoints;
 
-    _penDisplacement.x() = std::max(0.0f, std::min(screenWidth,  penLocation.x())) - _palmLocation.x();
+    _penDisplacement.x() = std::max(0.0f, std::min(screenWidth, penLocation.x())) - _palmLocation.x();
     _penDisplacement.y() = std::max(0.0f, std::min(screenHeight, penLocation.y())) - _palmLocation.y();
-
 }
 
 bool PenTracker::WasAtPalmEnd(Cluster::Ptr const &cluster)
 {
     bool palmEnd = cluster->_wasAtPalmEnd;
 
-    if (cluster->_endedPenDirectionScore < 2.0f)
-    {
+    if (cluster->_endedPenDirectionScore < 2.0f) {
         Eigen::Vector2f vPalmToPen = _commonData->proxy->PenTracker()->PenDirection();
-        Eigen::Vector2f vOtherEnd  = cluster->_vOtherEndpoint;
+        Eigen::Vector2f vOtherEnd = cluster->_vOtherEndpoint;
 
         // cluster's _wasAtPalmEnd is unreliable until we lock handedness, so we use another method
-        if (vPalmToPen.norm() > 0.0f && vOtherEnd.norm() > 0.0f)
-        {
+        if (vPalmToPen.norm() > 0.0f && vOtherEnd.norm() > 0.0f) {
             float dot = vPalmToPen.dot(vOtherEnd) / (vPalmToPen.norm() * vOtherEnd.norm());
-            palmEnd   = dot > 0.0f;
+            palmEnd = dot > 0.0f;
         }
     }
 
@@ -279,7 +232,6 @@ bool PenTracker::WasAtPalmEnd(Cluster::Ptr const &cluster)
 // it seemed more readable to make Confidence() a method.
 float PenTracker::Confidence() const
 {
-
     float separation = _penDisplacement.squaredNorm();
     const float fullConfidence = 44.0f * 44.0f;
 
@@ -321,93 +273,75 @@ bool PenTracker::TrackingPenDirection() const
     return _penDisplacement.norm() > 0.0f;
 }
 
-vector<Cluster::Ptr> PenTracker::CopyInPenToPalmOrder(vector<Cluster::Ptr> const & orderedClusters)
+vector<Cluster::Ptr> PenTracker::CopyInPenToPalmOrder(vector<Cluster::Ptr> const &orderedClusters)
 {
-    if (orderedClusters.size() < 2)
-    {
+    if (orderedClusters.size() < 2) {
         return orderedClusters;
     }
 
-    if (orderedClusters.size() < 2)
-    {
+    if (orderedClusters.size() < 2) {
         return orderedClusters;
     }
 
-    const auto & cluster0 = *(orderedClusters[0]);
-    const auto & clusterN = *(orderedClusters.back());
+    const auto &cluster0 = *(orderedClusters[0]);
+    const auto &clusterN = *(orderedClusters.back());
 
     Vector2f v0N = clusterN._center - cluster0._center;
 
-    float dot    = v0N.normalized().dot(PenDirection());
+    float dot = v0N.normalized().dot(PenDirection());
 
     vector<Cluster::Ptr> penToPalm = orderedClusters;
 
     // we want pen end first, so reverse it.
-    if (dot >= 0.0f)
-    {
+    if (dot >= 0.0f) {
         std::reverse(penToPalm.begin(), penToPalm.end());
     }
 
     return penToPalm;
 }
 
-bool PenTracker::AtPenEnd(Cluster::Ptr const & probeCluster, vector<Cluster::Ptr> const & orderedClusters, bool includePossibleThumbs)
+bool PenTracker::AtPenEnd(Cluster::Ptr const &probeCluster, vector<Cluster::Ptr> const &orderedClusters, bool includePossibleThumbs)
 {
     vector<Cluster::Ptr> penToPalm = CopyInPenToPalmOrder(orderedClusters);
 
-    for (Cluster::Ptr cluster :  penToPalm)
-    {
-        if (cluster == probeCluster)
-        {
+    for (Cluster::Ptr cluster : penToPalm) {
+        if (cluster == probeCluster) {
             return true;
         }
 
         // ordered clusters may include ended pens, so we need to keep looking for our touch.
         if (cluster->IsPenType() ||
-           (includePossibleThumbs && cluster->_edgeThumbState == EdgeThumbState::Possible) ||
-           cluster->_edgeThumbState == EdgeThumbState::Thumb)
-        {
+            (includePossibleThumbs && cluster->_edgeThumbState == EdgeThumbState::Possible) ||
+            cluster->_edgeThumbState == EdgeThumbState::Thumb) {
             continue;
-        }
-        else
-        {
+        } else {
             break;
         }
-
     }
     return false;
-
 }
 
-Cluster::Ptr PenTracker::PenEndCluster(vector<Cluster::Ptr> const & orderedClusters, bool ignorePossibleThumbs)
+Cluster::Ptr PenTracker::PenEndCluster(vector<Cluster::Ptr> const &orderedClusters, bool ignorePossibleThumbs)
 {
-    const auto & cluster0 = orderedClusters[0];
-    const auto & clusterN = orderedClusters.back();
+    const auto &cluster0 = orderedClusters[0];
+    const auto &clusterN = orderedClusters.back();
 
     Vector2f v0N = clusterN->_center - cluster0->_center;
 
-    float dot    = v0N.normalized().dot(PenDirection());
+    float dot = v0N.normalized().dot(PenDirection());
 
     Cluster::Ptr pen;
-    if (dot > 0.0f)
-    {
-        for (int j=(int)orderedClusters.size(); j--; )
-        {
-
+    if (dot > 0.0f) {
+        for (int j = (int)orderedClusters.size(); j--;) {
             EdgeThumbState state = orderedClusters[j]->_edgeThumbState;
-            if (state != EdgeThumbState::Thumb && ((! ignorePossibleThumbs) || state != EdgeThumbState::Possible))
-            {
+            if (state != EdgeThumbState::Thumb && ((!ignorePossibleThumbs) || state != EdgeThumbState::Possible)) {
                 pen = orderedClusters[j];
             }
         }
-    }
-    else
-    {
-        for (int j=0; j < orderedClusters.size(); j++ )
-        {
+    } else {
+        for (int j = 0; j < orderedClusters.size(); j++) {
             EdgeThumbState state = orderedClusters[j]->_edgeThumbState;
-            if (state != EdgeThumbState::Thumb && ((! ignorePossibleThumbs) || state != EdgeThumbState::Possible))
-            {
+            if (state != EdgeThumbState::Thumb && ((!ignorePossibleThumbs) || state != EdgeThumbState::Possible)) {
                 pen = orderedClusters[j];
             }
         }
@@ -416,21 +350,18 @@ Cluster::Ptr PenTracker::PenEndCluster(vector<Cluster::Ptr> const & orderedClust
     return pen;
 }
 
-Cluster::Ptr PenTracker::PalmEndCluster(vector<Cluster::Ptr> const & orderedClusters)
+Cluster::Ptr PenTracker::PalmEndCluster(vector<Cluster::Ptr> const &orderedClusters)
 {
-    const auto & cluster0 = orderedClusters[0];
-    const auto & clusterN = orderedClusters.back();
+    const auto &cluster0 = orderedClusters[0];
+    const auto &clusterN = orderedClusters.back();
 
     Vector2f v0N = clusterN->_center - cluster0->_center;
 
     float dot = v0N.normalized().dot(PenDirection());
 
-    if (dot < 0.0f)
-    {
+    if (dot < 0.0f) {
         return clusterN;
-    }
-    else
-    {
+    } else {
         return cluster0;
     }
 }
@@ -441,23 +372,21 @@ Eigen::VectorXf PenTracker::UpdateDirectionPrior(vector<Cluster::Ptr> const &ord
 
     Eigen::VectorXf directionPrior = VectorXf::Constant(orderedClusters.size(), 1.0f);
 
-    if (orderedClusters.size() > 1 && Confidence() > 0.0f)
-    {
-        Vector2f penDirection   = PenDirection();
+    if (orderedClusters.size() > 1 && Confidence() > 0.0f) {
+        Vector2f penDirection = PenDirection();
 
-        const auto & cluster0 = *(orderedClusters[0]);
-        const auto & clusterN = *(orderedClusters.back());
+        const auto &cluster0 = *(orderedClusters[0]);
+        const auto &clusterN = *(orderedClusters.back());
 
         Vector2f v0N = clusterN._center - cluster0._center;
 
         // if dot is positive, we feel that cluster N is the pen and 0 is the palm.
         // we interpret the magnitude of the dot as a measure of confidence.
         // if they're orthogonal, dot will be zero and this prior will have no effect.
-        float dot    = Confidence() * v0N.normalized().dot(penDirection);
+        float dot = Confidence() * v0N.normalized().dot(penDirection);
 
         vector<Vector2f> clusterCenters;
-        for (Cluster::Ptr const & cluster :  orderedClusters)
-        {
+        for (Cluster::Ptr const &cluster : orderedClusters) {
             clusterCenters.push_back(cluster->_center);
         }
 
@@ -466,49 +395,37 @@ Eigen::VectorXf PenTracker::UpdateDirectionPrior(vector<Cluster::Ptr> const &ord
 
         // for any ended pens we basically want to ignore them for the purpose of computing lengths
         // so equate arc lengths at either end of the curve
-        for (int k=0; k<arcLength.size()-1; k++)
-        {
+        for (int k = 0; k < arcLength.size() - 1; k++) {
             Cluster::Ptr cluster = orderedClusters[k];
-            if (cluster->IsPenType() && cluster->AllTouchesEnded())
-            {
-                for (int j=0; j<=k; j++)
-                {
-                    arcLength[j] = arcLength[k+1];
+            if (cluster->IsPenType() && cluster->AllTouchesEnded()) {
+                for (int j = 0; j <= k; j++) {
+                    arcLength[j] = arcLength[k + 1];
                 }
-            }
-            else
-            {
+            } else {
                 break;
             }
         }
 
         // now get the other end
-        for (int k=(int)arcLength.size()-1; k>0; k--)
-        {
+        for (int k = (int)arcLength.size() - 1; k > 0; k--) {
             Cluster::Ptr cluster = orderedClusters[k];
-            if (cluster->IsPenType() && cluster->AllTouchesEnded())
-            {
-                for (int j=(int)arcLength.size()-1; j>=k; j--)
-                {
-                    arcLength[j] = arcLength[k-1];
+            if (cluster->IsPenType() && cluster->AllTouchesEnded()) {
+                for (int j = (int)arcLength.size() - 1; j >= k; j--) {
+                    arcLength[j] = arcLength[k - 1];
                 }
-            }
-            else
-            {
+            } else {
                 break;
             }
         }
 
         // normalize from 0 to 1.
         arcLength.array() -= arcLength.minCoeff();
-        if (arcLength.maxCoeff() > 0.0f)
-        {
+        if (arcLength.maxCoeff() > 0.0f) {
             arcLength /= arcLength.maxCoeff();
         }
 
         // flip direction when dot is telling us the pen is at the other end
-        if (dot < 0.0f)
-        {
+        if (dot < 0.0f) {
             arcLength = 1.0f - arcLength.array();
         }
 
@@ -518,44 +435,37 @@ Eigen::VectorXf PenTracker::UpdateDirectionPrior(vector<Cluster::Ptr> const &ord
 
         // shrink actual min probability towards 1 based on confidence.
         float confidence = Confidence();
-        float pMin       = 1.0f - (confidence * (1.0f - handednessWeight));
+        float pMin = 1.0f - (confidence * (1.0f - handednessWeight));
 
         arcLength = pMin + arcLength.array() * (1.0f - pMin);
 
         float maxIndex = orderedClusters.size();
-        for (int k=0; k<orderedClusters.size(); k++)
-        {
-            Cluster const & cluster = *(orderedClusters[k]);
+        for (int k = 0; k < orderedClusters.size(); k++) {
+            Cluster const &cluster = *(orderedClusters[k]);
 
-            if (cluster.IsPenType() && cluster.AllTouchesEnded())
-            {
+            if (cluster.IsPenType() && cluster.AllTouchesEnded()) {
                 // if a rightie draws to the left of a not-yet-stale pen cluster, this will decrease
                 // the prior unfairly.  don't make updates.
                 directionPrior[k] = cluster._directionPrior;
                 continue;
             }
 
-            directionPrior[k] = powf(float(k+1) / maxIndex, dot);
-
+            directionPrior[k] = powf(float(k + 1) / maxIndex, dot);
         }
 
-        if (directionPrior.maxCoeff() > 0.0f)
-        {
+        if (directionPrior.maxCoeff() > 0.0f) {
             directionPrior /= directionPrior.maxCoeff();
         }
 
-        for (int k=0; k<orderedClusters.size(); k++)
-        {
-            Cluster & cluster = *(orderedClusters[k]);
+        for (int k = 0; k < orderedClusters.size(); k++) {
+            Cluster &cluster = *(orderedClusters[k]);
 
-            if (!(cluster.IsPenType() && cluster.AllTouchesEnded()))
-            {
+            if (!(cluster.IsPenType() && cluster.AllTouchesEnded())) {
                 cluster._directionPrior = std::min(cluster._directionPrior, directionPrior[k]);
             }
         }
     }
     return directionPrior;
 }
-
 }
 }

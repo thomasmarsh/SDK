@@ -19,9 +19,7 @@ namespace fiftythree
 {
 namespace sdk
 {
-struct StrokeStatistics
-{
-
+struct StrokeStatistics {
     ALIAS_PTR_TYPES(StrokeStatistics);
 
     // 1.0 is a constant which was obtained from training data.
@@ -44,31 +42,31 @@ struct StrokeStatistics
         return fiftythree::core::make_shared<StrokeStatistics>();
     }
 
-    StrokeStatistics() :
-    _arcLength(0.0f),
-    _strokeTime(0.0f),
-    _totalD2InSpace(Eigen::Vector2f::Zero()),
-    _totalAbsoluteD2InSpace(0.0f),
-    _totalSquaredD2InSpace(0.0f),
-    _dtVariance(0.0f),
-    _dtMean(0.0f),
-    _dtSumSquaredVariation(0.0f),
-    _arclengthParameter(Eigen::VectorXf::Zero(1)),
-    _smoothLength(0.0f),
-    _sampleTimingSquaredError(0.0f),
-    _sampleTimingMeanSquaredError(0.0f),
-    _firstDeltaT(0.0f),
-    _totalD2AtScale(44, 0.0f),
-    _normalD2(0.0f),
-    _tangentialD2(0.0f),
-    _totalD2(0.0f),
-    _normalD3(0.0f),
-    _normalD4(0.0f),
-    _tangentialD3(0.0f),
-    _tangentialD4(0.0f),
-    _maxDeltaT(0.0f),
-    _maxTravel(0.0f),
-    _minStepSize(std::numeric_limits<float>::max())
+    StrokeStatistics()
+    : _arcLength(0.0f)
+    , _strokeTime(0.0f)
+    , _totalD2InSpace(Eigen::Vector2f::Zero())
+    , _totalAbsoluteD2InSpace(0.0f)
+    , _totalSquaredD2InSpace(0.0f)
+    , _dtVariance(0.0f)
+    , _dtMean(0.0f)
+    , _dtSumSquaredVariation(0.0f)
+    , _arclengthParameter(Eigen::VectorXf::Zero(1))
+    , _smoothLength(0.0f)
+    , _sampleTimingSquaredError(0.0f)
+    , _sampleTimingMeanSquaredError(0.0f)
+    , _firstDeltaT(0.0f)
+    , _totalD2AtScale(44, 0.0f)
+    , _normalD2(0.0f)
+    , _tangentialD2(0.0f)
+    , _totalD2(0.0f)
+    , _normalD3(0.0f)
+    , _normalD4(0.0f)
+    , _tangentialD3(0.0f)
+    , _tangentialD4(0.0f)
+    , _maxDeltaT(0.0f)
+    , _maxTravel(0.0f)
+    , _minStepSize(std::numeric_limits<float>::max())
     {
     }
 
@@ -129,16 +127,13 @@ DEFINE_ENUM(StrokeSamplingType,
 
 class Stroke
 {
-
 public:
-
     ALIAS_PTR_TYPES(Stroke);
 
     // Samples that occur less than this delta amount of time before the preceding sample are discarded.
     static const float kMinSampleTimestampDelta;
 
 protected:
-
     DataStream2f _XYDataStream;
 
     // speed is a funny thing.  you can't actually compute it from _XY and _timestamp
@@ -147,24 +142,23 @@ protected:
     // further complicating matters are the unreliable timestamps coming from UITouch -- these cause
     // goofiness even when we're not dropping any samples.  instead we use sample-to-sample spacing,
     // which implicitly assumes equal time increments and ignores any time when they are not moving.
-    std::vector<Eigen::Vector2f>  _velocity;
-    std::vector<Vector1f>         _pressure;
+    std::vector<Eigen::Vector2f> _velocity;
+    std::vector<Vector1f> _pressure;
 
-    std::vector<Vector1f>         _touchRadius;
+    std::vector<Vector1f> _touchRadius;
 
     // due to Eigen alignment issues, we have to dynamically allocate this guy
     // to make sure he gets aligned or your code may crash depending on compiler
     // settings passed to Eigen.
-    StrokeStatistics::Ptr         _statistics;
+    StrokeStatistics::Ptr _statistics;
 
     // for some cases like early detection you get better performance by ignoring data after
     // the first N points
-    StrokeStatistics::Ptr         _earlyStatistics;
+    StrokeStatistics::Ptr _earlyStatistics;
 
     int ClampedIndex(int index) const;
 
 public:
-
     bool _computeStatistics;
 
     StrokeStatistics::cPtr Statistics() const
@@ -179,61 +173,56 @@ public:
 
     float NormalizedSmoothLength()
     {
-        if (_computeStatistics && Size() >= 5)
-        {
+        if (_computeStatistics && Size() >= 5) {
             return _statistics->_smoothLength;
-        }
-        else
-        {
+        } else {
             return 0.0f;
         }
     }
 
-    DataStream2f & XYDataStream()
+    DataStream2f &XYDataStream()
     {
         return _XYDataStream;
     }
 
-    void AppendXYAtRelativeTime(std::vector<Eigen::Vector2f> const & xy, std::vector<float> const & time);
+    void AppendXYAtRelativeTime(std::vector<Eigen::Vector2f> const &xy, std::vector<float> const &time);
 
-    bool               _offscreenExitFlag;
-    bool               _offscreenArrivalFlag;
+    bool _offscreenExitFlag;
+    bool _offscreenArrivalFlag;
 
     //double             _t0;
 
     core::TouchClassification _touchType;
 
     SamplingType _samplingType;
-    float        _XYSamplesPerSecond;
+    float _XYSamplesPerSecond;
 
     static Stroke::Ptr New() { return Stroke::Ptr(new Stroke()); }
 
-    Stroke(core::Touch const & touch, int maxPoints = std::numeric_limits<int>::max());
+    Stroke(core::Touch const &touch, int maxPoints = std::numeric_limits<int>::max());
 
-    Stroke(bool computeStatistics = true) :
-    _offscreenExitFlag(false),
-    _offscreenArrivalFlag(false),
-    _samplingType(SamplingType::UniformInSpace),
-    _XYSamplesPerSecond(60),
-    _computeStatistics(computeStatistics)
+    Stroke(bool computeStatistics = true)
+    : _offscreenExitFlag(false)
+    , _offscreenArrivalFlag(false)
+    , _samplingType(SamplingType::UniformInSpace)
+    , _XYSamplesPerSecond(60)
+    , _computeStatistics(computeStatistics)
     {
-        if (_computeStatistics)
-        {
+        if (_computeStatistics) {
             _statistics = StrokeStatistics::New();
         }
-
     }
 
-    void ToNormalizedCoordinates(Screen const & screen);
-    void ToScreenCoordinates(Screen const & screen);
+    void ToNormalizedCoordinates(Screen const &screen);
+    void ToScreenCoordinates(Screen const &screen);
 
-    double           FirstAbsoluteTimestamp()  const { return _XYDataStream.FirstAbsoluteTimestamp(); }
-    StdVectorFloat & RelativeTimestamp() { return _XYDataStream.RelativeTimestamp(); }
-    std::vector< Eigen::Vector2f > & XY() { return _XYDataStream.Data(); }
+    double FirstAbsoluteTimestamp() const { return _XYDataStream.FirstAbsoluteTimestamp(); }
+    StdVectorFloat &RelativeTimestamp() { return _XYDataStream.RelativeTimestamp(); }
+    std::vector<Eigen::Vector2f> &XY() { return _XYDataStream.Data(); }
 
-    Eigen::Map<Eigen::VectorXf> XYMap(Interval const & I);
-    Eigen::Map<Eigen::MatrixX2f, 0, Eigen::Stride<1,2>> XYMatrixMap();
-    Eigen::Map<Eigen::MatrixX2f, 0, Eigen::Stride<1,2>> XYMatrixMap(int endIndex);
+    Eigen::Map<Eigen::VectorXf> XYMap(Interval const &I);
+    Eigen::Map<Eigen::MatrixX2f, 0, Eigen::Stride<1, 2>> XYMatrixMap();
+    Eigen::Map<Eigen::MatrixX2f, 0, Eigen::Stride<1, 2>> XYMatrixMap(int endIndex);
 
     Eigen::Map<Eigen::VectorXf> ArclengthParameterMap(int endIndex);
     Eigen::Map<Eigen::VectorXf> ArclengthParameterMap();
@@ -241,8 +230,8 @@ public:
     Eigen::Map<Eigen::VectorXf> RelativeTimestampMap();
     Eigen::Map<Eigen::VectorXf> RelativeTimestampMap(int endIndex);
 
-    Stride2Map XMap(Interval const & I) const;
-    Stride2Map YMap(Interval const & I) const;
+    Stride2Map XMap(Interval const &I) const;
+    Stride2Map YMap(Interval const &I) const;
 
     Stride2Map XMap() const
     {
@@ -254,29 +243,29 @@ public:
         return YMap(MaximalInterval());
     }
 
-    Stride2Map VelocityXMap(Interval const & I);
-    Stride2Map VelocityYMap(Interval const & I);
+    Stride2Map VelocityXMap(Interval const &I);
+    Stride2Map VelocityYMap(Interval const &I);
 
-    float* XYPointer() const
+    float *XYPointer() const
     {
-        return (float*) &(_XYDataStream.Data()[0]);
+        return (float *)&(_XYDataStream.Data()[0]);
     }
 
-    float* RelativeTPointer() const
+    float *RelativeTPointer() const
     {
-        return (float*) &(_XYDataStream.RelativeTimestamp()[0]);
+        return (float *)&(_XYDataStream.RelativeTimestamp()[0]);
     }
 
-    float* ArclengthParameterPointer() const
+    float *ArclengthParameterPointer() const
     {
-        return (float*) &(_statistics->_arclengthParameter(0));
+        return (float *)&(_statistics->_arclengthParameter(0));
     }
 
     void AddVelocity(Eigen::Vector2f velocity) { _velocity.push_back(velocity); }
 
-    void AddPoint(Eigen::Vector2f const & XY, double timestamp);
-    void AddPoint(Eigen::Vector2f const & XY, Vector1f pressure, double timestamp);
-    void AddPoint(Eigen::Vector2f const & XY, Vector7f const & pressure, double timestamp);
+    void AddPoint(Eigen::Vector2f const &XY, double timestamp);
+    void AddPoint(Eigen::Vector2f const &XY, Vector1f pressure, double timestamp);
+    void AddPoint(Eigen::Vector2f const &XY, Vector7f const &pressure, double timestamp);
 
     void AddTouchRadius(Vector1f const &radius)
     {
@@ -293,17 +282,17 @@ public:
     // Vector1f allows shoehorning floats into a templated setup, but inconvenient if you just want float.
     std::vector<float> TouchRadiusFloat()
     {
-        std::vector<float> out((float*) &(_touchRadius[0]), ((float*) &(_touchRadius[_touchRadius.size()])));
+        std::vector<float> out((float *)&(_touchRadius[0]), ((float *)&(_touchRadius[_touchRadius.size()])));
 
         return out;
     }
 
-    Eigen::Map< Eigen::VectorXf > TouchRadiusXf()
+    Eigen::Map<Eigen::VectorXf> TouchRadiusXf()
     {
-        return Eigen::Map< Eigen::VectorXf >((float*) &(_touchRadius[0]), _touchRadius.size());
+        return Eigen::Map<Eigen::VectorXf>((float *)&(_touchRadius[0]), _touchRadius.size());
     }
 
-    std::vector<Vector1f> & TouchRadius()
+    std::vector<Vector1f> &TouchRadius()
     {
         return _touchRadius;
     }
@@ -312,20 +301,20 @@ public:
     float ArcLength(int endIndex) const;
     float StrokeTime();
     float StrokeTime(int endIndex);
-    void  UpdateSummaryStatistics();
+    void UpdateSummaryStatistics();
 
-    void AppendStroke(Stroke const & other, float initialDt);
-    void AppendStroke(Stroke const & other);
+    void AppendStroke(Stroke const &other, float initialDt);
+    void AppendStroke(Stroke const &other);
 
     // "slow" accessors which do range-checking.
     // they return zeros when the _XY vector is empty.
-    float            X(int idx) const;
-    float            Y(int idx) const;
+    float X(int idx) const;
+    float Y(int idx) const;
     Eigen::Vector2f XY(int idx) const;
 
-    Vector1f  Pressure(int idx) const;
+    Vector1f Pressure(int idx) const;
 
-    std::vector<Vector1f>&  Pressure()    { return _pressure; }
+    std::vector<Vector1f> &Pressure() { return _pressure; }
 
     Eigen::Vector2f ReverseXY(int idx) const;
 
@@ -354,7 +343,7 @@ public:
     Eigen::Vector2f SmoothTrailingVelocity(int radius);
     Eigen::Vector2f VelocityForPointAtIndex(int index);
     float SpeedForPointAtIndex(int idx);
-    std::vector<Eigen::Vector2f>& Velocity() { return _velocity; }
+    std::vector<Eigen::Vector2f> &Velocity() { return _velocity; }
 
     // rather than use a separate stream for acceleration data, this gives a simple finite difference
     // of _velocity.  the results will be essentially indistinguishable from simple exponential smoothing.
@@ -364,8 +353,7 @@ public:
 
     double LastAbsoluteTimestamp() const
     {
-        if (IsEmpty())
-        {
+        if (IsEmpty()) {
             return 0.0;
         }
 
@@ -382,18 +370,15 @@ public:
 
     std::vector<double> TimeStamps()
     {
-
         int start = 0;
         // TODO: WTF
-        if (_XYDataStream.AbsoluteTimestamp(0) < 000.0f)
-        {
+        if (_XYDataStream.AbsoluteTimestamp(0) < 000.0f) {
             start = 1;
         }
 
-        std::vector<double> times(_XYDataStream.Size()-start);
-        for (int i=0; i < _XYDataStream.Size()-start; ++i)
-        {
-            times[i] = _XYDataStream.AbsoluteTimestamp(ClampedIndex(i+start));
+        std::vector<double> times(_XYDataStream.Size() - start);
+        for (int i = 0; i < _XYDataStream.Size() - start; ++i) {
+            times[i] = _XYDataStream.AbsoluteTimestamp(ClampedIndex(i + start));
         }
 
         return times;
@@ -407,19 +392,16 @@ public:
     float LastRelativeTimestamp() const;
     float Lifetime() const
     {
-        if (IsEmpty())
-        {
+        if (IsEmpty()) {
             return 0.0f;
-        }
-        else
-        {
+        } else {
             return LastRelativeTimestamp();
         }
     }
 
     size_t Size() const { return _XYDataStream.Size(); }
 
-    Eigen::Vector2f  WeightedCenterOfMass();
+    Eigen::Vector2f WeightedCenterOfMass();
 };
 }
 }

@@ -24,11 +24,11 @@ Eigen::VectorXf StrokeScores(int);
 
 void PrintVector(std::vector<int>);
 
-void EtaModelTest(IsolatedStrokesClassifier*);
-void WeakScoreTest(TouchLogger*, IsolatedStrokesClassifier*);
-void ChosenWeakScoreTest(TouchLogger*, IsolatedStrokesClassifier*);
-void LogLikelihoodsTest(TouchLogger*, IsolatedStrokesClassifier*);
-void ScoreOutput(TouchLogger*, IsolatedStrokesClassifier*);
+void EtaModelTest(IsolatedStrokesClassifier *);
+void WeakScoreTest(TouchLogger *, IsolatedStrokesClassifier *);
+void ChosenWeakScoreTest(TouchLogger *, IsolatedStrokesClassifier *);
+void LogLikelihoodsTest(TouchLogger *, IsolatedStrokesClassifier *);
+void ScoreOutput(TouchLogger *, IsolatedStrokesClassifier *);
 
 //
 //           Debugging for LinAlgHelpers                      //
@@ -51,9 +51,9 @@ Eigen::MatrixX2f LineFitData(int testId);
 Eigen::VectorXf LineFitParameterData(int testId);
 
 Eigen::Matrix<float, 3, 1> GeometricLineFitSolution(int testId);
-float                      GeometricLineFitResidual(int testId);
+float GeometricLineFitResidual(int testId);
 Eigen::Matrix<float, 3, 1> LinearParamLineFitSolution(int testId);
-float                      LinearParamLineFitResidual(int testId);
+float LinearParamLineFitResidual(int testId);
 
 // Verifies line-fitting
 void GeometricLineFitTest();

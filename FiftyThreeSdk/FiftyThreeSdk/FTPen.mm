@@ -18,47 +18,47 @@
 #import "FTPeripheralDelegate.h"
 #import "FTServiceUUIDs.h"
 
-NSString * const kFTPenDidEncounterErrorNotificationName = @"com.fiftythree.pen.didEncounterError";
-NSString * const kFTPenIsReadyDidChangeNotificationName = @"com.fiftythree.pen.isReadyDidChange";
-NSString * const kFTPenIsTipPressedDidChangeNotificationName = @"com.fiftythree.pen.isTipPressedDidChange";
-NSString * const kFTPenIsEraserPressedDidChangeNotificationName = @"com.fiftythree.pen.isEraserPressedDidChange";
-NSString * const kFTPenBatteryLevelDidChangeNotificationName = @"com.fiftythree.pen.batteryLevelDidChange";
-NSString * const kFTPenDidUpdatePropertiesNotificationName = @"com.fiftythree.pen.didUpdateProperties";
-NSString * const kFTPenDidUpdatePrivatePropertiesNotificationName = @"com.fiftythree.pen.didUpdatePrivateProperties";
-NSString * const kFTPenNotificationPropertiesKey = @"kFTPenNotificationPropertiesKey";
-NSString * const kFTPenDidWriteHasListenerNotificationName = @"com.fiftythree.pen.didWriteHasListener";
+NSString *const kFTPenDidEncounterErrorNotificationName = @"com.fiftythree.pen.didEncounterError";
+NSString *const kFTPenIsReadyDidChangeNotificationName = @"com.fiftythree.pen.isReadyDidChange";
+NSString *const kFTPenIsTipPressedDidChangeNotificationName = @"com.fiftythree.pen.isTipPressedDidChange";
+NSString *const kFTPenIsEraserPressedDidChangeNotificationName = @"com.fiftythree.pen.isEraserPressedDidChange";
+NSString *const kFTPenBatteryLevelDidChangeNotificationName = @"com.fiftythree.pen.batteryLevelDidChange";
+NSString *const kFTPenDidUpdatePropertiesNotificationName = @"com.fiftythree.pen.didUpdateProperties";
+NSString *const kFTPenDidUpdatePrivatePropertiesNotificationName = @"com.fiftythree.pen.didUpdatePrivateProperties";
+NSString *const kFTPenNotificationPropertiesKey = @"kFTPenNotificationPropertiesKey";
+NSString *const kFTPenDidWriteHasListenerNotificationName = @"com.fiftythree.pen.didWriteHasListener";
 
-NSString * const kFTPenNamePropertyName = @"name";
-NSString * const kFTPenInactivityTimeoutPropertyName = @"inactivityTimeout";
-NSString * const kFTPenPressureSetupPropertyName = @"pressureSetup";
-NSString * const kFTPenMotionSetupPropertyName = @"motionSetup";
-NSString * const kFTPenManufacturerNamePropertyName = @"manufacturerName";
-NSString * const kFTPenModelNumberPropertyName = @"modelNumber";
-NSString * const kFTPenSerialNumberPropertyName = @"serialNumber";
-NSString * const kFTPenFirmwareRevisionPropertyName = @"firmwareRevision";
-NSString * const kFTPenHardwareRevisionPropertyName = @"hardwareRevision";
-NSString * const kFTPenSoftwareRevisionPropertyName = @"softwareRevision";
-NSString * const kFTPenSystemIDPropertyName = @"systemID";
-NSString * const kFTPenIEEECertificationDataPropertyName = @"IEEECertificationData";
-NSString * const kFTPenPnPIDCertificationDataPropertyName = @"PnpIDCertificationData";
-NSString * const kFTPenIsTipPressPropertyName = @"isTipPressed";
-NSString * const kFTPenIsEraserPressedPropertyName = @"isEraserPressed";
-NSString * const kFTPenBatteryLevelPropertyName = @"batteryLevel";
+NSString *const kFTPenNamePropertyName = @"name";
+NSString *const kFTPenInactivityTimeoutPropertyName = @"inactivityTimeout";
+NSString *const kFTPenPressureSetupPropertyName = @"pressureSetup";
+NSString *const kFTPenMotionSetupPropertyName = @"motionSetup";
+NSString *const kFTPenManufacturerNamePropertyName = @"manufacturerName";
+NSString *const kFTPenModelNumberPropertyName = @"modelNumber";
+NSString *const kFTPenSerialNumberPropertyName = @"serialNumber";
+NSString *const kFTPenFirmwareRevisionPropertyName = @"firmwareRevision";
+NSString *const kFTPenHardwareRevisionPropertyName = @"hardwareRevision";
+NSString *const kFTPenSoftwareRevisionPropertyName = @"softwareRevision";
+NSString *const kFTPenSystemIDPropertyName = @"systemID";
+NSString *const kFTPenIEEECertificationDataPropertyName = @"IEEECertificationData";
+NSString *const kFTPenPnPIDCertificationDataPropertyName = @"PnpIDCertificationData";
+NSString *const kFTPenIsTipPressPropertyName = @"isTipPressed";
+NSString *const kFTPenIsEraserPressedPropertyName = @"isEraserPressed";
+NSString *const kFTPenBatteryLevelPropertyName = @"batteryLevel";
 
-NSString * const kFTPenNumTipPressesPropertyName = @"numTipPresses";
-NSString * const kFTPenNumEraserPressesPropertyName = @"numEraserPresses";
-NSString * const kFTPenNumFailedConnectionsPropertyName = @"numFailedConnections";
-NSString * const kFTPenNumSuccessfulConnectionsPropertyName = @"numSuccessfulConnections";
-NSString * const kFTPenNumResetsPropertyName = @"numResets";
-NSString * const kFTPenNumLinkTerminationsPropertyName = @"numLinkTerminations";
-NSString * const kFTPenNumDroppedNotificationsPropertyName = @"numDroppedNotifications";
-NSString * const kFTPenConnectedSecondsPropertyName = @"numDroppedNotifications";
+NSString *const kFTPenNumTipPressesPropertyName = @"numTipPresses";
+NSString *const kFTPenNumEraserPressesPropertyName = @"numEraserPresses";
+NSString *const kFTPenNumFailedConnectionsPropertyName = @"numFailedConnections";
+NSString *const kFTPenNumSuccessfulConnectionsPropertyName = @"numSuccessfulConnections";
+NSString *const kFTPenNumResetsPropertyName = @"numResets";
+NSString *const kFTPenNumLinkTerminationsPropertyName = @"numLinkTerminations";
+NSString *const kFTPenNumDroppedNotificationsPropertyName = @"numDroppedNotifications";
+NSString *const kFTPenConnectedSecondsPropertyName = @"numDroppedNotifications";
 
-NSString * const kFTPenManufacturingIDPropertyName = @"manufacturingID";
-NSString * const kFTPenLastErrorCodePropertyName = @"lastErrorCode";
-NSString * const kFTPenAuthenticationCodePropertyName = @"authenticationCode";
-NSString * const kFTPenHasListenerPropertyName = @"hasListener";
-NSString * const kFTPenAccelerationPropertyName = @"acceleration";
+NSString *const kFTPenManufacturingIDPropertyName = @"manufacturingID";
+NSString *const kFTPenLastErrorCodePropertyName = @"lastErrorCode";
+NSString *const kFTPenAuthenticationCodePropertyName = @"authenticationCode";
+NSString *const kFTPenHasListenerPropertyName = @"hasListener";
+NSString *const kFTPenAccelerationPropertyName = @"acceleration";
 
 @implementation FTMotionSetup
 
@@ -66,8 +66,7 @@ NSString * const kFTPenAccelerationPropertyName = @"acceleration";
          notificatinPeriodMilliseconds:(uint8_t)notificatinPeriodMilliseconds
 {
     self = [super init];
-    if (self)
-    {
+    if (self) {
         _samplePeriodMilliseconds = samplePeriodMilliseconds;
         _notificatinPeriodMilliseconds = notificatinPeriodMilliseconds;
     }
@@ -79,8 +78,7 @@ NSString * const kFTPenAccelerationPropertyName = @"acceleration";
     FTAssert(data.length == 2, @"FTMotionSetup data is 2 bytes long");
 
     self = [super init];
-    if (self)
-    {
+    if (self) {
         uint8_t *bytes = (uint8_t *)data.bytes;
         _samplePeriodMilliseconds = bytes[0];
         _notificatinPeriodMilliseconds = bytes[1];
@@ -114,8 +112,7 @@ NSString * const kFTPenAccelerationPropertyName = @"acceleration";
                          isEraserGated:(BOOL)isEraserGated
 {
     self = [super init];
-    if (self)
-    {
+    if (self) {
         _samplePeriodMilliseconds = samplePeriodMilliseconds;
         _notificatinPeriodMilliseconds = notificatinPeriodMilliseconds;
         _tipFloorThreshold = tipFloorThreshold;
@@ -135,8 +132,7 @@ NSString * const kFTPenAccelerationPropertyName = @"acceleration";
     FTAssert(data.length == 10, @"PressureSetup data is 10 bytes long");
 
     self = [super init];
-    if (self)
-    {
+    if (self) {
         uint8_t *bytes = (uint8_t *)data.bytes;
         _samplePeriodMilliseconds = bytes[0];
         _notificatinPeriodMilliseconds = bytes[1];
@@ -175,8 +171,7 @@ NSString * const kFTPenAccelerationPropertyName = @"acceleration";
 - (id)initWithErrorID:(int)errorID andErrorValue:(int)errorValue
 {
     self = [super init];
-    if (self)
-    {
+    if (self) {
         _lastErrorID = errorID;
         _lastErrorValue = errorValue;
     }
@@ -207,8 +202,7 @@ NSString * const kFTPenAccelerationPropertyName = @"acceleration";
     FTAssert(peripheral.state == CBPeripheralStateDisconnected, @"peripheral is disconnected");
 
     self = [super init];
-    if (self)
-    {
+    if (self) {
         _peripheral = peripheral;
 
         _peripheralDelegate = [[FTPeripheralDelegate alloc] init];
@@ -439,8 +433,7 @@ NSString * const kFTPenAccelerationPropertyName = @"acceleration";
 {
     [self.penUsageServiceClient readUsageProperties];
 
-    if (!self.penUsageServiceClient)
-    {
+    if (!self.penUsageServiceClient) {
         self.penUsageServiceClient = [[FTPenUsageServiceClient alloc] initWithPeripheral:_peripheral];
         self.penUsageServiceClient.delegate = self;
         [self.peripheralDelegate addServiceClient:_penUsageServiceClient];
@@ -458,15 +451,12 @@ NSString * const kFTPenAccelerationPropertyName = @"acceleration";
 
 - (void)peripheralConnectionStatusDidChange
 {
-    if (self.peripheral.state == CBPeripheralStateConnected)
-    {
+    if (self.peripheral.state == CBPeripheralStateConnected) {
         FTAssert(self.peripheral.delegate == self.peripheralDelegate,
                  @"peripheral delegate is installed");
 
         MLOG_INFO(FTLogSDK, "Peripheral is connected.");
-    }
-    else
-    {
+    } else {
         MLOG_INFO(FTLogSDK, "Peripheral was disconnected.");
     }
 
@@ -479,15 +469,12 @@ NSString * const kFTPenAccelerationPropertyName = @"acceleration";
 
     NSArray *servicesToBeDiscovered = [self.peripheralDelegate ensureServicesForConnectionState:peripheralIsConnected];
 
-    if (peripheralIsConnected)
-    {
+    if (peripheralIsConnected) {
         FTAssert(self.peripheral.delegate == self.peripheralDelegate,
                  @"peripheral delegate is installed");
 
         [self.peripheral discoverServices:servicesToBeDiscovered];
-    }
-    else
-    {
+    } else {
         FTAssert(servicesToBeDiscovered.count == 0,
                  @"Should not attempt to discover services if not connected");
     }
@@ -499,7 +486,7 @@ NSString * const kFTPenAccelerationPropertyName = @"acceleration";
 {
     [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenDidUpdatePrivatePropertiesNotificationName
                                                         object:self
-                                                      userInfo:@{ kFTPenNotificationPropertiesKey : updatedProperties }];
+                                                      userInfo:@{kFTPenNotificationPropertiesKey : updatedProperties}];
 }
 
 - (void)penServiceClient:(FTPenServiceClient *)penServiceClient didEncounterError:(NSError *)error
@@ -508,18 +495,15 @@ NSString * const kFTPenAccelerationPropertyName = @"acceleration";
 
     [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenDidEncounterErrorNotificationName
                                                         object:self];
-
 }
 
 - (void)penServiceClient:(FTPenServiceClient *)penServiceClient isReadyDidChange:(BOOL)isReady
 {
-    if ([self.privateDelegate respondsToSelector:@selector(pen:isReadyDidChange:)])
-    {
+    if ([self.privateDelegate respondsToSelector:@selector(pen:isReadyDidChange:)]) {
         [self.privateDelegate pen:self isReadyDidChange:isReady];
     }
 
-    if (!self.deviceInfoServiceClient)
-    {
+    if (!self.deviceInfoServiceClient) {
         self.deviceInfoServiceClient = [[FTDeviceInfoServiceClient alloc] initWithPeripheral:_peripheral];
         self.deviceInfoServiceClient.delegate = self;
         [self.peripheralDelegate addServiceClient:_deviceInfoServiceClient];
@@ -535,8 +519,7 @@ NSString * const kFTPenAccelerationPropertyName = @"acceleration";
     [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenIsTipPressedDidChangeNotificationName
                                                         object:self];
 
-    if ([self.delegate respondsToSelector:@selector(pen:isTipPressedDidChange:)])
-    {
+    if ([self.delegate respondsToSelector:@selector(pen:isTipPressedDidChange:)]) {
         [self.delegate pen:self isTipPressedDidChange:isTipPressed];
     }
 }
@@ -546,32 +529,28 @@ NSString * const kFTPenAccelerationPropertyName = @"acceleration";
     [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenIsEraserPressedDidChangeNotificationName
                                                         object:self];
 
-    if ([self.delegate respondsToSelector:@selector(pen:isEraserPressedDidChange:)])
-    {
+    if ([self.delegate respondsToSelector:@selector(pen:isEraserPressedDidChange:)]) {
         [self.delegate pen:self isEraserPressedDidChange:isEraserPressed];
     }
 }
 
 - (void)penServiceClient:(FTPenServiceClient *)penServiceClient didUpdateTipPressure:(float)tipPressure
 {
-    if ([self.delegate respondsToSelector:@selector(pen:tipPressureDidChange:)])
-    {
+    if ([self.delegate respondsToSelector:@selector(pen:tipPressureDidChange:)]) {
         [self.delegate pen:self tipPressureDidChange:tipPressure];
     }
 }
 
 - (void)penServiceClient:(FTPenServiceClient *)penServiceClient didUpdateEraserPressure:(float)eraserPressure
 {
-    if ([self.delegate respondsToSelector:@selector(pen:eraserPressureDidChange:)])
-    {
+    if ([self.delegate respondsToSelector:@selector(pen:eraserPressureDidChange:)]) {
         [self.delegate pen:self eraserPressureDidChange:eraserPressure];
     }
 }
 
 - (void)penServiceClient:(FTPenServiceClient *)penServiceClient didUpdateMotion:(FTMotionSample)motion
 {
-    if ([self.delegate respondsToSelector:@selector(pen:motionDidChange:)])
-    {
+    if ([self.delegate respondsToSelector:@selector(pen:motionDidChange:)]) {
         [self.delegate pen:self motionDidChange:motion];
     }
 }
@@ -581,8 +560,7 @@ NSString * const kFTPenAccelerationPropertyName = @"acceleration";
     [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenBatteryLevelDidChangeNotificationName
                                                         object:self];
 
-    if ([self.delegate respondsToSelector:@selector(pen:batteryLevelDidChange:)])
-    {
+    if ([self.delegate respondsToSelector:@selector(pen:batteryLevelDidChange:)]) {
         [self.delegate pen:self batteryLevelDidChange:batteryLevel];
     }
 }
@@ -630,7 +608,7 @@ NSString * const kFTPenAccelerationPropertyName = @"acceleration";
 {
     [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenDidUpdatePrivatePropertiesNotificationName
                                                         object:self
-                                                      userInfo:@{ kFTPenNotificationPropertiesKey:updatedProperties }];
+                                                      userInfo:@{kFTPenNotificationPropertiesKey : updatedProperties}];
     [self.privateDelegate didUpdateUsageProperties:updatedProperties];
 }
 
@@ -641,9 +619,8 @@ NSString * const kFTPenAccelerationPropertyName = @"acceleration";
 {
     [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenDidUpdatePropertiesNotificationName
                                                         object:self
-                                                      userInfo:@{ kFTPenNotificationPropertiesKey : updatedProperties }];
-    if ([self.delegate respondsToSelector:@selector(penDidUpdateDeviceInfoProperty:)])
-    {
+                                                      userInfo:@{kFTPenNotificationPropertiesKey : updatedProperties}];
+    if ([self.delegate respondsToSelector:@selector(penDidUpdateDeviceInfoProperty:)]) {
         [self.delegate penDidUpdateDeviceInfoProperty:self];
     }
 }
@@ -657,9 +634,7 @@ NSString * const kFTPenAccelerationPropertyName = @"acceleration";
 
 - (NSString *)manufacturerName
 {
-    return (self.deviceInfoServiceClient.manufacturerName ?
-            self.deviceInfoServiceClient.manufacturerName :
-            _manufacturer);
+    return (self.deviceInfoServiceClient.manufacturerName ? self.deviceInfoServiceClient.manufacturerName : _manufacturer);
 }
 
 - (NSString *)modelNumber
@@ -706,17 +681,13 @@ NSString * const kFTPenAccelerationPropertyName = @"acceleration";
 
 - (FTPencilStyle)style
 {
-    if (self.modelNumber)
-    {
+    if (self.modelNumber) {
         // Example modelNumber: 53PA02
         NSString *modelNumber = self.modelNumber;
-        if ([modelNumber hasPrefix:@"53PA01"])
-        {
+        if ([modelNumber hasPrefix:@"53PA01"]) {
             // TODO: There were 30K gold pencils with this model number. We need to detect these and correct.
             return FTPencilStyleGraphite;
-        }
-        else if ([modelNumber hasPrefix:@"53PA05"])
-        {
+        } else if ([modelNumber hasPrefix:@"53PA05"]) {
             return FTPencilStyleGold;
         }
     }

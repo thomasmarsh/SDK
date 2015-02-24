@@ -16,7 +16,6 @@ namespace fiftythree
 {
 namespace sdk
 {
-
 DEFINE_ENUM(FTPenEventType,
             PenUp,
             PenDown);
@@ -43,6 +42,5 @@ public:
 
     FT_NO_COPY(PenEvent)
 };
-
 }
 }

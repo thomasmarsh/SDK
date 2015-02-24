@@ -17,7 +17,6 @@ namespace fiftythree
 {
 namespace sdk
 {
-
 typedef std::pair<core::TouchId, bool> IdBoolPair;
 typedef std::vector<core::TouchId> TouchIdVector;
 typedef std::set<core::TouchId> TouchIdSet;
@@ -33,11 +32,11 @@ typedef fiftythree::core::shared_ptr<const Cluster> ClusterCPtr;
 class TouchData
 {
 protected:
-    core::TouchId     _touchId;
-    core::TouchPhase  _phase;
+    core::TouchId _touchId;
+    core::TouchPhase _phase;
 
     Stroke::Ptr _stroke;
-    core::Touch::Ptr  _touch;
+    core::Touch::Ptr _touch;
 
     fiftythree::core::weak_ptr<Cluster> _cluster;
 
@@ -46,19 +45,19 @@ protected:
 
     // if the touch is still alive, _endedTime will be the current timestamp as passed
     // in to OnTouchesChanged
-    double              _beganTime;
-    double              _endedTime;
-    double              _arrivalTime;
-    double              _terminalTime;
+    double _beganTime;
+    double _endedTime;
+    double _arrivalTime;
+    double _terminalTime;
 
-    int                 _isolatedIncrementalUpdateIndex;  // Index determining incremental updates
+    int _isolatedIncrementalUpdateIndex; // Index determining incremental updates
 
 public:
     ALIAS_PTR_TYPES(TouchData);
 
-    float               _radiusMean;
-    float               _radiusMin;
-    float               _radiusMax;
+    float _radiusMean;
+    float _radiusMin;
+    float _radiusMax;
 
     // _radiusM2 is the total sum of squared deviations from the current _radiusMean and
     // has a convenient update formula.  variance is then estimated as _radiusM2 / (N-1)
@@ -67,24 +66,23 @@ public:
     // See:
     // http://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Incremental_algorithm
     //
-    float               _radiusM2;
-    float               _radiusVariance;
+    float _radiusM2;
+    float _radiusVariance;
 
     // some sh... tuff to work around a particular bug where the switch doesn't fire and we move
     // from pen to finger because the user rocked pencil to one side and made the touch larger.
-    float               _leadingRadiusMean;
-    float               _leadingRadiusMin;
-    float               _leadingRadiusMax;
-    float               _leadingRadiusVariance;
+    float _leadingRadiusMean;
+    float _leadingRadiusMin;
+    float _leadingRadiusMax;
+    float _leadingRadiusVariance;
 
     // what do we consider to be the "leading" segment?
-    static const int    _leadingSegmentSampleCount = 10;
+    static const int _leadingSegmentSampleCount = 10;
 
 protected:
     // methods
 
 public:
-
     static TouchData::Ptr New(core::TouchId touchId,
                               Stroke::Ptr stroke,
                               core::TouchPhase phase,
@@ -144,17 +142,16 @@ public:
         return _touch->IsPhaseEndedOrCancelled();
     }
 
-    core::TouchPhase  Phase();
-    core::TouchPhase  Phase(int idx);
-    Stroke::Ptr const & Stroke();
-    core::TouchId     Id();
+    core::TouchPhase Phase();
+    core::TouchPhase Phase(int idx);
+    Stroke::Ptr const &Stroke();
+    core::TouchId Id();
 
-    core::Touch::Ptr const & Touch()
+    core::Touch::Ptr const &Touch()
     {
         DebugAssert(_touch);
         return _touch;
     }
-
 };
 
 typedef std::pair<core::TouchId, TouchData::Ptr const &> IdDataRefPair;
@@ -176,18 +173,18 @@ protected:
 
 public:
     PenEventData();
-    PenEventData(int          eventId,
+    PenEventData(int eventId,
                  PenEventType eventType,
-                 double       eventTime);
+                 double eventTime);
 
-    static PenEventData::Ptr New(int          eventId,
+    static PenEventData::Ptr New(int eventId,
                                  PenEventType event,
                                  double time);
     static PenEventData::Ptr New();
 
-    double          Time();
-    PenEventId      Id();
-    PenEventType    Type();
+    double Time();
+    PenEventId Id();
+    PenEventType Type();
 
     bool TipDownEvent()
     {
@@ -201,8 +198,7 @@ public:
 
     core::TouchClassification TouchType()
     {
-        switch (_eventType)
-        {
+        switch (_eventType) {
             case PenEventType::Tip1Down:
             case PenEventType::Tip1Up:
                 return core::TouchClassification::Pen;
@@ -216,7 +212,6 @@ public:
             default:
                 return core::TouchClassification::Unknown;
                 break;
-
         }
     }
 };
@@ -227,17 +222,16 @@ typedef std::pair<PenEventId, PenEventData::Ptr> IdPenEventDataPair;
 class TouchLogger
 {
 protected:
-
     boost::container::flat_map<core::TouchId, TouchData::Ptr> _touchData;
 
     //std::map<core::TouchId, TouchData::Ptr> _touchData;
 
     // ConcurrentTouches is called a ton, and it's slow.  Cache the results.
-    boost::container::flat_map<core::TouchId, TouchIdVector>  _concurrentTouchesCache;
+    boost::container::flat_map<core::TouchId, TouchIdVector> _concurrentTouchesCache;
 
     double _currentTime;
-    double _startTime;     // Start time for first recorded touch
-    double _relativeTime;  // Just _currenttime - _startTime
+    double _startTime;    // Start time for first recorded touch
+    double _relativeTime; // Just _currenttime - _startTime
 
     // Only remove touches if *both* ended more than _trailingTouchTimeWindow seconds in the past,
     // *and* have currently stored more than _trailingTouchCount touches.
@@ -250,10 +244,10 @@ protected:
     const double _trailingPenEventTimeWindow = 20.0;
 
     // Keeps ordered logs of touch ended's, so we can figure out when to boot touch data
-    std::set<core::TouchId> _activeTouches;  //
-    std::deque<core::TouchId>    _endedTouches;
+    std::set<core::TouchId> _activeTouches; //
+    std::deque<core::TouchId> _endedTouches;
 
-    std::vector<core::TouchId> _cancelledTouches;  // Staging container for cancelled touches
+    std::vector<core::TouchId> _cancelledTouches;   // Staging container for cancelled touches
     std::vector<core::TouchId> _endedTouchesStaged; // Staging container for ended touches
 
     std::set<core::TouchId> _removedTouches; // touches which have been removed by the app
@@ -265,7 +259,7 @@ protected:
     // Silly way to translate ints to PenEvent Id's: manual counting
     int _penEventCounter = 0;
 
-    const CommonData* _commonData;
+    const CommonData *_commonData;
 
 public:
     ALIAS_PTR_TYPES(TouchLogger);
@@ -278,11 +272,9 @@ protected:
     void FlushEndedTouchesFromActiveSet();
 
 public:
-    inline TouchLogger(CommonData const* commonData) :
-                            _commonData(commonData),
-                            _currentTime(0.0)
-    {
-    };
+    inline TouchLogger(CommonData const *commonData)
+    : _commonData(commonData)
+    , _currentTime(0.0){};
 
     /////////////////////////////////
     //
@@ -294,7 +286,7 @@ public:
     //
     ///////////////////////////////
 
-    std::vector<core::TouchId> const & NewlyEndedTouches()
+    std::vector<core::TouchId> const &NewlyEndedTouches()
     {
         return _endedTouchesStaged;
     }
@@ -315,7 +307,7 @@ public:
     core::TouchId OldestReclassifiableTouch();
 
     // Logging methods
-    void TouchesChanged(const std::set<core::Touch::Ptr> & touches);
+    void TouchesChanged(const std::set<core::Touch::Ptr> &touches);
     void ClearUnclusteredEndedTouches();
 
     void LogPenEvent(PenEvent event);
@@ -330,27 +322,27 @@ public:
     double Time();
 
     // Returns a TouchIdVector containing common elements
-    TouchIdVector IntersectTouchIdVectors(TouchIdVector* v1, TouchIdVector* v2);
-    TouchIdVector IntersectTouchIdVectors(TouchIdVector* v1, TouchIdSet* v2);
+    TouchIdVector IntersectTouchIdVectors(TouchIdVector *v1, TouchIdVector *v2);
+    TouchIdVector IntersectTouchIdVectors(TouchIdVector *v1, TouchIdSet *v2);
 
     // Accessors for Touch and PenEvent data
-    TouchData::Ptr    const & Data(core::TouchId id);
+    TouchData::Ptr const &Data(core::TouchId id);
     std::vector<TouchData::Ptr> Data(TouchIdVector ids);
 
     // if/when TouchTracker gets modified to hold the ended touches the classifier needs
     // we can remove this call and replace it with the like-named TouchTracker call.
-    core::Touch::Ptr const & TouchWithId(core::TouchId touchId);
+    core::Touch::Ptr const &TouchWithId(core::TouchId touchId);
     bool ContainsTouchWithId(core::TouchId touchId);
 
-    Stroke::Ptr const & Stroke(core::TouchId id);
+    Stroke::Ptr const &Stroke(core::TouchId id);
     std::vector<Stroke::Ptr> Stroke(TouchIdVector ids);
 
     ClusterPtr Cluster(core::TouchId touchId);
 
     core::TouchPhase Phase(core::TouchId id);
-    std::vector<core::TouchPhase>  Phase(TouchIdVector ids);
+    std::vector<core::TouchPhase> Phase(TouchIdVector ids);
 
-    PenEventData::Ptr const & PenData(PenEventId id);
+    PenEventData::Ptr const &PenData(PenEventId id);
     std::vector<PenEventData::Ptr> PenData(PenEventIdVector ids);
 
     double PenTime(PenEventId id);
@@ -390,7 +382,7 @@ public:
 
     // Ids begun within specified (absolute) time interval
     TouchIdSet TouchIdSetBeganInTimeInterval(double interval_start,
-                                            double interval_end);
+                                             double interval_end);
 
     TouchIdSet TouchIdSetEndedInTimeInterval(double interval_start,
                                              double interval_end);
@@ -461,6 +453,5 @@ public:
 };
 
 core::TouchId InvalidTouchId();
-
 }
 }

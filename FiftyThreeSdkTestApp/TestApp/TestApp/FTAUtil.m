@@ -33,12 +33,12 @@
     CGContextSetGrayFillColor(context, 1.0, 1.0);
 
     // Draw circle
-    float halfSize = resolution/2.0;
+    float halfSize = resolution / 2.0;
     CGContextAddArc(context, halfSize, halfSize, halfSize - 0.5f, 0, M_PI * 2, false);
     CGContextFillPath(context);
 
     // Grab data
-    void* data = CGBitmapContextGetData(context);
+    void *data = CGBitmapContextGetData(context);
 
     // Upload pixel data to GPU texture
     GLuint texture;
@@ -191,8 +191,7 @@
 
     shader.attributeLocations = [@[] mutableCopy];
     shader.attribute = [@{} mutableCopy];
-    for(int i = 0; i < [shader.attributeNames count]; ++i)
-    {
+    for (int i = 0; i < [shader.attributeNames count]; ++i) {
         GLuint location = glGetAttribLocation(program, [shader.attributeNames[i] UTF8String]);
         [shader.attributeLocations addObject:[NSNumber numberWithInt:location]];
 
@@ -202,8 +201,7 @@
     // Get uniform locations
     shader.uniformLocations = [@[] mutableCopy];
     shader.uniform = [@{} mutableCopy];
-    for(int i = 0; i < [shader.uniformNames count]; ++i)
-    {
+    for (int i = 0; i < [shader.uniformNames count]; ++i) {
         GLuint location = glGetUniformLocation(program, [shader.uniformNames[i] UTF8String]);
         [shader.uniformLocations addObject:[NSNumber numberWithInt:location]];
         shader.uniform[shader.uniformNames[i]] = shader.uniformLocations[i];
@@ -214,13 +212,11 @@
     shader.glProgram = program;
 
     // Release vertex and fragment shaders
-    if (vertShader)
-    {
+    if (vertShader) {
         glDetachShader(program, vertShader);
         glDeleteShader(vertShader);
     }
-    if (fragShader)
-    {
+    if (fragShader) {
         glDetachShader(program, fragShader);
         glDeleteShader(fragShader);
     }

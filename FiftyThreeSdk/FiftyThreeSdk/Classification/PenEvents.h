@@ -19,15 +19,14 @@ namespace fiftythree
 {
 namespace sdk
 {
-
 typedef std::pair<PenEventId, float> IdLikelihoodPair;
 
 class PenEventClassifier
 {
 protected:
     // members
-    ClusterTracker::Ptr  _clusterTracker;
-    const CommonData*    _commonData;
+    ClusterTracker::Ptr _clusterTracker;
+    const CommonData *_commonData;
 
     bool _tip1DownDetected;
     bool _tip1UpDetected;
@@ -49,26 +48,25 @@ protected:
     const float lambda = 3.0f;
 
     // based on some data with the production tips 11/25/2013
-    const float _expectedDownDelayCycles  = 1.5f;
+    const float _expectedDownDelayCycles = 1.5f;
     const float _expectedUpPreDelayCycles = 1.0f;
 
 public:
     // members
 
 protected:
-
-    void MarkTouchTypes(IdTypeMap* touches, core::TouchId id, core::TouchClassification type);
-    void MarkTouchTypes(IdTypeMap* touches, TouchIdVector ids, core::TouchClassification type);
+    void MarkTouchTypes(IdTypeMap *touches, core::TouchId id, core::TouchClassification type);
+    void MarkTouchTypes(IdTypeMap *touches, TouchIdVector ids, core::TouchClassification type);
 
     void FoundPenEventTouch(PenEventId id);
     bool IsPenEventTouchFound(PenEventId id);
 
 public:
-    inline PenEventClassifier(ClusterTracker::Ptr clusterTracker, const CommonData* dataPtr) :
-                                    _clusterTracker(clusterTracker),
-                                    _commonData(dataPtr),
-                                    _tip1DownDetected(false),
-                                    _tip1UpDetected(false)
+    inline PenEventClassifier(ClusterTracker::Ptr clusterTracker, const CommonData *dataPtr)
+    : _clusterTracker(clusterTracker)
+    , _commonData(dataPtr)
+    , _tip1DownDetected(false)
+    , _tip1UpDetected(false)
     {
     }
 
@@ -88,10 +86,10 @@ public:
 
     float SwitchDurationLikelihoodForTimingError(float timingError);
 
-    std::pair<core::TouchClassification, float> TypeAndScoreForCluster(Cluster & cluster);
+    std::pair<core::TouchClassification, float> TypeAndScoreForCluster(Cluster &cluster);
 
     IdLikelihoodPair BestPenDownEventForTouch(core::TouchId touchId, PenEventIdSet const &penDownEvents);
-    IdLikelihoodPair BestPenUpEventForTouch(core::TouchId touchId,   PenEventIdSet const &penUpEvents);
+    IdLikelihoodPair BestPenUpEventForTouch(core::TouchId touchId, PenEventIdSet const &penUpEvents);
 
     PenEventId BestPenDownEventForTouch(core::TouchId touchId);
     PenEventId BestPenUpEventForTouch(core::TouchId touchId);
@@ -101,16 +99,14 @@ public:
     // used by the clusterTracker/touchLog to determine when we can safely remove data.
     double IrrelevancyTimeWindow() const;
 
-    float PenDownProbabilityForTouchGivenPenEvent(core::TouchId touchId, PenEventId downEventId,
-                                                  TouchIdVector touchesBegan, Eigen::VectorXf prior);
+    float PenDownProbabilityForTouchGivenPenEvent(core::TouchId touchId, PenEventId downEventId, TouchIdVector touchesBegan, Eigen::VectorXf prior);
 
-    float PenUpProbabilityForTouchGivenPenEvent(core::TouchId touchId,   PenEventId upEventId,
-                                                TouchIdVector touchesEnded, Eigen::VectorXf prior);
+    float PenUpProbabilityForTouchGivenPenEvent(core::TouchId touchId, PenEventId upEventId, TouchIdVector touchesEnded, Eigen::VectorXf prior);
 
     float DurationTimeErrorProbabilityForTouch(core::TouchId probeId,
                                                float switchOnDuration,
-                                               const TouchIdVector & concurrentTouches,
-                                               const Eigen::VectorXf & prior);
+                                               const TouchIdVector &concurrentTouches,
+                                               const Eigen::VectorXf &prior);
 
     float SwitchOnDurationInTimeInterval(double t0, double t1);
 

@@ -9,30 +9,29 @@
 
 #import "FTPen.h"
 
-extern NSString * const kFTPenDidUpdatePrivatePropertiesNotificationName;
-extern NSString * const kFTPenDidWriteHasListenerNotificationName;
+extern NSString *const kFTPenDidUpdatePrivatePropertiesNotificationName;
+extern NSString *const kFTPenDidWriteHasListenerNotificationName;
 
-extern NSString * const kFTPenNumTipPressesPropertyName;
-extern NSString * const kFTPenNumEraserPressesPropertyName;
-extern NSString * const kFTPenNumFailedConnectionsPropertyName;
-extern NSString * const kFTPenNumSuccessfulConnectionsPropertyName;
-extern NSString * const kFTPenNumResetsPropertyName;
-extern NSString * const kFTPenNumLinkTerminationsPropertyName;
-extern NSString * const kFTPenNumDroppedNotificationsPropertyName;
-extern NSString * const kFTPenConnectedSecondsPropertyName;
-extern NSString * const kFTPenCentralIdPropertyName;
+extern NSString *const kFTPenNumTipPressesPropertyName;
+extern NSString *const kFTPenNumEraserPressesPropertyName;
+extern NSString *const kFTPenNumFailedConnectionsPropertyName;
+extern NSString *const kFTPenNumSuccessfulConnectionsPropertyName;
+extern NSString *const kFTPenNumResetsPropertyName;
+extern NSString *const kFTPenNumLinkTerminationsPropertyName;
+extern NSString *const kFTPenNumDroppedNotificationsPropertyName;
+extern NSString *const kFTPenConnectedSecondsPropertyName;
+extern NSString *const kFTPenCentralIdPropertyName;
 
-extern NSString * const kFTPenInactivityTimeoutPropertyName;
-extern NSString * const kFTPenPressureSetupPropertyName;
-extern NSString * const kFTPenMotionSetupPropertyName;
+extern NSString *const kFTPenInactivityTimeoutPropertyName;
+extern NSString *const kFTPenPressureSetupPropertyName;
+extern NSString *const kFTPenMotionSetupPropertyName;
 
-extern NSString * const kFTPenManufacturingIDPropertyName;
-extern NSString * const kFTPenLastErrorCodePropertyName;
-extern NSString * const kFTPenAuthenticationCodePropertyName;
-extern NSString * const kFTPenHasListenerPropertyName;
+extern NSString *const kFTPenManufacturingIDPropertyName;
+extern NSString *const kFTPenLastErrorCodePropertyName;
+extern NSString *const kFTPenAuthenticationCodePropertyName;
+extern NSString *const kFTPenHasListenerPropertyName;
 
-enum FTPencilStyle
-{
+enum FTPencilStyle {
     FTPencilStyleWalnut,
     FTPencilStyleGraphite,
     FTPencilStyleGold,

@@ -16,15 +16,13 @@ namespace fiftythree
 {
 namespace sdk
 {
-
 // This contains a collection of utilities used in offscreen strokes detection & extrapolation.
 
 DEFINE_ENUM(OffscreenStrokesMode,
             ExitOffscreen,
             EnterFromOffscreen);
 
-struct Settings
-{
+struct Settings {
     float OffscreenStrokes_MaxHistorySeconds;
     int OffscreenStrokes_MaxDiscardSamples;
     int OffscreenStrokes_MinSampleCount;
@@ -63,8 +61,7 @@ struct Settings
     Settings();
 };
 
-struct ScreenEdges
-{
+struct ScreenEdges {
     bool IsNearTop;
     bool IsNearBottom;
     bool IsNearLeft;
@@ -74,8 +71,7 @@ struct ScreenEdges
     bool IsEmpty() const;
 };
 
-struct OffscreenStroke
-{
+struct OffscreenStroke {
     bool IsOffscreenStroke;
 
     // The remaining properties are only set if IsOffscreenStroke == true;
@@ -85,17 +81,17 @@ struct OffscreenStroke
     int DiscardedSampleCount;
     int FirstOffscreenExtrapolatedSampleIdx;
     static OffscreenStroke NotAnOffscreenStroke();
-    static OffscreenStroke IsAnOffscreenStroke(const core::InputSample & lastSample,
-                                                      const core::InputSample & velocity,
-                                                      const core::InputSample & acceleration,
-                                                      int discardedSampleCount,
-                                                      int firstOffscreenExtrapolatedSampleIdx);
+    static OffscreenStroke IsAnOffscreenStroke(const core::InputSample &lastSample,
+                                               const core::InputSample &velocity,
+                                               const core::InputSample &acceleration,
+                                               int discardedSampleCount,
+                                               int firstOffscreenExtrapolatedSampleIdx);
 };
 
 float MaxHistorySeconds(bool isPermissive);
 
-bool IsVelocityTowardScreenEdgesPermissive(const core::InputSample & velocity,
-                                           const ScreenEdges & screenEdges);
+bool IsVelocityTowardScreenEdgesPermissive(const core::InputSample &velocity,
+                                           const ScreenEdges &screenEdges);
 
 // When extrapolating, ignore samples older than
 // GlobalSettings::Instance()->OffscreenStrokes_MaxHistorySeconds().
@@ -115,48 +111,48 @@ bool IsVelocityTowardScreenEdgesPermissive(const core::InputSample & velocity,
 //
 // Samples closer than GlobalSettings::Instance()->OffscreenStrokes_UnreliableSampleEdgeDistance()
 // to an edge of the screen are considered unreliable and are discarded if possible.
-void InputSampleSmoothedVelocityAndAcceleration(const std::vector<core::InputSample> & samples,
-                                            const float smoothingLambda,
-                                                core::InputSample & velocity,
-                                                core::InputSample & acceleration);
+void InputSampleSmoothedVelocityAndAcceleration(const std::vector<core::InputSample> &samples,
+                                                const float smoothingLambda,
+                                                core::InputSample &velocity,
+                                                core::InputSample &acceleration);
 
-void SmoothedVelocityAndAccelerationFromSamples(const std::vector<core::InputSample> & samples,
-                                                    core::InputSample & velocity,
-                                                    core::InputSample & acceleration);
+void SmoothedVelocityAndAccelerationFromSamples(const std::vector<core::InputSample> &samples,
+                                                core::InputSample &velocity,
+                                                core::InputSample &acceleration);
 
-core::InputSample NaiveVelocityFromSamples(const std::vector<core::InputSample> & samples);
+core::InputSample NaiveVelocityFromSamples(const std::vector<core::InputSample> &samples);
 
-core::optional<std::vector<core::InputSample>> FilterEdgeSamples(const std::vector<core::InputSample> & edgeSamples,
+core::optional<std::vector<core::InputSample>> FilterEdgeSamples(const std::vector<core::InputSample> &edgeSamples,
                                                                  OffscreenStrokesMode offscreenStrokesMode,
                                                                  int minSampleCount,
                                                                  int maxDiscardSamples,
                                                                  bool forceDecision,
                                                                  bool isPermissive,
-                                                                 int & discardedSampleCount);
+                                                                 int &discardedSampleCount);
 
-bool IsOnScreen(const core::InputSample & inputSample, const int margin);
+bool IsOnScreen(const core::InputSample &inputSample, const int margin);
 
-bool IsUnreliableSample(const core::InputSample & inputSample);
+bool IsUnreliableSample(const core::InputSample &inputSample);
 
-core::optional<OffscreenStroke> IsOffscreenStrokePermissive(const std::deque<core::InputSample> & normalizedSamples,
-                                                  OffscreenStrokesMode offscreenStrokesMode,
-                                                  bool forceDecision);
+core::optional<OffscreenStroke> IsOffscreenStrokePermissive(const std::deque<core::InputSample> &normalizedSamples,
+                                                            OffscreenStrokesMode offscreenStrokesMode,
+                                                            bool forceDecision);
 int MaxDiscardSamples(bool isPermissive);
 
 int MaxEdgeSampleWindowSize(bool isPermissive);
 
-std::vector<core::InputSample> EdgeSamplesForNormalizedSamples(const std::deque<core::InputSample> & normalizedSamples,
+std::vector<core::InputSample> EdgeSamplesForNormalizedSamples(const std::deque<core::InputSample> &normalizedSamples,
                                                                OffscreenStrokesMode offscreenStrokesMode,
                                                                bool isPermissive);
 
-std::deque<core::InputSample> NormalizedSamplesForTouch(const core::Touch::cPtr & touch);
+std::deque<core::InputSample> NormalizedSamplesForTouch(const core::Touch::cPtr &touch);
 
-ScreenEdges ScreenEdgesNearSample(const core::InputSample & inputSample, bool isPermissive);
+ScreenEdges ScreenEdgesNearSample(const core::InputSample &inputSample, bool isPermissive);
 
-core::optional<OffscreenStroke> IsOffscreenStrokePermissive(const core::Touch::cPtr & touch,
+core::optional<OffscreenStroke> IsOffscreenStrokePermissive(const core::Touch::cPtr &touch,
                                                             OffscreenStrokesMode offscreenStrokesMode,
                                                             bool forceDecision);
-bool DidTouchExitOffscreenPermissive(const core::Touch::cPtr & touch);
-core::optional<bool> WillTouchEnterFromOffscreenPermissive(const core::Touch::cPtr & touch);
+bool DidTouchExitOffscreenPermissive(const core::Touch::cPtr &touch);
+core::optional<bool> WillTouchEnterFromOffscreenPermissive(const core::Touch::cPtr &touch);
 }
 }

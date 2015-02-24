@@ -21,7 +21,7 @@ namespace sdk
 {
 TouchClassifier::Ptr ActiveClassifier::_Instance = TouchClassifier::Ptr();
 
-void ActiveClassifier::Activate(const TouchClassifier::Ptr & classifier)
+void ActiveClassifier::Activate(const TouchClassifier::Ptr &classifier)
 {
     _Instance = classifier;
 }

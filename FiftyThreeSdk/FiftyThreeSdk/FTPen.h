@@ -9,55 +9,51 @@
 
 #import <Foundation/Foundation.h>
 
-typedef struct PnPID
-{
+typedef struct PnPID {
     uint8_t vendorIdSource;
     uint16_t vendorId;
     uint16_t productId;
     uint16_t productVersion;
 } PnPID;
 
-extern NSString * const kFTPenDidEncounterErrorNotificationName;
-extern NSString * const kFTPenIsReadyDidChangeNotificationName;
-extern NSString * const kFTPenIsTipPressedDidChangeNotificationName;
-extern NSString * const kFTPenIsEraserPressedDidChangeNotificationName;
-extern NSString * const kFTPenBatteryLevelDidChangeNotificationName;
-extern NSString * const kFTPenDidUpdatePropertiesNotificationName;
-extern NSString * const kFTPenNotificationPropertiesKey;
+extern NSString *const kFTPenDidEncounterErrorNotificationName;
+extern NSString *const kFTPenIsReadyDidChangeNotificationName;
+extern NSString *const kFTPenIsTipPressedDidChangeNotificationName;
+extern NSString *const kFTPenIsEraserPressedDidChangeNotificationName;
+extern NSString *const kFTPenBatteryLevelDidChangeNotificationName;
+extern NSString *const kFTPenDidUpdatePropertiesNotificationName;
+extern NSString *const kFTPenNotificationPropertiesKey;
 
-extern NSString * const kFTPenNamePropertyName;
-extern NSString * const kFTPenManufacturerNamePropertyName;
-extern NSString * const kFTPenModelNumberPropertyName;
-extern NSString * const kFTPenSerialNumberPropertyName;
-extern NSString * const kFTPenFirmwareRevisionPropertyName;
-extern NSString * const kFTPenHardwareRevisionPropertyName;
-extern NSString * const kFTPenSoftwareRevisionPropertyName;
-extern NSString * const kFTPenSystemIDPropertyName;
-extern NSString * const kFTPenIEEECertificationDataPropertyName;
-extern NSString * const kFTPenPnPIDCertificationDataPropertyName;
+extern NSString *const kFTPenNamePropertyName;
+extern NSString *const kFTPenManufacturerNamePropertyName;
+extern NSString *const kFTPenModelNumberPropertyName;
+extern NSString *const kFTPenSerialNumberPropertyName;
+extern NSString *const kFTPenFirmwareRevisionPropertyName;
+extern NSString *const kFTPenHardwareRevisionPropertyName;
+extern NSString *const kFTPenSoftwareRevisionPropertyName;
+extern NSString *const kFTPenSystemIDPropertyName;
+extern NSString *const kFTPenIEEECertificationDataPropertyName;
+extern NSString *const kFTPenPnPIDCertificationDataPropertyName;
 
-extern NSString * const kFTPenIsTipPressedPropertyName;
-extern NSString * const kFTPenIsEraserPressedPropertyName;
-extern NSString * const kFTPenBatteryLevelPropertyName;
+extern NSString *const kFTPenIsTipPressedPropertyName;
+extern NSString *const kFTPenIsEraserPressedPropertyName;
+extern NSString *const kFTPenBatteryLevelPropertyName;
 
 @protocol FTPenDelegate;
 
-typedef struct FTAccelerationSample
-{
-int16_t x;
-int16_t y;
-int16_t z;
+typedef struct FTAccelerationSample {
+    int16_t x;
+    int16_t y;
+    int16_t z;
 } FTAccelerationSample;
 
-typedef struct FTMagneticForceSample
-{
+typedef struct FTMagneticForceSample {
     int16_t x;
     int16_t y;
     int16_t z;
 } FTMagneticForceSample;
 
-typedef struct FTMotionSample
-{
+typedef struct FTMotionSample {
     FTAccelerationSample acceleration;
     FTMagneticForceSample magneticForce;
 

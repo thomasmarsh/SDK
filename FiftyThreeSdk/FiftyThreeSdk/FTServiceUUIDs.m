@@ -58,7 +58,7 @@
 #define FT_PEN_SERVICE_MOTION_UUID CFUUIDGetConstantUUIDWithBytes(kCFAllocatorSystemDefault, 0xFC, 0xCE, 0x8F, 0xB8, 0xD4, 0xC9, 0x43, 0x90, 0x8D, 0x75, 0x21, 0xCE, 0x74, 0x8E, 0xC3, 0x03)
 
 // CC454B53-1622-4604-95DD-A30ECC6A678E
-#define FT_PEN_SERVICE_MOTION_SETUP_UUID  CFUUIDGetConstantUUIDWithBytes(kCFAllocatorSystemDefault,0xCC, 0x45, 0x4B, 0x53, 0x16, 0x22, 0x46, 0x04, 0x95, 0xDD, 0xA3, 0x0E, 0xCC, 0x6A, 0x67, 0x8E)
+#define FT_PEN_SERVICE_MOTION_SETUP_UUID CFUUIDGetConstantUUIDWithBytes(kCFAllocatorSystemDefault, 0xCC, 0x45, 0x4B, 0x53, 0x16, 0x22, 0x46, 0x04, 0x95, 0xDD, 0xA3, 0x0E, 0xCC, 0x6A, 0x67, 0x8E)
 
 @implementation FTPenServiceUUIDs
 
@@ -166,7 +166,7 @@
                              [FTPenServiceUUIDs centralId] : @"CentralId",
                              [FTPenServiceUUIDs motion] : @"Motion",
                              [FTPenServiceUUIDs motionSetup] : @"MotionSetup",
-                             };
+    };
     return [UUIDs objectForKey:UUID];
 }
 
@@ -259,7 +259,7 @@
                              [FTPenUsageServiceUUIDs numLinkTerminations] : @"NumLinkTerminations",
                              [FTPenUsageServiceUUIDs numDroppedNotifications] : @"NumDroppedNotifications",
                              [FTPenUsageServiceUUIDs connectedSeconds] : @"ConnectedSeconds",
-                             };
+    };
 
     return [UUIDs objectForKey:UUID];
 }
@@ -331,7 +331,7 @@
                              [FTDeviceInfoServiceUUIDs softwareRevision] : @"SoftwareRevision",
                              [FTDeviceInfoServiceUUIDs systemID] : @"SystemID",
                              [FTDeviceInfoServiceUUIDs IEEECertificationData] : @"IEEECertificationData",
-                             [FTDeviceInfoServiceUUIDs PnPID] : @"PnPId"};
+                             [FTDeviceInfoServiceUUIDs PnPID] : @"PnPId" };
 
     return [UUIDs objectForKey:UUID];
 }
@@ -343,12 +343,10 @@
 NSString *FTNameForServiceUUID(CBUUID *UUID)
 {
     NSString *name = [FTPenServiceUUIDs nameForUUID:UUID];
-    if (!name)
-    {
+    if (!name) {
         name = [FTPenUsageServiceUUIDs nameForUUID:UUID];
     }
-    if (!name)
-    {
+    if (!name) {
         name = [FTDeviceInfoServiceUUIDs nameForUUID:UUID];
     }
 

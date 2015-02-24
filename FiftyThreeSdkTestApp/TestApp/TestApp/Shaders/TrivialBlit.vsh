@@ -2,7 +2,7 @@
 //  TrivialBlit.vsh
 //  TestApp
 //
-//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
+//  Copyright (c) 2015 FiftyThree, Inc. All rights reserved.
 //
 attribute vec2 inVertex;
 attribute vec2 inTex;

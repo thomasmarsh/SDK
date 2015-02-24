@@ -9,8 +9,7 @@
 
 #import <UIKit/UIKit.h>
 
-struct PairingSpotViewSettings
-{
+struct PairingSpotViewSettings {
     float BatteryFlashOpacityFactor = 0.25f;
     float CometMaxThickness = 16.0f;
     float CometRotationsPerSecond = 1.5f;
@@ -23,22 +22,20 @@ struct PairingSpotViewSettings
     float WellEasingAnimationDuration = 0.2f;
 };
 
-typedef NS_ENUM(NSInteger, FTPairingSpotConnectionState)
-{
+typedef NS_ENUM(NSInteger, FTPairingSpotConnectionState) {
     FTPairingSpotConnectionStateUnpaired,
     FTPairingSpotConnectionStateConnected,
     FTPairingSpotConnectionStateLowBattery,
     FTPairingSpotConnectionStateCriticallyLowBattery,
 };
 
-typedef NS_ENUM(NSInteger, FTPairingSpotCometState)
-{
+typedef NS_ENUM(NSInteger, FTPairingSpotCometState) {
     FTPairingSpotCometStateNone,
     FTPairingSpotCometStateClockwise,
     FTPairingSpotCometStateCounterClockwise,
 };
 
-extern NSString * const kPairingSpotStateDidChangeNotificationName;
+extern NSString *const kPairingSpotStateDidChangeNotificationName;
 
 @class PairingSpotView;
 

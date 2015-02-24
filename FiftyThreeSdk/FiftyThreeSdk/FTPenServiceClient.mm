@@ -74,8 +74,7 @@ using namespace fiftythree::core;
 - (id)initWithPeripheral:(CBPeripheral *)peripheral
 {
     self = [super init];
-    if (self)
-    {
+    if (self) {
         _peripheral = peripheral;
         _requiresTipBePressedToBecomeReady = YES;
         _inactivityTimeout = -1;
@@ -128,8 +127,7 @@ using namespace fiftythree::core;
 
 - (void)writeHasListener
 {
-    if (self.hasListenerCharacteristic)
-    {
+    if (self.hasListenerCharacteristic) {
         MLOG_INFO(FTLogSDK, "Set HasListener: %d", self.hasListener);
 
         const uint8_t hasListenerByte = (self.hasListener ? 1 : 0);
@@ -169,8 +167,7 @@ using namespace fiftythree::core;
 
     _inactivityTimeout = inactivityTimeout;
 
-    if (self.inactivityTimeoutCharacteristic)
-    {
+    if (self.inactivityTimeoutCharacteristic) {
         uint8_t inactivityTimeoutByte = inactivityTimeout;
         [self.peripheral writeValue:[NSData dataWithBytes:&inactivityTimeoutByte length:1]
                   forCharacteristic:self.inactivityTimeoutCharacteristic
@@ -181,8 +178,7 @@ using namespace fiftythree::core;
 
 - (void)readInactivityTimeout
 {
-    if (self.inactivityTimeoutCharacteristic)
-    {
+    if (self.inactivityTimeoutCharacteristic) {
         [self.peripheral readValueForCharacteristic:self.inactivityTimeoutCharacteristic];
     }
 }
@@ -192,8 +188,7 @@ using namespace fiftythree::core;
     FTAssert(pressureSetup, @"pressureSetup non-nil");
 
     _pressureSetup = pressureSetup;
-    if (self.pressureSetupCharacteristic)
-    {
+    if (self.pressureSetupCharacteristic) {
         static int length = 10;
         uint8_t bytes[length];
         NSData *data = [NSData dataWithBytes:bytes length:10];
@@ -212,8 +207,7 @@ using namespace fiftythree::core;
     FTAssert(setup, @"setup non-nil");
 
     _motionSetup = setup;
-    if (self.motionSetup)
-    {
+    if (self.motionSetup) {
         static int length = 2;
         uint8_t bytes[length];
         NSData *data = [NSData dataWithBytes:bytes length:2];
@@ -231,8 +225,7 @@ using namespace fiftythree::core;
 {
     FTAssert(manufacturingID.length == 15, @"Manufacturing ID must be 15 characters");
 
-    if (self.manufacturingIDCharacteristic)
-    {
+    if (self.manufacturingIDCharacteristic) {
         [self.peripheral writeNSString:manufacturingID
                      forCharacteristic:self.manufacturingIDCharacteristic
                                   type:CBCharacteristicWriteWithResponse];
@@ -247,8 +240,7 @@ using namespace fiftythree::core;
 {
     FTAssert(authenticationCode.length == 20, @"Authentication Code must be 20 bytes");
 
-    if (self.authenticationCodeCharacteristic)
-    {
+    if (self.authenticationCodeCharacteristic) {
         [self.peripheral writeValue:authenticationCode
                   forCharacteristic:self.authenticationCodeCharacteristic
                                type:CBCharacteristicWriteWithResponse];
@@ -262,27 +254,23 @@ using namespace fiftythree::core;
 
 - (void)setCentralId:(UInt32)centralId
 {
-    if (self.centralIdCharacteristic)
-    {
+    if (self.centralIdCharacteristic) {
         _centralId = centralId;
 
-        NSData * data = [NSData dataWithBytes:&_centralId length:4];
+        NSData *data = [NSData dataWithBytes:&_centralId length:4];
         [self.peripheral writeValue:data
                   forCharacteristic:self.centralIdCharacteristic
                                type:CBCharacteristicWriteWithResponse];
 
         MLOG_INFO(FTLogSDK, "Set CentralId: %x", (unsigned int)self.centralId);
-    }
-    else
-    {
+    } else {
         MLOG_ERROR(FTLogSDK, "Attempted to write CentralId before possible.");
     }
 }
 
 - (BOOL)readManufacturingIDAndAuthCode
 {
-    if (self.manufacturingIDCharacteristic && self.authenticationCodeCharacteristic)
-    {
+    if (self.manufacturingIDCharacteristic && self.authenticationCodeCharacteristic) {
         [self.peripheral readValueForCharacteristic:self.manufacturingIDCharacteristic];
         [self.peripheral readValueForCharacteristic:self.authenticationCodeCharacteristic];
 
@@ -296,9 +284,8 @@ using namespace fiftythree::core;
 {
     _lastErrorCode = nil;
 
-    if (self.lastErrorCodeCharacteristic)
-    {
-        uint32_t value[2] = { 0, 0 };
+    if (self.lastErrorCodeCharacteristic) {
+        uint32_t value[2] = {0, 0};
         NSData *data = [NSData dataWithBytes:&value length:sizeof(value)];
         [self.peripheral writeValue:data
                   forCharacteristic:self.lastErrorCodeCharacteristic
@@ -306,7 +293,7 @@ using namespace fiftythree::core;
 
         [self.peripheral readValueForCharacteristic:self.lastErrorCodeCharacteristic];
 
-        NSSet *updatedProperties = [NSSet setWithArray:@[kFTPenLastErrorCodePropertyName]];
+        NSSet *updatedProperties = [NSSet setWithArray:@[ kFTPenLastErrorCodePropertyName ]];
         [self.delegate penServiceClient:self didUpdatePenProperties:updatedProperties];
     }
 }
@@ -315,14 +302,9 @@ using namespace fiftythree::core;
 
 - (NSArray *)ensureServicesForConnectionState:(BOOL)isConnected;
 {
-    if (isConnected)
-    {
-        return (self.penService ?
-                nil :
-                @[[FTPenServiceUUIDs penService]]);
-    }
-    else
-    {
+    if (isConnected) {
+        return (self.penService ? nil : @[ [FTPenServiceUUIDs penService] ]);
+    } else {
         self.penService = nil;
         self.isTipPressedCharacteristic = nil;
         self.isEraserPressedCharacteristic = nil;
@@ -366,30 +348,27 @@ using namespace fiftythree::core;
 
 - (void)peripheral:(CBPeripheral *)peripheral didDiscoverServices:(NSError *)error
 {
-    if (!self.penService)
-    {
+    if (!self.penService) {
         self.penService = [FTServiceClient findServiceWithPeripheral:peripheral
                                                              andUUID:[FTPenServiceUUIDs penService]];
 
-        if (self.penService)
-        {
-            NSArray *characteristics = @[[FTPenServiceUUIDs isTipPressed],
-                                         [FTPenServiceUUIDs hasListener],
-                                         [FTPenServiceUUIDs tipPressure],
-                                         [FTPenServiceUUIDs isEraserPressed],
-                                         [FTPenServiceUUIDs eraserPressure],
-                                         [FTPenServiceUUIDs batteryLevel],
-                                         [FTPenServiceUUIDs shouldSwing],
-                                         [FTPenServiceUUIDs shouldPowerOff],
-                                         [FTPenServiceUUIDs inactivityTimeout],
-                                         [FTPenServiceUUIDs manufacturingID],
-                                         [FTPenServiceUUIDs authenticationCode],
-                                         [FTPenServiceUUIDs lastErrorCode],
-                                         [FTPenServiceUUIDs pressureSetup],
-                                         [FTPenServiceUUIDs centralId],
-                                         [FTPenServiceUUIDs motion],
-                                         [FTPenServiceUUIDs motionSetup]
-                                         ];
+        if (self.penService) {
+            NSArray *characteristics = @[ [FTPenServiceUUIDs isTipPressed],
+                                          [FTPenServiceUUIDs hasListener],
+                                          [FTPenServiceUUIDs tipPressure],
+                                          [FTPenServiceUUIDs isEraserPressed],
+                                          [FTPenServiceUUIDs eraserPressure],
+                                          [FTPenServiceUUIDs batteryLevel],
+                                          [FTPenServiceUUIDs shouldSwing],
+                                          [FTPenServiceUUIDs shouldPowerOff],
+                                          [FTPenServiceUUIDs inactivityTimeout],
+                                          [FTPenServiceUUIDs manufacturingID],
+                                          [FTPenServiceUUIDs authenticationCode],
+                                          [FTPenServiceUUIDs lastErrorCode],
+                                          [FTPenServiceUUIDs pressureSetup],
+                                          [FTPenServiceUUIDs centralId],
+                                          [FTPenServiceUUIDs motion],
+                                          [FTPenServiceUUIDs motionSetup] ];
 
             [peripheral discoverCharacteristics:characteristics forService:self.penService];
         }
@@ -397,34 +376,29 @@ using namespace fiftythree::core;
 }
 
 - (void)peripheral:(CBPeripheral *)peripheral didDiscoverCharacteristicsForService:(CBService *)service
-             error:(NSError *)error
+                                   error:(NSError *)error
 {
-    if (error || service.characteristics.count == 0)
-    {
+    if (error || service.characteristics.count == 0) {
         MLOG_ERROR(FTLogSDK, "Error discovering characteristics: %s", ObjcDescription(error.localizedDescription));
 
         // TODO: Report failed state
         return;
     }
 
-    if (service != self.penService)
-    {
+    if (service != self.penService) {
         return;
     }
 
-    for (CBCharacteristic *characteristic in service.characteristics)
-    {
+    for (CBCharacteristic *characteristic in service.characteristics) {
         // IsTipPressed
         if (!self.isTipPressedCharacteristic &&
-            [characteristic.UUID isEqual:[FTPenServiceUUIDs isTipPressed]])
-        {
+            [characteristic.UUID isEqual:[FTPenServiceUUIDs isTipPressed]]) {
             self.isTipPressedCharacteristic = characteristic;
         }
 
         // HasListener
         if (!self.hasListenerCharacteristic &&
-            [characteristic.UUID isEqual:[FTPenServiceUUIDs hasListener]])
-        {
+            [characteristic.UUID isEqual:[FTPenServiceUUIDs hasListener]]) {
             self.hasListener = YES;
             self.hasListenerCharacteristic = characteristic;
             [self writeHasListener];
@@ -432,98 +406,84 @@ using namespace fiftythree::core;
 
         // IsEraserPressed
         if (!self.isEraserPressedCharacteristic &&
-            [characteristic.UUID isEqual:[FTPenServiceUUIDs isEraserPressed]])
-        {
+            [characteristic.UUID isEqual:[FTPenServiceUUIDs isEraserPressed]]) {
             self.isEraserPressedCharacteristic = characteristic;
         }
 
         // TipPressure
         if (!self.tipPressureCharacteristic &&
-            [characteristic.UUID isEqual:[FTPenServiceUUIDs tipPressure]])
-        {
+            [characteristic.UUID isEqual:[FTPenServiceUUIDs tipPressure]]) {
             self.tipPressureCharacteristic = characteristic;
         }
 
         // EraserPressure
         if (!self.eraserPressureCharacteristic &&
-            [characteristic.UUID isEqual:[FTPenServiceUUIDs eraserPressure]])
-        {
+            [characteristic.UUID isEqual:[FTPenServiceUUIDs eraserPressure]]) {
             self.eraserPressureCharacteristic = characteristic;
         }
 
         // BatteryLevel
         if (!self.batteryLevelCharacteristic &&
-            [characteristic.UUID isEqual:[FTPenServiceUUIDs batteryLevel]])
-        {
+            [characteristic.UUID isEqual:[FTPenServiceUUIDs batteryLevel]]) {
             self.batteryLevelCharacteristic = characteristic;
         }
 
         // ShouldSwing
         if (!self.shouldSwingCharacteristic &&
-            [characteristic.UUID isEqual:[FTPenServiceUUIDs shouldSwing]])
-        {
+            [characteristic.UUID isEqual:[FTPenServiceUUIDs shouldSwing]]) {
             self.shouldSwingCharacteristic = characteristic;
         }
 
         // ShouldPowerOff
         if (!self.shouldPowerOffCharacteristic &&
-            [characteristic.UUID isEqual:[FTPenServiceUUIDs shouldPowerOff]])
-        {
+            [characteristic.UUID isEqual:[FTPenServiceUUIDs shouldPowerOff]]) {
             self.shouldPowerOffCharacteristic = characteristic;
         }
 
         // InactivityTimeout
         if (!self.inactivityTimeoutCharacteristic &&
-            [characteristic.UUID isEqual:[FTPenServiceUUIDs inactivityTimeout]])
-        {
+            [characteristic.UUID isEqual:[FTPenServiceUUIDs inactivityTimeout]]) {
             self.inactivityTimeoutCharacteristic = characteristic;
         }
 
         // PressureSetup
         if (!self.pressureSetupCharacteristic &&
-            [characteristic.UUID isEqual:[FTPenServiceUUIDs pressureSetup]])
-        {
+            [characteristic.UUID isEqual:[FTPenServiceUUIDs pressureSetup]]) {
             self.pressureSetupCharacteristic = characteristic;
         }
 
         // ManufacturingID
         if (!self.manufacturingIDCharacteristic &&
-            [characteristic.UUID isEqual:[FTPenServiceUUIDs manufacturingID]])
-        {
+            [characteristic.UUID isEqual:[FTPenServiceUUIDs manufacturingID]]) {
             self.manufacturingIDCharacteristic = characteristic;
         }
 
         // LastErrorCode
         if (!self.lastErrorCodeCharacteristic &&
-            [characteristic.UUID isEqual:[FTPenServiceUUIDs lastErrorCode]])
-        {
+            [characteristic.UUID isEqual:[FTPenServiceUUIDs lastErrorCode]]) {
             self.lastErrorCodeCharacteristic = characteristic;
         }
 
         // AuthenticationCode
         if (!self.authenticationCodeCharacteristic &&
-            [characteristic.UUID isEqual:[FTPenServiceUUIDs authenticationCode]])
-        {
+            [characteristic.UUID isEqual:[FTPenServiceUUIDs authenticationCode]]) {
             self.authenticationCodeCharacteristic = characteristic;
         }
 
         // CentralId
         if (!self.centralIdCharacteristic &&
-            [characteristic.UUID isEqual:[FTPenServiceUUIDs centralId]])
-        {
+            [characteristic.UUID isEqual:[FTPenServiceUUIDs centralId]]) {
             self.centralIdCharacteristic = characteristic;
         }
         // Motion
         if (!self.motionSetup &&
-            [characteristic.UUID isEqual:[FTPenServiceUUIDs motion]])
-        {
+            [characteristic.UUID isEqual:[FTPenServiceUUIDs motion]]) {
             self.motionCharacteristic = characteristic;
         }
 
         // MotionSetup
         if (!self.motionSetupCharacteristic &&
-            [characteristic.UUID isEqual:[FTPenServiceUUIDs motionSetup]])
-        {
+            [characteristic.UUID isEqual:[FTPenServiceUUIDs motionSetup]]) {
             self.motionSetupCharacteristic = characteristic;
         }
     }
@@ -532,15 +492,11 @@ using namespace fiftythree::core;
 }
 
 - (void)peripheral:(CBPeripheral *)peripheral didUpdateValueForCharacteristic:(CBCharacteristic *)characteristic
-             error:(NSError *)error
+                              error:(NSError *)error
 {
-    if (error)
-    {
-        if ([FTPenServiceUUIDs nameForUUID:characteristic.UUID])
-        {
-            MLOG_ERROR(FTLogSDK, "Error updating value for characteristic: %s error: %s.",
-                       ObjcDescription([FTPenServiceUUIDs nameForUUID:characteristic.UUID]),
-                       ObjcDescription(error.localizedDescription));
+    if (error) {
+        if ([FTPenServiceUUIDs nameForUUID:characteristic.UUID]) {
+            MLOG_ERROR(FTLogSDK, "Error updating value for characteristic: %s error: %s.", ObjcDescription([FTPenServiceUUIDs nameForUUID:characteristic.UUID]), ObjcDescription(error.localizedDescription));
 
             // TODO: Report failed state
         }
@@ -549,35 +505,27 @@ using namespace fiftythree::core;
 
     NSMutableSet *updatedProperties = [NSMutableSet set];
 
-    if ([characteristic isEqual:self.isTipPressedCharacteristic])
-    {
+    if ([characteristic isEqual:self.isTipPressedCharacteristic]) {
         // To avoid race conditions, it's crucial that we start listening for changes in the characteristic
         // before reading its value for the first time.
         FTAssert(self.isTipPressedDidSetNofifyValue,
                  @"The IsTipPressed characteristic must be notifying before we first read its value.");
 
         BOOL isTipPressed = self.isTipPressed;
-//        NSLog(@"IsTipPressed did update value: %d", isTipPressed);
+        //        NSLog(@"IsTipPressed did update value: %d", isTipPressed);
 
-        if (self.isReady)
-        {
-            if (!isTipPressed)
-            {
+        if (self.isReady) {
+            if (!isTipPressed) {
                 self.lastTipReleaseTime = [NSDate date];
             }
 
             // This must be called *after* updating the lastTipReleaseTime property since the delegate code
             // may need to take that property into account.
             [self.delegate penServiceClient:self isTipPressedDidChange:isTipPressed];
-        }
-        else
-        {
-            if (!self.requiresTipBePressedToBecomeReady || isTipPressed)
-            {
+        } else {
+            if (!self.requiresTipBePressedToBecomeReady || isTipPressed) {
                 self.isReady = YES;
-            }
-            else
-            {
+            } else {
                 NSDictionary *userInfo = @{ NSLocalizedDescriptionKey :
                                                 @"The pen tip must be pressed to finalize the connection." };
                 NSError *error = [NSError errorWithDomain:kFiftyThreeErrorDomain
@@ -586,9 +534,7 @@ using namespace fiftythree::core;
                 [self.delegate penServiceClient:self didEncounterError:error];
             }
         }
-    }
-    else if ([characteristic isEqual:self.isEraserPressedCharacteristic])
-    {
+    } else if ([characteristic isEqual:self.isEraserPressedCharacteristic]) {
         // To avoid race conditions, it's crucial that we start listening for changes in the characteristic
         // before reading its value for the first time.
         FTAssert(self.isEraserPressedDidSetNofifyValue,
@@ -597,22 +543,16 @@ using namespace fiftythree::core;
         BOOL isEraserPressed = self.isEraserPressed;
         [self.delegate penServiceClient:self isEraserPressedDidChange:isEraserPressed];
 
-//        NSLog(@"IsEraserPressed did update value: %d", isEraserPressed);
+        //        NSLog(@"IsEraserPressed did update value: %d", isEraserPressed);
     }
-    if ([characteristic.UUID isEqual:[FTPenServiceUUIDs tipPressure]])
-    {
+    if ([characteristic.UUID isEqual:[FTPenServiceUUIDs tipPressure]]) {
         _tipPressure = [characteristic valueAsNSUInteger];
         [self.delegate penServiceClient:self didUpdateTipPressure:_tipPressure];
-    }
-    else if ([characteristic.UUID isEqual:[FTPenServiceUUIDs eraserPressure]])
-    {
+    } else if ([characteristic.UUID isEqual:[FTPenServiceUUIDs eraserPressure]]) {
         _eraserPressure = [characteristic valueAsNSUInteger];
         [self.delegate penServiceClient:self didUpdateEraserPressure:_eraserPressure];
-    }
-    else if ([characteristic.UUID isEqual:[FTPenServiceUUIDs motion]])
-    {
-        if (self.motionCharacteristic)
-        {
+    } else if ([characteristic.UUID isEqual:[FTPenServiceUUIDs motion]]) {
+        if (self.motionCharacteristic) {
             FTAssert(characteristic == self.motionCharacteristic, @"characteristic = self.motionCharacteristic");
 
             NSData *data = characteristic.value;
@@ -634,8 +574,7 @@ using namespace fiftythree::core;
             _motion.magneticForce.y = 0x0;
             _motion.magneticForce.z = 0x0;
 
-            if (data.length >= 12)
-            {
+            if (data.length >= 12) {
                 // Some units have a mag. We optionally also read that data.
 
                 _motion.magneticForce.x = ((unsigned char *)data.bytes)[6];
@@ -650,63 +589,42 @@ using namespace fiftythree::core;
 
             [self.delegate penServiceClient:self didUpdateMotion:_motion];
         }
-    }
-    else if ([characteristic isEqual:self.batteryLevelCharacteristic])
-    {
+    } else if ([characteristic isEqual:self.batteryLevelCharacteristic]) {
         // Ignore the first battery level update that results from setting notification on the
         // characterisitic. We only want to pay attention to notifications from the peripheral itself.
-        if (self.batteryLevelDidReceiveFirstUpdate)
-        {
-            _batteryLevel = (self.batteryLevelCharacteristic.value.length > 0 ?
-                             @([self.batteryLevelCharacteristic valueAsNSUInteger]) :
-                             nil);
+        if (self.batteryLevelDidReceiveFirstUpdate) {
+            _batteryLevel = (self.batteryLevelCharacteristic.value.length > 0 ? @([self.batteryLevelCharacteristic valueAsNSUInteger]) : nil);
             [self.delegate penServiceClient:self batteryLevelDidChange:self.batteryLevel];
 
             [self resetBatteryLevelReadTimer];
-        }
-        else
-        {
+        } else {
             self.batteryLevelDidReceiveFirstUpdate = YES;
         }
-    }
-    else if ([characteristic isEqual:self.inactivityTimeoutCharacteristic])
-    {
+    } else if ([characteristic isEqual:self.inactivityTimeoutCharacteristic]) {
         _inactivityTimeout = [self.inactivityTimeoutCharacteristic valueAsNSUInteger];
         [updatedProperties addObject:kFTPenInactivityTimeoutPropertyName];
-    }
-    else if ([characteristic isEqual:self.pressureSetupCharacteristic])
-    {
-        if (characteristic.value.length == 10)
-        {
+    } else if ([characteristic isEqual:self.pressureSetupCharacteristic]) {
+        if (characteristic.value.length == 10) {
             _pressureSetup = [[FTPenPressureSetup alloc] initWithNSData:characteristic.value];
             [updatedProperties addObject:kFTPenPressureSetupPropertyName];
         }
-    }
-    else if ([characteristic isEqual:self.motionSetupCharacteristic])
-    {
-        if (characteristic.value.length == 2)
-        {
+    } else if ([characteristic isEqual:self.motionSetupCharacteristic]) {
+        if (characteristic.value.length == 2) {
             _motionSetup = [[FTMotionSetup alloc] initWithNSData:characteristic.value];
             [updatedProperties addObject:kFTPenMotionSetupPropertyName];
         }
-    }
-    else if ([characteristic.UUID isEqual:[FTPenServiceUUIDs manufacturingID]])
-    {
+    } else if ([characteristic.UUID isEqual:[FTPenServiceUUIDs manufacturingID]]) {
         _manufacturingID = [characteristic valueAsNSString];
 
         [self.delegate penServiceClient:self didReadManufacturingID:self.manufacturingID];
         [updatedProperties addObject:kFTPenManufacturingIDPropertyName];
-    }
-    else if ([characteristic.UUID isEqual:[FTPenServiceUUIDs lastErrorCode]])
-    {
-        if (self.lastErrorCodeCharacteristic)
-        {
+    } else if ([characteristic.UUID isEqual:[FTPenServiceUUIDs lastErrorCode]]) {
+        if (self.lastErrorCodeCharacteristic) {
             FTAssert(characteristic == self.lastErrorCodeCharacteristic,
                      @"matches last error code characterisit");
 
             NSData *data = self.lastErrorCodeCharacteristic.value;
-            if (data.length == 2 * sizeof(uint32_t))
-            {
+            if (data.length == 2 * sizeof(uint32_t)) {
                 int errorId = CFSwapInt32LittleToHost(((uint32_t *)data.bytes)[0]);
                 int errorValue = CFSwapInt32LittleToHost(((uint32_t *)data.bytes)[1]);
                 _lastErrorCode = [[FTPenLastErrorCode alloc] initWithErrorID:errorId
@@ -715,11 +633,8 @@ using namespace fiftythree::core;
                 [updatedProperties addObject:kFTPenLastErrorCodePropertyName];
             }
         }
-    }
-    else if ([characteristic.UUID isEqual:[FTPenServiceUUIDs authenticationCode]])
-    {
-        if (self.authenticationCodeCharacteristic)
-        {
+    } else if ([characteristic.UUID isEqual:[FTPenServiceUUIDs authenticationCode]]) {
+        if (self.authenticationCodeCharacteristic) {
             FTAssert(characteristic == self.authenticationCodeCharacteristic,
                      @"characteristic is authenenticationCode characteristic");
 
@@ -729,11 +644,8 @@ using namespace fiftythree::core;
                   didReadAuthenticationCode:self.authenticationCode];
             [updatedProperties addObject:kFTPenAuthenticationCodePropertyName];
         }
-    }
-    else if ([characteristic.UUID isEqual:[FTPenServiceUUIDs hasListener]])
-    {
-        if (self.hasListenerCharacteristic)
-        {
+    } else if ([characteristic.UUID isEqual:[FTPenServiceUUIDs hasListener]]) {
+        if (self.hasListenerCharacteristic) {
             FTAssert(characteristic == self.hasListenerCharacteristic, @"characteristic is hasListener characteristic");
             _hasListener = [self.hasListenerCharacteristic valueAsBOOL];
             [updatedProperties addObject:kFTPenHasListenerPropertyName];
@@ -742,25 +654,22 @@ using namespace fiftythree::core;
         }
     }
 
-    if (updatedProperties.count > 0)
-    {
+    if (updatedProperties.count > 0) {
         [self.delegate penServiceClient:self didUpdatePenProperties:updatedProperties];
     }
 }
 
 - (void)peripheral:(CBPeripheral *)peripheral didUpdateNotificationStateForCharacteristic:(CBCharacteristic *)characteristic
-             error:(NSError *)error
+                                          error:(NSError *)error
 {
-    if (error)
-    {
+    if (error) {
         MLOG_ERROR(FTLogSDK, "Error changing notification state: %s", ObjcDescription(error.localizedDescription));
 
         // TODO: Report failed state
         return;
     }
 
-    if (characteristic.isNotifying)
-    {
+    if (characteristic.isNotifying) {
         // Once we start listening for changes in the characteristic it's safe to read its value. (We avoid
         // the opposite order since that might lead to a race condidtion where we miss a change in the
         // characteristic.)
@@ -771,52 +680,31 @@ using namespace fiftythree::core;
 }
 
 - (void)peripheral:(CBPeripheral *)peripheral didWriteValueForCharacteristic:(CBCharacteristic *)characteristic
-             error:(NSError *)error
+                             error:(NSError *)error
 {
-    if (characteristic == self.manufacturingIDCharacteristic)
-    {
-        if (error)
-        {
+    if (characteristic == self.manufacturingIDCharacteristic) {
+        if (error) {
             [self.delegate penServiceClientDidFailToWriteManufacturingID:self];
-        }
-        else
-        {
+        } else {
             [self.delegate penServiceClientDidWriteManufacturingID:self];
         }
-    }
-    else if (characteristic == self.authenticationCodeCharacteristic)
-    {
-        if (error)
-        {
+    } else if (characteristic == self.authenticationCodeCharacteristic) {
+        if (error) {
             [self.delegate penServiceClientDidFailToWriteAuthenticationCode:self];
-        }
-        else
-        {
+        } else {
             [self.delegate penServiceClientDidWriteAuthenticationCode:self];
         }
-    }
-    else if (characteristic == self.centralIdCharacteristic)
-    {
-        if (error)
-        {
-            MLOG_ERROR(FTLogSDK, "Failed to write CentralId characteristic: %s",
-                       ObjcDescription(error.localizedDescription));
+    } else if (characteristic == self.centralIdCharacteristic) {
+        if (error) {
+            MLOG_ERROR(FTLogSDK, "Failed to write CentralId characteristic: %s", ObjcDescription(error.localizedDescription));
             [self.delegate penServiceClientDidFailToWriteCentralId:self];
-        }
-        else
-        {
+        } else {
             [self.delegate penServiceClientDidWriteCentralId:self];
         }
-    }
-    else if (characteristic == self.hasListenerCharacteristic)
-    {
-        if (error)
-        {
-            MLOG_ERROR(FTLogSDK, "Failed to write HasListener characteristic: %s",
-                       ObjcDescription(error.localizedDescription));
-        }
-        else
-        {
+    } else if (characteristic == self.hasListenerCharacteristic) {
+        if (error) {
+            MLOG_ERROR(FTLogSDK, "Failed to write HasListener characteristic: %s", ObjcDescription(error.localizedDescription));
+        } else {
             [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenDidWriteHasListenerNotificationName
                                                                 object:nil];
         }
@@ -829,54 +717,44 @@ using namespace fiftythree::core;
 {
     const BOOL isTipPressedNotifying = self.isTipPressedCharacteristic.isNotifying;
 
-    if (!isTipPressedNotifying)
-    {
-        if (!self.isTipPressedDidSetNofifyValue)
-        {
+    if (!isTipPressedNotifying) {
+        if (!self.isTipPressedDidSetNofifyValue) {
             [self.peripheral setNotifyValue:YES
                           forCharacteristic:self.isTipPressedCharacteristic];
             self.isTipPressedDidSetNofifyValue = YES;
         }
-    }
-    else
-    {
-        if (self.isEraserPressedCharacteristic && !self.isEraserPressedDidSetNofifyValue)
-        {
+    } else {
+        if (self.isEraserPressedCharacteristic && !self.isEraserPressedDidSetNofifyValue) {
             [self.peripheral setNotifyValue:YES
                           forCharacteristic:self.isEraserPressedCharacteristic];
             self.isEraserPressedDidSetNofifyValue = YES;
         }
 
-        if (self.tipPressureCharacteristic && !self.tipPressureDidSetNofifyValue)
-        {
+        if (self.tipPressureCharacteristic && !self.tipPressureDidSetNofifyValue) {
             [self.peripheral setNotifyValue:YES
                           forCharacteristic:self.tipPressureCharacteristic];
             self.tipPressureDidSetNofifyValue = YES;
         }
 
-        if (self.eraserPressureCharacteristic && !self.eraserPressureDidSetNofifyValue)
-        {
+        if (self.eraserPressureCharacteristic && !self.eraserPressureDidSetNofifyValue) {
             [self.peripheral setNotifyValue:YES
                           forCharacteristic:self.eraserPressureCharacteristic];
             self.eraserPressureDidSetNofifyValue = YES;
         }
 
-        if (self.motionCharacteristic && !self.motionCharacteristicDidSetNofifyValue)
-        {
+        if (self.motionCharacteristic && !self.motionCharacteristicDidSetNofifyValue) {
             [self.peripheral setNotifyValue:YES
                           forCharacteristic:self.motionCharacteristic];
             self.motionCharacteristicDidSetNofifyValue = YES;
         }
 
-        if (self.batteryLevelCharacteristic && !self.batteryLevelDidSetNofifyValue)
-        {
+        if (self.batteryLevelCharacteristic && !self.batteryLevelDidSetNofifyValue) {
             [self.peripheral setNotifyValue:YES
                           forCharacteristic:self.batteryLevelCharacteristic];
             self.batteryLevelDidSetNofifyValue = YES;
         }
 
-        if (self.batteryLevelCharacteristic && !self.batteryLevel && !self.batteryLevelReadTimer)
-        {
+        if (self.batteryLevelCharacteristic && !self.batteryLevel && !self.batteryLevelReadTimer) {
             // If we don't see a battery level within 22s of connecting, then we need to perform a manual
             // read of the characteristic. The complexity here is that the Pencil's battery level is
             // unreliable for the first 20s, so we either wait for the first notification in order to get the
@@ -888,36 +766,30 @@ using namespace fiftythree::core;
                                                                              repeats:NO];
         }
 
-        if (self.inactivityTimeoutCharacteristic && !self.didInitialReadOfInactivityTimeout)
-        {
+        if (self.inactivityTimeoutCharacteristic && !self.didInitialReadOfInactivityTimeout) {
             [self.peripheral readValueForCharacteristic:self.inactivityTimeoutCharacteristic];
             self.didInitialReadOfInactivityTimeout = YES;
         }
 
-        if (self.pressureSetupCharacteristic && !self.didInitialReadOfPressureSetup)
-        {
+        if (self.pressureSetupCharacteristic && !self.didInitialReadOfPressureSetup) {
             [self.peripheral readValueForCharacteristic:self.pressureSetupCharacteristic];
             self.didInitialReadOfPressureSetup = YES;
         }
-        if (self.motionSetupCharacteristic && !self.didInitialReadOfMotionSetup)
-        {
+        if (self.motionSetupCharacteristic && !self.didInitialReadOfMotionSetup) {
             [self.peripheral readValueForCharacteristic:self.motionSetupCharacteristic];
             self.didInitialReadOfMotionSetup = YES;
         }
-        if (self.manufacturingIDCharacteristic && !self.didInitialReadOfManufacturingID)
-        {
+        if (self.manufacturingIDCharacteristic && !self.didInitialReadOfManufacturingID) {
             [self.peripheral readValueForCharacteristic:self.manufacturingIDCharacteristic];
             self.didInitialReadOfManufacturingID = YES;
         }
 
-        if (self.lastErrorCodeCharacteristic && !self.didInitialReadOfLastErrorCode)
-        {
+        if (self.lastErrorCodeCharacteristic && !self.didInitialReadOfLastErrorCode) {
             [self.peripheral readValueForCharacteristic:self.lastErrorCodeCharacteristic];
             self.didInitialReadOfLastErrorCode = YES;
         }
 
-        if (self.authenticationCodeCharacteristic && !self.didInitialReadOfAuthenticationCode)
-        {
+        if (self.authenticationCodeCharacteristic && !self.didInitialReadOfAuthenticationCode) {
             [self.peripheral readValueForCharacteristic:self.authenticationCodeCharacteristic];
             self.didInitialReadOfAuthenticationCode = YES;
         }
@@ -925,15 +797,13 @@ using namespace fiftythree::core;
         // Version 55 and older firmware did not mark the HasListener characteristic as notifying,
         // so only request notificatons if they're available.
         if (self.hasListenerCharacteristic && self.hasListenerSupportsNotifications &&
-            !self.hasListenerDidSetNofifyValue)
-        {
+            !self.hasListenerDidSetNofifyValue) {
             [self.peripheral setNotifyValue:YES
                           forCharacteristic:self.hasListenerCharacteristic];
             self.hasListenerDidSetNofifyValue = YES;
         }
 
-        if (self.hasListenerCharacteristic && !self.didInitialReadOfHasListener)
-        {
+        if (self.hasListenerCharacteristic && !self.didInitialReadOfHasListener) {
             [self.peripheral readValueForCharacteristic:self.hasListenerCharacteristic];
             self.didInitialReadOfHasListener = YES;
         }
@@ -947,16 +817,14 @@ using namespace fiftythree::core;
 
 - (void)applicationWillEnterForeground:(NSNotification *)notification
 {
-    if (self.batteryLevelCharacteristic && !self.batteryLevel)
-    {
+    if (self.batteryLevelCharacteristic && !self.batteryLevel) {
         [self.peripheral readValueForCharacteristic:self.batteryLevelCharacteristic];
     }
 }
 
 - (void)batteryLevelReadTimerDidFire:(NSTimer *)sender
 {
-    if (self.batteryLevelCharacteristic && !self.batteryLevel)
-    {
+    if (self.batteryLevelCharacteristic && !self.batteryLevel) {
         [self.peripheral readValueForCharacteristic:self.batteryLevelCharacteristic];
     }
 }

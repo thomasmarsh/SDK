@@ -16,7 +16,6 @@ class TouchData;
 class TouchSize
 {
 public:
-
     constexpr static float PenTipRadius = 6.0f;
 
     // pen tip is very small -- this tells the caller if the size statistics

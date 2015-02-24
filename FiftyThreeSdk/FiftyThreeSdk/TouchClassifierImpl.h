@@ -19,7 +19,6 @@ namespace fiftythree
 {
 namespace sdk
 {
-
 class Classifier;
 class OffscreenTouchClassificationLinker;
 
@@ -30,18 +29,18 @@ public:
     TouchClassifierImpl();
     virtual bool IsPenConnected();
     virtual void SetPenConnected(bool connected);
-    virtual void PenStateDidChanged(const PenEventArgs & args);
-    virtual void TouchesDidChanged(const std::set<core::Touch::cPtr> & touches);
-    virtual void RemoveTouchFromClassification(const core::Touch::cPtr & touch);
-    virtual core::TouchClassification ClassifyPair(const core::Touch::cPtr & t0,
-                                                   const core::Touch::cPtr & t1,
-                                                   const TwoTouchPairType & type);
+    virtual void PenStateDidChanged(const PenEventArgs &args);
+    virtual void TouchesDidChanged(const std::set<core::Touch::cPtr> &touches);
+    virtual void RemoveTouchFromClassification(const core::Touch::cPtr &touch);
+    virtual core::TouchClassification ClassifyPair(const core::Touch::cPtr &t0,
+                                                   const core::Touch::cPtr &t1,
+                                                   const TwoTouchPairType &type);
 
-    virtual core::TouchClassification ClassifyForSingleTouchGestureType(const core::Touch::cPtr & touch, const SingleTouchGestureType & type);
-    virtual Eigen::VectorXf GeometricStatistics(const core::Touch::cPtr & t0);
+    virtual core::TouchClassification ClassifyForSingleTouchGestureType(const core::Touch::cPtr &touch, const SingleTouchGestureType &type);
+    virtual Eigen::VectorXf GeometricStatistics(const core::Touch::cPtr &t0);
     virtual void UpdateClassifications();
-    virtual Event<const std::vector<TouchClassificationChangedEventArgs> & > & TouchClassificationsDidChange();
-    virtual Event<const std::vector<TouchClassificationChangedEventArgs> & > & TouchContinuedClassificationsDidChange();
+    virtual Event<const std::vector<TouchClassificationChangedEventArgs> &> &TouchClassificationsDidChange();
+    virtual Event<const std::vector<TouchClassificationChangedEventArgs> &> &TouchContinuedClassificationsDidChange();
     virtual void ClearSessionStatistics();
     virtual SessionStatistics::Ptr SessionStatistics();
 
@@ -53,6 +52,7 @@ protected:
     // override the classifier. You might want to do this if you're supporting another stylus e.g., PogoConnect.
 
     void SetCopyGestureClassifications(bool b);
+
 private:
     fiftythree::core::shared_ptr<class fiftythree::sdk::Classifier> _Classifier;
     fiftythree::core::shared_ptr<class fiftythree::sdk::OffscreenTouchClassificationLinker> _Linker;
@@ -62,8 +62,6 @@ private:
     bool _CopyGestureClassifications;
     Event<const std::vector<TouchClassificationChangedEventArgs> &> _TouchClassificationsDidChange;
     Event<const std::vector<TouchClassificationChangedEventArgs> &> _TouchContinuedClassificationsDidChange;
-
 };
-
 }
 }

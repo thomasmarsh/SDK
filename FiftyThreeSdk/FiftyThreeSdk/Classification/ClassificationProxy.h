@@ -43,8 +43,7 @@ namespace fiftythree
 {
 namespace sdk
 {
-struct TouchStatistics
-{
+struct TouchStatistics {
     float _penDownDeltaT;
     float _penUpDeltaT;
     float _switchOnDuration;
@@ -73,26 +72,26 @@ struct TouchStatistics
 
     // using 100.0f since max() is really annoying when you open the spreadsheet.
     // 100 is big enough and easy to identify as the default.
-    TouchStatistics() :
-    _penDownDeltaT(100.0f),
-    _penUpDeltaT(100.0f),
-    _switchOnDuration(0.0f),
-    _touchDuration(0.0f),
-    _finalPenScore(0.0f),
-    _handednessPrior(-1.0f),
-    _isolatedPrior(-1.0f),
-    _clusterPrior(-1.0f),
-    _lengthPrior(-1.0f),
-    _touchPrior(-1.0f),
-    _clusterId(0),
-    _orthogonalJerk(-1.0f),
-    _curvatureScore(-1.0f),
-    _smoothLength(-1.0f),
-    _dominationScore(0.0f),
-    _preIsolation(100.0f),
-    _postIsolation(100.0f),
-    _tBegan(-1.0f),
-    _tEnded(-1.0f)
+    TouchStatistics()
+    : _penDownDeltaT(100.0f)
+    , _penUpDeltaT(100.0f)
+    , _switchOnDuration(0.0f)
+    , _touchDuration(0.0f)
+    , _finalPenScore(0.0f)
+    , _handednessPrior(-1.0f)
+    , _isolatedPrior(-1.0f)
+    , _clusterPrior(-1.0f)
+    , _lengthPrior(-1.0f)
+    , _touchPrior(-1.0f)
+    , _clusterId(0)
+    , _orthogonalJerk(-1.0f)
+    , _curvatureScore(-1.0f)
+    , _smoothLength(-1.0f)
+    , _dominationScore(0.0f)
+    , _preIsolation(100.0f)
+    , _postIsolation(100.0f)
+    , _tBegan(-1.0f)
+    , _tEnded(-1.0f)
     {
     }
 };
@@ -100,7 +99,6 @@ struct TouchStatistics
 class TouchClassificationProxy : public Classifier
 {
 public:
-
 #pragma mark - Classifier interface.
 
     bool ReclassifyIfNeeded(double timestamp = -1.0);
@@ -109,8 +107,8 @@ public:
     void StylusDisconnected();
 
     // Let the classifier know of changes to the world.
-    void OnPenEvent(const PenEvent & pen);
-    void OnTouchesChanged(const std::set<core::Touch::Ptr> & set);
+    void OnPenEvent(const PenEvent &pen);
+    void OnTouchesChanged(const std::set<core::Touch::Ptr> &set);
 
     // The caller can let the classifier know a touch has been marked
     void RemoveTouchFromClassification(core::TouchId touchId);
@@ -123,13 +121,13 @@ public:
 
     void ClearTouchesReclassified();
 
-    core::TouchClassification ClassifyPair(core::TouchId touch0, core::TouchId touch1, const TwoTouchPairType & type);
+    core::TouchClassification ClassifyPair(core::TouchId touch0, core::TouchId touch1, const TwoTouchPairType &type);
 
-    core::TouchClassification ClassifyForGesture(core::TouchId touch0, const SingleTouchGestureType & type);
+    core::TouchClassification ClassifyForGesture(core::TouchId touch0, const SingleTouchGestureType &type);
 
-    Eigen::VectorXf GeometricStatistics(core::TouchId  touch0);
+    Eigen::VectorXf GeometricStatistics(core::TouchId touch0);
 
-    bool IsReclassifiable(core::Touch::Ptr const & touch, Stroke::Ptr const &stroke);
+    bool IsReclassifiable(core::Touch::Ptr const &touch, Stroke::Ptr const &stroke);
 
     void RemoveEdgeThumbs();
 
@@ -137,15 +135,14 @@ public:
     SessionStatistics::Ptr SessionStatistics();
 
 protected:
-
     SessionStatistics::Ptr _sessionStatistics;
 
     // not really clear if these need to be exposed as tuning parameters.
     // they are used to decide when a touch can no longer be reclassified and
     // associated resources can be released.
     // 10 seconds == 600 points if 60Hz sampling
-    const float _noReclassifyDuration       = 2.0f;
-    const float _noReclassifyTimeSinceEnded =  .3f;
+    const float _noReclassifyDuration = 2.0f;
+    const float _noReclassifyTimeSinceEnded = .3f;
 
     std::map<core::TouchId, core::TouchClassification> _currentTypes;
 
@@ -176,7 +173,6 @@ protected:
     Eigen::Vector2f _penDirection;
 
 protected:
-
     void UpdateSessionStatistics();
 
     void SaveCurrentPenTipTouch(core::TouchId touchId);
@@ -185,11 +181,11 @@ protected:
 
     void ReclassifyClusters();
 
-    void FingerTapIsolationRule(IdTypeMap & newTypes);
+    void FingerTapIsolationRule(IdTypeMap &newTypes);
 
-    void FingerToPalmRules(IdTypeMap & newTypes);
+    void FingerToPalmRules(IdTypeMap &newTypes);
 
-    void SetClusterType(Cluster::Ptr const & cluster, core::TouchClassification newType, IdTypeMap & changedTypes);
+    void SetClusterType(Cluster::Ptr const &cluster, core::TouchClassification newType, IdTypeMap &changedTypes);
 
     IdTypeMap ReclassifyCurrentEvent();
 
@@ -206,7 +202,6 @@ protected:
     bool _isolatedStrokesForClusterClassification;
 
 public:
-
     bool _clearStaleStatistics;
     bool _showDebugLogMessages;
     bool _testingIsolated;
@@ -216,7 +211,7 @@ public:
     // this is not going to work when running RTs, and should not affect anything.
     bool _rtFlag;
 
-    std::map<core::TouchId, TouchStatistics> & TouchStatistics()
+    std::map<core::TouchId, TouchStatistics> &TouchStatistics()
     {
         return _touchStatistics;
     }
@@ -254,7 +249,7 @@ public:
     // return the minimum ratio of (cluster score) / (other cluster score).
     // if the worst ratio is larger than one, the probe is the best alive at the time.
     // if the worst ratio is very large, this guy dominates the others and should suppress them.
-    float DominationScore(Cluster::Ptr const & probeCluster);
+    float DominationScore(Cluster::Ptr const &probeCluster);
 
     bool IsLongestConcurrentTouch(core::TouchId probeId);
 
@@ -277,12 +272,12 @@ public:
         return _isolatedStrokesForClusterClassification;
     }
 
-    PenEventClassifier* PenEventClassifier()
+    PenEventClassifier *PenEventClassifier()
     {
         return &_penEventClassifier;
     }
 
-    IsolatedStrokesClassifier* IsolatedStrokesClassifier()
+    IsolatedStrokesClassifier *IsolatedStrokesClassifier()
     {
         return &_isolatedStrokesClassifier;
     }
@@ -292,7 +287,7 @@ public:
         return _clusterTracker;
     }
 
-    PenTracker* PenTracker()
+    PenTracker *PenTracker()
     {
         return &_penTracker;
     }
@@ -309,12 +304,9 @@ public:
 
     core::TouchClassification TouchTypeForNewCluster()
     {
-        if (_activeStylusConnected || _testingIsolated)
-        {
+        if (_activeStylusConnected || _testingIsolated) {
             return core::TouchClassification::Unknown;
-        }
-        else
-        {
+        } else {
             return core::TouchClassification::UnknownDisconnected;
         }
     }
@@ -323,21 +315,21 @@ public:
     void OnClusterEventEnded();
     void RecomputeClusterPriors();
 
-    Eigen::VectorXf PenPriorForTouches(TouchIdVector const & touchIds);
-    Eigen::VectorXf PenPriorForClusters(std::vector<Cluster::Ptr> const & clusters);
+    Eigen::VectorXf PenPriorForTouches(TouchIdVector const &touchIds);
+    Eigen::VectorXf PenPriorForClusters(std::vector<Cluster::Ptr> const &clusters);
 
-    inline TouchClassificationProxy():
-    _commonData(&_currentTypes, this),
-    _clusterTracker(ClusterTracker::Ptr::make_shared(&_commonData)),
-    _isolatedStrokesClassifier(_clusterTracker, &_commonData),
-    _penEventClassifier(_clusterTracker, &_commonData),
-    _needsClassification(false),
-    _penTracker(_clusterTracker, &_commonData),
-    _showDebugLogMessages(false),
-    _rtFlag(false),
-    _testingIsolated(false),
-    _clearStaleStatistics(true),
-    _activeStylusConnected(false)
+    inline TouchClassificationProxy()
+    : _commonData(&_currentTypes, this)
+    , _clusterTracker(ClusterTracker::Ptr::make_shared(&_commonData))
+    , _isolatedStrokesClassifier(_clusterTracker, &_commonData)
+    , _penEventClassifier(_clusterTracker, &_commonData)
+    , _needsClassification(false)
+    , _penTracker(_clusterTracker, &_commonData)
+    , _showDebugLogMessages(false)
+    , _rtFlag(false)
+    , _testingIsolated(false)
+    , _clearStaleStatistics(true)
+    , _activeStylusConnected(false)
     {
         ClearEndedTouchesReclassified();
         ClearActiveTouchesReclassified();

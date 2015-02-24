@@ -10,9 +10,10 @@
 
 #import "FTAAppDelegate.h"
 
-int main(int argc, char * argv[])
+int main(int argc, char *argv[])
 {
-    @autoreleasepool {
+    @autoreleasepool
+    {
         return UIApplicationMain(argc, argv, NSStringFromClass([FTApplication class]), NSStringFromClass([FTAAppDelegate class]));
     }
 }

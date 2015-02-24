@@ -29,8 +29,7 @@ static const NSTimeInterval kTrialSeparationInitializeTime = 1.0;
 
 - (id)init
 {
-    if (self = [super init])
-    {
+    if (self = [super init]) {
         self.lastApplicationDidBecomeActiveTime = [NSDate date];
 
         [[NSNotificationCenter defaultCenter] addObserver:self
@@ -50,7 +49,6 @@ static const NSTimeInterval kTrialSeparationInitializeTime = 1.0;
         self.touchAdapter = PropertyToObjCAdapter<int>::Bind(TouchTracker::Instance()->LiveTouchCount(),
                                                              self,
                                                              @selector(touchTrackerLiveTouchCountDidChange:newValue:));
-
     }
     return self;
 }
@@ -69,8 +67,7 @@ static const NSTimeInterval kTrialSeparationInitializeTime = 1.0;
                                    newValue:(const int &)newValue
 {
     DebugAssert(IsMainThread());
-    if (newValue > 0)
-    {
+    if (newValue > 0) {
         [self clearTimer];
     }
 }
@@ -83,8 +80,7 @@ static const NSTimeInterval kTrialSeparationInitializeTime = 1.0;
 
 - (void)clearTimer
 {
-    if (self.timer)
-    {
+    if (self.timer) {
         [self.timer invalidate];
         self.timer = nil;
     }
@@ -104,11 +100,9 @@ static const NSTimeInterval kTrialSeparationInitializeTime = 1.0;
     // app became action. If you don't wait a little bit, it's possible to get tip pressed w/out a touch,
     // thereby causing a trial separation.
     if ([UIApplication sharedApplication].applicationState == UIApplicationStateActive &&
-        timeSinceLastAppDidBecomeActive > 3.0)
-    {
+        timeSinceLastAppDidBecomeActive > 3.0) {
         bool haveRecentlySeenATouch = std::abs([[NSProcessInfo processInfo] systemUptime] - TouchTracker::Instance()->LastProcessedTimestamp()) < 0.25;
-        if (!haveRecentlySeenATouch && TouchTracker::Instance()->LiveTouchCount() == 0)
-        {
+        if (!haveRecentlySeenATouch && TouchTracker::Instance()->LiveTouchCount() == 0) {
             [self clearTimer];
             self.timer = [NSTimer weakScheduledTimerWithTimeInterval:kTrialSeparationInitializeTime
                                                               target:self
@@ -126,13 +120,10 @@ static const NSTimeInterval kTrialSeparationInitializeTime = 1.0;
 
 - (void)penIsTipPressedDidChange:(NSNotification *)notification
 {
-    FTPen *pen = (FTPen*)notification.object;
-    if (pen && pen.isTipPressed)
-    {
+    FTPen *pen = (FTPen *)notification.object;
+    if (pen && pen.isTipPressed) {
         [self tipWasPressed];
-    }
-    else
-    {
+    } else {
         [self tipWasReleased];
     }
 }

@@ -19,19 +19,16 @@ bool TouchSize::IsPenGivenTouchRadius(TouchData const &data)
     // really want equality, i.e. the pen tip size is typically exactly equal to PenTipRadius.
     // but we allow a little bit of flexibility.
     return (data._leadingRadiusMax < 2.1f * PenTipRadius) &&
-    data._leadingRadiusMean - PenTipRadius < .2f * PenTipRadius &&
-    std::sqrt(data._leadingRadiusVariance) < (.25f * PenTipRadius);
+           data._leadingRadiusMean - PenTipRadius < .2f * PenTipRadius &&
+           std::sqrt(data._leadingRadiusVariance) < (.25f * PenTipRadius);
 }
 
 bool TouchSize::IsWeakPenGivenTouchRadius(float r, float arcLength)
 {
     constexpr float notPenTipScaleFactor = 1.9f;
-    if (r > notPenTipScaleFactor * PenTipRadius)
-    {
+    if (r > notPenTipScaleFactor * PenTipRadius) {
         return false;
-    }
-    else
-    {
+    } else {
         // require more length at larger radii.  they are more likely to be palms
         // and the artifacts are also much worse: the dreaded blotches.
         return arcLength > r;
