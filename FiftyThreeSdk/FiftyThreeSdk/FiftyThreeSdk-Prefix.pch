@@ -2,23 +2,25 @@
 //  FiftyThreeSdk-Prefix.pch
 //  FiftyThreeSdk
 //
-//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
+//  Copyright (c) 2015 FiftyThree, Inc. All rights reserved.
 //
 
 #ifdef __OBJC__
+#import <CoreBluetooth/CoreBluetooth.h>
 #import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
 
 #endif
 
-#ifndef BEGIN_COMMON_NAMESPACE
-#define BEGIN_COMMON_NAMESPACE \
-    namespace fiftythree       \
-    {                          \
-    namespace common           \
-    {
-#endif
-#ifndef END_COMMON_NAMESPACE
-#define END_COMMON_NAMESPACE \
-    }                        \
-    }
+#ifdef __cplusplus
+#include <iostream>
+#include <map>
+#include <tuple>
+#include <vector>
+
+#include "Core/Event.hpp"
+#include "Core/Memory.h"
+#include "Core/Touch/Touch.h"
+#include "FiftyThreeSdk/Classification/Eigen.h"
+
 #endif
