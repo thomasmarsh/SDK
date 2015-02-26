@@ -2,12 +2,13 @@
 //  PenDirection.cpp
 //  FiftyThreeSdk
 //
-//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
+//  Copyright (c) 2015 FiftyThree, Inc. All rights reserved.
 //
 
 #include <algorithm>
 #include <vector>
 
+#include "Core/STLUtils.h"
 #include "FiftyThreeSdk/Classification/ClassificationProxy.h"
 #include "FiftyThreeSdk/Classification/Cluster.h"
 #include "FiftyThreeSdk/Classification/Eigen.h"
@@ -294,7 +295,7 @@ vector<Cluster::Ptr> PenTracker::CopyInPenToPalmOrder(vector<Cluster::Ptr> const
 
     // we want pen end first, so reverse it.
     if (dot >= 0.0f) {
-        std::reverse(penToPalm.begin(), penToPalm.end());
+        core::reverse(penToPalm);
     }
 
     return penToPalm;
