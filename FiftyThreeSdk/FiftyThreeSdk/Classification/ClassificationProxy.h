@@ -11,6 +11,7 @@
 
 #include "FiftyThreeSdk/Classification/Cluster.h"
 #include "FiftyThreeSdk/Classification/CommonDeclarations.h"
+#include "FiftyThreeSdk/Classification/Debug.h"
 #include "FiftyThreeSdk/Classification/EigenLAB.h"
 #include "FiftyThreeSdk/Classification/FiniteDifferences.h"
 #include "FiftyThreeSdk/Classification/IsolatedStrokes.h"

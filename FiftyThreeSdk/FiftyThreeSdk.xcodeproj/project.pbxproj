@@ -10,6 +10,8 @@
 		041587DE18DB6C7800642939 /* FTEventDispatcher.mm in Sources */ = {isa = PBXBuildFile; fileRef = 041587DD18DB6C7800642939 /* FTEventDispatcher.mm */; };
 		0416CABA18A42B51004EAC00 /* ClassificationProxy.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0416CA8B18A42B51004EAC00 /* ClassificationProxy.cpp */; };
 		0416CABB18A42B51004EAC00 /* Cluster.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0416CA8E18A42B51004EAC00 /* Cluster.cpp */; };
+		0416CABC18A42B51004EAC00 /* Debug.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0416CA9418A42B51004EAC00 /* Debug.cpp */; };
+		0416CABD18A42B51004EAC00 /* DumbStylus.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0416CA9618A42B51004EAC00 /* DumbStylus.cpp */; };
 		0416CABE18A42B51004EAC00 /* EigenLAB.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0416CA9818A42B51004EAC00 /* EigenLAB.cpp */; };
 		0416CABF18A42B51004EAC00 /* FiniteDifferences.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0416CA9A18A42B51004EAC00 /* FiniteDifferences.cpp */; };
 		0416CAC018A42B51004EAC00 /* Helpers.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0416CA9D18A42B51004EAC00 /* Helpers.mm */; };
@@ -18,6 +20,7 @@
 		0416CAC618A42B51004EAC00 /* PenDirection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0416CAA818A42B51004EAC00 /* PenDirection.cpp */; };
 		0416CAC718A42B51004EAC00 /* PenEvents.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0416CAAA18A42B51004EAC00 /* PenEvents.cpp */; };
 		0416CAC818A42B51004EAC00 /* Performance.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0416CAAC18A42B51004EAC00 /* Performance.cpp */; };
+		0416CAC918A42B51004EAC00 /* Playback.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0416CAAE18A42B51004EAC00 /* Playback.cpp */; };
 		0416CACB18A42B51004EAC00 /* Screen.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0416CAB218A42B51004EAC00 /* Screen.cpp */; };
 		0416CACC18A42B51004EAC00 /* Stroke.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0416CAB418A42B51004EAC00 /* Stroke.cpp */; };
 		0416CACD18A42B51004EAC00 /* TouchLogger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0416CAB618A42B51004EAC00 /* TouchLogger.cpp */; };
@@ -67,6 +70,10 @@
 		0416CA9018A42B51004EAC00 /* CommonDeclarations.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CommonDeclarations.h; sourceTree = "<group>"; };
 		0416CA9218A42B51004EAC00 /* CubicPolynomial.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = CubicPolynomial.hpp; sourceTree = "<group>"; };
 		0416CA9318A42B51004EAC00 /* DataStream.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = DataStream.hpp; sourceTree = "<group>"; };
+		0416CA9418A42B51004EAC00 /* Debug.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Debug.cpp; sourceTree = "<group>"; };
+		0416CA9518A42B51004EAC00 /* Debug.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Debug.h; sourceTree = "<group>"; };
+		0416CA9618A42B51004EAC00 /* DumbStylus.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DumbStylus.cpp; sourceTree = "<group>"; };
+		0416CA9718A42B51004EAC00 /* DumbStylus.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DumbStylus.h; sourceTree = "<group>"; };
 		0416CA9818A42B51004EAC00 /* EigenLAB.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EigenLAB.cpp; sourceTree = "<group>"; };
 		0416CA9918A42B51004EAC00 /* EigenLAB.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EigenLAB.h; sourceTree = "<group>"; };
 		0416CA9A18A42B51004EAC00 /* FiniteDifferences.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FiniteDifferences.cpp; sourceTree = "<group>"; };
@@ -85,6 +92,8 @@
 		0416CAAB18A42B51004EAC00 /* PenEvents.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PenEvents.h; sourceTree = "<group>"; };
 		0416CAAC18A42B51004EAC00 /* Performance.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Performance.cpp; sourceTree = "<group>"; };
 		0416CAAD18A42B51004EAC00 /* Performance.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Performance.h; sourceTree = "<group>"; };
+		0416CAAE18A42B51004EAC00 /* Playback.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Playback.cpp; sourceTree = "<group>"; };
+		0416CAAF18A42B51004EAC00 /* Playback.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Playback.h; sourceTree = "<group>"; };
 		0416CAB118A42B51004EAC00 /* Quadrature.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Quadrature.h; sourceTree = "<group>"; };
 		0416CAB218A42B51004EAC00 /* Screen.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Screen.cpp; sourceTree = "<group>"; };
 		0416CAB318A42B51004EAC00 /* Screen.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Screen.h; sourceTree = "<group>"; };
@@ -201,6 +210,10 @@
 				0416CA9218A42B51004EAC00 /* CubicPolynomial.hpp */,
 				0416CA9318A42B51004EAC00 /* DataStream.hpp */,
 				8B36066C19D242D9002A67DE /* MissedSampleInjector.hpp */,
+				0416CA9418A42B51004EAC00 /* Debug.cpp */,
+				0416CA9518A42B51004EAC00 /* Debug.h */,
+				0416CA9618A42B51004EAC00 /* DumbStylus.cpp */,
+				0416CA9718A42B51004EAC00 /* DumbStylus.h */,
 				0493D9DC18B6957B0049FEFC /* Eigen.h */,
 				0416CA9818A42B51004EAC00 /* EigenLAB.cpp */,
 				0416CA9918A42B51004EAC00 /* EigenLAB.h */,
@@ -220,6 +233,8 @@
 				0416CAAB18A42B51004EAC00 /* PenEvents.h */,
 				0416CAAC18A42B51004EAC00 /* Performance.cpp */,
 				0416CAAD18A42B51004EAC00 /* Performance.h */,
+				0416CAAE18A42B51004EAC00 /* Playback.cpp */,
+				0416CAAF18A42B51004EAC00 /* Playback.h */,
 				0416CAB118A42B51004EAC00 /* Quadrature.h */,
 				0416CAB218A42B51004EAC00 /* Screen.cpp */,
 				0416CAB318A42B51004EAC00 /* Screen.h */,
@@ -463,9 +478,11 @@
 				0416CABB18A42B51004EAC00 /* Cluster.cpp in Sources */,
 				041587DE18DB6C7800642939 /* FTEventDispatcher.mm in Sources */,
 				66D779BB16E57461001C4F55 /* FTPenManager.mm in Sources */,
+				0416CAC918A42B51004EAC00 /* Playback.cpp in Sources */,
 				0416CAC118A42B51004EAC00 /* IsolatedStrokes.cpp in Sources */,
 				0416CABE18A42B51004EAC00 /* EigenLAB.cpp in Sources */,
 				66D779BC16E57461001C4F55 /* TIUpdateManager.mm in Sources */,
+				0416CABC18A42B51004EAC00 /* Debug.cpp in Sources */,
 				0467BAF1198C00AB00E8B63B /* OffscreenTouchClassificationLinker.cpp in Sources */,
 				0489D38B18CE2A7400B41E20 /* FTSDKVersionInfo.m in Sources */,
 				663AFED916FA6BD800681A90 /* PenEvent.cpp in Sources */,
@@ -500,6 +517,7 @@
 				3CE80BD417CE6DE700AA73A0 /* CBCharacteristic+Helpers.m in Sources */,
 				3C02E084183698E100420B95 /* FTLog.mm in Sources */,
 				04493E3C18C628A00003AFB8 /* PenConnectionView.mm in Sources */,
+				0416CABD18A42B51004EAC00 /* DumbStylus.cpp in Sources */,
 				0467BAEE198BE91600E8B63B /* OffscreenStrokeDetectionUtilities.cpp in Sources */,
 				04497AE61950B6EF002E899B /* FTXCallbackURL.m in Sources */,
 			);

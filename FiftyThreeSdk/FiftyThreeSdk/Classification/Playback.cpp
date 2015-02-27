@@ -1,0 +1,143 @@
+//
+//  Playback.cpp
+//  FiftyThreeSdk
+//
+//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
+//
+
+//
+//  Playback.cpp
+//  FiftyThreeSdk
+//
+//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
+//
+
+#include "Core/StringUtils.h"
+#include "Core/Touch/Touch.h"
+#include "FiftyThreeSdk/Classification/Playback.h"
+
+using namespace fiftythree::core;
+using fiftythree::core::make_shared;
+using std::to_string;
+
+namespace
+{
+std::vector<std::string> CSVgetNextLineAndSplitIntoTokens(std::istream &str)
+{
+    std::string line;
+    std::getline(str, line);
+
+    auto parts = Split(line, ',');
+
+    for (auto &part : parts) {
+        part = Trim(part);
+    }
+    return parts;
+}
+}
+
+namespace fiftythree
+{
+namespace sdk
+{
+PlaybackSequence::PlaybackSequence(std::istream &str)
+{
+    std::vector<std::string> row;
+    int previousIndex = -1;
+
+    while (str) {
+        row = CSVgetNextLineAndSplitIntoTokens(str);
+
+        if (row.empty() || (row.size() == 1 && row[0] == "")) {
+            break;
+        }
+
+        int index = std::stoi(row[0]);
+        double timestamp = std::stod(row[1]);
+        int type = std::stoi(row[2]);
+
+        if (index != previousIndex) {
+            if (type == (size_t)PlaybackEntryType::PenEvent) {
+                int penEventType = std::stoi(row[3]);
+                PenEvent pe;
+
+                pe._type = static_cast<PenEventType>(penEventType);
+                pe._timestamp = timestamp;
+
+                _playbackEntries.push_back(make_shared<PlaybackEntry>(pe));
+            } else {
+                // set up a new entry -- the touches will get added below
+                _playbackEntries.push_back(make_shared<PlaybackEntry>(PlaybackEntryType::TouchesChanged));
+            }
+        }
+
+        if (type == (size_t)PlaybackEntryType::TouchesChanged) {
+            TouchId touchId = static_cast<TouchId>(std::stoi(row[3]));
+            TouchPhase phase = static_cast<TouchPhase>(std::stoi(row[4]));
+
+            float x = std::stof(row[5]);
+            float y = std::stof(row[6]);
+
+            Eigen::Vector2f z(x, y);
+            core::InputSample sample(z, z, timestamp);
+
+            auto touch = core::Touch::New(touchId, phase, sample);
+
+            if (row.size() >= 8) {
+                float r = std::stof(row[7]);
+                sample.SetTouchRadius(r);
+            }
+
+            // optional...
+            if (row.size() >= 9) {
+                int v = std::stoi(row[8]);
+                touch->DynamicProperties()["prviewControllerGestureTouches"] = fiftythree::core::any(v);
+            }
+
+            _playbackEntries.back()->_touches.insert(touch);
+        }
+        previousIndex = index;
+    }
+}
+
+void PlaybackSequence::Write(std::ostream &str)
+{
+    str.precision(20);
+
+    int counter = 0;
+    for (const PlaybackEntry::Ptr &entry : _playbackEntries) {
+        if (entry->_type == PlaybackEntryType::PenEvent) {
+            str << counter << ", " << entry->_penEvent._timestamp << ", " << (size_t)entry->_type << ", ";
+            str << (size_t)entry->_penEvent._type;
+            str << std::endl;
+        } else {
+            for (const core::Touch::cPtr &touch : entry->_touches) {
+                core::InputSample snapshotSample = touch->CurrentSample();
+
+                str << counter << ", " << snapshotSample.TimestampSeconds() << ", " << (size_t)entry->_type << ", ";
+
+                str << touch->Id() << ", ";
+                str << (size_t)touch->Phase() << ", ";
+                str << snapshotSample.Location().x() << ", ";
+                str << snapshotSample.Location().y() << ", ";
+
+                if (snapshotSample.TouchRadius()) {
+                    str << *(snapshotSample.TouchRadius());
+                } else {
+                    str << "0.0";
+                }
+
+                // optional...
+                std::unordered_map<std::string, fiftythree::core::any>::const_iterator it = touch->DynamicProperties().find("prviewControllerGestureTouches");
+                if (it != touch->DynamicProperties().end()) {
+                    str << ", " << to_string(fiftythree::core::any_cast<int>(it->second));
+                }
+
+                str << std::endl;
+            }
+        }
+        ++counter;
+    }
+}
+}
+}
