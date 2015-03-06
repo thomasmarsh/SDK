@@ -203,14 +203,17 @@ static const CGFloat kPairingSpotTouchRadius_Moved = 150.f;
 
 - (void)updateLayoutForDebugControls
 {
+    self.size = CGSizeMake(81, 81);
+    _pairingSpotView.y = 0;
+
     if (self.debugControlsVisibility == VisibilityStateCollapsed) {
-        // PenConnectionView only has a pairing spot, so is square.
-        [self setSize:CGSizeMake(81, 81)];
         _pairingSpotView.y = 0;
     } else {
-        // PenConnectionView has extra space at the top for debug controls (which may be hidden or visible)
-        [self setSize:CGSizeMake(81, 101)];
-        _pairingSpotView.y = 20;
+        // PenConnectionView has extra space at the top for debug controls (which may be hidden or visible).
+        // Equal space is added to the bottom so that the spot is centered within the view.
+        constexpr CGFloat kDebugSpace = 20;
+        self.height += kDebugSpace * 2;
+        _pairingSpotView.y = kDebugSpace;
     }
 }
 
