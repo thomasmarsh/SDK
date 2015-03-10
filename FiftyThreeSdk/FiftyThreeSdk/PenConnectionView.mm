@@ -203,7 +203,7 @@ static const CGFloat kPairingSpotTouchRadius_Moved = 150.f;
 
 - (void)updateLayoutForDebugControls
 {
-    self.size = CGSizeMake(81, 81);
+    self.size = (CGSize){81, 81};
     _pairingSpotView.y = 0;
 
     if (self.debugControlsVisibility == VisibilityStateCollapsed) {
