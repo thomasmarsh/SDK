@@ -2,7 +2,7 @@
 //  OffscreenTouchClassificationLinker.cpp
 //  FiftyThreeSdk
 //
-//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
+//  Copyright (c) 2015 FiftyThree, Inc. All rights reserved.
 //
 
 #include "Core/Log.h"
@@ -216,7 +216,7 @@ public:
             } else {
                 optional<bool> touchEntersFromOffscreenOptional = fiftythree::sdk::WillTouchEnterFromOffscreenPermissive(newTouch);
 
-                if (touchEntersFromOffscreenOptional) {
+                if (touchEntersFromOffscreenOptional.is_initialized()) {
                     touchEntersFromOffscreen = *touchEntersFromOffscreenOptional;
                     Touch::Ptr nonConstTouch = cpc<Touch>(newTouch);
                     nonConstTouch->DynamicProperties()[kTouchDidEnterFromOffscreen] = any(touchEntersFromOffscreen);
