@@ -32,8 +32,10 @@ NSString *const kPencilConnectionStatusChangedWithPenConnectionViewNotificationN
 
 using namespace fiftythree::core;
 
-static const CGFloat kPairingSpotTouchRadius_Began = 35.f;
-static const CGFloat kPairingSpotTouchRadius_Moved = 150.f;
+constexpr CGFloat kPairingSpotTouchRadius_Began = 35.f;
+constexpr CGFloat kPairingSpotTouchRadius_Moved = 150.f;
+constexpr CGFloat kDebugControlWidth = 10.f;
+constexpr CGFloat kDebugControlSpacing = 5.f;
 
 // The GreedyGestureRecognizer recognizes every touch, immediately and indiscriminately.
 //
@@ -201,20 +203,25 @@ static const CGFloat kPairingSpotTouchRadius_Moved = 150.f;
     [self updateLayoutForDebugControls];
 }
 
+- (CGFloat)spotWidth
+{
+    return 81.f;
+}
+
 - (void)updateLayoutForDebugControls
 {
-    self.size = (CGSize){81, 81};
-    _pairingSpotView.y = 0;
+    self.size = (CGSize){self.spotWidth, 81.f};
 
-    if (self.debugControlsVisibility == VisibilityStateCollapsed) {
-        _pairingSpotView.y = 0;
-    } else {
+    if (self.debugControlsVisibility != VisibilityStateCollapsed) {
         // PenConnectionView has extra space at the top for debug controls (which may be hidden or visible).
         // Equal space is added to the bottom so that the spot is centered within the view.
         constexpr CGFloat kDebugSpace = 20;
         self.height += kDebugSpace * 2;
-        _pairingSpotView.y = kDebugSpace;
     }
+
+    [_pairingSpotView centerInSuperview];
+    _tipPressedView.alignedX = (self.size.width - kDebugControlSpacing) * 0.5f - _tipPressedView.width;
+    _eraserPressedView.alignedX = (self.size.width + kDebugControlSpacing) * 0.5f;
 }
 
 - (void)setPenManager:(FTPenManager *)penManager
@@ -547,7 +554,7 @@ static const CGFloat kPairingSpotTouchRadius_Moved = 150.f;
 {
     if (!_eraserPressedView) {
         _eraserPressedView = [self tipOrEraserPressedView];
-        _eraserPressedView.x += 15;
+        _eraserPressedView.x += kDebugControlWidth + kDebugControlSpacing;
         _eraserPressedView.userInteractionEnabled = NO;
     }
 
@@ -556,7 +563,7 @@ static const CGFloat kPairingSpotTouchRadius_Moved = 150.f;
 
 - (UIView *)tipOrEraserPressedView
 {
-    static const CGFloat width = 10.f;
+    CGFloat width = kDebugControlWidth;
 
     UIView *view = [[UIView alloc] initWithFrame:CGRectMake(27, 0, width, width)];
     view.layer.cornerRadius = 0.5f * width;
