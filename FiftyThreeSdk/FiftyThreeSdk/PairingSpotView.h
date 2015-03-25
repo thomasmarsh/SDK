@@ -2,7 +2,7 @@
 //  PairingSpotView.h
 //  FiftyThreeSdk
 //
-//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
+//  Copyright (c) 2015 FiftyThree, Inc. All rights reserved.
 //
 
 #pragma once
@@ -35,6 +35,18 @@ typedef NS_ENUM(NSInteger, FTPairingSpotCometState) {
     FTPairingSpotCometStateCounterClockwise,
 };
 
+///
+/// General styling options for the pairing spot UI.
+///
+typedef NS_ENUM(NSInteger, FTPairingSpotStyle) {
+
+    /// Show the pairing UI using a flattened appearance.
+    FTPairingSpotStyleFlat = 0,
+
+    /// Show the pairing UI as being inset into the glass.
+    FTPairingSpotStyleInset = 1,
+};
+
 extern NSString *const kPairingSpotStateDidChangeNotificationName;
 
 @class PairingSpotView;
@@ -62,6 +74,12 @@ extern NSString *const kPairingSpotStateDidChangeNotificationName;
 @property (nonatomic) FTPairingSpotCometState cometState;
 
 @property (nonatomic) BOOL shouldSuspendNewAnimations;
+
+///
+/// Controls different styles for the pairing spot. See
+/// FTPairingSpotStyle enum for supported values.
+///
+@property (nonatomic) FTPairingSpotStyle style UI_APPEARANCE_SELECTOR;
 
 @property (nonatomic) PairingSpotViewSettings viewSettings;
 

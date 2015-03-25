@@ -314,6 +314,10 @@ NSString *FTPairingSpotCometStateName(FTPairingSpotCometState value)
 {
     self = [super initWithFrame:CGRectMake(0, 0, 82, 82)];
     if (self) {
+        // UIAppearance tracks "changed" properties by access through the getters and setters.
+        // as such defaults must be set by directly accessing the property's ivar.
+        _style = FTPairingSpotStyleInset;
+
         self.opaque = NO;
         self.backgroundColor = [UIColor clearColor];
 
@@ -845,9 +849,11 @@ NSString *FTPairingSpotCometStateName(FTPairingSpotCometState value)
     const float wellRadius = fmax(iconScale * minWellRadius,
                                   minWellRadius + wellMargin);
 
-    [PairingSpotView drawWellUnderlayToContext:context
-                                    withCenter:wellCenter
-                                        radius:wellRadius];
+    if (FTPairingSpotStyleInset == self.style) {
+        [PairingSpotView drawWellUnderlayToContext:context
+                                        withCenter:wellCenter
+                                            radius:wellRadius];
+    }
 
     for (PairingSpotIconAnimation *iconAnimation in self.iconAnimations) {
         if (!iconAnimation.isStarted) {
@@ -916,9 +922,12 @@ NSString *FTPairingSpotCometStateName(FTPairingSpotCometState value)
         }
     }
 
-    [PairingSpotView drawWellOverlayToContext:context
-                                   withCenter:wellCenter
-                                       radius:wellRadius];
+    if (FTPairingSpotStyleInset == self.style) {
+        [PairingSpotView drawWellOverlayToContext:context
+                                       withCenter:wellCenter
+                                           radius:wellRadius];
+    }
+
     if (wellMargin > 0.f) {
         if (!self.cometsLayer) {
             self.cometsLayer = [[CometsLayer alloc] initWithLayer:self.layer];
@@ -1032,7 +1041,7 @@ NSString *FTPairingSpotCometStateName(FTPairingSpotCometState value)
                       withCenter:(CGPoint)center
                           radius:(CGFloat)radius
 {
-    // TODO: I'm not sure that this method is doing anything.
+    // This draws the top, inner shadow of the pairing inset UI.
 
     CGContextSaveGState(context);
 
