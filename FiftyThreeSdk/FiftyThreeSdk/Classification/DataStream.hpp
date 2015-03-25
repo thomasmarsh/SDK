@@ -2,7 +2,7 @@
 //  DataStream.hpp
 //  FiftyThreeSdk
 //
-//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
+//  Copyright (c) 2015 FiftyThree, Inc. All rights reserved.
 //
 
 #pragma once
@@ -75,7 +75,7 @@ public:
 
     void AddPoint(DataType value, double timestamp)
     {
-        if (_data.empty() && _t0 < 0.0) {
+        if (_data.empty()) {
             _t0 = timestamp;
         }
 
