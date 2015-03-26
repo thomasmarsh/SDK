@@ -308,15 +308,57 @@ NSString *FTPairingSpotCometStateName(FTPairingSpotCometState value)
 
 #pragma mark -
 
-@implementation PairingSpotView
+///
+/// Internal helper to implement properties that initially have a default value which are overridden by
+/// any external values supplied to the PairingSpotView instance.
+///
+@interface OverrideableProperty : NSObject
+@property (nonatomic) id defaultValue;
+@property (nonatomic) id value;
+@property (nonatomic) BOOL hasOverride;
+
+@end
+
+@implementation OverrideableProperty
+
+@synthesize value = _value;
+
+- (id)value
+{
+    if (_hasOverride) {
+        return _value;
+    } else {
+        return _defaultValue;
+    }
+}
+
+- (void)setValue:(id)value
+{
+    self.hasOverride = YES;
+    self.defaultValue = nil;
+    _value = value;
+}
+
+@end
+
+#pragma mark -
+
+@implementation PairingSpotView {
+    OverrideableProperty *_selectedColorOverrides;
+    OverrideableProperty *_unselectedColorOverrides;
+    OverrideableProperty *_unselectedTintColorOverrides;
+}
 
 - (id)init
 {
     self = [super initWithFrame:CGRectMake(0, 0, 82, 82)];
     if (self) {
-        // UIAppearance tracks "changed" properties by access through the getters and setters.
-        // as such defaults must be set by directly accessing the property's ivar.
+        _selectedColorOverrides = [[OverrideableProperty alloc] init];
+        _unselectedColorOverrides = [[OverrideableProperty alloc] init];
+        _unselectedTintColorOverrides = [[OverrideableProperty alloc] init];
+        // you must set the ivar or ios will refuse to override the style from an appearance.
         _style = FTPairingSpotStyleInset;
+        [self setDefaultsForStyle:_style];
 
         self.opaque = NO;
         self.backgroundColor = [UIColor clearColor];
@@ -849,10 +891,18 @@ NSString *FTPairingSpotCometStateName(FTPairingSpotCometState value)
     const float wellRadius = fmax(iconScale * minWellRadius,
                                   minWellRadius + wellMargin);
 
+    UIColor *tint;
+    if (FTPairingSpotStyleFlat == self.style) {
+        tint = self.tintColor;
+    } else {
+        tint = [UIColor colorWithWhite:1.f alpha:1.f];
+    }
+
     if (FTPairingSpotStyleInset == self.style) {
         [PairingSpotView drawWellUnderlayToContext:context
                                         withCenter:wellCenter
-                                            radius:wellRadius];
+                                            radius:wellRadius
+                                andBackgroundColor:self.unselectedTintColor];
     }
 
     for (PairingSpotIconAnimation *iconAnimation in self.iconAnimations) {
@@ -872,27 +922,42 @@ NSString *FTPairingSpotCometStateName(FTPairingSpotCometState value)
 
         Clamp<CGFloat>(iconOpacity, 0.f, 1.f);
 
-        CGFloat backgroundGrayValue = 0x32 / (CGFloat)0xff;
-
         UIColor *iconColor;
+        UIColor *figureColor;
+
         switch (iconAnimation.iconType) {
-            case FTPairingSpotIconTypeUnpaired:
-                iconColor = [UIColor colorWithWhite:Lerp<CGFloat>(backgroundGrayValue, 0.f, iconOpacity)
-                                              alpha:1.f];
+            case FTPairingSpotIconTypeUnpaired: {
+                iconColor = self.unselectedTintColor;
+                CGFloat hue, saturation, brightness, alpha, unselectedBrightness;
+                [iconColor getHue:&hue saturation:&saturation brightness:&brightness alpha:&alpha];
+                [self.unselectedColor getHue:NULL saturation:NULL brightness:&unselectedBrightness alpha:NULL];
+                brightness = Lerp<CGFloat>(unselectedBrightness, brightness, iconOpacity);
+                iconColor = [UIColor colorWithHue:hue saturation:saturation brightness:brightness alpha:alpha];
+
+                // Color for "figure" elements (i.e. figure/ground) when in a disconnected state.
+                figureColor = self.unselectedColor;
                 break;
+            }
             case FTPairingSpotIconTypeConnected:
             case FTPairingSpotIconTypeLowBattery:
             case FTPairingSpotIconTypeCriticallyLowBattery:
-            default:
-                iconColor = [UIColor colorWithWhite:Lerp<CGFloat>(backgroundGrayValue, 1.f, iconOpacity)
-                                              alpha:1.f];
+            default: {
+                CGFloat hue, saturation, selectedBrightness;
+                [tint getHue:&hue saturation:&saturation brightness:NULL alpha:NULL];
+                [self.selectedColor getHue:NULL saturation:NULL brightness:&selectedBrightness alpha:NULL];
+
+                iconColor = [UIColor colorWithHue:hue saturation:saturation brightness:Lerp<CGFloat>(selectedBrightness, 1.f, iconOpacity)
+                                            alpha:1.f];
+                // Color for "figure" elements (i.e. figure/ground) when in a connected state.
+                figureColor = self.selectedColor;
                 break;
+            }
         }
 
         switch (iconAnimation.iconType) {
             case FTPairingSpotIconTypeLowBattery:
             case FTPairingSpotIconTypeCriticallyLowBattery: {
-                UIColor *batterySegmentColor = [UIColor colorWithWhite:backgroundGrayValue alpha:1.f];
+                UIColor *batterySegmentColor = figureColor;
                 // Battery segment flash animation.
                 if (iconAnimation.isStarted &&
                     iconAnimation.iconType == FTPairingSpotIconTypeCriticallyLowBattery &&
@@ -901,14 +966,24 @@ NSString *FTPairingSpotCometStateName(FTPairingSpotCometState value)
                                                                        1.f,
                                                                        flashOpacityPhase);
                     Clamp<CGFloat>(batterySegmentOpacity, 0.f, 1.f);
-                    batterySegmentColor = [UIColor colorWithWhite:Lerp<CGFloat>(1.f, backgroundGrayValue, batterySegmentOpacity)
-                                                            alpha:1.f];
+
+                    if (FTPairingSpotStyleFlat == self.style) {
+                        CGFloat red, green, blue;
+                        [batterySegmentColor getRed:&red green:&green blue:&blue alpha:NULL];
+                        batterySegmentColor = [UIColor colorWithRed:red green:green blue:blue alpha:batterySegmentOpacity];
+                    } else {
+                        CGFloat figureColorBrightness;
+                        [figureColor getHue:NULL saturation:NULL brightness:&figureColorBrightness alpha:NULL];
+                        batterySegmentColor = [UIColor colorWithWhite:Lerp<CGFloat>(1.f, figureColorBrightness, batterySegmentOpacity)
+                                                                alpha:1.f];
+                    }
                 }
                 [PairingSpotView drawBatteryIconToContext:context
                                                withCenter:wellCenter
                                                     scale:iconScale
-                                                 andColor:iconColor
-                                      batterySegmentColor:batterySegmentColor];
+                                      batterySegmentColor:batterySegmentColor
+                                          foregroundColor:figureColor
+                                       andBackgroundColor:iconColor];
                 break;
             }
             case FTPairingSpotIconTypeUnpaired:
@@ -917,7 +992,8 @@ NSString *FTPairingSpotCometStateName(FTPairingSpotCometState value)
                 [PairingSpotView drawPencilIconToContext:context
                                               withCenter:wellCenter
                                                    scale:iconScale
-                                                andColor:iconColor];
+                                         foregroundColor:figureColor
+                                      andBackgroundColor:iconColor];
                 break;
         }
     }
@@ -962,12 +1038,62 @@ NSString *FTPairingSpotCometStateName(FTPairingSpotCometState value)
         CGImageRelease(maskImage);
 
         const CGFloat cometsAlpha = Clamped<CGFloat>(InverseLerp<CGFloat>(3.f, 13.f, self.cometsLayer.width), 0.f, 1.f);
-        [[UIColor colorWithWhite:1.f alpha:cometsAlpha] setFill];
+
+        UIColor *cometsColor = [self getCometsColorWithAlpha:cometsAlpha];
+        [cometsColor setFill];
+
         CGContextFillRect(context, CGContextGetClipBoundingBox(context));
     }
 }
 
-#pragma mark - Graphics
+#pragma mark - Appearance
+
+- (UIColor *)getCometsColorWithAlpha:(CGFloat)alpha
+{
+    UIColor *color = nil;
+    if (self.highlightColor) {
+        color = self.highlightColor;
+    } else if (FTPairingSpotStyleFlat == self.style) {
+        color = self.tintColor;
+    }
+
+    if (color) {
+        CGFloat r, g, b;
+        [color getRed:&r green:&g blue:&b alpha:NULL];
+        return [UIColor colorWithRed:r green:g blue:b alpha:alpha];
+    } else {
+        return [UIColor colorWithWhite:1.f alpha:alpha];
+    }
+}
+
+///
+/// Reset OverridableProperty defaults for data members based on the supplied style.
+///
+- (void)setDefaultsForStyle:(FTPairingSpotStyle)style
+{
+    // setup defaults for each style
+    switch (style) {
+        case FTPairingSpotStyleFlat: {
+            [_selectedColorOverrides setDefaultValue:[UIColor colorWithWhite:1.f alpha:1.f]];
+            [_unselectedColorOverrides setDefaultValue:[PairingSpotView grayPairingColor]];
+            [_unselectedTintColorOverrides setDefaultValue:[UIColor colorWithWhite:1.0f alpha:0.25f]];
+            break;
+        }
+        case FTPairingSpotStyleInset:
+        default: {
+            [_selectedColorOverrides setDefaultValue:[PairingSpotView grayPairingColor]];
+            [_unselectedColorOverrides setDefaultValue:[PairingSpotView grayPairingColor]];
+            [_unselectedTintColorOverrides setDefaultValue:[UIColor colorWithWhite:0.f alpha:1.f]];
+            break;
+        }
+    }
+}
+
+- (void)setStyle:(FTPairingSpotStyle)style
+{
+    [self setDefaultsForStyle:style];
+    _style = style;
+}
 
 + (UIColor *)grayPairingColor
 {
@@ -977,9 +1103,42 @@ NSString *FTPairingSpotCometStateName(FTPairingSpotCometState value)
                            alpha:1.0f];
 }
 
+- (void)setSelectedColor:(UIColor *)selectedColor
+{
+    _selectedColorOverrides.value = selectedColor;
+}
+
+- (UIColor *)selectedColor
+{
+    return _selectedColorOverrides.value;
+}
+
+- (void)setUnselectedColor:(UIColor *)unselectedColor
+{
+    _unselectedColorOverrides.value = unselectedColor;
+}
+
+- (UIColor *)unselectedColor
+{
+    return _unselectedColorOverrides.value;
+}
+
+- (void)setUnselectedTintColor:(UIColor *)unselectedTintColor
+{
+    _unselectedTintColorOverrides.value = unselectedTintColor;
+}
+
+- (UIColor *)unselectedTintColor
+{
+    return _unselectedTintColorOverrides.value;
+}
+
+#pragma mark - Graphics
+
 + (void)drawWellUnderlayToContext:(CGContextRef)context
                        withCenter:(CGPoint)center
                            radius:(CGFloat)radius
+               andBackgroundColor:(UIColor *)bgColor
 {
     const CGFloat innerDiameter = 2.f * radius;
     const CGFloat outerRadius = radius + 1.f;
@@ -1000,7 +1159,6 @@ NSString *FTPairingSpotCometStateName(FTPairingSpotCometState value)
     // Color Declarations
     UIColor *shadowGradient = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.5];
     UIColor *whiteGradient = [UIColor colorWithRed:1 green:1 blue:1 alpha:0.2];
-    UIColor *gray = [PairingSpotView grayPairingColor];
 
     // Gradient background
     {
@@ -1028,7 +1186,7 @@ NSString *FTPairingSpotCometStateName(FTPairingSpotCometState value)
 
     // Oval 7 Drawing
     UIBezierPath *oval7Path = [UIBezierPath bezierPathWithOvalInRect:CGRectMake(1, 1, innerDiameter, innerDiameter)];
-    [gray setFill];
+    [bgColor setFill];
     [oval7Path fill];
 
     // Cleanup
@@ -1093,7 +1251,8 @@ NSString *FTPairingSpotCometStateName(FTPairingSpotCometState value)
 + (void)drawPencilIconToContext:(CGContextRef)context
                      withCenter:(CGPoint)center
                           scale:(CGFloat)scale
-                       andColor:(UIColor *)color
+                foregroundColor:(UIColor *)fgColor
+             andBackgroundColor:(UIColor *)bgColor
 {
     CGContextSaveGState(context);
 
@@ -1110,7 +1269,7 @@ NSString *FTPairingSpotCometStateName(FTPairingSpotCometState value)
                                                               startAngle:0.f
                                                                 endAngle:M_PI * 2.f
                                                                clockwise:NO];
-    [color setFill];
+    [bgColor setFill];
     [backgroundPath fill];
 
     // The code paint code isn't properly centered.
@@ -1166,8 +1325,7 @@ NSString *FTPairingSpotCometStateName(FTPairingSpotCometState value)
 
     pencilPath.miterLimit = 4;
 
-    UIColor *gray = [PairingSpotView grayPairingColor];
-    [gray setFill];
+    [fgColor setFill];
     [pencilPath fill];
 
     CGContextRestoreGState(context);
@@ -1176,8 +1334,9 @@ NSString *FTPairingSpotCometStateName(FTPairingSpotCometState value)
 + (void)drawBatteryIconToContext:(CGContextRef)context
                       withCenter:(CGPoint)center
                            scale:(CGFloat)scale
-                        andColor:(UIColor *)color
              batterySegmentColor:(UIColor *)batterySegmentColor
+                 foregroundColor:(UIColor *)color
+              andBackgroundColor:(UIColor *)bgColor
 {
     CGContextSaveGState(context);
 
@@ -1194,7 +1353,7 @@ NSString *FTPairingSpotCometStateName(FTPairingSpotCometState value)
                                                               startAngle:0.f
                                                                 endAngle:M_PI * 2.f
                                                                clockwise:NO];
-    [color setFill];
+    [bgColor setFill];
     [backgroundPath fill];
 
     // The code paint code isn't properly centered.
@@ -1234,8 +1393,7 @@ NSString *FTPairingSpotCometStateName(FTPairingSpotCometState value)
                                                            cornerRadius:2]];
     batteryBodyPath.miterLimit = 4;
 
-    UIColor *gray = [PairingSpotView grayPairingColor];
-    [gray setFill];
+    [color setFill];
     [batteryBodyPath fill];
 
     UIBezierPath *batterySegmentPath = [UIBezierPath bezierPath];

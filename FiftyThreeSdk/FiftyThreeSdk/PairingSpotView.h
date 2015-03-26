@@ -81,6 +81,26 @@ extern NSString *const kPairingSpotStateDidChangeNotificationName;
 ///
 @property (nonatomic) FTPairingSpotStyle style UI_APPEARANCE_SELECTOR;
 
+///
+/// Sets the color used when drawing "highlights" for the pairing view.
+///
+@property (nonatomic) UIColor *highlightColor UI_APPEARANCE_SELECTOR;
+
+///
+/// Sets the color used when drawing "selected" elements for the pairing view.
+///
+@property (nonatomic) UIColor *selectedColor UI_APPEARANCE_SELECTOR;
+
+///
+/// Sets the color used when drawing elements for the pairing view that are not selected.
+///
+@property (nonatomic) UIColor *unselectedColor UI_APPEARANCE_SELECTOR;
+
+///
+/// Sets the tint color used when the pairing spot is "deselected".
+///
+@property (nonatomic) UIColor *unselectedTintColor UI_APPEARANCE_SELECTOR;
+
 @property (nonatomic) PairingSpotViewSettings viewSettings;
 
 - (void)setConnectionState:(FTPairingSpotConnectionState)connectionState
