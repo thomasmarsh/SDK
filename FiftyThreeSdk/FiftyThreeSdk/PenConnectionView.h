@@ -2,16 +2,15 @@
 //  PenConnectionView.h
 //  FiftyThreeSdk
 //
-//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
+//  Copyright (c) 2015 FiftyThree, Inc. All rights reserved.
 //
 
 #pragma once
 
 #import <UIKit/UIKit.h>
 
+#import "FiftyThreeSdk/FTPenManager.h"
 #import "FiftyThreeSdk/PairingSpotView.h"
-
-@class FTPenManager;
 
 typedef NS_ENUM(NSInteger, VisibilityState) {
     VisibilityStateVisible,  // Visible
@@ -45,6 +44,7 @@ typedef NS_ENUM(NSInteger, VisibilityState) {
 @property (nonatomic, readonly) BOOL isPairingSpotPressed;
 @property (nonatomic) BOOL suppressDialogs;
 @property (nonatomic) BOOL shouldSuspendNewAnimations;
+@property (nonatomic) FTPairingUIStyle style;
 
 - (BOOL)isPenConnected;
 - (BOOL)isPenDisconnected;

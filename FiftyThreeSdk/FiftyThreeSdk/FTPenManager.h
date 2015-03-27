@@ -115,7 +115,9 @@ typedef NS_ENUM(NSInteger, FTPairingUIStyle) {
     // You should use this in release builds.
     FTPairingUIStyleDefault,
     // This turns on two additional views that show if the tip or eraser are pressed.
-    FTPairingUIStyleDebug
+    FTPairingUIStyleDebug,
+    // Uses an alternate visual style more compatible with the "flat" look of iOS7.
+    FTPairingUIStyleFlat
 };
 
 #pragma mark -  FTPenManager
@@ -146,6 +148,11 @@ typedef NS_ENUM(NSInteger, FTPairingUIStyle) {
 //
 // This must be called on the UI thread.
 - (UIView *)pairingButtonWithStyle:(FTPairingUIStyle)style;
+
+// This provides a view that implements our BTLE pairing UI. The control is 81x101 points.
+//
+// This must be called on the UI thread.
+- (UIView *)pairingButtonWithStyle:(FTPairingUIStyle)style andUnselectedTintColor:(UIColor *)unselectedTintColor;
 
 // Call this to tear down the API. This also will shut down any CoreBluetooth activity.
 // You'll also need to release any views that FTPenManager has handed you. The next access to

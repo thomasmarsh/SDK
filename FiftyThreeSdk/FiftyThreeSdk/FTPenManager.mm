@@ -4,12 +4,6 @@
 //
 //  Copyright (c) 2015 FiftyThree, Inc. All rights reserved.
 //
-//
-//  FTPenManager.mm
-//  FiftyThreeSdk
-//
-//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
-//
 
 #import <CoreBluetooth/CoreBluetooth.h>
 #import <UIKit/UIKit.h>
@@ -2232,18 +2226,23 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
 - (UIView *)pairingButtonWithStyle:(FTPairingUIStyle)style
 {
+    return [self pairingButtonWithStyle:style andUnselectedTintColor:nil];
+}
+
+- (UIView *)pairingButtonWithStyle:(FTPairingUIStyle)style andUnselectedTintColor:(UIColor *)unselectedTintColor
+{
     NSAssert([NSThread isMainThread], @"This must be called on the UI thread.");
 
     PenConnectionView *penConnectionView = [[PenConnectionView alloc] init];
+    if (style == FTPairingUIStyleFlat && unselectedTintColor) {
+        // Don't allow modification of the default UI. Only the flat UI can be tinted.
+        penConnectionView.pairingSpotView.unselectedTintColor = unselectedTintColor;
+    }
     penConnectionView.penManager = self;
     penConnectionView.suppressDialogs = YES;
     penConnectionView.isActive = true;
     penConnectionView.delegate = self;
-    if (FTPairingUIStyleDebug == style) {
-        penConnectionView.debugControlsVisibility = VisibilityStateVisible;
-    } else {
-        penConnectionView.debugControlsVisibility = VisibilityStateHidden;
-    }
+    penConnectionView.style = style;
 
     auto instance = fiftythree::core::spc<AnimationPumpObjC>(AnimationPump::Instance());
     DebugAssert(instance->GetDelegate() == nil || instance->GetDelegate() == self);

@@ -429,6 +429,26 @@ constexpr CGFloat kDebugControlSpacing = 5.f;
     [self setNeedsDisplay];
 }
 
+- (void)setStyle:(FTPairingUIStyle)style
+{
+    switch (style) {
+        case FTPairingUIStyleDebug: {
+            self.debugControlsVisibility = VisibilityStateVisible;
+            break;
+        }
+        case FTPairingUIStyleFlat: {
+            self.debugControlsVisibility = VisibilityStateHidden;
+            _pairingSpotView.style = FTPairingSpotStyleFlat;
+            break;
+        }
+        case FTPairingUIStyleDefault:
+        default: {
+            self.debugControlsVisibility = VisibilityStateHidden;
+            _pairingSpotView.style = FTPairingSpotStyleInset;
+        }
+    }
+}
+
 #pragma mark - Pen Notifications
 
 - (void)isTipOrEraserPressedStateChange:(NSNotification *)notification
