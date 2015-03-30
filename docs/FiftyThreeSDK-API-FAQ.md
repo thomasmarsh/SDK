@@ -108,3 +108,35 @@ If you want to add support for this in your app you'll need to do the following:
 }
 ```
 
+#####How do I change the color of the pairing UI?
+
+By default the pairing UI is not customizable. It uses the same design found in our Paper app. To create a
+version that can be tinted per iOS7+ UI design guidelines you must specify the "flat" style added in version
+1.2 of our SDK.
+
+```
+UIView *connectionView = [[FTPenManager sharedInstance] pairingButtonWithStyle:FTPairingUIStyleFlat];
+```
+
+The "flat" style has the same behavior as the default version but inherits the UIView's
+```tintColor``` appearance. You can read more about programmatically changing appearance properties
+in the [UIAppearance Protocol Reference](https://developer.apple.com/library/ios/documentation/UIKit/Reference/UIAppearance_Protocol/)
+in the Apple UIKit documentation.
+
+In addition to the tint color, you can also customize the color of the pencil graphic. Both of these colors can
+also be customized for the "connected" and "disconnected" pairing states. To override the default tinting and
+coloring use the ```pairingButtonWithStyle:andStyleOverrides``` method added in
+version 1.2 of our SDK.
+
+```
+FTPairingUIStyleOverrides *overrides = [[FTPairingUIStyleOverrides alloc] init];
+
+// Specify any overrides for the pairing spot. The default values will be
+// used for any nil references.
+overrides.unselectedTintColor = [UIColor colorWithWhite:1.0f alpha:0.25f];
+
+UIView *connectionView = [[FTPenManager sharedInstance] pairingButtonWithStyle:FTPairingUIStyleFlat
+                                                             andStyleOverrides:overrides];
+```
+
+![Diagram of Available Pairing Spot Style Overrides](FTPairingUIStyle.png)

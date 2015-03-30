@@ -11,7 +11,7 @@ Building (Internally):
 - Open iOS/SDK/FiftyThreeSdkTestApp/FiftyThreeSdkTestApp.xcworkspace/ in xcode. Note, this test app ships as part of the SDK but compiles non-framework versions so it's easy to step in the debugger.
 
 Release Checklist:
-- Bump version in Build/build.sh and check in.
+- Bump version in Build/build.py and check in.
 
 - Run copy changes and header documentation changes by EricR.
 

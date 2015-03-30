@@ -1,5 +1,8 @@
-1.1.8 
-- Fix startup crash when optionally linking against FiftyThree SDK on iOS 6 devices. 
+1.2.0
+- Add new iOS7+ compatible version of pairing UI.
+
+1.1.8
+- Fix startup crash when optionally linking against FiftyThree SDK on iOS 6 devices.
 - Updated documentation to note that to use FiftyThree SDK you should be running on iOS 7 or greater.
 
 1.1.7
