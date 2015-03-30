@@ -1054,7 +1054,7 @@ NSString *FTPairingSpotCometStateName(FTPairingSpotCometState value)
     if (self.highlightColor) {
         color = self.highlightColor;
     } else if (FTPairingSpotStyleFlat == self.style) {
-        color = self.tintColor;
+        color = self.unselectedColor;
     }
 
     if (color) {

@@ -111,12 +111,34 @@ extern "C"
 @class UIView;
 @class UIColor;
 
+// Style overrides available for some values of FTPairingUIStyle.
+@interface FTPairingUIStyleOverrides
+
+// Override the color used by the style for drawing icons when the UI control is in a
+// "selected" psedo-state (e.g. "selected" is synonoumous with "connected").
+@property (nonatomic) UIColor *selectedColor;
+
+// Override the color used by the style for drawing icons when the UI control is in an
+// "normal" psedo-state (e.g. "normal" is synonoumous with "disconnected").
+@property (nonatomic) UIColor *unselectedColor;
+
+// Override the color used by the style tinting the UI control. This value supercedes any tintColor set
+// for the UIView or its type heiarchy.
+@property (nonatomic) UIColor *tintColor;
+
+// Override the color used by the style for tinting the UI control when in an
+// "normal" psedo-state (e.g. "normal" is synonoumous with "disconnected").
+@property (nonatomic) UIColor *unselectedTintColor;
+
+@end
+
 typedef NS_ENUM(NSInteger, FTPairingUIStyle) {
     // You should use this in release builds.
     FTPairingUIStyleDefault,
     // This turns on two additional views that show if the tip or eraser are pressed.
     FTPairingUIStyleDebug,
     // Uses an alternate visual style more compatible with the "flat" look of iOS7.
+    // This style supports FTPairingUIStyleOverrides
     FTPairingUIStyleFlat
 };
 
@@ -152,7 +174,10 @@ typedef NS_ENUM(NSInteger, FTPairingUIStyle) {
 // This provides a view that implements our BTLE pairing UI. The control is 81x101 points.
 //
 // This must be called on the UI thread.
-- (UIView *)pairingButtonWithStyle:(FTPairingUIStyle)style andUnselectedTintColor:(UIColor *)unselectedTintColor;
+//
+// The styleOverrides is only supported for some values of FTPairingUIStyle. See FTPairingUIStyle comments
+// for details.
+- (UIView *)pairingButtonWithStyle:(FTPairingUIStyle)style andStyleOverrides:(FTPairingUIStyleOverrides *)styleOverrides;
 
 // Call this to tear down the API. This also will shut down any CoreBluetooth activity.
 // You'll also need to release any views that FTPenManager has handed you. The next access to

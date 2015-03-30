@@ -122,6 +122,12 @@ namespace
 static FTPenManager *sharedInstance = nil;
 }
 
+#pragma mark - Style
+
+@implementation FTPairingUIStyleOverrides
+
+@end
+
 #pragma mark -
 
 typedef enum {
@@ -2226,17 +2232,38 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
 - (UIView *)pairingButtonWithStyle:(FTPairingUIStyle)style
 {
-    return [self pairingButtonWithStyle:style andUnselectedTintColor:nil];
+    return [self pairingButtonWithStyle:style andStyleOverrides:nil];
 }
 
-- (UIView *)pairingButtonWithStyle:(FTPairingUIStyle)style andUnselectedTintColor:(UIColor *)unselectedTintColor
+- (UIView *)pairingButtonWithStyle:(FTPairingUIStyle)style andStyleOverrides:(FTPairingUIStyleOverrides *)styleOverrides
 {
     NSAssert([NSThread isMainThread], @"This must be called on the UI thread.");
 
     PenConnectionView *penConnectionView = [[PenConnectionView alloc] init];
-    if (style == FTPairingUIStyleFlat && unselectedTintColor) {
+    if (style == FTPairingUIStyleFlat) {
+        UIColor *const tintColor = styleOverrides.tintColor;
+        if (tintColor) {
+            penConnectionView.pairingSpotView.tintColor = tintColor;
+        }
+
+        UIColor *const unselectedTintColor = styleOverrides.unselectedTintColor;
+        if (unselectedTintColor) {
+            penConnectionView.pairingSpotView.unselectedTintColor = unselectedTintColor;
+        }
+
+        UIColor *const selectedColor = styleOverrides.selectedColor;
+        if (selectedColor) {
+            penConnectionView.pairingSpotView.selectedColor = selectedColor;
+        }
+
+        UIColor *const unselectedColor = styleOverrides.unselectedColor;
+        if (unselectedColor) {
+            penConnectionView.pairingSpotView.unselectedColor = unselectedColor;
+        }
+
+    } else if (styleOverrides) {
         // Don't allow modification of the default UI. Only the flat UI can be tinted.
-        penConnectionView.pairingSpotView.unselectedTintColor = unselectedTintColor;
+        MLOG_WARN(FTLogSDK, "Style overrides are not supported for the given FTPairingUIStyle: %d", (int)style);
     }
     penConnectionView.penManager = self;
     penConnectionView.suppressDialogs = YES;
