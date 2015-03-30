@@ -112,7 +112,7 @@ extern "C"
 @class UIColor;
 
 // Style overrides available for some values of FTPairingUIStyle.
-@interface FTPairingUIStyleOverrides
+@interface FTPairingUIStyleOverrides : NSObject
 
 // Override the color used by the style for drawing icons when the UI control is in a
 // "selected" psedo-state (e.g. "selected" is synonoumous with "connected").
