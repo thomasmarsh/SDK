@@ -52,7 +52,7 @@ NSString *const kFTPenNumSuccessfulConnectionsPropertyName = @"numSuccessfulConn
 NSString *const kFTPenNumResetsPropertyName = @"numResets";
 NSString *const kFTPenNumLinkTerminationsPropertyName = @"numLinkTerminations";
 NSString *const kFTPenNumDroppedNotificationsPropertyName = @"numDroppedNotifications";
-NSString *const kFTPenConnectedSecondsPropertyName = @"numDroppedNotifications";
+NSString *const kFTPenConnectedSecondsPropertyName = @"connectedSeconds";
 
 NSString *const kFTPenManufacturingIDPropertyName = @"manufacturingID";
 NSString *const kFTPenLastErrorCodePropertyName = @"lastErrorCode";
