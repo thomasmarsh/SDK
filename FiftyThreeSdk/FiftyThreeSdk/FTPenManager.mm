@@ -648,21 +648,19 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
         if (self.pen.firmwareRevision &&
             self.pen.softwareRevision &&
             !self.updateManager) {
-            MLOG_INFO(FTLogSDK, "Factory firmware version: %s", ObjcDescription(self.pen.firmwareRevision));
-            MLOG_INFO(FTLogSDK, "Upgrade firmware version: %s", ObjcDescription(self.pen.softwareRevision));
-
-            self.updateManager = [[TIUpdateManager alloc] initWithPeripheral:self.pen.peripheral
-                                                                    delegate:self];
-            [self.updateManager updateWithImagePath:self.firmwareImagePath];
-
-            // If the pen is currently running the upgrade firmware, it needs to reset. We
-            // don't want to indicate that the update has started until we initate another
-            // update *after* the reset has happened.
-            FTFirmwareImageType type;
-            BOOL result = [FTFirmwareManager imageTypeRunningOnPen:self.pen andType:&type];
-            if (result && type == FTFirmwareImageTypeFactory) {
-                [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenManagerFirmwareUpdateDidBeginSendingUpdate
+            NSInteger runningFirmwareVersion = [FTFirmwareManager currentRunningFirmwareVersion:self.pen];
+            if (runningFirmwareVersion >= self.latestFirmwareVersion) {
+                // we're done!
+                [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenManagerFirmwareUpdateDidCompleteSuccessfully
                                                                     object:self];
+                [self fireStateMachineEvent:kBecomeMarriedEventName];
+            } else {
+                MLOG_INFO(FTLogSDK, "Factory firmware version: %s", ObjcDescription(self.pen.firmwareRevision));
+                MLOG_INFO(FTLogSDK, "Upgrade firmware version: %s", ObjcDescription(self.pen.softwareRevision));
+
+                self.updateManager = [[TIUpdateManager alloc] initWithPeripheral:self.pen.peripheral
+                                                                        delegate:self];
+                [self.updateManager updateWithImagePath:self.firmwareImagePath];
             }
         }
     }
@@ -1720,32 +1718,19 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
         }
 
         if ([self currentStateHasName:kUpdatingFirmwareStateName]) {
-            if (self.updateManager.state == TIUpdateManagerStateSucceeded) {
-                FTPen *pen = self.pen;
-                self.pen = nil;
-                [pen peripheralConnectionStatusDidChange];
-
-                // TODO: Should this wait until reconnect?
-                [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenManagerFirmwareUpdateDidCompleteSuccessfully
-                                                                    object:self];
-
-                [self fireStateMachineEvent:kBecomeSingleEventName];
-            } else {
-                MLOG_INFO(FTLogSDK, "Peripheral did disconnect while updating firmware. Reconnecting.");
-                FTFirmwareImageType type;
-                BOOL result = [FTFirmwareManager imageTypeRunningOnPen:self.pen andType:&type];
-                if (result && type == FTFirmwareImageTypeFactory) {
-                    [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenUnexpectedDisconnectWhileUpdatingFirmwareNotificationName
-                                                                        object:self.pen];
-                }
-
-                // Normally when we transition from the UpdatingFirmware state we cancel the firmware update,
-                // which restores the peripheral delegate. In this case since we've created a new FTPen, we
-                // *don't* want the old delegate.
-                self.updateManager.shouldRestorePeripheralDelegate = NO;
-                self.pen = [[FTPen alloc] initWithPeripheral:self.pen.peripheral];
-                [self fireStateMachineEvent:kAttemptConnectionFromUpdatingFirmwareEventName];
+            MLOG_INFO(FTLogSDK, "Peripheral did disconnect while updating firmware. Reconnecting.");
+            FTFirmwareImageType type;
+            BOOL result = [FTFirmwareManager imageTypeRunningOnPen:self.pen andType:&type];
+            if (result && type == FTFirmwareImageTypeFactory && self.updateManager.state != TIUpdateManagerStateProbablyDone) {
+                [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenUnexpectedDisconnectWhileUpdatingFirmwareNotificationName
+                                                                    object:self.pen];
             }
+
+            // which restores the peripheral delegate. In this case since we've created a new FTPen, we
+            // *don't* want the old delegate.
+            self.updateManager.shouldRestorePeripheralDelegate = NO;
+            self.pen = [[FTPen alloc] initWithPeripheral:self.pen.peripheral];
+            [self fireStateMachineEvent:kAttemptConnectionFromUpdatingFirmwareEventName];
         } else if ([self currentStateHasName:kUpdatingFirmwareAttemptingConnectionStateName] ||
                    [self currentStateHasName:kDatingAttemptingConnectiongStateName] ||
                    [self currentStateHasName:kSeparatedAttemptingConnectionStateName] ||
@@ -2002,6 +1987,12 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
 #pragma mark - TIUpdateManagerDelegate
 
+- (void)updateManager:(TIUpdateManager *)manager didBeginUpdateToVersion:(uint16_t)firmwareUpdateVersion
+{
+    [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenManagerFirmwareUpdateDidBeginSendingUpdate
+                                                        object:self];
+}
+
 - (void)updateManager:(TIUpdateManager *)manager didFinishUpdate:(NSError *)error
 {
     FTAssert([self currentStateHasName:kUpdatingFirmwareStateName], @"in updating firmware state");
@@ -2009,7 +2000,10 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     FTAssert(manager, nil);
 
     if (error) {
-        // TODO: Should retry...
+        [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenManagerFirmwareUpdateDidFail
+                                                            object:self];
+        
+        [self handleError];
     } else {
         [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenManagerFirmwareUpdateDidFinishSendingUpdate
                                                             object:self];

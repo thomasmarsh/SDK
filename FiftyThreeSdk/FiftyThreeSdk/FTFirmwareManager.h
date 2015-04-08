@@ -16,6 +16,18 @@ typedef NS_ENUM(NSInteger, FTFirmwareImageType) {
     FTFirmwareImageTypeUpgrade
 };
 
+// Full firmware image header. Note that for the OAD service the Image Identify characteristic
+// must only receive the last 12 bytes (i.e. skip the CRC and CRC shadow).
+typedef struct {
+    uint16_t crc;
+    uint16_t crcShadow;
+    uint16_t version;
+    uint16_t blockCount;
+    uint8_t uid[4];
+    uint8_t reserved[4];
+    
+} TIFirmwareImageHeader;
+
 @interface FTFirmwareManager : NSObject
 
 + (NSString *)imagePath;
