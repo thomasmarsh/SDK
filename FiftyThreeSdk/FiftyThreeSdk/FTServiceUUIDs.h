@@ -2,7 +2,7 @@
 //  FTServiceUUIDs.h
 //  FiftyThreeSdk
 //
-//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
+//  Copyright (c) 2015 FiftyThree, Inc. All rights reserved.
 //
 
 #pragma once
@@ -27,6 +27,7 @@
 + (CBUUID *)centralId;
 + (CBUUID *)motion;
 + (CBUUID *)motionSetup;
++ (CBUUID *)encoderTurn;
 + (NSString *)nameForUUID:(CBUUID *)UUID;
 @end
 

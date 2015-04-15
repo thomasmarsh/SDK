@@ -2,7 +2,7 @@
 //  FTServiceUUIDs.m
 //  FiftyThreeSdk
 //
-//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
+//  Copyright (c) 2015 FiftyThree, Inc. All rights reserved.
 //
 
 #import "FTServiceUUIDs.h"
@@ -59,6 +59,9 @@
 
 // CC454B53-1622-4604-95DD-A30ECC6A678E
 #define FT_PEN_SERVICE_MOTION_SETUP_UUID CFUUIDGetConstantUUIDWithBytes(kCFAllocatorSystemDefault, 0xCC, 0x45, 0x4B, 0x53, 0x16, 0x22, 0x46, 0x04, 0x95, 0xDD, 0xA3, 0x0E, 0xCC, 0x6A, 0x67, 0x8E)
+
+// 574B27A7-5D18-7209-E0CA-AD82CDABD716
+#define FT_PEN_SERVICE_ENCODERTURN_UUID_BASE CFUUIDGetConstantUUIDWithBytes(kCFAllocatorSystemDefault, 0x57, 0x4B, 0x27, 0xA7, 0x5D, 0x18, 0x72, 0x09, 0xE0, 0xCA, 0xAD, 0x82, 0xCD, 0xAB, 0xD7, 0x16)
 
 @implementation FTPenServiceUUIDs
 
@@ -147,6 +150,11 @@
     return [CBUUID UUIDWithCFUUID:FT_PEN_SERVICE_MOTION_SETUP_UUID];
 }
 
++ (CBUUID *)encoderTurn
+{
+    return [CBUUID UUIDWithCFUUID:FT_PEN_SERVICE_ENCODERTURN_UUID_BASE];
+}
+
 + (NSString *)nameForUUID:(CBUUID *)UUID
 {
     NSDictionary *UUIDs = @{ [FTPenServiceUUIDs penService] : @"PenService",
@@ -166,6 +174,7 @@
                              [FTPenServiceUUIDs centralId] : @"CentralId",
                              [FTPenServiceUUIDs motion] : @"Motion",
                              [FTPenServiceUUIDs motionSetup] : @"MotionSetup",
+                             [FTPenServiceUUIDs encoderTurn] : @"EncoderTurn",
     };
     return [UUIDs objectForKey:UUID];
 }

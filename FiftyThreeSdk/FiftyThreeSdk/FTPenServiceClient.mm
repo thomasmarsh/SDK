@@ -2,7 +2,7 @@
 //  FTPenServiceClient.mm
 //  FiftyThreeSdk
 //
-//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
+//  Copyright (c) 2015 FiftyThree, Inc. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>
@@ -41,6 +41,7 @@ using namespace fiftythree::core;
 @property (nonatomic) CBCharacteristic *centralIdCharacteristic;
 @property (nonatomic) CBCharacteristic *motionCharacteristic;
 @property (nonatomic) CBCharacteristic *motionSetupCharacteristic;
+@property (nonatomic) CBCharacteristic *encoderTurnCharacteristic;
 
 @property (nonatomic) BOOL isTipPressedDidSetNofifyValue;
 @property (nonatomic) BOOL isEraserPressedDidSetNofifyValue;
@@ -50,6 +51,7 @@ using namespace fiftythree::core;
 @property (nonatomic) BOOL batteryLevelDidReceiveFirstUpdate;
 @property (nonatomic) BOOL hasListenerDidSetNofifyValue;
 @property (nonatomic) BOOL motionCharacteristicDidSetNofifyValue;
+@property (nonatomic) BOOL encoderTurnDidSetNotifyValue;
 
 @property (nonatomic) BOOL didInitialReadOfInactivityTimeout;
 @property (nonatomic) BOOL didInitialReadOfPressureSetup;
@@ -322,6 +324,7 @@ using namespace fiftythree::core;
         self.centralIdCharacteristic = nil;
         self.motionCharacteristic = nil;
         self.motionSetupCharacteristic = nil;
+        self.encoderTurnCharacteristic = nil;
 
         self.isTipPressedDidSetNofifyValue = NO;
         self.isEraserPressedDidSetNofifyValue = NO;
@@ -330,6 +333,7 @@ using namespace fiftythree::core;
         self.hasListenerDidSetNofifyValue = NO;
         self.batteryLevelDidSetNofifyValue = NO;
         self.batteryLevelDidReceiveFirstUpdate = NO;
+        self.encoderTurnDidSetNotifyValue = NO;
 
         self.didInitialReadOfInactivityTimeout = NO;
         self.didInitialReadOfPressureSetup = NO;
@@ -368,7 +372,8 @@ using namespace fiftythree::core;
                                           [FTPenServiceUUIDs pressureSetup],
                                           [FTPenServiceUUIDs centralId],
                                           [FTPenServiceUUIDs motion],
-                                          [FTPenServiceUUIDs motionSetup] ];
+                                          [FTPenServiceUUIDs motionSetup],
+                                          [FTPenServiceUUIDs encoderTurn] ];
 
             [peripheral discoverCharacteristics:characteristics forService:self.penService];
         }
@@ -485,6 +490,11 @@ using namespace fiftythree::core;
         if (!self.motionSetupCharacteristic &&
             [characteristic.UUID isEqual:[FTPenServiceUUIDs motionSetup]]) {
             self.motionSetupCharacteristic = characteristic;
+        }
+        // Encoder
+        if (!self.encoderTurnCharacteristic &&
+            [characteristic.UUID isEqual:[FTPenServiceUUIDs encoderTurn]]) {
+            self.encoderTurnCharacteristic = characteristic;
         }
     }
 
@@ -652,6 +662,12 @@ using namespace fiftythree::core;
 
             MLOG_INFO(FTLogSDK, "Updated HasListener characteristic: %d", _hasListener);
         }
+    } else if ([characteristic.UUID isEqual:[FTPenServiceUUIDs encoderTurn]]) {
+        char turnVector = characteristic.valueAsNSUInteger;
+        if (0 != turnVector) {
+            // 0 value happens when we first discover the characteristic.
+            [self.delegate penServiceClient:self encoderDidTurn:turnVector];
+        }
     }
 
     if (updatedProperties.count > 0) {
@@ -806,6 +822,11 @@ using namespace fiftythree::core;
         if (self.hasListenerCharacteristic && !self.didInitialReadOfHasListener) {
             [self.peripheral readValueForCharacteristic:self.hasListenerCharacteristic];
             self.didInitialReadOfHasListener = YES;
+        }
+
+        if (self.encoderTurnCharacteristic && !self.encoderTurnDidSetNotifyValue) {
+            [self.peripheral setNotifyValue:YES forCharacteristic:self.encoderTurnCharacteristic];
+            self.encoderTurnDidSetNotifyValue = YES;
         }
     }
 }

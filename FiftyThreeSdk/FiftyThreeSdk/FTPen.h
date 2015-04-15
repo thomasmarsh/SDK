@@ -2,7 +2,7 @@
 //  FTPen.h
 //  FiftyThreeSdk
 //
-//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
+//  Copyright (c) 2015 FiftyThree, Inc. All rights reserved.
 //
 
 #pragma once
@@ -23,6 +23,7 @@ extern NSString *const kFTPenIsEraserPressedDidChangeNotificationName;
 extern NSString *const kFTPenBatteryLevelDidChangeNotificationName;
 extern NSString *const kFTPenDidUpdatePropertiesNotificationName;
 extern NSString *const kFTPenNotificationPropertiesKey;
+extern NSString *const kFTPenEncoderDidTurnNotificationName;
 
 extern NSString *const kFTPenNamePropertyName;
 extern NSString *const kFTPenManufacturerNamePropertyName;
@@ -95,5 +96,6 @@ typedef struct FTMotionSample {
 - (void)pen:(FTPen *)pen eraserPressureDidChange:(float)eraserPressure;
 - (void)pen:(FTPen *)pen motionDidChange:(FTMotionSample)motion;
 - (void)pen:(FTPen *)pen batteryLevelDidChange:(NSNumber *)batteryLevel;
+- (void)pen:(FTPen *)pen encoderDidTurn:(NSInteger)turnVector;
 
 @end

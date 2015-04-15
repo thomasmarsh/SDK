@@ -2,7 +2,7 @@
 //  FTPenServiceClient.h
 //  FiftyThreeSdk
 //
-//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
+//  Copyright (c) 2015 FiftyThree, Inc. All rights reserved.
 //
 
 #pragma once
@@ -65,6 +65,7 @@
 - (void)penServiceClient:(FTPenServiceClient *)penServiceClient isEraserPressedDidChange:(BOOL)isEraserPressed;
 - (void)penServiceClient:(FTPenServiceClient *)penServiceClient batteryLevelDidChange:(NSNumber *)batteryLevel;
 - (void)penServiceClient:(FTPenServiceClient *)penServiceClient didReadManufacturingID:(NSString *)manufacturingID;
+- (void)penServiceClient:(FTPenServiceClient *)penServiceClient encoderDidTurn:(NSInteger)turnVector;
 - (void)penServiceClientDidWriteManufacturingID:(FTPenServiceClient *)penServiceClient;
 - (void)penServiceClientDidFailToWriteManufacturingID:(FTPenServiceClient *)penServiceClient;
 - (void)penServiceClientDidWriteAuthenticationCode:(FTPenServiceClient *)serviceClient;
