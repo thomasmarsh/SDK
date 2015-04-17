@@ -11,8 +11,7 @@
 
 enum FTError {
     FTErrorInvalid,
-    FTErrorAborted,
-    FTErrorConnectionTimeout
+    FTErrorAborted
 };
 
 extern NSString *const kFiftyThreeErrorDomain;

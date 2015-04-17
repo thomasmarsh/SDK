@@ -11,11 +11,10 @@
 
 typedef NS_ENUM(NSInteger, TIUpdateManagerState) {
     TIUpdateManagerStateNotStarted,
-    TIUpdateManagerStateStarting,
     TIUpdateManagerStateInProgress,
     TIUpdateManagerStateFailed,
     TIUpdateManagerStateCancelled,
-    TIUpdateManagerStateProbablyDone
+    TIUpdateManagerStateSucceeded
 };
 
 @class CBPeripheral;
@@ -40,7 +39,6 @@ typedef NS_ENUM(NSInteger, TIUpdateManagerState) {
 
 @protocol TIUpdateManagerDelegate <NSObject>
 
-- (void)updateManager:(TIUpdateManager *)manager didBeginUpdateToVersion:(uint16_t)firmwareUpdateVersion;
 - (void)updateManager:(TIUpdateManager *)manager didUpdatePercentComplete:(float)percent;
 - (void)updateManager:(TIUpdateManager *)manager didFinishUpdate:(NSError *)error;
 

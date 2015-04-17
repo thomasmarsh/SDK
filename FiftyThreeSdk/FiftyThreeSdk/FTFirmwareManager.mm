@@ -107,37 +107,38 @@ static NSString *applicationDocumentsDirectory()
 
 + (NSInteger)versionOfImage:(NSData *)image
 {
-    NSInteger version = -1;
+    uint16_t version = 0;
 
-    if (image.length >= sizeof(TIFirmwareImageHeader)) {
-        TIFirmwareImageHeader* header = (TIFirmwareImageHeader*)image.bytes;
-        version = (CFSwapInt16LittleToHost(header->version) >> 1);
+    if (image.length > 4 + sizeof(version)) {
+        version = *((uint16_t *)((uint8_t *)image.bytes + 4));
+        version >>= 1;
+        return version;
     }
 
-    return version;
+    return -1;
 }
-
 + (NSInteger)versionOfImageAtPath:(NSString *)imagePath
 {
     FTAssert(imagePath, @"image path non-nil");
 
-    NSInteger version = -1;
+    uint16_t version = 0;
     if (imagePath) {
-        // legacy behaviour: return 0 if there is an image path but we did not find a header?
-        version = 0;
         NSFileHandle *fileHandle = [NSFileHandle fileHandleForReadingAtPath:imagePath];
         FTAssert(fileHandle, @"firmware file exists at path");
 
-        [fileHandle seekToFileOffset:0];
-        NSData *data = [fileHandle readDataOfLength:sizeof(TIFirmwareImageHeader)];
-        if (data.length == sizeof(TIFirmwareImageHeader)) {
-            version = [FTFirmwareManager versionOfImage:data];
+        [fileHandle seekToFileOffset:4];
+        NSData *data = [fileHandle readDataOfLength:sizeof(version)];
+        if (data.length == sizeof(version)) {
+            version = *((uint16_t *)data.bytes);
+            version >>= 1; // LSB is ImgA/ImgB
         }
 
         [fileHandle closeFile];
+
+        return version;
     }
 
-    return version;
+    return -1;
 }
 
 + (BOOL)firmwareVersionOnPen:(FTPen *)pen

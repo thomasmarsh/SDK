@@ -18,10 +18,6 @@
 
 using namespace fiftythree::core;
 
-// Time in milliseconds within which the peripherial must process an attribute write by
-// this object and respond.
-#define BLOCK_TRANSFER_REQUEST_TIMEOUT_MILLIS 15000
-
 static NSString *const kOADServiceUUID = @"F000FFC0-0451-4000-B000-000000000000";
 static NSString *const kImageIdentifyUUID = @"F000FFC1-0451-4000-B000-000000000000";
 static NSString *const kImageBlockTransferUUID = @"F000FFC2-0451-4000-B000-000000000000";
@@ -37,11 +33,11 @@ static NSString *const kImageBlockTransferUUID = @"F000FFC2-0451-4000-B000-00000
 
 @property (nonatomic, copy) NSString *imagePath;
 @property (nonatomic) NSFileHandle *imageHandle;
-@property (nonatomic) uint16_t imageBlockCount;
-@property (nonatomic) uint16_t lastBlockIndexTransferred;
+@property (nonatomic) unsigned long long imageSize;
 
 @property (nonatomic) NSTimer *imageBlockWriteTimer;
-@property (nonatomic) uint16_t imageBlocksRemaining;
+@property (nonatomic) NSInteger currentBlock;
+@property (nonatomic) unsigned long long imageSizeRemaining;
 @property (nonatomic) float lastPercent;
 
 @end
@@ -72,11 +68,13 @@ static NSString *const kImageBlockTransferUUID = @"F000FFC2-0451-4000-B000-00000
     _imageIdentifyCharacteristic = nil;
     _imageBlockTransferCharacteristic = nil;
     [self stopImageBlockWrite];
+    _currentBlock = 0;
+    _imageSizeRemaining = 0;
 
-    _imageBlocksRemaining = 0;
     _imagePath = nil;
     [self.imageHandle closeFile];
     _imageHandle = nil;
+    _imageSize = 0;
 
     _lastPercent = 0;
 
@@ -91,7 +89,7 @@ static NSString *const kImageBlockTransferUUID = @"F000FFC2-0451-4000-B000-00000
     FTAssert(self.state == TIUpdateManagerStateNotStarted,
              @"Firmware may only be updated once using a single update manager.");
 
-    self.state = TIUpdateManagerStateStarting;
+    self.state = TIUpdateManagerStateInProgress;
 
     self.oldPeripheralDelegate = self.peripheral.delegate;
     self.peripheral.delegate = self;
@@ -104,23 +102,22 @@ static NSString *const kImageBlockTransferUUID = @"F000FFC2-0451-4000-B000-00000
         [self doneWithError:[self errorAborted]];
     }
 
+    NSDictionary *attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:self.imagePath
+                                                                                error:NULL];
+    self.imageSize = attributes.fileSize;
+    self.imageSizeRemaining = self.imageSize;
+    self.currentBlock = 0;
+
     [self.peripheral discoverServices:@[ [CBUUID UUIDWithString:kOADServiceUUID] ]];
 }
 
 - (void)cancelUpdate
 {
-    switch (self.state) {
-        case TIUpdateManagerStateInProgress:
-        case TIUpdateManagerStateStarting:
-        case TIUpdateManagerStateProbablyDone: {
-            self.state = TIUpdateManagerStateCancelled;
-            [self cleanup];
-            MLOG_INFO(FTLogSDK, "Firmware: update cancelled");
-            break;
-        }
-        default:
-            // No effect
-            break;
+    if (self.state == TIUpdateManagerStateInProgress) {
+        MLOG_INFO(FTLogSDK, "Firmware: update cancelled");
+
+        self.state = TIUpdateManagerStateCancelled;
+        [self cleanup];
     }
 }
 
@@ -139,13 +136,15 @@ static NSString *const kImageBlockTransferUUID = @"F000FFC2-0451-4000-B000-00000
     [self cleanup];
 }
 
-- (void)probablyDone
+- (void)done
 {
-    MLOG_INFO(FTLogSDK, "Firmware: update is probably done");
+    MLOG_INFO(FTLogSDK, "Firmware: update done");
 
-    self.state = TIUpdateManagerStateProbablyDone;
+    self.state = TIUpdateManagerStateSucceeded;
 
     [self.delegate updateManager:self didFinishUpdate:nil];
+
+    [self cleanup];
 }
 
 #pragma mark - CBPeripheralDelegate
@@ -182,23 +181,9 @@ static NSString *const kImageBlockTransferUUID = @"F000FFC2-0451-4000-B000-00000
             self.imageIdentifyCharacteristic = characteristic;
         } else if ([characteristic.UUID isEqual:[CBUUID UUIDWithString:kImageBlockTransferUUID]]) {
             self.imageBlockTransferCharacteristic = characteristic;
-            [peripheral setNotifyValue:YES forCharacteristic:characteristic];
         }
     }
 
-    [self maybeStartImageBlockWrite];
-}
-
-- (void)peripheral:(CBPeripheral*)peripheral didUpdateNotificationStateForCharacteristic:(CBCharacteristic*)characteristic
-             error:(NSError *)error
-{
-    if (error) {
-        MLOG_ERROR(FTLogSDK, "Firmware: error updating notification state for characteristic: %s", ObjcDescription(error.localizedDescription));
-        
-        [self doneWithError:error];
-        return;
-    }
-    
     [self maybeStartImageBlockWrite];
 }
 
@@ -210,17 +195,6 @@ static NSString *const kImageBlockTransferUUID = @"F000FFC2-0451-4000-B000-00000
 
         [self doneWithError:error];
         return;
-    }
-    
-    if ([characteristic.UUID isEqual:[CBUUID UUIDWithString:kImageBlockTransferUUID]]) {
-        NSData* value = characteristic.value;
-        if (!value.length) {
-            MLOG_ERROR(FTLogSDK, "0 length write to the Image Block Transfer characteristic?");
-        } else {
-            uint16_t blockIndex = CFSwapInt16LittleToHost(((uint16_t*)value.bytes)[0]);
-            MLOG_DEBUG(FTLogSDK, "Target requested block %u be written.", blockIndex);
-            [self writeImageBlock:blockIndex toPeripheral:peripheral];
-        }
     }
 }
 
@@ -262,12 +236,8 @@ static NSString *const kImageBlockTransferUUID = @"F000FFC2-0451-4000-B000-00000
 - (void)maybeStartImageBlockWrite
 {
     if (self.imageIdentifyCharacteristic &&
-        self.imageBlockTransferCharacteristic &&
-        self.imageBlockTransferCharacteristic.isNotifying &&
-        self.state == TIUpdateManagerStateStarting)
-    {
+        self.imageBlockTransferCharacteristic) {
         [self startImageBlockWrite];
-        self.state = TIUpdateManagerStateInProgress;
     }
 }
 
@@ -278,23 +248,13 @@ static NSString *const kImageBlockTransferUUID = @"F000FFC2-0451-4000-B000-00000
     [self.imageHandle seekToFileOffset:4]; // skip CRC + shadow CRC
 
     NSData *data = [self.imageHandle readDataOfLength:12];
-    
-    uint16_t updateVersion = (CFSwapInt16LittleToHost(((uint16_t*)data.bytes)[0]) >> 1);
-
-    // From oad.h
-    // OAD_BLOCK_SIZE = 16
-    // HAL_FLASH_WORD_SIZE = 4
-    // imageBlockCount = imageHeader.len / (OAD_BLOCK_SIZE / HAL_FLASH_WORD_SIZE);
-    self.imageBlocksRemaining = self.imageBlockCount = (CFSwapInt16LittleToHost(((uint16_t*)data.bytes)[1]) / 4);
-    
     [self.peripheral writeValue:data
               forCharacteristic:self.imageIdentifyCharacteristic
                            type:CBCharacteristicWriteWithoutResponse];
-    
-    MLOG_DEBUG(FTLogSDK, "Starting update to firmware version %u", updateVersion);
 
-    [self.delegate updateManager:self didBeginUpdateToVersion:updateVersion];
-    [self resetWriteTimer];
+    [self.imageHandle seekToFileOffset:0];
+
+    [self scheduleWriteTimer];
 }
 
 - (void)stopImageBlockWrite
@@ -303,10 +263,10 @@ static NSString *const kImageBlockTransferUUID = @"F000FFC2-0451-4000-B000-00000
     self.imageBlockWriteTimer = nil;
 }
 
-- (void)resetWriteTimer
+- (void)scheduleWriteTimer
 {
-    [self.imageBlockWriteTimer invalidate];
-    self.imageBlockWriteTimer = [NSTimer weakScheduledTimerWithTimeInterval:(double)BLOCK_TRANSFER_REQUEST_TIMEOUT_MILLIS/1000.00
+    FTAssert(!self.imageBlockWriteTimer, @"write timer nil");
+    self.imageBlockWriteTimer = [NSTimer weakScheduledTimerWithTimeInterval:0.25
                                                                      target:self
                                                                    selector:@selector(imageBlockWriteTimerFired:)
                                                                    userInfo:nil
@@ -315,53 +275,45 @@ static NSString *const kImageBlockTransferUUID = @"F000FFC2-0451-4000-B000-00000
 
 - (void)imageBlockWriteTimerFired:(NSTimer *)writeTimer
 {
-    MLOG_ERROR(FTLogSDK, "Timeout waiting for the peripherial to respond.");
-    [self doneWithError:[[NSError alloc] initWithDomain:@"TiUpdateManager"
-                                                   code:FTErrorConnectionTimeout
-                                               userInfo:nil]];
-}
-
-- (void)writeImageBlock:(uint16_t)blockIndex toPeripheral:(CBPeripheral *)peripheral
-{
-    [self.imageBlockWriteTimer invalidate];
-    
-    if (peripheral.state != CBPeripheralStateConnected || !self.imageBlockWriteTimer) {
+    if (self.peripheral.state != CBPeripheralStateConnected) {
         [self doneWithError:[self errorAborted]];
         return;
     }
 
-    uint16_t indexHeader = CFSwapInt16HostToLittle(blockIndex);
-    NSMutableData *data = [NSMutableData dataWithBytes:&indexHeader length:sizeof(indexHeader)];
-    [self.imageHandle seekToFileOffset:blockIndex * 16];
-    NSData *block = [self.imageHandle readDataOfLength:16];
+    const int numBlocksToWrite = 4;
+    for (int i = 0; i < numBlocksToWrite; i++) {
+        uint16_t indexHeader = CFSwapInt16HostToLittle(self.currentBlock);
+        NSMutableData *data = [NSMutableData dataWithBytes:&indexHeader length:sizeof(indexHeader)];
+        NSData *block = [self.imageHandle readDataOfLength:16];
 
-    [data appendData:block];
+        FTAssert(block.length != 0, nil);
 
-    [self.peripheral writeValue:data forCharacteristic:self.imageBlockTransferCharacteristic
-                           type:CBCharacteristicWriteWithoutResponse];
+        [data appendData:block];
 
-    if (blockIndex != self.lastBlockIndexTransferred) {
-        if (self.imageBlocksRemaining) {
-            // This is sort of an estimate since we don't track every block request individually.
-            // Be sure to keep the unsigned value from rolling over here.
-            self.imageBlocksRemaining--;
+        [self.peripheral writeValue:data forCharacteristic:self.imageBlockTransferCharacteristic
+                               type:CBCharacteristicWriteWithoutResponse];
+        self.currentBlock++;
+
+        self.imageSizeRemaining -= block.length;
+
+        float percent = (float)(self.imageSize - self.imageSizeRemaining) / (float)self.imageSize * 100;
+
+        // only send integral updates
+        if ((percent - self.lastPercent) > 0.1) {
+            [self.delegate updateManager:self didUpdatePercentComplete:percent];
+            self.lastPercent = percent;
         }
-        self.lastBlockIndexTransferred = blockIndex;
-    }
-    
-    float percent = (1.f - ((float)self.imageBlocksRemaining / (float)self.imageBlockCount)) * 100.f;
 
-    // only send integral updates
-    if (self.state == TIUpdateManagerStateInProgress && (percent - self.lastPercent) > 0.1f) {
-        [self.delegate updateManager:self didUpdatePercentComplete:percent];
-        self.lastPercent = percent;
+        if (self.imageSizeRemaining == 0) {
+            [self done];
+            break;
+        } else {
+            if (i == numBlocksToWrite - 1) {
+                self.imageBlockWriteTimer = nil;
+                [self scheduleWriteTimer];
+            }
+        }
     }
-
-    if (self.imageBlocksRemaining == 0) {
-        [self probablyDone];
-    }
-    
-    [self resetWriteTimer];
 }
 
 - (NSError *)errorAborted
