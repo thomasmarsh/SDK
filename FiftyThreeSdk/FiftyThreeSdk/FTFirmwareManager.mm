@@ -65,7 +65,7 @@ static NSString *applicationDocumentsDirectory()
 
 + (NSURL *)firmwareURL
 {
-    NSString *endPoint = @"https://www.fiftythree.com/downloads/sdk/v1/pencil/latest/firmware.bin";
+    NSString *endPoint = @"https://www.fiftythree.com/downloads/pencilv1upgradeimage.bin";
     return [NSURL URLWithString:endPoint];
 }
 
