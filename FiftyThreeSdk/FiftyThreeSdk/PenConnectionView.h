@@ -45,6 +45,7 @@ typedef NS_ENUM(NSInteger, VisibilityState) {
 @property (nonatomic) BOOL suppressDialogs;
 @property (nonatomic) BOOL shouldSuspendNewAnimations;
 @property (nonatomic) FTPairingUIStyle style;
+@property (nonatomic) CGFloat penConnectionSpotRadius;
 
 - (BOOL)isPenConnected;
 - (BOOL)isPenDisconnected;

@@ -876,13 +876,13 @@ NSString *FTPairingSpotCometStateName(FTPairingSpotCometState value)
 
     const CGPoint wellCenter = CGPointMake(40.5f, 40.5f);
 
-    static const float minWellRadius = 23.f;
+    static const float minWellRadius = 23.f * self.scale;
 
     // We use a single timer & easy to control "disconnected" and "critically low battery" flash animations.
     const float flashPhase = _flashIconOpacityEasing.GetCurrentValue().x();
     const float flashOpacityPhase = [self flashOpacityPhase:flashPhase];
 
-    const float iconScale = 1.f;
+    const float iconScale = self.scale;
     // wellMargin is the distance from the outside edge of the "disc" icon to inside (TODO: or outside?) edge of the
     // "well", or embossed edge.
     const float wellMargin = _wellMarginEasing.GetCurrentValue().x();
@@ -910,7 +910,7 @@ NSString *FTPairingSpotCometStateName(FTPairingSpotCometState value)
             continue;
         }
 
-        const float iconScale = iconAnimation.easing.GetCurrentValue().x();
+        const float currentIconScale = iconAnimation.easing.GetCurrentValue().x() * iconScale;
         CGFloat iconOpacity = 1.f;
 
         // Disconnected flash animation.
@@ -985,7 +985,7 @@ NSString *FTPairingSpotCometStateName(FTPairingSpotCometState value)
                 }
                 [PairingSpotView drawBatteryIconToContext:context
                                                withCenter:wellCenter
-                                                    scale:iconScale
+                                                    scale:currentIconScale
                                       batterySegmentColor:batterySegmentColor
                                           foregroundColor:figureColor
                                        andBackgroundColor:iconColor];
@@ -996,7 +996,7 @@ NSString *FTPairingSpotCometStateName(FTPairingSpotCometState value)
             default:
                 [PairingSpotView drawPencilIconToContext:context
                                               withCenter:wellCenter
-                                                   scale:iconScale
+                                                   scale:currentIconScale
                                          foregroundColor:figureColor
                                       andBackgroundColor:iconColor];
                 break;

@@ -203,14 +203,20 @@ constexpr CGFloat kDebugControlSpacing = 5.f;
     [self updateLayoutForDebugControls];
 }
 
-- (CGFloat)spotWidth
+- (void)setPenConnectionSpotRadius:(CGFloat)penConnectionSpotRadius
+{
+    _penConnectionSpotRadius = penConnectionSpotRadius;
+    self.pairingSpotView.scale = penConnectionSpotRadius / 23.f;
+}
+
+- (CGFloat)spotViewWidth
 {
     return 81.f;
 }
 
 - (void)updateLayoutForDebugControls
 {
-    self.size = (CGSize){self.spotWidth, 81.f};
+    self.size = (CGSize){self.spotViewWidth, 81.f};
 
     if (self.debugControlsVisibility != VisibilityStateCollapsed) {
         // PenConnectionView has extra space at the top for debug controls (which may be hidden or visible).

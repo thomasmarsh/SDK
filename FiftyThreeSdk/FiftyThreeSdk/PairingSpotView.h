@@ -75,6 +75,8 @@ extern NSString *const kPairingSpotStateDidChangeNotificationName;
 
 @property (nonatomic) BOOL shouldSuspendNewAnimations;
 
+@property (nonatomic) CGFloat scale;
+
 ///
 /// Controls different styles for the pairing spot. See
 /// FTPairingSpotStyle enum for supported values.
