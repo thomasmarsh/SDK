@@ -359,9 +359,6 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     _centralManager = nil;
 
     self.trialSeparationMonitor = nil;
-
-    [self.displayLink invalidate];
-    self.displayLink = nil;
     self.originalInactivityTimeout = 0;
 }
 
@@ -2294,6 +2291,9 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     [self.pairingViews removeAllObjects];
 
     [self reset];
+
+    [self.displayLink invalidate];
+    self.displayLink = nil;
 
     auto instance = fiftythree::core::spc<AnimationPumpObjC>(AnimationPump::Instance());
     if (instance->GetDelegate() == self) {
