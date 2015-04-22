@@ -22,7 +22,7 @@ import android.util.Log;
  */
 public class AppInfo {
 	static final String DefaultUDID = "0000000000000000000000000000000000000000";
-	public static String DefaultAppBladeHost = "AppBlade.com";
+	public static String DefaultAppBladeHost = "appblade.com";
 	public static String DefaultServiceScheme = "https://";
 
 	public String Token;
@@ -37,6 +37,7 @@ public class AppInfo {
 	PackageInfo PackageInfo;
 	private String systemInfo;
 	public String storedANDROID_ID;
+    public String storedGSF_ID;
 	
 	/**
 	 * Initializes systemInfo string if it does not yet exist.
