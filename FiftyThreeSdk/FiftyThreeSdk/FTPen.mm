@@ -28,6 +28,7 @@ NSString *const kFTPenDidUpdatePrivatePropertiesNotificationName = @"com.fiftyth
 NSString *const kFTPenNotificationPropertiesKey = @"kFTPenNotificationPropertiesKey";
 NSString *const kFTPenDidWriteHasListenerNotificationName = @"com.fiftythree.pen.didWriteHasListener";
 NSString *const kFTPenEncoderDidTurnNotificationName = @"com.fiftythree.pen.encoderDidTurn";
+NSString *const kFTPenEncoderTurnVectorNotificationKey = @"turnVector";
 
 NSString *const kFTPenNamePropertyName = @"name";
 NSString *const kFTPenInactivityTimeoutPropertyName = @"inactivityTimeout";
@@ -605,13 +606,9 @@ NSString *const kFTPenAccelerationPropertyName = @"acceleration";
 
 - (void)penServiceClient:(FTPenServiceClient *)penServiceClient encoderDidTurn:(NSInteger)turnVector
 {
-    //TODO: perf? This could be called a lot and rapidly.
-    NSDictionary *encoderValue = [NSDictionary dictionaryWithObjectsAndKeys:
-                                                   @"turnVector", [NSNumber numberWithInteger:turnVector], nil];
-
     [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenEncoderDidTurnNotificationName
                                                         object:self
-                                                      userInfo:encoderValue];
+                                                      userInfo:@{kFTPenEncoderTurnVectorNotificationKey : @(turnVector)}];
 
     if ([self.delegate respondsToSelector:@selector(pen:encoderDidTurn:)]) {
         [self.delegate pen:self encoderDidTurn:turnVector];
