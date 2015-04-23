@@ -1227,7 +1227,8 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
                                                  marriedState,
                                                  marriedWaitingForLongPressToUnpairState,
                                                  swingingAttemptingConnectionState,
-                                                 updatingFirmwareAttemptingConnectionState
+                                                 updatingFirmwareAttemptingConnectionState,
+                                                 updatingFirmwareState
                                              ]
                                                              toState:disconnectingAndBecomingSingleState];
     TKEvent *disconnectAndBecomeSeparatedEvent = [TKEvent eventWithName:kDisconnectAndBecomeSeparatedEventName
@@ -1529,6 +1530,14 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
         if ([self currentStateHasName:kWaitingForCentralManagerToPowerOnStateName]) {
             [self reset];
         } else {
+
+            if ([self currentStateHasName:kUpdatingFirmwareStateName] ||
+                [self currentStateHasName:kUpdatingFirmwareAttemptingConnectionStateName])
+            {
+                [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenManagerFirmwareUpdateWasCancelled
+                                                                    object:self];
+            }
+
             [self fireStateMachineEvent:kWaitForCentralManagerToPowerOnEventName];
         }
 
@@ -2007,6 +2016,13 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     } else {
         [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenManagerFirmwareUpdateDidFinishSendingUpdate
                                                             object:self];
+        // we are 99% certain that the upgrade ultimatly worked at this point. Because of this
+        // and because of the complexity inherent in verifying the firmware update after a reconnect
+        // we are going to just be optimistic and message success.
+        [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenManagerFirmwareUpdateDidCompleteSuccessfully
+                                                            object:self];
+        [self fireStateMachineEvent:kBecomeMarriedEventName];
+
     }
 }
 

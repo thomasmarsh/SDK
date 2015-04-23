@@ -134,11 +134,13 @@ static NSString *const kImageBlockTransferUUID = @"F000FFC2-0451-4000-B000-00000
 
     self.state = TIUpdateManagerStateFailed;
 
-    [self.delegate updateManager:self didFinishUpdate:error];
-
     [self cleanup];
+
+    [self.delegate updateManager:self didFinishUpdate:error];
 }
 
+// Do not call any other methods on self after this one as this object may be deallocated when this method
+// exits.
 - (void)probablyDone
 {
     MLOG_INFO(FTLogSDK, "Firmware: update is probably done");
@@ -286,15 +288,19 @@ static NSString *const kImageBlockTransferUUID = @"F000FFC2-0451-4000-B000-00000
     // HAL_FLASH_WORD_SIZE = 4
     // imageBlockCount = imageHeader.len / (OAD_BLOCK_SIZE / HAL_FLASH_WORD_SIZE);
     self.imageBlocksRemaining = self.imageBlockCount = (CFSwapInt16LittleToHost(((uint16_t*)data.bytes)[1]) / 4);
-    
+
     [self.peripheral writeValue:data
               forCharacteristic:self.imageIdentifyCharacteristic
                            type:CBCharacteristicWriteWithoutResponse];
-    
+
+    self.lastBlockIndexTransferred = 0;
+    self.imageBlocksRemaining--;
+
     MLOG_DEBUG(FTLogSDK, "Starting update to firmware version %u", updateVersion);
 
-    [self.delegate updateManager:self didBeginUpdateToVersion:updateVersion];
     [self resetWriteTimer];
+
+    [self.delegate updateManager:self didBeginUpdateToVersion:updateVersion];
 }
 
 - (void)stopImageBlockWrite
@@ -357,11 +363,12 @@ static NSString *const kImageBlockTransferUUID = @"F000FFC2-0451-4000-B000-00000
         self.lastPercent = percent;
     }
 
+    [self resetWriteTimer];
+
     if (self.imageBlocksRemaining == 0) {
         [self probablyDone];
     }
     
-    [self resetWriteTimer];
 }
 
 - (NSError *)errorAborted
