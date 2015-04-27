@@ -942,12 +942,17 @@ NSString *FTPairingSpotCometStateName(FTPairingSpotCometState value)
             case FTPairingSpotIconTypeLowBattery:
             case FTPairingSpotIconTypeCriticallyLowBattery:
             default: {
-                CGFloat hue, saturation, selectedBrightness;
+                CGFloat hue, saturation, selectedBrightness, iconBrightness;
                 [tint getHue:&hue saturation:&saturation brightness:NULL alpha:NULL];
                 [self.selectedColor getHue:NULL saturation:NULL brightness:&selectedBrightness alpha:NULL];
-
-                iconColor = [UIColor colorWithHue:hue saturation:saturation brightness:Lerp<CGFloat>(selectedBrightness, 1.f, iconOpacity)
-                                            alpha:1.f];
+                if (selectedBrightness > 0.5f) {
+                    // bright to dark interpolation.
+                    iconBrightness = Lerp<CGFloat>(0.f, selectedBrightness, iconOpacity);
+                } else {
+                    // dark to bright interpolation.
+                    iconBrightness = Lerp<CGFloat>(selectedBrightness, 1.f, iconOpacity);
+                }
+                iconColor = [UIColor colorWithHue:hue saturation:saturation brightness:iconBrightness alpha:1.f];
                 // Color for "figure" elements (i.e. figure/ground) when in a connected state.
                 figureColor = self.selectedColor;
                 break;
