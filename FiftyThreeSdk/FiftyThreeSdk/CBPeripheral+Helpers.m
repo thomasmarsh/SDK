@@ -15,7 +15,8 @@
                  type:(CBCharacteristicWriteType)type
 {
     if (characteristic) {
-        NSData *data = [NSData dataWithBytes:value ? "1" : "0" length:1];
+        uint8_t boolBit = value ? 0x01 : 0x00;
+        NSData *data = [NSData dataWithBytes:&boolBit length:1];
         [self writeValue:data forCharacteristic:characteristic type:type];
     } else {
         NSLog(@"Attempt to write to nil characteristic");
