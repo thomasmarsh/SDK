@@ -286,6 +286,8 @@ NSString *FTPairingSpotCometStateName(FTPairingSpotCometState value)
 
 #pragma mark -
 
+static constexpr float kDefaultSpotRadius = 23.f;
+
 @interface PairingSpotView () {
     Easing<float, 1> _wellMarginEasing;
     Easing<float, 1> _flashIconOpacityEasing;
@@ -356,6 +358,7 @@ NSString *FTPairingSpotCometStateName(FTPairingSpotCometState value)
         _selectedColorOverrides = [[OverrideableProperty alloc] init];
         _unselectedColorOverrides = [[OverrideableProperty alloc] init];
         _unselectedTintColorOverrides = [[OverrideableProperty alloc] init];
+        _spotRadius = kDefaultSpotRadius;
         // you must set the ivar or ios will refuse to override the style from an appearance.
         _style = FTPairingSpotStyleInset;
         [self setDefaultsForStyle:_style];
@@ -876,13 +879,13 @@ NSString *FTPairingSpotCometStateName(FTPairingSpotCometState value)
 
     const CGPoint wellCenter = CGPointMake(40.5f, 40.5f);
 
-    static const float minWellRadius = 23.f * self.scale;
+    static const float minWellRadius = self.spotRadius;
 
     // We use a single timer & easy to control "disconnected" and "critically low battery" flash animations.
     const float flashPhase = _flashIconOpacityEasing.GetCurrentValue().x();
     const float flashOpacityPhase = [self flashOpacityPhase:flashPhase];
 
-    const float iconScale = self.scale;
+    const float iconScale = minWellRadius / kDefaultSpotRadius;
     // wellMargin is the distance from the outside edge of the "disc" icon to inside (TODO: or outside?) edge of the
     // "well", or embossed edge.
     const float wellMargin = _wellMarginEasing.GetCurrentValue().x();

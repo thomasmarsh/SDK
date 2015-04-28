@@ -205,8 +205,7 @@ constexpr CGFloat kDebugControlSpacing = 5.f;
 
 - (void)setPenConnectionSpotRadius:(CGFloat)penConnectionSpotRadius
 {
-    _penConnectionSpotRadius = penConnectionSpotRadius;
-    self.pairingSpotView.scale = penConnectionSpotRadius / 23.f;
+    self.pairingSpotView.spotRadius = penConnectionSpotRadius;
 }
 
 - (CGFloat)spotViewWidth
