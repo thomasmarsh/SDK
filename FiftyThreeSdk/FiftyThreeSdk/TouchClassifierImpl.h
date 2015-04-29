@@ -43,6 +43,8 @@ public:
     virtual Event<const std::vector<TouchClassificationChangedEventArgs> &> &TouchContinuedClassificationsDidChange();
     virtual void ClearSessionStatistics();
     virtual SessionStatistics::Ptr SessionStatistics();
+    // Set should classify one finger.
+    virtual void SetShouldClassifyOneFinger(bool v);
 
 protected:
     // Call this to get at the Classification parameters.

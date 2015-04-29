@@ -23,6 +23,9 @@ using std::vector;
 typedef fiftythree::sdk::Classifier Classifier;
 using fiftythree::core::cpc;
 
+// REFACTOR TODO:
+//     TouchClassifier,Classifier.h (interface),ClassificationProxy are basically the same. We should liv
+//     We should remove all this indirection since the form of these interfaces have long since settled.
 namespace fiftythree
 {
 namespace sdk
@@ -44,6 +47,11 @@ void TouchClassifierImpl::TouchesDidChanged(const std::set<Touch::cPtr> &touches
         nonConstTouches.insert(cpc<Touch>(t));
     }
     _Classifier->OnTouchesChanged(nonConstTouches);
+}
+
+void TouchClassifierImpl::SetShouldClassifyOneFinger(bool v)
+{
+    _Classifier->SetShouldClassifyOneFinger(v);
 }
 
 void TouchClassifierImpl::ClearSessionStatistics()

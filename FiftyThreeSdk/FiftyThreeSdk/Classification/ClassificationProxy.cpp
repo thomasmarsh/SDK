@@ -2,12 +2,12 @@
 //  ClassificationProxy.cpp
 //  FiftyThreeSdk
 //
-//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
+//  Copyright (c) 2015 FiftyThree, Inc. All rights reserved.
 //
 
 #include <iomanip>
-#include <tuple>
 #include <iostream>
+#include <tuple>
 
 #include "Core/Eigen.h"
 #include "Core/Log.h"
@@ -1055,6 +1055,11 @@ void TouchClassificationProxy::RemoveEdgeThumbs()
     }
 }
 
+void TouchClassificationProxy::SetShouldClassifyOneFinger(bool v)
+{
+    _ShouldClassifyOneFinger = v;
+}
+
 IdTypeMap TouchClassificationProxy::ReclassifyCurrentEvent()
 {
     IdTypeMap types;
@@ -1103,7 +1108,7 @@ IdTypeMap TouchClassificationProxy::ReclassifyCurrentEvent()
             _clusterTracker->ConcurrentTouches(liveTouches[0]).empty() &&
             _commonData.proxy->ActiveStylusIsConnected() &&
             CurrentClass(liveTouches.back()) != TouchClassification::RemovedFromClassification) {
-            Cluster::Ptr cluster = _clusterTracker->Cluster(liveTouches[0]);
+            auto cluster = _clusterTracker->Cluster(liveTouches[0]);
 
             if (TouchRadiusAvailable() && _clusterTracker->Data(liveTouches[0]) && TouchSize::IsPenGivenTouchRadius(*_clusterTracker->Data(liveTouches[0]))) {
                 checkForFingerSequence = false;
@@ -1111,14 +1116,13 @@ IdTypeMap TouchClassificationProxy::ReclassifyCurrentEvent()
                 if (_touchStatistics[liveTouches[0]]._preIsolation > _fingerSmudgeIsolationSeconds) {
                     // a single live cluster which satisifes a temporal isolation condition will trigger a sequence
                     // of finger smudges, unless it comes down in a palm cluster
-
-                    if (cluster->_touchIds.size() == 1 || cluster->_clusterTouchType != TouchClassification::Palm) {
+                    if (_ShouldClassifyOneFinger && (cluster->_touchIds.size() == 1 || cluster->_clusterTouchType != TouchClassification::Palm)) {
                         checkForFingerSequence = true;
                     }
                 } else {
                     // new smudges don't need to satisfy any condition if the previous touch was a smudge
-                    TouchId previousId = _clusterTracker->TouchPrecedingTouch(liveTouches[0]);
-                    if (previousId != InvalidTouchId() && CurrentClass(previousId) == TouchClassification::Finger) {
+                    auto previousId = _clusterTracker->TouchPrecedingTouch(liveTouches[0]);
+                    if (_ShouldClassifyOneFinger && (previousId != InvalidTouchId() && CurrentClass(previousId) == TouchClassification::Finger)) {
                         checkForFingerSequence = true;
                     }
                 }
@@ -1133,7 +1137,7 @@ IdTypeMap TouchClassificationProxy::ReclassifyCurrentEvent()
             Cluster::Ptr cluster = _clusterTracker->Cluster(liveTouches[0]);
             std::pair<TouchClassification, float> pair = _penEventClassifier.TypeAndScoreForCluster(*cluster);
 
-            TouchClassification newType = TouchClassification::Unknown;
+            auto newType = TouchClassification::Unknown;
 
             if (cluster && cluster->_simultaneousTouches) {
                 newType = TouchClassification::Palm;
@@ -1553,7 +1557,6 @@ void TouchClassificationProxy::ReclassifyCurrentEventGivenSize(IdTypeMap &change
                         probeData->_radiusMax > otherData->_radiusMax ||
                         (HandednessLocked() && probeCluster->_wasAtPalmEnd) ||
                         probeCluster->_wasInterior) {
-                        
                         newTypes[probeCluster] = TouchClassification::Palm;
                     }
                 }

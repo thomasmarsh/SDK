@@ -115,6 +115,8 @@ public:
 
     core::TouchClassification Classify(core::TouchId touchID);
 
+    void SetShouldClassifyOneFinger(bool v);
+
     void SetUseDebugLogging(bool v);
 
     std::vector<core::TouchId> TouchesReclassified();
@@ -143,6 +145,8 @@ protected:
     // 10 seconds == 600 points if 60Hz sampling
     const float _noReclassifyDuration = 2.0f;
     const float _noReclassifyTimeSinceEnded = .3f;
+
+    bool _ShouldClassifyOneFinger = true;
 
     std::map<core::TouchId, core::TouchClassification> _currentTypes;
 
