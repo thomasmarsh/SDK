@@ -115,11 +115,11 @@ extern "C"
 @interface FTPairingUIStyleOverrides : NSObject
 
 // Override the color used by the style for drawing icons when the UI control is in a
-// "selected" psedo-state (e.g. "selected" is synonoumous with "connected").
+// "selected" pseudo-state (e.g. "selected" is synonoumous with "connected").
 @property (nonatomic) UIColor *selectedColor;
 
 // Override the color used by the style for drawing icons when the UI control is in an
-// "normal" psedo-state (e.g. "normal" is synonoumous with "disconnected").
+// "normal" pseudo-state (e.g. "normal" is synonoumous with "disconnected").
 @property (nonatomic) UIColor *unselectedColor;
 
 // Override the color used by the style tinting the UI control. This value supercedes any tintColor set
@@ -127,7 +127,7 @@ extern "C"
 @property (nonatomic) UIColor *tintColor;
 
 // Override the color used by the style for tinting the UI control when in an
-// "normal" psedo-state (e.g. "normal" is synonoumous with "disconnected").
+// "normal" pseudo-state (e.g. "normal" is synonoumous with "disconnected").
 @property (nonatomic) UIColor *unselectedTintColor;
 
 @end

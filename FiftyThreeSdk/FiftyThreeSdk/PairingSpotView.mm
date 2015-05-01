@@ -895,7 +895,7 @@ NSString *FTPairingSpotCometStateName(FTPairingSpotCometState value)
     if (FTPairingSpotStyleFlat == self.style) {
         tint = self.tintColor;
     } else {
-        tint = [UIColor colorWithWhite:1.f alpha:1.f];
+        tint = [UIColor colorWithHue:0.f saturation:0.f brightness:1.f alpha:1.f];
     }
 
     if (FTPairingSpotStyleInset == self.style) {
@@ -929,8 +929,12 @@ NSString *FTPairingSpotCometStateName(FTPairingSpotCometState value)
             case FTPairingSpotIconTypeUnpaired: {
                 iconColor = self.unselectedTintColor;
                 CGFloat hue, saturation, brightness, alpha, unselectedBrightness;
-                [iconColor getHue:&hue saturation:&saturation brightness:&brightness alpha:&alpha];
-                [self.unselectedColor getHue:NULL saturation:NULL brightness:&unselectedBrightness alpha:NULL];
+                if (![iconColor getHue:&hue saturation:&saturation brightness:&brightness alpha:&alpha]) {
+                    FTFail("on iOS7 some colors cannot be converted to HSB. Use UIColor colorWithHue to ensure this failure doesn't happen.");
+                }
+                if (![self.unselectedColor getHue:NULL saturation:NULL brightness:&unselectedBrightness alpha:NULL]) {
+                    FTFail("on iOS7 some colors cannot be converted to HSB. Use UIColor colorWithHue to ensure this failure doesn't happen.");
+                }
                 brightness = Lerp<CGFloat>(unselectedBrightness, brightness, iconOpacity);
                 iconColor = [UIColor colorWithHue:hue saturation:saturation brightness:brightness alpha:alpha];
 
@@ -943,8 +947,12 @@ NSString *FTPairingSpotCometStateName(FTPairingSpotCometState value)
             case FTPairingSpotIconTypeCriticallyLowBattery:
             default: {
                 CGFloat hue, saturation, selectedBrightness, iconBrightness;
-                [tint getHue:&hue saturation:&saturation brightness:NULL alpha:NULL];
-                [self.selectedColor getHue:NULL saturation:NULL brightness:&selectedBrightness alpha:NULL];
+                if(![tint getHue:&hue saturation:&saturation brightness:NULL alpha:NULL]) {
+                    FTFail("on iOS7 some colors cannot be converted to HSB. Use UIColor colorWithHue to ensure this failure doesn't happen.");
+                }
+                if (![self.selectedColor getHue:NULL saturation:NULL brightness:&selectedBrightness alpha:NULL]) {
+                    FTFail("on iOS7 some colors cannot be converted to HSB. Use UIColor colorWithHue to ensure this failure doesn't happen.");
+                }
                 if (selectedBrightness > 0.5f) {
                     // bright to dark interpolation.
                     iconBrightness = Lerp<CGFloat>(0.f, selectedBrightness, iconOpacity);
@@ -953,6 +961,7 @@ NSString *FTPairingSpotCometStateName(FTPairingSpotCometState value)
                     iconBrightness = Lerp<CGFloat>(selectedBrightness, 1.f, iconOpacity);
                 }
                 iconColor = [UIColor colorWithHue:hue saturation:saturation brightness:iconBrightness alpha:1.f];
+
                 // Color for "figure" elements (i.e. figure/ground) when in a connected state.
                 figureColor = self.selectedColor;
                 break;
@@ -978,7 +987,9 @@ NSString *FTPairingSpotCometStateName(FTPairingSpotCometState value)
                         batterySegmentColor = [UIColor colorWithRed:red green:green blue:blue alpha:batterySegmentOpacity];
                     } else {
                         CGFloat figureColorBrightness;
-                        [figureColor getHue:NULL saturation:NULL brightness:&figureColorBrightness alpha:NULL];
+                        if(![figureColor getHue:NULL saturation:NULL brightness:&figureColorBrightness alpha:NULL]) {
+                            FTFail("on iOS7 some colors cannot be converted to HSB. Use UIColor colorWithHue to ensure this failure doesn't happen.");
+                        }
                         batterySegmentColor = [UIColor colorWithWhite:Lerp<CGFloat>(1.f, figureColorBrightness, batterySegmentOpacity)
                                                                 alpha:1.f];
                     }
@@ -1079,16 +1090,16 @@ NSString *FTPairingSpotCometStateName(FTPairingSpotCometState value)
     // setup defaults for each style
     switch (style) {
         case FTPairingSpotStyleFlat: {
-            [_selectedColorOverrides setDefaultValue:[UIColor colorWithWhite:1.f alpha:1.f]];
+            [_selectedColorOverrides setDefaultValue:[UIColor colorWithHue:0.f saturation:0.f brightness:1.f alpha:1.f]];
             [_unselectedColorOverrides setDefaultValue:[PairingSpotView grayPairingColor]];
-            [_unselectedTintColorOverrides setDefaultValue:[UIColor colorWithWhite:1.0f alpha:0.25f]];
+            [_unselectedTintColorOverrides setDefaultValue:[UIColor colorWithHue:0.f saturation:0.f brightness:1.f alpha:.25f]];
             break;
         }
         case FTPairingSpotStyleInset:
         default: {
             [_selectedColorOverrides setDefaultValue:[PairingSpotView grayPairingColor]];
             [_unselectedColorOverrides setDefaultValue:[PairingSpotView grayPairingColor]];
-            [_unselectedTintColorOverrides setDefaultValue:[UIColor colorWithWhite:0.f alpha:1.f]];
+            [_unselectedTintColorOverrides setDefaultValue:[UIColor colorWithHue:0.f saturation:0.f brightness:0.f alpha:1.f]];
             break;
         }
     }
