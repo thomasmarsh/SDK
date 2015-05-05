@@ -874,7 +874,7 @@ NSString *FTPairingSpotCometStateName(FTPairingSpotCometState value)
 
     CGContextClearRect(context, self.bounds);
 
-    const CGPoint wellCenter = CGPointMake(40.5f, 40.5f);
+    const CGPoint wellCenter = CGPointMake(41.5f, 41.5f);
 
     static const float minWellRadius = 23.f;
 
