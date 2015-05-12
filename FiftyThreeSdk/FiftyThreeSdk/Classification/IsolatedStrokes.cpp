@@ -155,19 +155,19 @@ EdgeThumbState IsolatedStrokesClassifier::TestEdgeThumb(core::TouchId touchId)
     float dt = _clusterTracker->CurrentTime() - stroke->FirstAbsoluteTimestamp();
 
     float maxTravel = stats->_maxTravel;
-    float npVoteScore = 1.0f;
 
     float deltaTScore = stats->_maxDeltaT;
 
     deltaTScore = std::max(deltaTScore, float(_clusterTracker->CurrentTime() - stroke->LastAbsoluteTimestamp()));
 
-    float score = maxTravel * npVoteScore / (.2f + dt);
+    float score = maxTravel / (.2f + dt);
 
     float dEdge = Screen::MainScreen().DistanceToNearestEdge(stroke->LastPoint());
 
+    constexpr float maxThumbTravel = 22.0f;
     if (dEdge < 44.0f) {
         // istap probably does nothing here since dt > .3f rules it out.  leaving in case the rules change.
-        if (dt > .3f && ((score < 10.0f && (!IsTap(touchId))) || deltaTScore > .2f)) {
+        if (dt > .3f && ((score < 10.0f && (!IsTap(touchId))) || (deltaTScore > .2f && maxTravel < maxThumbTravel))) {
             return EdgeThumbState::Thumb;
         } else {
             if (_clusterTracker->Phase(touchId) != core::TouchPhase::Ended) {

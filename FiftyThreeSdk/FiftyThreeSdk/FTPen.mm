@@ -694,17 +694,22 @@ NSString *const kFTPenAccelerationPropertyName = @"acceleration";
 
 - (FTPencilStyle)style
 {
+    //
+    // As of 04/2015 here are the known Pencil model numbers
+    // 53PW01 - Walnut
+    // 53PW02 - Walnut w/ international manuals
+    // 53PA02 - Graphite
+    // 53PA03 - Graphite w/ international manuals
+    // 53PA05 - Gold
+    //
     if (self.modelNumber) {
-        // Example modelNumber: 53PA02
         NSString *modelNumber = self.modelNumber;
-        if ([modelNumber hasPrefix:@"53PA01"]) {
-            // TODO: There were 30K gold pencils with this model number. We need to detect these and correct.
-            return FTPencilStyleGraphite;
-        } else if ([modelNumber hasPrefix:@"53PA05"]) {
+        if ([modelNumber hasPrefix:@"53PA05"]) {
             return FTPencilStyleGold;
+        } else if ([modelNumber hasPrefix:@"53PA"]) {
+            return FTPencilStyleGraphite;
         }
     }
-
     return FTPencilStyleWalnut;
 }
 

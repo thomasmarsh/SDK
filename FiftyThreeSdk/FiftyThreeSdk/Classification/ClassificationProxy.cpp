@@ -2,12 +2,12 @@
 //  ClassificationProxy.cpp
 //  FiftyThreeSdk
 //
-//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
+//  Copyright (c) 2015 FiftyThree, Inc. All rights reserved.
 //
 
 #include <iomanip>
-#include <tuple>
 #include <iostream>
+#include <tuple>
 
 #include "Core/Eigen.h"
 #include "Core/Log.h"
@@ -1055,54 +1055,13 @@ void TouchClassificationProxy::RemoveEdgeThumbs()
     }
 }
 
+void TouchClassificationProxy::SetShouldClassifyOneFinger(bool v)
+{
+    _ShouldClassifyOneFinger = v;
+}
+
 IdTypeMap TouchClassificationProxy::ReclassifyCurrentEvent()
 {
-    /*
-    if (_showDebugLogMessages)
-    {
-    for (TouchId touchId:_clusterTracker->TouchesForCurrentClusters(true))
-    {
-        Stroke::Ptr const & stroke = _clusterTracker->Stroke(touchId);
-
-        if (stroke->Size() < 3)
-        {
-            continue;
-        }
-
-        if (stroke->Size() == 10)
-        {
-            Eigen::MatrixX2f XY = stroke->XYMatrixMap();
-            Eigen::VectorXf  t  = stroke->RelativeTimestampMap();
-
-            //Eigen::VectorXf weights = t;
-
-            DebugAssert(t.rows() == XY.rows());
-
-            float residual = 0.0f; // storage for residual
-            //LinearlyParameterized2DLine<float> paramLine = LeastSquaresLinearlyParameterizedLine(t, XY, residual);
-            //LinearlyParameterized2DLine<float> paramLine = LeastSquaresLinearlyParameterizedLine(t, XY, weights, residual);
-
-            //float geometricResidual = 0.0f;
-            //Geometric2DLine<float> geoLine = GeometricLeastSquaresLineFit(XY, geometricResidual);
-            //Geometric2DLine<float> geoLine = GeometricLeastSquaresLineFit(XY, weights, geometricResidual);
-            QuadraticallyParameterized2DLine<float> quadParamLine = LeastSquaresQuadraticallyParameterizedLine(t, XY, residual);
-            //QuadraticallyParameterized2DLine<float> quadParamLine = LeastSquaresQuadraticallyParameterizedLine(t, XY, weights, residual);
-
-            float normalization = (stroke->XY(0) - stroke->LastPoint()).norm();
-            //normalization = stroke->Statistics()->_arcLength;
-            std::cerr << "\n" << touchId << ": " << residual / normalization;
-
-            //std::cerr << "\n" << "times: \n" << t;
-            //std::cerr << "\n" << "XY: \n" << XY;
-            //std::cerr << "\n" << "Geometric residual:" << geometricResidual << " and residual: " << residual << std::endl;
-            //std::cerr << "\n" << "Linear param line values: speed:" << paramLine.Speed() << "and Direction: " << paramLine.Direction() << " and anchor point: " << paramLine.AnchorPoint() << std::endl;
-            //std::cerr << "\n" << "Quad param line values: acceleration:" << quadParamLine.Acceleration() << " velocity0: " << quadParamLine.Velocity0() << " anchor point: " << quadParamLine.AnchorPoint() << std::endl;
-        }
-
-    }
-    }
-    */
-
     IdTypeMap types;
 
     // the clusters in order along the shortest curve joining them
@@ -1149,7 +1108,7 @@ IdTypeMap TouchClassificationProxy::ReclassifyCurrentEvent()
             _clusterTracker->ConcurrentTouches(liveTouches[0]).empty() &&
             _commonData.proxy->ActiveStylusIsConnected() &&
             CurrentClass(liveTouches.back()) != TouchClassification::RemovedFromClassification) {
-            Cluster::Ptr cluster = _clusterTracker->Cluster(liveTouches[0]);
+            auto cluster = _clusterTracker->Cluster(liveTouches[0]);
 
             if (TouchRadiusAvailable() && _clusterTracker->Data(liveTouches[0]) && TouchSize::IsPenGivenTouchRadius(*_clusterTracker->Data(liveTouches[0]))) {
                 checkForFingerSequence = false;
@@ -1157,14 +1116,13 @@ IdTypeMap TouchClassificationProxy::ReclassifyCurrentEvent()
                 if (_touchStatistics[liveTouches[0]]._preIsolation > _fingerSmudgeIsolationSeconds) {
                     // a single live cluster which satisifes a temporal isolation condition will trigger a sequence
                     // of finger smudges, unless it comes down in a palm cluster
-
-                    if (cluster->_touchIds.size() == 1 || cluster->_clusterTouchType != TouchClassification::Palm) {
+                    if (_ShouldClassifyOneFinger && (cluster->_touchIds.size() == 1 || cluster->_clusterTouchType != TouchClassification::Palm)) {
                         checkForFingerSequence = true;
                     }
                 } else {
                     // new smudges don't need to satisfy any condition if the previous touch was a smudge
-                    TouchId previousId = _clusterTracker->TouchPrecedingTouch(liveTouches[0]);
-                    if (previousId != InvalidTouchId() && CurrentClass(previousId) == TouchClassification::Finger) {
+                    auto previousId = _clusterTracker->TouchPrecedingTouch(liveTouches[0]);
+                    if (_ShouldClassifyOneFinger && (previousId != InvalidTouchId() && CurrentClass(previousId) == TouchClassification::Finger)) {
                         checkForFingerSequence = true;
                     }
                 }
@@ -1179,7 +1137,7 @@ IdTypeMap TouchClassificationProxy::ReclassifyCurrentEvent()
             Cluster::Ptr cluster = _clusterTracker->Cluster(liveTouches[0]);
             std::pair<TouchClassification, float> pair = _penEventClassifier.TypeAndScoreForCluster(*cluster);
 
-            TouchClassification newType = TouchClassification::Unknown;
+            auto newType = TouchClassification::Unknown;
 
             if (cluster && cluster->_simultaneousTouches) {
                 newType = TouchClassification::Palm;
@@ -1599,10 +1557,6 @@ void TouchClassificationProxy::ReclassifyCurrentEventGivenSize(IdTypeMap &change
                         probeData->_radiusMax > otherData->_radiusMax ||
                         (HandednessLocked() && probeCluster->_wasAtPalmEnd) ||
                         probeCluster->_wasInterior) {
-                        //std::cerr << "\n" << static_cast<int>(probeTouch) << ": beaten by " << static_cast<int>(otherTouch);
-                        //std::cerr << ", pMean = " << probeData->_radiusMean << ", oMean = " << otherData->_radiusMean <<
-                        //", pMax = " << probeData->_radiusMax << " oMax = " << otherData->_radiusMax << ", palmEnd = " << probeCluster->_wasAtPalmEnd << ", int = " << probeCluster->_wasInterior;
-
                         newTypes[probeCluster] = TouchClassification::Palm;
                     }
                 }
@@ -1614,36 +1568,6 @@ void TouchClassificationProxy::ReclassifyCurrentEventGivenSize(IdTypeMap &change
     for (ClusterTypePair pair : newTypes) {
         SetClusterType(pair.first, pair.second, changedTypes);
     }
-#if 0
-    for (IdTypePair pair : changedTypes)
-    {
-        Cluster::Ptr probeCluster = _clusterTracker->Cluster(pair.first);
-        TouchData::Ptr data = _clusterTracker->Data(probeCluster->MostRecentTouch());
-
-        bool atCorrectEnd = true;
-        if (HandednessLocked())
-        {
-            atCorrectEnd = ! probeCluster->_wasAtPalmEnd;
-        }
-
-        bool locationOK = atCorrectEnd && (! probeCluster->_wasInterior);
-
-        auto concurrent = _clusterTracker->ConcurrentTouches(probeCluster->MostRecentTouch());
-
-        std::cerr << std::setprecision(3);
-        std::cerr << "\n" << static_cast<int>(probeCluster->MostRecentTouch()) <<  //" (" << static_cast<int>(probeCluster->_id) << ")" <<
-        ": score = " << probeCluster->_penScore << ", prior = " << probeCluster->_penPrior << ", r = " << data->_radiusMean << ", locn = " << locationOK
-        << ", lock = " << HandednessLocked() << ", L = " << data->Stroke()->ArcLength();
-
-        std::cerr << ", conc = (";
-        for (TouchId cId : concurrent)
-        {
-            std::cerr << " " << static_cast<int>(cId);
-        }
-
-        std::cerr << "), type = " << static_cast<int>(newTypes[probeCluster]);
-    }
-#endif
 }
 
 bool TouchClassificationProxy::IsLongestConcurrentTouch(TouchId probeId)

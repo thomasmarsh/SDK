@@ -2,7 +2,7 @@
 //  TouchClassifier.h
 //  FiftyThreeSdk
 //
-//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
+//  Copyright (c) 2015 FiftyThree, Inc. All rights reserved.
 //
 
 #pragma once
@@ -105,6 +105,9 @@ public:
 
     // Call this once per frame before you use classifications.
     virtual void UpdateClassifications() = 0;
+
+    // Set should classify one finger.
+    virtual void SetShouldClassifyOneFinger(bool v) = 0;
 
     // Fired with a list of all classifications that have changed.
     // These touches may be expired and may transition classifications of Untracked or RemovedFromClassification.
