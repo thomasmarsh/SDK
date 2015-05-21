@@ -1628,11 +1628,23 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     }
 }
 
+- (BOOL)isPeripheral:(CBPeripheral*)peripheral advertisingInBackground:(NSDictionary*)advertisementData
+{
+    NSArray* backgroundServices = advertisementData [@"kCBAdvDataHashedServiceUUIDs"];
+    return (backgroundServices);
+}
+
 - (void)centralManager:(CBCentralManager *)central
     didDiscoverPeripheral:(CBPeripheral *)peripheral
         advertisementData:(NSDictionary *)advertisementData
                      RSSI:(NSNumber *)RSSI
 {
+    if ([self isPeripheral:peripheral advertisingInBackground:advertisementData]) {
+        MLOG_DEBUG(FTLogSDK, "Peripheral %s is advertising FiftyThree services while in background. Our "
+                   "peripherals don't run on iOS so this has to be a rouge BLE service.",
+                   [advertisementData[CBAdvertisementDataLocalNameKey] UTF8String]);
+        return;
+    }
     BOOL isPeripheralReconciling = [self isPeripheral:peripheral reconcilingUsing:advertisementData];
     BOOL isPeripheralReconcilingWithUs = [self isPeripheralReconcilingWithUs:peripheral
                                                        withAdvertisementData:advertisementData
