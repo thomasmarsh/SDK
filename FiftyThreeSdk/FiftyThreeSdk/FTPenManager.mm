@@ -1543,7 +1543,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
         self.pairedPeripheralUUID = NULL;
     }
 }
-- (UInt32)peripheralAdvertisementCentralId:(NSDictionary *)advertisementData
+- (UInt32)advertisementCentralId:(NSDictionary *)advertisementData forPeripheral:(CBPeripheral*)peripheral
 {
     NSData *manufacturerData = advertisementData[CBAdvertisementDataManufacturerDataKey];
 
@@ -1558,14 +1558,34 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
             return value;
         }
     } else {
-        DebugAssert(false);
+        
+        MLOG_ERROR(FTLogSDK, "Device %s did not have any manufacturing data.", [peripheral.identifier.UUIDString UTF8String]);
+
+        NSArray* serviceUUIDs = advertisementData[CBAdvertisementDataServiceUUIDsKey];
+        CBUUID* penSvcUUID = [FTPenServiceUUIDs penService];
+        BOOL foundPenSvc = NO;
+        for (id uuid in serviceUUIDs) {
+            if ((foundPenSvc = [penSvcUUID isEqual:uuid])) {
+                break;
+            }
+        }
+
+        // Assert that if we didn't have manufacturing data we also shouldn't be looking at a pen.
+        // If this fails we either have a rogue peripheral or iOS isn't giving us this data for some reason.
+        if (foundPenSvc) {
+	        FTFail("No manufacturer's data for a device claiming to support the pen service.");
+        }
+
+        // If we get here then iOS has returned a peripheral that did not match the filter provided
+        // to scanForPeripheralsWithServices which is total pants if that's what's going on!
+        FTFail("scanForPeripheralsWithServices seems to have discovered a device that did not support the pen service.");
     }
     return 0x0;
 }
 
-- (BOOL)isPeripheralReconciling:(NSDictionary *)advertisementData
+- (BOOL)isPeripheral:(CBPeripheral*)peripheral reconcilingUsing:(NSDictionary *)advertisementData
 {
-    UInt32 centralId = [self peripheralAdvertisementCentralId:advertisementData];
+    UInt32 centralId = [self advertisementCentralId:advertisementData forPeripheral:peripheral];
 
     return (centralId != 0x0);
 }
@@ -1588,7 +1608,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
                 withAdvertisementData:(NSDictionary *)advertisementData
                 requireCentralIdMatch:(BOOL)requireCentralIdMatch
 {
-    UInt32 advertisedCentralId = [self peripheralAdvertisementCentralId:advertisementData];
+    UInt32 advertisedCentralId = [self advertisementCentralId:advertisementData forPeripheral:peripheral];
 
     UInt32 peripheralCentralId = [self centralIdFromPeripheralId:peripheral.identifier];
 
@@ -1613,7 +1633,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
         advertisementData:(NSDictionary *)advertisementData
                      RSSI:(NSNumber *)RSSI
 {
-    BOOL isPeripheralReconciling = [self isPeripheralReconciling:advertisementData];
+    BOOL isPeripheralReconciling = [self isPeripheral:peripheral reconcilingUsing:advertisementData];
     BOOL isPeripheralReconcilingWithUs = [self isPeripheralReconcilingWithUs:peripheral
                                                        withAdvertisementData:advertisementData
                                                        requireCentralIdMatch:NO];
@@ -1621,7 +1641,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
                                                                    withAdvertisementData:advertisementData
                                                                    requireCentralIdMatch:YES];
 
-    MLOG_INFO(FTLogSDK, "Discovered peripheral with name: \"%s\" PotentialCentralId: %x CentralId: %x", ObjcDescription(peripheral.name), (unsigned int)[self centralIdFromPeripheralId:peripheral.identifier], (unsigned int)[self peripheralAdvertisementCentralId:advertisementData]);
+    MLOG_INFO(FTLogSDK, "Discovered peripheral with name: \"%s\" PotentialCentralId: %x CentralId: %x", ObjcDescription(peripheral.name), (unsigned int)[self centralIdFromPeripheralId:peripheral.identifier], (unsigned int)[self advertisementCentralId:advertisementData forPeripheral:peripheral]);
 
     if ([self currentStateHasName:kDatingScanningStateName]) {
         FTAssert(!self.pen, @"pen is nil");
