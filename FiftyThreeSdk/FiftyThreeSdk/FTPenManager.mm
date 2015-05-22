@@ -1631,7 +1631,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 - (BOOL)isPeripheral:(CBPeripheral*)peripheral advertisingInBackground:(NSDictionary*)advertisementData
 {
     NSArray* backgroundServices = advertisementData [@"kCBAdvDataHashedServiceUUIDs"];
-    return (backgroundServices);
+    return (backgroundServices != nil);
 }
 
 - (void)centralManager:(CBCentralManager *)central
