@@ -25,3 +25,7 @@ USER_HEADER_SEARCH_PATHS = $(inherited) "$(SRCROOT)/../../FiftyThreeSdk" "$(SRCR
 ARCHS = $(ARCHS_STANDARD_INCLUDING_64_BIT)
 // TODO: Revert once we sort out the "only run Crashlytics on Jenkins" issue
 DEBUG_INFORMATION_FORMAT = dwarf-with-dsym
+
+// Override the deployment target and SDK root defaults while the FiftyThreeSdk project continues to
+// support iOS 7
+IPHONEOS_DEPLOYMENT_TARGET = 7.0
