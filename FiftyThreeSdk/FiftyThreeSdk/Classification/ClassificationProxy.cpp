@@ -1599,7 +1599,7 @@ float TouchClassificationProxy::DominationScore(Cluster::Ptr const &probe)
 
         float ratio = probePair.second / (.0001f + otherCluster->_penScore);
 
-#if USE_DEBUG_ASSERT
+#ifdef USE_DEBUG_ASSERT
         float otherScore = _penEventClassifier.TypeAndScoreForCluster(*otherCluster).second;
         DebugAssert(otherCluster->_penScore == otherScore);
 #endif
