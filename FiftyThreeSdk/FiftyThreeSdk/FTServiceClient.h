@@ -17,4 +17,6 @@
 
 + (CBService *)findServiceWithPeripheral:(CBPeripheral *)peripheral andUUID:(CBUUID *)UUID;
 
+- (void)peripheralDidInvalidateServices:(CBPeripheral *)peripheral;
+
 @end
