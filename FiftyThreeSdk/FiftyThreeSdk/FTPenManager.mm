@@ -1527,10 +1527,8 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
         if ([self currentStateHasName:kWaitingForCentralManagerToPowerOnStateName]) {
             [self reset];
         } else {
-
             if ([self currentStateHasName:kUpdatingFirmwareStateName] ||
-                [self currentStateHasName:kUpdatingFirmwareAttemptingConnectionStateName])
-            {
+                [self currentStateHasName:kUpdatingFirmwareAttemptingConnectionStateName]) {
                 [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenManagerFirmwareUpdateWasCancelled
                                                                     object:self];
             }
@@ -1543,7 +1541,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
         self.pairedPeripheralUUID = NULL;
     }
 }
-- (UInt32)advertisementCentralId:(NSDictionary *)advertisementData forPeripheral:(CBPeripheral*)peripheral
+- (UInt32)advertisementCentralId:(NSDictionary *)advertisementData forPeripheral:(CBPeripheral *)peripheral
 {
     NSData *manufacturerData = advertisementData[CBAdvertisementDataManufacturerDataKey];
 
@@ -1558,11 +1556,10 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
             return value;
         }
     } else {
-        
         MLOG_ERROR(FTLogSDK, "Device %s did not have any manufacturing data.", [peripheral.identifier.UUIDString UTF8String]);
 
-        NSArray* serviceUUIDs = advertisementData[CBAdvertisementDataServiceUUIDsKey];
-        CBUUID* penSvcUUID = [FTPenServiceUUIDs penService];
+        NSArray *serviceUUIDs = advertisementData[CBAdvertisementDataServiceUUIDsKey];
+        CBUUID *penSvcUUID = [FTPenServiceUUIDs penService];
         BOOL foundPenSvc = NO;
         for (id uuid in serviceUUIDs) {
             if ((foundPenSvc = [penSvcUUID isEqual:uuid])) {
@@ -1573,7 +1570,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
         // Assert that if we didn't have manufacturing data we also shouldn't be looking at a pen.
         // If this fails we either have a rogue peripheral or iOS isn't giving us this data for some reason.
         if (foundPenSvc) {
-	        FTFail("No manufacturer's data for a device claiming to support the pen service.");
+            FTFail("No manufacturer's data for a device claiming to support the pen service.");
         }
 
         // If we get here then iOS has returned a peripheral that did not match the filter provided
@@ -1583,7 +1580,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     return 0x0;
 }
 
-- (BOOL)isPeripheral:(CBPeripheral*)peripheral reconcilingUsing:(NSDictionary *)advertisementData
+- (BOOL)isPeripheral:(CBPeripheral *)peripheral reconcilingUsing:(NSDictionary *)advertisementData
 {
     UInt32 centralId = [self advertisementCentralId:advertisementData forPeripheral:peripheral];
 
@@ -1628,9 +1625,9 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     }
 }
 
-- (BOOL)isPeripheral:(CBPeripheral*)peripheral advertisingInBackground:(NSDictionary*)advertisementData
+- (BOOL)isPeripheral:(CBPeripheral *)peripheral advertisingInBackground:(NSDictionary *)advertisementData
 {
-    NSArray* backgroundServices = advertisementData [@"kCBAdvDataHashedServiceUUIDs"];
+    NSArray *backgroundServices = advertisementData[@"kCBAdvDataHashedServiceUUIDs"];
     return (backgroundServices != nil);
 }
 
@@ -1640,7 +1637,8 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
                      RSSI:(NSNumber *)RSSI
 {
     if ([self isPeripheral:peripheral advertisingInBackground:advertisementData]) {
-        MLOG_DEBUG(FTLogSDK, "Peripheral %s is advertising FiftyThree services while in background. Our "
+        MLOG_DEBUG(FTLogSDK,
+                   "Peripheral %s is advertising FiftyThree services while in background. Our "
                    "peripherals don't run on iOS so this has to be a rouge BLE service.",
                    [advertisementData[CBAdvertisementDataLocalNameKey] UTF8String]);
         return;
@@ -2040,7 +2038,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     if (error) {
         [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenManagerFirmwareUpdateDidFail
                                                             object:self];
-        
+
         [self handleError];
     } else {
         [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenManagerFirmwareUpdateDidFinishSendingUpdate
@@ -2051,7 +2049,6 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
         [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenManagerFirmwareUpdateDidCompleteSuccessfully
                                                             object:self];
         [self fireStateMachineEvent:kBecomeMarriedEventName];
-
     }
 }
 
@@ -2219,7 +2216,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 {
     if (useDisplayLink) {
         self.displayLink = [CADisplayLink displayLinkWithTarget:sharedInstance selector:@selector(update)];
-        [self.displayLink addToRunLoop:[NSRunLoop mainRunLoop] forMode:NSDefaultRunLoopMode];
+        [self.displayLink addToRunLoop:[NSRunLoop mainRunLoop] forMode:NSRunLoopCommonModes];
     } else {
         [self.displayLink invalidate];
         self.displayLink = nil;
