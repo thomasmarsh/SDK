@@ -27,24 +27,24 @@ class TouchClassifierImpl : virtual public TouchClassifier
 {
 public:
     TouchClassifierImpl();
-    virtual bool IsPenConnected();
-    virtual void SetPenConnected(bool connected);
-    virtual void PenStateDidChanged(const PenEventArgs &args);
-    virtual void TouchesDidChanged(const std::set<core::Touch::cPtr> &touches);
-    virtual void RemoveTouchFromClassification(const core::Touch::cPtr &touch);
+    virtual bool IsPenConnected() override;
+    virtual void SetPenConnected(bool connected) override;
+    virtual void PenStateDidChanged(const PenEventArgs &args) override;
+    virtual void TouchesDidChanged(const std::set<core::Touch::cPtr> &touches) override;
+    virtual void RemoveTouchFromClassification(const core::Touch::cPtr &touch) override;
     virtual core::TouchClassification ClassifyPair(const core::Touch::cPtr &t0,
                                                    const core::Touch::cPtr &t1,
-                                                   const TwoTouchPairType &type);
+                                                   const TwoTouchPairType &type) override;
 
-    virtual core::TouchClassification ClassifyForSingleTouchGestureType(const core::Touch::cPtr &touch, const SingleTouchGestureType &type);
-    virtual Eigen::VectorXf GeometricStatistics(const core::Touch::cPtr &t0);
-    virtual void UpdateClassifications();
-    virtual Event<const std::vector<TouchClassificationChangedEventArgs> &> &TouchClassificationsDidChange();
-    virtual Event<const std::vector<TouchClassificationChangedEventArgs> &> &TouchContinuedClassificationsDidChange();
-    virtual void ClearSessionStatistics();
-    virtual SessionStatistics::Ptr SessionStatistics();
+    virtual core::TouchClassification ClassifyForSingleTouchGestureType(const core::Touch::cPtr &touch, const SingleTouchGestureType &type) override;
+    virtual Eigen::VectorXf GeometricStatistics(const core::Touch::cPtr &t0) override;
+    virtual void UpdateClassifications() override;
+    virtual Event<const std::vector<TouchClassificationChangedEventArgs> &> &TouchClassificationsDidChange() override;
+    virtual Event<const std::vector<TouchClassificationChangedEventArgs> &> &TouchContinuedClassificationsDidChange() override;
+    virtual void ClearSessionStatistics() override;
+    virtual SessionStatistics::Ptr SessionStatistics() override;
     // Set should classify one finger.
-    virtual void SetShouldClassifyOneFinger(bool v);
+    virtual void SetShouldClassifyOneFinger(bool v) override;
 
 protected:
     // Call this to get at the Classification parameters.
