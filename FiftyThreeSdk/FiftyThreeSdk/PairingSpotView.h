@@ -9,6 +9,10 @@
 
 #import <UIKit/UIKit.h>
 
+const CGFloat kPairingSpotTouchRadius_Began = 35.f;
+const CGFloat kPairingSpotMinRadius = 23.f;
+const CGFloat kPairingSpotMaxRadius = 41.f;
+
 struct PairingSpotViewSettings {
     float BatteryFlashOpacityFactor = 0.25f;
     float CometMaxThickness = 16.0f;

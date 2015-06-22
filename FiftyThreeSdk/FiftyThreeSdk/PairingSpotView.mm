@@ -351,7 +351,7 @@ NSString *FTPairingSpotCometStateName(FTPairingSpotCometState value)
 
 - (id)init
 {
-    self = [super initWithFrame:CGRectMake(0, 0, 82, 82)];
+    self = [super initWithFrame:CGRectMake(0, 0, kPairingSpotMaxRadius * 2.f, kPairingSpotMaxRadius * 2.f)];
     if (self) {
         _selectedColorOverrides = [[OverrideableProperty alloc] init];
         _unselectedColorOverrides = [[OverrideableProperty alloc] init];
@@ -876,7 +876,7 @@ NSString *FTPairingSpotCometStateName(FTPairingSpotCometState value)
 
     const CGPoint wellCenter = CGPointMake(41.5f, 41.5f);
 
-    static const float minWellRadius = 23.f;
+    static const float minWellRadius = kPairingSpotMinRadius;
 
     // We use a single timer & easy to control "disconnected" and "critically low battery" flash animations.
     const float flashPhase = _flashIconOpacityEasing.GetCurrentValue().x();
@@ -947,7 +947,7 @@ NSString *FTPairingSpotCometStateName(FTPairingSpotCometState value)
             case FTPairingSpotIconTypeCriticallyLowBattery:
             default: {
                 CGFloat hue, saturation, selectedBrightness, iconBrightness;
-                if(![tint getHue:&hue saturation:&saturation brightness:NULL alpha:NULL]) {
+                if (![tint getHue:&hue saturation:&saturation brightness:NULL alpha:NULL]) {
                     FTFail("on iOS7 some colors cannot be converted to HSB. Use UIColor colorWithHue to ensure this failure doesn't happen.");
                 }
                 if (![self.selectedColor getHue:NULL saturation:NULL brightness:&selectedBrightness alpha:NULL]) {
@@ -987,7 +987,7 @@ NSString *FTPairingSpotCometStateName(FTPairingSpotCometState value)
                         batterySegmentColor = [UIColor colorWithRed:red green:green blue:blue alpha:batterySegmentOpacity];
                     } else {
                         CGFloat figureColorBrightness;
-                        if(![figureColor getHue:NULL saturation:NULL brightness:&figureColorBrightness alpha:NULL]) {
+                        if (![figureColor getHue:NULL saturation:NULL brightness:&figureColorBrightness alpha:NULL]) {
                             FTFail("on iOS7 some colors cannot be converted to HSB. Use UIColor colorWithHue to ensure this failure doesn't happen.");
                         }
                         batterySegmentColor = [UIColor colorWithWhite:Lerp<CGFloat>(1.f, figureColorBrightness, batterySegmentOpacity)
