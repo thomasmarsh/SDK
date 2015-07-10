@@ -2,7 +2,7 @@
 //  FTPeripheralDelegate.mm
 //  FiftyThreeSdk
 //
-//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
+//  Copyright (c) 2015 FiftyThree, Inc. All rights reserved.
 //
 
 #import "Core/Log.h"
@@ -125,8 +125,7 @@ using namespace fiftythree::core;
 - (void)peripheral:(CBPeripheral *)peripheral didUpdateValueForCharacteristic:(CBCharacteristic *)characteristic
                               error:(NSError *)error
 {
-    MLOG_INFO(FTLogSDKVerbose, "Peripheral did update value for characteristic: %s", FTNameForServiceUUID(characteristic.UUID).UTF8String);
-
+    MLOG_INFO(FTLogSDKVerbose, "Peripheral did update value %s for characteristic: %s", characteristic.value.description.UTF8String, FTNameForServiceUUID(characteristic.UUID).UTF8String);
     for (FTServiceClient *serviceClient in self.serviceClients) {
         [serviceClient peripheral:peripheral didUpdateValueForCharacteristic:characteristic error:error];
     }

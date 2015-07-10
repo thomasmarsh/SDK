@@ -353,7 +353,7 @@ static constexpr float kDefaultSpotRadius = 23.f;
 
 - (id)init
 {
-    self = [super initWithFrame:CGRectMake(0, 0, 82, 82)];
+    self = [super initWithFrame:CGRectMake(0, 0, kPairingSpotMaxRadius * 2.f, kPairingSpotMaxRadius * 2.f)];
     if (self) {
         _selectedColorOverrides = [[OverrideableProperty alloc] init];
         _unselectedColorOverrides = [[OverrideableProperty alloc] init];
@@ -950,7 +950,7 @@ static constexpr float kDefaultSpotRadius = 23.f;
             case FTPairingSpotIconTypeCriticallyLowBattery:
             default: {
                 CGFloat hue, saturation, selectedBrightness, iconBrightness;
-                if(![tint getHue:&hue saturation:&saturation brightness:NULL alpha:NULL]) {
+                if (![tint getHue:&hue saturation:&saturation brightness:NULL alpha:NULL]) {
                     FTFail("on iOS7 some colors cannot be converted to HSB. Use UIColor colorWithHue to ensure this failure doesn't happen.");
                 }
                 if (![self.selectedColor getHue:NULL saturation:NULL brightness:&selectedBrightness alpha:NULL]) {
@@ -990,7 +990,7 @@ static constexpr float kDefaultSpotRadius = 23.f;
                         batterySegmentColor = [UIColor colorWithRed:red green:green blue:blue alpha:batterySegmentOpacity];
                     } else {
                         CGFloat figureColorBrightness;
-                        if(![figureColor getHue:NULL saturation:NULL brightness:&figureColorBrightness alpha:NULL]) {
+                        if (![figureColor getHue:NULL saturation:NULL brightness:&figureColorBrightness alpha:NULL]) {
                             FTFail("on iOS7 some colors cannot be converted to HSB. Use UIColor colorWithHue to ensure this failure doesn't happen.");
                         }
                         batterySegmentColor = [UIColor colorWithWhite:Lerp<CGFloat>(1.f, figureColorBrightness, batterySegmentOpacity)

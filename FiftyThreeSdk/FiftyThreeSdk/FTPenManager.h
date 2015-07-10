@@ -116,19 +116,19 @@ extern "C"
 
 // Override the color used by the style for drawing icons when the UI control is in a
 // "selected" pseudo-state (e.g. "selected" is synonoumous with "connected").
-@property (nonatomic) UIColor *selectedColor;
+@property (nonatomic, strong) UIColor *selectedColor;
 
 // Override the color used by the style for drawing icons when the UI control is in an
 // "normal" pseudo-state (e.g. "normal" is synonoumous with "disconnected").
-@property (nonatomic) UIColor *unselectedColor;
+@property (nonatomic, strong) UIColor *unselectedColor;
 
 // Override the color used by the style tinting the UI control. This value supercedes any tintColor set
 // for the UIView or its type heiarchy.
-@property (nonatomic) UIColor *tintColor;
+@property (nonatomic, strong) UIColor *tintColor;
 
 // Override the color used by the style for tinting the UI control when in an
 // "normal" pseudo-state (e.g. "normal" is synonoumous with "disconnected").
-@property (nonatomic) UIColor *unselectedTintColor;
+@property (nonatomic, strong) UIColor *unselectedTintColor;
 
 @end
 

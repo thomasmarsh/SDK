@@ -2,7 +2,7 @@
 //  FTPenManager+Private.h
 //  FiftyThreeSdk
 //
-//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
+//  Copyright (c) 2015 FiftyThree, Inc. All rights reserved.
 //
 
 #pragma once
@@ -16,6 +16,7 @@ extern NSString *const kFTPenUnexpectedDisconnectWhileConnectingNotifcationName;
 extern NSString *const kFTPenUnexpectedDisconnectWhileUpdatingFirmwareNotificationName;
 
 extern NSString *const kFTPenManagerFirmwareUpdateDidBegin;
+extern NSString *const kFTPenManagerFirmwareUpdateDidPrepare;
 extern NSString *const kFTPenManagerFirmwareUpdateDidBeginSendingUpdate;
 extern NSString *const kFTPenManagerFirmwareUpdateDidUpdatePercentComplete;
 extern NSString *const kFTPenManagerPercentCompleteProperty;
@@ -23,6 +24,7 @@ extern NSString *const kFTPenManagerFirmwareUpdateDidFinishSendingUpdate;
 extern NSString *const kFTPenManagerFirmwareUpdateDidCompleteSuccessfully;
 extern NSString *const kFTPenManagerFirmwareUpdateDidFail;
 extern NSString *const kFTPenManagerFirmwareUpdateWasCancelled;
+extern NSString *const kFTPenManagerFirmwareUpdateWaitingForPencilTipRelease;
 
 @interface FTPenManager ()
 
@@ -39,8 +41,26 @@ extern NSString *const kFTPenManagerFirmwareUpdateWasCancelled;
 // updateVersion is updated IFF the return value is @(@YES) and should otherwise be ignored.
 - (NSNumber *)isFirmwareUpdateAvailable:(NSInteger *)currentVersion
                           updateVersion:(NSInteger *)updateVersion;
-- (BOOL)updateFirmware;
-- (BOOL)updateFirmware:(NSString *)firmwareImagePath;
+
+// Gets the firmware image ready for update and prepares the peripheral. This action
+// is still reversable (i.e. no firmware images on the peripheral will be invalidated
+// until the update proceeds).
+- (BOOL)prepareFirmwareUpdate;
+- (BOOL)prepareFirmwareUpdate:(NSString *)firmwareImagePath;
+
+// Deprecated. Use prepareFirmwareUpdate first then call startUpdatingFirmware
+// once the kFTPenManagerFirmwareUpdateDidPrepare was receieved.
+// Note that this method will try to start the firmware update automatically but
+// could fail to do so. For some older peripherals this method could prepare the
+// update and then wait indefinitly for more user input.
+- (BOOL)updateFirmware __attribute__((deprecated));
+- (BOOL)updateFirmware:(NSString *)firmwareImagePath __attribute__((deprecated));
+
+// Call this after the kFTPenManagerFirmwareUpdateDidPrepare was received.
+//
+// Returns YES if the update has started else returns NO.
+- (BOOL)startUpdatingFirmware;
+
 - (void)cancelFirmwareUpdate;
 
 - (void)startTrialSeparation;

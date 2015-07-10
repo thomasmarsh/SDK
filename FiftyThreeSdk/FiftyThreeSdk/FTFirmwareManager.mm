@@ -2,13 +2,14 @@
 //  FTFirmwareManager.mm
 //  FiftyThreeSdk
 //
-//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
+//  Copyright (c) 2015 FiftyThree, Inc. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>
 
 #import "Core/Asserts.h"
 #import "Core/Log.h"
+#import "FTFirmwareManager+Private.h"
 #import "FTFirmwareManager.h"
 #import "FTLogPrivate.h"
 #import "FTPen.h"
@@ -32,7 +33,7 @@ static NSString *applicationDocumentsDirectory()
 + (NSString *)imagePathIncludingDocumentsDir
 {
     NSString *bestImagePath;
-    NSInteger bestVersion;
+    NSInteger bestVersion = -1;
 
     NSString *documentsDir = applicationDocumentsDirectory();
     NSArray *directoryContent = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:documentsDir
@@ -65,11 +66,17 @@ static NSString *applicationDocumentsDirectory()
 
 + (NSURL *)firmwareURL
 {
-    NSString *endPoint = @"https://www.fiftythree.com/downloads/sdk/v1/pencil/latest/firmware.bin";
+    NSString *endPoint = @"https://www.fiftythree.com/downloads/sdk/v2/pencil/latest/firmware.bin";
     return [NSURL URLWithString:endPoint];
 }
 
 + (void)fetchLatestFirmwareWithCompletionHandler:(void (^)(NSData *))handler
+{
+    [FTFirmwareManager fetchFirmware:[FTFirmwareManager firmwareURL]
+               withCompletionHandler:handler];
+}
+
++ (void)fetchFirmware:(NSURL *)firmwareUrl withCompletionHandler:(void (^)(NSData *))handler
 {
     NSURLSessionConfiguration *defaultConfigObject = [NSURLSessionConfiguration defaultSessionConfiguration];
     defaultConfigObject.allowsCellularAccess = NO;
@@ -78,7 +85,7 @@ static NSString *applicationDocumentsDirectory()
                                                                       delegate:nil
                                                                  delegateQueue:[NSOperationQueue mainQueue]];
 
-    [[delegateFreeSession dataTaskWithURL:[FTFirmwareManager firmwareURL]
+    [[delegateFreeSession dataTaskWithURL:firmwareUrl
                         completionHandler:^(NSData *data,
                                             NSURLResponse *response,
                                             NSError *error) {
@@ -110,7 +117,7 @@ static NSString *applicationDocumentsDirectory()
     NSInteger version = -1;
 
     if (image.length >= sizeof(TIFirmwareImageHeader)) {
-        TIFirmwareImageHeader* header = (TIFirmwareImageHeader*)image.bytes;
+        TIFirmwareImageHeader *header = (TIFirmwareImageHeader *)image.bytes;
         version = (CFSwapInt16LittleToHost(header->version) >> 1);
     }
 
@@ -146,7 +153,9 @@ static NSString *applicationDocumentsDirectory()
           isCurrentlyRunning:(BOOL *)isCurrentlyRunning
 {
     *version = -1;
-    *isCurrentlyRunning = NO;
+    if (isCurrentlyRunning) {
+        *isCurrentlyRunning = NO;
+    }
 
     NSString *versionString = (imageType == FTFirmwareImageTypeFactory ? pen.firmwareRevision : pen.softwareRevision);
 
@@ -165,7 +174,9 @@ static NSString *applicationDocumentsDirectory()
             *version = [versionNumberString intValue];
 
             NSRange asteriskRange = [match rangeAtIndex:2];
-            *isCurrentlyRunning = (asteriskRange.length > 0);
+            if (isCurrentlyRunning) {
+                *isCurrentlyRunning = (asteriskRange.length > 0);
+            }
 
             return YES;
         }

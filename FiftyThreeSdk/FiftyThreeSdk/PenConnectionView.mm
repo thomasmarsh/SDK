@@ -32,7 +32,6 @@ NSString *const kPencilConnectionStatusChangedWithPenConnectionViewNotificationN
 
 using namespace fiftythree::core;
 
-constexpr CGFloat kPairingSpotTouchRadius_Began = 35.f;
 constexpr CGFloat kPairingSpotTouchRadius_Moved = 150.f;
 constexpr CGFloat kDebugControlWidth = 10.f;
 constexpr CGFloat kDebugControlSpacing = 5.f;
