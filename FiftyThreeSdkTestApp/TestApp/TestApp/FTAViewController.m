@@ -2,7 +2,7 @@
 //  FTAViewController.m
 //  TestApp
 //
-//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
+//  Copyright (c) 2015 FiftyThree, Inc. All rights reserved.
 //
 
 #import <FiftyThreeSdk/FiftyThreeSdk.h>
@@ -53,7 +53,11 @@
     // (5) A button to show a popover with Pen status. This uses the FTPenInformation API to
     //     populate a table view. See FTASettingsViewController.
 
-    self.bar = [[UIToolbar alloc] initWithFrame:CGRectMake(0, 0, MAX(self.view.frame.size.width, self.view.frame.size.height), 44)];
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+        self.bar = [[UIToolbar alloc] initWithFrame:CGRectMake(0, 0, MAX(self.view.frame.size.width, self.view.frame.size.height), 44)];
+    } else {
+        self.bar = [[UIToolbar alloc] initWithFrame:CGRectMake(0, 0, MIN(self.view.frame.size.width, self.view.frame.size.height), 44)];
+    }
 
     UIBarButtonItem *shutdownButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemStop
                                                                                     target:self
@@ -82,7 +86,7 @@
                                                                 target:self
                                                                 action:@selector(updateFirmware:)];
 
-    self.updateFirmwareButton.enabled = NO;
+    self.updateFirmwareButton.enabled = YES;
 
     [self.bar setItems:@[ shutdownButton, startupButton, spacer, clearButton, self.updateFirmwareButton, self.infoButton ]];
     self.bar.barStyle = UIBarStyleBlack;
@@ -121,7 +125,7 @@
 {
     NSNumber *firmwareUpdateIsAvailable = [FTPenManager sharedInstance].firmwareUpdateIsAvailable;
 
-    if (firmwareUpdateIsAvailable != nil && [firmwareUpdateIsAvailable boolValue]) {
+    if (YES) { // firmwareUpdateIsAvailable != nil && [firmwareUpdateIsAvailable boolValue]) {
         BOOL isPaperInstalled = [FTPenManager sharedInstance].canInvokePaperToUpdatePencilFirmware;
         if (isPaperInstalled) {
             // We invoke Paper via url handlers. You can optionally specify urls so that
@@ -153,6 +157,12 @@
         }
     }
 }
+
+- (void)backPressed:(id)sender
+{
+    [self dismissViewControllerAnimated:YES completion:nil];
+}
+
 - (void)showInfo:(id)sender
 {
     UIBarButtonItem *barButton = (UIBarButtonItem *)sender;
@@ -164,9 +174,21 @@
         self.popoverContents = [[FTASettingsViewController alloc] init];
         self.popoverContents.info = [FTPenManager sharedInstance].info;
 
-        self.popover = [[UIPopoverController alloc] initWithContentViewController:self.popoverContents];
-        self.popover.delegate = self;
-        [self.popover presentPopoverFromBarButtonItem:barButton permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
+        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+            self.popover = [[UIPopoverController alloc] initWithContentViewController:self.popoverContents];
+            self.popover.delegate = self;
+            [self.popover presentPopoverFromBarButtonItem:barButton permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
+        } else {
+            UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:self.popoverContents];
+
+            UIBarButtonItem *backButton = [[UIBarButtonItem alloc] initWithTitle:@"Back"
+                                                                           style:UIBarButtonItemStyleBordered
+                                                                          target:nil
+                                                                          action:@selector(backPressed:)];
+
+            self.popoverContents.navigationItem.leftBarButtonItem = backButton;
+            [self presentViewController:navController animated:YES completion:nil];
+        }
     }
 }
 
@@ -192,7 +214,7 @@
 {
     UIView *connectionView = [[FTPenManager sharedInstance] pairingButtonWithStyle:FTPairingUIStyleDefault];
 
-    connectionView.frame = CGRectMake(0.0f, 768 - 100, connectionView.frame.size.width, connectionView.frame.size.height);
+    connectionView.frame = CGRectMake(0.0f, self.view.frame.size.height - 100, connectionView.frame.size.width, connectionView.frame.size.height);
     [self.view addSubview:connectionView];
 
     [FTPenManager sharedInstance].classifier.delegate = self;
