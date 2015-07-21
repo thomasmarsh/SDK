@@ -491,6 +491,7 @@ static constexpr float kDefaultSpotRadius = 23.f;
     // Pairing Spot has no "Reconnecting" UI if using thin comets.
     if (self.useThinComets) {
         isDisconnected = NO;
+        _isDisconnected = NO;
     }
 
     if (_connectionState != connectionState ||

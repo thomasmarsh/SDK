@@ -352,8 +352,14 @@ constexpr CGFloat kDebugControlSpacing = 5.f;
             break;
 
         case FTPenManagerStateReconnecting:
-            [self.pairingSpotView setConnectionState:self.reconnectingPairingSpotConnectionState
-                                      isDisconnected:YES];
+            if (self.pairingSpotView.useThinComets) {
+                // Pairing Spot should not go into a reconnecting (pulsing) state when Pencil is not connected.
+                [self.pairingSpotView setConnectionState:FTPairingSpotConnectionStateUnpaired
+                                          isDisconnected:NO];
+            } else {
+                [self.pairingSpotView setConnectionState:self.reconnectingPairingSpotConnectionState
+                                          isDisconnected:YES];
+            }
             break;
 
         case FTPenManagerStateDisconnected:
