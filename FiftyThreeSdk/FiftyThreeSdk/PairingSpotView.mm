@@ -488,6 +488,11 @@ static constexpr float kDefaultSpotRadius = 23.f;
 - (void)setConnectionState:(FTPairingSpotConnectionState)connectionState
             isDisconnected:(BOOL)isDisconnected
 {
+    // Pairing Spot has no "Reconnecting" UI if using thin comets.
+    if (self.useThinComets) {
+        isDisconnected = NO;
+    }
+
     if (_connectionState != connectionState ||
         _isDisconnected != isDisconnected) {
         _connectionState = connectionState;
@@ -978,6 +983,12 @@ static constexpr float kDefaultSpotRadius = 23.f;
             case FTPairingSpotIconTypeLowBattery:
             case FTPairingSpotIconTypeCriticallyLowBattery: {
                 UIColor *batterySegmentColor = figureColor;
+
+                if (self.useThinComets && iconAnimation.iconType == FTPairingSpotIconTypeCriticallyLowBattery) {
+                    // Use FiftyThree $OrangeLight background for critically low battery
+                    iconColor = [UIColor colorWithRed:1.f green:.56f blue:.37f alpha:1.f];
+                }
+
                 // Battery segment flash animation.
                 if (iconAnimation.isStarted &&
                     iconAnimation.iconType == FTPairingSpotIconTypeCriticallyLowBattery &&
@@ -1009,6 +1020,12 @@ static constexpr float kDefaultSpotRadius = 23.f;
                         }
                     }
                 }
+
+                if (self.useThinComets && iconAnimation.iconType == FTPairingSpotIconTypeLowBattery) {
+                    // When using thin comets, the battery segment should be knocked out.
+                    batterySegmentColor = nil;
+                }
+
                 [PairingSpotView drawBatteryIconToContext:context
                                                withCenter:wellCenter
                                                     scale:currentIconScale
@@ -1499,11 +1516,13 @@ static constexpr float kDefaultSpotRadius = 23.f;
 
     CGContextRestoreGState(context);
 
-    // The battery segment animates, so we should always draw it.
-    // It may draw over the clipped battery mask.
-    CGContextTranslateCTM(context, -1, -1);
-    [batterySegmentColor setFill];
-    [batterySegmentPath fill];
+    if (batterySegmentColor) {
+        // The battery segment animates, so we should always draw it.
+        // It may draw over the clipped battery mask.
+        CGContextTranslateCTM(context, -1, -1);
+        [batterySegmentColor setFill];
+        [batterySegmentPath fill];
+    }
 
     CGContextRestoreGState(context);
 }

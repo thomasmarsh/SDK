@@ -359,17 +359,24 @@ constexpr CGFloat kDebugControlSpacing = 5.f;
         case FTPenManagerStateDisconnected:
         case FTPenManagerStateDisconnectedLongPressToUnpair:
 
-            if (self.hadCriticallyLowBatteryWhenLastConnected &&
-                [self.hadCriticallyLowBatteryWhenLastConnected boolValue]) {
-                [self.pairingSpotView setConnectionState:FTPairingSpotConnectionStateCriticallyLowBattery
-                                          isDisconnected:YES];
-            } else if (self.hadLowBatteryWhenLastConnected &&
-                       [self.hadLowBatteryWhenLastConnected boolValue]) {
-                [self.pairingSpotView setConnectionState:FTPairingSpotConnectionStateLowBattery
-                                          isDisconnected:YES];
+            if (self.pairingSpotView.useThinComets) {
+                // Pairing Spot should not go into a reconnecting (pulsing) state or show battery state
+                // when Pencil is not connected.
+                [self.pairingSpotView setConnectionState:FTPairingSpotConnectionStateUnpaired
+                                          isDisconnected:NO];
             } else {
-                [self.pairingSpotView setConnectionState:FTPairingSpotConnectionStateConnected
-                                          isDisconnected:YES];
+                if (self.hadCriticallyLowBatteryWhenLastConnected &&
+                    [self.hadCriticallyLowBatteryWhenLastConnected boolValue]) {
+                    [self.pairingSpotView setConnectionState:FTPairingSpotConnectionStateCriticallyLowBattery
+                                              isDisconnected:YES];
+                } else if (self.hadLowBatteryWhenLastConnected &&
+                           [self.hadLowBatteryWhenLastConnected boolValue]) {
+                    [self.pairingSpotView setConnectionState:FTPairingSpotConnectionStateLowBattery
+                                              isDisconnected:YES];
+                } else {
+                    [self.pairingSpotView setConnectionState:FTPairingSpotConnectionStateConnected
+                                              isDisconnected:YES];
+                }
             }
             break;
 
