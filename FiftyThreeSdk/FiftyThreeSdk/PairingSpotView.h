@@ -81,6 +81,8 @@ extern NSString *const kPairingSpotStateDidChangeNotificationName;
 
 @property (nonatomic, readwrite) CGFloat spotRadius;
 
+@property (nonatomic) BOOL useThinComets;
+
 ///
 /// Controls different styles for the pairing spot. See
 /// FTPairingSpotStyle enum for supported values.

@@ -901,11 +901,13 @@ static constexpr float kDefaultSpotRadius = 23.f;
         tint = [UIColor colorWithHue:0.f saturation:0.f brightness:1.f alpha:1.f];
     }
 
-    if (FTPairingSpotStyleInset == self.style) {
-        [PairingSpotView drawWellUnderlayToContext:context
-                                        withCenter:wellCenter
-                                            radius:wellRadius
-                                andBackgroundColor:self.unselectedTintColor];
+    if (!self.useThinComets) {
+        if (FTPairingSpotStyleInset == self.style) {
+            [PairingSpotView drawWellUnderlayToContext:context
+                                            withCenter:wellCenter
+                                                radius:wellRadius
+                                    andBackgroundColor:self.unselectedTintColor];
+        }
     }
 
     for (PairingSpotIconAnimation *iconAnimation in self.iconAnimations) {
@@ -1017,10 +1019,12 @@ static constexpr float kDefaultSpotRadius = 23.f;
         }
     }
 
-    if (FTPairingSpotStyleInset == self.style) {
-        [PairingSpotView drawWellOverlayToContext:context
-                                       withCenter:wellCenter
-                                           radius:wellRadius];
+    if (!self.useThinComets) {
+        if (FTPairingSpotStyleInset == self.style) {
+            [PairingSpotView drawWellOverlayToContext:context
+                                           withCenter:wellCenter
+                                               radius:wellRadius];
+        }
     }
 
     if (wellMargin > 0.f) {
@@ -1045,8 +1049,19 @@ static constexpr float kDefaultSpotRadius = 23.f;
         }
 
         self.cometsLayer.center = CGPointMake(wellCenter.x, wellCenter.y);
-        self.cometsLayer.radius = wellRadius - 2.f;
-        self.cometsLayer.width = wellMargin - 3.f;
+
+        CGFloat alphaLerpMax = 0.f;
+
+        if (self.useThinComets) {
+            alphaLerpMax = 6.f;
+            self.cometsLayer.radius = wellRadius - 4.f;
+            self.cometsLayer.width = wellMargin - 10.f;
+        } else {
+            alphaLerpMax = 13.f;
+            self.cometsLayer.radius = wellRadius - 2.f;
+            self.cometsLayer.width = wellMargin - 3.f;
+        }
+
         self.cometsLayer.rotation = self.cometRotation;
 
         [self.cometsLayer drawInContext:self.cometsBitmapContext
@@ -1056,7 +1071,7 @@ static constexpr float kDefaultSpotRadius = 23.f;
         CGContextClipToMask(context, CGContextGetClipBoundingBox(context), maskImage);
         CGImageRelease(maskImage);
 
-        const CGFloat cometsAlpha = Clamped<CGFloat>(InverseLerp<CGFloat>(3.f, 13.f, self.cometsLayer.width), 0.f, 1.f);
+        const CGFloat cometsAlpha = Clamped<CGFloat>(InverseLerp<CGFloat>(3.f, alphaLerpMax, self.cometsLayer.width), 0.f, 1.f);
 
         UIColor *cometsColor = [self getCometsColorWithAlpha:cometsAlpha];
         [cometsColor setFill];
