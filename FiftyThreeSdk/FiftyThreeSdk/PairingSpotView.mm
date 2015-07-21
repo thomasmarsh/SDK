@@ -902,6 +902,7 @@ static constexpr float kDefaultSpotRadius = 23.f;
     }
 
     if (!self.useThinComets) {
+        // No well underlay if we're using thin comets.
         if (FTPairingSpotStyleInset == self.style) {
             [PairingSpotView drawWellUnderlayToContext:context
                                             withCenter:wellCenter
@@ -984,7 +985,7 @@ static constexpr float kDefaultSpotRadius = 23.f;
                     CGFloat batterySegmentOpacity = iconOpacity * Lerp(self.viewSettings.BatteryFlashOpacityFactor,
                                                                        1.f,
                                                                        flashOpacityPhase);
-                    Clamp<CGFloat>(batterySegmentOpacity, 0.f, 1.f);
+                    batterySegmentOpacity = Clamp<CGFloat>(batterySegmentOpacity, 0.f, 1.f);
 
                     if (FTPairingSpotStyleFlat == self.style) {
                         CGFloat red, green, blue;
@@ -995,15 +996,24 @@ static constexpr float kDefaultSpotRadius = 23.f;
                         if (![figureColor getHue:NULL saturation:NULL brightness:&figureColorBrightness alpha:NULL]) {
                             FTFail("on iOS7 some colors cannot be converted to HSB. Use UIColor colorWithHue to ensure this failure doesn't happen.");
                         }
-                        batterySegmentColor = [UIColor colorWithWhite:Lerp<CGFloat>(1.f, figureColorBrightness, batterySegmentOpacity)
-                                                                alpha:1.f];
+
+                        CGFloat batterySegmentAlpha = Lerp<CGFloat>(1.f, figureColorBrightness, batterySegmentOpacity);
+
+                        if (self.useThinComets) {
+                            // When using thin comets, the battery is knocked out, so the battery segment
+                            // should flash over the background. Mix it with the background color here.
+                            batterySegmentColor = [iconColor colorWithAlphaComponent:batterySegmentAlpha];
+                        } else {
+                            batterySegmentColor = [UIColor colorWithWhite:batterySegmentAlpha
+                                                                    alpha:1.f];
+                        }
                     }
                 }
                 [PairingSpotView drawBatteryIconToContext:context
                                                withCenter:wellCenter
                                                     scale:currentIconScale
                                       batterySegmentColor:batterySegmentColor
-                                          foregroundColor:figureColor
+                                          foregroundColor:(self.useThinComets ? nil : figureColor)
                                        andBackgroundColor:iconColor];
                 break;
             }
@@ -1013,13 +1023,14 @@ static constexpr float kDefaultSpotRadius = 23.f;
                 [PairingSpotView drawPencilIconToContext:context
                                               withCenter:wellCenter
                                                    scale:currentIconScale
-                                         foregroundColor:figureColor
+                                         foregroundColor:(self.useThinComets ? nil : figureColor)
                                       andBackgroundColor:iconColor];
                 break;
         }
     }
 
     if (!self.useThinComets) {
+        // No well overlay if we're using thin comets.
         if (FTPairingSpotStyleInset == self.style) {
             [PairingSpotView drawWellOverlayToContext:context
                                            withCenter:wellCenter
@@ -1288,14 +1299,8 @@ static constexpr float kDefaultSpotRadius = 23.f;
                 foregroundColor:(UIColor *)fgColor
              andBackgroundColor:(UIColor *)bgColor
 {
-    CGContextSaveGState(context);
-
     const CGFloat radius = 22.5f;
     const CGPoint modelCenter = CGPointMake(radius, radius);
-
-    CGContextTranslateCTM(context, center.x, center.y);
-    CGContextScaleCTM(context, scale, scale);
-    CGContextTranslateCTM(context, -modelCenter.x, -modelCenter.y);
 
     // Background circle
     UIBezierPath *backgroundPath = [UIBezierPath bezierPathWithArcCenter:modelCenter
@@ -1303,11 +1308,6 @@ static constexpr float kDefaultSpotRadius = 23.f;
                                                               startAngle:0.f
                                                                 endAngle:M_PI * 2.f
                                                                clockwise:NO];
-    [bgColor setFill];
-    [backgroundPath fill];
-
-    // The code paint code isn't properly centered.
-    CGContextTranslateCTM(context, -0.5f, -0.5f);
 
     UIBezierPath *pencilPath = [UIBezierPath bezierPath];
 
@@ -1359,8 +1359,35 @@ static constexpr float kDefaultSpotRadius = 23.f;
 
     pencilPath.miterLimit = 4;
 
-    [fgColor setFill];
-    [pencilPath fill];
+    CGContextSaveGState(context);
+
+    CGContextTranslateCTM(context, center.x, center.y);
+    CGContextScaleCTM(context, scale, scale);
+    CGContextTranslateCTM(context, -modelCenter.x, -modelCenter.y);
+
+    if (!fgColor) {
+        // If no foreground color is specified, knock out the path
+        // so that you can see through the pencil to the background.
+        UIBezierPath *clipPath = [UIBezierPath bezierPathWithRect:CGRectInfinite];
+        [clipPath appendPath:pencilPath];
+        clipPath.usesEvenOddFillRule = YES;
+
+        // The PaintCode battery isn't properly centered,
+        CGContextTranslateCTM(context, -.5f, -.5f);
+        [clipPath addClip];
+
+        CGContextTranslateCTM(context, 0.5f, 0.5f);
+        [bgColor setFill];
+        [backgroundPath fill];
+    } else {
+        [bgColor setFill];
+        [backgroundPath fill];
+
+        // The PaintCode battery isn't properly centered,
+        CGContextTranslateCTM(context, -0.5f, -0.5f);
+        [fgColor setFill];
+        [pencilPath fill];
+    }
 
     CGContextRestoreGState(context);
 }
@@ -1372,14 +1399,8 @@ static constexpr float kDefaultSpotRadius = 23.f;
                  foregroundColor:(UIColor *)color
               andBackgroundColor:(UIColor *)bgColor
 {
-    CGContextSaveGState(context);
-
     const CGFloat radius = 22.5f;
     const CGPoint modelCenter = CGPointMake(radius, radius);
-
-    CGContextTranslateCTM(context, center.x, center.y);
-    CGContextScaleCTM(context, scale, scale);
-    CGContextTranslateCTM(context, -modelCenter.x, -modelCenter.y);
 
     // Background circle
     UIBezierPath *backgroundPath = [UIBezierPath bezierPathWithArcCenter:modelCenter
@@ -1387,11 +1408,6 @@ static constexpr float kDefaultSpotRadius = 23.f;
                                                               startAngle:0.f
                                                                 endAngle:M_PI * 2.f
                                                                clockwise:NO];
-    [bgColor setFill];
-    [backgroundPath fill];
-
-    // The code paint code isn't properly centered.
-    CGContextTranslateCTM(context, -1, -1);
 
     UIBezierPath *batteryBodyPath = [UIBezierPath bezierPath];
 
@@ -1427,9 +1443,6 @@ static constexpr float kDefaultSpotRadius = 23.f;
                                                            cornerRadius:2]];
     batteryBodyPath.miterLimit = 4;
 
-    [color setFill];
-    [batteryBodyPath fill];
-
     UIBezierPath *batterySegmentPath = [UIBezierPath bezierPath];
 
     [batterySegmentPath moveToPoint:CGPointMake(17.5, 27)];
@@ -1448,6 +1461,47 @@ static constexpr float kDefaultSpotRadius = 23.f;
 
     [batterySegmentPath closePath];
     batterySegmentPath.miterLimit = 4;
+
+    CGContextSaveGState(context);
+
+    CGContextTranslateCTM(context, center.x, center.y);
+    CGContextScaleCTM(context, scale, scale);
+    CGContextTranslateCTM(context, -modelCenter.x, -modelCenter.y);
+
+    CGContextSaveGState(context);
+
+    if (!color) {
+        // If no foreground color is specified, knock out the path
+        // so that you can see through the battery to the background.
+        UIBezierPath *clipPath = [UIBezierPath bezierPathWithRect:CGRectInfinite];
+        [clipPath appendPath:batteryBodyPath];
+        [clipPath appendPath:batterySegmentPath];
+        clipPath.usesEvenOddFillRule = YES;
+
+        // The PaintCode battery isn't properly centered,
+        CGContextTranslateCTM(context, -1, -1);
+        [clipPath addClip];
+
+        // Revert change to translation for background fill.
+        CGContextTranslateCTM(context, 1, 1);
+        [bgColor setFill];
+        [backgroundPath fill];
+    } else {
+        [bgColor setFill];
+        [backgroundPath fill];
+
+        // The PaintCode battery isn't properly centered,
+        CGContextTranslateCTM(context, -1, -1);
+
+        [color setFill];
+        [batteryBodyPath fill];
+    }
+
+    CGContextRestoreGState(context);
+
+    // The battery segment animates, so we should always draw it.
+    // It may draw over the clipped battery mask.
+    CGContextTranslateCTM(context, -1, -1);
     [batterySegmentColor setFill];
     [batterySegmentPath fill];
 
