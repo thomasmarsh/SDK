@@ -327,9 +327,6 @@
 				LastUpgradeCheck = 0510;
 				ORGANIZATIONNAME = FiftyThree;
 				TargetAttributes = {
-					0489D47018CE75D100B41E20 = {
-						DevelopmentTeam = XHG73HYLJ8;
-					};
 					0489D49918CE75D100B41E20 = {
 						TestTargetID = 0489D47018CE75D100B41E20;
 					};
@@ -501,7 +498,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 0489D4C818CE780F00B41E20 /* TestAppDebug.xcconfig */;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "iPhone Developer";
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -510,7 +506,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 04C3133118D3828C008097D1 /* TestAppRelease.xcconfig */;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "iPhone Developer";
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
@@ -540,7 +535,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 0489D4C918CE780F00B41E20 /* TestAppProduction.xcconfig */;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "iPhone Developer";
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Production;
@@ -563,7 +557,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 04C3133018D3828C008097D1 /* TestAppPreview.xcconfig */;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "iPhone Developer";
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Preview;

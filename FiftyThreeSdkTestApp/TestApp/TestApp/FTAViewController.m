@@ -125,7 +125,7 @@
 {
     NSNumber *firmwareUpdateIsAvailable = [FTPenManager sharedInstance].firmwareUpdateIsAvailable;
 
-    if (YES) { // firmwareUpdateIsAvailable != nil && [firmwareUpdateIsAvailable boolValue]) {
+    if (firmwareUpdateIsAvailable != nil && [firmwareUpdateIsAvailable boolValue]) {
         BOOL isPaperInstalled = [FTPenManager sharedInstance].canInvokePaperToUpdatePencilFirmware;
         if (isPaperInstalled) {
             // We invoke Paper via url handlers. You can optionally specify urls so that
