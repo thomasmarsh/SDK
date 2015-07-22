@@ -118,6 +118,8 @@ constexpr CGFloat kDebugControlSpacing = 5.f;
 @property (nonatomic) FTPenManagerState lastPenManagerState;
 @property (nonatomic) NSMutableSet *ignoredTouchIds;
 
+@property (nonatomic) BOOL suppressFlashOnDisconnect;
+
 @end
 
 #pragma mark -
@@ -205,6 +207,15 @@ constexpr CGFloat kDebugControlSpacing = 5.f;
 - (void)setPenConnectionSpotRadius:(CGFloat)penConnectionSpotRadius
 {
     self.pairingSpotView.spotRadius = penConnectionSpotRadius;
+}
+
+- (void)setUseThinComets:(BOOL)useThinComets
+{
+    if (_useThinComets != useThinComets) {
+        _useThinComets = useThinComets;
+        self.suppressFlashOnDisconnect = useThinComets;
+        self.pairingSpotView.useThinComets = useThinComets;
+    }
 }
 
 - (CGFloat)spotViewWidth
@@ -352,7 +363,7 @@ constexpr CGFloat kDebugControlSpacing = 5.f;
             break;
 
         case FTPenManagerStateReconnecting:
-            if (self.pairingSpotView.useThinComets) {
+            if (self.suppressFlashOnDisconnect) {
                 // Pairing Spot should not go into a reconnecting (pulsing) state when Pencil is not connected.
                 [self.pairingSpotView setConnectionState:FTPairingSpotConnectionStateUnpaired
                                           isDisconnected:NO];
@@ -365,7 +376,7 @@ constexpr CGFloat kDebugControlSpacing = 5.f;
         case FTPenManagerStateDisconnected:
         case FTPenManagerStateDisconnectedLongPressToUnpair:
 
-            if (self.pairingSpotView.useThinComets) {
+            if (self.suppressFlashOnDisconnect) {
                 // Pairing Spot should not go into a reconnecting (pulsing) state or show battery state
                 // when Pencil is not connected.
                 [self.pairingSpotView setConnectionState:FTPairingSpotConnectionStateUnpaired
