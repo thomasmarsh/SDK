@@ -139,7 +139,9 @@ typedef NS_ENUM(NSInteger, FTPairingUIStyle) {
     FTPairingUIStyleDebug,
     // Uses an alternate visual style more compatible with the "flat" look of iOS7.
     // This style supports FTPairingUIStyleOverrides
-    FTPairingUIStyleFlat
+    FTPairingUIStyleFlat,
+    // Uses a visual style with thin comets, knocked-out graphics. Also suppresses flash while reconnecting.
+    FTPairingUIStyleCompact
 };
 
 #pragma mark -  FTPenManager

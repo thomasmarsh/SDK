@@ -49,6 +49,9 @@ typedef NS_ENUM(NSInteger, FTPairingSpotStyle) {
 
     /// Show the pairing UI as being inset into the glass.
     FTPairingSpotStyleInset = 1,
+
+    /// Show the pairing UI as flat but with thin comets and graphics that knock out the background color.
+    FTPairingSpotStyleThinKnockout = 2,
 };
 
 extern NSString *const kPairingSpotStateDidChangeNotificationName;
@@ -80,8 +83,6 @@ extern NSString *const kPairingSpotStateDidChangeNotificationName;
 @property (nonatomic) BOOL shouldSuspendNewAnimations;
 
 @property (nonatomic, readwrite) CGFloat spotRadius;
-
-@property (nonatomic) BOOL useThinComets;
 
 ///
 /// Controls different styles for the pairing spot. See

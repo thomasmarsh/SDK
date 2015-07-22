@@ -2476,6 +2476,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
         // Don't allow modification of the default UI. Only the flat UI can be tinted.
         MLOG_WARN(FTLogSDK, "Style overrides are not supported for the given FTPairingUIStyle: %d", (int)style);
     }
+
     penConnectionView.penManager = self;
     penConnectionView.suppressDialogs = YES;
     penConnectionView.isActive = true;

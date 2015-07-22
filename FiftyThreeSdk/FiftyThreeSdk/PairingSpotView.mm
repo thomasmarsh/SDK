@@ -901,14 +901,11 @@ static constexpr float kDefaultSpotRadius = 23.f;
         tint = [UIColor colorWithHue:0.f saturation:0.f brightness:1.f alpha:1.f];
     }
 
-    if (!self.useThinComets) {
-        // No well underlay if we're using thin comets.
-        if (FTPairingSpotStyleInset == self.style) {
-            [PairingSpotView drawWellUnderlayToContext:context
-                                            withCenter:wellCenter
-                                                radius:wellRadius
-                                    andBackgroundColor:self.unselectedTintColor];
-        }
+    if (FTPairingSpotStyleInset == self.style) {
+        [PairingSpotView drawWellUnderlayToContext:context
+                                        withCenter:wellCenter
+                                            radius:wellRadius
+                                andBackgroundColor:self.unselectedTintColor];
     }
 
     for (PairingSpotIconAnimation *iconAnimation in self.iconAnimations) {
@@ -979,7 +976,7 @@ static constexpr float kDefaultSpotRadius = 23.f;
             case FTPairingSpotIconTypeCriticallyLowBattery: {
                 UIColor *batterySegmentColor = figureColor;
 
-                if (self.useThinComets && iconAnimation.iconType == FTPairingSpotIconTypeCriticallyLowBattery) {
+                if (self.style == FTPairingSpotStyleThinKnockout && iconAnimation.iconType == FTPairingSpotIconTypeCriticallyLowBattery) {
                     // Use FiftyThree $OrangeLight background for critically low battery
                     iconColor = [UIColor colorWithRed:1.f green:.56f blue:.37f alpha:1.f];
                 }
@@ -1005,7 +1002,7 @@ static constexpr float kDefaultSpotRadius = 23.f;
 
                         CGFloat batterySegmentAlpha = Lerp<CGFloat>(1.f, figureColorBrightness, batterySegmentOpacity);
 
-                        if (self.useThinComets) {
+                        if (self.style == FTPairingSpotStyleThinKnockout) {
                             // When using thin comets, the battery is knocked out, so the battery segment
                             // should flash over the background. Mix it with the background color here.
                             batterySegmentColor = [iconColor colorWithAlphaComponent:batterySegmentAlpha];
@@ -1016,7 +1013,7 @@ static constexpr float kDefaultSpotRadius = 23.f;
                     }
                 }
 
-                if (self.useThinComets && iconAnimation.iconType == FTPairingSpotIconTypeLowBattery) {
+                if (self.style == FTPairingSpotStyleThinKnockout && iconAnimation.iconType == FTPairingSpotIconTypeLowBattery) {
                     // When using thin comets, the battery segment should be knocked out.
                     batterySegmentColor = nil;
                 }
@@ -1025,7 +1022,7 @@ static constexpr float kDefaultSpotRadius = 23.f;
                                                withCenter:wellCenter
                                                     scale:currentIconScale
                                       batterySegmentColor:batterySegmentColor
-                                          foregroundColor:(self.useThinComets ? nil : figureColor)
+                                          foregroundColor:(self.style == FTPairingSpotStyleThinKnockout ? nil : figureColor)
                                        andBackgroundColor:iconColor];
                 break;
             }
@@ -1035,19 +1032,16 @@ static constexpr float kDefaultSpotRadius = 23.f;
                 [PairingSpotView drawPencilIconToContext:context
                                               withCenter:wellCenter
                                                    scale:currentIconScale
-                                         foregroundColor:(self.useThinComets ? nil : figureColor)
+                                         foregroundColor:(self.style == FTPairingSpotStyleThinKnockout ? nil : figureColor)
                                       andBackgroundColor:iconColor];
                 break;
         }
     }
 
-    if (!self.useThinComets) {
-        // No well overlay if we're using thin comets.
-        if (FTPairingSpotStyleInset == self.style) {
-            [PairingSpotView drawWellOverlayToContext:context
-                                           withCenter:wellCenter
-                                               radius:wellRadius];
-        }
+    if (FTPairingSpotStyleInset == self.style) {
+        [PairingSpotView drawWellOverlayToContext:context
+                                       withCenter:wellCenter
+                                           radius:wellRadius];
     }
 
     if (wellMargin > 0.f) {
@@ -1075,7 +1069,7 @@ static constexpr float kDefaultSpotRadius = 23.f;
 
         CGFloat alphaLerpMax = 0.f;
 
-        if (self.useThinComets) {
+        if (self.style == FTPairingSpotStyleThinKnockout) {
             alphaLerpMax = 6.f;
             self.cometsLayer.radius = wellRadius - 4.f;
             self.cometsLayer.width = wellMargin - 10.f;

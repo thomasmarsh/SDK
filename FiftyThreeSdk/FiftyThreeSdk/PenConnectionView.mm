@@ -209,15 +209,6 @@ constexpr CGFloat kDebugControlSpacing = 5.f;
     self.pairingSpotView.spotRadius = penConnectionSpotRadius;
 }
 
-- (void)setUseThinComets:(BOOL)useThinComets
-{
-    if (_useThinComets != useThinComets) {
-        _useThinComets = useThinComets;
-        self.suppressFlashOnDisconnect = useThinComets;
-        self.pairingSpotView.useThinComets = useThinComets;
-    }
-}
-
 - (CGFloat)spotViewWidth
 {
     return 81.f;
@@ -467,6 +458,12 @@ constexpr CGFloat kDebugControlSpacing = 5.f;
         case FTPairingUIStyleFlat: {
             self.debugControlsVisibility = VisibilityStateHidden;
             _pairingSpotView.style = FTPairingSpotStyleFlat;
+            break;
+        }
+        case FTPairingUIStyleCompact: {
+            self.debugControlsVisibility = VisibilityStateHidden;
+            self.suppressFlashOnDisconnect = YES;
+            _pairingSpotView.style = FTPairingSpotStyleThinKnockout;
             break;
         }
         case FTPairingUIStyleDefault:
