@@ -164,12 +164,6 @@ constexpr CGFloat kDebugControlSpacing = 5.f;
 
         [self updateViews];
 
-        auto classifier = ActiveClassifier::Instance();
-        DebugAssert(classifier);
-        self.touchClassificationsDidChangeAdapter = EventToObjCAdapter<const std::vector<TouchClassificationChangedEventArgs> &>::Bind(classifier->TouchClassificationsDidChange(),
-                                                                                                                                       self,
-                                                                                                                                       @selector(touchClassificationsDidChange));
-
         // Add a gesture recognizer to the view to capture _ANY_ gestures that occur while pressing on the
         // pairing spot. We do this to block the panning of the tray, etc. (We don't want the tray to pan
         // while the pairing spot is being pressed.)
@@ -216,13 +210,15 @@ constexpr CGFloat kDebugControlSpacing = 5.f;
 
 - (void)updateLayoutForDebugControls
 {
-    self.size = (CGSize){self.spotViewWidth, 81.f};
+    self.size = (CGSize){self.spotViewWidth, self.spotViewWidth};
 
-    if (self.debugControlsVisibility != VisibilityStateCollapsed) {
-        // PenConnectionView has extra space at the top for debug controls (which may be hidden or visible).
-        // Equal space is added to the bottom so that the spot is centered within the view.
-        constexpr CGFloat kDebugSpace = 20;
-        self.height += kDebugSpace * 2;
+    if (self.style != FTPairingUIStyleCompact) {
+        if (self.debugControlsVisibility != VisibilityStateCollapsed) {
+            // PenConnectionView has extra space at the top for debug controls (which may be hidden or visible).
+            // Equal space is added to the bottom so that the spot is centered within the view.
+            constexpr CGFloat kDebugSpace = 20;
+            self.height += kDebugSpace * 2;
+        }
     }
 
     [_pairingSpotView centerInSuperview];
@@ -450,6 +446,7 @@ constexpr CGFloat kDebugControlSpacing = 5.f;
 
 - (void)setStyle:(FTPairingUIStyle)style
 {
+    _style = style;
     switch (style) {
         case FTPairingUIStyleDebug: {
             self.debugControlsVisibility = VisibilityStateVisible;
@@ -472,6 +469,7 @@ constexpr CGFloat kDebugControlSpacing = 5.f;
             _pairingSpotView.style = FTPairingSpotStyleInset;
         }
     }
+    [self updateViews];
 }
 
 #pragma mark - Pen Notifications
@@ -672,6 +670,15 @@ constexpr CGFloat kDebugControlSpacing = 5.f;
 - (void)updatePairingSpotTouch
 {
     BOOL shouldIgnore = NO;
+
+    if (!self.touchClassificationsDidChangeAdapter) {
+        auto classifier = ActiveClassifier::Instance();
+        if (classifier) {
+            self.touchClassificationsDidChangeAdapter = EventToObjCAdapter<const std::vector<TouchClassificationChangedEventArgs> &>::Bind(classifier->TouchClassificationsDidChange(),
+                                                                                                                                           self,
+                                                                                                                                           @selector(touchClassificationsDidChange));
+        }
+    }
 
     // Determine if there's a valid pairing spot touch.
     NSArray *allUITouches = spc<TouchTrackerObjC>(TouchTracker::Instance())->AllUITouches();
