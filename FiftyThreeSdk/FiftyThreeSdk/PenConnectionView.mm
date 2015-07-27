@@ -672,6 +672,9 @@ constexpr CGFloat kDebugControlSpacing = 5.f;
     BOOL shouldIgnore = NO;
 
     if (!self.touchClassificationsDidChangeAdapter) {
+        // In Paper, the tray is created before an ActiveClassifier exists.
+        // If we wait to create this adapter until a touch has come in, we can guarantee that
+        // ActiveClassifier exists and can add the adapter.
         auto classifier = ActiveClassifier::Instance();
         if (classifier) {
             self.touchClassificationsDidChangeAdapter = EventToObjCAdapter<const std::vector<TouchClassificationChangedEventArgs> &>::Bind(classifier->TouchClassificationsDidChange(),
