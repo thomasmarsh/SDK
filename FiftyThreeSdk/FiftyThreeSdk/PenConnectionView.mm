@@ -119,6 +119,7 @@ constexpr CGFloat kDebugControlSpacing = 5.f;
 @property (nonatomic) NSMutableSet *ignoredTouchIds;
 
 @property (nonatomic) BOOL suppressFlashOnDisconnect;
+@property (nonatomic) BOOL suppressPenManagerUpdates;
 
 @end
 
@@ -314,8 +315,29 @@ constexpr CGFloat kDebugControlSpacing = 5.f;
     self.pairingSpotView.shouldSuspendNewAnimations = shouldSuspendNewAnimations;
 }
 
+- (void)setSuppressPenManagerUpdates:(BOOL)suppressPenManagerUpdates
+{
+    // If there are two or more pairing spots on the screen (as in Paper on iPad, when the Pencil dialog
+    // is showing), we want to stop one of them from updating while the second is on screen.
+    // Rather than listening for animations to end, we'll ignore the Pen Manager updates
+    // on the first one in favor the of the second one.
+    //
+    // Once the first one is turned back one, it will update to reflect the current status.
+    if (suppressPenManagerUpdates != self.suppressPenManagerUpdates) {
+        _suppressPenManagerUpdates = suppressPenManagerUpdates;
+
+        if (!_suppressPenManagerUpdates) {
+            [self updatePairingSpotConnectionState];
+        }
+    }
+}
+
 - (void)updatePairingSpotConnectionState
 {
+    if (self.suppressPenManagerUpdates) {
+        return;
+    }
+
     DebugAssert(self.penManager);
 
     switch (self.penManager.state) {

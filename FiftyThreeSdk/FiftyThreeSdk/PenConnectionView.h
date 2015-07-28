@@ -55,5 +55,8 @@ typedef NS_ENUM(NSInteger, VisibilityState) {
 @end
 
 @interface PenConnectionView (Paper)
+
 @property (nonatomic, readonly) PairingSpotView *pairingSpotView;
+@property (nonatomic) BOOL suppressPenManagerUpdates;
+
 @end
