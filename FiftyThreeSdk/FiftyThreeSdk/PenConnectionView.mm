@@ -326,7 +326,7 @@ constexpr CGFloat kDebugControlSpacing = 5.f;
     if (suppressPenManagerUpdates != self.suppressPenManagerUpdates) {
         _suppressPenManagerUpdates = suppressPenManagerUpdates;
 
-        if (!_suppressPenManagerUpdates) {
+        if (!_suppressPenManagerUpdates && self.penManager) {
             [self updatePairingSpotConnectionState];
         }
     }
