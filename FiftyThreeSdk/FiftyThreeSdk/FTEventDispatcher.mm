@@ -97,7 +97,8 @@ using namespace fiftythree::sdk;
         if (classifier) {
             std::set<fiftythree::core::Touch::cPtr> touches;
 
-            for (UITouch *t in [event allTouches]) {
+            auto rootWindow = spc<TouchTrackerObjC>(TouchTracker::Instance())->RootView().window;
+            for (UITouch *t in [event touchesForWindow:rootWindow]) {
                 auto touch = spc<TouchTrackerObjC>(TouchTracker::Instance())->TouchForUITouch(t);
                 touches.insert(touch);
             }
