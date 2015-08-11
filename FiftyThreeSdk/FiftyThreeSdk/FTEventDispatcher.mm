@@ -2,7 +2,7 @@
 //  FTEventDispatcher.mm
 //  FiftyThreeSdk
 //
-//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
+//  Copyright (c) 2015 FiftyThree, Inc. All rights reserved.
 //
 #import <dispatch/dispatch.h>
 #import <UIKit/UIKit.h>
@@ -97,6 +97,9 @@ using namespace fiftythree::sdk;
         if (classifier) {
             std::set<fiftythree::core::Touch::cPtr> touches;
 
+            // Note that the touches are filtered to the window that TouchTracker is watching. A set of touches that
+            // span multiple windows (for example, a pinch gesture where one finger is over the keyboard) will
+            // be delivered in multiple UIEvents, one per window, and TouchTracker doesn't currently handle that.
             auto rootWindow = spc<TouchTrackerObjC>(TouchTracker::Instance())->RootView().window;
             for (UITouch *t in [event touchesForWindow:rootWindow]) {
                 auto touch = spc<TouchTrackerObjC>(TouchTracker::Instance())->TouchForUITouch(t);
