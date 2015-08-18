@@ -15,6 +15,7 @@ extern NSString *const kFTPenUnexpectedDisconnectNotificationName;
 extern NSString *const kFTPenUnexpectedDisconnectWhileConnectingNotifcationName;
 extern NSString *const kFTPenUnexpectedDisconnectWhileUpdatingFirmwareNotificationName;
 
+extern NSString *const kFTPenManagerFirmwareUpdateAvailableDidChange;
 extern NSString *const kFTPenManagerFirmwareUpdateDidBegin;
 extern NSString *const kFTPenManagerFirmwareUpdateDidPrepare;
 extern NSString *const kFTPenManagerFirmwareUpdateDidBeginSendingUpdate;

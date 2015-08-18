@@ -43,6 +43,7 @@ NSString *const kFTPenUnexpectedDisconnectNotificationName = @"com.fiftythree.pe
 NSString *const kFTPenUnexpectedDisconnectWhileConnectingNotifcationName = @"com.fiftythree.penManager.unexpectedDisconnectWhileConnecting";
 NSString *const kFTPenUnexpectedDisconnectWhileUpdatingFirmwareNotificationName = @"com.fiftythre.penManager.unexpectedDisconnectWhileUpdatingFirmware";
 
+NSString *const kFTPenManagerFirmwareUpdateAvailableDidChange = @"com.fiftythree.penManger.firmwareUpdateAvailable";
 NSString *const kFTPenManagerFirmwareUpdateDidPrepare = @"com.fiftythree.penManger.firmwareUpdateDidPrepare";
 NSString *const kFTPenManagerFirmwareUpdateWaitingForPencilTipRelease = @"com.fiftythree.penManger.firmwareUpdateWaitingForPencilTipPress";
 NSString *const kFTPenManagerFirmwareUpdateDidBegin = @"com.fiftythree.penManger.firmwareUpdateDidBegin";
@@ -612,7 +613,6 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
             } else {
                 self.info.firmwareRevision = nil;
             }
-            [self attemptLoadFirmwareFromNetworkForVersionChecking];
             if (currentVersion != -1) {
                 [self updateFirmwareUpdateIsAvailble];
             }
@@ -878,6 +878,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
         weakSelf.state = FTPenManagerStateConnected;
         weakSelf.didConnectViaWarmStart = NO;
 
+        [self attemptLoadFirmwareFromNetworkForVersionChecking];
         [self updatePenInfoObjectAndInvokeDelegate];
         [self ensureCentralId];
 
@@ -1389,7 +1390,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
     [self.delegate penManagerStateDidChange:self.state];
 
-    [self attemptLoadFirmwareFromNetwork];
+    [self attemptLoadFirmwareFromNetworkForVersionChecking];
 }
 
 - (void)stateMachineDidChangeState:(NSNotification *)notification
@@ -1932,6 +1933,8 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     NSNumber *oldValue = self.firmwareUpdateIsAvailable;
     _firmwareUpdateIsAvailable = firmwareUpdateIsAvailable;
     if (oldValue != firmwareUpdateIsAvailable) {
+        [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenManagerFirmwareUpdateAvailableDidChange
+                                                            object:self];
         // OK let the outside world know
         if ([self.delegate respondsToSelector:@selector(penManagerFirmwareUpdateIsAvailableDidChange)]) {
             [self.delegate penManagerFirmwareUpdateIsAvailableDidChange];
@@ -2015,7 +2018,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 {
     BOOL checkedRecently = self.lastFirmwareNetworkCheckTime && fabs([self.lastFirmwareNetworkCheckTime timeIntervalSinceNow]) > 60.0 * 5; // 5 minutes.
 
-    if (!self.isFetchingLatestFirmware && !checkedRecently && self.state != FTPenManagerStateUpdatingFirmware) {
+    if (self.shouldCheckForFirmwareUpdates && !self.isFetchingLatestFirmware && !checkedRecently && self.state != FTPenManagerStateUpdatingFirmware) {
         self.isFetchingLatestFirmware = YES;
 
         __weak FTPenManager *weakSelf = self;
