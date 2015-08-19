@@ -12,7 +12,7 @@
 @interface FTFirmwareManager (Private)
 
 + (NSURL *)firmwareURL;
-+ (void)fetchFirmware:(NSURL *)firmwareUrl withCompletionHandler:(void (^)(NSData *))handler;
++ (id<FTFirmwareManagerCompletion>)fetchFirmware:(NSURL *)firmwareUrl withCompletionHandler:(void (^)(NSData *))handler;
 + (BOOL)firmwareVersionOnPen:(FTPen *)pen
                 forImageType:(FTFirmwareImageType)imageType
                      version:(NSInteger *)version

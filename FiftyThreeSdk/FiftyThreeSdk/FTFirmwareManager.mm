@@ -16,6 +16,30 @@
 
 using namespace fiftythree::core;
 
+@interface FTFirmwareManagerCompletionImpl : NSObject<FTFirmwareManagerCompletion>
+
+@property(nonatomic) NSURLSessionTask* task;
+
+@end
+
+@implementation FTFirmwareManagerCompletionImpl
+
+- (id)initWithTask:(NSURLSessionTask *)task
+{
+    self = [super init];
+    if (self) {
+        self.task = task;
+    }
+    return self;
+}
+
+- (void)cancel
+{
+    [self.task cancel];
+}
+
+@end
+
 static NSString *applicationDocumentsDirectory()
 {
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
@@ -70,13 +94,12 @@ static NSString *applicationDocumentsDirectory()
     return [NSURL URLWithString:endPoint];
 }
 
-+ (void)fetchLatestFirmwareWithCompletionHandler:(void (^)(NSData *))handler
++ (id<FTFirmwareManagerCompletion>)fetchLatestFirmwareWithCompletionHandler:(void (^)(NSData *))handler
 {
-    [FTFirmwareManager fetchFirmware:[FTFirmwareManager firmwareURL]
-               withCompletionHandler:handler];
+    return [FTFirmwareManager fetchFirmware:[FTFirmwareManager firmwareURL] withCompletionHandler:handler];
 }
 
-+ (void)fetchFirmware:(NSURL *)firmwareUrl withCompletionHandler:(void (^)(NSData *))handler
++ (id<FTFirmwareManagerCompletion>)fetchFirmware:(NSURL *)firmwareUrl withCompletionHandler:(void (^)(NSData *))handler
 {
     NSURLSessionConfiguration *defaultConfigObject = [NSURLSessionConfiguration defaultSessionConfiguration];
     defaultConfigObject.allowsCellularAccess = NO;
@@ -85,7 +108,7 @@ static NSString *applicationDocumentsDirectory()
                                                                       delegate:nil
                                                                  delegateQueue:[NSOperationQueue mainQueue]];
 
-    [[delegateFreeSession dataTaskWithURL:firmwareUrl
+    NSURLSessionTask* task = [delegateFreeSession dataTaskWithURL:firmwareUrl
                         completionHandler:^(NSData *data,
                                             NSURLResponse *response,
                                             NSError *error) {
@@ -109,7 +132,9 @@ static NSString *applicationDocumentsDirectory()
                                     handler(nil);
                                 }
                             });
-                        }] resume];
+                        }];
+    [task resume];
+    return [[FTFirmwareManagerCompletionImpl alloc] initWithTask: task];
 }
 
 + (NSInteger)versionOfImage:(NSData *)image

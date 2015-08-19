@@ -28,6 +28,14 @@ typedef struct {
     
 } TIFirmwareImageHeader;
 
+// Provides control over pending completions
+@protocol FTFirmwareManagerCompletion <NSObject>
+
+// Cancel the task that will invoke the completion.
+- (void)cancel;
+
+@end
+
 @interface FTFirmwareManager : NSObject
 
 + (NSString *)imagePath;
@@ -46,7 +54,7 @@ typedef struct {
 
 + (BOOL)imageTypeRunningOnPen:(FTPen *)pen andType:(FTFirmwareImageType *)type;
 
-+ (void)fetchLatestFirmwareWithCompletionHandler:(void (^)(NSData *))handler;
++ (id<FTFirmwareManagerCompletion>)fetchLatestFirmwareWithCompletionHandler:(void (^)(NSData *))handler;
 
 + (NSInteger)versionOfImage:(NSData *)image;
 

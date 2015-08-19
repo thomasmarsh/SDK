@@ -217,7 +217,6 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 @property (nonatomic) CBCentralManager *centralManager;
 
 @property (nonatomic, copy) NSString *firmwareImagePath;
-@property (nonatomic) NSInteger firmwareImageVersion;
 @property (nonatomic) TIUpdateManager *updateManager;
 
 @property (nonatomic) TKStateMachine *stateMachine;
@@ -263,7 +262,6 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 @property (nonatomic) NSInteger originalInactivityTimeout;
 
 @property (nonatomic) BOOL isFetchingLatestFirmware;
-@property (nonatomic) NSData *latestFirmware;
 @property (nonatomic) NSInteger latestFirmwareVersion;
 @property (nonatomic) NSDate *lastFirmwareNetworkCheckTime;
 
@@ -336,7 +334,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
         self.pairingViews = [@[] mutableCopy];
 
-        self.shouldCheckForFirmwareUpdates = NO;
+        _shouldCheckForFirmwareUpdates = NO;
         self.firmwareUpdateIsAvailable = nil;
         self.disableLongPressToUnpairIfTipPressed = NO;
     }
@@ -400,6 +398,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
         if (_state == FTPenManagerStateUpdatingFirmware) {
             self.tryToAutoStartFirmwareUpdate = NO;
             self.forceFirmwareUpdate = NO;
+            self.firmwareImagePath = nil;
         }
 
         _state = state;
@@ -511,6 +510,16 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 {
     return (self.pairedPeripheralUUID != NULL &&
             [peripheral.identifier isEqual:self.pairedPeripheralUUID]);
+}
+
+- (void)setShouldCheckForFirmwareUpdates:(BOOL)shouldCheck
+{
+    if (_shouldCheckForFirmwareUpdates != shouldCheck) {
+        _shouldCheckForFirmwareUpdates = shouldCheck;
+        if (shouldCheck) {
+            [self attemptLoadFirmwareFromNetworkForVersionChecking];
+        }
+    }
 }
 
 - (void)penDidEncounterError:(NSNotification *)notification
@@ -659,8 +668,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     if (hasInactivityTimeoutUpdated) {
         if ([self currentStateHasName:kUpdatingFirmwareStateName]) {
             FTAssert(self.pen, @"pen is non-nil");
-            FTAssert(0 == self.pen.inactivityTimeout, @"Peripheral sleep must be diabled for the duration of the update.");
-            if (self.tryToAutoStartFirmwareUpdate) {
+            if (0 == self.pen.inactivityTimeout && self.tryToAutoStartFirmwareUpdate) {
                 [self startUpdatingFirmware];
             }
         } else if (self.state != FTPenManagerStateUpdatingFirmware && self.pen.inactivityTimeout == 0) {
@@ -681,7 +689,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
             self.pen.softwareRevision &&
             !self.updateManager) {
             NSInteger runningFirmwareVersion = [FTFirmwareManager currentRunningFirmwareVersion:self.pen];
-            if (!self.forceFirmwareUpdate && runningFirmwareVersion >= self.firmwareImageVersion) {
+            if (!self.forceFirmwareUpdate && self.latestFirmwareVersion > 0 && runningFirmwareVersion >= self.latestFirmwareVersion) {
                 // we're done!
                 MLOG_DEBUG(FTLogSDK, "Successfully completed firmware update to %ld", runningFirmwareVersion);
                 [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenManagerFirmwareUpdateDidCompleteSuccessfully
@@ -697,7 +705,11 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
                 self.updateManager = [[TIUpdateManager alloc] initWithPeripheral:self.pen.peripheral
                                                                         delegate:self];
-                [self.updateManager updateWithImagePath:self.firmwareImagePath];
+                if (!self.firmwareImagePath) {
+                    [self.updateManager startUpdateFromWeb];
+                } else {
+                    [self.updateManager startUpdate:self.firmwareImagePath];
+                }
             }
         }
     }
@@ -1104,7 +1116,6 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     TKState *updatingFirmwareState = [TKState stateWithName:kUpdatingFirmwareStateName];
     [updatingFirmwareState setDidEnterStateBlock:^(TKState *state, TKStateMachine *stateMachine) {
         FTAssert(weakSelf.pen, @"Pen must be non-nil");
-        FTAssert(weakSelf.firmwareImagePath, @"firmwareImagePath must be non-nil");
         FTAssert(!weakSelf.updateManager, @"Update manager must be nil");
 
         weakSelf.state = FTPenManagerStateUpdatingFirmware;
@@ -1155,7 +1166,6 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     TKState *updatingFirmwareStartedState = [TKState stateWithName:kUpdatingFirmwareStartedStateName];
     [updatingFirmwareStartedState setDidEnterStateBlock:^(TKState *state, TKStateMachine *stateMachine) {
         FTAssert(weakSelf.pen, @"Pen must be non-nil");
-        FTAssert(weakSelf.firmwareImagePath, @"firmwareImagePath must be non-nil");
         FTAssert(!weakSelf.updateManager, @"Update manager must be nil");
 
         [self possiblyStartEnsureHasListenerTimer];
@@ -1179,7 +1189,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
         [weakSelf.updateManager cancelUpdate];
         weakSelf.updateManager = nil;
 
-        weakSelf.pen.inactivityTimeout = weakSelf.originalInactivityTimeout;
+        weakSelf.pen.inactivityTimeout = (weakSelf.originalInactivityTimeout == -1) ? kInactivityTimeoutMinutes : weakSelf.originalInactivityTimeout;
     }];
 
     [self.stateMachine addStates:@[
@@ -2009,44 +2019,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
     if (isOlderThanADay) {
         self.lastFirmwareNetworkCheckTime = nil;
-        self.latestFirmware = nil;
         self.latestFirmwareVersion = -1;
-    }
-}
-
-- (void)attemptLoadFirmwareFromNetwork
-{
-    BOOL checkedRecently = self.lastFirmwareNetworkCheckTime && fabs([self.lastFirmwareNetworkCheckTime timeIntervalSinceNow]) > 60.0 * 5; // 5 minutes.
-
-    if (self.shouldCheckForFirmwareUpdates && !self.isFetchingLatestFirmware && !checkedRecently && self.state != FTPenManagerStateUpdatingFirmware) {
-        self.isFetchingLatestFirmware = YES;
-
-        __weak FTPenManager *weakSelf = self;
-
-        [FTFirmwareManager fetchLatestFirmwareWithCompletionHandler:^(NSData *data) {
-             FTPenManager *strongSelf = weakSelf;
-             if (strongSelf)
-             {
-                 strongSelf.isFetchingLatestFirmware = NO;
-                 if (data)
-                 {
-                     NSInteger version = [FTFirmwareManager versionOfImage:data];
-                     NSInteger currentVersion = [FTFirmwareManager currentRunningFirmwareVersion:self.pen];
-
-                     if (version > strongSelf.latestFirmwareVersion)
-                     {
-                         strongSelf.latestFirmware = data;
-                         strongSelf.latestFirmwareVersion = version;
-                         strongSelf.lastFirmwareNetworkCheckTime = [NSDate date];
-
-                         if (currentVersion != -1 && version != -1 && currentVersion != version)
-                         {
-                             strongSelf.firmwareUpdateIsAvailable = @(YES);
-                         }
-                     }
-                 }
-             }
-        }];
     }
 }
 
@@ -2054,11 +2027,10 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
                           updateVersion:(NSInteger *)updateVersion
 {
     [self ensureRecentInMemoryFirmware];
-    [self attemptLoadFirmwareFromNetwork];
 
     *currentVersion = [FTFirmwareManager currentRunningFirmwareVersion:self.pen];
 
-    if (*currentVersion != -1 && self.latestFirmware) {
+    if (*currentVersion != -1) {
         *updateVersion = self.latestFirmwareVersion;
         return @(*updateVersion > *currentVersion);
     }
@@ -2067,11 +2039,9 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
 - (BOOL)prepareFirmwareUpdate
 {
-    if (self.latestFirmware) {
-        return [self prepareFirmwareUpdateInternal:nil
-                                       forceUpdate:NO
-                                   autoStartUpdate:NO];
-    }
+    return [self prepareFirmwareUpdateInternal:nil
+                                   forceUpdate:NO
+                               autoStartUpdate:NO];
     return NO;
 }
 
@@ -2086,11 +2056,9 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
 - (BOOL)updateFirmware
 {
-    if (self.latestFirmware) {
-        return [self prepareFirmwareUpdateInternal:nil
-                                       forceUpdate:NO
-                                   autoStartUpdate:YES];
-    }
+    return [self prepareFirmwareUpdateInternal:nil
+                                   forceUpdate:NO
+                               autoStartUpdate:YES];
     return NO;
 }
 
@@ -2107,52 +2075,33 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
                           forceUpdate:(BOOL)forced
                       autoStartUpdate:(BOOL)autoStart
 {
-    if (!firmwareImagePath) {
-        if ([self currentStateHasName:kUpdatingFirmwareStateName] &&
-            self.forceFirmwareUpdate == forced &&
-            self.tryToAutoStartFirmwareUpdate == autoStart) {
-            MLOG_DEBUG(FTLogSDK, "Firmware update already prepared.");
-            [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenManagerFirmwareUpdateDidPrepare
-                                                                object:self];
-            return YES;
-        }
-
-        if (![self.stateMachine canFireEvent:kUpdateFirmwareEventName]) {
-            MLOG_WARN(FTLogSDK, "Attempt to prepare firmware update failed. The manager was not ready and might already be updating firmware.");
-            return NO;
-        }
-
-        if (!self.latestFirmware) {
-            MLOG_ERROR(FTLogSDK, "prepareFirmwareUpdate called without any firmware image and when no firmware image was available.");
-            return NO;
-        }
-
-        // Write it.
-        NSString *tempFilePath = [NSTemporaryDirectory() stringByAppendingPathComponent:[[NSUUID UUID] UUIDString]];
-        [self.latestFirmware writeToFile:tempFilePath atomically:YES];
-        // Update.
-        self.firmwareImagePath = tempFilePath;
-
-    } else {
-        if ([self currentStateHasName:kUpdatingFirmwareStateName] &&
-            [self.firmwareImagePath isEqualToString:firmwareImagePath] &&
-            self.forceFirmwareUpdate == forced &&
-            self.tryToAutoStartFirmwareUpdate == autoStart) {
-            MLOG_DEBUG(FTLogSDK, "Firmware update already prepared.");
-            [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenManagerFirmwareUpdateDidPrepare
-                                                                object:self];
-            return YES;
-        }
-
-        if (![self.stateMachine canFireEvent:kUpdateFirmwareEventName]) {
-            MLOG_WARN(FTLogSDK, "Attempt to prepare firmware update failed. The manager was not ready and might already be updating firmware.");
-            return NO;
-        }
-
-        self.firmwareImagePath = firmwareImagePath;
+    
+    if (([self currentStateHasName:kUpdatingFirmwareStartedStateName] ||
+         [self currentStateHasName:kUpdatingFirmwareStateName] ||
+         [self currentStateHasName:kUpdatingFirmwareAttemptingConnectionStateName] ||
+         [self currentStateHasName:kUpdatingFirmwareWaitingForTipReleaseStateName])
+        &&
+        ((!firmwareImagePath && !self.firmwareImagePath) || (firmwareImagePath && [self.firmwareImagePath isEqualToString:firmwareImagePath]))
+        &&
+        self.forceFirmwareUpdate == forced && self.tryToAutoStartFirmwareUpdate == autoStart)
+    {
+        MLOG_DEBUG(FTLogSDK, "Firmware update already prepared.");
+        [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenManagerFirmwareUpdateDidPrepare
+                                                            object:self];
+        return YES;
+    }
+    
+    if (![self.stateMachine canFireEvent:kUpdateFirmwareEventName]) {
+        MLOG_WARN(FTLogSDK, "Attempt to prepare firmware update failed. The manager was not ready and might already be updating firmware.");
+        return NO;
     }
 
-    self.firmwareImageVersion = [FTFirmwareManager versionOfImageAtPath:self.firmwareImagePath];
+    self.firmwareImagePath = firmwareImagePath;
+    
+    if (self.firmwareImagePath) {
+        self.latestFirmwareVersion = [FTFirmwareManager versionOfImageAtPath:self.firmwareImagePath];
+    }
+    
     self.forceFirmwareUpdate = forced;
     self.tryToAutoStartFirmwareUpdate = autoStart;
 
@@ -2187,7 +2136,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 - (void)cancelFirmwareUpdate
 {
     if (self.state == FTPenManagerStateUpdatingFirmware) {
-        self.pen.inactivityTimeout = self.originalInactivityTimeout;
+        self.pen.inactivityTimeout = (self.originalInactivityTimeout == -1) ? kInactivityTimeoutMinutes : self.originalInactivityTimeout;
 
         if (self.pen && [self.stateMachine canFireEvent:kBecomeMarriedEventName]) {
             [self fireStateMachineEvent:kBecomeMarriedEventName];
@@ -2200,6 +2149,16 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 }
 
 #pragma mark - TIUpdateManagerDelegate
+
+- (void)updateManager:(TIUpdateManager *)manager didLoadFirmwareFromWeb:(NSInteger)firmwareVersion
+{
+    if (!self.forceFirmwareUpdate && firmwareVersion < [FTFirmwareManager currentRunningFirmwareVersion:self.pen]) {
+        [manager cancelUpdate];
+    } else if (self.latestFirmwareVersion != firmwareVersion) {
+        self.latestFirmwareVersion = firmwareVersion;
+        self.firmwareUpdateIsAvailable = @(YES);
+    }
+}
 
 - (void)updateManager:(TIUpdateManager *)manager didBeginUpdateToVersion:(uint16_t)firmwareUpdateVersion
 {

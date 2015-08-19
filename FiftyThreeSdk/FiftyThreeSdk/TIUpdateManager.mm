@@ -2,7 +2,7 @@
 //  TIUpdateManager.mm
 //  FiftyThreeSdk
 //
-//  Copyright (c) 2014 FiftyThree, Inc. All rights reserved.
+//  Copyright (c) 2015 FiftyThree, Inc. All rights reserved.
 //
 
 #include "Core/Timer.h"
@@ -13,6 +13,7 @@
 #import "Core/Log.h"
 #import "Core/NSTimer+Helpers.h"
 #import "FTError.h"
+#import "FTFirmwareManager.h"
 #import "FTLogPrivate.h"
 #import "TIUpdateManager.h"
 
@@ -31,6 +32,7 @@ static NSString *const kImageBlockTransferUUID = @"F000FFC2-0451-4000-B000-00000
 @property (nonatomic, weak) id<TIUpdateManagerDelegate> delegate;
 @property (nonatomic, weak) id<CBPeripheralDelegate> oldPeripheralDelegate;
 
+@property (nonatomic) id<FTFirmwareManagerCompletion> firmwareLoadCompletion;
 @property (nonatomic) CBPeripheral *peripheral;
 @property (nonatomic) CBCharacteristic *imageIdentifyCharacteristic;
 @property (nonatomic) CBCharacteristic *imageBlockTransferCharacteristic;
@@ -69,6 +71,11 @@ static NSString *const kImageBlockTransferUUID = @"F000FFC2-0451-4000-B000-00000
 
 - (void)cleanup
 {
+    if (self.firmwareLoadCompletion) {
+        [self.firmwareLoadCompletion cancel];
+        self.firmwareLoadCompletion = nil;
+    }
+    
     _imageIdentifyCharacteristic = nil;
     _imageBlockTransferCharacteristic = nil;
     [self stopImageBlockWrite];
@@ -86,7 +93,35 @@ static NSString *const kImageBlockTransferUUID = @"F000FFC2-0451-4000-B000-00000
     }
 }
 
-- (void)updateWithImagePath:(NSString *)imagePath
+- (void)startUpdateFromWeb
+{
+    if (nil == self.firmwareLoadCompletion) {
+        __weak TIUpdateManager *weakSelf = self;
+        
+        self.firmwareLoadCompletion = [FTFirmwareManager fetchLatestFirmwareWithCompletionHandler:^(NSData *data) {
+            TIUpdateManager *strongSelf = weakSelf;
+            if (strongSelf) {
+                NSString *tempFilePath = [NSTemporaryDirectory() stringByAppendingPathComponent:[[NSUUID UUID] UUIDString]];
+
+                if (data && [data writeToFile:tempFilePath atomically:YES]) {
+                    NSInteger firmwareVersionOnWeb = [FTFirmwareManager versionOfImageAtPath:tempFilePath];
+                    
+                    [self.delegate updateManager:strongSelf didLoadFirmwareFromWeb:firmwareVersionOnWeb];
+                    
+                    [strongSelf startUpdate:tempFilePath];
+                } else {
+                    NSError* error = [[NSError alloc] initWithDomain:@"TIUpdateManager"
+                                                                code:FTErrorInvalid
+                                                            userInfo:nil];
+                    [strongSelf doneWithError:error];
+                }
+                strongSelf.firmwareLoadCompletion = nil;
+            }
+        }];
+    }
+}
+
+- (void)startUpdate:(NSString *)imagePath
 {
     FTAssert(self.state == TIUpdateManagerStateNotStarted,
              @"Firmware may only be updated once using a single update manager.");

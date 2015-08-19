@@ -86,7 +86,7 @@
                                                                 target:self
                                                                 action:@selector(updateFirmware:)];
 
-    self.updateFirmwareButton.enabled = YES;
+    self.updateFirmwareButton.enabled = NO;
 
     [self.bar setItems:@[ shutdownButton, startupButton, spacer, clearButton, self.updateFirmwareButton, self.infoButton ]];
     self.bar.barStyle = UIBarStyleBlack;
@@ -240,7 +240,14 @@
 // Invoked when the connection state is altered.
 - (void)penManagerStateDidChange:(FTPenManagerState)state
 {
-    self.infoButton.enabled = FTPenManagerStateIsConnected(state);
+    if (FTPenManagerStateIsConnected(state)) {
+        self.infoButton.enabled = YES;
+        NSNumber *firmwareUpdateIsAvailable = [FTPenManager sharedInstance].firmwareUpdateIsAvailable;
+        self.updateFirmwareButton.enabled = (firmwareUpdateIsAvailable != nil && [firmwareUpdateIsAvailable boolValue]);
+    } else {
+        self.updateFirmwareButton.enabled = NO;
+        self.infoButton.enabled = NO;
+    }
 }
 
 // Invoked when any of the BTLE information is read off the pen. See FTPenInformation.
