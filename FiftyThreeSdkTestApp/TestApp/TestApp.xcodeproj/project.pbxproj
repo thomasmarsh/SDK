@@ -35,6 +35,7 @@
 		04BD4AD518D74EC4003FCCCF /* TrivialBlit.vsh in Resources */ = {isa = PBXBuildFile; fileRef = 04C3135C18D74E85008097D1 /* TrivialBlit.vsh */; };
 		04C3133C18D3841B008097D1 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 04C3133B18D3841B008097D1 /* QuartzCore.framework */; };
 		15BB4DD218E9F705007BE707 /* FTADrawer.m in Sources */ = {isa = PBXBuildFile; fileRef = 15BB4DD118E9F705007BE707 /* FTADrawer.m */; };
+		D4F525D91B9625020002B941 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = D4F525D81B9625020002B941 /* Default-568h@2x.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -124,6 +125,7 @@
 		04C3135C18D74E85008097D1 /* TrivialBlit.vsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; name = TrivialBlit.vsh; path = Shaders/TrivialBlit.vsh; sourceTree = "<group>"; };
 		15BB4DD018E9F705007BE707 /* FTADrawer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FTADrawer.h; sourceTree = "<group>"; };
 		15BB4DD118E9F705007BE707 /* FTADrawer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FTADrawer.m; sourceTree = "<group>"; };
+		D4F525D81B9625020002B941 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -160,6 +162,7 @@
 		0489D46818CE75D100B41E20 = {
 			isa = PBXGroup;
 			children = (
+				D4F525D81B9625020002B941 /* Default-568h@2x.png */,
 				0489D4C618CE77FA00B41E20 /* BuildConfigurations */,
 				0489D47E18CE75D100B41E20 /* TestApp */,
 				0489D4A118CE75D100B41E20 /* TestAppTests */,
@@ -324,7 +327,7 @@
 			isa = PBXProject;
 			attributes = {
 				CLASSPREFIX = FTA;
-				LastUpgradeCheck = 0510;
+				LastUpgradeCheck = 0640;
 				ORGANIZATIONNAME = FiftyThree;
 				TargetAttributes = {
 					0489D49918CE75D100B41E20 = {
@@ -395,6 +398,7 @@
 				0489D49018CE75D100B41E20 /* TrivialPointSprite.vsh in Resources */,
 				0489D49518CE75D100B41E20 /* Images.xcassets in Resources */,
 				0489D48E18CE75D100B41E20 /* TrivialPointSprite.fsh in Resources */,
+				D4F525D91B9625020002B941 /* Default-568h@2x.png in Resources */,
 				0489D48318CE75D100B41E20 /* InfoPlist.strings in Resources */,
 				0489D48C18CE75D100B41E20 /* Main.storyboard in Resources */,
 			);

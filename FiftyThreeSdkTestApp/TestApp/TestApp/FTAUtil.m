@@ -154,14 +154,14 @@
     vertShaderPathname = [[NSBundle mainBundle] pathForResource:shader.shaderName ofType:@"vsh"];
     if (![FTAUtil compileShader:&vertShader type:GL_VERTEX_SHADER file:vertShaderPathname]) {
         NSLog(@"Failed to compile vertex shader");
-        return NO;
+        return 0;
     }
 
     // Create and compile fragment shader
     fragShaderPathname = [[NSBundle mainBundle] pathForResource:shader.shaderName ofType:@"fsh"];
     if (![FTAUtil compileShader:&fragShader type:GL_FRAGMENT_SHADER file:fragShaderPathname]) {
         NSLog(@"Failed to compile fragment shader");
-        return NO;
+        return 0;
     }
 
     // Attach vertex shader to program

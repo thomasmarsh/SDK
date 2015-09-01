@@ -106,6 +106,14 @@ extern "C"
 
 // See FTPenManager (FirmwareUpdateSupport)
 - (void)penManagerFirmwareUpdateIsAvailableDidChange;
+
+@optional
+// See FTPenManager's needsUpdate property.
+//
+// Invoked if the needsUpdate property is set to YES. For most uses of our SDK this
+// selector can be ignored.
+- (void)penManagerNeedsUpdate;
+
 @end
 
 @class UIView;
@@ -187,6 +195,59 @@ typedef NS_ENUM(NSInteger, FTPairingUIStyle) {
 //
 // This must be called on the UI thread.
 - (void)shutdown;
+
+#pragma mark -  FTPenManager  - Touch Classification Processing
+
+// Defaults YES. We automatically process touches the next time the main thread's
+// run loop is in one of the modes specified by updateRunLoopModes.
+//
+// To manually process touch classifications set this to NO and call
+// [[FTPenManager sharedInstance] update] from the main thread where appropriate
+// for your application. Normally this is done as part of a rendering loop before
+// drawing.
+@property (nonatomic) BOOL automaticUpdatesEnabled;
+
+// This property is normally used by FTApplication by way of an FTEventDispatcher
+// and can be ignored for most uses of our SDK.
+//
+// If automaticUpdatesEnabled is YES (the default) then setting this property to
+// YES will force touch classifications and pairing spot animations to be updated
+// on the main thread the next time it processes its main loop in one of the modes
+// specified by updateRunLoopModes. This is normally done automatically as a side
+// effect of processing various events.
+//
+// If automaticUpdatesEnabled is NO then setting this propery will have no specific
+// effect other than triggering the penManagerNeedsUpdate callback on
+// the pen manager's delegate if the value changs from NO to YES.
+//
+// See also penManagerNeedsUpdate.
+@property (nonatomic) BOOL needsUpdate;
+
+// This method can be ignored if automaticUpdatesEnabled is YES (the default).
+//
+// If you've turned off automatic updates you must call this method to run touch
+// classification and pairing spot animations.
+//
+// Since this method checks the needsUpdate property before updating classifications
+// or animations it can be called as part of an app's rendering loop without wasting
+// too much CPU time.
+//
+// You can also use the pen manager delegate's penManagerNeedsUpdate method to
+// cause your rendering loop to execute if it has a sleep mode (e.g. to set the
+// needsUpdate property of a UIView or the paused property of a GLKView).
+- (void)update;
+
+// A list of modes for the main thread's run loop in which touch classifications
+// and pairing spot animations will be updated when automaticUpdatesEnabled is YES.
+// If not using automatic updates this property has no effect.
+//
+// As of version 1.2.1 of this SDK the default is to use only the NSRunLoopCommonModes
+// mode. This ensures that touch classifications can be processed even when input
+// events would otherwise block default mode processing.
+//
+// See Apple's documentation on Run Loops for more details on these modes :
+// https://goo.gl/65Zwv3
+@property (nonatomic) NSArray *updateRunLoopModes;
 
 #pragma mark - SurfacePressure APIs iOS8+
 

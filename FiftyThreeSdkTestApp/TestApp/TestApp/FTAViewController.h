@@ -12,4 +12,6 @@
 
 @interface FTAViewController : GLKViewController
 
+@property (weak, nonatomic) IBOutlet UIToolbar *bar;
+
 @end

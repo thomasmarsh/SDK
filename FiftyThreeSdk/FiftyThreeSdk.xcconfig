@@ -18,3 +18,5 @@ FRAMEWORK_SEARCH_PATHS = "$(SDKROOT)/Developer/Library/Frameworks" "$(DEVELOPER_
 HEADER_SEARCH_PATHS = "$(SRCROOT)/../../../ThirdParty" "$(SRCROOT)" "$(SRCROOT)/../../ThirdParty/boost/"
 USER_HEADER_SEARCH_PATHS = "$(SRCROOT)" "$(SRCROOT)/../../ThirdParty" "$(SRCROOT)/../../../ThirdParty" "$(SRCROOT)/../../Core" "$(SRCROOT)/../../Common" "$(SRCROOT)/../GlobalSettings"
 
+GCC_NO_COMMON_BLOCKS = YES
+ONLY_ACTIVE_ARCH = NO

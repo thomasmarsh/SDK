@@ -178,6 +178,11 @@ constexpr CGFloat kDebugControlSpacing = 5.f;
     return self;
 }
 
+- (CGSize)sizeThatFits:(CGSize)size
+{
+    return CGSize{kPairingSpotMaxRadius * 2, kPairingSpotMaxRadius * 2};
+}
+
 - (void)dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];

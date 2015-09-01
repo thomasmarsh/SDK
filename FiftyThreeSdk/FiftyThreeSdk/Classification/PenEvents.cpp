@@ -250,42 +250,17 @@ std::pair<TouchClassification, float> PenEventClassifier::TypeAndScoreForCluster
 
     PenEventIdSet validPenEvents = _clusterTracker->PenEventSetInTimeInterval(t0 - _maxPenEventDelay, t1 + _maxPenEventDelay);
 
-    // first check size...
-    auto touch = cluster._touchIds.back();
+    // each touch needs 2 pen events.  if we're off by more than one, mark palm.
+    if (2 * int(cluster._touchIds.size()) - int(validPenEvents.size()) > 1) {
+        cluster._meanPenProbability = 0.0001f;
+        cluster._meanPalmProbability = 1.0f;
 
-    if (false &&
-        cluster._touchIds.size() == 1 &&
-        _commonData->proxy->TouchRadiusAvailable() &&
-        TouchSize::IsPenGivenTouchRadius(*_clusterTracker->Data(touch))) {
-        cluster._meanPalmProbability = .0001f;
-        cluster._meanPenProbability = 1.0f;
+        cluster._penScore = pair.second;
+        cluster._penTotalScore = 0.0001f;
 
-        TouchIdVector concurrentTouches = _clusterTracker->ConcurrentTouches(touch);
-        concurrentTouches.push_back(touch);
-        Eigen::VectorXf prior = _commonData->proxy->PenPriorForTouches(concurrentTouches);
+        _clusterTypesAndScores[cluster._id] = pair;
 
-        cluster._penScore = 1.0f;
-        cluster._penTotalScore = cluster._penScore;
-
-        sizePair.first = core::TouchClassification::Pen;
-        sizePair.second = cluster._penScore;
-
-        if (_clusterTracker->MostRecentPenTipType() == core::TouchClassification::Eraser) {
-            sizePair.first = core::TouchClassification::Eraser;
-        }
-    } else {
-        // each touch needs 2 pen events.  if we're off by more than one, mark palm.
-        if (2 * int(cluster._touchIds.size()) - int(validPenEvents.size()) > 1) {
-            cluster._meanPenProbability = 0.0001f;
-            cluster._meanPalmProbability = 1.0f;
-
-            cluster._penScore = pair.second;
-            cluster._penTotalScore = 0.0001f;
-
-            _clusterTypesAndScores[cluster._id] = pair;
-
-            return pair;
-        }
+        return pair;
     }
 
     //float temp         = 1.0f;
@@ -313,19 +288,14 @@ std::pair<TouchClassification, float> PenEventClassifier::TypeAndScoreForCluster
         N += 1.0f;
     }
 
-    if (false) //pair.first == TouchClassification::Unknown || N == 0.0f)
-    {
-        pair.second = 0.0f; // should be true already; just for documentation
-    } else {
-        // compute the odds ratio.
-        // this is handy because the raw probabilities allow for mixed cases,
-        // as if clusters could contain both pen and palm touches (this is a consequence
-        // of our independence assumptions).  comparing only the "all pen" vs. the "all palm"
-        // cases via the odds ratio lets us reclaim much of what was lost, without complicating
-        // the model.
-        float oddsRatio = .5f * (1.0f + pAllPen) / (.0001f + pAllPalm);
-        pair.second = oddsRatio;
-    }
+    // compute the odds ratio.
+    // this is handy because the raw probabilities allow for mixed cases,
+    // as if clusters could contain both pen and palm touches (this is a consequence
+    // of our independence assumptions).  comparing only the "all pen" vs. the "all palm"
+    // cases via the odds ratio lets us reclaim much of what was lost, without complicating
+    // the model.
+    float oddsRatio = .5f * (1.0f + pAllPen) / (.0001f + pAllPalm);
+    pair.second = oddsRatio;
 
     // defer to size if it looks good...
     if (sizePair.second > 0.0f && sizePair.second > pair.second) {

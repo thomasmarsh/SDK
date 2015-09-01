@@ -1616,7 +1616,6 @@ float TouchClassificationProxy::DominationScore(Cluster::Ptr const &probe)
 
 void TouchClassificationProxy::DebugPrintClusterStatus()
 {
-    return;
     if (!_showDebugLogMessages) {
         return;
     }

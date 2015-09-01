@@ -196,16 +196,6 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 @property (nonatomic, readwrite) BOOL isEraserPressed;
 @end
 
-@protocol FTPenManagerDelegatePrivate <FTPenManagerDelegate>
-@optional
-// See FTPenManager's automaticUpdates property.
-//
-// Invoked if we get events that should trigger turning on the display link. You should only need this
-// if you're running your own displayLink.
-- (void)penManagerNeedsUpdateDidChange;
-
-@end
-
 // Placeholder implementation.
 @implementation FTPenInformation
 @end
@@ -255,8 +245,6 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
 @property (nonatomic) NSMutableArray *pairingViews;
 
-@property (nonatomic) CADisplayLink *displayLink;
-
 @property (nonatomic) BOOL didConnectViaWarmStart;
 
 @property (nonatomic) NSInteger originalInactivityTimeout;
@@ -269,10 +257,6 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
 @property (nonatomic) BOOL penHasListener;
 
-@property (nonatomic) BOOL automaticUpdatesEnabled;
-
-@property (nonatomic) BOOL needsUpdate;
-
 @property (nonatomic) BOOL disableLongPressToUnpairIfTipPressed;
 
 @property (nonatomic) BOOL forceFirmwareUpdate;
@@ -284,15 +268,6 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 @end
 
 @implementation FTPenManager
-
-- (void)setPenHasListener:(BOOL)penHasListener
-{
-    _penHasListener = penHasListener;
-
-    if (self.pen.hasListener != _penHasListener) {
-        self.pen.hasListener = _penHasListener;
-    }
-}
 
 - (id)init
 {
@@ -334,6 +309,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
         self.pairingViews = [@[] mutableCopy];
 
+        _updateRunLoopModes = @[NSRunLoopCommonModes];
         _shouldCheckForFirmwareUpdates = NO;
         self.firmwareUpdateIsAvailable = nil;
         self.disableLongPressToUnpairIfTipPressed = NO;
@@ -376,6 +352,50 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 }
 
 #pragma mark - Properties
+
+- (void)setPenHasListener:(BOOL)penHasListener
+{
+    _penHasListener = penHasListener;
+    
+    if (self.pen.hasListener != _penHasListener) {
+        self.pen.hasListener = _penHasListener;
+    }
+}
+
+- (void)setAutomaticUpdatesEnabled:(BOOL)automaticUpdatesEnabled
+{
+    if (_automaticUpdatesEnabled != automaticUpdatesEnabled) {
+        _automaticUpdatesEnabled = automaticUpdatesEnabled;
+        self.needsUpdate = YES;
+    }
+}
+
+- (void)setUpdateRunLoopModes:(NSArray *)updateRunLoopModes
+{
+    if (![updateRunLoopModes isEqualToArray:_updateRunLoopModes]) {
+        _updateRunLoopModes = updateRunLoopModes;
+        self.needsUpdate = YES;
+    }
+}
+
+- (void)setNeedsUpdate:(BOOL)needsUpdate
+{
+    NSAssert([NSThread isMainThread], @"needsUpdate value must be set on the UI thread.");
+    
+    _needsUpdate = needsUpdate;
+        
+    if (needsUpdate && [self.delegate respondsToSelector:@selector(penManagerNeedsUpdate)]) {
+        [self.delegate penManagerNeedsUpdate];
+    }
+    
+    if (self.automaticUpdatesEnabled) {
+        SEL updateSel = @selector(update);
+        [NSObject cancelPreviousPerformRequestsWithTarget:self selector:updateSel object:self];
+        if (needsUpdate) {
+            [self performSelector:updateSel withObject:self afterDelay:0 inModes:self.updateRunLoopModes];
+        }
+    }
+}
 
 - (CBCentralManager *)centralManager
 {
@@ -638,16 +658,15 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
         self.info.isEraserPressed = self.pen.isEraserPressed;
         self.info.isTipPressed = self.pen.isTipPressed;
 
-        [self ensureNeedsUpdate];
-
-        if ([self.delegate respondsToSelector:@selector(penManagerNeedsUpdateDidChange)]) {
-            [((id<FTPenManagerDelegatePrivate>)self.delegate)penManagerNeedsUpdateDidChange];
-        }
         if ([self.delegate respondsToSelector:@selector(penInformationDidChange)]) {
-            [((id<FTPenManagerDelegatePrivate>)self.delegate)penInformationDidChange];
+            [self.delegate penInformationDidChange];
         }
+        
     }
+    
+    self.needsUpdate = YES;
 }
+
 - (void)penBatteryLevelDidChange:(NSNotification *)notification
 {
     [self updatePenInfoObjectAndInvokeDelegate];
@@ -2266,16 +2285,6 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     }
 }
 
-- (void)ensureNeedsUpdate
-{
-    self.needsUpdate = YES;
-    self.displayLink.paused = NO;
-
-    if ([self.delegate respondsToSelector:@selector(penManagerNeedsUpdateDidChange)]) {
-        [((id<FTPenManagerDelegatePrivate>)self.delegate)penManagerNeedsUpdateDidChange];
-    }
-}
-
 #pragma mark - Ensure HasListener Timer
 
 // This odd bit of code is here for good reason. When apps switch on iOS they are not guarenteed to resign
@@ -2319,14 +2328,14 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 #pragma mark - AnimationPumpDelegate
 - (void)animationPumpActivated
 {
-    [self ensureNeedsUpdate];
+    self.needsUpdate = YES;
 }
 
 #pragma mark - PenConnectionViewDelegate
 
 - (void)penConnectionViewAnimationWasEnqueued:(PenConnectionView *)penConnectionView
 {
-    [self ensureNeedsUpdate];
+    self.needsUpdate = YES;
 }
 
 - (BOOL)canPencilBeConnected
@@ -2337,7 +2346,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
 - (void)isPairingSpotPressedDidChange:(BOOL)isPairingSpotPressed
 {
-    [self ensureNeedsUpdate];
+    self.needsUpdate = YES;
 }
 + (FTPenManager *)sharedInstanceWithoutInitialization
 {
@@ -2346,42 +2355,23 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
 
 - (void)pen:(FTPen *)pen tipPressureDidChange:(float)tipPressure
 {
-    MLOG_INFO(FTLogSDKVerbose, "tipPressureDid Chage %f", tipPressure);
-}
-
-- (void)setAutomaticUpdatesEnabled:(BOOL)useDisplayLink
-{
-    if (useDisplayLink) {
-        self.displayLink = [CADisplayLink displayLinkWithTarget:sharedInstance selector:@selector(update)];
-        [self.displayLink addToRunLoop:[NSRunLoop mainRunLoop] forMode:NSRunLoopCommonModes];
-    } else {
-        [self.displayLink invalidate];
-        self.displayLink = nil;
-    }
-    _automaticUpdatesEnabled = useDisplayLink;
-    [self ensureNeedsUpdate];
+    MLOG_INFO(FTLogSDKVerbose, "tipPressureDid Change %f", tipPressure);
 }
 
 - (void)update
 {
     NSAssert([NSThread isMainThread], @"update must be called on the UI thread.");
-    [self.classifier update];
 
-    NSTimeInterval time = [[NSProcessInfo processInfo] systemUptime];
-
-    AnimationPump::Instance()->UpdateAnimations(time);
-
-    bool oldValue = self.needsUpdate;
-    self.needsUpdate = AnimationPump::Instance()->HasActiveAnimations();
-
-    if (oldValue != self.needsUpdate) {
-        if ([self.delegate respondsToSelector:@selector(penManagerNeedsUpdateDidChange)]) {
-            [((id<FTPenManagerDelegatePrivate>)self.delegate)penManagerNeedsUpdateDidChange];
-        }
-    }
-
-    if (!self.needsUpdate) {
-        self.displayLink.paused = YES;
+    if (self.needsUpdate) {
+        
+        [self.classifier update];
+        
+        NSTimeInterval time = [[NSProcessInfo processInfo] systemUptime];
+        
+        AnimationPump::Ptr animationPump = AnimationPump::Instance();
+        animationPump->UpdateAnimations(time);
+        
+        self.needsUpdate = (animationPump->HasActiveAnimations()) ? YES : NO;
     }
 }
 
@@ -2468,9 +2458,6 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
     [self.pairingViews removeAllObjects];
 
     [self reset];
-
-    [self.displayLink invalidate];
-    self.displayLink = nil;
 
     auto instance = fiftythree::core::spc<AnimationPumpObjC>(AnimationPump::Instance());
     if (instance->GetDelegate() == self) {

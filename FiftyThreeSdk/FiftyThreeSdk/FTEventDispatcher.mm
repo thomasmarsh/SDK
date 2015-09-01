@@ -108,7 +108,7 @@ using namespace fiftythree::sdk;
 
             classifier->TouchesDidChanged(touches);
 
-            [[FTPenManager sharedInstanceWithoutInitialization] ensureNeedsUpdate];
+            [FTPenManager sharedInstanceWithoutInitialization].needsUpdate = YES;
         }
     }
 }

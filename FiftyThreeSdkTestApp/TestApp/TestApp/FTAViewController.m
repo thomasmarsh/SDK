@@ -14,10 +14,11 @@
 
 @interface FTAViewController () <FTTouchClassificationsChangedDelegate,
                                  FTPenManagerDelegate,
-                                 UIPopoverControllerDelegate> {
+                                 UIPopoverControllerDelegate,
+                                 FTASettingsViewControllerDelegate> {
     NSDictionary *_strokeColors;
 }
-@property (nonatomic) UIToolbar *bar;
+@property (nonatomic) UIBarButtonItem *fps;
 @property (nonatomic) UIBarButtonItem *infoButton;
 @property (nonatomic) UIBarButtonItem *updateFirmwareButton;
 @property (nonatomic) BOOL isPencilEnabled;
@@ -26,6 +27,8 @@
 @property (nonatomic) FTASettingsViewController *popoverContents;
 
 @property (nonatomic) FTADrawer *drawer;
+
+@property (nonatomic) FTPenManager *penManager;
 
 @end
 
@@ -52,24 +55,22 @@
     // (4) A button to trigger firmware update if needed
     // (5) A button to show a popover with Pen status. This uses the FTPenInformation API to
     //     populate a table view. See FTASettingsViewController.
-
-    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
-        self.bar = [[UIToolbar alloc] initWithFrame:CGRectMake(0, 0, MAX(self.view.frame.size.width, self.view.frame.size.height), 44)];
-    } else {
-        self.bar = [[UIToolbar alloc] initWithFrame:CGRectMake(0, 0, MIN(self.view.frame.size.width, self.view.frame.size.height), 44)];
-    }
-
     UIBarButtonItem *shutdownButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemStop
                                                                                     target:self
-                                                                                    action:@selector(shutdownFTPenManager:)];
+                                                                                    action:@selector(disablePencil:)];
     UIBarButtonItem *startupButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemPlay
                                                                                    target:self
-                                                                                   action:@selector(initializeFTPenManager:)];
+                                                                                   action:@selector(enablePencil:)];
 
     UIBarButtonItem *spacer = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace
                                                                             target:nil
                                                                             action:nil];
 
+    self.fps = [[UIBarButtonItem alloc] initWithTitle:nil
+                                                style:UIBarButtonItemStylePlain
+                                               target:nil
+                                               action:nil];
+    
     UIBarButtonItem *clearButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh
                                                                                  target:self
                                                                                  action:@selector(clearScene:)];
@@ -88,12 +89,13 @@
 
     self.updateFirmwareButton.enabled = NO;
 
-    [self.bar setItems:@[ shutdownButton, startupButton, spacer, clearButton, self.updateFirmwareButton, self.infoButton ]];
+    [self.bar setItems:@[ shutdownButton, startupButton, spacer, self.fps, clearButton, self.updateFirmwareButton, self.infoButton ]];
     self.bar.barStyle = UIBarStyleBlack;
     self.bar.translucent = NO;
 
     [self.view addSubview:self.bar];
-    self.isPencilEnabled = NO;
+
+    _isPencilEnabled = NO;
 
     // Defaults to 30, we want to catch any performance problems so we crank it up
     self.preferredFramesPerSecond = 60;
@@ -120,13 +122,70 @@
     NSLog(@"FiftyThree SDK Version:%@", versionInfo.version);
 }
 
+#pragma mark - Properties
+
+- (void)setIsPencilEnabled:(BOOL)isPencilEnabled
+{
+    if (_isPencilEnabled != isPencilEnabled) {
+        _isPencilEnabled = isPencilEnabled;
+        self.penManager = (isPencilEnabled) ? [FTPenManager sharedInstance] : nil;
+    }
+}
+
+- (void)setPenManager:(FTPenManager *)penManager
+{
+    if (_penManager != penManager) {
+        if (_penManager) {
+            // Make sure you don't retain any instances of FTPenManager.
+            // It needs to be dealloced to free up CoreBluetooth for other
+            // stylus SDKs.
+            [_penManager shutdown];
+            _penManager = nil;
+            self.isPencilEnabled = NO;
+        } else {
+            _penManager = penManager;
+            
+            UIView *connectionView = [_penManager pairingButtonWithStyle:FTPairingUIStyleFlat];
+            connectionView.translatesAutoresizingMaskIntoConstraints = NO;
+            
+            [self.view addSubview:connectionView];
+            
+            NSDictionary* viewsDictionary = NSDictionaryOfVariableBindings(connectionView);
+            
+            CGSize minimalSize = {0,0};
+            CGSize pairingSpotSize = [connectionView sizeThatFits:minimalSize];
+            CGFloat barHeight = self.bar.frame.size.height;
+            
+            [self.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"V:[connectionView(%d)]-(==%d)-|", (int)round(pairingSpotSize.height), (int)round(barHeight)]
+                                                                      options:NSLayoutFormatAlignAllBottom
+                                                                      metrics:nil
+                                                                        views:viewsDictionary]];
+            
+            [self.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"H:|-[connectionView(%d)]", (int)round(pairingSpotSize.width)]
+                                                                     options:0
+                                                                     metrics:nil
+                                                                       views:viewsDictionary]];
+            
+            _penManager.classifier.delegate = self;
+            _penManager.delegate = self;
+            
+            // By default the FiftyThree SDK doesn't check for firmware updates.
+            // Turn on this check by setting this property. You'll be notified on
+            // penManagerFirmwareUpdateIsAvailableDidChange
+            _penManager.shouldCheckForFirmwareUpdates = YES;
+            
+            self.isPencilEnabled = YES;
+        }
+    }
+}
+
 #pragma mark - Bar Button Press handlers.
 - (void)updateFirmware:(id)sender
 {
-    NSNumber *firmwareUpdateIsAvailable = [FTPenManager sharedInstance].firmwareUpdateIsAvailable;
+    NSNumber *firmwareUpdateIsAvailable = self.penManager.firmwareUpdateIsAvailable;
 
     if (firmwareUpdateIsAvailable != nil && [firmwareUpdateIsAvailable boolValue]) {
-        BOOL isPaperInstalled = [FTPenManager sharedInstance].canInvokePaperToUpdatePencilFirmware;
+        BOOL isPaperInstalled = self.penManager.canInvokePaperToUpdatePencilFirmware;
         if (isPaperInstalled) {
             // We invoke Paper via url handlers. You can optionally specify urls so that
             // Paper can return to your app. The application name is shown in a button labelled:
@@ -137,10 +196,10 @@
             NSURL *cancelUrl = [NSURL URLWithString:@"sdktestapp://x-callback-url/cancel"];
             NSURL *errorUrl = [NSURL URLWithString:@"sdktestapp://x-callback-url/error"];
 
-            BOOL result = [[FTPenManager sharedInstance] invokePaperToUpdatePencilFirmware:applicationName
-                                                                                   success:successUrl
-                                                                                     error:errorUrl
-                                                                                    cancel:cancelUrl];
+            BOOL result = [self.penManager invokePaperToUpdatePencilFirmware:applicationName
+                                                                     success:successUrl
+                                                                       error:errorUrl
+                                                                      cancel:cancelUrl];
 
             if (!result) {
                 // If we for some reason couldn't open the url. We might alert to user.
@@ -149,7 +208,7 @@
             // If Paper isn't installed or is too old to support firmware update we'll direct the user
             // to FiftyThree's support site. This site walks them through installing Paper and doing
             // firmware update.
-            NSURL *firmwareUpdateSupportUrl = [FTPenManager sharedInstance].firmwareUpdateSupportLink;
+            NSURL *firmwareUpdateSupportUrl = self.penManager.firmwareUpdateSupportLink;
             BOOL result = [[UIApplication sharedApplication] openURL:firmwareUpdateSupportUrl];
             if (!result) {
                 // Very unlikely that opening mobile safari would fail. But you might alert the user here.
@@ -171,8 +230,8 @@
     self.popoverContents = nil;
 
     if (self.isPencilEnabled) {
-        self.popoverContents = [[FTASettingsViewController alloc] init];
-        self.popoverContents.info = [FTPenManager sharedInstance].info;
+        self.popoverContents = [[FTASettingsViewController alloc] initWithStyle:UITableViewStylePlain :self];
+        self.popoverContents.info = self.penManager.info;
 
         if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
             self.popover = [[UIPopoverController alloc] initWithContentViewController:self.popoverContents];
@@ -195,14 +254,11 @@
 - (void)clearScene:(id)sender
 {
     [self.drawer removeAllStrokes];
+    self.paused = NO;
 }
 
-- (void)shutdownFTPenManager:(id)sender
+- (void)disablePencil:(id)sender
 {
-    // Make sure you don't retain any instances of FTPenManager
-    // as that will be dealloced to free up CoreBluetooth for other
-    // stylus SDKs.
-    [[FTPenManager sharedInstance] shutdown];
     self.isPencilEnabled = NO;
     if (self.popover) {
         [self.popover dismissPopoverAnimated:NO];
@@ -210,22 +266,20 @@
     }
 }
 
-- (void)initializeFTPenManager:(id)sender
+- (void)enablePencil:(id)sender
 {
-    UIView *connectionView = [[FTPenManager sharedInstance] pairingButtonWithStyle:FTPairingUIStyleDefault];
-
-    connectionView.frame = CGRectMake(0.0f, self.view.frame.size.height - 100, connectionView.frame.size.width, connectionView.frame.size.height);
-    [self.view addSubview:connectionView];
-
-    [FTPenManager sharedInstance].classifier.delegate = self;
-    [FTPenManager sharedInstance].delegate = self;
-
-    // By default the FiftyThree SDK doesn't check for firmware updates.
-    // Turn on this check by setting this property. You'll be notified on
-    // penManagerFirmwareUpdateIsAvailableDidChange
-    [FTPenManager sharedInstance].shouldCheckForFirmwareUpdates = YES;
-
     self.isPencilEnabled = YES;
+}
+
+#pragma mark - FTASettingsViewControllerDelegate
+- (NSInteger)getFramerate
+{
+    return self.framesPerSecond;
+}
+
+- (void)setFramerate:(NSInteger)framesPerSecond
+{
+    self.preferredFramesPerSecond = framesPerSecond;
 }
 
 #pragma mark - FTTouchClassificationDelegate
@@ -234,6 +288,7 @@
     for (FTTouchClassificationInfo *info in touches) {
         [self.drawer setColor:_strokeColors[@(info.newValue)] forStroke:info.touchId];
     }
+    self.paused = NO;
 }
 
 #pragma mark - FTPenManagerDelegate
@@ -242,7 +297,7 @@
 {
     if (FTPenManagerStateIsConnected(state)) {
         self.infoButton.enabled = YES;
-        NSNumber *firmwareUpdateIsAvailable = [FTPenManager sharedInstance].firmwareUpdateIsAvailable;
+        NSNumber *firmwareUpdateIsAvailable = self.penManager.firmwareUpdateIsAvailable;
         self.updateFirmwareButton.enabled = (firmwareUpdateIsAvailable != nil && [firmwareUpdateIsAvailable boolValue]);
     } else {
         self.updateFirmwareButton.enabled = NO;
@@ -254,7 +309,7 @@
 - (void)penInformationDidChange
 {
     if (self.popoverContents) {
-        self.popoverContents.info = [FTPenManager sharedInstance].info;
+        self.popoverContents.info = self.penManager.info;
         [self.popoverContents.tableView reloadData];
     }
 }
@@ -262,7 +317,7 @@
 // This is optional.
 - (void)penManagerFirmwareUpdateIsAvailableDidChange
 {
-    NSNumber *firmwareUpdateIsAvailable = [FTPenManager sharedInstance].firmwareUpdateIsAvailable;
+    NSNumber *firmwareUpdateIsAvailable = self.penManager.firmwareUpdateIsAvailable;
 
     if (firmwareUpdateIsAvailable != nil && [firmwareUpdateIsAvailable boolValue]) {
         // Note, we always enable the button but if Paper isn't installed that button
@@ -273,6 +328,12 @@
     }
 }
 
+// This also is optional.
+- (void)penManagerNeedsUpdate
+{
+    self.paused = NO;
+}
+
 #pragma mark - Touch Handling
 
 // Since we've turned on multi touch we may get
@@ -281,15 +342,18 @@
 // This isn't correct if you can have multiple touches and multipleTouchEnabled set to YES.
 - (void)handleTouches:(NSSet *)touches withEvent:(UIEvent *)event
 {
-    if (_isPencilEnabled) {
+
+    if (self.isPencilEnabled) {
+        BOOL didChange = NO;
+        FTPenManager *penManager = self.penManager;
         for (UITouch *touch in touches) {
-            NSInteger k = [[FTPenManager sharedInstance].classifier idForTouch:touch];
+            NSInteger k = [penManager.classifier idForTouch:touch];
 
             CGPoint location = [touch locationInView:self.view];
 
             // We also surface unfiltered radius. This is very quantized.
-            // NSNumber *radius = [[FTPenManager sharedInstance] normalizedRadiusForTouch:touch];
-            NSNumber *smoothedRadius = [[FTPenManager sharedInstance] smoothedRadiusForTouch:touch];
+            // NSNumber *radius = [penManager normalizedRadiusForTouch:touch];
+            NSNumber *smoothedRadius = [penManager smoothedRadiusForTouch:touch];
 
             CGFloat r = 4;
             if (smoothedRadius) {
@@ -300,15 +364,23 @@
 
             if (touch.phase == UITouchPhaseBegan) {
                 [self.drawer appendCGPoint:location andRadius:r forStroke:k];
+                didChange = YES;
             } else if (touch.phase == UITouchPhaseMoved) {
                 [self.drawer appendCGPoint:location andRadius:r forStroke:k];
+                didChange = YES;
             } else if (touch.phase == UITouchPhaseEnded) {
                 [self.drawer appendCGPoint:location andRadius:r forStroke:k];
+                didChange = YES;
             } else if (touch.phase == UITouchPhaseCancelled) {
                 [self.drawer removeStroke:k];
+                didChange = YES;
+            }
+            if (didChange) {
+                self.paused = NO;
             }
         }
     }
+    
 }
 
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
@@ -339,7 +411,13 @@
 
 - (void)glkView:(GLKView *)view drawInRect:(CGRect)rect
 {
+    self.paused = YES;
+    if (self.isPencilEnabled && !self.penManager.automaticUpdatesEnabled) {
+        [self.penManager update];
+    }
     [self.drawer draw];
+    self.fps.title = [NSString stringWithFormat:@"%ld@%ld", self.framesDisplayed, self.framesPerSecond];
+    
 }
 
 #pragma mark - View Controller boiler plate.
@@ -356,8 +434,20 @@
 
 - (void)viewWillLayoutSubviews
 {
-    self.drawer.scale = self.view.contentScaleFactor;
-    self.drawer.size = self.view.bounds.size;
+    BOOL changed = NO;
+    if (self.drawer.scale != self.view.contentScaleFactor) {
+        self.drawer.scale = self.view.contentScaleFactor;
+        changed = YES;
+    }
+    if (self.drawer.size.width != self.view.bounds.size.width ||
+        self.drawer.size.height != self.view.bounds.size.height)
+    {
+        self.drawer.size = self.view.bounds.size;
+        changed = YES;
+    }
+    if (changed) {
+        self.paused = NO;
+    }
 }
 
 #pragma mark - UIPopoverViewControllerDelegate

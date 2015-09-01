@@ -29,8 +29,6 @@ extern NSString *const kFTPenManagerFirmwareUpdateWaitingForPencilTipRelease;
 
 @interface FTPenManager ()
 
-- (void)ensureNeedsUpdate;
-
 // Returns a boolean value as a NSNumber, or nil if this cannot yet be determined.
 //
 // Returns @(YES) if a firmware update is available for the connected pen. This determination
