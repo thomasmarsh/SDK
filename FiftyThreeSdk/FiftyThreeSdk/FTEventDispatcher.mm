@@ -97,11 +97,14 @@ using namespace fiftythree::sdk;
         if (classifier) {
             std::set<fiftythree::core::Touch::cPtr> touches;
 
-            // Note that the touches are filtered to the window that TouchTracker is watching. A set of touches that
-            // span multiple windows (for example, a pinch gesture where one finger is over the keyboard) will
-            // be delivered in multiple UIEvents, one per window, and TouchTracker doesn't currently handle that.
-            auto rootWindow = spc<TouchTrackerObjC>(TouchTracker::Instance())->RootView().window;
-            for (UITouch *t in [event touchesForWindow:rootWindow]) {
+            // FUTURE: https://www.pivotaltracker.com/story/show/102706136 using allTouches
+            // can provide UITouch events for multiple windows!
+            //
+            // A set of touches that span multiple windows (for example, a pinch gesture
+            // where one finger is over the keyboard) will be delivered in multiple UIEvents,
+            // one per window, and this class doesn't currently handle that specifically
+            // although it does appear to recover after this happens.
+            for (UITouch *t in [event allTouches]) {
                 auto touch = spc<TouchTrackerObjC>(TouchTracker::Instance())->TouchForUITouch(t);
                 touches.insert(touch);
             }
