@@ -183,7 +183,7 @@ public:
         return closestExitTouch;
     }
 
-    virtual void UpdateTouchContinuationLinkage()
+    virtual void UpdateTouchContinuationLinkage() override
     {
         // Recaculate linkages between all recent touches.
         //
@@ -279,7 +279,7 @@ public:
         }
     }
 
-    virtual Event<std::vector<Touch::cPtr>> &TouchesReclassified()
+    virtual Event<std::vector<Touch::cPtr>> &TouchesReclassified() override
     {
         return _TouchesReclassified;
     }

@@ -101,40 +101,40 @@ class TouchClassificationProxy : public Classifier
 public:
 #pragma mark - Classifier interface.
 
-    bool ReclassifyIfNeeded(double timestamp = -1.0);
+    bool ReclassifyIfNeeded(double timestamp = -1.0) override;
 
-    void StylusConnected();
-    void StylusDisconnected();
+    void StylusConnected() override;
+    void StylusDisconnected() override;
 
     // Let the classifier know of changes to the world.
-    void OnPenEvent(const PenEvent &pen);
-    void OnTouchesChanged(const std::set<core::Touch::Ptr> &set);
+    void OnPenEvent(const PenEvent &pen) override;
+    void OnTouchesChanged(const std::set<core::Touch::Ptr> &set) override;
 
     // The caller can let the classifier know a touch has been marked
-    void RemoveTouchFromClassification(core::TouchId touchId);
+    void RemoveTouchFromClassification(core::TouchId touchId) override;
 
-    core::TouchClassification Classify(core::TouchId touchID);
+    core::TouchClassification Classify(core::TouchId touchID) override;
 
-    void SetShouldClassifyOneFinger(bool v);
+    void SetShouldClassifyOneFinger(bool v) override;
 
-    void SetUseDebugLogging(bool v);
+    void SetUseDebugLogging(bool v) override;
 
-    std::vector<core::TouchId> TouchesReclassified();
+    std::vector<core::TouchId> TouchesReclassified() override;
 
-    void ClearTouchesReclassified();
+    void ClearTouchesReclassified() override;
 
-    core::TouchClassification ClassifyPair(core::TouchId touch0, core::TouchId touch1, const TwoTouchPairType &type);
+    core::TouchClassification ClassifyPair(core::TouchId touch0, core::TouchId touch1, const TwoTouchPairType &type) override;
 
-    core::TouchClassification ClassifyForGesture(core::TouchId touch0, const SingleTouchGestureType &type);
+    core::TouchClassification ClassifyForGesture(core::TouchId touch0, const SingleTouchGestureType &type) override;
 
-    Eigen::VectorXf GeometricStatistics(core::TouchId touch0);
+    Eigen::VectorXf GeometricStatistics(core::TouchId touch0) override;
 
     bool IsReclassifiable(core::Touch::Ptr const &touch, Stroke::Ptr const &stroke);
 
     void RemoveEdgeThumbs();
 
-    void ClearSessionStatistics();
-    SessionStatistics::Ptr SessionStatistics();
+    void ClearSessionStatistics() override;
+    SessionStatistics::Ptr SessionStatistics() override;
 
 protected:
     SessionStatistics::Ptr _sessionStatistics;
