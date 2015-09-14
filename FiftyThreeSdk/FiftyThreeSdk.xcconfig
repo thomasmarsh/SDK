@@ -13,10 +13,10 @@ PRODUCT_NAME = $(USER_TARGET_NAME)
 PUBLIC_HEADERS_FOLDER_PATH = "/../$(USER_PRODUCT_NAME)/$(USER_PRODUCT_NAME)"
 DSTROOT = /tmp/$(USER_PRODUCT_NAME).dst
 
-FRAMEWORK_SEARCH_PATHS = "$(SDKROOT)/Developer/Library/Frameworks" "$(DEVELOPER_FRAMEWORKS_DIR)" "$(SRCROOT)/../../ThirdParty/boost/framework"
+FRAMEWORK_SEARCH_PATHS = "$(SDKROOT)/Developer/Library/Frameworks" "$(DEVELOPER_FRAMEWORKS_DIR)" "$(SRCROOT)/../../Core/ThirdParty/boost/framework"
 
-HEADER_SEARCH_PATHS = "$(SRCROOT)/../../../ThirdParty" "$(SRCROOT)" "$(SRCROOT)/../../ThirdParty/boost/"
-USER_HEADER_SEARCH_PATHS = "$(SRCROOT)" "$(SRCROOT)/../../ThirdParty" "$(SRCROOT)/../../../ThirdParty" "$(SRCROOT)/../../Core" "$(SRCROOT)/../../Common" "$(SRCROOT)/../GlobalSettings"
+HEADER_SEARCH_PATHS = "$(SRCROOT)/../../Core/ThirdParty" "$(SRCROOT)" "$(SRCROOT)/../../Core/ThirdParty/boost/"
+USER_HEADER_SEARCH_PATHS = "$(SRCROOT)" "$(SRCROOT)/../../ThirdParty" "$(SRCROOT)/../../Core/ThirdParty" "$(SRCROOT)/../../Core" "$(SRCROOT)/../../Common" "$(SRCROOT)/../GlobalSettings"
 
 GCC_NO_COMMON_BLOCKS = YES
 ONLY_ACTIVE_ARCH = NO

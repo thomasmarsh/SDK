@@ -1,0 +1,6 @@
+[submodule "ThirdParty/TransitionKit"]
+	path = ThirdParty/TransitionKit
+	url = git@github.com:FiftyThree/TransitionKit.git
+[submodule "Core"]
+	path = Core
+	url = git@github.com:FiftyThree/Core.git

@@ -1,0 +1,26 @@
+# Xcode
+build/*
+xcuserdata/
+*.xccheckout
+*.xcscmblueprint
+*.xcuserstate
+
+# OS X 
+.DS_Store
+profile
+.tm_properties
+
+# Python
+*.pyc
+
+# local ag config
+.agignore
+
+# Build.pu temp dir
+ci_build/*
+
+#symbolication script
+symbols/*
+ 
+#xctool intermediates
+.build/*

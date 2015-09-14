@@ -5,5 +5,5 @@
 //  Copyright (c) 2015 FiftyThree, Inc. All rights reserved.
 //
 
-#include "../../../BuildConfigurations/ApplicationProduction.xcconfig"
+#include "../../../Core/BuildConfigurations/ApplicationProduction.xcconfig"
 #include "TestApp.xcconfig"
