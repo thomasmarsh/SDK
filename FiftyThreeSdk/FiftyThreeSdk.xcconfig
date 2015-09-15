@@ -5,6 +5,8 @@
 //  Copyright (c) 2015 FiftyThree, Inc. All rights reserved.
 //
 
+FT_PATH_TO_CORE = $(SRCROOT)/Core
+
 USER_PRODUCT_NAME = FiftyThreeSdk
 USER_TARGET_NAME = $(USER_PRODUCT_NAME)
 
