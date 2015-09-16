@@ -1,9 +1,11 @@
 SDK Internal README and release process.
 
+<a href='https://app.ship.io/dashboard#/jobs/10518/history' target='_blank'><img src='https://app.ship.io/jobs/X9rTyoGVPjCkg5lA/build_status.png' width='160' /></a>
+
 Components:
 - docs/ these are all copied into a tar.bz2 as part of the automated build. This includes branding guidelines, quick start guide and legal notices.
 - FiftyThreeSdk/ contains the library source code used by both Paper and FiftyThreeSDK project. The public headers which are copied with the .framework are the ones in FiftyThreeSdk.h
-- FiftyThreeSdkTestApp/ contains the source code of a test app. This source code is included with the SDK so don't put any private API calls there. 
+- FiftyThreeSdkTestApp/ contains the source code of a test app. This source code is included with the SDK so don't put any private API calls there.
 - FiftyThreeSimpleSampleApp/ contains *only* a xcodeporoject file, with out any FiftyThree build configuration settings. This is packaged and built as part of the automated build process. If you add files to the test app you'll need to add them here too.
 
 Building (Internally):
@@ -29,6 +31,3 @@ use tag name as annotation when prompted
 git push --tags
 
 - copy the tar.bz2 files to partners dropbox folders & let them know via email.
-
-
-
