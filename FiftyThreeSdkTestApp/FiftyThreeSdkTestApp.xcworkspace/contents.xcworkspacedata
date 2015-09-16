@@ -5,46 +5,46 @@
       location = "container:"
       name = "BuildConfigurations">
       <FileRef
-         location = "group:../../Core/BuildConfigurations/Application.xcconfig">
+         location = "group:../Core/BuildConfigurations/Application.xcconfig">
       </FileRef>
       <FileRef
-         location = "group:../../Core/BuildConfigurations/ApplicationDebug.xcconfig">
+         location = "group:../Core/BuildConfigurations/ApplicationDebug.xcconfig">
       </FileRef>
       <FileRef
-         location = "group:../../Core/BuildConfigurations/ApplicationPreview.xcconfig">
+         location = "group:../Core/BuildConfigurations/ApplicationPreview.xcconfig">
       </FileRef>
       <FileRef
-         location = "group:../../Core/BuildConfigurations/ApplicationProduction.xcconfig">
+         location = "group:../Core/BuildConfigurations/ApplicationProduction.xcconfig">
       </FileRef>
       <FileRef
-         location = "group:../../Core/BuildConfigurations/ApplicationRelease.xcconfig">
+         location = "group:../Core/BuildConfigurations/ApplicationRelease.xcconfig">
       </FileRef>
       <FileRef
-         location = "group:../../Core/BuildConfigurations/ApplicationTests.xcconfig">
+         location = "group:../Core/BuildConfigurations/ApplicationTests.xcconfig">
       </FileRef>
       <FileRef
-         location = "group:../../Core/BuildConfigurations/Shared.xcconfig">
+         location = "group:../Core/BuildConfigurations/Shared.xcconfig">
       </FileRef>
       <FileRef
-         location = "group:../../Core/BuildConfigurations/SharedDebug.xcconfig">
+         location = "group:../Core/BuildConfigurations/SharedDebug.xcconfig">
       </FileRef>
       <FileRef
-         location = "group:../../Core/BuildConfigurations/SharedRelease.xcconfig">
+         location = "group:../Core/BuildConfigurations/SharedRelease.xcconfig">
       </FileRef>
       <FileRef
-         location = "group:../../Core/BuildConfigurations/Subproject.xcconfig">
+         location = "group:../Core/BuildConfigurations/Subproject.xcconfig">
       </FileRef>
       <FileRef
-         location = "group:../../Core/BuildConfigurations/SubprojectDebug.xcconfig">
+         location = "group:../Core/BuildConfigurations/SubprojectDebug.xcconfig">
       </FileRef>
       <FileRef
-         location = "group:../../Core/BuildConfigurations/SubprojectPreview.xcconfig">
+         location = "group:../Core/BuildConfigurations/SubprojectPreview.xcconfig">
       </FileRef>
       <FileRef
-         location = "group:../../Core/BuildConfigurations/SubprojectProduction.xcconfig">
+         location = "group:../Core/BuildConfigurations/SubprojectProduction.xcconfig">
       </FileRef>
       <FileRef
-         location = "group:../../Core/BuildConfigurations/SubprojectRelease.xcconfig">
+         location = "group:../Core/BuildConfigurations/SubprojectRelease.xcconfig">
       </FileRef>
    </Group>
    <FileRef
