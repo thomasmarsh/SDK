@@ -5,6 +5,9 @@
 //  Copyright (c) 2015 FiftyThree, Inc. All rights reserved.
 //
 
+FT_PATH_TO_CORE = $(SRCROOT)/../../Core
+FT_PATH_TO_SDK = $(SRCROOT)/../../FiftyThreeSdk
+
 CURRENT_PROJECT_VERSION = 1.0.0
 BUNDLE_SHORT_VERSION_STRING = 1.0.0
 
@@ -14,13 +17,9 @@ BUNDLE_IDENTIFIER = com.fiftythree.SDKTest
 GCC_PREFIX_HEADER = TestApp/TestApp-Prefix.pch
 INFOPLIST_FILE = TestApp/TestApp-Info.plist
 
-FRAMEWORK_SEARCH_PATHS = $(inherited)
+HEADER_SEARCH_PATHS = $(inherited) $(FT_PATH_TO_SDK)
 
-LIBRARY_SEARCH_PATHS = $(inherited)
-
-HEADER_SEARCH_PATHS = $(inherited) "$(SRCROOT)/../../FiftyThreeSdk"
-
-USER_HEADER_SEARCH_PATHS = $(inherited) "$(SRCROOT)/../../FiftyThreeSdk" "$(SRCROOT)/../../../Core"
+USER_HEADER_SEARCH_PATHS = $(inherited) $(FT_PATH_TO_SDK) $(FT_PATH_TO_CORE)
 
 ARCHS = $(ARCHS_STANDARD_INCLUDING_64_BIT)
 // TODO: Revert once we sort out the "only run Crashlytics on Jenkins" issue
@@ -32,4 +31,3 @@ IPHONEOS_DEPLOYMENT_TARGET = 7.0
 
 GCC_NO_COMMON_BLOCKS = YES
 ONLY_ACTIVE_ARCH = NO
-

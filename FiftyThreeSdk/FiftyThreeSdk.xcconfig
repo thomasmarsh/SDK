@@ -5,7 +5,7 @@
 //  Copyright (c) 2015 FiftyThree, Inc. All rights reserved.
 //
 
-FT_PATH_TO_CORE = $(SRCROOT)/Core
+FT_PATH_TO_CORE = $(SRCROOT)/../Core
 
 USER_PRODUCT_NAME = FiftyThreeSdk
 USER_TARGET_NAME = $(USER_PRODUCT_NAME)
@@ -15,27 +15,11 @@ PRODUCT_NAME = $(USER_TARGET_NAME)
 PUBLIC_HEADERS_FOLDER_PATH = "/../$(USER_PRODUCT_NAME)/$(USER_PRODUCT_NAME)"
 DSTROOT = /tmp/$(USER_PRODUCT_NAME).dst
 
-FT_SDK_FRAMEWORK_SEARCH_PATHS = $(FT_SUBPROJECT_FRAMEWORK_SEARCH_PATHS) "$(SRCROOT)/../../Core/ThirdParty/boost/framework" "$(SRCROOT)/../../SDK/Core/ThirdParty/boost/framework"
-
-FRAMEWORK_SEARCH_PATHS = $(FT_SDK_FRAMEWORK_SEARCH_PATHS)
-
-HEADER_SEARCH_PATH0 = "$(SRCROOT)/../../Core"
-HEADER_SEARCH_PATH1 = "$(SRCROOT)/../../Core/ThirdParty"
-HEADER_SEARCH_PATH2 = "$(SRCROOT)/../../Core/ThirdParty/boost"
-
-HEADER_SEARCH_PATH3 = "$(SRCROOT)/../../SDK/Core"
-HEADER_SEARCH_PATH4 = "$(SRCROOT)/../../SDK/Core/ThirdParty"
-HEADER_SEARCH_PATH5 = "$(SRCROOT)/../../SDK/Core/ThirdParty/boost"
-
-FT_SDK_HEADER_SEARCH_PATHS = $(SRCROOT) $(FT_SUBPROJECT_HEADER_SEARCH_PATHS) $(HEADER_SEARCH_PATH0) $(HEADER_SEARCH_PATH1) $(HEADER_SEARCH_PATH2) $(HEADER_SEARCH_PATH3) $(HEADER_SEARCH_PATH4) $(HEADER_SEARCH_PATH5)
-
-HEADER_SEARCH_PATHS = $(inherited) $(FT_SDK_HEADER_SEARCH_PATHS)
-
-USER_HEADER_SEARCH_PATHS = $(inherited) $(FT_SDK_HEADER_SEARCH_PATHS)
-
 GCC_NO_COMMON_BLOCKS = YES
 ONLY_ACTIVE_ARCH = NO
 ONLY_ACTIVE_ARCH[config=Debug] = YES
+
+USER_HEADER_SEARCH_PATHS = $(inherited) $(FT_SUBPROJECT_HEADER_SEARCH_PATHS) "$(SRCROOT)"
 
 // By default unless you are building an archive Clang inserts bitcode markers but no bitcode in every .o file
 // instead we force clang to embed bit code in every .o file see:

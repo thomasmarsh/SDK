@@ -271,10 +271,10 @@
 		0489D4C618CE77FA00B41E20 /* BuildConfigurations */ = {
 			isa = PBXGroup;
 			children = (
-				04C3133018D3828C008097D1 /* TestAppPreview.xcconfig */,
-				04C3133118D3828C008097D1 /* TestAppRelease.xcconfig */,
 				0489D4C718CE780F00B41E20 /* TestApp.xcconfig */,
 				0489D4C818CE780F00B41E20 /* TestAppDebug.xcconfig */,
+				04C3133018D3828C008097D1 /* TestAppPreview.xcconfig */,
+				04C3133118D3828C008097D1 /* TestAppRelease.xcconfig */,
 				0489D4C918CE780F00B41E20 /* TestAppProduction.xcconfig */,
 			);
 			name = BuildConfigurations;
