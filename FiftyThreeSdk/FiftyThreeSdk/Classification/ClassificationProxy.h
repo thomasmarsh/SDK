@@ -115,8 +115,6 @@ public:
 
     core::TouchClassification Classify(core::TouchId touchID) override;
 
-    void SetShouldClassifyOneFinger(bool v) override;
-
     void SetUseDebugLogging(bool v) override;
 
     std::vector<core::TouchId> TouchesReclassified() override;

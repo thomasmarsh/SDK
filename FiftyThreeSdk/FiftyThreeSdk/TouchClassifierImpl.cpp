@@ -49,11 +49,6 @@ void TouchClassifierImpl::TouchesDidChanged(const std::set<Touch::cPtr> &touches
     _Classifier->OnTouchesChanged(nonConstTouches);
 }
 
-void TouchClassifierImpl::SetShouldClassifyOneFinger(bool v)
-{
-    _Classifier->SetShouldClassifyOneFinger(v);
-}
-
 void TouchClassifierImpl::ClearSessionStatistics()
 {
     _Classifier->ClearSessionStatistics();
