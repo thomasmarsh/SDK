@@ -90,7 +90,6 @@ public:
     virtual void ClearSessionStatistics() = 0;
     virtual fiftythree::sdk::SessionStatistics::Ptr SessionStatistics() = 0;
 
-    virtual void SetShouldClassifyOneFinger(bool v) = 0;
     // TODO:
     //    API clean up. Rightnow these live in an interface so we can get at them from within Paper.
 

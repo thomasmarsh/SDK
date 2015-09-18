@@ -1055,11 +1055,6 @@ void TouchClassificationProxy::RemoveEdgeThumbs()
     }
 }
 
-void TouchClassificationProxy::SetShouldClassifyOneFinger(bool v)
-{
-    _ShouldClassifyOneFinger = v;
-}
-
 IdTypeMap TouchClassificationProxy::ReclassifyCurrentEvent()
 {
     IdTypeMap types;

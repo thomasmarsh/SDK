@@ -106,9 +106,6 @@ public:
     // Call this once per frame before you use classifications.
     virtual void UpdateClassifications() = 0;
 
-    // Set should classify one finger.
-    virtual void SetShouldClassifyOneFinger(bool v) = 0;
-
     // Fired with a list of all classifications that have changed.
     // These touches may be expired and may transition classifications of Untracked or RemovedFromClassification.
     virtual Event<const std::vector<TouchClassificationChangedEventArgs> &> &TouchClassificationsDidChange() = 0;
