@@ -43,8 +43,6 @@ public:
     virtual Event<const std::vector<TouchClassificationChangedEventArgs> &> &TouchContinuedClassificationsDidChange() override;
     virtual void ClearSessionStatistics() override;
     virtual SessionStatistics::Ptr SessionStatistics() override;
-    // Set should classify one finger.
-    virtual void SetShouldClassifyOneFinger(bool v) override;
 
 protected:
     // Call this to get at the Classification parameters.
