@@ -1,0 +1,38 @@
+//
+//  FTSDKVersionInfo.h
+//  FiftyThreeSdk
+//
+//  Copyright (c) {{script.BUILDTIME|datetimeformat('%Y')}} FiftyThree, Inc. All rights reserved.
+//
+
+#import "FTSDKVersionInfo.h"
+
+// clang-format off
+@implementation FTSDKVersionInfo
+- (NSString *) version
+{
+    return [NSString stringWithFormat:@"%ld.%ld.%ld",(long)self.majorVersion,(long)self.minorVersion, (long)self.patchVersion];
+}
+- (NSInteger)majorVersion
+{
+    return {{script.FRAMEWORK_MAJOR_VERSION}};
+}
+- (NSInteger)minorVersion
+{
+    return {{script.FRAMEWORK_MINOR_VERSION}};
+}
+- (NSInteger)patchVersion
+{
+    return {{script.FRAMEWORK_PATCH_VERSION}};
+}
+- (NSString *)commit
+{
+    return @"{{script.GITCOMMIT}}";
+}
+
+- (NSString *)timestamp
+{
+    return @"{{script.BUILDTIME|datetimeformat('%m-%d-%y-%H:%M')}}";
+}
+@end
+// clang-format on

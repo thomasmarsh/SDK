@@ -1,0 +1,10 @@
+FiftyThree Inc., Confidential.
+
+Date: {{script.BUILDTIME|datetimeformat('%m-%d-%Y')}}
+Git-Commit: {{script.GITCOMMIT}}
+
+*Contents*
+This has the iOS static framework for the FiftyThree SDK and a sample app.
+
+*Usage Notes*
+You'll need to link the following system frameworks into your application: CoreBluetooth, UIKit, CoreGraphics, QuartzCore, and libc++.dylib. You'll also need to add -ObjC to the "Other Linker Flags" setting.

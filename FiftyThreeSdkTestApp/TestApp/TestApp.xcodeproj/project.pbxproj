@@ -30,6 +30,10 @@
 		04BD4AD518D74EC4003FCCCF /* TrivialBlit.vsh in Resources */ = {isa = PBXBuildFile; fileRef = 04C3135C18D74E85008097D1 /* TrivialBlit.vsh */; };
 		04C3133C18D3841B008097D1 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 04C3133B18D3841B008097D1 /* QuartzCore.framework */; };
 		15BB4DD218E9F705007BE707 /* FTADrawer.m in Sources */ = {isa = PBXBuildFile; fileRef = 15BB4DD118E9F705007BE707 /* FTADrawer.m */; };
+		D4ABE27D1BB2686C004758C5 /* FiftyThreeSdkUnitTests.m in Sources */ = {isa = PBXBuildFile; fileRef = D4ABE27C1BB2686C004758C5 /* FiftyThreeSdkUnitTests.m */; };
+		D4ABE28B1BB268D8004758C5 /* libCore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0489D4BD18CE766200B41E20 /* libCore.a */; };
+		D4ABE28C1BB268DB004758C5 /* libFiftyThreeSdk.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0489D4B618CE764B00B41E20 /* libFiftyThreeSdk.a */; };
+		D4ABE28E1BB268E3004758C5 /* libc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = D4ABE28D1BB268E3004758C5 /* libc++.tbd */; };
 		D4F525D91B9625020002B941 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = D4F525D81B9625020002B941 /* Default-568h@2x.png */; };
 /* End PBXBuildFile section */
 
@@ -68,6 +72,27 @@
 			proxyType = 1;
 			remoteGlobalIDString = 66A8387016E52D840048FFE4;
 			remoteInfo = FiftyThreeSdk;
+		};
+		D4ABE27F1BB2686C004758C5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0489D46918CE75D100B41E20 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 0489D47018CE75D100B41E20;
+			remoteInfo = TestApp;
+		};
+		D4ABE2871BB268CC004758C5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0489D4B118CE764B00B41E20 /* FiftyThreeSdk.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 66A8387016E52D840048FFE4;
+			remoteInfo = FiftyThreeSdk;
+		};
+		D4ABE2891BB268CF004758C5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0489D4B718CE766200B41E20 /* Core.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 04EDB34F18BCFBD900E35A40;
+			remoteInfo = Core;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -108,6 +133,10 @@
 		04C3135C18D74E85008097D1 /* TrivialBlit.vsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; name = TrivialBlit.vsh; path = Shaders/TrivialBlit.vsh; sourceTree = "<group>"; };
 		15BB4DD018E9F705007BE707 /* FTADrawer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FTADrawer.h; sourceTree = "<group>"; };
 		15BB4DD118E9F705007BE707 /* FTADrawer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FTADrawer.m; sourceTree = "<group>"; };
+		D4ABE27A1BB2686C004758C5 /* FiftyThreeSdkUnitTests.app */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FiftyThreeSdkUnitTests.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D4ABE27C1BB2686C004758C5 /* FiftyThreeSdkUnitTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FiftyThreeSdkUnitTests.m; sourceTree = "<group>"; };
+		D4ABE27E1BB2686C004758C5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		D4ABE28D1BB268E3004758C5 /* libc++.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libc++.tbd"; path = "usr/lib/libc++.tbd"; sourceTree = SDKROOT; };
 		D4F525D81B9625020002B941 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -129,6 +158,16 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		D4ABE2771BB2686C004758C5 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D4ABE28E1BB268E3004758C5 /* libc++.tbd in Frameworks */,
+				D4ABE28C1BB268DB004758C5 /* libFiftyThreeSdk.a in Frameworks */,
+				D4ABE28B1BB268D8004758C5 /* libCore.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -138,6 +177,7 @@
 				D4F525D81B9625020002B941 /* Default-568h@2x.png */,
 				0489D4C618CE77FA00B41E20 /* BuildConfigurations */,
 				0489D47E18CE75D100B41E20 /* TestApp */,
+				D4ABE27B1BB2686C004758C5 /* FiftyThreeSdkUnitTests */,
 				0489D47318CE75D100B41E20 /* Frameworks */,
 				0489D47218CE75D100B41E20 /* Products */,
 			);
@@ -147,6 +187,7 @@
 			isa = PBXGroup;
 			children = (
 				0489D47118CE75D100B41E20 /* SDKTest.app */,
+				D4ABE27A1BB2686C004758C5 /* FiftyThreeSdkUnitTests.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -154,6 +195,7 @@
 		0489D47318CE75D100B41E20 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				D4ABE28D1BB268E3004758C5 /* libc++.tbd */,
 				04C3133B18D3841B008097D1 /* QuartzCore.framework */,
 				0489D4CF18CE78B400B41E20 /* CoreBluetooth.framework */,
 				0489D4CD18CE78A900B41E20 /* libc++.dylib */,
@@ -232,6 +274,15 @@
 			name = BuildConfigurations;
 			sourceTree = "<group>";
 		};
+		D4ABE27B1BB2686C004758C5 /* FiftyThreeSdkUnitTests */ = {
+			isa = PBXGroup;
+			children = (
+				D4ABE27C1BB2686C004758C5 /* FiftyThreeSdkUnitTests.m */,
+				D4ABE27E1BB2686C004758C5 /* Info.plist */,
+			);
+			path = FiftyThreeSdkUnitTests;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -254,6 +305,26 @@
 			productReference = 0489D47118CE75D100B41E20 /* SDKTest.app */;
 			productType = "com.apple.product-type.application";
 		};
+		D4ABE2791BB2686C004758C5 /* FiftyThreeSdkUnitTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D4ABE2861BB2686C004758C5 /* Build configuration list for PBXNativeTarget "FiftyThreeSdkUnitTests" */;
+			buildPhases = (
+				D4ABE2761BB2686C004758C5 /* Sources */,
+				D4ABE2771BB2686C004758C5 /* Frameworks */,
+				D4ABE2781BB2686C004758C5 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				D4ABE28A1BB268CF004758C5 /* PBXTargetDependency */,
+				D4ABE2881BB268CC004758C5 /* PBXTargetDependency */,
+				D4ABE2801BB2686C004758C5 /* PBXTargetDependency */,
+			);
+			name = FiftyThreeSdkUnitTests;
+			productName = FiftyThreeSdkUnitTests;
+			productReference = D4ABE27A1BB2686C004758C5 /* FiftyThreeSdkUnitTests.app */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -266,6 +337,10 @@
 				TargetAttributes = {
 					0489D47018CE75D100B41E20 = {
 						DevelopmentTeam = XHG73HYLJ8;
+					};
+					D4ABE2791BB2686C004758C5 = {
+						CreatedOnToolsVersion = 7.0;
+						TestTargetID = 0489D47018CE75D100B41E20;
 					};
 				};
 			};
@@ -293,6 +368,7 @@
 			projectRoot = "";
 			targets = (
 				0489D47018CE75D100B41E20 /* TestApp */,
+				D4ABE2791BB2686C004758C5 /* FiftyThreeSdkUnitTests */,
 			);
 		};
 /* End PBXProject section */
@@ -337,6 +413,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		D4ABE2781BB2686C004758C5 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -353,6 +436,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		D4ABE2761BB2686C004758C5 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D4ABE27D1BB2686C004758C5 /* FiftyThreeSdkUnitTests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -365,6 +456,21 @@
 			isa = PBXTargetDependency;
 			name = FiftyThreeSdk;
 			targetProxy = 0489D4C418CE767E00B41E20 /* PBXContainerItemProxy */;
+		};
+		D4ABE2801BB2686C004758C5 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 0489D47018CE75D100B41E20 /* TestApp */;
+			targetProxy = D4ABE27F1BB2686C004758C5 /* PBXContainerItemProxy */;
+		};
+		D4ABE2881BB268CC004758C5 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = FiftyThreeSdk;
+			targetProxy = D4ABE2871BB268CC004758C5 /* PBXContainerItemProxy */;
+		};
+		D4ABE28A1BB268CF004758C5 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = Core;
+			targetProxy = D4ABE2891BB268CF004758C5 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -452,6 +558,180 @@
 			};
 			name = Preview;
 		};
+		D4ABE2811BB2686C004758C5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_FILE = FiftyThreeSdkUnitTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.fiftythree.FiftyThreeSdkUnitTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SDKTest.app/SDKTest";
+			};
+			name = Debug;
+		};
+		D4ABE2821BB2686C004758C5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_FILE = FiftyThreeSdkUnitTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MTL_ENABLE_DEBUG_INFO = NO;
+				PRODUCT_BUNDLE_IDENTIFIER = com.fiftythree.FiftyThreeSdkUnitTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SDKTest.app/SDKTest";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		D4ABE2831BB2686C004758C5 /* Preview */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_FILE = FiftyThreeSdkUnitTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MTL_ENABLE_DEBUG_INFO = NO;
+				PRODUCT_BUNDLE_IDENTIFIER = com.fiftythree.FiftyThreeSdkUnitTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SDKTest.app/SDKTest";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Preview;
+		};
+		D4ABE2841BB2686C004758C5 /* Production */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_FILE = FiftyThreeSdkUnitTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MTL_ENABLE_DEBUG_INFO = NO;
+				PRODUCT_BUNDLE_IDENTIFIER = com.fiftythree.FiftyThreeSdkUnitTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SDKTest.app/SDKTest";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Production;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -473,6 +753,17 @@
 				0489D4AD18CE75D100B41E20 /* Release */,
 				04C3132D18D381C8008097D1 /* Preview */,
 				04C3132A18D381B6008097D1 /* Production */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Production;
+		};
+		D4ABE2861BB2686C004758C5 /* Build configuration list for PBXNativeTarget "FiftyThreeSdkUnitTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D4ABE2811BB2686C004758C5 /* Debug */,
+				D4ABE2821BB2686C004758C5 /* Release */,
+				D4ABE2831BB2686C004758C5 /* Preview */,
+				D4ABE2841BB2686C004758C5 /* Production */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Production;
