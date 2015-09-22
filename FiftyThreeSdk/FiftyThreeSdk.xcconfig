@@ -16,8 +16,6 @@ PUBLIC_HEADERS_FOLDER_PATH = "/../$(USER_PRODUCT_NAME)/$(USER_PRODUCT_NAME)"
 DSTROOT = /tmp/$(USER_PRODUCT_NAME).dst
 
 GCC_NO_COMMON_BLOCKS = YES
-ONLY_ACTIVE_ARCH = NO
-ONLY_ACTIVE_ARCH[config=Debug] = YES
 
 USER_HEADER_SEARCH_PATHS = $(inherited) $(FT_SUBPROJECT_HEADER_SEARCH_PATHS) "$(SRCROOT)"
 
@@ -26,3 +24,5 @@ USER_HEADER_SEARCH_PATHS = $(inherited) $(FT_SUBPROJECT_HEADER_SEARCH_PATHS) "$(
 // http://stackoverflow.com/questions/31486232/how-do-i-xcodebuild-a-static-library-with-bitcode-enabled
 ENABLE_BITCODE[sdk=iphoneos9.*] = YES
 OTHER_CFLAGS[sdk=iphoneos9.*] = $(inherited) -fembed-bitcode
+
+IPHONEOS_DEPLOYMENT_TARGET = 7.0
