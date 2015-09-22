@@ -24,3 +24,8 @@ symbols/*
  
 #xctool intermediates
 .build/*
+
+#eclipse
+*.pydevproject
+*.project
+

@@ -7,3 +7,5 @@
 
 #include "../Core/BuildConfigurations/SubprojectDebug.xcconfig"
 #include "FiftyThreeSdk.xcconfig"
+
+ENABLE_TESTABILITY = YES
