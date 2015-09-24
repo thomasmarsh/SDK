@@ -29,7 +29,7 @@ class XCRunCommand(Command):
     __metaclass__ = ABCMeta
     
     def setup(self, script, previousCommand):
-        self._inheritAttribute("REPOSITORY", script)
+        self._inheritAttribute("LOCAL_REPOSITORY", script)
         self._inheritAttribute("ARTIFACTS_DIRECTORY", script)
         self._inheritAttribute("ABS_ARTIFACTS_DIRECTORY", script)
         self._inheritAttribute("SDKS", script)
@@ -192,8 +192,8 @@ class CopyPublicHeaders(XCRunCommand, SearchPathAgent):
     def run(self, script, previousCommand):
         self._inheritAttribute("FRAMEWORK_CURRENT_VERSION_HEADERS", script)
         
-        headerSearchPath = SearchPath(script.ENVIRONMENT, self.REPOSITORY)
-        headerSearchPath.scanDirs(os.path.join(self.REPOSITORY, "FiftyThreeSdk"), self)
+        headerSearchPath = SearchPath(script.ENVIRONMENT, self.LOCAL_REPOSITORY)
+        headerSearchPath.scanDirs(os.path.join(self.LOCAL_REPOSITORY, "FiftyThreeSdk"), self)
         if not hasattr(self, "SDKHEADER"):
             script.ENVIRONMENT.error("Failed to find the master SDK include {}".format(self.FIFTYTHREE_HEADER_NAME))
             return ERROR_NOTFOUND
@@ -250,12 +250,12 @@ class CopySampleApp(Command):
     '''
     def run(self, script, previousCommand):
         self._inheritAttribute("TMPPACKAGEDIR", script)
-        self._inheritAttribute("REPOSITORY", script)
+        self._inheritAttribute("LOCAL_REPOSITORY", script)
         
         script.ENVIRONMENT.info('Copying Sample App contents to %s' % self.TMPPACKAGEDIR)
 
-        sample_app_dir = os.path.join(self.REPOSITORY, 'FiftyThreeSimpleSampleApp')
-        test_app_src_dir = os.path.join(self.REPOSITORY, 'FiftyThreeSdkTestApp', 'TestApp', 'TestApp')
+        sample_app_dir = os.path.join(self.LOCAL_REPOSITORY, 'FiftyThreeSimpleSampleApp')
+        test_app_src_dir = os.path.join(self.LOCAL_REPOSITORY, 'FiftyThreeSdkTestApp', 'TestApp', 'TestApp')
         
         target_dir = os.path.join(self.TMPPACKAGEDIR, 'FiftyThreeSimpleSampleApp' )
         target_src_dir = os.path.join(target_dir, 'FiftyThreeSimpleSampleApp' )
@@ -291,9 +291,9 @@ class CopyStaticDocs(Command):
     '''
     
     def run(self, script, previousCommand):
-        self._inheritAttribute("REPOSITORY", script)
+        self._inheritAttribute("LOCAL_REPOSITORY", script)
         self._inheritAttribute("TMPPACKAGEDIR", script)
-        docsdir = os.path.join(self.REPOSITORY, "docs")
+        docsdir = os.path.join(self.LOCAL_REPOSITORY, "docs")
         for filename in os.listdir(docsdir):
             fullpath = os.path.join(docsdir, filename)
             if os.path.isdir(fullpath):
@@ -316,11 +316,11 @@ class MakeStaticFramework(Command):
         if SUCCESS != result:
             return result
 
-        self._inheritAttribute("REPOSITORY", script)
+        self._inheritAttribute("LOCAL_REPOSITORY", script)
         self._inheritAttribute("ARTIFACTS_DIRECTORY", script)
         self._inheritAttribute("SDK_VERSION_STRING", script)
 
-        setattr(self, "ABS_ARTIFACTS_DIRECTORY", os.path.join(self.REPOSITORY, self.ARTIFACTS_DIRECTORY))
+        setattr(self, "ABS_ARTIFACTS_DIRECTORY", os.path.join(self.LOCAL_REPOSITORY, self.ARTIFACTS_DIRECTORY))
         try:
             self._inheritAttribute("TMPBUILDDIR", script)
         except MissingAttributeException:

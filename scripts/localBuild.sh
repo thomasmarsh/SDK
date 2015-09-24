@@ -11,14 +11,19 @@
 # |
 # +----------------------------------------------------------------------------------------------------------+
 
-
-if [ -z ${REPOSITORY+x} ]; then
-    REPOSITORY=$(git rev-parse --show-toplevel)
+if [ -z ${LOCAL_REPOSITORY+x} ]; then
+    LOCAL_REPOSITORY=$(git rev-parse --show-toplevel)
 fi
 
 # sudo easy_install jinja2
-PYTHONPATH=$PYTHONPATH:$REPOSITORY/scripts python -m ftsdk.scripts.build -env ShipIo --target Production
+export PYTHONPATH=${PYTHONPATH}:${LOCAL_REPOSITORY}/scripts 
+
+echo "+-----------------------------------------------------------------------------+"
+echo "Using PYTHONPATH=${PYTHONPATH}"
+echo -e "+-----------------------------------------------------------------------------+\n\n"
+
+
+python -m ftsdk.scripts.build -env ShipIo --target Production
 
 # tests will be run by CI environment. Use xcode to run tests locally.
-
-PYTHONPATH=$PYTHONPATH:$REPOSITORY/scripts python -m ftsdk.scripts.publish -env ShipIo --target Production
+python -m ftsdk.scripts.publish -env ShipIo --target Production

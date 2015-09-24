@@ -98,8 +98,8 @@ class XCToolCommand(Command):
             '''):
             return ERROR_MISSING_TOOLS
         
-        self._inheritAttribute("REPOSITORY", script)
-        setattr(self, "ABS_ARTIFACTS_DIRECTORY", os.path.join(self.REPOSITORY, self.ARTIFACTS_DIRECTORY))
+        self._inheritAttribute("LOCAL_REPOSITORY", script)
+        setattr(self, "ABS_ARTIFACTS_DIRECTORY", os.path.join(self.LOCAL_REPOSITORY, self.ARTIFACTS_DIRECTORY))
         return SUCCESS
 
     def run(self, script, previousCommand):
@@ -107,7 +107,7 @@ class XCToolCommand(Command):
         self._inheritAttribute("ABS_ARTIFACTS_DIRECTORY", script)
         mkdirs(self.ARTIFACTS_DIRECTORY)
         
-        setattr(self, "WORKSPACE", os.path.join(self.REPOSITORY, "FiftyThreeSdkTestApp", "FiftyThreeSdkTestApp.xcworkspace"))
+        setattr(self, "WORKSPACE", os.path.join(self.LOCAL_REPOSITORY, "FiftyThreeSdkTestApp", "FiftyThreeSdkTestApp.xcworkspace"))
         
         script.ENVIRONMENT.info("will build the {} target of the {} workspace into {}".format(self.target, self.WORKSPACE, self.ABS_ARTIFACTS_DIRECTORY))
         
@@ -126,9 +126,9 @@ class Nuke(Command):
     '''
     
     def run(self, script, previousCommand):
-        self._inheritAttribute("REPOSITORY", script)
+        self._inheritAttribute("LOCAL_REPOSITORY", script)
         self._inheritAttribute("ARTIFACTS_DIRECTORY", script)
-        setattr(self, "ABS_ARTIFACTS_DIRECTORY", os.path.join(self.REPOSITORY, self.ARTIFACTS_DIRECTORY))
+        setattr(self, "ABS_ARTIFACTS_DIRECTORY", os.path.join(self.LOCAL_REPOSITORY, self.ARTIFACTS_DIRECTORY))
         shutil.rmtree(self.ABS_ARTIFACTS_DIRECTORY)
         return SUCCESS
     
@@ -190,14 +190,14 @@ class VersionSdkSource(Command):
     '''
 
     def run(self, script, previousCommand):
-        self._inheritAttribute("REPOSITORY", script)
+        self._inheritAttribute("LOCAL_REPOSITORY", script)
         self._inheritAttribute("SDK_VERSION_STRING", script)
         version_match = re.match("(\d+)\.(\d+)\.(\d+)", self.SDK_VERSION_STRING)
         setattr(self, "FRAMEWORK_MAJOR_VERSION", version_match.group(1))
         setattr(self, "FRAMEWORK_MINOR_VERSION", version_match.group(2))
         setattr(self, "FRAMEWORK_PATCH_VERSION", version_match.group(3))
         
-        setattr(self, "FTSDKVERSIONINFO_PATH", os.path.join(self.REPOSITORY, "FiftyThreeSdk", "FiftyThreeSdk", "FTSDKVersionInfo.m"))
+        setattr(self, "FTSDKVERSIONINFO_PATH", os.path.join(self.LOCAL_REPOSITORY, "FiftyThreeSdk", "FiftyThreeSdk", "FTSDKVersionInfo.m"))
         JinjaTemplates.getTemplate(script, "FTSDKVersionInfo.m.jinja").renderTo(self.FTSDKVERSIONINFO_PATH)
         return SUCCESS
 

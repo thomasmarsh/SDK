@@ -227,11 +227,11 @@ class ShipIo(Environment):
         try:
             return super(ShipIo, self).__getattr__(name)
         except AttributeError as e:
-            if name == 'REPOSITORY':
+            if name == 'LOCAL_REPOSITORY':
                 value = subprocess.check_output("git rev-parse --show-toplevel", shell=True).strip()
                 if self.willPrintVerbose():
                     self.verbose("Attribute {}={} was provided by querying git.".format(name, str(value)))
-                setattr(self, 'REPOSITORY', value)
+                setattr(self, 'LOCAL_REPOSITORY', value)
                 return value
             elif name == 'BUILD_BRANCH_NAME':
                 try:

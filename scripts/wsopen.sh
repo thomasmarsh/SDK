@@ -13,8 +13,9 @@
 # |
 # +----------------------------------------------------------------------------------------------------------+
 
-REPOSITORY=$(git rev-parse --show-toplevel)/FiftyThreeSdkTestApp/FiftyThreeSdkTestApp.xcworkspace
 
-echo -e "\033[1mOpening ${REPOSITORY} as the SDK workspace…\033[0m\n"
+LOCAL_WORKSPACE=$(git rev-parse --show-toplevel)/FiftyThreeSdkTestApp/FiftyThreeSdkTestApp.xcworkspace
 
-open ${REPOSITORY}
+echo -e "\033[1mOpening ${LOCAL_WORKSPACE} as the SDK workspace…\033[0m\n"
+
+open ${LOCAL_WORKSPACE}
