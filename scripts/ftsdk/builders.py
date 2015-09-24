@@ -50,6 +50,8 @@ class XCToolCommand(Command):
         self._inheritAttributeOrDefault("JENKINS_BUILD", script, False)
         self._inheritAttributeOrDefault("ONLY_ACTIVE_ARCH", script, "NO")
         self._inheritAttributeOrDefault("DEBUG_INFORMATION_FORMAT", script, "dwarf-with-dsym")
+        self._inheritAttributeOrDefault("CODE_SIGN_IDENTITY", script, "")
+        self._inheritAttributeOrDefault("CODE_SIGNING_REQUIRED", script, "NO")
         self._inheritAttribute("BUILD_BRANCH_NAME", script)
         self._inheritAttribute('SDK_VERSION_STRING', script)
         
@@ -67,6 +69,8 @@ class XCToolCommand(Command):
                 'MASTER_BRANCH_BUILD={}'.format(str(self.is_master_branch(self.BUILD_BRANCH_NAME))),
                 'PREVIEW_BRANCH_BUILD={}'.format(str(self.is_preview_branch(self.BUILD_BRANCH_NAME))),
                 'CONFIGURATION_BUILD_DIR="{}"'.format(artifactsDir),
+                'CODE_SIGN_IDENTITY="{}"'.format(self.CODE_SIGN_IDENTITY),
+                'CODE_SIGNING_REQUIRED={}'.format(self.CODE_SIGNING_REQUIRED),
                 'OBJROOT="{}"'.format(artifactsDir),
                 'SYMROOT="{}"'.format(artifactsDir),
                 'DSTROOT="{}"'.format(artifactsDir),
