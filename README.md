@@ -11,7 +11,55 @@
 - FiftyThreeSimpleSampleApp/ contains *only* a xcodeporoject file, with out any FiftyThree build configuration settings. This is packaged and built as part of the automated build process. If you add files to the test app you'll need to add them here too.
 
 ## Building (Internally):
-- Open FiftyThreeSdkTestApp/FiftyThreeSdkTestApp.xcworkspace/ in xcode. Note, this test app ships as part of the SDK but compiles non-framework versions so it's easy to step in the debugger.
+For debugging open FiftyThreeSdkTestApp/FiftyThreeSdkTestApp.xcworkspace/ in xcode. Note, this test app ships as part of the SDK but compiles non-framework versions so it's easy to step in the debugger.
+
+To build from the commandline use the python scripts provided in the script folder.
+
+### Python Script Cookbook
+
+(using the [`ShipIo`](https://support.ship.io/environment/build-environment) environment. It's possible there are other environments available)
+
+##### List available commands
+```
+python -m ftsdk.scripts -env ShipIo
+```
+
+##### Simple build (no clean) using [XCTool](https://github.com/facebook/xctool)
+```
+python -m ftsdk.scripts -env ShipIo XCToolBuild
+```
+
+##### Full build using [XCTool](https://github.com/facebook/xctool)
+```
+python -m ftsdk.scripts.build -env ShipIo
+```
+
+##### Create static framework
+```
+python -m ftsdk.scripts.publish -env ShipIo
+```
+
+##### Create static framework with debug symbols
+```
+python -m ftsdk.scripts.publish.nostrip -env ShipIo
+```
+
+##### Print build variable resolutions
+```
+python -m ftsdk.scripts -v -env ShipIo XCToolBuild
+```
+
+##### Debug build (Production is the default)
+```
+python -m ftsdk.scripts --target Debug -env ShipIo XCToolBuild
+```
+
+##### Override any variable in the python scripts
+You can override any variable used by the python scripts (see "Print build variable resolutions" above for how to see these variables) by setting the same variable in your environment.
+For example:
+```
+ARTIFACTS_DIRECTORY=.developbuild python -m ftsdk.scripts.build --target Develop -env ShipIo
+```
 
 ## Release
 ### Release Checklist:

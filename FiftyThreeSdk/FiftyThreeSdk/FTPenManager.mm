@@ -710,7 +710,7 @@ NSString *FTPenManagerStateToString(FTPenManagerState state)
             NSInteger runningFirmwareVersion = [FTFirmwareManager currentRunningFirmwareVersion:self.pen];
             if (!self.forceFirmwareUpdate && self.latestFirmwareVersion > 0 && runningFirmwareVersion >= self.latestFirmwareVersion) {
                 // we're done!
-                MLOG_DEBUG(FTLogSDK, "Successfully completed firmware update to %ld", runningFirmwareVersion);
+                MLOG_DEBUG(FTLogSDK, "Successfully completed firmware update to %ld", (long)runningFirmwareVersion);
                 [[NSNotificationCenter defaultCenter] postNotificationName:kFTPenManagerFirmwareUpdateDidCompleteSuccessfully
                                                                     object:self];
                 [self fireStateMachineEvent:kBecomeMarriedEventName];

@@ -416,7 +416,7 @@
         [self.penManager update];
     }
     [self.drawer draw];
-    self.fps.title = [NSString stringWithFormat:@"%ld@%ld", self.framesDisplayed, self.framesPerSecond];
+    self.fps.title = [NSString stringWithFormat:@"%ld@%ld", (long)self.framesDisplayed, (long)self.framesPerSecond];
     
 }
 

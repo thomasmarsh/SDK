@@ -1,40 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "0640"
+   LastUpgradeVersion = "0700"
    version = "1.3">
    <BuildAction
       parallelizeBuildables = "YES"
       buildImplicitDependencies = "YES">
-      <BuildActionEntries>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "0489D47018CE75D100B41E20"
-               BuildableName = "SDKTest.app"
-               BlueprintName = "TestApp"
-               ReferencedContainer = "container:TestApp.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "NO"
-            buildForArchiving = "NO"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "0489D49918CE75D100B41E20"
-               BuildableName = "SDKTest.app"
-               BlueprintName = "TestAppTests"
-               ReferencedContainer = "container:TestApp.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-      </BuildActionEntries>
    </BuildAction>
    <TestAction
       buildConfiguration = "Debug"
@@ -46,17 +16,17 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "0489D49918CE75D100B41E20"
-               BuildableName = "SDKTest.app"
-               BlueprintName = "TestAppTests"
-               ReferencedContainer = "container:TestApp.xcodeproj">
+               BlueprintIdentifier = "04EDB35F18BCFBD900E35A40"
+               BuildableName = "Core.xctest"
+               BlueprintName = "CoreTests"
+               ReferencedContainer = "container:../../Core/Core.xcodeproj">
             </BuildableReference>
          </TestableReference>
          <TestableReference
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "D4B5AAD41BB1EF990060209C"
+               BlueprintIdentifier = "D4ABE2791BB2686C004758C5"
                BuildableName = "FiftyThreeSdkUnitTests.app"
                BlueprintName = "FiftyThreeSdkUnitTests"
                ReferencedContainer = "container:TestApp.xcodeproj">
@@ -104,8 +74,7 @@
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
       debugDocumentVersioning = "YES">
-      <BuildableProductRunnable
-         runnableDebuggingMode = "0">
+      <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "0489D47018CE75D100B41E20"
@@ -113,7 +82,7 @@
             BlueprintName = "TestApp"
             ReferencedContainer = "container:TestApp.xcodeproj">
          </BuildableReference>
-      </BuildableProductRunnable>
+      </MacroExpansion>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">
