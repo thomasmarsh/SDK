@@ -10,8 +10,8 @@ from ftsdk.scripts import Script
 
 from ftsdk.builders import XCToolUseExistingArtifacts
 import sys
-from ftsdk.packagers import MergeArchives, MakeFatArchive, CopyPublicHeaders, MakeFrameworkPlist,\
-    MakeStaticFramework, StripArchives, CopySampleApp, AddReadmeToSdk, CopyStaticDocs
+from ftsdk.packagers import MergeArchives, MakeFatArchive, CopyPublicHeaders, HeaderDocGen,\
+    MakeFrameworkPlist,MakeStaticFramework, StripArchives, CopySampleApp, AddReadmeToSdk, CopyStaticDocs
 from ftsdk.publishers import PublishStaticFrameworkToBuildArtifacts
 from ftsdk.validators import CheckForArchitectures
 

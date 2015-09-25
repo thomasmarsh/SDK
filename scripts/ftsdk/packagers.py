@@ -225,23 +225,43 @@ class CopyPublicHeaders(XCRunCommand, SearchPathAgent):
 # +----------------------------------------------------------------------------------------------------------+
 
 class HeaderDocGen(Command):
+    '''
+    Generates HTML documentation by reading headerdoc in SDK header files.
+    '''
 
-    def whereIs(program):
-    for path in os.environ.get('PATH', '').split(':'):
-        if os.path.exists(os.path.join(path, program)) and not os.path.isdir(os.path.join(path, program)):
-            return os.path.join(path, program)
-    return None
+    def tool_exist(self, name):
+        try:
+            devnull = open(os.devnull)
+            subprocess.Popen([name], stdout=devnull, stderr=devnull).communicate()
+        except OSError as e:
+            if e.errno == os.errno.ENOENT:
+                return False
+        return True
 
     def run(self, script, previousCommand):
-        location = whereIs('headerdoc2html')
-        if location is not None:
-            headerdoc_resource_dir = os.path.join(self.REPOSITORY, 'scripts', 'HeaderDoc')
-            headerdocConfigPath = os.path.join(headerdoc_resource_dir, "headerDoc2HTML.config")
+        self._inheritAttribute("LOCAL_REPOSITORY", script)
+        self._inheritAttribute("FRAMEWORK_CURRENT_VERSION_HEADERS", script)
+        self._inheritAttribute("FRAMEWORK_CURRENT_VERSION_DOCS", script)
 
-            subprocess.check_call("headerdoc2html -c {} -o {} {}".format(headerdocConfigPath, self.FRAMEWORK_CURRENT_VERSION_DOCS, self.FRAMEWORK_CURRENT_VERSION_HEADERS))
-            subprocess.check_call('gatherheaderdoc {}'.format(self.FRAMEWORK_CURRENT_VERSION_DOCS))
+        if self.tool_exist('headerdoc2html') == True:
+            original_working_dir = os.getcwd()
 
-            shutil.copytree(os.path.join(headerdoc_resource_dir, "Resources"), self.FRAMEWORK_CURRENT_VERSION_DOCS)
+            headerdoc_process_dir = os.path.join(self.LOCAL_REPOSITORY, 'HeaderDoc')
+            os.chdir(headerdoc_process_dir)
+
+            current_working_dir = os.getcwd()
+
+            currentVersionHeaderPath = os.path.relpath(self.FRAMEWORK_CURRENT_VERSION_HEADERS, current_working_dir)
+            currentVersionDocsPath = os.path.relpath(self.FRAMEWORK_CURRENT_VERSION_DOCS, current_working_dir)
+
+            headerdoc2htmlScript = "headerdoc2html -o {} {}".format(currentVersionDocsPath, currentVersionHeaderPath)
+
+            subprocess.check_call(headerdoc2htmlScript, shell=True)
+            subprocess.check_call("gatherheaderdoc {}".format(currentVersionDocsPath), shell=True)
+
+            shutil.copytree(os.path.join(headerdoc_process_dir, "Resources"), os.path.join(currentVersionDocsPath, "Resources"))
+
+            os.chdir(original_working_dir)
 
             return SUCCESS
 
