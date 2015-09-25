@@ -237,7 +237,6 @@ class HeaderDocGen(Command):
         if SUCCESS == script.ENVIRONMENT.checkTool('headerdoc2html', 'headerdoc2html command not found. Check if you have the XCode installed'):
 
             headerdoc_process_dir = os.path.join(self.LOCAL_REPOSITORY, 'HeaderDoc')
-            os.chdir(headerdoc_process_dir)
 
             currentVersionHeaderPath = os.path.relpath(self.FRAMEWORK_CURRENT_VERSION_HEADERS, headerdoc_process_dir)
             currentVersionDocsPath = os.path.relpath(self.FRAMEWORK_CURRENT_VERSION_DOCS, headerdoc_process_dir)
@@ -247,7 +246,7 @@ class HeaderDocGen(Command):
             subprocess.check_call(headerdoc2htmlScript, cwd=headerdoc_process_dir, shell=True)
             subprocess.check_call("gatherheaderdoc {}".format(currentVersionDocsPath), cwd=headerdoc_process_dir, shell=True)
 
-            shutil.copytree(os.path.join(headerdoc_process_dir, "Resources"), os.path.join(currentVersionDocsPath, "Resources"))
+            shutil.copytree(os.path.join(headerdoc_process_dir, "Resources"), os.path.join(self.FRAMEWORK_CURRENT_VERSION_DOCS, "Resources"))
 
             return SUCCESS
 
