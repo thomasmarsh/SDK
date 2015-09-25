@@ -229,21 +229,12 @@ class HeaderDocGen(Command):
     Generates HTML documentation by reading headerdoc in SDK header files.
     '''
 
-    def tool_exist(self, name):
-        try:
-            devnull = open(os.devnull)
-            subprocess.Popen([name], stdout=devnull, stderr=devnull).communicate()
-        except OSError as e:
-            if e.errno == os.errno.ENOENT:
-                return False
-        return True
-
     def run(self, script, previousCommand):
         self._inheritAttribute("LOCAL_REPOSITORY", script)
         self._inheritAttribute("FRAMEWORK_CURRENT_VERSION_HEADERS", script)
         self._inheritAttribute("FRAMEWORK_CURRENT_VERSION_DOCS", script)
 
-        if self.tool_exist('headerdoc2html') == True:
+        if SUCCESS == script.ENVIRONMENT.checkTool('headerdoc2html', 'headerdoc2html command not found. Check if you have the XCode installed'):
             original_working_dir = os.getcwd()
 
             headerdoc_process_dir = os.path.join(self.LOCAL_REPOSITORY, 'HeaderDoc')
