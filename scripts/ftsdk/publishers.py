@@ -6,7 +6,7 @@
 # | Copyright (c) 2015 FiftyThree, Inc. All rights reserved.
 # |
 # +----------------------------------------------------------------------------------------------------------+
-from ftsdk import Command, SUCCESS
+from ftsdk import Command, SUCCESS, ERROR_UNEXPECTED_STATE
 import shutil
 import os
 
@@ -21,11 +21,17 @@ class PublishStaticFrameworkToBuildArtifacts(Command):
         self._inheritAttribute("ABS_ARTIFACTS_DIRECTORY", script)
         self._inheritAttribute("TMPPACKAGEDIR", script)
         self._inheritAttribute("SDK_VERSION_STRING", script)
-        basename = os.path.join(self.ABS_ARTIFACTS_DIRECTORY, "fiftythree-public-sdk-{}".format(self.SDK_VERSION_STRING))
-        shutil.make_archive(basename, 
+        basepath = os.path.join(self.ABS_ARTIFACTS_DIRECTORY, "fiftythree-public-sdk-{}".format(self.SDK_VERSION_STRING))
+        archiveName = shutil.make_archive(basepath, 
                             self.ARCHIVE_FORMAT, 
                             os.path.abspath(os.path.join(self.TMPPACKAGEDIR, os.pardir)), 
                             os.path.basename(self.TMPPACKAGEDIR), 
                             verbose=script.ENVIRONMENT.willPrintVerbose(), 
                             logger=script.ENVIRONMENT)
-        return SUCCESS
+
+        if os.path.isfile(archiveName):
+            script.ENVIRONMENT.debug("Created SDK bundle at {}".format(archiveName))
+            return SUCCESS
+        else:
+            script.ENVIRONMENT.error("Expected SDK bundle at {}.[extension]".format(basepath))
+            return ERROR_UNEXPECTED_STATE
