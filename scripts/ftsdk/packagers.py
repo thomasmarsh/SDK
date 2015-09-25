@@ -234,7 +234,7 @@ class HeaderDocGen(Command):
         self._inheritAttribute("FRAMEWORK_CURRENT_VERSION_HEADERS", script)
         self._inheritAttribute("FRAMEWORK_CURRENT_VERSION_DOCS", script)
 
-        if SUCCESS == script.ENVIRONMENT.checkTool('headerdoc2html', 'headerdoc2html command not found. Check if you have the XCode installed'):
+        if SUCCESS == script.ENVIRONMENT.checkTool('headerdoc2html', 'headerdoc2html command not found. Check if you have XCode installed'):
 
             headerdoc_process_dir = os.path.join(self.LOCAL_REPOSITORY, 'HeaderDoc')
 
