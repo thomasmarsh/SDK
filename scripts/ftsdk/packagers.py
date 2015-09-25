@@ -235,24 +235,19 @@ class HeaderDocGen(Command):
         self._inheritAttribute("FRAMEWORK_CURRENT_VERSION_DOCS", script)
 
         if SUCCESS == script.ENVIRONMENT.checkTool('headerdoc2html', 'headerdoc2html command not found. Check if you have the XCode installed'):
-            original_working_dir = os.getcwd()
 
             headerdoc_process_dir = os.path.join(self.LOCAL_REPOSITORY, 'HeaderDoc')
             os.chdir(headerdoc_process_dir)
 
-            current_working_dir = os.getcwd()
-
-            currentVersionHeaderPath = os.path.relpath(self.FRAMEWORK_CURRENT_VERSION_HEADERS, current_working_dir)
-            currentVersionDocsPath = os.path.relpath(self.FRAMEWORK_CURRENT_VERSION_DOCS, current_working_dir)
+            currentVersionHeaderPath = os.path.relpath(self.FRAMEWORK_CURRENT_VERSION_HEADERS, headerdoc_process_dir)
+            currentVersionDocsPath = os.path.relpath(self.FRAMEWORK_CURRENT_VERSION_DOCS, headerdoc_process_dir)
 
             headerdoc2htmlScript = "headerdoc2html -o {} {}".format(currentVersionDocsPath, currentVersionHeaderPath)
 
-            subprocess.check_call(headerdoc2htmlScript, shell=True)
-            subprocess.check_call("gatherheaderdoc {}".format(currentVersionDocsPath), shell=True)
+            subprocess.check_call(headerdoc2htmlScript, cwd=headerdoc_process_dir, shell=True)
+            subprocess.check_call("gatherheaderdoc {}".format(currentVersionDocsPath), cwd=headerdoc_process_dir, shell=True)
 
             shutil.copytree(os.path.join(headerdoc_process_dir, "Resources"), os.path.join(currentVersionDocsPath, "Resources"))
-
-            os.chdir(original_working_dir)
 
             return SUCCESS
 
