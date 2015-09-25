@@ -21,7 +21,7 @@ class PublishStaticFrameworkToBuildArtifacts(Command):
         self._inheritAttribute("ABS_ARTIFACTS_DIRECTORY", script)
         self._inheritAttribute("TMPPACKAGEDIR", script)
         self._inheritAttribute("SDK_VERSION_STRING", script)
-        basepath = os.path.join(self.ABS_ARTIFACTS_DIRECTORY, "fiftythree-public-sdk-{}".format(self.SDK_VERSION_STRING))
+        basepath = os.path.join(self.ABS_ARTIFACTS_DIRECTORY, "{}.build".format(self.PACKAGENAME), "fiftythree-public-sdk-{}".format(self.SDK_VERSION_STRING))
         archiveName = shutil.make_archive(basepath, 
                             self.ARCHIVE_FORMAT, 
                             os.path.abspath(os.path.join(self.TMPPACKAGEDIR, os.pardir)), 
