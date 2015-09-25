@@ -16,13 +16,14 @@ from ftsdk.publishers import PublishStaticFrameworkToBuildArtifacts
 from ftsdk.validators import CheckForArchitectures
 
 if __name__ == '__main__':
-    cibuildScript = Script("Default publishing command.", 
+    cibuildScript = Script("Default publishing command.",
                    XCToolUseExistingArtifacts(),
                    CheckForArchitectures(),
                    MergeArchives(),
                    StripArchives(),
                    MakeFatArchive(),
                    CopyPublicHeaders(),
+                   HeaderDocGen(),
                    MakeFrameworkPlist(),
                    MakeStaticFramework(),
                    CopySampleApp(),

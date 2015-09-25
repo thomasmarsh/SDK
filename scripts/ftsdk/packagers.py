@@ -25,9 +25,9 @@ class XCRunCommand(Command):
     '''
     Common baseclass for commands that use 'xcrun' to select and use build tools.
     '''
-    
+
     __metaclass__ = ABCMeta
-    
+
     def setup(self, script, previousCommand):
         self._inheritAttribute("LOCAL_REPOSITORY", script)
         self._inheritAttribute("ARTIFACTS_DIRECTORY", script)
@@ -38,13 +38,13 @@ class XCRunCommand(Command):
         if not os.path.isdir(self.ABS_ARTIFACTS_DIRECTORY):
             script.ENVIRONMENT.error("\033[31mNo build directory (expected build output at {})\033[0m".format(self.ABS_ARTIFACTS_DIRECTORY))
             return ERROR_UNEXPECTED_STATE
-        
+
         if SUCCESS != script.ENVIRONMENT.checkTool('xcrun', '''
             \033[1mxcrun\033[0m\033[31m is required\033[0m
-            
+
             get it:
                 xcode-select --install
-        
+
             '''):
             return ERROR_MISSING_TOOLS
 
@@ -56,13 +56,13 @@ class MergeArchives(XCRunCommand):
     '''
     Merges the object files from the SDK and Core archives into a single archive.
     '''
-   
+
     def run(self, script, previousCommand):
         self._inheritAttribute("PACKAGENAME", script)
         sdkArchives = {}
         coreArchives = {}
         project = self.PACKAGENAME
-        
+
         for sdk in self.SDKS:
             targetPath = self._makeTargetPath(project, self.target, sdk)
             if os.path.isdir(targetPath):
@@ -76,18 +76,18 @@ class MergeArchives(XCRunCommand):
                         script.ENVIRONMENT.debug("Found sdkArchives {} and {}".format(sdkArchivePath, coreArchivePath))
                         sdkArchives[sdkArchivePath] = architectureName
                         coreArchives[coreArchivePath] = architectureName
-                        
-            
+
+
         if len(sdkArchives) == 0:
             script.ENVIRONMENT.error("No built sdkArchives found.")
             return ERROR_UNEXPECTED_STATE
-        
+
         self._inheritAttribute("TMPBUILDDIR", script)
 
         expandedArchives = {}
         self._expandAll(sdkArchives, expandedArchives)
         self._expandAll(coreArchives, expandedArchives)
-        
+
         mergedArchives = {}
         for expandedArchive, archiveArch in expandedArchives.iteritems():
             mergedArchive = os.path.join(self.TMPBUILDDIR, "lib", archiveArch, "lib{}.a".format(self.PACKAGENAME))
@@ -112,7 +112,7 @@ class MergeArchives(XCRunCommand):
             shutil.copyfile(archivePath, copiedPath)
             outPaths[os.path.dirname(copiedPath)] = archiveArch
             subprocess.check_call('xcrun -sdk iphoneos ar x {}'.format(copiedPath), cwd=os.path.dirname(copiedPath), shell=True)
-        
+
     def _makeTargetPath(self, project, target, sdk):
         projectdirname = "{}.build".format(project)
         targetdirname = "{}-{}".format(target, sdk)
@@ -129,7 +129,7 @@ class StripArchives(XCRunCommand):
         self._inheritAttribute("ARCHIVES", script, dict)
         self._inheritAttribute("TMPBUILDDIR", script)
         self._inheritAttribute("PACKAGENAME", script)
-        
+
         unstrippedArchives = self.ARCHIVES.copy()
         for archivePath, archiveArch in unstrippedArchives.iteritems():
             strippedPath = os.path.join(self.TMPBUILDDIR, "stripped", archiveArch, "lib{}.a".format(self.PACKAGENAME))
@@ -141,32 +141,32 @@ class StripArchives(XCRunCommand):
         return SUCCESS
 
 # +----------------------------------------------------------------------------------------------------------+
-    
+
 class MakeFatArchive(XCRunCommand):
     '''
     Combines archives provided in ARCHIVES into a single fat binary.
     '''
-        
+
     def run(self, script, previousCommand):
         self._inheritAttribute("ARCHIVES", script, type(dict))
         self._inheritAttribute("TMPBUILDDIR", script)
         self._inheritAttribute("FRAMEWORK_CURRENT_VERSION_ARCHIVE", script)
         self._inheritAttribute("PACKAGENAME", script)
-        
+
         lipocreate = ["xcrun -sdk iphoneos lipo", "-create"]
         for archivePath, archiveArch in self.ARCHIVES.iteritems():
             lipocreate.append("-arch {} {}".format(archiveArch, archivePath))
-        
+
         lipocreate.append("-o")
         fatArchive = os.path.join(self.TMPBUILDDIR, "lib{}.a".format(self.PACKAGENAME))
         lipocreate.append(fatArchive)
-        
+
         subprocess.check_call(' '.join(lipocreate), shell=True)
-        
+
         subprocess.call("xcrun -sdk iphoneos lipo -info {}".format(fatArchive), shell=True)
-        
+
         shutil.copy(fatArchive, self.FRAMEWORK_CURRENT_VERSION_ARCHIVE)
-        
+
         return SUCCESS
 
 # +----------------------------------------------------------------------------------------------------------+
@@ -175,9 +175,9 @@ class CopyPublicHeaders(XCRunCommand, SearchPathAgent):
     '''
     Finds and copies the publishes headers of the SDK to the framework.
     '''
-    
+
     FIFTYTHREE_HEADER_NAME = "FiftyThreeSdk.h"
-    
+
     def onVisitFile(self, parentPath, rootPath, containingFolderName, filename, fqFilename):
         if filename == self.FIFTYTHREE_HEADER_NAME:
             setattr(self, "HEADERFOLDER", parentPath)
@@ -188,16 +188,16 @@ class CopyPublicHeaders(XCRunCommand, SearchPathAgent):
     def setup(self, script, previousCommand):
         setattr(self, "HEADERINCLUDEPATTERN", re.compile("^\\s*#(?:include|import)\\s*[<\"](\\S+)[\">]"))
         return super(CopyPublicHeaders, self).setup(script, previousCommand)
-    
+
     def run(self, script, previousCommand):
         self._inheritAttribute("FRAMEWORK_CURRENT_VERSION_HEADERS", script)
-        
+
         headerSearchPath = SearchPath(script.ENVIRONMENT, self.LOCAL_REPOSITORY)
         headerSearchPath.scanDirs(os.path.join(self.LOCAL_REPOSITORY, "FiftyThreeSdk"), self)
         if not hasattr(self, "SDKHEADER"):
             script.ENVIRONMENT.error("Failed to find the master SDK include {}".format(self.FIFTYTHREE_HEADER_NAME))
             return ERROR_NOTFOUND
-        
+
         shutil.copy(self.SDKHEADER, self.FRAMEWORK_CURRENT_VERSION_HEADERS)
 
         with open(self.SDKHEADER, "r") as sdkHeader:
@@ -208,11 +208,11 @@ class CopyPublicHeaders(XCRunCommand, SearchPathAgent):
             shutil.copy(publicHeader, self.FRAMEWORK_CURRENT_VERSION_HEADERS)
 
         return SUCCESS
-    
+
     # +--------------------------------------------------------------------------------------------------+
     # | PRIVATE
     # +--------------------------------------------------------------------------------------------------+
-    
+
     def _find_public_headers(self, basepath, src_lines):
         includes = []
         for line in src_lines:
@@ -221,6 +221,33 @@ class CopyPublicHeaders(XCRunCommand, SearchPathAgent):
                 includes.append(os.path.join(basepath, match.group(1)))
 
         return includes
+
+# +----------------------------------------------------------------------------------------------------------+
+
+class HeaderDocGen(Command):
+
+    def whereIs(program):
+    for path in os.environ.get('PATH', '').split(':'):
+        if os.path.exists(os.path.join(path, program)) and not os.path.isdir(os.path.join(path, program)):
+            return os.path.join(path, program)
+    return None
+
+    def run(self, script, previousCommand):
+        location = whereIs('headerdoc2html')
+        if location is not None:
+            headerdoc_resource_dir = os.path.join(self.REPOSITORY, 'scripts', 'HeaderDoc')
+            headerdocConfigPath = os.path.join(headerdoc_resource_dir, "headerDoc2HTML.config")
+
+            subprocess.check_call("headerdoc2html -c {} -o {} {}".format(headerdocConfigPath, self.FRAMEWORK_CURRENT_VERSION_DOCS, self.FRAMEWORK_CURRENT_VERSION_HEADERS))
+            subprocess.check_call('gatherheaderdoc {}'.format(self.FRAMEWORK_CURRENT_VERSION_DOCS))
+
+            shutil.copytree(os.path.join(headerdoc_resource_dir, "Resources"), self.FRAMEWORK_CURRENT_VERSION_DOCS)
+
+            return SUCCESS
+
+        else:
+            script.ENVIRONMENT.error("Command headerdoc2html does not exist")
+            return ERROR_NOTFOUND
 
 # +----------------------------------------------------------------------------------------------------------+
 
@@ -233,7 +260,7 @@ class MakeFrameworkPlist(XCRunCommand):
         self._inheritAttribute("FRAMEWORK_CURRENT_VERSION_RESOURCES", script)
         plistPath = os.path.join(self.FRAMEWORK_CURRENT_VERSION_RESOURCES, "Info.plist")
         JinjaTemplates.getTemplate(script, "Info.plist.jinja").renderTo(plistPath)
-        
+
         if not os.path.isfile(plistPath):
             script.ENVIRONMENT.error("Failed to write Info.plist.jinja to {}".format(plistPath))
             return ERROR_UNEXPECTED_STATE
@@ -251,22 +278,22 @@ class CopySampleApp(Command):
     def run(self, script, previousCommand):
         self._inheritAttribute("TMPPACKAGEDIR", script)
         self._inheritAttribute("LOCAL_REPOSITORY", script)
-        
+
         script.ENVIRONMENT.info('Copying Sample App contents to %s' % self.TMPPACKAGEDIR)
 
         sample_app_dir = os.path.join(self.LOCAL_REPOSITORY, 'FiftyThreeSimpleSampleApp')
         test_app_src_dir = os.path.join(self.LOCAL_REPOSITORY, 'FiftyThreeSdkTestApp', 'TestApp', 'TestApp')
-        
+
         target_dir = os.path.join(self.TMPPACKAGEDIR, 'FiftyThreeSimpleSampleApp' )
         target_src_dir = os.path.join(target_dir, 'FiftyThreeSimpleSampleApp' )
         target_shaders_dir = os.path.join(target_src_dir, 'Shaders' )
-        
+
         shutil.copytree(sample_app_dir, target_dir, symlinks=True)
         mkdirs(target_shaders_dir)
-        
+
         for source_file in glob.glob(os.path.join(test_app_src_dir, "*.[hm]")):
             shutil.copy(source_file, target_src_dir)
-        
+
         for shader_file in glob.glob(os.path.join(test_app_src_dir, "Shaders", "*.*")):
             shutil.copy(shader_file, target_shaders_dir)
 
@@ -289,7 +316,7 @@ class CopyStaticDocs(Command):
     '''
     Copy everything under the docs folder to the sdk package.
     '''
-    
+
     def run(self, script, previousCommand):
         self._inheritAttribute("LOCAL_REPOSITORY", script)
         self._inheritAttribute("TMPPACKAGEDIR", script)
@@ -301,16 +328,16 @@ class CopyStaticDocs(Command):
             else:
                 shutil.copy(fullpath, self.TMPPACKAGEDIR)
         return SUCCESS
-    
+
 # +----------------------------------------------------------------------------------------------------------+
-    
+
 class MakeStaticFramework(Command):
     '''
     Packages up binaries and creates the required folder structure to allow other build steps to populate a
     static framework. The root of this framework will be defined in the setup phase as TMPPACKAGEDIR. This
     directory will be deleted in the teardown phase unless --messy is specified.
     '''
-    
+
     def setup(self, script, previousCommand):
         result = super(MakeStaticFramework, self).setup(script, previousCommand)
         if SUCCESS != result:
@@ -325,7 +352,7 @@ class MakeStaticFramework(Command):
             self._inheritAttribute("TMPBUILDDIR", script)
         except MissingAttributeException:
             setattr(self, "TMPBUILDDIR", tempfile.mkdtemp(dir=self.ABS_ARTIFACTS_DIRECTORY))
-            
+
         setattr(self, "TMPPACKAGEDIR", os.path.join(self.TMPBUILDDIR, "fiftythree-public-sdk-{}".format(self.SDK_VERSION_STRING)))
 
         self._inheritAttribute("ABS_ARTIFACTS_DIRECTORY", script)
@@ -334,7 +361,7 @@ class MakeStaticFramework(Command):
         setattr(self, "FRAMEWORK_VERSION", "A")
 
         setattr(self, "FRAMEWORK_BUNDLE", os.path.join(self.TMPPACKAGEDIR, "{}.framework".format(self.PACKAGENAME)))
-        
+
         targetDir = os.path.join(self.ABS_ARTIFACTS_DIRECTORY, "framework")
         if os.path.exists(targetDir):
             script.ENVIRONMENT.info("Cleaning existing framework under {}".format(targetDir))
@@ -344,23 +371,23 @@ class MakeStaticFramework(Command):
         versionedResources = os.path.join(versionedDir, "Resources")
         versionedHeaders   = os.path.join(versionedDir, "Headers")
         versionedDocs      = os.path.join(versionedDir, "Documentation")
-        
+
         mkdirs(versionedDir)
         mkdirs(versionedResources)
         mkdirs(versionedHeaders)
         mkdirs(versionedDocs)
-        
+
         setattr(self, "FRAMEWORK_CURRENT_VERSION_HEADERS", versionedHeaders)
         setattr(self, "FRAMEWORK_CURRENT_VERSION_RESOURCES", versionedResources)
         setattr(self, "FRAMEWORK_CURRENT_VERSION_DOCS", versionedDocs)
         setattr(self, "FRAMEWORK_CURRENT_VERSION_ARCHIVE", os.path.join(versionedDir, self.PACKAGENAME))
-        
+
         currentVersion = os.path.join(self.FRAMEWORK_BUNDLE, "Versions", "Current")
         os.symlink(versionedDir, currentVersion)
         os.symlink(versionedResources, os.path.join(self.FRAMEWORK_BUNDLE, "Resources"))
         os.symlink(versionedDocs, os.path.join(self.FRAMEWORK_BUNDLE, "Documentation"))
         os.symlink(versionedHeaders, os.path.join(self.FRAMEWORK_BUNDLE, "Headers"))
-                              
+
         return SUCCESS
 
     def run(self, script, previousCommand):
@@ -377,7 +404,3 @@ class MakeStaticFramework(Command):
             shutil.rmtree(self.TMPBUILDDIR)
             delattr(self, "TMPBUILDDIR")
         return super(MakeStaticFramework, self).teardown(script, previousCommand)
-
-
-
-
