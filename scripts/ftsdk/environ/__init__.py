@@ -17,6 +17,8 @@ from distutils.util import strtobool
 import string
 import re
 import time
+import threading
+from ftsdk.osutil import get_terminal_size
 
 def _is_concrete_environment_subclass(environmentClass):
     if inspect.isclass(environmentClass) and issubclass(environmentClass, Environment) and not inspect.isabstract(environmentClass):
@@ -33,6 +35,9 @@ def getAllEnvironments():
         setattr(module, "__envtype_cache__", environmentsDict)
     return getattr(module, "__envtype_cache__")
 
+def bold(text):
+    return "\x1b[1m" + text + "\x1b[0m"
+
 # +----------------------------------------------------------------------------------------------------------+
 
 class Environment(object):
@@ -44,6 +49,7 @@ class Environment(object):
     @abstractmethod
     def __init__(self, args):
         super(Environment, self).__init__()
+        self._console_lock = threading.RLock()
         self._loglevel = 0
         self._contexts = []
         self._indents = 0
@@ -108,6 +114,11 @@ class Environment(object):
                 if self.willPrintVerbose():
                     self.verbose("Attribute {}={} was provided by quering git".format(name, str(value)))
                 return value
+            elif name == 'GITCOMMIT_SHORT':
+                value = self._getCurrentGitHash(short_hash=True)
+                if self.willPrintVerbose():
+                    self.verbose("Attribute {}={} was provided by quering git".format(name, str(value)))
+                return value
             raise AttributeError(name)
 
     # +---------------------------------------------------------------------------+
@@ -119,16 +130,24 @@ class Environment(object):
         '''
         Increase console indentation by 1.
         '''
-        self._indents += 1
-        self._resetIndent()
-    
+        self._console_lock.acquire()
+        try:
+            self._indents += 1
+            self._resetIndent()
+        finally:
+            self._console_lock.release()
+
     def unshift(self):
         '''
         Decrease console indentation by 1.
         '''
-        if self._indents > 0:
-            self._indents -= 1
-            self._resetIndent()
+        self._console_lock.acquire()
+        try:
+            if self._indents > 0:
+                self._indents -= 1
+                self._resetIndent()
+        finally:
+            self._console_lock.release()
 
     def pushContext(self):
         '''
@@ -142,18 +161,26 @@ class Environment(object):
                 console.popContext()
         '''
         # For now context==indentation but this may change in the future.
-        self._contexts.append(self._indents)
-        
+        self._console_lock.acquire()
+        try:
+            self._contexts.append(self._indents)
+        finally:
+            self._console_lock.release()
+
     def popContext(self):
         '''
         Pop the last console state from the context stack and restore.
         '''
         # For now context==indentation but this may change in the future.
-        if len(self._contexts) > 0:
-            currentIndents = self._indents
-            self._indents = self._contexts.pop()
-            if currentIndents != self._indents:
-                self._resetIndent()
+        self._console_lock.acquire()
+        try:
+            if len(self._contexts) > 0:
+                currentIndents = self._indents
+                self._indents = self._contexts.pop()
+                if currentIndents != self._indents:
+                    self._resetIndent()
+        finally:
+            self._console_lock.release()
 
     def willPrintVerbose(self):
         return (self._loglevel > 1)
@@ -179,8 +206,43 @@ class Environment(object):
         self._printMessage(message, *args)
 
     def stdout(self, *tokens):
-        for token in tokens:
-            print token,
+        self._console_lock.acquire()
+        try:
+            for token in tokens:
+                print token,
+        finally:
+            self._console_lock.release()
+
+    def hr(self):
+        self._console_lock.acquire()
+        try:
+            terminalWidth = get_terminal_size()[0] - len(self._indent)
+            line_string = self._indent + (unichr(0x2500) * terminalWidth)
+            print line_string
+        finally:
+            self._console_lock.release()
+
+    # +---------------------------------------------------------------------------+
+    # | PRIVATE :: Console
+    # +---------------------------------------------------------------------------+
+    def _resetIndent(self):
+        self._console_lock.acquire()
+        try:
+            self._indent = ""
+            for i in range(0, self._indents):  # @UnusedVariable
+                self._indent += self.INDENTATION
+        finally:
+            self._console_lock.release()
+
+    def _printMessage(self, message, *args):
+        self._console_lock.acquire()
+        try:
+            if len(args) > 0:
+                print self._indent + (message % args)
+            else:
+                print self._indent + message
+        finally:
+            self._console_lock.release()
 
     # +---------------------------------------------------------------------------+
     # | PRIVATE
@@ -193,24 +255,8 @@ class Environment(object):
         value = tags.split('\n')[0]
         return re.match("sdk(\d+\.\d+\.\d+)", value, flags=re.IGNORECASE).group(1)
     
-    def _getCurrentGitHash(self):
-        return subprocess.check_output('git rev-parse HEAD', shell=True).strip()
-
-    def _resetIndent(self):
-        self._indent = ""
-        for i in range(0, self._indents):  # @UnusedVariable
-            self._indent += self.INDENTATION
-            
-    def _printMessage(self, message, *args):
-        if len(args) > 0:
-            print self._indent + (message % args)
-        else:
-            print self._indent + message
-
-    def _colourize(self, text, colour):
-        if string.lower(colour) in ('red'):
-            return "\x1b[31m" + text + "\x1b[0m"
-        return text
+    def _getCurrentGitHash(self, short_hash=False):
+        return subprocess.check_output('git rev-parse{} HEAD'.format(" --short" if short_hash else ""), shell=True).strip()
 
 # +----------------------------------------------------------------------------------------------------------+
 

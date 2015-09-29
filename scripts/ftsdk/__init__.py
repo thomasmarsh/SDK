@@ -23,6 +23,7 @@ ERROR_UNEXPECTED_STATE = 2
 ERROR_SHELLSCRIPT = 3
 ERROR_INVALID_INPUT = 4
 ERROR_NOTFOUND = 5
+ERROR_UNEXPECTED_RESPONSE = 6
 
     
 # +----------------------------------------------------------------------------------------------------------+
