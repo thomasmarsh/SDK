@@ -23,6 +23,6 @@ USER_HEADER_SEARCH_PATHS = $(inherited) $(FT_SUBPROJECT_HEADER_SEARCH_PATHS) "$(
 // instead we force clang to embed bit code in every .o file see:
 // http://stackoverflow.com/questions/31486232/how-do-i-xcodebuild-a-static-library-with-bitcode-enabled
 ENABLE_BITCODE[sdk=iphoneos9.*] = YES
-OTHER_CFLAGS[sdk=iphoneos9.*] = $(inherited) -fembed-bitcode
+OTHER_CFLAGS[sdk=iphoneos9.*] = $(inherited) -fembed-bitcode -Qunused-arguments
 
 IPHONEOS_DEPLOYMENT_TARGET = 7.0

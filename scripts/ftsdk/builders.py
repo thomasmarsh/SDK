@@ -21,9 +21,9 @@ class XCToolCommand(Command):
     reproduce CI builds on a developer machine. The state of the local repository after this build completes
     should be suitable for a packager to use.
     '''
-    
+
     __metaclass__ = ABCMeta
-    
+
     @abstractmethod
     def __init__(self, scheme, command, sdk=None, buildconfig=None):
         super(XCToolCommand, self).__init__()
@@ -52,15 +52,19 @@ class XCToolCommand(Command):
         self._inheritAttributeOrDefault("DEBUG_INFORMATION_FORMAT", script, "dwarf-with-dsym")
         self._inheritAttributeOrDefault("CODE_SIGN_IDENTITY", script, "")
         self._inheritAttributeOrDefault("CODE_SIGNING_REQUIRED", script, "NO")
+        self._inheritAttributeOrDefault("ENABLE_BITCODE", script, "YES")
+        self._inheritAttributeOrDefault("OTHER_CFLAGS", script, "-fembed-bitcode -Qunused-arguments")
         self._inheritAttribute("BUILD_BRANCH_NAME", script)
         self._inheritAttribute('SDK_VERSION_STRING', script)
-        
+
         required = ['xctool',
                 'ONLY_ACTIVE_ARCH={}'.format(self.ONLY_ACTIVE_ARCH),
                 '-scheme "{}"'.format(self._scheme),
                 self._command,
                 '-workspace "{}"'.format(workspace),
                 '-configuration "{}"'.format(self.target),
+                'ENABLE_BITCODE[sdk=iphoneos9.*]={}'.format(self.ENABLE_BITCODE),
+                'OTHER_CFLAGS="{}"'.format(self.OTHER_CFLAGS),
                 'BUNDLE_VERSION_STRING={}'.format(self.SDK_VERSION_STRING),
                 'BUILD_NAME={}'.format(self._scheme),
                 'DEBUG_INFORMATION_FORMAT={}'.format(self.DEBUG_INFORMATION_FORMAT),
@@ -80,28 +84,28 @@ class XCToolCommand(Command):
         if self.SDK is not None:
             required.append('-sdk {}'.format(self.SDK))
         return required
-    
+
     def setup(self, script, previousCommand):
         setattr(self, "SDKS", ["iphoneos", "iphonesimulator"])
         self._inheritAttribute("ARTIFACTS_DIRECTORY", script)
-        
+
         if SUCCESS != script.ENVIRONMENT.checkTool('xcode-select', '''
             \033[1mxcode\033[0m\033[31m is required\033[0m
-            
+
             To get it download from https://developer.apple.com/
-        
+
             '''):
             return ERROR_MISSING_TOOLS
-        
+
         if SUCCESS != script.ENVIRONMENT.checkTool('xctool', '''
             \033[1mxctool\033[0m\033[31m is required\033[0m
-            
+
             get it:
                 brew install xctool
-        
+
             '''):
             return ERROR_MISSING_TOOLS
-        
+
         self._inheritAttribute("LOCAL_REPOSITORY", script)
         setattr(self, "ABS_ARTIFACTS_DIRECTORY", os.path.join(self.LOCAL_REPOSITORY, self.ARTIFACTS_DIRECTORY))
         return SUCCESS
@@ -110,32 +114,32 @@ class XCToolCommand(Command):
         self._inheritAttribute("target", script)
         self._inheritAttribute("ABS_ARTIFACTS_DIRECTORY", script)
         mkdirs(self.ARTIFACTS_DIRECTORY)
-        
+
         setattr(self, "WORKSPACE", os.path.join(self.LOCAL_REPOSITORY, "FiftyThreeSdkTestApp", "FiftyThreeSdkTestApp.xcworkspace"))
-        
+
         script.ENVIRONMENT.info("will build the {} target of the {} workspace into {}".format(self.target, self.WORKSPACE, self.ABS_ARTIFACTS_DIRECTORY))
-        
+
         XCTOOL_COMMAND = self._getXCToolCommand(script, self.WORKSPACE, self.ABS_ARTIFACTS_DIRECTORY)
-        
+
         # Build
         subprocess.check_call(' '.join(XCTOOL_COMMAND), shell=True)
-        
+
         return SUCCESS
 
-# +----------------------------------------------------------------------------------------------------------+ 
+# +----------------------------------------------------------------------------------------------------------+
 
 class Nuke(Command):
     '''
     rm -rf the build directory.
     '''
-    
+
     def run(self, script, previousCommand):
         self._inheritAttribute("LOCAL_REPOSITORY", script)
         self._inheritAttribute("ARTIFACTS_DIRECTORY", script)
         setattr(self, "ABS_ARTIFACTS_DIRECTORY", os.path.join(self.LOCAL_REPOSITORY, self.ARTIFACTS_DIRECTORY))
         shutil.rmtree(self.ABS_ARTIFACTS_DIRECTORY)
         return SUCCESS
-    
+
 # +----------------------------------------------------------------------------------------------------------+
 
 class XCToolBuild(XCToolCommand):
@@ -145,7 +149,7 @@ class XCToolBuild(XCToolCommand):
     def __init__(self):
         super(XCToolBuild, self).__init__("TestApp", "build", sdk="iphoneos")
 
-# +----------------------------------------------------------------------------------------------------------+ 
+# +----------------------------------------------------------------------------------------------------------+
 
 class XCToolClean(XCToolCommand):
     '''
@@ -154,8 +158,8 @@ class XCToolClean(XCToolCommand):
     def __init__(self):
         super(XCToolClean, self).__init__("TestApp", "clean")
 
-# +----------------------------------------------------------------------------------------------------------+ 
-    
+# +----------------------------------------------------------------------------------------------------------+
+
 class XCToolBuildTests(XCToolCommand):
     '''
     Build the SDK unit tests.
@@ -164,7 +168,7 @@ class XCToolBuildTests(XCToolCommand):
     def __init__(self):
         super(XCToolBuildTests, self).__init__("FiftyThreeSdkUnitTests", "build-tests", "iphonesimulator")
 
-# +----------------------------------------------------------------------------------------------------------+ 
+# +----------------------------------------------------------------------------------------------------------+
 
 class XCToolCleanTests(XCToolCommand):
     '''
@@ -173,7 +177,7 @@ class XCToolCleanTests(XCToolCommand):
     def __init__(self):
         super(XCToolCleanTests, self).__init__("FiftyThreeSdkUnitTests", "clean",)
 
-# +----------------------------------------------------------------------------------------------------------+ 
+# +----------------------------------------------------------------------------------------------------------+
 
 class XCToolUseExistingArtifacts(XCToolCommand):
     '''
@@ -181,11 +185,11 @@ class XCToolUseExistingArtifacts(XCToolCommand):
     '''
     def __init__(self):
         super(XCToolUseExistingArtifacts, self).__init__("", "")
-        
+
     def run(self, script, previousCommand):
         return SUCCESS
 
-# +----------------------------------------------------------------------------------------------------------+ 
+# +----------------------------------------------------------------------------------------------------------+
 
 class VersionSdkSource(Command):
     '''
@@ -200,7 +204,7 @@ class VersionSdkSource(Command):
         setattr(self, "FRAMEWORK_MAJOR_VERSION", version_match.group(1))
         setattr(self, "FRAMEWORK_MINOR_VERSION", version_match.group(2))
         setattr(self, "FRAMEWORK_PATCH_VERSION", version_match.group(3))
-        
+
         setattr(self, "FTSDKVERSIONINFO_PATH", os.path.join(self.LOCAL_REPOSITORY, "FiftyThreeSdk", "FiftyThreeSdk", "FTSDKVersionInfo.m"))
         JinjaTemplates.getTemplate(script, "FTSDKVersionInfo.m.jinja").renderTo(self.FTSDKVERSIONINFO_PATH)
         return SUCCESS
@@ -210,5 +214,3 @@ class VersionSdkSource(Command):
         if not self.messy:
             subprocess.check_call('git checkout {}'.format(self.FTSDKVERSIONINFO_PATH), shell=True)
         return super(VersionSdkSource, self).teardown(script, previousCommand)
-
-
