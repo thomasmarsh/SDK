@@ -26,7 +26,7 @@ ARCHS = $(ARCHS_STANDARD_INCLUDING_64_BIT)
 DEBUG_INFORMATION_FORMAT = dwarf-with-dsym
 
 ENABLE_BITCODE[sdk=iphoneos9.*] = YES
-OTHER_CFLAGS[sdk=iphoneos9.*] = $(inherited) -fembed-bitcode
+OTHER_CFLAGS[sdk=iphoneos9.*] = $(inherited) -fembed-bitcode -Qunused-arguments
 
 // Override the deployment target and SDK root defaults while the FiftyThreeSdk project continues to
 // support iOS 7
