@@ -25,6 +25,9 @@ ARCHS = $(ARCHS_STANDARD_INCLUDING_64_BIT)
 // TODO: Revert once we sort out the "only run Crashlytics on Jenkins" issue
 DEBUG_INFORMATION_FORMAT = dwarf-with-dsym
 
+ENABLE_BITCODE[sdk=iphoneos9.*] = YES
+OTHER_CFLAGS[sdk=iphoneos9.*] = $(inherited) -fembed-bitcode
+
 // Override the deployment target and SDK root defaults while the FiftyThreeSdk project continues to
 // support iOS 7
 IPHONEOS_DEPLOYMENT_TARGET = 7.0
