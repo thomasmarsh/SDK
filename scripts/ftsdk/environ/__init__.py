@@ -250,10 +250,13 @@ class Environment(object):
     def _getBranchnameFromGit(self):
         return subprocess.check_output('git rev-parse --abbrev-ref HEAD', shell=True).strip()
         
-    def _getSdkVersionFromGitTag(self):
-        tags = subprocess.check_output('git tag -l --sort=-refname sdk*', shell=True)
-        value = tags.split('\n')[0]
-        return re.match("sdk(\d+\.\d+\.\d+)", value, flags=re.IGNORECASE).group(1)
+    def _getSdkVersionFromGitTag(self, remote="origin"):
+        if not hasattr(self, "_gittag"):
+            subprocess.check_output('git fetch --tags {}'.format(remote), shell=True)
+            tags = subprocess.check_output('git tag -l --sort=-refname sdk*', shell=True)
+            value = tags.split('\n')[0]
+            setattr(self, "_gittag", re.match("sdk(\d+\.\d+\.\d+)", value, flags=re.IGNORECASE).group(1))
+        return self._gittag
     
     def _getCurrentGitHash(self, short_hash=False):
         return subprocess.check_output('git rev-parse{} HEAD'.format(" --short" if short_hash else ""), shell=True).strip()

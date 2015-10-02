@@ -12,7 +12,7 @@ from ftsdk.builders import XCToolUseExistingArtifacts
 import sys
 from ftsdk.packagers import MergeArchives, MakeFatArchive, CopyPublicHeaders, HeaderDocGen,\
     MakeFrameworkPlist,MakeStaticFramework, StripArchives, CopySampleApp, AddReadmeToSdk, CopyStaticDocs
-from ftsdk.publishers import PublishStaticFrameworkToBuildArtifacts
+from ftsdk.publishers import PublishStaticFrameworkToBuildArtifacts, PublishStaticFrameworkToGithubRelease
 from ftsdk.validators import CheckForArchitectures
 
 if __name__ == '__main__':
@@ -29,7 +29,8 @@ if __name__ == '__main__':
                    CopySampleApp(),
                    AddReadmeToSdk(),
                    CopyStaticDocs(),
-                   PublishStaticFrameworkToBuildArtifacts())
+                   PublishStaticFrameworkToBuildArtifacts(),
+                   PublishStaticFrameworkToGithubRelease())
 
     cibuildScript.ENVIRONMENT.info("Package existing artifacts from a previous build.")
     sys.exit(cibuildScript.run())
